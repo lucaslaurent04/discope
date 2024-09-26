@@ -1,0 +1,59 @@
+[
+    {
+        "name": "identity\\IdentityType",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "code": "I",
+                "description": "Particulier (personne physique)"
+            },
+            {
+                "id": 2,
+                "code": "SE",
+                "description": "Indépendant"
+            },
+            {
+                "id": 3,
+                "code": "C",
+                "description": "Société"
+            },
+            {
+                "id": 4,
+                "code": "NP",
+                "description": "Groupes, Associations et Écoles (ASBL, association de fait, ..."
+            },
+            {
+                "id": 5,
+                "code": "PA",
+                "description": "Administration publique"
+            }
+        ]
+    },
+    {
+        "name": "identity\\IdentityType",
+        "lang": "en",
+        "data": [
+            {
+                "id": 1,
+                "description": "Individual (natural person)"
+            },
+            {
+                "id": 2,
+                "description": "Self-employed"
+            },
+            {
+                "id": 3,
+                "description": "Company"
+            },
+            {
+                "id": 4,
+                "description": "Groups, Associations, and Schools (non-profit organizations, informal associations, ...)"
+            },
+            {
+                "id": 5,
+                "description": "Public administration"
+            }
+        ]
+    }
+]

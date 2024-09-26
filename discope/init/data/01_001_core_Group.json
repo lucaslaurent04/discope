@@ -1,0 +1,204 @@
+[
+    {
+        "name": "core\\Group",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "admin",
+                "display_name": "*",
+                "description": "Administrateur système"
+            },
+            {
+                "id": 2,
+                "name": "users",
+                "display_name": null,
+                "description": null
+            },
+            {
+                "id": 3,
+                "name": "sale.default.administrator",
+                "display_name": "Vente / * / Administrateur",
+                "description": ""
+            },
+            {
+                "id": 4,
+                "name": "sale.default.user",
+                "display_name": "Vente / * / Utilisateur",
+                "description": ""
+            },
+            {
+                "id": 5,
+                "name": "booking.default.administrator",
+                "display_name": "Réservation / */ Administrateur",
+                "description": ""
+            },
+            {
+                "id": 6,
+                "name": "booking.default.user",
+                "display_name": "Réservation / * / Utilisateur",
+                "description": ""
+            },
+            {
+                "id": 7,
+                "name": "finance.default.user",
+                "display_name": "Comptabilité / * / Utilisateur",
+                "description": ""
+            },
+            {
+                "id": 8,
+                "name": "finance.default.administrator",
+                "display_name": "Comptabilité / * / Administrateur",
+                "description": ""
+            },
+            {
+                "id": 9,
+                "name": "stats.default.administrator",
+                "display_name": "Stats / * / Administrateur",
+                "description": ""
+            },
+            {
+                "id": 10,
+                "name": "stats.default.user",
+                "display_name": "Stats / * / Utilisateur",
+                "description": ""
+            },
+            {
+                "id": 11,
+                "name": "documents.default.administrator",
+                "display_name": "Documents / * / Administrateur",
+                "description": ""
+            },
+            {
+                "id": 12,
+                "name": "documents.default.user",
+                "display_name": "Document / * / Utilisateur",
+                "description": ""
+            },
+            {
+                "id": 13,
+                "name": "setting.default.administrator",
+                "display_name": "Configuration / * / Administrateur",
+                "description": ""
+            },
+            {
+                "id": 14,
+                "name": "setting.default.user",
+                "display_name": "Configuration / * / Utilisateur",
+                "description": ""
+            },
+            {
+                "id": 15,
+                "name": "inventory.default.user",
+                "display_name": "Inventaire / * / Utilisateur",
+                "description": ""
+            },
+            {
+                "id": 16,
+                "name": "inventory.default.administrator",
+                "display_name": "Inventaire / * / Administrateur",
+                "description": ""
+            },
+            {
+                "id": 17,
+                "name": "pos.default.user",
+                "display_name": "Caisse / * / Utilisateur",
+                "description": ""
+            },
+            {
+                "id": 18,
+                "name": "pos.default.administrator",
+                "display_name": "Caisse / * / Administrateur",
+                "description": ""
+            },
+            {
+                "id": 19,
+                "name": "support.default.user",
+                "display_name": "Equipe de support",
+                "description": ""
+            }
+        ]
+    },
+    {
+        "name": "core\\Group",
+        "lang": "en",
+        "data": [
+            {
+                "id": 1,
+                "display_name": "System Administrator"
+            },
+            {
+                "id": 2,
+                "display_name": null
+            },
+            {
+                "id": 3,
+                "display_name": "Sales / * / Administrator"
+            },
+            {
+                "id": 4,
+                "display_name": "Sales / * / User"
+            },
+            {
+                "id": 5,
+                "display_name": "Booking / * / Administrator"
+            },
+            {
+                "id": 6,
+                "display_name": "Booking / * / User"
+            },
+            {
+                "id": 7,
+                "display_name": "Accounting / * / User"
+            },
+            {
+                "id": 8,
+                "display_name": "Accounting / * / Administrator"
+            },
+            {
+                "id": 9,
+                "display_name": "Stats / * / Administrator"
+            },
+            {
+                "id": 10,
+                "display_name": "Stats / * / User"
+            },
+            {
+                "id": 11,
+                "display_name": "Documents / * / Administrator"
+            },
+            {
+                "id": 12,
+                "display_name": "Documents / * / User"
+            },
+            {
+                "id": 13,
+                "display_name": "Configuration / * / Administrator"
+            },
+            {
+                "id": 14,
+                "display_name": "Configuration / * / User"
+            },
+            {
+                "id": 15,
+                "display_name": "Inventory / * / User"
+            },
+            {
+                "id": 16,
+                "display_name": "Inventory / * / Administrator"
+            },
+            {
+                "id": 17,
+                "display_name": "POS / * / User"
+            },
+            {
+                "id": 18,
+                "display_name": "POS / * / Administrator"
+            },
+            {
+                "id": 19,
+                "display_name": "Support Team"
+            }
+        ]
+    }
+]

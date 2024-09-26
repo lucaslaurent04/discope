@@ -1,0 +1,22 @@
+[
+    {
+        "name": "sale\\season\\SeasonCategory",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "OR"
+            }
+        ]
+    },
+    {
+        "name": "sale\\season\\SeasonCategory",
+        "lang": "en",
+        "data": [
+            {
+                "id": 1,
+                "name": "OR"
+            }
+        ]
+    }
+]

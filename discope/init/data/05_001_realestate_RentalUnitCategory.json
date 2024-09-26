@@ -1,0 +1,74 @@
+[
+    {
+        "name": "realestate\\RentalUnitCategory",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "SR - Salle de réunion",
+                "code": "SR",
+                "description": "Salle de réunion"
+            },
+            {
+                "id": 2,
+                "name": "CH - Chambre",
+                "code": "CH",
+                "description": "Chambre commune ou privative, avec ou sans équipements"
+            },
+            {
+                "id": 3,
+                "name": "AH - Appart'hôtel",
+                "code": "AH",
+                "description": "Appart'hôtel"
+            },
+            {
+                "id": 4,
+                "name": "RE - Réfectoire",
+                "code": "RE",
+                "description": "Réfectoire"
+            },
+            {
+                "id": 5,
+                "name": "SA - Salle",
+                "code": "SA",
+                "description": "Salle"
+            },
+            {
+                "id": 6,
+                "name": "AC - Mobilier, accessoires et équipement",
+                "code": "AC",
+                "description": "Mobilier, accessoires et équipement"
+            }
+        ]
+    },
+    {
+        "name": "realestate\\RentalUnitCategory",
+        "lang": "en",
+        "data": [
+            {
+                "id": 1,
+                "description": "Meeting room"
+            },
+            {
+                "id": 2,
+                "description": "Shared or private room, with or without equipment"
+            },
+            {
+                "id": 3,
+                "description": "Serviced apartment"
+            },
+            {
+                "id": 4,
+                "description": "Dining hall"
+            },
+            {
+                "id": 5,
+                "description": "Room"
+            },
+            {
+                "id": 6,
+                "description": "Furniture, accessories, and equipment"
+            }
+        ]
+    }
+]

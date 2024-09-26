@@ -1,0 +1,104 @@
+[
+    {
+        "name": "finance\\stats\\StatSection",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "ANIM",
+                "code": "ANIM",
+                "description": null,
+                "label": null,
+                "stat_chart_id": 1
+            },
+            {
+                "id": 2,
+                "name": "BAR",
+                "code": "BAR",
+                "description": null,
+                "label": null,
+                "stat_chart_id": 1
+            },
+            {
+                "id": 3,
+                "name": "BOU",
+                "code": "BOU",
+                "description": null,
+                "label": null,
+                "stat_chart_id": 1
+            },
+            {
+                "id": 4,
+                "name": "CAMP",
+                "code": "CAMP",
+                "description": null,
+                "label": null,
+                "stat_chart_id": 1
+            },
+            {
+                "id": 5,
+                "name": "DIV",
+                "code": "DIV",
+                "description": null,
+                "label": null,
+                "stat_chart_id": 1
+            },
+            {
+                "id": 6,
+                "name": "FRAI",
+                "code": "FRAI",
+                "description": null,
+                "label": null,
+                "stat_chart_id": 1
+            },
+            {
+                "id": 7,
+                "name": "GITE",
+                "code": "GITE",
+                "description": null,
+                "label": null,
+                "stat_chart_id": 1
+            },
+            {
+                "id": 8,
+                "name": "LOCS",
+                "code": "LOCS",
+                "description": null,
+                "label": null,
+                "stat_chart_id": 1
+            },
+            {
+                "id": 9,
+                "name": "RST",
+                "code": "RST",
+                "description": null,
+                "label": null,
+                "stat_chart_id": 1
+            },
+            {
+                "id": 10,
+                "name": "SEJ",
+                "code": "SEJ",
+                "description": null,
+                "label": null,
+                "stat_chart_id": 1
+            },
+            {
+                "id": 11,
+                "name": "VOY",
+                "code": "VOY",
+                "description": null,
+                "label": null,
+                "stat_chart_id": 1
+            },
+            {
+                "id": 12,
+                "name": "STAG",
+                "code": "STAG",
+                "description": null,
+                "label": null,
+                "stat_chart_id": 1
+            }
+        ]
+    }
+]

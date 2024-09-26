@@ -1,0 +1,58 @@
+[
+    {
+        "name": "finance\\tax\\VatRule",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "Vente TVA 0%",
+                "rate": 0.0000,
+                "type": "sale",
+                "account_id": 1
+            },
+            {
+                "id": 2,
+                "name": "Vente TVA 6%",
+                "rate": 0.0600,
+                "type": "sale",
+                "account_id": 1
+            },
+            {
+                "id": 3,
+                "name": "Vente TVA 12%",
+                "rate": 0.1200,
+                "type": "sale",
+                "account_id": 1
+            },
+            {
+                "id": 4,
+                "name": "Vente TVA 21%",
+                "rate": 0.2100,
+                "type": "sale",
+                "account_id": 1
+            }
+        ]
+    },
+    {
+        "name": "finance\\tax\\VatRule",
+        "lang": "en",
+        "data": [
+            {
+                "id": 1,
+                "name": "Sale VAT 0%"
+            },
+            {
+                "id": 2,
+                "name": "Sale VAT 6%"
+            },
+            {
+                "id": 3,
+                "name": "Sale VAT 12%"
+            },
+            {
+                "id": 4,
+                "name": "Sale VAT 21%"
+            }
+        ]
+    }
+]

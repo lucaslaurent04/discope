@@ -1,0 +1,6 @@
+{
+    "name": "documents",
+    "depends_on": [
+    ],
+    "apps": ["documents"]
+}

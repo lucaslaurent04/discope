@@ -1,0 +1,69 @@
+[
+    {
+        "name": "core\\setting\\SettingSection",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "Locale",
+                "description": "Paramètres régioniaux",
+                "code": "locale"
+            },
+            {
+                "id": 2,
+                "name": "Général",
+                "description": "Paramètres généraux et de formats",
+                "code": "main"
+            },
+            {
+                "id": 3,
+                "name": "Sécurité",
+                "description": "Paramètres de sécurité",
+                "code": "security"
+            },
+            {
+                "id": 4,
+                "name": "Unités",
+                "description": "Unités de mesures et systèmes d'unités",
+                "code": "units"
+            },
+            {
+                "id": 5,
+                "name": "Facturation",
+                "description": "Paramètres pour la création des factures",
+                "code": "invoice"
+            }
+        ]
+    },
+    {
+        "name": "core\\setting\\SettingSection",
+        "lang": "en",
+        "data": [
+            {
+                "id": 1,
+                "name": "Locale",
+                "description": "Regional settings"
+            },
+            {
+                "id": 2,
+                "name": "General",
+                "description": "General and format settings"
+            },
+            {
+                "id": 3,
+                "name": "Security",
+                "description": "Security settings"
+            },
+            {
+                "id": 4,
+                "name": "Units",
+                "description": "Measurement units and unit systems"
+            },
+            {
+                "id": 5,
+                "name": "Billing",
+                "description": "Settings for invoice creation"
+            }
+        ]
+    }
+]

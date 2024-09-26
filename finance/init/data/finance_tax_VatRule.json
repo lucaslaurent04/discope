@@ -1,0 +1,31 @@
+[
+    {
+        "name": "finance\\tax\\VatRule",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "Vente TVA 0%",
+                "rate": null,
+                "type": "sale"
+            },
+            {
+                "id": 2,
+                "name": "Vente TVA 6%",
+                "rate": null,
+                "type": "sale"
+            },
+            {
+                "id": 3,
+                "name": "Vente TVA 12%",
+                "rate": null,
+                "type": "sale"
+            },
+            {
+                "id": 4,
+                "name": "Vente TVA 21%",
+                "type": "sale"
+            }
+        ]
+    }
+]

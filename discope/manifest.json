@@ -1,0 +1,10 @@
+{
+    "name": "dispoce",
+    "depends_on": [
+        "core",
+        "identity",
+        "finance",
+        "sale",
+        "realestate"
+    ]
+}

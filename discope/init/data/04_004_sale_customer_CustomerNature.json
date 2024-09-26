@@ -1,0 +1,58 @@
+[
+    {
+        "name": "sale\\customer\\CustomerNature",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "code": "IN",
+                "description": "Individuels (particuliers)",
+                "rate_class_id": 4,
+                "customer_type_id": 1
+            },
+            {
+                "id": 2,
+                "code": "AC",
+                "description": "Administration publique",
+                "rate_class_id": 4,
+                "customer_type_id": 5
+            },
+            {
+                "id": 3,
+                "code": "AD",
+                "description": "Administrateur ",
+                "rate_class_id": 3,
+                "customer_type_id": 1
+            },
+            {
+                "id": 4,
+                "code": "AM",
+                "description": "Groupe d'amis",
+                "rate_class_id": 4,
+                "customer_type_id": 1
+            }
+        ]
+    },
+    {
+        "name": "sale\\customer\\CustomerNature",
+        "lang": "en",
+        "data": [
+            {
+                "id": 1,
+                "description": "Individuals (private persons)"
+            },
+            {
+                "id": 2,
+                "description": "Public administration"
+            },
+            {
+                "id": 3,
+                "description": "Administrator"
+            },
+            {
+                "id": 4,
+                "description": "Group of friends"
+            }
+        ]
+    }
+]
