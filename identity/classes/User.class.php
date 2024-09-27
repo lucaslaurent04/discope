@@ -28,7 +28,7 @@ class User extends \core\User {
                 'foreign_object'    => 'identity\Identity',
                 'domain'            => ['type', '=', 'I'],
                 'description'       => 'The contact related to the user.',
-                'onupdate'          => 'onupdateIdentity'
+                'dependents'        => ['name']
             ],
 
             'setting_values_ids' => [
@@ -50,23 +50,18 @@ class User extends \core\User {
         ];
     }
 
-    public static function calcName($om, $oids, $lang) {
+    public static function calcName($self) {
         $result = [];
-        $users = $om->read(self::getType(), $oids, ['login', 'identity_id.name']);
-        foreach($users as $oid => $odata) {
-            if(isset($odata['identity_id.name']) && strlen($odata['identity_id.name']) ) {
-                $result[$oid] = $odata['identity_id.name'];
+        $self->read(['login', 'identity_id' => ['name']]);
+        foreach($self as $id => $user) {
+            if(isset($user['identity_id']['name']) && strlen($user['identity_id']['name'])) {
+                $result[$id] = $user['identity_id']['name'];
             }
             else {
-                $result[$oid] = $odata['login'];
+                $result[$id] = $user['login'];
             }
         }
         return $result;
     }
 
-
-    public static function onupdateIdentity($om, $oids, $values, $lang) {
-        // force re-compute the name
-        $om->write(self::getType(), $oids, ['name' =>  null], $lang);
-    }
 }
