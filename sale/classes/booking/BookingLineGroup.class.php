@@ -57,13 +57,13 @@ class BookingLineGroup extends Model {
 
             'is_sojourn' => [
                 'type'              => 'boolean',
-                'description'       => 'Does the group spans over several nights and relate to accomodations?',
+                'description'       => 'Does the group spans over several nights and relate to accommodations?',
                 'default'           => false
             ],
 
             'is_event' => [
                 'type'              => 'boolean',
-                'description'       => 'Does the group relate to an event occuring on a single day?',
+                'description'       => 'Does the group relate to an event occurring on a single day?',
                 'default'           => false
             ],
 
@@ -236,7 +236,7 @@ class BookingLineGroup extends Model {
 
         foreach($groups as $oid => $group) {
             $bookings_ids[] = $group['booking_id'];
-            $result[$oid] = array_reduce($group['booking_lines_ids.total'], function ($c, $a) {
+            $result[$oid] = array_reduce((array) $group['booking_lines_ids.total'], function ($c, $a) {
                 return $c + round($a['total'], 2);
             }, 0.0);
         }
@@ -257,7 +257,7 @@ class BookingLineGroup extends Model {
         $groups = $om->read(get_called_class(), $oids, ['booking_lines_ids.price']);
 
         foreach($groups as $oid => $group) {
-            $result[$oid] = array_reduce($group['booking_lines_ids.price'], function ($c, $a) {
+            $result[$oid] = array_reduce((array) $group['booking_lines_ids.price'], function ($c, $a) {
                 return $c + $a['price'];
             }, 0.0);
         }
@@ -276,7 +276,7 @@ class BookingLineGroup extends Model {
 
         foreach($groups as $oid => $group) {
             $result[$oid] = 0.0;
-            if(count($group['booking_lines_ids.fare_benefit'])) {
+            if(count((array) $group['booking_lines_ids.fare_benefit'])) {
                 $result[$oid] = array_reduce($group['booking_lines_ids.fare_benefit'], function ($c, $a) {
                         return $c + $a['fare_benefit'];
                     }, 0.0);

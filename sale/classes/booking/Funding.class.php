@@ -143,7 +143,7 @@ class Funding extends \sale\pay\Funding {
             if($bookings > 0 && count($bookings)) {
                 $booking = reset($bookings);
                 $fundings_price = (float) $values['due_amount'];
-                foreach($booking['fundings_ids.due_amount'] as $fid => $funding) {
+                foreach((array) $booking['fundings_ids.due_amount'] as $fid => $funding) {
                     $fundings_price += (float) $funding['due_amount'];
                 }
                 if($fundings_price > $booking['price'] && abs($booking['price']-$fundings_price) >= 0.0001) {
@@ -176,13 +176,13 @@ class Funding extends \sale\pay\Funding {
                     if($bookings > 0 && count($bookings)) {
                         $booking = reset($bookings);
                         $fundings_price = (float) $values['due_amount'];
-                        foreach($booking['fundings_ids.due_amount'] as $oid => $odata) {
+                        foreach((array) $booking['fundings_ids.due_amount'] as $oid => $odata) {
                             if($oid != $fid) {
                                 $fundings_price += (float) $odata['due_amount'];
                             }
                         }
                         if($fundings_price > $booking['price'] && abs($booking['price']-$fundings_price) >= 0.0001) {
-                            return ['status' => ['exceded_price' => "Sum of the fundings cannot be higher than the booking total."]];
+                            return ['status' => ['exceeded_price' => "Sum of the fundings cannot be higher than the booking total."]];
                         }
                     }
                 }

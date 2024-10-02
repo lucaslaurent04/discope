@@ -148,7 +148,7 @@ class OrderPayment extends Model {
         if($payments > 0) {
             foreach($payments as $oid => $payment) {
                 $result[$oid] = 0.0;
-                foreach($payment['order_lines_ids.price'] as $line) {
+                foreach((array) $payment['order_lines_ids.price'] as $line) {
                     $result[$oid] += $line['price'];
                 }
                 $result[$oid] = round($result[$oid], 2);

@@ -111,7 +111,7 @@ class Contract extends Model {
         $contracts = $om->read(__CLASS__, $oids, ['contract_lines_ids.total']);
 
         foreach($contracts as $oid => $contract) {
-            $result[$oid] = array_reduce($contract['contract_lines_ids.total'], function ($c, $a) {
+            $result[$oid] = array_reduce((array) $contract['contract_lines_ids.total'], function ($c, $a) {
                 return $c + $a['total'];
             }, 0.0);
         }
@@ -127,7 +127,7 @@ class Contract extends Model {
         $contracts = $om->read(__CLASS__, $oids, ['contract_lines_ids.price']);
 
         foreach($contracts as $oid => $contract) {
-            $result[$oid] = array_reduce($contract['contract_lines_ids.price'], function ($c, $a) {
+            $result[$oid] = array_reduce((array) $contract['contract_lines_ids.price'], function ($c, $a) {
                 return $c + $a['price'];
             }, 0.0);
         }

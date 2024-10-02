@@ -132,7 +132,7 @@ class Funding extends Model {
         $fundings = $om->read(self::getType(), $oids, ['payments_ids.amount'], $lang);
         if($fundings > 0) {
             foreach($fundings as $fid => $funding) {
-                $result[$fid] = array_reduce($funding['payments_ids.amount'], function ($c, $funding) {
+                $result[$fid] = array_reduce((array) $funding['payments_ids.amount'], function ($c, $funding) {
                     return $c + $funding['amount'];
                 }, 0);
             }
