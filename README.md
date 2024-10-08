@@ -1,5 +1,7 @@
-# Discope - PMS hautement personnalisable
-
+# Discope - Logiciel PMS hautement personnalisable
+[![Build Status](https://circleci.com/gh/discope-pms/discope.svg?style=shield)](https://circleci.com/gh/discope-pms/discope)
+[![License: AGPL v3](https://img.shields.io/badge/license-AGPL--v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/discope-pms/discope)
 
 ## Présentation
 Discope est un système de gestion de propriété (PMS) hautement personnalisable, initialement développée pour Kaleo ASBL, une organisation spécialisée dans la gestion de gîtes et auberges en Belgique. 
