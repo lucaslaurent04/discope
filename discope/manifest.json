@@ -1,5 +1,5 @@
 {
-    "name": "dispoce",
+    "name": "discope",
     "depends_on": [
         "core",
         "identity",
