@@ -235,7 +235,7 @@ class ProductModel extends Model {
         foreach($models as $mid => $model) {
             $products = $om->read('sale\catalog\Product', $model['products_ids'], ['groups_ids']);
             foreach($products as $pid => $product) {
-                $groups_ids = array_map(function($a) {return "-$a";}, $product['groups_ids']);
+                $groups_ids = array_map(function($a) {return "-$a";}, (array) $product['groups_ids']);
                 $groups_ids = array_merge($groups_ids, $model['groups_ids']);
                 $om->write('sale\catalog\Product', $pid, ['groups_ids' => $groups_ids]);
             }

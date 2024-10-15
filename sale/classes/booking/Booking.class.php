@@ -501,7 +501,7 @@ class Booking extends Model {
                     $om->update(__CLASS__, $bid, ['customer_identity_id' => $booking['customer_id.partner_identity_id']], $lang);
                 }
 
-                if(!in_array($booking['customer_id.partner_identity_id'], array_map( function($a) { return $a['partner_identity_id']; }, $booking['contacts_ids.partner_identity_id']))) {
+                if(!in_array($booking['customer_id.partner_identity_id'], array_map( function($a) { return $a['partner_identity_id']; }, (array) $booking['contacts_ids.partner_identity_id']))) {
                     // create a contact with the customer as 'booking' contact
                     $om->create('sale\booking\Contact', ['booking_id' => $bid, 'owner_identity_id' => $booking['customer_identity_id'], 'partner_identity_id' => $booking['customer_id.partner_identity_id']]);
                 }
