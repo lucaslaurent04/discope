@@ -67,6 +67,7 @@
                                                 "value": "environment",
                                                 "width": "100%",
                                                 "widget": {
+                                                    "usage": "text/plain.short",
                                                     "visible": ["status", "<>", "draft"]
                                                 }
                                             }
