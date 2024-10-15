@@ -65,13 +65,13 @@ class Ticket extends Model {
 
             'environment' => [
                 'type'              => 'string',
-                'usage'             => 'plain/text',
+                'usage'             => 'text/plain',
                 'description'       => "Auto-filled description of the original user environment."
             ],
 
             'description' => [
                 'type'              => 'string',
-                'usage'             => 'plain/text',
+                'usage'             => 'text/plain',
                 'description'       => "Message of the first entry.",
                 'onupdate'          => 'onupdateDescription'
             ],

@@ -26,14 +26,14 @@ class TicketEntry extends Model {
 
             'description' => [
                 'type'              => 'string',
-                'usage'             => 'plain/text',
+                'usage'             => 'text/plain',
                 'description'       => "Message of the entry.",
                 'onupdate'          => 'onupdateDescription'
             ],
 
             'environment' => [
                 'type'              => 'string',
-                'usage'             => 'plain/text',
+                'usage'             => 'text/plain',
                 'description'       => "Auto-filled description of the original user environment."
             ],
 
