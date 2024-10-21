@@ -44,8 +44,26 @@ class User extends \core\User {
                 'foreign_object'    => 'identity\Identity',
                 'description'       => "The organisation the user relates to.",
                 'default'           => 1
-            ]
+            ],
 
+            'centers_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'identity\Center',
+                'foreign_field'     => 'users_ids',
+                'rel_table'         => 'lodging_identity_rel_center_user',
+                'rel_foreign_key'   => 'center_id',
+                'rel_local_key'     => 'user_id'
+            ],
+
+            'center_offices_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'identity\CenterOffice',
+                'foreign_field'     => 'users_ids',
+                'rel_table'         => 'lodging_identity_rel_center_office_user',
+                'rel_foreign_key'   => 'center_office_id',
+                'rel_local_key'     => 'user_id',
+                'onupdate'          => 'onupdateCenterOfficesIds'
+            ]
 
         ];
     }
@@ -64,4 +82,21 @@ class User extends \core\User {
         return $result;
     }
 
+    public static function onupdateCenterOfficesIds($om, $oids, $values, $lang) {
+
+        $users = $om->read(__CLASS__, $oids, ['centers_ids', 'center_offices_ids.centers_ids'], $lang);
+        if($users > 0) {
+
+            foreach($users as $uid => $user) {
+                // pass-1 remove previous centers_ids
+                $om->write(__CLASS__, $uid, ['centers_ids' => array_map(function($id) { return "-{$id}";}, $user['centers_ids'])], $lang);
+                // pass-2 add new centers_ids
+                $centers_ids = [];
+                foreach((array) $user['center_offices_ids.centers_ids'] as $oid => $office) {
+                    $centers_ids = array_merge($centers_ids, $office['centers_ids']);
+                }
+                $om->write(__CLASS__, $uid, ['centers_ids' => $centers_ids], $lang);
+            }
+        }
+    }
 }
