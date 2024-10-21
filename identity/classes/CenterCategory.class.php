@@ -37,7 +37,7 @@ class CenterCategory extends Model {
             // #memo - center categories are just an indication for centers, but do no apply on RU (RU can be GA or GG)
             'rental_units_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\realestate\RentalUnit',
+                'foreign_object'    => 'realestate\RentalUnit',
                 'foreign_field'     => 'center_category_id',
                 'description'       => 'List of rental units related to the category.'
             ],
