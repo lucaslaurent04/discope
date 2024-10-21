@@ -38,6 +38,17 @@ class TemplateAttachment extends Model {
                 'foreign_object'    => 'core\Lang',
                 'description'       => "Language of the attachment (related document).",
                 'default'           => 1
+            ],
+
+            // #todo - use 2 fields : has_booking_type (bool) + booking_type_id (many2one)
+            'attachment_type' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'all',
+                    'schools',
+                    'individuals',
+                    'groups'
+                ]
             ]
 
         ];
