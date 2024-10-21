@@ -39,15 +39,15 @@ class Template extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'communication\TemplateCategory',
                 'description'       => "The category the template belongs to.",
-                'onupdate'          => 'communication\Template::onupdateCategoryId',
+                'onupdate'          => 'onupdateCategoryId',
                 'required'          => true
             ],
 
             'type' => [
                 'type'              => 'string',
-                'selection'         => [ 'quote', 'option', 'contract', 'funding', 'invoice' ],
+                'selection'         => [ 'quote', 'option', 'contract', 'funding', 'invoice', 'guest' ],
                 'description'       => 'The context in which the template is meant to be used.',
-                'onupdate'          => 'communication\Template::onupdateType'
+                'onupdate'          => 'onupdateType'
             ],
 
             'parts_ids' => [
