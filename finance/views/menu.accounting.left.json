@@ -51,7 +51,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\documents\\Export",
+                            "entity": "documents\\Export",
                             "view": "list.downloads"
                         }
                     },
@@ -62,7 +62,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\documents\\Export",
+                            "entity": "documents\\Export",
                             "view": "list.default"
                         }
                     }
