@@ -13,6 +13,10 @@ class Family extends Model {
         return "Product Family";
     }
 
+    public static function getDescription() {
+        return "A Product Family is a group of goods produced under the same brand. Families support hierarchy.";
+    }
+
     public static function getColumns() {
         /**
          * A Product Family is a group of goods produced under the same brand.
@@ -45,6 +49,15 @@ class Family extends Model {
                 'result_type'       => 'string',
                 'store'             => true,
                 'description'       => 'Full path of the family with ancestors.'
+            ],
+
+            'centers_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'identity\Center',
+                'foreign_field'     => 'product_families_ids',
+                'rel_table'         => 'sale_product_family_rel_identity_center',
+                'rel_foreign_key'   => 'center_id',
+                'rel_local_key'     => 'family_id'
             ],
 
             'product_models_ids' => [
