@@ -55,7 +55,7 @@ class CenterOffice extends \identity\Establishment {
 
             'users_ids' => [
                 'type'              => 'many2many',
-                'foreign_object'    => 'lodging\identity\User',
+                'foreign_object'    => 'identity\User',
                 'foreign_field'     => 'center_offices_ids',
                 'rel_table'         => 'lodging_identity_rel_center_office_user',
                 'rel_foreign_key'   => 'user_id',
