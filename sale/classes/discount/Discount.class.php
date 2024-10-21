@@ -68,7 +68,7 @@ class Discount extends Model {
 
             'age_ranges_ids' => [
                 'type'              => 'many2many',
-                'foreign_object'    => 'lodging\sale\customer\AgeRange',
+                'foreign_object'    => 'sale\customer\AgeRange',
                 'foreign_field'     => 'discounts_ids',
                 'rel_table'         => 'lodging_sale_discount_rel_agerange_discount',
                 'rel_foreign_key'   => 'age_range_id',
