@@ -52,7 +52,7 @@ class InvoiceLineGroup extends Model {
 
 
     public static function onupdateInvoiceLinesIds($om, $oids, $values, $lang) {
-        $groups = $om->read(__CLASS__, $oids, ['invoice_id']);
+        $groups = $om->read(self::getType(), $oids, ['invoice_id']);
         if($groups) {
             $invoices_ids = [];
             foreach($groups as $gid => $group) {

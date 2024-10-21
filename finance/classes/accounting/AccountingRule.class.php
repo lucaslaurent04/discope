@@ -66,7 +66,22 @@ class AccountingRule extends Model {
                 'foreign_object'    => 'sale\price\Price',
                 'foreign_field'     => 'accounting_rule_id',
                 'description'       => "Prices that relate to the accounting rule."
+            ],
+
+            'code_legacy' => [
+                'type'              => 'string',
+                'description'       => "Old name of the accounting rule."
+            ],
+
+            /*
+            // les règles comptables devraient être relatives aux organisations et pas aux catégories de centre
+            'center_category_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\CenterCategory',
+                'description'       => "Center category targeted by the rule.",
+                'required'          => true
             ]
+            */
 
         ];
     }
