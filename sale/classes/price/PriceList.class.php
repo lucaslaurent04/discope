@@ -139,17 +139,26 @@ class PriceList extends Model {
         }
     }
 
-    public static function onupdateStatus($om, $oids, $values, $lang) {
-        $pricelists = $om->read(self::getType(), $oids, ['status', 'prices_ids']);
-        $om->update(self::getType(), $oids, ['is_active' => null]);
+    public static function onupdateStatus($om, $ids, $values, $lang) {
+        $pricelists = $om->read(self::getType(), $ids, ['status', 'prices_ids']);
+        $om->update(self::getType(), $ids, ['is_active' => null]);
         // immediate re-compute (required by subsequent re-computations of prices is_active flag)
-        $om->read(self::getType(), $oids, ['is_active']);
+        $om->read(self::getType(), $ids, ['is_active']);
 
         if($pricelists > 0) {
             $providers = \eQual::inject(['cron']);
             $cron = $providers['cron'];
 
             foreach($pricelists as $pid => $pricelist) {
+                if($pricelist['status'] == 'published') {
+                    // add a task to the CRON for updating status of bookings waiting for the pricelist
+                    $cron->schedule(
+                        "booking.is_tbc.confirm",
+                        time() + 60,
+                        'lodging_pricelist_check-bookings',
+                        [ 'id' => $pid ]
+                    );
+                }
                 // immediate re-compute prices is_active flag
                 $om->update('sale\price\Price', $pricelist['prices_ids'], ['is_active' => null]);
                 $om->read('sale\price\Price', $pricelist['prices_ids'], ['is_active']);
