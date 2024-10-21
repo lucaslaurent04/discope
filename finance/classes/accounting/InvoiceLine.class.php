@@ -125,7 +125,7 @@ class InvoiceLine extends Model {
 
             'downpayment_invoice_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => Invoice::getType(),
+                'foreign_object'    => 'finance\accounting\Invoice',
                 'description'       => 'Downpayment invoice (set when the line refers to an invoiced downpayment.)'
             ]
         ];
