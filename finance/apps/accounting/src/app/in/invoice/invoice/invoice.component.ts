@@ -367,7 +367,7 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
     }
 
     private async loadCenter() {
-        const result = <Array<any>> await this.api.read("lodging\\identity\\Center", [this.booking.center_id], Object.getOwnPropertyNames(new Center()));
+        const result = <Array<any>> await this.api.read("identity\\Center", [this.booking.center_id], Object.getOwnPropertyNames(new Center()));
         if(result && result.length) {
             const item:any = result[0];
             let center:any = new Center();
@@ -387,7 +387,7 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
     }
 
     private async loadCenterOffice() {
-        const result = <Array<any>> await this.api.read("lodging\\identity\\CenterOffice", [this.center.center_office_id], Object.getOwnPropertyNames(new CenterOffice()));
+        const result = <Array<any>> await this.api.read("identity\\CenterOffice", [this.center.center_office_id], Object.getOwnPropertyNames(new CenterOffice()));
         if(result && result.length) {
             const item:any = result[0];
             let office:any = new CenterOffice();
