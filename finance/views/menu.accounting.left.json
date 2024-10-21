@@ -144,7 +144,7 @@
                         "label": "Accounting rules",
                         "description": "",
                         "context": {
-                            "entity": "lodging\\finance\\accounting\\AccountingRule",
+                            "entity": "finance\\accounting\\AccountingRule",
                             "view": "list.default"
                         }
                     },
@@ -165,7 +165,7 @@
                         "label": "Accounting journals",
                         "description": "",
                         "context": {
-                            "entity": "lodging\\finance\\accounting\\AccountingJournal",
+                            "entity": "finance\\accounting\\AccountingJournal",
                             "view": "list.default"
                         }
                     }
