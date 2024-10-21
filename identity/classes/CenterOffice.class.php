@@ -117,7 +117,7 @@ class CenterOffice extends \identity\Establishment {
 
             'product_favorites_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\catalog\ProductFavorite',
+                'foreign_object'    => 'sale\catalog\ProductFavorite',
                 'foreign_field'     => 'center_office_id',
                 'order'             => 'order',
                 'description'       => 'List of product favorites of the office.'

@@ -8,7 +8,7 @@ namespace finance\accounting;
 use equal\orm\Model;
 use core\setting\Setting;
 use lodging\sale\booking\Funding;
-use lodging\sale\catalog\Product;
+use sale\catalog\Product;
 
 class Invoice extends Model {
 
@@ -735,7 +735,7 @@ class Invoice extends Model {
                 // retrieve downpayment product
                 $downpayment_sku = Setting::get_value('sale', 'invoice', 'downpayment.sku.'.$invoice['organisation_id']);
                 if($downpayment_sku) {
-                    $products_ids = $om->search(\lodging\sale\catalog\Product::getType(), ['sku', '=', $downpayment_sku]);
+                    $products_ids = $om->search(\sale\catalog\Product::getType(), ['sku', '=', $downpayment_sku]);
                     if($products_ids) {
                         $downpayment_product_id = reset($products_ids);
                     }
