@@ -82,7 +82,7 @@
                         "description": "",
                         "route": "/invoices",
                         "context": {
-                            "entity": "lodging\\finance\\accounting\\Invoice",
+                            "entity": "finance\\accounting\\Invoice",
                             "view": "list.default"
                         }
                     }
