@@ -53,6 +53,13 @@ class Season extends Model {
                 'foreign_field'     => 'season_id',
                 'description'       => 'Periods that are part of the season (on a yearly basis).',
                 'ondetach'          => 'delete'
+            ],
+
+            'center_category_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\CenterCategory',
+                'description'       => "Center category targeted by season.",
+                'required'          => true
             ]
 
         ];
