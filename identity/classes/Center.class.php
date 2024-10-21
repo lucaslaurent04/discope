@@ -103,7 +103,7 @@ class Center extends \identity\Establishment {
 
             'rental_units_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\realestate\RentalUnit',
+                'foreign_object'    => 'realestate\RentalUnit',
                 'foreign_field'     => 'center_id',
                 'description'       => 'List of rental units of the center.'
             ],
