@@ -66,6 +66,19 @@ class AccountingJournal extends Model {
                 'foreign_field'     => 'journal_id',
                 'description'       => 'Accounting entries relating to the journal.',
                 'ondetach'          => 'null'
+            ],
+
+            'index' => [
+                'type'              => 'integer',
+                'description'       => 'Counter for payments exports.',
+                'default'           => 120000
+            ],
+
+            'center_office_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => \identity\CenterOffice::getType(),
+                'description'       => 'Management Group the accounting journal belongs to.',
+                'onupdate'          => 'updateCenterOfficeId'
             ]
 
         ];
@@ -79,6 +92,25 @@ class AccountingJournal extends Model {
             $result[$oid] = $journal['code'].' - '.$journal['organisation_id.name'];
         }
         return $result;
+    }
+
+    /**
+     * Handler for updating values relating the customer.
+     * Sets the organisation_id accordingly to the Center Office.
+     *
+     * @param  \equal\orm\ObjectManager     $om        Object Manager instance.
+     * @param  array                        $oids      List of objects identifiers.
+     * @param  array                        $values    Associative array mapping fields names with new values tha thave been assigned.
+     * @param  string                       $lang      Language (char 2) in which multilang field are to be processed.
+     */
+    public static function updateCenterOfficeId($om, $oids, $values, $lang) {
+
+        $journals = $om->read(__CLASS__, $oids, ['center_office_id.organisation_id'], $lang);
+        if($journals > 0) {
+            foreach($journals as $oid => $odata) {
+                $om->update(self::getType(), $oid, ['organisation_id' => $odata['center_office_id.organisation_id']], $lang);
+            }
+        }
     }
 
 }
