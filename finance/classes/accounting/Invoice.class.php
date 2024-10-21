@@ -7,6 +7,8 @@
 namespace finance\accounting;
 use equal\orm\Model;
 use core\setting\Setting;
+use lodging\sale\booking\Funding;
+use lodging\sale\catalog\Product;
 
 class Invoice extends Model {
 
@@ -18,6 +20,10 @@ class Invoice extends Model {
         return "An invoice is a legal document issued by a seller to a buyer that relates to a sale, and is part of the accounting system.";
     }
 
+    public static function getLink() {
+        return "/accounting/#/invoice/object.id";
+    }
+
     public static function getColumns() {
 
         return [
@@ -26,10 +32,19 @@ class Invoice extends Model {
                 'alias'             => "number"
             ],
 
+            'name_old' => [
+                'type'              => 'string',
+                'description'       => 'Previous invoice number for invoice emitted before numbering change (as of february 2023).'
+            ],
+
             'customer_ref' => [
                 'type'              => 'string',
                 'description'       => 'Reference that must appear on invoice (requested by customer).'
             ],
+
+            // #memo this field is defined in parent Model and is reset by several handlers. BUT it is not used (yet) nor is it a computed field.
+            // #memo - do not use yet
+            // 'payment_status'
 
             'is_deposit' => [
                 'type'              => 'boolean',
@@ -66,7 +81,7 @@ class Invoice extends Model {
 
             'number' => [
                 'type'              => 'computed',
-                'result_type'        => 'string',
+                'result_type'       => 'string',
                 'description'       => "Number of the invoice, according to organization logic (@see config/invoicing).",
                 'function'          => 'calcNumber',
                 'store'             => true
@@ -84,8 +99,8 @@ class Invoice extends Model {
             'reversed_invoice_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => self::getType(),
-                'description'       => "Credit note that was created for cancelling the invoice, if any.",
-                'visible'           => ['status', '=', 'cancelled']
+                'description'       => "Symmetrical link between credit note and cancelled invoice, if any.",
+                'visible'           => [[['status', '=', 'cancelled']], [['type', '=', 'credit_note']]]
             ],
 
             'payment_status' => [
@@ -115,6 +130,11 @@ class Invoice extends Model {
                 'default'           => time()
             ],
 
+            'customer_id' => [
+                'type'              => 'alias',
+                'alias'             => 'partner_id'
+            ],
+
             'partner_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => \identity\Partner::getType(),
@@ -138,6 +158,14 @@ class Invoice extends Model {
                 'usage'             => 'amount/money:4',
                 'description'       => 'Total tax-excluded price of the invoice (computed).',
                 'store'             => true
+            ],
+
+            'balance' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'function'          => 'calcBalance',
+                'usage'             => 'amount/money:2',
+                'description'       => 'Amount left to be paid by customer.'
             ],
 
             'invoice_lines_ids' => [
@@ -166,6 +194,40 @@ class Invoice extends Model {
                 'ondetach'          => 'delete'
             ],
 
+            'accounting_price' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'function'          => 'calcAccountingPrice',
+                'usage'             => 'amount/money:4',
+                'description'       => 'Total tax-included price to record for accounting.',
+                'store'             => true
+            ],
+
+            'accounting_total' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'function'          => 'calcAccountingTotal',
+                'usage'             => 'amount/money:4',
+                'description'       => 'Total tax-excluded price to record for accounting related outputs.',
+                'store'             => true
+            ],
+
+            'display_price' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'function'          => 'calcDisplayPrice',
+                'usage'             => 'amount/money:2',
+                'store'             => true,
+                'description'       => "Final tax-included amount used for display (inverted for credit notes)."
+            ],
+
+            'funding_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => \lodging\sale\pay\Funding::getType(),
+                'description'       => 'The funding the invoice originates from, if any.'
+            ],
+
+            // #memo - when emitted, (partially) paid non-invoiced fundings are attached to the invoice
             'fundings_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\pay\Funding',
@@ -192,7 +254,27 @@ class Invoice extends Model {
                 'type'              => 'boolean',
                 'description'       => 'Mark the invoice as exported (part of an export to elsewhere).',
                 'default'           => false
-            ]
+            ],
+
+            'center_office_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => \identity\CenterOffice::getType(),
+                'description'       => 'Office the invoice relates to (for center management).',
+                'required'          => true
+            ],
+
+            'has_orders' => [
+                'type'              => 'boolean',
+                'description'       => 'Flag marking that the invoice originates from one or more orders (PoS).',
+                'default'           => false
+            ],
+
+            'orders_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'lodging\sale\pos\Order',
+                'foreign_field'     => 'invoice_id',
+                'description'       => 'The orders (PoS) the invoice originates from, if any.'
+            ],
 
         ];
     }
@@ -234,32 +316,31 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcNumber($om, $oids, $lang) {
+    public static function calcNumber($om, $ids, $lang) {
         $result = [];
 
-        $invoices = $om->read(get_called_class(), $oids, ['status', 'organisation_id'], $lang);
+        $invoices = $om->read(self::getType(), $ids, ['status', 'date', 'organisation_id', 'center_office_id.code'], $lang);
 
-        foreach($invoices as $oid => $invoice) {
+        foreach($invoices as $id => $invoice) {
 
             // no code is generated for proforma
             if($invoice['status'] == 'proforma') {
-                $result[$oid] = '[proforma]';
+                $result[$id] = '[proforma]';
                 continue;
             }
 
-            $result[$oid] = '';
-
             $organisation_id = $invoice['organisation_id'];
-
             $format = Setting::get_value('finance', 'invoice', 'invoice.sequence_format', '%05d{sequence}');
-            $year = Setting::get_value('finance', 'invoice', 'invoice.fiscal_year');
-            $sequence = Setting::get_value('sale', 'invoice', 'invoice.sequence.'.$organisation_id);
+            $fiscal_year = Setting::get_value('finance', 'invoice', 'fiscal_year');
+            $year = date('Y', $invoice['date']);
+            $sequence = Setting::get_value('lodging', 'invoice', 'sequence.'.$invoice['center_office_id.code']);
 
-            if($sequence) {
-                Setting::set_value('sale', 'invoice', 'invoice.sequence.'.$organisation_id, $sequence + 1);
+            if(intval($year) == intval($fiscal_year) && $sequence) {
+                Setting::set_value('lodging', 'invoice', 'sequence.'.$invoice['center_office_id.code'], $sequence + 1);
 
-                $result[$oid] = Setting::parse_format($format, [
+                $result[$id] = Setting::parse_format($format, [
                     'year'      => $year,
+                    'office'    => $invoice['center_office_id.code'],
                     'org'       => $organisation_id,
                     'sequence'  => $sequence
                 ]);
@@ -268,6 +349,9 @@ class Invoice extends Model {
         return $result;
     }
 
+    /**
+     * #memo - this should not include installment [non-invoiced pre-payments] (we should deal with display_price instead)
+     */
     public static function calcPrice($om, $oids, $lang) {
         $result = [];
 
@@ -282,6 +366,9 @@ class Invoice extends Model {
         return $result;
     }
 
+    /**
+     * #memo - this should not include installment [non-invoiced pre-payments] (we should deal with display_price instead)
+     */
     public static function calcTotal($om, $oids, $lang) {
         $result = [];
 
@@ -289,9 +376,53 @@ class Invoice extends Model {
 
         foreach($invoices as $oid => $invoice) {
             $total = array_reduce((array) $invoice['invoice_lines_ids.total'], function ($c, $a) {
+                // precision must be considered at line level only (i.e. for an invoice with VAT 0, the sum of `total` must equal sum of `price` )
                 return $c + round($a['total'], 2);
             }, 0.0);
             $result[$oid] = round($total, 2);
+        }
+        return $result;
+    }
+
+    public static function calcBalance($om, $ids, $lang) {
+        $result = [];
+        $invoices = $om->read(self::getType(), $ids, ['booking_id', 'type', 'status', 'is_deposit', 'fundings_ids', 'price'], $lang);
+        foreach($invoices as $id => $invoice) {
+            if($invoice['status'] == 'cancelled') {
+                $result[$id] = 0;
+            }
+            else {
+                if($invoice['is_deposit'] || $invoice['type'] == 'credit_note') {
+                    $fundings = $om->read(Funding::getType(), $invoice['fundings_ids'], ['paid_amount'], $lang);
+                    if($fundings > 0) {
+                        $result[$id] = $invoice['price'];
+                        if($invoice['type'] == 'credit_note') {
+                            $result[$id] = -$result[$id];
+                        }
+                        foreach($fundings as $fid => $funding) {
+                            $result[$id] -= $funding['paid_amount'];
+                        }
+                        $result[$id] = round($result[$id], 2);
+                    }
+                }
+                else {
+                    $fundings_ids = $om->search(Funding::getType(), [ ['booking_id', '=', $invoice['booking_id'] ],  ]);
+                    if($fundings_ids > 0) {
+                        $fundings = $om->read(Funding::getType(), $fundings_ids, ['type', 'invoice_id', 'paid_amount'], $lang);
+                        if($fundings > 0) {
+                            $result[$id] = $invoice['price'];
+                            foreach($fundings as $fid => $funding) {
+                                // #memo - all paid amount must be considered, even negative ones
+                                if(/*$funding['type'] == 'invoice' &&*/ $funding['invoice_id'] != $id) {
+                                    continue;
+                                }
+                                $result[$id] -= $funding['paid_amount'];
+                            }
+                            $result[$id] = round($result[$id], 2);
+                        }
+                    }
+                }
+            }
         }
         return $result;
     }
@@ -320,6 +451,118 @@ class Invoice extends Model {
         return $result;
     }
 
+    public static function calcAccountingTotal($om, $oids, $lang) {
+        $result = [];
+
+        $invoices = $om->read(self::getType(), $oids, ['organisation_id', 'is_deposit', 'invoice_lines_ids'], $lang);
+
+        foreach($invoices as $oid => $invoice) {
+            // retrieve downpayment product
+            $downpayment_product_id = 0;
+            $downpayment_sku = Setting::get_value('sale', 'invoice', 'downpayment.sku.'.$invoice['organisation_id']);
+            if($downpayment_sku) {
+                $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();
+                if($products_ids) {
+                    $downpayment_product_id = reset($products_ids);
+                }
+            }
+
+            $total = 0;
+            $lines = $om->read('finance\accounting\InvoiceLine', $invoice['invoice_lines_ids'], ['total', 'product_id', 'downpayment_invoice_id', 'downpayment_invoice_id.status'], $lang);
+            foreach($lines as $lid => $line) {
+                if($line['product_id'] == $downpayment_product_id) {
+                    // deposit invoice
+                    if($invoice['is_deposit']) {
+                        $total += round($line['total'], 2);
+                    }
+                    // balance invoice
+                    else {
+                        // if the line refers to an invoiced downpayment and if the related downpayment invoice hasn't been cancelled
+                        if(isset($line['downpayment_invoice_id']) && $line['downpayment_invoice_id'] && isset($line['downpayment_invoice_id.status']) && $line['downpayment_invoice_id.status'] == 'invoice') {
+                            // remove deposit from accounting total
+                            // #memo - total should be a negative value
+                            $total += round($line['total'], 2);
+                        }
+                        else {
+                            // ignore installment
+                        }
+                    }
+                }
+                else {
+                    $total += round($line['total'], 2);
+                }
+            }
+            $result[$oid] = round($total, 2);
+        }
+        return $result;
+    }
+
+    /**
+     * Compute the turnover corresponding to the invoice.
+     */
+    public static function calcAccountingPrice($om, $oids, $lang) {
+        $result = [];
+
+        $invoices = $om->read(self::getType(), $oids, ['organisation_id', 'is_deposit', 'invoice_lines_ids'], $lang);
+
+        foreach($invoices as $oid => $invoice) {
+            // retrieve downpayment product
+            $downpayment_product_id = 0;
+            $downpayment_sku = Setting::get_value('sale', 'invoice', 'downpayment.sku.'.$invoice['organisation_id']);
+            if($downpayment_sku) {
+                $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();
+                if($products_ids) {
+                    $downpayment_product_id = reset($products_ids);
+                }
+            }
+
+            $price = 0;
+            $lines = $om->read('finance\accounting\InvoiceLine', $invoice['invoice_lines_ids'], ['price', 'product_id', 'downpayment_invoice_id', 'downpayment_invoice_id.status'], $lang);
+            foreach($lines as $lid => $line) {
+                if($line['product_id'] == $downpayment_product_id) {
+                    // deposit invoice
+                    if($invoice['is_deposit']) {
+                        $price += $line['price'];
+                    }
+                    // balance invoice
+                    else {
+                        // if the line refers to an invoiced downpayment and if the related downpayment invoice hasn't been cancelled
+                        if(isset($line['downpayment_invoice_id']) && $line['downpayment_invoice_id'] && isset($line['downpayment_invoice_id.status']) && $line['downpayment_invoice_id.status'] == 'invoice') {
+                            // remove deposit from accounting price
+                            // #memo - price should be a negative value
+                            $price += $line['price'];
+                        }
+                        else {
+                            // ignore installment
+                        }
+                    }
+                }
+                else {
+                    $price += $line['price'];
+                }
+            }
+            $result[$oid] = round($price, 2);
+        }
+        return $result;
+    }
+
+    public static function calcDisplayPrice($om, $oids, $lang) {
+        $result = [];
+
+        $invoices = $om->read(self::getType(), $oids, ['type', 'price'], $lang);
+
+        foreach($invoices as $oid => $invoice) {
+            if($invoice['type'] == 'invoice') {
+                $result[$oid] = $invoice['price'];
+            }
+            else {
+                $result[$oid] = -$invoice['price'];
+            }
+        }
+
+        return $result;
+    }
+
     public static function onupdateInvoiceLinesIds($om, $oids, $values, $lang) {
         $om->update(__CLASS__, $oids, ['price' => null, 'total' => null]);
     }
@@ -328,26 +571,69 @@ class Invoice extends Model {
         $om->update(__CLASS__, $oids, ['price' => null, 'total' => null]);
     }
 
+    /**
+     * Handler triggered after a status change occurred.
+     */
     public static function onupdateStatus($om, $oids, $values, $lang) {
+        // a number must be assigned to the invoice (if not already set)
         if(isset($values['status']) && $values['status'] == 'invoice') {
-            // reset invoice number and set emission date
-            $om->update(__CLASS__, $oids, ['number' => null, 'date' => time()], $lang);
-            // generate an invoice number (force immediate recomuting)
-            $om->read(__CLASS__, $oids, ['number'], $lang);
-            // generate accounting entries
-            $invoices_accounting_entries = self::_generateAccountingEntries($om, $oids, [], $lang);
-            // create new entries objects
-            foreach($invoices_accounting_entries as $oid => $accounting_entries) {
-                foreach($accounting_entries as $entry) {
-                    $om->create(AccountingEntry::getType(), $entry);
+
+            // pass-1 - assign invoice number and check the date consistency
+            $invoices = $om->read(self::getType(), $oids, ['number', 'date', 'center_office_id', 'organisation_id'], $lang);
+
+            foreach($invoices as $oid => $invoice) {
+                // #memo - we don't want to assign a new number to invoiced and cancelled invoices
+                if($invoice['number'] != '[proforma]') {
+                    continue;
+                }
+                // find most recent invoice emitted by the center office
+                $last_invoices_ids = $om->search(self::getType(), [['center_office_id', '=', $invoice['center_office_id']], ['status', '<>', 'proforma']], ['date' => 'desc'], 0, 1);
+                if($last_invoices_ids > 0 && count($last_invoices_ids)) {
+                    $last_invoice_id = reset($last_invoices_ids);
+                    $res = $om->read(self::getType(), $last_invoice_id, ['date']);
+                    if($res > 0 && count($res)) {
+                        $last_invoice = reset($res);
+                        // if date is before last update, set invoice date to the last invoice date
+                        if($last_invoice['date'] > $invoice['date']) {
+                            $om->update(self::getType(), $oid, ['date' => $last_invoice['date']], $lang);
+                        }
+                    }
+                }
+                // reset invoice number
+                $om->update(self::getType(), $oid, ['number' => null], $lang);
+                // trigger number assignment
+                $om->read(self::getType(), $oid, ['number'], $lang);
+            }
+
+            // pass-2 - generate accounting entries
+            foreach($invoices as $oid => $invoice) {
+                // #memo - we don't want to update entries of an existing invoice
+                if($invoice['number'] != '[proforma]') {
+                    continue;
+                }
+
+                // generate accounting entries
+                $invoices_accounting_entries = self::_generateAccountingEntries($om, $oid, [], $lang);
+
+                $res = $om->search(AccountingJournal::getType(), [['center_office_id', '=', $invoice['center_office_id']], ['type', '=', 'sales']]);
+                $journal_id = reset($res);
+
+                if($journal_id && isset($invoices_accounting_entries[$oid])) {
+                    $accounting_entries = $invoices_accounting_entries[$oid];
+                    // create new entries objects and assign to the sale journal relating to the center_office_id
+                    foreach($accounting_entries as $entry) {
+                        $entry['journal_id'] = $journal_id;
+                        $om->create(\finance\accounting\AccountingEntry::getType(), $entry);
+                    }
                 }
             }
+
         }
     }
 
     /**
-     * Check wether an object can be updated, and perform some additional operations if necessary.
-     * This method can be overriden to define a more precise set of tests.
+     * Check whether an object can be updated, and perform some additional operations if necessary.
+     * This method can be overridden to define a more precise set of tests.
      *
      * @param  \equal\orm\ObjectManager   $om         ObjectManager instance.
      * @param  array                      $oids       List of objects identifiers.
@@ -356,27 +642,31 @@ class Invoice extends Model {
      * @return array                      Returns an associative array mapping fields with their error messages. En empty array means that object has been successfully processed and can be updated.
      */
     public static function canupdate($om, $oids, $values, $lang='en') {
-        $res = $om->read(self::getType(), $oids, ['status']);
+        $allowed_fields = ['customer_ref', 'payment_status', 'is_paid', 'is_exported', 'funding_id', 'reversed_invoice_id'];
 
-        if($res > 0) {
-            foreach($res as $oids => $odata) {
+        $invoices = $om->read(self::getType(), $oids, ['status']);
+
+        if($invoices > 0) {
+            foreach($invoices as $ids => $invoice) {
                 // status can only be changed from 'proforma' to 'invoice' and from 'invoice' to 'cancelled'
-                if($odata['status'] == 'proforma') {
+                if($invoice['status'] == 'proforma') {
                     if(isset($values['status']) && !in_array($values['status'], ['proforma', 'invoice'])) {
                         return ['status' => ['non_editable' => 'Invoice status can only be updated from proforma to invoice.']];
                     }
                 }
-                if($odata['status'] == 'invoice') {
-                    if(!isset($values['status']) || !in_array($values['status'], ['invoice', 'cancelled'])) {
-                        // only allow modifiable fields
-                        if( count(array_diff(array_keys($values), ['customer_ref','payment_status','is_exported'])) ) {
-                            return ['status' => ['non_editable' => 'Invoice can only be updated while its status is proforma.']];
-                        }
+                elseif($invoice['status'] == 'invoice') {
+                    if(count($values) == 1 && isset($values['status']) && in_array($values['status'], ['cancelled'])) {
+                        // changing status to 'cancelled' is allowed
+                    }
+                    // otherwise, only allow modifiable fields
+                    elseif( count(array_diff(array_keys($values), $allowed_fields)) > 0 ) {
+                        return ['status' => ['non_editable' => 'Invoice can only be updated while its status is proforma ['.implode(',', array_keys($values)).'].']];
                     }
                 }
             }
         }
-        return parent::canupdate($om, $oids, $values, $lang);
+        // bypass parents rules
+        return [];
     }
 
     /**
@@ -418,13 +708,13 @@ class Invoice extends Model {
             $account_sales_taxes = Setting::get_value('finance', 'invoice', 'account.sales_taxes', 'not_found');
             $account_trade_debtors = Setting::get_value('finance', 'invoice', 'account.trade_debtors', 'not_found');
 
-            $res = $om->search(AccountChartLine::getType(), ['code', '=', $account_sales]);
+            $res = $om->search(\finance\accounting\AccountChartLine::getType(), ['code', '=', $account_sales]);
             $account_sales_id = reset($res);
 
-            $res = $om->search(AccountChartLine::getType(), ['code', '=', $account_sales_taxes]);
+            $res = $om->search(\finance\accounting\AccountChartLine::getType(), ['code', '=', $account_sales_taxes]);
             $account_sales_taxes_id = reset($res);
 
-            $res = $om->search(AccountChartLine::getType(), ['code', '=', $account_trade_debtors]);
+            $res = $om->search(\finance\accounting\AccountChartLine::getType(), ['code', '=', $account_trade_debtors]);
             $account_trade_debtors_id = reset($res);
 
             if(!$account_sales_id || !$account_sales_taxes_id || !$account_trade_debtors_id) {
@@ -439,10 +729,13 @@ class Invoice extends Model {
                 }
                 // default downpayment product to null
                 $downpayment_product_id = 0;
+                // #todo - store this value in the settings
+                // discount product is the same for all organisations: KA-Remise-A [65]
+                $discount_product_id = 65;
                 // retrieve downpayment product
                 $downpayment_sku = Setting::get_value('sale', 'invoice', 'downpayment.sku.'.$invoice['organisation_id']);
                 if($downpayment_sku) {
-                    $products_ids = $om->search(\sale\catalog\Product::getType(), ['sku', '=', $downpayment_sku]);
+                    $products_ids = $om->search(\lodging\sale\catalog\Product::getType(), ['sku', '=', $downpayment_sku]);
                     if($products_ids) {
                         $downpayment_product_id = reset($products_ids);
                     }
@@ -450,7 +743,7 @@ class Invoice extends Model {
 
                 $accounting_entries = [];
                 // fetch invoice lines
-                $lines = $om->read(InvoiceLine::getType(), $invoice['invoice_lines_ids'], [
+                $lines = $om->read('finance\accounting\InvoiceLine', $invoice['invoice_lines_ids'], [
                     'name', 'description', 'product_id', 'qty', 'total', 'price',
                     'price_id.accounting_rule_id.accounting_rule_line_ids'
                 ], $lang);
@@ -460,6 +753,7 @@ class Invoice extends Model {
                     $credit_vat_sum = 0.0;
                     $prices_sum = 0.0;
                     $downpayments_sum = 0.0;
+                    $discounts_sum = 0.0;
 
                     foreach($lines as $lid => $line) {
                         $vat_amount = abs($line['price']) - abs($line['total']);
@@ -483,6 +777,24 @@ class Invoice extends Model {
                                 'credit'            => ($invoice['type'] == 'invoice')?$credit:$debit
                             ];
                         }
+                        elseif($line['product_id'] == $discount_product_id && ($line['qty'] < 0 || $line['price'] < 0) ) {
+                            // sum up downpayments (VAT incl. price)
+                            $discounts_sum += abs($line['price']);
+                            // if some VAT is due, deduct the sum accordingly
+                            $debit_vat_sum += $vat_amount;
+                            // create a debit line with the product, on account "sales"
+                            $debit = abs($line['total']);
+                            $credit = 0.0;
+                            $accounting_entries[] = [
+                                'name'              => $line['name'],
+                                'has_invoice'       => true,
+                                'invoice_id'        => $oid,
+                                'invoice_line_id'   => $lid,
+                                'account_id'        => $account_sales_id,
+                                'debit'             => ($invoice['type'] == 'invoice')?$debit:$credit,
+                                'credit'            => ($invoice['type'] == 'invoice')?$credit:$debit
+                            ];
+                        }
                         // line is a regular product line
                         else {
                             // sum up VAT amounts
@@ -490,14 +802,20 @@ class Invoice extends Model {
                             // sum up sale prices (VAT incl. price)
                             $prices_sum += $line['price'];
                             $rule_lines = [];
-                            // handle installment invoice
+                            // handle downpayments
                             if($line['product_id'] == $downpayment_product_id) {
                                 // generate virtual rule for downpayment with account "sales"
                                 $rule_lines = [
                                     ['account_id' => $account_sales_id, 'share' => 1.0]
                                 ];
                             }
-                            else if (isset($line['price_id.accounting_rule_id.accounting_rule_line_ids'])) {
+                            if($line['product_id'] == $discount_product_id) {
+                                // generate virtual rule for discount with account "sales"
+                                $rule_lines = [
+                                    ['account_id' => $account_sales_id, 'share' => 1.0]
+                                ];
+                            }
+                            elseif (isset($line['price_id.accounting_rule_id.accounting_rule_line_ids'])) {
                                 // for products, retrieve all lines of accounting rule
                                 $rule_lines = $om->read(\finance\accounting\AccountingRuleLine::getType(), $line['price_id.accounting_rule_id.accounting_rule_line_ids'], ['account_id', 'share']);
                             }
@@ -551,7 +869,7 @@ class Invoice extends Model {
                     }
 
                     // create a debit line on account "trade debtors"
-                    $debit = round($prices_sum-$downpayments_sum, 2);
+                    $debit = round($prices_sum-$downpayments_sum-$discounts_sum, 2);
                     $credit = 0.0;
                     // assign with handling of reversing entries
                     $accounting_entries[] = [
