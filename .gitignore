@@ -1,7 +1,7 @@
 .vscode
 .browserslistrc
 .editorconfig
-core
-lodging
-demo
-qursus
+./core/
+./lodging/
+./demo/
+./qursus/
