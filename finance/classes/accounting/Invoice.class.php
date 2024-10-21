@@ -223,7 +223,7 @@ class Invoice extends Model {
 
             'funding_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \lodging\sale\pay\Funding::getType(),
+                'foreign_object'    => \sale\pay\Funding::getType(),
                 'description'       => 'The funding the invoice originates from, if any.'
             ],
 

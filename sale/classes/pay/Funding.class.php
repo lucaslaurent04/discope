@@ -103,14 +103,23 @@ class Funding extends Model {
                 'foreign_object'    => 'finance\accounting\Invoice',
                 'ondelete'          => 'null',
                 'description'       => 'The invoice targeted by the funding, if any.',
-                'help'              => 'As a convention, this field is set when a funding relates to an invoice: either because the funding has been invoiced (downpayment or balance invoice), or because it is an installment (deduced from the due amount)'
+                'help'              => 'As a convention, this field is set when a funding relates to an invoice: either because the funding has been invoiced (downpayment or balance invoice), or because it is an installment (deduced from the due amount)',
+                'visible'           => [ ['type', '=', 'invoice'] ]
             ],
 
             'payment_reference' => [
                 'type'              => 'string',
                 'description'       => 'Message for identifying the purpose of the transaction.',
                 'default'           => ''
+            ],
+
+            'center_office_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\CenterOffice',
+                'description'       => "The center office the booking relates to.",
+                'required'          => true
             ]
+
         ];
     }
 
@@ -154,6 +163,37 @@ class Funding extends Model {
         return $result;
     }
 
+    /**
+     * Hook invoked before object update for performing object-specific additional operations.
+     * Update the scheduled tasks related to the fundings.
+     *
+     * @param  \equal\orm\ObjectManager    $om         ObjectManager instance.
+     * @param  array                       $ids       List of objects identifiers.
+     * @param  array                       $values     Associative array holding the new values that have been assigned.
+     * @param  string                      $lang       Language in which multilang fields are being updated.
+     * @return void
+     */
+    public static function onupdate($om, $ids, $values, $lang) {
+        $cron = $om->getContainer()->get('cron');
+
+        if(isset($values['due_date'])) {
+            foreach($ids as $fid) {
+                // remove any previously scheduled task
+                $cron->cancel("booking.funding.overdue.{$fid}");
+                // setup a scheduled job upon funding overdue
+                $cron->schedule(
+                // assign a reproducible unique name
+                    "booking.funding.overdue.{$fid}",
+                    // remind on day following due_date
+                    $values['due_date'] + 86400,
+                    'lodging_funding_check-payment',
+                    [ 'id' => $fid ]
+                );
+            }
+        }
+        parent::onupdate($om, $ids, $values, $lang);
+    }
+
     public static function onupdateDueAmount($om, $oids, $values, $lang) {
         // reset the name
         $om->update(self::getType(), $oids, ['name' => null], $lang);
@@ -179,8 +219,8 @@ class Funding extends Model {
     }
 
     /**
-     * Check wether an object can be updated, and perform some additional operations if necessary.
-     * This method can be overriden to define a more precise set of tests.
+     * Check whether an object can be updated, and perform some additional operations if necessary.
+     * This method can be overridden to define a more precise set of tests.
      *
      * @param  \equal\orm\ObjectManager     $om         ObjectManager instance.
      * @param  array                        $oids       List of objects identifiers.
@@ -213,26 +253,27 @@ class Funding extends Model {
     }
 
     /**
-     * Check wether the identity can be deleted.
+     * Check whether the identity can be deleted.
      *
      * @param  \equal\orm\ObjectManager    $om        ObjectManager instance.
      * @param  array                       $ids       List of objects identifiers.
      * @return array                       Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be deleted.
      */
     public static function candelete($om, $ids) {
-        $fundings = $om->read(self::getType(), $ids, [ 'is_paid', 'paid_amount', 'invoice_id', 'invoice_id.status', 'payments_ids' ]);
+        $fundings = $om->read(self::getType(), $ids, [ 'is_paid', 'due_amount', 'paid_amount', 'type', 'invoice_id', 'invoice_id.status', 'invoice_id.type', 'payments_ids' ]);
 
         if($fundings > 0) {
             foreach($fundings as $id => $funding) {
                 if( $funding['is_paid'] || $funding['paid_amount'] != 0 || ($funding['payments_ids'] && count($funding['payments_ids']) > 0) ) {
                     return ['payments_ids' => ['non_removable_funding' => 'Funding paid or partially paid cannot be deleted.']];
                 }
-                if( !is_null($funding['invoice_id']) && $funding['invoice_id.status'] == 'invoice' ) {
+                if( $funding['due_amount'] > 0 && $funding['type'] == 'invoice' && is_null($funding['invoice_id']) && $funding['invoice_id.status'] == 'invoice' && $funding['invoice_id.type'] == 'invoice') {
                     return ['invoice_id' => ['non_removable_funding' => 'Funding relating to an invoice cannot be deleted.']];
                 }
             }
         }
-        return parent::candelete($om, $ids);
+
+        return [];
     }
 
 
@@ -258,10 +299,10 @@ class Funding extends Model {
      * Signature for single object change from views.
      *
      * @param  \equal\orm\ObjectManager     $om        Object Manager instance.
-     * @param  Array                        $event     Associative array holding changed fields as keys, and their related new values.
-     * @param  Array                        $values    Copy of the current (partial) state of the object (fields depend on the view).
-     * @param  String                       $lang      Language (char 2) in which multilang field are to be processed.
-     * @return Array    Associative array mapping fields with their resulting values.
+     * @param  array                        $event     Associative array holding changed fields as keys, and their related new values.
+     * @param  array                        $values    Copy of the current (partial) state of the object (fields depend on the view).
+     * @param  string                       $lang      Language (char 2) in which multilang field are to be processed.
+     * @return array                        Associative array mapping fields with their resulting values.
      */
     public static function onchange($om, $event, $values, $lang='en') {
         $result = [];
