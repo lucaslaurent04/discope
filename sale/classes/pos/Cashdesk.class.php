@@ -18,17 +18,22 @@ class Cashdesk extends Model {
                 'required'          => true
             ],
 
-            'establishment_id' => [
+            'center_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \identity\Establishment::getType(),
+                'foreign_object'    => 'identity\Center',
                 'description'       => "The center the desk relates to.",
                 'required'          => true,
                 'ondelete'          => 'cascade'         // delete cashdesk when parent Center is deleted
             ],
 
+            'establishment_id' => [
+                'type'              => 'alias',
+                'alias'             => 'center_id',
+            ],
+
             'sessions_ids'  => [
                 'type'              => 'one2many',
-                'foreign_object'    => CashdeskSession::getType(),
+                'foreign_object'    => 'sale\pos\CashdeskSession',
                 'foreign_field'     => 'cashdesk_id',
                 'ondetach'          => 'delete',
                 'description'       => 'List of sessions of the cashdesk.'

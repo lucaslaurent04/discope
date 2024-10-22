@@ -21,20 +21,22 @@ class OrderLine extends Model {
             'order_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\pos\Order',
-                'description'       => 'The operation the payment relates to.'
+                'description'       => 'The operation the payment relates to.',
+                'onupdate'          => 'onupdateOrderId',
+                'ondelete'          => 'cascade'
             ],
 
             'order_payment_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => OrderPayment::getType(),
-                'description'       => 'The payement the line relates to.',
+                'foreign_object'    => 'sale\pos\OrderPayment',
+                'description'       => 'The payment the line relates to.',
                 'default'           => 0,
                 'ondelete'          => 'null'
             ],
 
             'product_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \sale\catalog\Product::getType(),
+                'foreign_object'    => 'sale\catalog\Product',
                 'description'       => 'The product (SKU) the line relates to.',
                 'onupdate'          => 'onupdateProductId'
             ],
@@ -55,7 +57,14 @@ class OrderLine extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\pay\Funding',
                 'description'       => 'The funding the line relates to, if any.',
+                'onupdate'          => 'onupdateFundingId',
                 'visible'           => ['has_funding', '=', true]
+            ],
+
+            'has_booking' => [
+                'type'              => 'boolean',
+                'description'       => 'Mark the line as paid using a booking.',
+                'default'           => false
             ],
 
             'unit_price' => [
@@ -118,21 +127,35 @@ class OrderLine extends Model {
         ];
     }
 
-    public static function onupdateProductId($om, $oids, $values, $lang) {
-        $lines = $om->read(self::getType(), $oids, ['product_id']);
+    /**
+     * Update parent Order for lines referring to a funding.
+     */
+    public static function onupdateOrderId($om, $ids, $values, $lang) {
+        $lines = $om->read(self::getType(), $ids, ['order_id', 'funding_id'], $lang);
+        if($lines > 0) {
+            foreach($lines as $id => $line) {
+                // #memo - this triggers Order::onupdateFundingId (on which depends has_funding)
+                $om->update('sale\pos\Order', $line['order_id'], ['funding_id' => $line['funding_id']], $lang);
+            }
+        }
+    }
+
+    public static function onupdateProductId($om, $ids, $values, $lang) {
+        $lines = $om->read(self::getType(), $ids, ['product_id', 'order_id.center_id.price_list_category_id']);
 
         foreach($lines as $lid => $line) {
             /*
-                Find the Price List that matches the criteria from the booking with the shortest duration
+                Find the first Price List that matches the criteria from the order with (shortest duration first)
             */
             $price_lists_ids = $om->search(
-                'sale\price\PriceList',
-                [
-                    ['date_from', '<=', time()],
-                    ['date_to', '>=', time()],
-                    ['status', 'in', ['published']],
-                    ['is_active', '=', true]
-                ]
+                'sale\price\PriceList', [
+                ['price_list_category_id', '=', $line['order_id.center_id.price_list_category_id']],
+                ['date_from', '<=', time()],
+                ['date_to', '>=', time()],
+                ['status', '=', 'published'],
+                ['is_active', '=', true]
+            ],
+                ['date_from' => 'desc', 'duration' => 'asc']
             );
 
             $found = false;
@@ -148,7 +171,7 @@ class OrderLine extends Model {
                         /*
                             Assign found Price to current line
                         */
-                        $prices = $om->read(\sale\price\Price::getType(), $prices_ids, ['price', 'vat_rate']);
+                        $prices = $om->read(\sale\price\Price::getType(), $prices_ids, ['id', 'price', 'vat_rate']);
                         $price = reset($prices);
                         // set unit_price and vat_rate from found price
                         $om->update(self::getType(), $lid, ['price_id' => $price['id'], 'unit_price' => $price['price'], 'vat_rate' => $price['vat_rate']]);
@@ -162,6 +185,31 @@ class OrderLine extends Model {
                 trigger_error("ORM::no matching price list found for product {$line['product_id']} for date {$date}", QN_REPORT_WARNING);
             }
         }
+    }
+
+    public static function onupdateFundingId($om, $ids, $values, $lang) {
+        $lines = $om->read(self::getType(), $ids, ['order_id', 'has_funding', 'funding_id', 'funding_id.booking_id.customer_id'], $lang);
+        if($lines > 0) {
+            foreach($lines as $id => $line) {
+                // #memo - this triggers Order::onupdateFundingId (on which depends has_funding)
+                $om->update('sale\pos\Order', $line['order_id'], ['funding_id' => $line['funding_id'], 'customer_id' => $line['funding_id.booking_id.customer_id']], $lang);
+                $om->update(self::getType(), $id, ['has_funding' => ($line['funding_id'] > 0)], $lang);
+            }
+        }
+    }
+
+    public static function candelete($om, $ids) {
+        $lines = $om->read(self::getType(), $ids, [ 'order_id.status' ]);
+
+        if($lines > 0) {
+            foreach($lines as $id => $line) {
+                if($line['order_id.status'] == 'paid') {
+                    return ['status' => ['non_removable' => 'Lines from paid orders cannot be deleted.']];
+                }
+            }
+        }
+        // ignore parent `candelete()`
+        return [];
     }
 
     public static function calcTotal($om, $ids, $lang) {

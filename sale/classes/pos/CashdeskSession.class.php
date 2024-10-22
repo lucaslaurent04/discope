@@ -65,10 +65,16 @@ class CashdeskSession extends Model {
 
             'cashdesk_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => Cashdesk::getType(),
+                'foreign_object'    => 'sale\pos\Cashdesk',
                 'description'       => 'The cashdesk the session relates to.',
                 'onupdate'          => 'onupdateCashdeskId',
                 'required'          => true
+            ],
+
+            'center_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\Center',
+                'description'       => "The center the desk relates to (from cashdesk)."
             ],
 
             'status' => [
@@ -91,11 +97,20 @@ class CashdeskSession extends Model {
 
             'operations_ids'  => [
                 'type'              => 'one2many',
-                'foreign_object'    => Operation::getType(),
+                'foreign_object'    => 'sale\pos\Operation',
                 'foreign_field'     => 'session_id',
                 'ondetach'          => 'delete',
                 'description'       => 'List of operations performed during session.'
-            ]
+            ],
+
+            'link_sheet' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'usage'             => 'uri/url',
+                'description'       => 'URL for generating the PDF version of the report.',
+                'function'          => 'calcLinkSheet',
+                'readonly'          => true
+            ],
 
         ];
     }
@@ -114,9 +129,9 @@ class CashdeskSession extends Model {
 
 
     /**
-     * Check wether an object can be updated.
+     * Check whether an object can be updated.
      * These tests come in addition to the unique constraints return by method `getUnique()`.
-     * This method can be overriden to define a more precise set of tests.
+     * This method can be overridden to define a more precise set of tests.
      *
      * @param  \equal\orm\ObjectManager    $om         ObjectManager instance.
      * @param  array                       $oids       List of objects identifiers.
@@ -139,40 +154,41 @@ class CashdeskSession extends Model {
 
     /**
      * Create an 'opening' operation in the operations log.
-     * Cashdesk assignement cannot be changed, so this handler is called once, when the session has just been created.
+     * Cashdesk assignment cannot be changed, so this handler is called once, when the session has just been created.
      *
+     * If cashdesk id modified, then sync session center_id with it
      */
     public static function onupdateCashdeskId($om, $oids, $values, $lang) {
-        $sessions = $om->read(__CLASS__, $oids, ['cashdesk_id', 'amount_opening', 'user_id'], $lang);
+        $sessions = $om->read(self::getType(), $oids, ['cashdesk_id.id', 'cashdesk_id.center_id', 'amount_opening', 'user_id'], $lang);
 
         if($sessions > 0) {
             foreach($sessions as $sid => $session) {
                 $om->create(Operation::getType(), [
-                    'cashdesk_id'   => $session['cashdesk_id'],
+                    'cashdesk_id'   => $session['cashdesk_id.id'],
                     'session_id'    => $sid,
                     'user_id'       => $session['user_id'],
                     'amount'        => $session['amount_opening'],
                     'type'          => 'opening'
                 ], $lang);
+
+                $om->update(self::getType(), $sid, ['center_id' => $session['cashdesk_id.center_id']], $lang);
             }
         }
     }
 
     public static function onupdateStatus($om, $oids, $values, $lang) {
-        // upon session closing, set date_closing and create additional operation if there is a delta in cash amount
+        // upon session closing, create additional operation if there is a delta in cash amount
         if(isset($values['status']) && $values['status'] == 'closed') {
-            $sessions = $om->read(self::getType(), $oids, ['id', 'cashdesk_id', 'user_id', 'amount_opening', 'amount_closing', 'operations_ids.amount'], $lang);
+            $sessions = $om->read(self::getType(), $oids, ['cashdesk_id', 'user_id', 'amount_opening', 'amount_closing', 'operations_ids.amount'], $lang);
             if($sessions > 0) {
-                // set cashdesk session date_closing
-                $om->update(self::getType(), $oids, ['date_closing' => time()], $lang);
-
                 foreach($sessions as $sid => $session) {
                     $total_cash = 0.0;
                     foreach((array) $session['operations_ids.amount'] as $oid => $operation) {
                         $total_cash += $operation['amount'];
                     }
                     // compute the difference (if any) between expected cash and actual cash in the cashdesk
-                    $delta = $session['amount_closing'] - $total_cash;
+                    $expected_cash = $total_cash + $session['amount_opening'];
+                    $delta = $session['amount_closing'] - $expected_cash;
                     if($delta != 0) {
                         // create a new move with the delta
                         $om->create(Operation::getType(), [
@@ -183,6 +199,13 @@ class CashdeskSession extends Model {
                             'type'          => 'move',
                             'description'   => 'cashdesk closing'
                         ], $lang);
+
+                        $providers = \eQual::inject(['dispatch']);
+
+                        /** @var \equal\dispatch\Dispatcher $dispatch */
+                        $dispatch = $providers['dispatch'];
+
+                        $dispatch->dispatch('lodging.pos.close-discrepancy', 'sale\pos\CashdeskSession', $sid, 'warning');
                     }
                 }
             }
@@ -202,6 +225,14 @@ class CashdeskSession extends Model {
             }
         }
 
+        return $result;
+    }
+
+    public static function calcLinkSheet($om, $ids, $lang) {
+        $result = [];
+        foreach($ids as $id) {
+            $result[$id] = '/?get=lodging_sale_pos_print-cashdeskSession-day&id='.$id;
+        }
         return $result;
     }
 }

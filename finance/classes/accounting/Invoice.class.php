@@ -271,7 +271,7 @@ class Invoice extends Model {
 
             'orders_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\pos\Order',
+                'foreign_object'    => 'sale\pos\Order',
                 'foreign_field'     => 'invoice_id',
                 'description'       => 'The orders (PoS) the invoice originates from, if any.'
             ],
