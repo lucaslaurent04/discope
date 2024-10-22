@@ -198,7 +198,7 @@ class RentalUnit extends Model {
 
             'sojourn_type_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\SojournType',
+                'foreign_object'    => 'sale\booking\SojournType',
                 'description'       => 'Default sojourn type of the rental unit.',
                 'default'           => 1,
                 'visible'           => ['is_accomodation', '=', true]
