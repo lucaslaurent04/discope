@@ -8,7 +8,7 @@ namespace identity;
 use equal\data\DataGenerator;
 use equal\orm\Model;
 use lodging\sale\booking\Booking;
-use lodging\sale\booking\Invoice;
+use sale\booking\Invoice;
 
 /**
  * This class is meant to be used as an interface for other entities (organisation and partner).
@@ -441,7 +441,7 @@ class Identity extends Model {
 
             'invoices_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\booking\Invoice',
+                'foreign_object'    => 'sale\booking\Invoice',
                 'foreign_field'     => 'customer_identity_id',
                 'description'       => 'List of invoices relating to the identity (as customer).'
             ],
