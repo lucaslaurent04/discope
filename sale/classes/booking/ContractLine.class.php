@@ -20,6 +20,19 @@ class ContractLine extends \sale\contract\ContractLine {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Contract',
                 'description'       => 'The contract the line relates to.',
+            ],
+
+            'contract_line_group_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\booking\ContractLineGroup',
+                'description'       => 'The group the line relates to.',
+            ],
+
+            'product_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\catalog\Product',
+                'description'       => 'The product (SKU) the line relates to.',
+                'required'          => true
             ]
 
         ];
