@@ -135,7 +135,7 @@ class Center extends \identity\Establishment {
 
             'sojourn_type_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\SojournType',
+                'foreign_object'    => 'sale\booking\SojournType',
                 'description'       => 'Default sojourn type of the center.',
                 'required'          => true
             ],
