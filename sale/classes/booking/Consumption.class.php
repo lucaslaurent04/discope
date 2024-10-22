@@ -69,7 +69,7 @@ class Consumption extends Model {
             // #todo - deprecate : relation between consumptions and lines might be indirect
             'booking_line_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\BookingLine',
+                'foreign_object'    => 'sale\booking\BookingLine',
                 'description'       => 'The booking line the consumption relates to.',
                 'ondelete'          => 'cascade',        // delete consumption when parent line is deleted
                 'readonly'          => true
@@ -268,9 +268,9 @@ class Consumption extends Model {
                         $group_id = $om->create('lodging\sale\booking\BookingLineGroup', ['name' => 'Suppléments', 'booking_id' => $consumption['booking_id'], 'is_extra' => true]);
                     }
                     // create a new bookingLine
-                    $line_id = $om->create('lodging\sale\booking\BookingLine', ['booking_id' => $consumption['booking_id'], 'booking_line_group_id' => $group_id, 'product_id' => $consumption['booking_line_id.product_id']], $lang);
+                    $line_id = $om->create('sale\booking\BookingLine', ['booking_id' => $consumption['booking_id'], 'booking_line_group_id' => $group_id, 'product_id' => $consumption['booking_line_id.product_id']], $lang);
                     // #memo - at creation booking_line qty is always set accordingly to its parent group nb_pers
-                    $om->update('lodging\sale\booking\BookingLine', $line_id, ['qty' => $diff, 'unit_price' => $consumption['booking_line_id.unit_price'], 'vat_rate' => $consumption['booking_line_id.vat_rate']], $lang);
+                    $om->update('sale\booking\BookingLine', $line_id, ['qty' => $diff, 'unit_price' => $consumption['booking_line_id.unit_price'], 'vat_rate' => $consumption['booking_line_id.vat_rate']], $lang);
                 }
             }
         }
