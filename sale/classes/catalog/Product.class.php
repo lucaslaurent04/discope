@@ -30,6 +30,19 @@ class Product extends Model {
                 'description'       => 'The full name of the product (label + sku).'
             ],
 
+            'code_legacy' => [
+                'type'              => 'string',
+                'description'       => "Old code of the product."
+            ],
+
+            // #todo - deprecate
+            'ref_pack_lines_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\catalog\PackLine',
+                'foreign_field'     => 'child_product_id',
+                'description'       => "Pack lines that relate to the product."
+            ],
+
             'label' => [
                 'type'              => 'string',
                 'description'       => 'Human readable mnemo for identifying the product. Allows duplicates.',
@@ -95,8 +108,7 @@ class Product extends Model {
                 'foreign_object'    => 'sale\catalog\PackLine',
                 'foreign_field'     => 'parent_product_id',
                 'description'       => "Products that are bundled in the pack.",
-                'ondetach'          => 'delete',
-                'visible'           => ['is_pack', '=', true]
+                'ondetach'          => 'delete'
             ],
 
             'product_attributes_ids' => [
@@ -144,6 +156,13 @@ class Product extends Model {
                 'default'           => true
             ],
 
+            'allow_price_adaptation' => [
+                'type'              => 'boolean',
+                'description'       => 'Flag telling if price adaptation can be applied on the variants (or children for packs).',
+                'default'           => true,
+                'visible'           => ['is_pack', '=', true],
+            ],
+
             'groups_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\catalog\Group',
@@ -163,6 +182,7 @@ class Product extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\AgeRange',
                 'description'       => 'Customers age range the product is intended for.',
+                'onupdate'          => 'onupdateAgeRangeId',
                 'visible'           => [ ['has_age_range', '=', true] ]
             ],
 
@@ -212,12 +232,12 @@ class Product extends Model {
         return $result;
     }
 
-    public static function onupdateLabel($om, $oids, $values, $lang) {
-        $om->update(__CLASS__, $oids, ['name' => null], $lang);
+    public static function onupdateLabel($om, $ids, $values, $lang) {
+        $om->update(self::getType(), $ids, ['name' => null], $lang);
     }
 
-    public static function onupdateSku($om, $oids, $values, $lang) {
-        $products = $om->read(__CLASS__, $oids, ['prices_ids']);
+    public static function onupdateSku($om, $ids, $values, $lang) {
+        $products = $om->read(self::getType(), $ids, ['prices_ids']);
         if($products > 0 && count($products)) {
             $prices_ids = [];
             foreach($products as $product) {
@@ -225,7 +245,7 @@ class Product extends Model {
             }
             $om->update('sale\price\Price', $prices_ids, ['name' => null], $lang);
         }
-        $om->update(__CLASS__, $oids, ['name' => null], $lang);
+        $om->update(self::getType(), $ids, ['name' => null], $lang);
     }
 
     public static function onupdateProductModelId($om, $oids, $values, $lang) {
@@ -241,5 +261,13 @@ class Product extends Model {
         }
     }
 
+    public static function onupdateAgeRangeId($om, $ids, $values, $lang) {
+        $products = $om->read(self::getType(), $ids, ['age_range_id']);
+        if($products > 0 && count($products)) {
+            foreach($products as $id => $product) {
+                $om->update(self::getType(), $id, ['has_age_range' => boolval($product['age_range_id'])], $lang);
+            }
+        }
+    }
 
 }

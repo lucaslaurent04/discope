@@ -42,7 +42,14 @@ class Group extends Model {
                 'type'              => 'many2one',
                 'description'       => "Product Family which current group belongs to.",
                 'foreign_object'    => 'sale\catalog\Family'
-            ]
+            ],
+
+            'center_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\Center',
+                'description'       => "Center targeted by the group.",
+                'required'          => true
+            ],
 
         ];
     }

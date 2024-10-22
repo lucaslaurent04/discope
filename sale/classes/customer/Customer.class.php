@@ -58,17 +58,19 @@ class Customer extends \identity\Partner {
                 'default'           => false
             ],
 
+            // #memo  count must be relative to booking not customer
             'count_booking_12' => [
                 'type'              => 'computed',
+                'deprecated'        => true,
                 'result_type'       => 'integer',
-                'function'          => 'sale\customer\Customer::calcCountBooking12',
+                'function'          => 'calcCountBooking12',
                 'description'       => 'Number of bookings made during last 12 months (one year).'
             ],
 
             'count_booking_24' => [
                 'type'              => 'computed',
                 'result_type'       => 'integer',
-                'function'          => 'sale\customer\Customer::calcCountBooking24',
+                'function'          => 'calcCountBooking24',
                 'description'       => 'Number of bookings made during last 24 months (2 years).'
             ],
 
@@ -92,6 +94,14 @@ class Customer extends \identity\Partner {
                 'usage'             => 'uri/urn.iban',
                 'description'       => 'Arbitrary reference account number for identifying the customer in external accounting softwares.',
                 'readonly'          => true
+            ],
+
+            'email_secondary' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'usage'             => 'email',
+                'description'       => "Identity secondary email address.",
+                'function'          => 'calcEmailSecondary'
             ]
 
         ];
@@ -135,7 +145,7 @@ class Customer extends \identity\Partner {
         foreach($oids as $oid) {
             $bookings_ids = $om->search('sale\booking\Booking', [
                 ['customer_id', '=', $oid],
-                ['created', '>=', $from],
+                ['date_from', '>=', $from],
                 ['is_cancelled', '=', false],
                 ['status', 'not in', ['quote', 'option']]
             ]);
@@ -155,12 +165,41 @@ class Customer extends \identity\Partner {
         foreach($oids as $oid) {
             $bookings_ids = $om->search('sale\booking\Booking', [
                 ['customer_id', '=', $oid],
-                ['created', '>=', $from],
+                ['date_from', '>=', $from],
                 ['is_cancelled', '=', false],
                 ['status', 'not in', ['quote', 'option']]
             ]);
             $result[$oid] = count($bookings_ids);
         }
         return $result;
+    }
+
+    public static function calcEmailSecondary($om, $ids, $lang) {
+        $result = [];
+        $customers = $om->read(self::getType(), $ids, ['partner_identity_id.email_secondary']);
+        foreach($customers as $id => $customer) {
+            $result[$id] = $customer['partner_identity_id.email_secondary'];
+        }
+        return $result;
+    }
+
+    /**
+     * Check whether the customer can be deleted.
+     *
+     * @param  \equal\orm\ObjectManager    $om        ObjectManager instance.
+     * @param  array                       $ids       List of objects identifiers.
+     * @return array                       Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be deleted.
+     */
+    public static function candelete($om, $ids) {
+        $customers = $om->read(self::getType(), $ids, [ 'bookings_ids' ]);
+
+        if($customers > 0) {
+            foreach($customers as $id => $customer) {
+                if($customer['bookings_ids'] && count($customer['bookings_ids']) > 0) {
+                    return ['bookings_ids' => ['non_removable_customer' => 'Customers relating to one or more bookings cannot be deleted.']];
+                }
+            }
+        }
+        return parent::candelete($om, $ids);
     }
 }
