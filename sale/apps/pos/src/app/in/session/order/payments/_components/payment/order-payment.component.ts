@@ -184,7 +184,7 @@ export class SessionOrderPaymentsOrderPaymentComponent extends TreeComponent<Ord
     public async changeQuantity(line : any){
         // Remove the number of elements indicated, and create a new object with the difference
         if(parseInt(this.line_quantity) <line.qty) {
-            await this.api.create('lodging\\sale\\pos\\OrderLine', {
+            await this.api.create('sale\\pos\\OrderLine', {
                 order_id: line.order_id,
                 order_payment_id: 0,
                 order_unit_price: line.unit_price,
@@ -196,11 +196,11 @@ export class SessionOrderPaymentsOrderPaymentComponent extends TreeComponent<Ord
                 name: line.name,
                 qty: line.qty-parseInt(this.line_quantity)
             });
-            await this.api.update('lodging\\sale\\pos\\OrderLine', [line.id], {
+            await this.api.update('sale\\pos\\OrderLine', [line.id], {
                 qty : parseInt(this.line_quantity)
             });
         }else{
-            await this.api.update('lodging\\sale\\pos\\OrderLine', [line.id], {
+            await this.api.update('sale\\pos\\OrderLine', [line.id], {
                 qty : parseInt(this.line_quantity)
             });
         }

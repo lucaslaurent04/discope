@@ -1,5 +1,5 @@
 export class CashdeskSession {
-    public static entity:string = 'lodging\\sale\\pos\\CashdeskSession';
+    public static entity:string = 'sale\\pos\\CashdeskSession';
 
     constructor(
         public id: number = 0,
@@ -15,7 +15,7 @@ export class CashdeskSession {
 }
 
 export class Order {
-    public static entity:string = 'lodging\\sale\\pos\\Order';
+    public static entity:string = 'sale\\pos\\Order';
 
     constructor(
         public id: number = 0,
