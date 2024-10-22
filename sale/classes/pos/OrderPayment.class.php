@@ -111,7 +111,7 @@ class OrderPayment extends Model {
 
             'payments_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\booking\Payment',
+                'foreign_object'    => 'sale\booking\Payment',
                 'foreign_field'     => 'order_payment_id',
                 'ondetach'          => 'null',
                 'description'       => 'The payments relating to the OrderPayment (o2o : list length should be 1 or 0).'
