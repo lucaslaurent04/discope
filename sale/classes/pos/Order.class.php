@@ -271,7 +271,7 @@ class Order extends Model {
     }
 
     public static function onupdateOrderLinesIds($om, $ids, $values, $lang) {
-        $om->write(get_called_class(), $ids, ['price' => null, 'total' => null], $lang);
+        $om->write(self::getType(), $ids, ['price' => null, 'total' => null], $lang);
     }
 
     public static function onupdateFundingId($om, $ids, $values, $lang) {
@@ -294,7 +294,7 @@ class Order extends Model {
 
     public static function calcName($om, $ids, $lang) {
         $result = [];
-        $orders = $om->read(get_called_class(), $ids, ['sequence', 'session_id', 'session_id.cashdesk_id'], $lang);
+        $orders = $om->read(self::getType(), $ids, ['sequence', 'session_id', 'session_id.cashdesk_id'], $lang);
         if($orders > 0) {
             foreach($orders as $oid => $order) {
                 $result[$oid] = sprintf("%03d.%05d.%03d", $order['session_id.cashdesk_id'], $order['session_id'], $order['sequence']);
@@ -322,7 +322,7 @@ class Order extends Model {
 
     public static function calcTotal($om, $ids, $lang) {
         $result = [];
-        $orders = $om->read(__CLASS__, $ids, ['order_lines_ids.total']);
+        $orders = $om->read(self::getType(), $ids, ['order_lines_ids.total']);
         if($orders > 0) {
             foreach($orders as $oid => $order) {
                 $result[$oid] = 0.0;
@@ -339,7 +339,7 @@ class Order extends Model {
 
     public static function calcPrice($om, $ids, $lang) {
         $result = [];
-        $orders = $om->read(__CLASS__, $ids, ['order_lines_ids.price']);
+        $orders = $om->read(self::getType(), $ids, ['order_lines_ids.price']);
         if($orders > 0) {
             foreach($orders as $oid => $order) {
                 $result[$oid] = 0.0;
@@ -356,7 +356,7 @@ class Order extends Model {
 
     public static function calcTotalPaid($om, $ids, $lang) {
         $result = [];
-        $orders = $om->read(__CLASS__, $ids, ['order_payments_ids.total_paid']);
+        $orders = $om->read(self::getType(), $ids, ['order_payments_ids.total_paid']);
         if($orders > 0) {
             foreach($orders as $oid => $order) {
                 $result[$oid] = 0.0;
@@ -373,7 +373,7 @@ class Order extends Model {
 
     public static function canupdate($om, $ids, $values, $lang) {
         if(isset($values['session_id'])) {
-            $res = $om->read('sale\pos\CashdeskSession', $values['session_id'], [ 'status' ]);
+            $res = $om->read(CashdeskSession::getType(), $values['session_id'], [ 'status' ]);
 
             if($res > 0) {
                 $session = reset($res);

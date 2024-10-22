@@ -120,7 +120,7 @@ class CashdeskSession extends Model {
      * Make sure there are no other pending sessions, otherwise, deny the update (which might be called on draft instance).
      */
     public static function cancreate($om, $values, $lang) {
-        $res = $om->search(get_called_class(), [ ['status', '=', 'pending'], ['cashdesk_id', '=', $values['cashdesk_id']] ]);
+        $res = $om->search(self::getType(), [ ['status', '=', 'pending'], ['cashdesk_id', '=', $values['cashdesk_id']] ]);
         if($res > 0 && count($res)) {
             return ['status' => ['already_open' => 'There can be only one session at a time on a given cashdesk.']];
         }
@@ -140,7 +140,7 @@ class CashdeskSession extends Model {
      * @return array    Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be updated.
      */
     public static function canupdate($om, $oids, $values, $lang) {
-        $sessions = $om->read(__CLASS__, $oids, ['status'], $lang);
+        $sessions = $om->read(self::getType(), $oids, ['status'], $lang);
 
         if($sessions > 0) {
             foreach($sessions as $sid => $session) {
@@ -215,7 +215,7 @@ class CashdeskSession extends Model {
     public static function calcName($om, $ids, $lang) {
         $result = [];
 
-        $sessions = $om->read(get_called_class(), $ids, ['cashdesk_id.name', 'user_id.name'], $lang);
+        $sessions = $om->read(self::getType(), $ids, ['cashdesk_id.name', 'user_id.name'], $lang);
 
         if($sessions > 0) {
             foreach($sessions as $sid => $session) {

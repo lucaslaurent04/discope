@@ -69,7 +69,7 @@ class OrderPaymentPart extends \sale\booking\Payment {
 
             'funding_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => Funding::getType(),
+                'foreign_object'    => 'lodging\sale\booking\Funding',
                 'description'       => 'The funding the payment relates to, if any.',
                 'onupdate'          => 'onupdateFundingId'
             ],
@@ -98,7 +98,7 @@ class OrderPaymentPart extends \sale\booking\Payment {
         $parts = $om->read(get_called_class(), $ids, ['order_payment_id'], $lang);
         if($parts > 0) {
             $order_payments_ids = array_reduce($parts, function($c, $o) { return array_merge($c, [$o['order_payment_id']]); }, []);
-            $om->write('sale\pos\OrderPayment', $order_payments_ids, ['total_paid' => null ], $lang);
+            $om->write(OrderPayment::getType(), $order_payments_ids, ['total_paid' => null ], $lang);
         }
     }
 
@@ -146,7 +146,7 @@ class OrderPaymentPart extends \sale\booking\Payment {
         $parts = $om->read(self::getType(), $ids, ['order_payment_id.order_id'], $lang);
         if($parts > 0) {
             foreach($parts as $id => $part) {
-                $orders = $om->read('sale\pos\Order', $part['order_payment_id.order_id'], ['id', 'customer_id', 'funding_id', 'center_id.center_office_id']);
+                $orders = $om->read(Order::getType(), $part['order_payment_id.order_id'], ['id', 'customer_id', 'funding_id', 'center_id.center_office_id']);
                 if($orders > 0 && count($orders)) {
                     $order = reset($orders);
                     $om->update(self::getType(), $id, ['order_id' => $order['id'],'partner_id' => $order['customer_id'], 'funding_id' => $order['funding_id'], 'center_office_id' => $order['center_id.center_office_id']], $lang);
@@ -164,10 +164,10 @@ class OrderPaymentPart extends \sale\booking\Payment {
         if($parts > 0) {
             foreach($parts as $id => $part) {
                 if($part['payment_method'] == 'booking') {
-                    $om->update('sale\pos\OrderPayment', $part['order_payment_id'], ['has_booking' => true, 'booking_id' => $part['booking_id']], $lang);
+                    $om->update(OrderPayment::getType(), $part['order_payment_id'], ['has_booking' => true, 'booking_id' => $part['booking_id']], $lang);
                 }
                 else {
-                    $om->update('sale\pos\OrderPayment', $part['order_payment_id'], ['has_booking' => false, 'booking_id' => null], $lang);
+                    $om->update(OrderPayment::getType(), $part['order_payment_id'], ['has_booking' => false, 'booking_id' => null], $lang);
                 }
             }
         }
