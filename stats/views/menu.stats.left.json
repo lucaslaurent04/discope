@@ -196,7 +196,7 @@
                                 "label": "Total Reimbursements",
                                 "description": "",
                                 "context": {
-                                    "entity": "lodging\\sale\\booking\\Funding",
+                                    "entity": "sale\\booking\\Funding",
                                     "view": "chart.default",
                                     "mode": "grid"
                                 }

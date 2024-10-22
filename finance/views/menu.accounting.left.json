@@ -102,7 +102,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\Funding",
+                            "entity": "sale\\booking\\Funding",
                             "view": "list.default",
                             "domain": ["due_amount", "<", 0]
                         }

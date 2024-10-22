@@ -7,7 +7,7 @@
 namespace sale\booking;
 
 use lodging\sale\booking\Booking;
-use lodging\sale\booking\Funding;
+use sale\booking\Funding;
 use lodging\sale\booking\Invoice;
 
 class BankStatementLine extends \sale\pay\BankStatementLine {

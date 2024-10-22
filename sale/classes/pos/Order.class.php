@@ -79,7 +79,7 @@ class Order extends Model {
 
             'funding_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\Funding',
+                'foreign_object'    => 'sale\booking\Funding',
                 'description'       => 'The booking funding that relates to the order, if any.',
                 'visible'           => ['has_funding', '=', true],
                 'onupdate'          => 'onupdateFundingId'

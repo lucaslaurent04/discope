@@ -7,7 +7,7 @@
 namespace sale\booking;
 
 use lodging\sale\booking\Booking;
-use lodging\sale\booking\Funding;
+use sale\booking\Funding;
 use lodging\sale\booking\Invoice;
 
 class Payment extends \sale\pay\Payment {
@@ -27,7 +27,7 @@ class Payment extends \sale\pay\Payment {
 
             'funding_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\Funding',
+                'foreign_object'    => 'sale\booking\Funding',
                 'description'       => 'The funding the payment relates to, if any.',
                 'onupdate'          => 'onupdateFundingId'
             ],
