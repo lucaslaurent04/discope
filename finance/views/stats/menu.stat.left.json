@@ -193,7 +193,7 @@
                                 "label": "Total Remboursements",
                                 "description": "",
                                 "context": {
-                                    "entity": "lodging\\sale\\booking\\Funding",
+                                    "entity": "sale\\booking\\Funding",
                                     "view": "chart.default"
                                 }
                             }
