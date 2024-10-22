@@ -22,7 +22,7 @@ class Center extends \identity\Establishment {
 
             'center_office_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => CenterOffice::getType(),
+                'foreign_object'    => 'identity\CenterOffice',
                 'description'       => 'Management Group to which the center belongs.'
             ],
 
@@ -142,7 +142,7 @@ class Center extends \identity\Establishment {
 
             'pos_default_customer_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \sale\customer\Customer::getType(),
+                'foreign_object'    => 'sale\customer\Customer',
                 'description'       => 'Default customer for sales at POS.'
             ],
 

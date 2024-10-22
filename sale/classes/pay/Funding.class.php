@@ -28,7 +28,7 @@ class Funding extends Model {
 
             'payments_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => Payment::getType(),
+                'foreign_object'    => 'sale\pay\Payment',
                 'foreign_field'     => 'funding_id'
             ],
 

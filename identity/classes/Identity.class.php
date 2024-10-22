@@ -355,7 +355,7 @@ class Identity extends Model {
 
             'lang_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \core\Lang::getType(),
+                'foreign_object'    => 'core\Lang',
                 'description'       => "Preferred language of the identity.",
                 'default'           => 2,
                 'onupdate'          => 'onupdateLangId'
@@ -434,14 +434,14 @@ class Identity extends Model {
 
             'bookings_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => Booking::getType(),
+                'foreign_object'    => 'lodging\sale\booking\Booking',
                 'foreign_field'     => 'customer_identity_id',
                 'description'       => 'List of bookings relating to the identity.'
             ],
 
             'invoices_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => Invoice::getType(),
+                'foreign_object'    => 'lodging\sale\booking\Invoice',
                 'foreign_field'     => 'customer_identity_id',
                 'description'       => 'List of invoices relating to the identity (as customer).'
             ],
