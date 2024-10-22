@@ -29,14 +29,14 @@ class Composition extends Model {
 
             'booking_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'sale\booking\Booking',
-                'description'       => 'The booking the composition relates to.' 
+                'foreign_object'    => 'lodging\sale\booking\Booking',
+                'description'       => 'The booking the composition relates to.'
             ],
 
             'booking_line_group_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'sale\booking\BookingLineGroup',
-                'description'       => 'The group the composition relates to.' 
+                'foreign_object'    => 'lodging\sale\booking\BookingLineGroup',
+                'description'       => 'The group the composition relates to.'
             ],
 
             'composition_items_ids' => [
