@@ -7,7 +7,7 @@
 namespace sale\booking;
 use equal\orm\Model;
 use equal\html\HTMLToText;
-use lodging\sale\booking\Consumption;
+use sale\booking\Consumption;
 
 class Repairing extends Model {
 
