@@ -18,7 +18,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatement",
+                            "entity": "sale\\booking\\BankStatement",
                             "view": "list.default",
                             "order": "date",
                             "sort": "desc",
@@ -32,7 +32,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatement",
+                            "entity": "sale\\booking\\BankStatement",
                             "view": "list.default",
                             "order": "date",
                             "sort": "desc"
@@ -45,7 +45,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatementLine",
+                            "entity": "sale\\booking\\BankStatementLine",
                             "view": "list.default",
                             "order": "date",
                             "sort": "desc",
@@ -59,7 +59,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatementLine",
+                            "entity": "sale\\booking\\BankStatementLine",
                             "view": "list.default",
                             "order": "date",
                             "sort": "desc"
@@ -72,7 +72,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatementLine",
+                            "entity": "sale\\booking\\BankStatementLine",
                             "view": "list.reconciled",
                             "domain": [
                                 ["status", "=", "reconciled"]
