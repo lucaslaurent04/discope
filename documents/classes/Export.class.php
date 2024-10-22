@@ -24,7 +24,7 @@ class Export extends Document {
 
             'center_office_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \identity\CenterOffice::getType(),
+                'foreign_object'    => 'identity\CenterOffice',
                 'description'       => 'Office the invoice relates to (for center management).',
             ],
 

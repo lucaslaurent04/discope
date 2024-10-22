@@ -50,6 +50,16 @@ class AgeRange extends Model {
                 'type'              => 'boolean',
                 'description'       => "Can the age range be used in bookings?",
                 'default'           => true
+            ],
+
+            'discounts_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\discount\Discount',
+                'foreign_field'     => 'age_ranges_ids',
+                'rel_table'         => 'lodging_sale_discount_rel_agerange_discount',
+                'rel_foreign_key'   => 'discount_id',
+                'rel_local_key'     => 'age_range_id',
+                'description'       => 'The conditions that apply to the discount.'
             ]
 
         ];

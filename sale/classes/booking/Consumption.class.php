@@ -52,10 +52,10 @@ class Consumption extends Model {
                 'visible'           => ['type', '=', 'ooo']
             ],
 
-            // #todo - deprecate : relation bewteen consumptions and lines might be indirect
+            // #todo - deprecate : relation between consumptions and lines might be indirect
             'booking_line_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => BookingLine::getType(),
+                'foreign_object'    => 'sale\booking\BookingLine',
                 'description'       => 'The booking line the consumption relates to.',
                 'ondelete'          => 'cascade',        // delete consumption when parent line is deleted
                 'readonly'          => true

@@ -23,11 +23,13 @@ class Condition extends Model {
             'operand' => [
                 'type'              => 'string',
                 'selection'         => [
-                                            'season', 
-                                            'nb_pers', 
-                                            'duration', 
-                                            'count_booking_24'
-                                       ],
+                    'season',
+                    'nb_pers',
+                    'nb_children',
+                    'nb_adults',
+                    'duration',
+                    'count_booking_24'
+                ],
                 'required'          => true
             ],
 
@@ -47,7 +49,7 @@ class Condition extends Model {
                 'foreign_object'    => 'sale\discount\Discount',
                 'description'       => 'The discount list the discount belongs to.',
                 'required'          => true
-            ],
+            ]
 
 
         ];

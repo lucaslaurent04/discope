@@ -22,7 +22,7 @@ class Center extends \identity\Establishment {
 
             'center_office_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => CenterOffice::getType(),
+                'foreign_object'    => 'identity\CenterOffice',
                 'description'       => 'Management Group to which the center belongs.'
             ],
 
@@ -110,7 +110,7 @@ class Center extends \identity\Establishment {
 
             'product_families_ids' => [
                 'type'              => 'many2many',
-                'foreign_object'    => 'lodging\sale\catalog\Family',
+                'foreign_object'    => 'sale\catalog\Family',
                 'foreign_field'     => 'centers_ids',
                 'rel_table'         => 'sale_product_family_rel_identity_center',
                 'rel_foreign_key'   => 'family_id',
@@ -128,7 +128,7 @@ class Center extends \identity\Establishment {
 
             'product_groups_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\catalog\Group',
+                'foreign_object'    => 'sale\catalog\Group',
                 'foreign_field'     => 'center_id',
                 'description'       => "Group targeted by the center."
             ],
@@ -142,7 +142,7 @@ class Center extends \identity\Establishment {
 
             'pos_default_customer_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \sale\customer\Customer::getType(),
+                'foreign_object'    => 'sale\customer\Customer',
                 'description'       => 'Default customer for sales at POS.'
             ],
 

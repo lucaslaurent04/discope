@@ -40,6 +40,12 @@ class ProductFavorite extends Model {
                 'description'       => "Targeted product.",
                 'onupdate'          => 'onupdateProductId',
                 'required'          => true
+            ],
+
+            'center_office_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\CenterOffice',
+                'description'       => "Center Office the favorite belongs to."
             ]
 
         ];

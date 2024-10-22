@@ -1,5 +1,5 @@
 export class CashdeskSession {
-    public static entity:string = 'lodging\\sale\\pos\\CashdeskSession';
+    public static entity:string = 'sale\\pos\\CashdeskSession';
 
     constructor(
         public id: number = 0,

@@ -187,9 +187,130 @@ class ProductModel extends Model {
                 'foreign_object'    => 'sale\catalog\Product',
                 'foreign_field'     => 'product_model_id',
                 'description'       => "Product variants that are related to this model.",
+            ],
+
+            'qty_accounting_method' => [
+                'type'              => 'string',
+                'description'       => 'The way the product quantity has to be computed (per unit [default], per person, or per accommodation [resource]).',
+                'selection'         => [
+                    'person',           // depends on the number of people
+                    'accomodation',     // depends on the number of nights
+                    'unit'              // only depends on quantity
+                ],
+                'default'           => 'unit'
+            ],
+
+            'booking_type_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\booking\BookingType',
+                'description'       => "The kind of booking it is about.",
+                'default'           => 1                // default to 'general public'
+            ],
+
+            'is_repeatable' => [
+                'type'              => 'boolean',
+                'description'       => 'Model relates to a consumption that is repeated each day of the sojourn.',
+                'default'           => false,
+                'visible'           => [ 'has_duration', '=', false ]
+            ],
+
+            'is_accomodation' => [
+                'type'              => 'boolean',
+                'description'       => 'Model relates to a rental unit that is an accommodation.',
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', true] ]
+            ],
+
+            'is_rental_unit' => [
+                'type'              => 'boolean',
+                'description'       => 'Is the product a rental_unit?',
+                'default'           => false,
+                'onupdate'          => 'onupdateIsRentalUnit',
+                'visible'           => [ ['type', '=', 'service'], ['is_meal', '=', false] , ['is_snack', '=', false]]
+            ],
+
+            'is_meal' => [
+                'type'              => 'boolean',
+                'description'       => 'Is the product a meal? (meals might be part of the board / included services of the stay).',
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false] , ['is_snack', '=', false] ]
+            ],
+
+            'is_snack' => [
+                'type'              => 'boolean',
+                'description'       => 'Is the product a snack?.',
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_meal', '=', false] ]
+            ],
+
+            'rental_unit_assignement' => [
+                'type'              => 'string',
+                'description'       => 'The way the product is assigned to a rental unit (a specific unit, a specific category, or based on capacity match).',
+                'selection'         => [
+                    'unit',             // only one specific rental unit can be assigned to the products
+                    'category',         // only rental units of the specified category can be assigned to the products
+                    'auto'              // rental unit assignment is based on required qty/capacity (best match first)
+                ],
+                'default'           => 'category',
+                'visible'           => [ ['is_rental_unit', '=', true] ]
+            ],
+
+            'has_duration' => [
+                'type'              => 'boolean',
+                'description'       => 'Does the product have a specific duration.',
+                'default'           => false,
+                'visible'           => ['type', '=', 'service']
+            ],
+
+            'duration' => [
+                'type'              => 'integer',
+                'description'       => 'Duration of the service (in days), used for planning.',
+                'default'           => 1,
+                'visible'           => [ ['type', '=', 'service'], ['has_duration', '=', true] ]
+            ],
+
+            'capacity' => [
+                'type'              => 'integer',
+                'description'       => 'Capacity implied by the service (used for filtering rental units).',
+                'default'           => 1
+            ],
+
+            // a product either refers to a specific rental unit, or to a category of rental units (both allowing to find matching units for a given period and a capacity)
+            'rental_unit_category_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'realestate\RentalUnitCategory',
+                'description'       => "Rental Unit Category this Product related to, if any.",
+                'visible'           => [ ['is_rental_unit', '=', true], ['rental_unit_assignement', '=', 'category'] ]
+            ],
+
+            'rental_unit_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'realestate\RentalUnit',
+                'description'       => "Specific Rental Unit this Product related to, if any",
+                'visible'           => [ ['is_rental_unit', '=', true], ['rental_unit_assignement', '=', 'unit'] ],
+                'onupdate'          => 'onupdateRentalUnitId'
+            ],
+
+            'allow_price_adaptation' => [
+                'type'              => 'boolean',
+                'description'       => 'Flag telling if price adaptation can be applied on the variants (or children for packs).',
+                'default'           => true,
+                'visible'           => ['is_pack', '=', true],
+                'onupdate'          => 'onupdateAllowPriceAdaptation'
             ]
 
         ];
+    }
+
+    public static function onchange($om, $event, $values, $lang='en') {
+        $result = [];
+
+        if(isset($event['is_meal'])) {
+            $result['is_snack'] = false;
+        }
+        if(isset($event['is_snack'])) {
+            $result['is_meal'] = false;
+        }
+        return $result;
     }
 
     /**
@@ -238,6 +359,35 @@ class ProductModel extends Model {
                 $groups_ids = array_map(function($a) {return "-$a";}, (array) $product['groups_ids']);
                 $groups_ids = array_merge($groups_ids, $model['groups_ids']);
                 $om->write('sale\catalog\Product', $pid, ['groups_ids' => $groups_ids]);
+            }
+        }
+    }
+
+    /**
+     * Assign the related rental unity capacity as own capacity.
+     */
+    public static function onupdateRentalUnitId($om, $ids, $values, $lang) {
+        $models = $om->read(self::gettype(), $ids, ['rental_unit_id.capacity', 'rental_unit_id.is_accomodation'], $lang);
+        foreach($models as $id => $model) {
+            $om->update(self::gettype(), $id, ['capacity' => $model['rental_unit_id.capacity'], 'is_accomodation' => $model['rental_unit_id.is_accomodation']]);
+        }
+    }
+
+    /**
+     * Sync model with variants (products) upon change for `allow_price_adaptation`
+     */
+    public static function onupdateAllowPriceAdaptation($om, $ids, $values, $lang) {
+        $models = $om->read(self::getType(), $ids, ['products_ids', 'allow_price_adaptation'], $lang);
+        foreach($models as $id => $model) {
+            $om->update('sale\catalog\Product', $model['products_ids'], ['allow_price_adaptation' => $model['allow_price_adaptation']]);
+        }
+    }
+
+    public static function onupdateIsRentalUnit($om, $ids, $values, $lang) {
+        $models = $om->read(self::getType(), $ids, ['is_rental_unit'], $lang);
+        foreach($models as $id => $model) {
+            if(!$model['is_rental_unit']) {
+                $om->update(self::gettype(), $id, ['is_accomodation' => false]);
             }
         }
     }
