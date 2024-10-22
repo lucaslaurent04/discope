@@ -41,7 +41,7 @@ class Establishment extends Model {
             /* parent organisation */
             'organisation_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => Identity::getType(),
+                'foreign_object'    => 'identity\Identity',
                 'description'       => "The organisation the establishment belongs to.",
                 'required'          => true
             ],
@@ -113,7 +113,7 @@ class Establishment extends Model {
 
             'analytic_section_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \finance\accounting\AnalyticSection::getType(),
+                'foreign_object'    => 'finance\accounting\AnalyticSection',
                 'description'       => "Related analytic section, if any."
             ],
 

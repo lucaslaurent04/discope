@@ -17,14 +17,14 @@ class Payment extends \sale\pay\Payment {
                 'result_type'       => 'many2one',
                 'function'          => 'calcBookingId',
                 'foreign_object'    => 'sale\booking\Booking',
-                'description'       => 'The booking the payement relates to, if any (computed).',
+                'description'       => 'The booking the payment relates to, if any (computed).',
                 'store'             => true
             ],
 
             'funding_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Funding',
-                'description'       => 'The funding the payement relates to, if any.',
+                'description'       => 'The funding the payment relates to, if any.',
                 'onupdate'          => 'sale\pay\Payment::onupdateFundingId'
             ],
 

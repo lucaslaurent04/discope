@@ -1,6 +1,8 @@
 {
     "name": "documents",
     "depends_on": [
+        "core",
+        "identity"
     ],
     "apps": ["documents"]
 }
