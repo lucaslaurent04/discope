@@ -13,7 +13,7 @@ class AccountingEntry extends \finance\accounting\AccountingEntry {
 
             'invoice_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\Invoice',
+                'foreign_object'    => 'sale\booking\Invoice',
                 'description'       => 'Invoice that the line relates to.',
                 'ondelete'          => 'cascade',
                 'visible'           => ['has_invoice', '=', true]
@@ -21,7 +21,7 @@ class AccountingEntry extends \finance\accounting\AccountingEntry {
 
             'invoice_line_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\InvoiceLine',
+                'foreign_object'    => 'sale\booking\InvoiceLine',
                 'description'       => 'Invoice line the entry relates to.',
                 'ondelete'          => 'cascade',
                 'visible'           => ['has_invoice', '=', true]

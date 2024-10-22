@@ -85,7 +85,7 @@ class Funding extends \sale\pay\Funding {
 
             'invoice_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\Invoice',
+                'foreign_object'    => 'sale\booking\Invoice',
                 'ondelete'          => 'null',
                 'description'       => 'The invoice targeted by the funding, if any.',
                 'visible'           => [ ['type', '=', 'invoice'] ]

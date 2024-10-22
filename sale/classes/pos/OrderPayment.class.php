@@ -7,7 +7,7 @@
 namespace sale\pos;
 use equal\orm\Model;
 use lodging\sale\booking\Booking;
-use lodging\sale\booking\Invoice;
+use sale\booking\Invoice;
 
 class OrderPayment extends Model {
 

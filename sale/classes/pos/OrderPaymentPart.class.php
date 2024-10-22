@@ -8,7 +8,7 @@ namespace sale\pos;
 
 use lodging\sale\booking\Booking;
 use sale\booking\Funding;
-use lodging\sale\booking\Invoice;
+use sale\booking\Invoice;
 
 class OrderPaymentPart extends \sale\booking\Payment {
 
