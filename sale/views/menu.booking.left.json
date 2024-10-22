@@ -177,7 +177,7 @@
                         "description": "",
                         "route": "/consumptions",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\Consumption",
+                            "entity": "sale\\booking\\Consumption",
                             "view": "list.checkins",
                             "domain": ["schedule_from", "<>", "00:00:00"]
                         }
@@ -189,7 +189,7 @@
                         "description": "",
                         "route": "/consumptions",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\Consumption",
+                            "entity": "sale\\booking\\Consumption",
                             "view": "list.meals"
                         }
                     },
@@ -200,7 +200,7 @@
                         "description": "",
                         "route": "/consumptions",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\Consumption",
+                            "entity": "sale\\booking\\Consumption",
                             "view": "list.cleanups"
                         }
                     },
@@ -211,7 +211,7 @@
                         "description": "",
                         "route": "/consumptions",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\Consumption",
+                            "entity": "sale\\booking\\Consumption",
                             "view": "list.occupancies"
                         }
                     }

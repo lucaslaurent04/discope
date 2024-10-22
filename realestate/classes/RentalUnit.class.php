@@ -314,14 +314,14 @@ class RentalUnit extends Model {
         $result = [];
 
         // #memo - a consumption always spans on a single day
-        $consumptions_ids = $om->search(\lodging\sale\booking\Consumption::getType(), [
+        $consumptions_ids = $om->search(\sale\booking\Consumption::getType(), [
             ['date', '>=', $date_from],
             ['date', '<=', $date_to],
             ['rental_unit_id', '=', $rental_unit_id]
         ], ['date' => 'asc']);
 
         if($consumptions_ids > 0 && count($consumptions_ids)) {
-            $consumptions = $om->read(\lodging\sale\booking\Consumption::getType(), $consumptions_ids, [
+            $consumptions = $om->read(\sale\booking\Consumption::getType(), $consumptions_ids, [
                 'id',
                 'date',
                 'rental_unit_id',
