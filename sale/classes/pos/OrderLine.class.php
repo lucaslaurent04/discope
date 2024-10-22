@@ -55,7 +55,7 @@ class OrderLine extends Model {
 
             'funding_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'sale\pay\Funding',
+                'foreign_object'    => 'lodging\sale\booking\Funding',
                 'description'       => 'The funding the line relates to, if any.',
                 'onupdate'          => 'onupdateFundingId',
                 'visible'           => ['has_funding', '=', true]
