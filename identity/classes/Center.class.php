@@ -95,7 +95,7 @@ class Center extends \identity\Establishment {
 
             'repairings_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\booking\Repairing',
+                'foreign_object'    => 'sale\booking\Repairing',
                 'foreign_field'     => 'center_id',
                 'description'       => 'List of rental units of the center.',
                 'ondetach'          => 'delete'
