@@ -135,7 +135,7 @@ class OrderLine extends Model {
         if($lines > 0) {
             foreach($lines as $id => $line) {
                 // #memo - this triggers Order::onupdateFundingId (on which depends has_funding)
-                $om->update('sale\pos\Order', $line['order_id'], ['funding_id' => $line['funding_id']], $lang);
+                $om->update(Order::getType(), $line['order_id'], ['funding_id' => $line['funding_id']], $lang);
             }
         }
     }
@@ -192,7 +192,7 @@ class OrderLine extends Model {
         if($lines > 0) {
             foreach($lines as $id => $line) {
                 // #memo - this triggers Order::onupdateFundingId (on which depends has_funding)
-                $om->update('sale\pos\Order', $line['order_id'], ['funding_id' => $line['funding_id'], 'customer_id' => $line['funding_id.booking_id.customer_id']], $lang);
+                $om->update(Order::getType(), $line['order_id'], ['funding_id' => $line['funding_id'], 'customer_id' => $line['funding_id.booking_id.customer_id']], $lang);
                 $om->update(self::getType(), $id, ['has_funding' => ($line['funding_id'] > 0)], $lang);
             }
         }
@@ -214,7 +214,7 @@ class OrderLine extends Model {
 
     public static function calcTotal($om, $ids, $lang) {
         $result = [];
-        $lines = $om->read(__CLASS__, $ids, ['unit_price', 'qty', 'free_qty', 'discount']);
+        $lines = $om->read(self::getType(), $ids, ['unit_price', 'qty', 'free_qty', 'discount']);
         if($lines > 0) {
             foreach($lines as $lid => $line) {
                 $result[$lid] = round(($line['unit_price'] * (1 - $line['discount'])) * ($line['qty'] - $line['free_qty']), 4);
@@ -225,7 +225,7 @@ class OrderLine extends Model {
 
     public static function calcPrice($om, $ids, $lang) {
         $result = [];
-        $lines = $om->read(__CLASS__, $ids, ['total', 'vat_rate']);
+        $lines = $om->read(self::getType(), $ids, ['total', 'vat_rate']);
         if($lines > 0) {
             foreach($lines as $lid => $line) {
                 $result[$lid] = round($line['total'] * (1 + $line['vat_rate']), 2);
@@ -239,11 +239,11 @@ class OrderLine extends Model {
      * This method is used as onupdate handler for all fields impacting the price.
      */
     public static function _resetPrice($om, $ids, $values, $lang) {
-        $lines = $om->read(get_called_class(), $ids, ['order_id'], $lang);
+        $lines = $om->read(self::getType(), $ids, ['order_id'], $lang);
         if($lines > 0) {
             $orders_ids = array_map(function ($a) {return $a['order_id'];}, $lines);
-            $om->write('sale\pos\Order', $orders_ids, ['total' => null, 'price' => null], $lang);
+            $om->write(Order::getType(), $orders_ids, ['total' => null, 'price' => null], $lang);
         }
-        $om->write(get_called_class(), $ids, ['total' => null, 'price' => null], $lang);
+        $om->write(self::getType(), $ids, ['total' => null, 'price' => null], $lang);
     }
 }

@@ -39,7 +39,7 @@ class Operation extends Model {
 
             'session_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => CashdeskSession::getType(),
+                'foreign_object'    => 'sale\pos\CashdeskSession',
                 'description'       => 'The cashdesk session the operation relates to.',
                 'onupdate'          => 'onupdateSessionId',
                 'required'          => true
@@ -71,7 +71,7 @@ class Operation extends Model {
     public static function calcName($om, $ids, $lang) {
         $result = [];
 
-        $operations = $om->read(get_called_class(), $ids, ['cashdesk_id.name', 'type', 'amount'], $lang);
+        $operations = $om->read(self::getType(), $ids, ['cashdesk_id.name', 'type', 'amount'], $lang);
 
         if($operations > 0) {
             foreach($operations as $oid => $operation) {

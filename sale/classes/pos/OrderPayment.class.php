@@ -135,7 +135,7 @@ class OrderPayment extends Model {
         $payments = $om->read(self::getType(), $ids, ['order_id'], $lang);
         if($payments > 0) {
             foreach($payments as $id => $payment) {
-                $orders = $om->read('sale\pos\Order', $payment['order_id'], ['has_funding', 'funding_id'], $lang);
+                $orders = $om->read(Order::getType(), $payment['order_id'], ['has_funding', 'funding_id'], $lang);
                 if($orders > 0) {
                     $order = reset($orders);
                     $om->update(self::getType(), $id, ['has_funding' => $order['has_funding'], 'funding_id' => $order['funding_id']], $lang);
@@ -165,7 +165,7 @@ class OrderPayment extends Model {
             foreach($payments as $pid => $payment) {
                 if($payment['funding_id']) {
                     $om->update(self::getType(), $pid, ['has_funding' => ($payment['funding_id'] > 0)], $lang);
-                    $om->update('sale\pos\Order', $payment['order_id'], ['funding_id' => $payment['funding_id']], $lang);
+                    $om->update(Order::getType(), $payment['order_id'], ['funding_id' => $payment['funding_id']], $lang);
                     if($payment['funding_id.booking_id']) {
                         $map_bookings_ids[$payment['funding_id.booking_id']] = true;
                     }
@@ -184,8 +184,8 @@ class OrderPayment extends Model {
         $payments = $om->read(self::getType(), $ids, ['has_booking', 'booking_id', 'order_id', 'order_lines_ids'], $lang);
         if($payments > 0) {
             foreach($payments as $oid => $payment) {
-                $om->update('sale\pos\OrderLine', $payment['order_lines_ids'], ['has_booking' => $payment['has_booking']], $lang);
-                $om->update('sale\pos\Order', $payment['order_id'], ['booking_id' => $payment['booking_id']], $lang);
+                $om->update(OrderLine::getType(), $payment['order_lines_ids'], ['has_booking' => $payment['has_booking']], $lang);
+                $om->update(Order::getType(), $payment['order_id'], ['booking_id' => $payment['booking_id']], $lang);
             }
         }
     }
@@ -210,7 +210,7 @@ class OrderPayment extends Model {
 
     public static function calcTotalDue($om, $ids, $lang) {
         $result = [];
-        $payments = $om->read(__CLASS__, $ids, ['order_lines_ids.price'], $lang);
+        $payments = $om->read(self::getType(), $ids, ['order_lines_ids.price'], $lang);
         if($payments > 0) {
             foreach($payments as $oid => $payment) {
                 $result[$oid] = 0.0;
@@ -225,7 +225,7 @@ class OrderPayment extends Model {
 
     public static function calcTotalChange($om, $ids, $lang) {
         $result = [];
-        $payments = $om->read(__CLASS__, $ids, ['total_due', 'total_paid'], $lang);
+        $payments = $om->read(self::getType(), $ids, ['total_due', 'total_paid'], $lang);
         if($payments > 0) {
             foreach($payments as $id => $payment) {
                 $result[$id] = 0.0;
@@ -252,11 +252,11 @@ class OrderPayment extends Model {
     }
 
     public static function onupdateOrderPaymentPartsIds($om, $ids, $values, $lang) {
-        $om->write(__CLASS__, $ids, ['total_paid' => null], $lang);
+        $om->write(self::getType(), $ids, ['total_paid' => null], $lang);
     }
 
     public static function onupdateOrderLinesIds($om, $ids, $values, $lang) {
-        $om->write(__CLASS__, $ids, ['total_due' => null], $lang);
+        $om->write(self::getType(), $ids, ['total_due' => null], $lang);
     }
 
     public static function candelete($om, $ids) {
