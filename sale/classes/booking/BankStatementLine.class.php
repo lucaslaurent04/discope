@@ -9,7 +9,6 @@ namespace sale\booking;
 use lodging\sale\booking\Booking;
 use lodging\sale\booking\Funding;
 use lodging\sale\booking\Invoice;
-use lodging\sale\booking\Payment;
 
 class BankStatementLine extends \sale\pay\BankStatementLine {
 
@@ -40,7 +39,7 @@ class BankStatementLine extends \sale\pay\BankStatementLine {
 
             'payments_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\booking\Payment',
+                'foreign_object'    => 'sale\booking\Payment',
                 'foreign_field'     => 'statement_line_id',
                 'description'       => 'The list of payments this line relates to .',
                 'onupdate'          => 'onupdatePaymentsIds',
