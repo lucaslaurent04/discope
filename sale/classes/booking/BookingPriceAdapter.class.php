@@ -87,6 +87,29 @@ class BookingPriceAdapter extends Model {
         ];
     }
 
+    /**
+     * Check whether an object can be updated, and perform some additional operations if necessary.
+     * This method can be overridden to define a more precise set of tests.
+     *
+     * @param  \equal\orm\ObjectManager     $om         ObjectManager instance.
+     * @param  array                        $oids       List of objects identifiers.
+     * @param  array                        $values     Associative array holding the new values to be assigned.
+     * @param  string                       $lang       Language in which multilang fields are being updated.
+     * @return array                        Returns an associative array mapping fields with their error messages. En empty array means that object has been successfully processed and can be updated.
+     */
+    public static function canupdate($om, $oids, $values, $lang='en') {
+        if(isset($values['value'])) {
+            $adapters = $om->read(self::getType(), $oids, [ 'type' ], $lang);
+            foreach($adapters as $id => $adapter) {
+                // #memo - price adapters cannot void a line. To give customer 100% discount, user must use the discount product on a distinct line (KA-Remise-A) with qty of 1 and negative value.
+                if($adapter['type'] == 'percent' && $values['value'] >= 0.9999) {
+                    return ['value' => ['exceeded_amount' => 'Percent discount cannot be 100%.']];
+                }
+            }
+        }
+        return parent::canupdate($om, $oids, $values, $lang);
+    }
+
     public static function onupdateValue($om, $oids, $values, $lang) {
         // reset computed price for related bookings and booking_line_groups
         $discounts = $om->read(__CLASS__, $oids, ['booking_id', 'booking_line_id', 'booking_line_group_id']);

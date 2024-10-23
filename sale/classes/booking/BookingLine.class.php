@@ -6,9 +6,6 @@
 */
 namespace sale\booking;
 use equal\orm\Model;
-use sale\booking\Booking;
-use sale\booking\BookingLineGroup;
-use lodging\sale\booking\BookingLineGroupAgeRangeAssignment;
 
 class BookingLine extends Model {
 
@@ -83,7 +80,7 @@ class BookingLine extends Model {
 
             'price_adapters_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\booking\BookingPriceAdapter',
+                'foreign_object'    => 'sale\booking\BookingPriceAdapter',
                 'foreign_field'     => 'booking_line_id',
                 'description'       => 'All price adapters: auto and manual discounts applied on the line.',
                 'onupdate'          => 'onupdatePriceAdaptersIds'

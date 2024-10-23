@@ -7,9 +7,6 @@
 namespace sale\booking;
 use equal\orm\Model;
 use identity\Center;
-use sale\booking\Booking;
-use lodging\sale\booking\BookingLineGroupAgeRangeAssignment;
-use lodging\sale\booking\BookingPriceAdapter;
 
 class BookingLineGroup extends Model {
 
@@ -208,7 +205,7 @@ class BookingLineGroup extends Model {
 
             'price_adapters_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\booking\BookingPriceAdapter',
+                'foreign_object'    => 'sale\booking\BookingPriceAdapter',
                 'foreign_field'     => 'booking_line_group_id',
                 'description'       => 'Price adapters that apply to all lines of the group (based on group settings).'
             ],
@@ -319,7 +316,7 @@ class BookingLineGroup extends Model {
 
             'age_range_assignments_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\booking\BookingLineGroupAgeRangeAssignment',
+                'foreign_object'    => 'sale\booking\BookingLineGroupAgeRangeAssignment',
                 'foreign_field'     => 'booking_line_group_id',
                 'description'       => 'Age range assignments defined for the group.',
                 'ondetach'          => 'ondetachAgeRange'
@@ -1163,9 +1160,9 @@ class BookingLineGroup extends Model {
         /*
             Remove all previous price adapters that were automatically created
         */
-        $price_adapters_ids = $om->search('lodging\sale\booking\BookingPriceAdapter', [ ['booking_line_group_id', 'in', $oids], ['is_manual_discount','=', false]]);
+        $price_adapters_ids = $om->search('sale\booking\BookingPriceAdapter', [['booking_line_group_id', 'in', $oids], ['is_manual_discount', '=', false]]);
 
-        $om->delete('lodging\sale\booking\BookingPriceAdapter', $price_adapters_ids, true);
+        $om->delete('sale\booking\BookingPriceAdapter', $price_adapters_ids, true);
 
         $line_groups = $om->read(self::getType(), $oids, [
             'has_pack',
@@ -1351,7 +1348,7 @@ class BookingLineGroup extends Model {
                         create price adapter for group only, according to discount and group settings
                         (needed in case group targets a pack with own price)
                     */
-                    $price_adapters_ids = $om->create('lodging\sale\booking\BookingPriceAdapter', [
+                    $price_adapters_ids = $om->create('sale\booking\BookingPriceAdapter', [
                         'is_manual_discount'    => false,
                         'booking_id'            => $group['booking_id'],
                         'booking_line_group_id' => $group_id,
@@ -1420,7 +1417,7 @@ class BookingLineGroup extends Model {
                             }
 
                             // current discount must be applied on the line: create a price adapter
-                            $price_adapters_ids = $om->create('lodging\sale\booking\BookingPriceAdapter', [
+                            $price_adapters_ids = $om->create('sale\booking\BookingPriceAdapter', [
                                 'is_manual_discount'    => false,
                                 'booking_id'            => $group['booking_id'],
                                 'booking_line_group_id' => $group_id,
@@ -1472,8 +1469,8 @@ class BookingLineGroup extends Model {
         /*
             Remove all previous price adapters relating to given lines were automatically created
         */
-        $price_adapters_ids = $om->search('lodging\sale\booking\BookingPriceAdapter', [ ['booking_line_id', 'in', $booking_lines_ids], ['is_manual_discount','=', false]]);
-        $om->remove('lodging\sale\booking\BookingPriceAdapter', $price_adapters_ids, true);
+        $price_adapters_ids = $om->search('sale\booking\BookingPriceAdapter', [['booking_line_id', 'in', $booking_lines_ids], ['is_manual_discount', '=', false]]);
+        $om->remove('sale\booking\BookingPriceAdapter', $price_adapters_ids, true);
 
         $line_groups = $om->read(self::getType(), $oids, [
             'has_pack',
@@ -1718,7 +1715,7 @@ class BookingLineGroup extends Model {
                             }
 
                             // current discount must be applied on the line: create a price adapter
-                            $price_adapters_ids = $om->create('lodging\sale\booking\BookingPriceAdapter', [
+                            $price_adapters_ids = $om->create('sale\booking\BookingPriceAdapter', [
                                 'is_manual_discount'    => false,
                                 'booking_id'            => $group['booking_id'],
                                 'booking_line_group_id' => $group_id,
