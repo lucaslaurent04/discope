@@ -25,7 +25,7 @@ export class InvoiceComponent implements OnInit, AfterViewInit, OnDestroy {
     private default_descriptor: any = {
         // route: '/booking/object.id',
         context: {
-            entity: 'lodging\\sale\\booking\\Booking',
+            entity: 'sale\\booking\\Booking',
             view:   'form.default'
         }
     };

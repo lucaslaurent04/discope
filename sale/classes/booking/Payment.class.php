@@ -6,7 +6,7 @@
 */
 namespace sale\booking;
 
-use lodging\sale\booking\Booking;
+use sale\booking\Booking;
 use sale\booking\Funding;
 use sale\booking\Invoice;
 
@@ -20,7 +20,7 @@ class Payment extends \sale\pay\Payment {
                 'type'              => 'computed',
                 'result_type'       => 'many2one',
                 'function'          => 'calcBookingId',
-                'foreign_object'    => 'lodging\sale\booking\Booking',
+                'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'The booking the payment relates to, if any (computed).',
                 'store'             => true
             ],

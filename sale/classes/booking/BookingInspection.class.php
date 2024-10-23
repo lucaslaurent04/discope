@@ -6,7 +6,7 @@
 */
 namespace sale\booking;
 
-use lodging\sale\booking\Booking;
+use sale\booking\Booking;
 
 class BookingInspection extends \equal\orm\Model {
 
@@ -25,7 +25,7 @@ class BookingInspection extends \equal\orm\Model {
 
             'booking_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\Booking',
+                'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'The booking inspection relates to inspecting the condition of the booking, such as meter index or remarks.',
                 'required'          => true,
                 'ondelete'          => 'cascade'

@@ -7,7 +7,7 @@
 namespace sale\booking;
 use equal\orm\Model;
 use identity\Center;
-use lodging\sale\booking\Booking;
+use sale\booking\Booking;
 use lodging\sale\booking\BookingLineGroupAgeRangeAssignment;
 use lodging\sale\booking\BookingPriceAdapter;
 
@@ -215,7 +215,7 @@ class BookingLineGroup extends Model {
 
             'booking_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\Booking',
+                'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'Booking the line relates to (for consistency, lines should be accessed using the group they belong to).',
                 'required'          => true,
                 'ondelete'          => 'cascade'         // delete group when parent booking is deleted
@@ -532,7 +532,7 @@ class BookingLineGroup extends Model {
                 $om->callonce('sale\booking\BookingLine', '_updateQty', $group['booking_lines_ids'], [], $lang);
                 if($group['is_sojourn']  || $group['is_event']) {
                     // force parent booking to recompute date_from
-                    $om->update('lodging\sale\booking\Booking', $group['booking_id'], ['date_from' => null]);
+                    $om->update('sale\booking\Booking', $group['booking_id'], ['date_from' => null]);
                 }
             }
         }
@@ -555,7 +555,7 @@ class BookingLineGroup extends Model {
                 $om->callonce('sale\booking\BookingLine', '_updateQty', $group['booking_lines_ids'], [], $lang);
                 if($group['is_sojourn'] || $group['is_event']) {
                     // force parent booking to recompute date_from
-                    $om->update('lodging\sale\booking\Booking', $group['booking_id'], ['date_to' => null]);
+                    $om->update('sale\booking\Booking', $group['booking_id'], ['date_to' => null]);
                 }
             }
         }
@@ -570,7 +570,7 @@ class BookingLineGroup extends Model {
             foreach($groups as $group) {
                 if($group['is_sojourn'] || $group['is_event']) {
                     // force parent booking to recompute time_from
-                    $om->update('lodging\sale\booking\Booking', $group['booking_id'], ['time_from' => null]);
+                    $om->update('sale\booking\Booking', $group['booking_id'], ['time_from' => null]);
                 }
             }
         }
@@ -585,7 +585,7 @@ class BookingLineGroup extends Model {
             foreach($groups as $group) {
                 if($group['is_sojourn'] || $group['is_event']) {
                     // force parent booking to recompute time_to
-                    $om->update('lodging\sale\booking\Booking', $group['booking_id'], ['time_to' => null]);
+                    $om->update('sale\booking\Booking', $group['booking_id'], ['time_to' => null]);
                 }
             }
         }
