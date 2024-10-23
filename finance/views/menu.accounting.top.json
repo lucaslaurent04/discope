@@ -13,7 +13,7 @@
                 "type": "entry",
                 "route": "/",
                 "context": {
-                    "entity": "lodging\\sale\\booking\\Invoice",
+                    "entity": "sale\\booking\\Invoice",
                     "view": "dashboard.default"
                 }
             },
@@ -25,7 +25,7 @@
                 "type": "entry",
                 "route": "/invoices",
                 "context": {
-                    "entity": "lodging\\sale\\booking\\Invoice",
+                    "entity": "sale\\booking\\Invoice",
                     "view": "list.default",
                     "order": "id",
                     "sort": "desc",

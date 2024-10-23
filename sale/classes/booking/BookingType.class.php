@@ -57,8 +57,22 @@ class BookingType extends Model {
                 'rel_foreign_key'   => 'productcategory_id',
                 'rel_local_key'     => 'bookingtype_id',
                 'description'       => "Categories of products that the type relates to."
-            ]
+            ],
 
+            'days_expiry_option' =>  [
+                'description'   => 'The number of days for the option to expire.',
+                'type'          => 'integer'
+            ],
+
+            'booking_schedule_layout' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'simple',
+                    'detailed'
+                ],
+                'description'       => 'Set the configuration for consumption printing.',
+                'default'           => 'simple'
+            ]
 
         ];
     }

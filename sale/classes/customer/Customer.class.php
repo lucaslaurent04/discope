@@ -30,6 +30,14 @@ class Customer extends \identity\Partner {
                 'readonly'          => true
             ],
 
+            'partner_identity_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\Identity',
+                'description'       => 'The targeted identity (the partner).',
+                'onupdate'          => 'onupdatePartnerIdentityId',
+                'required'          => true
+            ],
+
             'customer_nature_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\CustomerNature',

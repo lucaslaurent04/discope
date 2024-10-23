@@ -56,13 +56,11 @@ class CompositionItem extends Model {
             /* some legal constraints might apply, in which case we need extra contact details */
             'email' => [
                 'type'              => 'string',
-                'usage'             => 'email',
                 'description'       => "Email address of the contact."
             ],
 
             'phone' => [
                 'type'              => 'string',
-                'usage'             => 'phone',
                 'description'       => "Phone number of the contact."
             ],
 
@@ -82,8 +80,7 @@ class CompositionItem extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'realestate\RentalUnit',
                 'description'       => "The rental unit the person is assigned to.",
-                'required'          => true,
-                /*'domain'            => ['id', 'in', 'object.rental_units_ids']*/
+                'domain'            => ['id', 'in', 'object.rental_units_ids']
             ],
 
             'composition_id' => [
@@ -102,14 +99,24 @@ class CompositionItem extends Model {
             ],
 
             // for filtering rental_unit_id field in forms
-            // #todo [2023-09-08] - this seems to be wrong  (generates errors)
             /*
+            // #memo - this seems incorrect and generates an error when printing the listing
             'rental_units_ids' => [
-                'type'              => 'one2many',
+                'type'              => 'computed',
+                'result_type'       => 'one2many',
+                'function'          => 'calcRentalUnitsIds',
                 'foreign_object'    => 'realestate\RentalUnit',
                 'description'       => "The rental units attached to the current booking."
             ]
             */
+
+            // #memo - values provided by OTA might not be valid values
+
+            'is_coordinator' => [
+                'type'              => 'boolean',
+                'description'       => 'The person is the coordinator',
+                'default'           => false
+            ]
 
         ];
     }
@@ -127,6 +134,25 @@ class CompositionItem extends Model {
         $res = $om->read(__CLASS__, $oids, ['firstname', 'lastname']);
         foreach($res as $oid => $odata) {
             $result[$oid] = "{$odata['firstname']} {$odata['lastname']}";
+        }
+        return $result;
+    }
+
+    public static function calcRentalUnitsIds($om, $oids, $lang) {
+        $result = [];
+        $items = $om->read(__CLASS__, $oids, ['composition_id.booking_id']);
+
+        foreach($items as $oid => $odata) {
+
+            $rental_units_ids = [];
+            $assignments_ids = $om->search(\sale\booking\SojournProductModelRentalUnitAssignement::getType(), ['booking_id', '=', $odata['composition_id.booking_id']]);
+
+            if($assignments_ids > 0 && count($assignments_ids)) {
+                $assignments = $om->read(\sale\booking\SojournProductModelRentalUnitAssignement::getType(), $assignments_ids, ['rental_unit_id']);
+                $rental_units_ids = array_filter(array_map(function($a) { return $a['rental_unit_id']; }, array_values($assignments)), function($a) {return $a > 0;});
+            }
+
+            $result[$oid] = $rental_units_ids;
         }
         return $result;
     }

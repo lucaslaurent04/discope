@@ -95,7 +95,7 @@ class Center extends \identity\Establishment {
 
             'repairings_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\booking\Repairing',
+                'foreign_object'    => 'sale\booking\Repairing',
                 'foreign_field'     => 'center_id',
                 'description'       => 'List of rental units of the center.',
                 'ondetach'          => 'delete'
@@ -135,7 +135,7 @@ class Center extends \identity\Establishment {
 
             'sojourn_type_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\SojournType',
+                'foreign_object'    => 'sale\booking\SojournType',
                 'description'       => 'Default sojourn type of the center.',
                 'required'          => true
             ],
@@ -159,7 +159,7 @@ class Center extends \identity\Establishment {
 
             'consumptions_meters_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\booking\ConsumptionMeter',
+                'foreign_object'    => 'sale\booking\ConsumptionMeter',
                 'foreign_field'     => 'center_id',
                 'description'       => 'List of consumptions meters of the center.'
             ],

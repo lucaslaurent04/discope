@@ -19,7 +19,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatement",
+                            "entity": "sale\\booking\\BankStatement",
                             "view": "list.reconciled",
                             "domain": [["status", "=", "reconciled"], ["is_exported", "=", false]]
                         }
@@ -31,7 +31,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatement",
+                            "entity": "sale\\booking\\BankStatement",
                             "view": "list.default"
                         }
                     }
@@ -102,7 +102,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\Funding",
+                            "entity": "sale\\booking\\Funding",
                             "view": "list.default",
                             "domain": ["due_amount", "<", 0]
                         }
@@ -114,7 +114,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatementLine",
+                            "entity": "sale\\booking\\BankStatementLine",
                             "view": "list.default",
                             "domain": ["status", "=", "to_refund"]
                         }

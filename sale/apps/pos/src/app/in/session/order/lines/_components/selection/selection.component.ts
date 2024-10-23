@@ -119,7 +119,7 @@ export class SessionOrderLinesSelectionComponent implements OnInit {
 
         try {
             //  #todo - bookings du centre en cours + non payés (au moins un funding)
-            this.bookings = await this.api.collect('lodging\\sale\\booking\\Booking', domain, ['customer_id.name', 'center_id', 'total', 'date_from', 'date_to', 'price']);
+            this.bookings = await this.api.collect('sale\\booking\\Booking', domain, ['customer_id.name', 'center_id', 'total', 'date_from', 'date_to', 'price']);
 
             this.bookingsDataSource = new MatTableDataSource(this.bookings);
             this.bookingsDataSource.paginator = this.bookingsPaginator;
@@ -132,7 +132,7 @@ export class SessionOrderLinesSelectionComponent implements OnInit {
 
     private async loadFundings(booking: any) {
         try {
-            this.fundings = await this.api.collect('lodging\\sale\\booking\\Funding', [[['booking_id', '=', booking.id], ['is_paid', '=', false]]], ['name', 'description', 'due_amount', 'due_date', 'booking_id.customer_id']);
+            this.fundings = await this.api.collect('sale\\booking\\Funding', [[['booking_id', '=', booking.id], ['is_paid', '=', false]]], ['name', 'description', 'due_amount', 'due_date', 'booking_id.customer_id']);
             this.fundingsDataSource = new MatTableDataSource(this.fundings);
             this.fundingsDataSource.paginator = this.fundingsPaginator;
         }
