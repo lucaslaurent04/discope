@@ -6,8 +6,6 @@
 */
 namespace sale\booking;
 
-use sale\booking\Booking;
-
 class BookingInspection extends \equal\orm\Model {
 
     public static function getColumns() {
@@ -78,7 +76,7 @@ class BookingInspection extends \equal\orm\Model {
 
             'consumptions_meters_readings_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\booking\ConsumptionMeterReading',
+                'foreign_object'    => 'sale\booking\ConsumptionMeterReading',
                 'foreign_field'     => 'booking_inspection_id',
                 'description'       => 'List of consumption meter readings related to the booking inspection.',
                 'ondetach'          => 'delete'

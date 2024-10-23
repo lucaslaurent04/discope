@@ -159,7 +159,7 @@ class Center extends \identity\Establishment {
 
             'consumptions_meters_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\booking\ConsumptionMeter',
+                'foreign_object'    => 'sale\booking\ConsumptionMeter',
                 'foreign_field'     => 'center_id',
                 'description'       => 'List of consumptions meters of the center.'
             ],
