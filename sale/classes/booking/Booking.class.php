@@ -458,13 +458,13 @@ class Booking extends Model {
 
             'guest_list_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\GuestList',
+                'foreign_object'    => 'sale\booking\GuestList',
                 'description'       => 'Guest List associated to booking'
             ],
 
             'guest_list_items_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\booking\GuestListItem',
+                'foreign_object'    => 'sale\booking\GuestListItem',
                 'foreign_field'     => 'booking_id',
                 'description'       => "The guest items that refer to the booking."
             ],
@@ -478,7 +478,7 @@ class Booking extends Model {
 
             'consumptions_meter_reading_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\booking\ConsumptionMeterReading',
+                'foreign_object'    => 'sale\booking\ConsumptionMeterReading',
                 'foreign_field'     => 'booking_id',
                 'description'       => "The consumptions meter readings  relates to Booking.."
             ],

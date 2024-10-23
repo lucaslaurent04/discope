@@ -213,7 +213,7 @@
                         "label": "All invoices",
                         "description": "",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\Invoice",
+                            "entity": "sale\\booking\\Invoice",
                             "view": "list.default",
                             "domain": ["status", "=", "invoice"]
                         }
@@ -224,7 +224,7 @@
                         "label": "Overdue invoices",
                         "description": "",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\Invoice",
+                            "entity": "sale\\booking\\Invoice",
                             "view": "list.default",
                             "domain": [ ["due_date", "<=", "date.this.day"],  ["is_paid", "=", false] ]
                         }
