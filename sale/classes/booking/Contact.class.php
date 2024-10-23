@@ -46,14 +46,14 @@ class Contact extends \identity\Partner {
 
             'owner_identity_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\identity\Identity',
+                'foreign_object'    => 'identity\Identity',
                 'description'       => 'The organisation which the targeted identity is a partner of.',
                 'default'           => 1
             ],
 
             'partner_identity_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\identity\Identity',
+                'foreign_object'    => 'identity\Identity',
                 'description'       => 'The targeted identity (the partner).',
                 'onupdate'          => 'identity\Partner::onupdatePartnerIdentityId'
             ],

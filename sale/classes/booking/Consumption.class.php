@@ -521,7 +521,7 @@ class Consumption extends Model {
      * @param int                       $date_to            Timestamp of the last day of the lookup.
      */
     public static function getAvailableRentalUnits($om, $center_id, $product_model_id, $date_from, $date_to) {
-        trigger_error("ORM::calling lodging\sale\booking\Consumption:getAvailableRentalUnits", QN_REPORT_DEBUG);
+        trigger_error("ORM::calling sale\booking\Consumption:getAvailableRentalUnits", QN_REPORT_DEBUG);
 
         $models = $om->read(\sale\catalog\ProductModel::getType(), $product_model_id, [
             'type',

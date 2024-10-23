@@ -46,7 +46,7 @@ class CenterCategory extends Model {
             /*
             'accounting_rules_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\finance\accounting\AccountingRule',
+                'foreign_object'    => 'finance\accounting\AccountingRule',
                 'foreign_field'     => 'center_category_id'
             ]
             */

@@ -1214,7 +1214,7 @@ class Booking extends Model {
                 }
                 else {
                     // create a new customer for the selected identity
-                    $identities = $om->read('lodging\identity\Identity', $identity_id, ['type_id']);
+                    $identities = $om->read('identity\Identity', $identity_id, ['type_id']);
                     if($identities > 0 && count($identities)) {
                         $identity = reset($identities);
                         $partner_id = $om->create('sale\customer\Customer', [

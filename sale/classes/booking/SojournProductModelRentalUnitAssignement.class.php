@@ -6,7 +6,6 @@
 */
 namespace sale\booking;
 use equal\orm\Model;
-use lodging\sale\booking\ObjectManager;
 
 class SojournProductModelRentalUnitAssignement extends Model {
 
