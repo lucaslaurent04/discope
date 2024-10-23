@@ -1156,7 +1156,7 @@ class BookingLineGroup extends Model {
      *
      */
     public static function updatePriceAdapters($om, $oids, $values, $lang) {
-        trigger_error("ORM::calling lodging\sale\booking\BookingLineGroup:updatePriceAdapters (".implode(',', $oids).")", QN_REPORT_DEBUG);
+        trigger_error("ORM::calling sale\booking\BookingLineGroup:updatePriceAdapters (".implode(',', $oids).")", QN_REPORT_DEBUG);
         /*
             Remove all previous price adapters that were automatically created
         */

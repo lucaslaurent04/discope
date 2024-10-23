@@ -56,7 +56,7 @@ class BookingHistoryEntry extends Model {
 
             'organisation_id' => [
                 'type'           => 'many2one',
-                'foreign_object' => 'lodging\identity\Identity',
+                'foreign_object' => 'identity\Identity',
                 'description'    => 'The organisation to which the booking relates to.',
                 'required'       => true
             ],

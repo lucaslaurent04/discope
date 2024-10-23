@@ -578,7 +578,7 @@ class BookingLine extends Model {
     }
 
     public static function onupdateQtyVars($om, $oids, $values, $lang) {
-        trigger_error("ORM::calling lodging\sale\booking\BookingLine:onupdateQtyVars", QN_REPORT_DEBUG);
+        trigger_error("ORM::calling sale\booking\BookingLine:onupdateQtyVars", QN_REPORT_DEBUG);
 
         // reset computed fields related to price
         $om->callonce(self::getType(), '_resetPrices', $oids, [], $lang);
@@ -690,7 +690,7 @@ class BookingLine extends Model {
      * New group assignment (should be called upon creation only)
      */
     public static function onupdateBookingLineGroupId($om, $oids, $values, $lang) {
-        trigger_error("ORM::calling lodging\sale\booking\BookingLine:onupdateBookingLineGroupId", QN_REPORT_DEBUG);
+        trigger_error("ORM::calling sale\booking\BookingLine:onupdateBookingLineGroupId", QN_REPORT_DEBUG);
     }
 
     /**
@@ -739,7 +739,7 @@ class BookingLine extends Model {
      *
      */
     public static function _updateQty($om, $oids, $values, $lang) {
-        trigger_error("ORM::calling lodging\sale\booking\BookingLine:_updateQty", QN_REPORT_DEBUG);
+        trigger_error("ORM::calling sale\booking\BookingLine:_updateQty", QN_REPORT_DEBUG);
 
         $lines = $om->read(self::getType(), $oids, [
             'product_id.has_age_range',
@@ -852,7 +852,7 @@ class BookingLine extends Model {
      * @param \equal\orm\ObjectManager $om
      */
     public static function _updatePriceId($om, $oids, $values, $lang) {
-        trigger_error("ORM::calling lodging\sale\booking\BookingLine:_updatePriceId", QN_REPORT_DEBUG);
+        trigger_error("ORM::calling sale\booking\BookingLine:_updatePriceId", QN_REPORT_DEBUG);
 
         /*
             There are 2 situations :
@@ -1313,7 +1313,7 @@ class BookingLine extends Model {
     }
 
     public static function calcIsAccomodation($om, $oids, $lang) {
-        trigger_error("ORM::calling lodging\sale\booking\BookingLine:calcIsAccomodation", QN_REPORT_DEBUG);
+        trigger_error("ORM::calling sale\booking\BookingLine:calcIsAccomodation", QN_REPORT_DEBUG);
 
         $result = [];
         $lines = $om->read(self::getType(), $oids, [
@@ -1328,7 +1328,7 @@ class BookingLine extends Model {
     }
 
     public static function calcIsRentalUnit($om, $oids, $lang) {
-        trigger_error("ORM::calling lodging\sale\booking\BookingLine:calcIsRentalUnit", QN_REPORT_DEBUG);
+        trigger_error("ORM::calling sale\booking\BookingLine:calcIsRentalUnit", QN_REPORT_DEBUG);
 
         $result = [];
         $lines = $om->read(self::getType(), $oids, [
@@ -1343,7 +1343,7 @@ class BookingLine extends Model {
     }
 
     public static function calcIsMeal($om, $oids, $lang) {
-        trigger_error("ORM::calling lodging\sale\booking\BookingLine:calcIsMeal", QN_REPORT_DEBUG);
+        trigger_error("ORM::calling sale\booking\BookingLine:calcIsMeal", QN_REPORT_DEBUG);
 
         $result = [];
         $lines = $om->read(self::getType(), $oids, [
@@ -1358,7 +1358,7 @@ class BookingLine extends Model {
     }
 
     public static function calcQtyAccountingMethod($om, $oids, $lang) {
-        trigger_error("ORM::calling lodging\sale\booking\BookingLine:calcQtyAccountingMethod", QN_REPORT_DEBUG);
+        trigger_error("ORM::calling sale\booking\BookingLine:calcQtyAccountingMethod", QN_REPORT_DEBUG);
 
         $result = [];
         $lines = $om->read(self::getType(), $oids, [
