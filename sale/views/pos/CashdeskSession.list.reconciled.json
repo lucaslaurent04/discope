@@ -4,11 +4,13 @@
     "access": {
         "groups": ["pos.default.user"]
     },
-    "domain": ["center_id", "in", "user.centers_ids"],
+    "domain": [ ["status", "=", "closed"], ["center_id", "in", "user.centers_ids"] ],
+    "controller": "lodging_sale_pos_cashdeskSession-collect",
     "header": {
         "actions": {
-            "ACTION.CREATE" : false
+            "ACTION.CREATE": false
         },
+        "selection": false,
         "advanced_search": {
             "open": true
         }
@@ -48,8 +50,16 @@
             },
             {
                 "type": "field",
-                "value": "status",
+                "value": "amount_closing",
                 "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "link_sheet",
+                "width": "10%",
+                "widget": {
+                    "link": "icon"
+                }
             }
         ]
     }

@@ -4,12 +4,18 @@
     "access": {
         "groups": ["pos.default.user"]
     },
+    "domain": ["center_id", "in", "user.centers_ids"],
     "layout": {
         "items": [
             {
                 "type": "field",
                 "value": "name",
                 "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "center_id",
+                "width": "25%"
             }
         ]
     }

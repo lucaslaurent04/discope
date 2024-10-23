@@ -2,11 +2,19 @@
     "name": "Orders",
     "description": "List of Point of Sale orders.",
     "access": {
-        "groups": ["pos.default.user"]
+        "groups": [
+            "pos.default.user"
+        ]
     },
     "header": {
+        "selection": {
+            "default": false
+        },
         "actions": {
             "ACTION.CREATE": false
+        },
+        "advanced_search": {
+            "open": true
         }
     },
     "operations": {
@@ -21,7 +29,25 @@
             }
         }
     },
-    "limit": 500,
+    "limit": 100,
+    "actions": [
+        {
+            "id": "bulk_invoice",
+            "label": "Facturer",
+            "controller": "lodging_sale_pos_orders_invoice",
+            "confirm": false
+        }
+    ],
+    "domain": [
+        ["status","=","paid"],
+        ["booking_id","=","null"],
+        ["funding_id","=","null"],
+        ["invoice_id","=","null"],
+        ["price",">",0]
+    ],
+    "order": "created",
+    "sort": "desc",
+    "controller": "lodging_sale_pos_order_invoiceable-collect",
     "layout": {
         "items": [
             {
@@ -42,6 +68,11 @@
             },
             {
                 "type": "field",
+                "value": "center_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
                 "value": "status",
                 "width": "15%"
             },
@@ -55,17 +86,6 @@
                 "type": "field",
                 "label": "Price",
                 "value": "price",
-                "width": "20%"
-            },
-            {
-                "type": "field",
-                "value": "has_funding",
-                "width": "15%"
-            },
-            {
-                "type": "field",
-                "label": "Funding",
-                "value": "funding_id",
                 "width": "20%"
             }
         ]

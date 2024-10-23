@@ -4,6 +4,15 @@
     "access": {
         "groups": ["pos.default.user"]
     },
+    "header": {
+        "selection": {
+            "default": false
+        },
+        "actions": {
+            "ACTION.CREATE": false,
+            "ACTION.EDIT": false
+        }
+    },
     "routes": [
         {
             "id": "session.orders",
@@ -20,15 +29,6 @@
             "route": "/session/object.id/close"
         }
     ],
-    "header": {
-        "selection": {
-            "default": false
-        },
-        "actions": {
-            "ACTION.CREATE": false,
-            "ACTION.EDIT": false
-        }
-    },
     "layout": {
         "groups": [
             {
