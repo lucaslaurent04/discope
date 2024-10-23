@@ -1,6 +1,6 @@
 {
     "name": "Booking Line",
-    "description": "Booking lines describe the products and quantities that are part of a booking.",
+    "description": "Les lignes de réservation décrivent les produits et les quantités qui font partie d'une réservation.",
     "access": {
         "groups": ["booking.default.user"]
      },
@@ -10,7 +10,7 @@
                 "sections": [
                     {
                         "label": "General info",
-                        "id": "section.booking_line",
+                        "id": "section.bookingLine_section",
                         "rows": [
                             {
                                 "columns": [
@@ -19,22 +19,40 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "label": "Line Booking Group",
-                                                "value": "booking_line_group_id",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "label": "Booking",
                                                 "value": "booking_id",
                                                 "width": "50%"
                                             },
                                             {
                                                 "type": "field",
-                                                "label": "Product",
+                                                "value": "booking_line_group_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "product_id",
                                                 "width": "50%"
                                             },
+                                            {
+                                                "type": "field",
+                                                "value": "has_own_qty",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "qty",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "qty_accounting_method",
+                                                "width": "50%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "align": "left",
+                                        "items": [
                                             {
                                                 "type": "field",
                                                 "label": "Price",
@@ -43,34 +61,13 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "label": "Quanity",
-                                                "value": "qty",
-                                                "width": "50%"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "width": "50%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "payment_mode",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "vat_rate",
-                                                "width": "100%"
-                                            },
-                                            {
-                                                "type": "field",
                                                 "value": "order",
                                                 "width": "50%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "price",
-                                                "width": "50%"
+                                                "value": "payment_mode",
+                                                "width": "100%"
                                             }
                                         ]
                                     }
@@ -79,8 +76,8 @@
                         ]
                     },
                     {
-                        "label": "Price Adapter",
-                        "id": "section.price_adapter",
+                        "label": "Price Adapters",
+                        "id": "section.priceAdapters_section",
                         "rows": [
                             {
                                 "columns": [
@@ -90,6 +87,66 @@
                                             {
                                                 "type": "field",
                                                 "value": "price_adapters_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Consumptions",
+                        "id": "section.consumptions_section",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "consumptions_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Auto Discounts",
+                        "id": "section.autoDiscounts_section",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "auto_discounts_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Manual Discounts",
+                        "id": "section.manualDiscounts_section",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "manual_discounts_ids",
                                                 "width": "100%"
                                             }
                                         ]

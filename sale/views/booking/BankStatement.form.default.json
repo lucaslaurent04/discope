@@ -3,7 +3,7 @@
     "description": "",
     "access": {
         "groups": ["sale.default.user"]
-     },
+    },
     "layout": {
         "groups": [
             {
@@ -28,14 +28,23 @@
                                                 "type": "field",
                                                 "value": "date",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "center_office_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "status",
+                                                "visible": false,
+                                                "width": "0"
                                             }
                                         ]
                                     },
                                     {
-                                        "width": "25%"
-                                    },
-                                    {
                                         "width": "25%",
+                                        "align": "right",
                                         "items": [
                                             {
                                                 "type": "field",
@@ -63,6 +72,9 @@
                                                 "width": "100%",
                                                 "widget":{
                                                     "header": {
+                                                        "selection": {
+                                                            "default": false
+                                                        },
                                                         "actions": {
                                                             "ACTION.CREATE": false
                                                         }

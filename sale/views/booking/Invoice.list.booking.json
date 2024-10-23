@@ -1,12 +1,12 @@
 {
     "name": "Invoices",
-    "description": "This view is intended for displaying the list of invoices.",
+    "description": "This view is intended for displaying the list of invoices within a Booking form.",
     "access": {
         "groups": ["booking.default.user"]
     },
     "operations": {
         "total": {
-            "price": {
+            "display_price": {
                 "operation": "SUM",
                 "usage": "amount/money:2"
             }
@@ -32,13 +32,18 @@
             },
             {
                 "type": "field",
+                "value": "type",
+                "width": "20%"
+            },
+            {
+                "type": "field",
                 "value": "status",
                 "width": "20%"
             },
             {
                 "type": "field",
-                "value": "type",
-                "width": "20%"
+                "value": "is_deposit",
+                "width": "15%"
             },
             {
                 "type": "field",
@@ -47,7 +52,12 @@
             },
             {
                 "type": "field",
-                "value": "price",
+                "value": "balance",
+                "width": "15%"
+            },
+            {
+                "type": "field",
+                "value": "display_price",
                 "width": "15%"
             }
         ]
