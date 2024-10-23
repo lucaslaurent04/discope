@@ -7,7 +7,7 @@
 namespace sale\booking;
 use equal\orm\Model;
 use lodging\sale\booking\Booking;
-use lodging\sale\booking\BookingLineGroup;
+use sale\booking\BookingLineGroup;
 use lodging\sale\booking\BookingLineGroupAgeRangeAssignment;
 
 class BookingLine extends Model {
@@ -38,7 +38,7 @@ class BookingLine extends Model {
 
             'booking_line_group_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\BookingLineGroup',
+                'foreign_object'    => 'sale\booking\BookingLineGroup',
                 'description'       => 'Group the line relates to (in turn, groups relate to their booking).',
                 'onupdate'          => 'onupdateBookingLineGroupId',
                 'ondelete'          => 'cascade',        // delete line when parent group is deleted
