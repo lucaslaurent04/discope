@@ -9,6 +9,10 @@ use equal\orm\Model;
 
 class SojournProductModel extends Model {
 
+    public function getTable() {
+        return 'lodging_sale_booking_sojournproductmodel';
+    }
+
     public static function getName() {
         return "Product Model Group";
     }

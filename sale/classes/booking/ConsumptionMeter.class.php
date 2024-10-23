@@ -9,6 +9,10 @@ namespace sale\booking;
 
 class ConsumptionMeter extends \equal\orm\Model {
 
+    public function getTable() {
+        return 'lodging_sale_booking_consumptionmeter';
+    }
+
     public static function getColumns() {
         return [
 

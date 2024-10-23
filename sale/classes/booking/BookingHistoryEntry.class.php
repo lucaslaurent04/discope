@@ -11,6 +11,10 @@ use equal\orm\Model;
 
 class BookingHistoryEntry extends Model {
 
+    public function getTable() {
+        return 'lodging_sale_booking_bookinghistoryentry';
+    }
+
     public static function getColumns() {
         return [
 
