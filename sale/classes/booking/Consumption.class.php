@@ -6,7 +6,7 @@
 */
 namespace sale\booking;
 use equal\orm\Model;
-use lodging\sale\booking\BookingLineGroup;
+use sale\booking\BookingLineGroup;
 
 class Consumption extends Model {
 
@@ -77,7 +77,7 @@ class Consumption extends Model {
 
             'booking_line_group_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\BookingLineGroup',
+                'foreign_object'    => 'sale\booking\BookingLineGroup',
                 'description'       => 'The booking line group the consumption relates to.',
                 'ondelete'          => 'cascade',        // delete consumption when parent group is deleted
                 'readonly'          => true
@@ -259,13 +259,13 @@ class Consumption extends Model {
                 if($consumption['qty'] < $values['qty'] && in_array($consumption['booking_line_id.qty_accounting_method'], ['person', 'unit'])) {
                     $diff = $values['qty'] - $consumption['qty'];
                     // in is_extra group, add a new line with same product as targeted booking_line
-                    $groups_ids = $om->search('lodging\sale\booking\BookingLineGroup', [['booking_id', '=', $consumption['booking_id']], ['is_extra', '=', true]]);
+                    $groups_ids = $om->search('sale\booking\BookingLineGroup', [['booking_id', '=', $consumption['booking_id']], ['is_extra', '=', true]]);
                     if($groups_ids > 0 && count($groups_ids)) {
                         $group_id = reset(($groups_ids));
                     }
                     else {
                         // create extra group
-                        $group_id = $om->create('lodging\sale\booking\BookingLineGroup', ['name' => 'Suppléments', 'booking_id' => $consumption['booking_id'], 'is_extra' => true]);
+                        $group_id = $om->create('sale\booking\BookingLineGroup', ['name' => 'Suppléments', 'booking_id' => $consumption['booking_id'], 'is_extra' => true]);
                     }
                     // create a new bookingLine
                     $line_id = $om->create('sale\booking\BookingLine', ['booking_id' => $consumption['booking_id'], 'booking_line_group_id' => $group_id, 'product_id' => $consumption['booking_line_id.product_id']], $lang);

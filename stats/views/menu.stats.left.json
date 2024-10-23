@@ -133,7 +133,7 @@
                                 "label": "Taxes de séjour",
                                 "description": "",
                                 "context": {
-                                    "entity": "lodging\\sale\\booking\\BookingLine",
+                                    "entity": "sale\\booking\\BookingLine",
                                     "view": "chart.taxes",
                                     "mode": "grid"
                                 }

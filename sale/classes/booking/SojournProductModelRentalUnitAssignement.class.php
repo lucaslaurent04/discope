@@ -30,7 +30,7 @@ class SojournProductModelRentalUnitAssignement extends Model {
 
             'booking_line_group_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\BookingLineGroup',
+                'foreign_object'    => 'sale\booking\BookingLineGroup',
                 'description'       => 'Booking lines Group the assignment relates to.',
                 'required'          => true,
                 'ondelete'          => 'cascade'
