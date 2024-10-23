@@ -28,12 +28,12 @@
                                             {
                                                 "type": "field",
                                                 "value": "valid_from",
-                                                "width": "50%"                                                
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "valid_until",
-                                                "width": "50%"                                                
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
@@ -57,7 +57,7 @@
                                                 "label": "Class Rate",
                                                 "value": "rate_class_id",
                                                 "width": "50%"
-                                            }                                            
+                                            }
                                         ]
                                     }
                                 ]

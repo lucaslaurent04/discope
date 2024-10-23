@@ -15,7 +15,7 @@
                 "type": "field",
                 "value": "discount_list_category_id",
                 "width": "20%"
-            },            
+            },
             {
                 "type": "field",
                 "value": "valid_from",
@@ -42,7 +42,7 @@
                 "label": "Maximum Rate",
                 "value": "rate_max",
                 "width": "20%"
-            }            
+            }
         ]
     }
 }
