@@ -3,7 +3,13 @@
     "description": "",
     "access": {
         "groups": ["pos.default.user"]
-     },
+    },
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false,
+            "ACTION.EDIT": false
+        }
+    },
     "layout": {
         "groups": [
             {
@@ -52,6 +58,44 @@
                                                 "label": "Freebies",
                                                 "value": "free_qty",
                                                 "width": "50%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "columns": [
+                                    {
+                                        "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "has_booking",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "columns": [
+                                    {
+                                        "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "has_funding",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "funding_id",
+                                                "width": "100%"
                                             }
                                         ]
                                     }

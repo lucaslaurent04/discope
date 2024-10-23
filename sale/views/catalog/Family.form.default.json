@@ -1,16 +1,13 @@
 {
     "name": "Family",
-    "description": "A Product Family is a group of goods produced under the same brand.",
-    "access": {
-        "groups": ["pos.default.user", "sale.default.user"]
-     },
+    "description": "",
     "layout": {
         "groups": [
             {
                 "sections": [
                     {
-                        "label": "General Info",
-                        "id": "section.family_section",
+                        "label": "Family info",
+                        "id": "section.family_info",
                         "rows": [
                             {
                                 "columns": [
@@ -20,29 +17,51 @@
                                             {
                                                 "type": "field",
                                                 "value": "name",
-                                                "width": "100%",
+                                                "width": "50%",
                                                 "widget": {
                                                     "heading": true
                                                 }
                                             },
                                             {
                                                 "type": "field",
-                                                "label": "Parent",
                                                 "value": "parent_id",
                                                 "width": "50%"
                                             }
                                         ]
-                                    },
+                                    }
+                                ]
+                            },
+                            {
+                                "columns": [
                                     {
                                         "width": "50%",
                                         "items": [
+
                                             {
                                                 "type": "field",
                                                 "value": "path",
-                                                "width": "100%",
-                                                "widget": {
-                                                    "readonly": true
-                                                }
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+
+                        ]
+                    },
+                    {
+                        "label": "Products",
+                        "id": "section.product_model",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "product_models_ids",
+                                                "width": "100%"
                                             }
                                         ]
                                     }
@@ -52,7 +71,7 @@
                     },
                     {
                         "label": "Children",
-                        "id": "section.children_section",
+                        "id": "section.children_ids",
                         "rows": [
                             {
                                 "columns": [
@@ -71,8 +90,8 @@
                         ]
                     },
                     {
-                        "label": "Products",
-                        "id": "section.product_models",
+                        "label": "Centres",
+                        "id": "section.centers_ids",
                         "rows": [
                             {
                                 "columns": [
@@ -81,11 +100,8 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "product_models_ids",
-                                                "width": "100%",
-                                                "widget": {
-                                                    "domain": ["can_sell", "=", true]
-                                                }                                                
+                                                "value": "centers_ids",
+                                                "width": "100%"
                                             }
                                         ]
                                     }
@@ -93,7 +109,6 @@
                             }
                         ]
                     }
-
                 ]
             }
        ]

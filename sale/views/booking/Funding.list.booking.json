@@ -6,11 +6,7 @@
     },
     "operations": {
         "total": {
-            "amount_share": {
-                "operation": "SUM",
-                "usage": "amount/percent"
-            },
-            "due_amount": {
+            "paid_amount": {
                 "operation": "SUM",
                 "usage": "amount/money:2"
             }
@@ -31,7 +27,10 @@
             {
                 "type": "field",
                 "value": "issue_date",
-                "width": "15%"
+                "width": "15%",
+                "widget": {
+                    "usage": "date/short"
+                }
             },
             {
                 "type": "field",
@@ -41,7 +40,10 @@
             {
                 "type": "field",
                 "value": "due_date",
-                "width": "15%"
+                "width": "15%",
+                "widget": {
+                    "usage": "date/short"
+                }
             },
             {
                 "type": "field",
@@ -60,13 +62,13 @@
             },
             {
                 "type": "field",
-                "value": "paid_amount",
-                "width": "10%"
+                "value": "due_amount",
+                "width": "15%"
             },
             {
                 "type": "field",
-                "value": "due_amount",
-                "width": "10%"
+                "value": "paid_amount",
+                "width": "15%"
             }
         ]
     }

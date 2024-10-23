@@ -3,7 +3,8 @@
     "description": "List of cashdesk logs (sessions).",
     "access": {
         "groups": ["pos.default.user"]
-     },
+    },
+    "domain": ["center_id", "in", "user.centers_ids"],
     "layout": {
         "items": [
             {

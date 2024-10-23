@@ -9,6 +9,10 @@ use equal\orm\Model;
 
 class CenterOfficeContact extends Model {
 
+    public function getTable() {
+        return 'lodging_identity_centerofficecontact';
+    }
+
     public static function getName() {
         return 'Contact details of a Center management Office';
     }

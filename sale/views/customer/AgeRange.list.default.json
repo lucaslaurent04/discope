@@ -7,27 +7,27 @@
     "layout": {
         "items": [
             {
-                "type": "field",            
+                "type": "field",
                 "value": "name",
                 "width": "15%"
-            }, 
+            },
             {
-                "type": "field",            
+                "type": "field",
                 "value": "description",
                 "width": "45%"
             },
             {
-                "type": "field",            
+                "type": "field",
                 "value": "age_from",
                 "width": "25%"
             },
             {
-                "type": "field",            
+                "type": "field",
                 "value": "age_to",
                 "width": "25%"
             },
             {
-                "type": "field",            
+                "type": "field",
                 "value": "is_active",
                 "width": "15%"
             }

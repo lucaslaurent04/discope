@@ -1,0 +1,113 @@
+{
+    "name": "Contact",
+    "description": "Booking contacts are persons involved in the organisation of a booking.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "layout": {
+        "groups": [
+            {
+                "sections": [
+                    {
+                        "label": "Contacts",
+                        "id": "section.contacts",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "type",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_direct_contact",
+                                                "width": "0%",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "name",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "email",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Identity of Partner",
+                                                "value": "partner_identity_id",
+                                                "width": "50%",
+                                                "domain": [
+                                                    "type",
+                                                    "=",
+                                                    "I"
+                                                ],
+                                                "visible": ["is_direct_contact", "=", false]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "owner_identity_id",
+                                                "width": "50%",
+                                                "visible": false,
+                                                "widget": {
+                                                    "header":{
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "booking_id",
+                                                "width": "0%",
+                                                "visible": false
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "relationship",
+                                                "visible": false,
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "partner_organisation_id",
+                                                "visible": false,
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "partner_position",
+                                                "visible": false,
+                                                "width": "50%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -25,9 +25,60 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "label": "Product Model",
+                                                "label": "Center",
+                                                "value": "center_id",
+                                                "width": "50%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "sections": [
+                    {
+                        "id": "section.product_models",
+                        "label": "Product Models",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
                                                 "value": "product_models_ids",
-                                                "width": "100%"
+                                                "width": "100%",
+                                                "widget": {
+                                                    "domain": ["can_sell", "=", true]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+
+                        ]
+                    },
+                    {
+                        "id": "section.products",
+                        "label": "Products",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "products_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "domain": ["can_sell", "=", true]
+                                                }
                                             }
                                         ]
                                     }

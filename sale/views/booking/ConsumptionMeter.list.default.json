@@ -1,0 +1,55 @@
+{
+    "name": "Consumption Meter",
+    "description": "This view is intended for displaying the list of consumptions meters.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "order" : "center_id",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "label": "Center",
+                "value": "center_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "label": "Product",
+                "value": "product_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "type_meter",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "date_opening",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "is_active",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "index_value",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "coefficient",
+                "width": "10%"
+            }
+
+        ]
+    }
+}

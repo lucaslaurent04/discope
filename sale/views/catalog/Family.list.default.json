@@ -1,6 +1,6 @@
 {
-    "name": "Families",
-    "description": "This view is intended for displaying the list of families.",
+    "name": "Product Families",
+    "description": "This view is intended for displaying the list of product families.",
     "access": {
         "groups": ["pos.default.user", "sale.default.user"]
      },
@@ -13,15 +13,13 @@
             },
             {
                 "type": "field",
-                "label": "Parent",
                 "value": "parent_id",
                 "width": "20%"
             },
             {
                 "type": "field",
-                "label": "Path",
                 "value": "path",
-                "width": "30%"
+                "width": "20%"
             }
         ]
     }

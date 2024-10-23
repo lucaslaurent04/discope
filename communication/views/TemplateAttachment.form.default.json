@@ -40,8 +40,17 @@
                                                 "value": "template_id",
                                                 "width": "50%",
                                                 "visible": false
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "attachment_type",
+                                                "width": "25%"
                                             }
-
                                         ]
                                     }
                                 ]

@@ -1,0 +1,58 @@
+{
+    "name": "Consumption Meter Reading",
+    "description": "This view is intended for displaying the list of consumptions meters reading.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "label": "Booking Inspection",
+                "value": "booking_inspection_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "label": "Booking",
+                "value": "booking_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "label": "Meter",
+                "value": "consumption_meter_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "date_reading",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "index_value",
+                "width": "10%",
+                "visible" : false
+            },
+            {
+                "type": "field",
+                "value": "display_value",
+                "width": "10%",
+                "widget": {
+                    "usage": "number/real:3"
+                }
+            },
+            {
+                "type": "field",
+                "value": "price_id",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "unit_price",
+                "width": "10%"
+            }
+        ]
+    }
+}

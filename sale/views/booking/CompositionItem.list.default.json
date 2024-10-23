@@ -41,6 +41,11 @@
             },
             {
                 "type": "field",
+                "value": "is_coordinator",
+                "width": "15%"
+            },
+            {
+                "type": "field",
                 "value": "gender",
                 "width": "10%"
             },

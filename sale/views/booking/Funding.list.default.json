@@ -1,39 +1,36 @@
 {
-    "name": "Fundings",
-    "description": "This view is intended for displaying the list of fundings.",
+    "name": "Funding",
+    "description": "List of Fundings.",
     "access": {
         "groups": ["booking.default.user"]
     },
+    "domain": ["center_office_id", "in", "user.center_offices_ids"],
+    "controller": "lodging_sale_booking_funding-collect",
     "layout": {
         "items": [
             {
                 "type": "field",
                 "value": "name",
-                "width": "25%"
+                "width": "20%"
             },
             {
                 "type": "field",
-                "value": "issue_date",
+                "value": "invoice_id",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "center_office_id",
                 "width": "15%"
             },
             {
                 "type": "field",
-                "value": "payment_deadline_id",
-                "width": "15%"
+                "value": "booking_id",
+                "width": "10%"
             },
             {
                 "type": "field",
                 "value": "type",
-                "width": "15%"
-            },
-            {
-                "type": "field",
-                "value": "due_date",
-                "width": "15%"
-            },
-            {
-                "type": "field",
-                "value": "amount_share",
                 "width": "10%"
             },
             {
@@ -43,18 +40,13 @@
             },
             {
                 "type": "field",
+                "value": "due_date",
+                "width": "10%"
+            },
+            {
+                "type": "field",
                 "value": "paid_amount",
                 "width": "10%"
-            },
-            {
-                "type": "field",
-                "value": "is_paid",
-                "width": "10%"
-            },
-            {
-                "type": "field",
-                "value": "payment_reference",
-                "width": "20%"
             }
         ]
     }

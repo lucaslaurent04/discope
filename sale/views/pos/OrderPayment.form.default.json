@@ -12,7 +12,13 @@
             "confirm": true,
             "visible": ["status", "=", "pending"]
         }
-    ],    
+    ],
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false,
+            "ACTION.EDIT": false
+        }
+    },
     "layout": {
         "groups": [
             {
@@ -74,7 +80,17 @@
                                                 "value": "order_payment_parts_ids",
                                                 "width": "100%",
                                                 "widget": {
-                                                    "domain": ["payment_origin", "=", "cashdesk"]
+                                                    "domain": ["payment_origin", "=", "cashdesk"],
+                                                    "header": {
+                                                        "selection": {
+                                                            "default": false
+                                                        },
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.EDIT": false
+                                                        }
+                                                    },
+                                                    "actions": false
                                                 }
                                             }
                                         ]
@@ -82,7 +98,7 @@
                                 ]
                             }
                         ]
-                    },                    
+                    },
                     {
                         "id": "section.order_lines",
                         "label": "Order lines",
@@ -98,9 +114,12 @@
                                                 "width": "100%",
                                                 "widget": {
                                                     "header": {
+                                                        "selection": {
+                                                            "default": false
+                                                        },
                                                         "actions": {
-                                                            "ACTION.SELECT": true,
-                                                            "ACTION.CREATE": false
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.EDIT": false
                                                         }
                                                     },
                                                     "domain": ["order_id", "=", "object.order_id"]
@@ -111,9 +130,9 @@
                                 ]
                             }
                         ]
-                    }                    
+                    }
                 ]
-            }            
+            }
         ]
     }
 }

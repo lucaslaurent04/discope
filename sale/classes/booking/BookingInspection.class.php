@@ -8,6 +8,10 @@ namespace sale\booking;
 
 class BookingInspection extends \equal\orm\Model {
 
+    public function getTable() {
+        return 'lodging_sale_booking_bookinginspection';
+    }
+
     public static function getColumns() {
         return [
 

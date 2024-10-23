@@ -3,12 +3,18 @@
     "description": "List of scheduled repairs.",
     "access": {
         "groups": ["booking.default.user"]
-     },
+    },
     "layout": {
         "items": [
             {
                 "type": "field",
                 "value": "name",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "label": "Center",
+                "value": "center_id",
                 "width": "20%"
             },
             {

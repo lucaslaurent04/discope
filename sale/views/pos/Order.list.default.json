@@ -6,16 +6,29 @@
     },
     "header": {
         "actions": {
-            "ACTION.CREATE" : [
-                {
-                    "view": "form.create",
-                    "description": "overload form to use for order creation"
-                }
-            ]
+            "ACTION.CREATE": false
         }
-    },     
+    },
+    "operations": {
+        "total": {
+            "total": {
+                "operation": "SUM",
+                "usage": "amount/money:2"
+            },
+            "price": {
+                "operation": "SUM",
+                "usage": "amount/money:2"
+            }
+        }
+    },
+    "limit": 500,
     "layout": {
         "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "20%"
+            },
             {
                 "type": "field",
                 "value": "name",
@@ -25,7 +38,12 @@
                 "type": "field",
                 "label": "Date",
                 "value": "created",
-                "width": "20%"
+                "width": "15%"
+            },
+            {
+                "type": "field",
+                "value": "status",
+                "width": "15%"
             },
             {
                 "type": "field",
@@ -37,6 +55,17 @@
                 "type": "field",
                 "label": "Price",
                 "value": "price",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "has_funding",
+                "width": "15%"
+            },
+            {
+                "type": "field",
+                "label": "Funding",
+                "value": "funding_id",
                 "width": "20%"
             }
         ]

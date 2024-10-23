@@ -3,20 +3,21 @@
     "description": "This view is intended for displaying the list of packlines.",
     "access": {
         "groups": ["pos.default.user", "sale.default.user"]
-    },
+     },
     "layout": {
         "items": [
             {
                 "type": "field",
-                "label": "Name",
-                "value": "name",
-                "width": "30%"
+                "label": "Identifier",
+                "value": "id",
+                "width": "10%"
             },
             {
                 "type": "field",
-                "label": "Parent Product",
+                "label": "Pack",
                 "value": "parent_product_id",
-                "width": "20%"
+                "width": "20%",
+                "visible": false
             },
             {
                 "type": "field",
@@ -47,14 +48,14 @@
                 "type": "field",
                 "label": "Has Duration",
                 "value": "has_own_duration",
-                "width": "50%"
+                "width": "15%"
             },
             {
                 "type": "field",
                 "label": "Product Duration",
                 "value": "own_duration",
-                "width": "50%"
-            }            
+                "width": "15%"
+            }
         ]
     }
 }

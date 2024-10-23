@@ -4,6 +4,12 @@
     "access": {
         "groups": ["pos.default.user"]
     },
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false,
+            "ACTION.EDIT": false
+        }
+    },
     "layout": {
         "groups": [
             {
