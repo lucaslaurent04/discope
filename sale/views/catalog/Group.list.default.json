@@ -13,8 +13,7 @@
             },
             {
                 "type": "field",
-                "label": "Product Model",
-                "value": "product_models_ids",
+                "value": "center_id",
                 "width": "20%"
             }
         ]
