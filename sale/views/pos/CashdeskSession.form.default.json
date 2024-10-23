@@ -19,7 +19,16 @@
             "icon": "close",
             "route": "/session/object.id/close"
         }
-    ],    
+    ],
+    "header": {
+        "selection": {
+            "default": false
+        },
+        "actions": {
+            "ACTION.CREATE": false,
+            "ACTION.EDIT": false
+        }
+    },
     "layout": {
         "groups": [
             {
@@ -33,20 +42,39 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "value": "status",
+                                                "visible": false,
+                                                "width": "0"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "created",
-                                                "width": "50%",
-                                                "widget": {                                                
+                                                "width": "66%",
+                                                "widget": {
                                                     "readonly": true,
-                                                    "heading": true                                                    
+                                                    "heading": true
                                                 }
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "amount",
-                                                "width": "50%",
+                                                "value": "amount_opening",
+                                                "width": "33%",
                                                 "widget": {
                                                     "readonly": true,
-                                                    "heading": true                                                    
+                                                    "heading": true
+                                                }
+                                            },
+                                            {
+                                                "width": "66%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "amount_closing",
+                                                "width": "33%",
+                                                "visible": ["status", "=", "closed"],
+                                                "widget": {
+                                                    "readonly": true,
+                                                    "heading": true
                                                 }
                                             }
                                         ]
@@ -76,7 +104,96 @@
                                                 }
                                             }
                                         ]
-                                    }                                    
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "sections": [
+                    {
+                        "id":"section.orders",
+                        "label": "Orders",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "orders_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "selection": {
+                                                            "default": false
+                                                        },
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.EDIT": false
+                                                        }
+                                                    }
+                                                },
+                                                "actions": false
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id":"section.operations",
+                        "label": "Operations",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "operations_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "selection": {
+                                                            "default": false
+                                                        },
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.EDIT": false
+                                                        }
+                                                    }
+                                                },
+                                                "actions": false
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id":"section.notes",
+                        "label": "Closing notes",
+                        "visible": ["status", "=", "closed"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "note",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
                                 ]
                             }
                         ]

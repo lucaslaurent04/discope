@@ -1,63 +1,26 @@
 {
     "name": "Contract Lines",
-    "description": "This view is intended for displaying the list of contract lines.",
+    "description": "This view is intended for displaying the list of contact lines.",
     "access": {
         "groups": ["booking.default.user"]
-    },
-    "operations": {
-        "total": {
-            "price": {
-                "operation": "SUM",
-                "usage": "amount/money:2"
-            }
-        }
-    },
+     },
     "layout": {
         "items": [
             {
                 "type": "field",
-                "value": "name",
-                "width": "20%"
-            },
-            {
-                "type": "field",
-                "label": "contrat",
+                "label": "Contract",
                 "value": "contract_id",
+                "width": "30%"
+            },
+            {
+                "type": "field",
+                "value": "contract_line_group_id",
                 "width": "20%"
             },
             {
                 "type": "field",
-                "value": "unit_price",
-                "width": "10%"
-            },
-            {
-                "type": "field",
-                "value": "vat_rate",
-                "width": "10%"
-            },
-            {
-                "type": "field",
-                "label": "Quantity",
-                "value": "qty",
-                "width": "10%"
-            },
-            {
-                "type": "field",
-                "label": "Freebies",
-                "value": "free_qty",
-                "width": "10%"
-            },
-            {
-                "type": "field",
-                "label": "Discount",
-                "value": "discount",
-                "width": "10%"
-            },
-            {
-                "type": "field",
-                "label": "Price",
-                "value": "price",
-                "width": "10%"
+                "value": "product_id",
+                "width": "20%"
             }
         ]
     }

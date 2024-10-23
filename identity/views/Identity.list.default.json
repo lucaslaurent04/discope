@@ -1,8 +1,20 @@
 {
     "name": "Identity list",
     "description": "Listing of all existing identities.",
+    "controller": "lodging_identity_collect",
+    "header": {
+        "filters": {
+            "custom": true,
+            "quicksearch": false
+        }
+    },
     "layout": {
         "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "10%"
+            },
             {
                 "type": "field",
                 "value": "name",
@@ -32,6 +44,24 @@
                 "type": "field",
                 "value": "email",
                 "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "is_duplicate",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "duplicate_identity_id",
+                "width": "20%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "is_ota",
+                "width": "10%",
+                "visible": false
             }
         ]
     }

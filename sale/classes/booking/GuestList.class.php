@@ -9,6 +9,10 @@ use equal\orm\Model;
 
 class GuestList extends Model {
 
+    public function getTable() {
+        return 'lodging_sale_booking_guestlist';
+    }
+
     public static function getColumns() {
         return [
 

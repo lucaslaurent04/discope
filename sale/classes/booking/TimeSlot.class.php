@@ -9,6 +9,10 @@ use equal\orm\Model;
 
 class TimeSlot extends Model {
 
+    public function getTable() {
+        return 'lodging_sale_booking_timeslot';
+    }
+
     public static function getName() {
         return 'Time Slot';
     }

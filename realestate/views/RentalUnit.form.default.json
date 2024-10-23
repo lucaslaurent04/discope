@@ -1,9 +1,19 @@
 {
     "name": "Rental Units",
-    "description": "A rental unit is a ressource that can be rented to a customer.",
+    "description": "A rental unit is a resource that can be rented to a customer.",
     "access": {
         "groups": ["booking.default.user"]
     },
+    "actions": [
+        {
+            "id": "action.cleaned",
+            "label": "Mark as cleaned",
+            "description": "Rental unit will be marked as none.",
+            "controller": "lodging_realestate_do-cleaned",
+            "confirm": true,
+            "visible": ["action_required", "in", ["cleanup_daily","cleanup_full"]]
+        }
+    ],
     "layout": {
         "groups": [
             {
@@ -20,10 +30,27 @@
                                             {
                                                 "type": "field",
                                                 "value": "name",
-                                                "width": "50%",
+                                                "width": "100%",
                                                 "widget": {
                                                     "heading": true
                                                 }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "code",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Center",
+                                                "value": "center_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Rentable",
+                                                "value": "can_rent",
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
@@ -32,8 +59,14 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "label": "Rentable",
-                                                "value": "can_rent",
+                                                "label": "Accomodation",
+                                                "value": "is_accomodation",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Sojourn Type",
+                                                "value": "sojourn_type_id",
                                                 "width": "50%"
                                             }
                                         ]
@@ -43,8 +76,18 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "capacity",
+                                                "value": "rental_unit_category_id",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "action_required",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "capacity",
+                                                "width": "33%"
                                             },
                                             {
                                                 "type": "field",
@@ -63,6 +106,31 @@
                                                 "label": "Partial rent?",
                                                 "value": "can_partial_rent",
                                                 "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "description",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "status",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "order",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "color",
+                                                "width": "33%"
                                             }
                                         ]
                                     }
@@ -73,6 +141,7 @@
                     {
                         "label": "Children",
                         "id": "section.children_section",
+                        "visible": ["has_children", "=", true],
                         "rows": [
                             {
                                 "columns": [
@@ -82,14 +151,46 @@
                                             {
                                                 "type": "field",
                                                 "value": "children_ids",
-                                                "width": "100%"
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.SELECT": true
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
                                 ]
                             }
                         ]
-                    }                                        
+                    },
+                    {
+                        "label": "Repairs",
+                        "id": "section.repairs",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "repairs_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "domain": ["type", "=", "ooo"],
+                                                    "order": "date",
+                                                    "sort": "desc"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 ]
             }
         ]

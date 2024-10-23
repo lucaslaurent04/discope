@@ -4,6 +4,7 @@
     "access": {
         "groups": ["pos.default.user"]
     },
+    "domain": ["center_id", "in", "user.centers_ids"],
     "layout": {
         "entity": "sale\\pay\\Payment",
         "type": "pie",

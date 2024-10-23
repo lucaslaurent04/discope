@@ -9,6 +9,10 @@ use equal\orm\Model;
 
 class SojournProductModelRentalUnitAssignement extends Model {
 
+    public function getTable() {
+        return 'lodging_sale_booking_sojournproductmodelrentalunitassignement';
+    }
+
     public static function getName() {
         return "Rental Unit Assignment";
     }

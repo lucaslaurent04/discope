@@ -9,6 +9,10 @@ use equal\orm\Model;
 
 class CenterCategory extends Model {
 
+    public function getTable() {
+        return 'lodging_identity_centercategory';
+    }
+
     public static function getName() {
         return 'Center category';
     }

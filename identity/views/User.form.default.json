@@ -2,8 +2,8 @@
     "name": "User",
     "description": "Basic form for displaying a User",
     "access": {
-        "groups": ["*"]
-     },
+        "groups": ["admin"]
+    },
     "layout": {
         "groups": [
             {
@@ -30,41 +30,39 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "password",
-                                                "width": "50%"
+                                                "value": "language",
+                                                "width": "25%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "firstname",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "lastname",
-                                                "width": "50%"
+                                                "value": "validated",
+                                                "width": "25%"
                                             }
+
                                         ]
                                     },
                                     {
                                         "width": "50%",
-                                        "items": [
+                                        "items": [ 
                                             {
                                                 "type": "field",
                                                 "label": "Identity",
                                                 "value": "identity_id",
                                                 "width": "100%"
-                                            },
+                                            }, 
                                             {
                                                 "type": "field",
-                                                "value": "language",
+                                                "label": "Password",
+                                                "value": "password",
                                                 "width": "50%"
-                                            },
+                                            }, 
                                             {
                                                 "type": "field",
-                                                "value": "validated",
+                                                "label": "Organisation",
+                                                "value": "organisation_id",
                                                 "width": "50%"
                                             }
-                                        ]                                        
+                                        ]
                                     }
                                 ]
                             }
@@ -76,7 +74,7 @@
                 "sections": [
                     {
                         "label": "Groups",
-                        "id":  "section.group",
+                        "id": "section.group",
                         "rows": [
                             {
                                 "columns": [
@@ -86,7 +84,74 @@
                                             {
                                                 "type": "field",
                                                 "value": "groups_ids",
-                                                "width": "100%"
+                                                "width": "100%",
+                                                "widget": {
+                                                    "mode": "view",
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.SELECT": false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Centers",
+                        "id": "section.centers",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "centers_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "mode": "view",
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.SELECT": false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Center Offices",
+                        "id": "section.center_offices",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "center_offices_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "mode": "view",
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.SELECT": false
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
@@ -96,7 +161,7 @@
                     },
                     {
                         "label": "Preferences",
-                        "id":  "section.preferences",
+                        "id": "section.preferences",
                         "rows": [
                             {
                                 "columns": [
@@ -106,16 +171,27 @@
                                             {
                                                 "type": "field",
                                                 "value": "setting_values_ids",
-                                                "width": "100%"
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.SELECT": false
+                                                        },
+                                                        "selection": {
+                                                            "default": false
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
                                 ]
                             }
                         ]
-                    }                    
+                    }
                 ]
-            }            
+            }
         ]
     }
 }

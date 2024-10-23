@@ -3,13 +3,18 @@
     "description": "",
     "access": {
         "groups": ["booking.default.user"]
-     },
+    },
+    "header": {
+        "actions": {
+            "ACTION.EDIT": false
+        }
+    },
     "actions": [
         {
             "id": "action.sent",
             "label": "Mark as sent",
             "description": "Contract will be marked as sent and waiting for customer's signature.",
-            "controller": "sale_contract_sent",
+            "controller": "lodging_contract_sent",
             "confirm": true,
             "visible": ["status", "=", "pending"]
         },
@@ -17,9 +22,45 @@
             "id": "action.signed",
             "label": "Mark as signed",
             "description": "Contract will be marked as signed. Booking will be validated as soon as the payment is received.",
-            "controller": "sale_contract_signed",
+            "controller": "lodging_contract_signed",
             "confirm": true,
-            "visible": ["status", "=", "sent"]
+            "visible": ["status", "in", ["pending", "sent"]]
+        },
+        {
+            "id": "action.lock",
+            "label": "Lock contract",
+            "description": "Contract will be locked. Users will not be able to updated it nor cancel it (and related booking) while locked.",
+            "controller": "lodging_contract_lock",
+            "confirm": true,
+            "access": {
+                "groups": ["booking.default.administrator", "sale.default.administrator"]
+            },
+            "visible": ["is_locked", "=", false]
+        },
+        {
+            "id": "action.unlock",
+            "label": "Unlock contract",
+            "description": "Contract will be unlocked and users will be able to cancel it when reverting bookings to quotes.",
+            "help": "Unlike the locking feature, unlocking a contract is available to all Booking users.",
+            "controller": "lodging_contract_unlock",
+            "confirm": true,
+            "visible": ["is_locked", "=", true]
+        }
+    ],
+    "routes": [
+        {
+            "id": "item.contract.send",
+            "label": "Envoi du contrat",
+            "description": "",
+            "icon": "drive_file_rename_outline",
+            "route": "/booking/object.booking_id/contract/object.id"
+        },
+        {
+            "id": "item.contract.remind",
+            "label": "Envoi de rappel",
+            "description": "Envoyer un rappel pour la signature.",
+            "icon": "email",
+            "route": "/booking/object.booking_id/contract/object.id/remind"
         }
     ],
     "layout": {
@@ -58,9 +99,9 @@
                             }
                         ]
                     }
-                                       
+
                 ]
-            },            
+            },
             {
                 "sections": [
                     {
@@ -101,6 +142,20 @@
                                                 "width": "100%"
                                             }
                                         ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "align": "right",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "is_locked",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "align": "right"
+                                                }
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -111,21 +166,28 @@
                         "label": "Contract Lines",
                         "rows": [
                             {
-                                "columns": [                                    
+                                "columns": [
                                     {
                                         "width": "100%",
                                         "items": [
                                             {
                                                 "type": "field",
                                                 "value": "contract_lines_ids",
-                                                "width": "100%"
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
                                 ]
                             }
                         ]
-                    }                    
+                    }
                 ]
             }
         ]

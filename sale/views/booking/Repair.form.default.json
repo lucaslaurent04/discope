@@ -3,7 +3,7 @@
     "description": "Repair are scheduled occupation of rental units for maintenance & repair.",
     "access": {
         "groups": ["booking.default.user"]
-     },
+    },
     "layout": {
         "groups": [
             {

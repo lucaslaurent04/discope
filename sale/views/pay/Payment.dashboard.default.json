@@ -20,7 +20,7 @@
                                                 "label": "Alertes",
                                                 "description": "",
                                                 "width": "50%",
-                                                "entity": "core\\alert\\MessageModel",
+                                                "entity": "core\\alert\\Message",
                                                 "view": "list.default",
                                                 "domain":  ["object_class", "=", "sale\\pay\\*"]
                                             },
@@ -29,7 +29,7 @@
                                                 "label": "Extraits bancaires",
                                                 "description": "",
                                                 "width": "50%",
-                                                "entity": "sale\\pay\\BankStatement",
+                                                "entity": "sale\\booking\\BankStatement",
                                                 "view": "list.dashboard",
                                                 "domain": ["status", "=", "pending"]
                                             }
@@ -49,7 +49,7 @@
                                                 "label": "Financements",
                                                 "description": "",
                                                 "width": "50%",
-                                                "entity": "sale\\pay\\Funding",
+                                                "entity": "sale\\booking\\Funding",
                                                 "view": "chart.default"
                                             },
                                             {

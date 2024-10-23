@@ -1,6 +1,6 @@
 {
     "name": "Contract Line Group",
-    "description": "",
+    "description": "Contract line groups are related to a booking.",
     "access": {
         "groups": ["booking.default.user"]
      },
@@ -9,6 +9,8 @@
             {
                 "sections": [
                     {
+                        "label": "General info",
+                        "id": "section.contractlineGroup_section",
                         "rows": [
                             {
                                 "columns": [
@@ -25,45 +27,54 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "label": "Contract",
+                                                "value": "is_pack",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "contract_line_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "contract_id",
                                                 "width": "50%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "rate_class_id",
+                                                "value": "total",
                                                 "width": "50%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "fare_benefit",
+                                                "value": "price",
                                                 "width": "50%"
                                             }
                                         ]
                                     }
                                 ]
-                            }
-                        ]
-                    },
-                    {
-                        "label":"Contract Lines",
-                        "id": "section.contract_lines",
-                        "rows": [
+                            },
                             {
-                                "columns": [
+                                "id": "section.lines",
+                                "label": "Contract Lines",
+                                "rows": [
                                     {
-                                        "width": "100%",
-                                        "items": [
+                                        "columns": [                                    
                                             {
-                                                "type": "field",
-                                                "value": "contract_lines_ids",
-                                                "width": "100%"
+                                                "width": "100%",
+                                                "items": [
+                                                    {
+                                                        "type": "field",
+                                                        "value": "contract_lines_ids",
+                                                        "width": "100%"
+                                                    }
+                                                ]
                                             }
                                         ]
                                     }
                                 ]
-                            }
-                        ]    
+                            } 
+                        ]
                     }
                 ]
             }

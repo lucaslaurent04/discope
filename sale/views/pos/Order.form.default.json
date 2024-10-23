@@ -3,7 +3,23 @@
     "description": "Point of Sale order.",
     "access": {
         "groups": ["pos.default.user"]
-     },
+    },
+    "routes": [
+        {
+            "id": "item.order.ticket",
+            "label": "Ticket",
+            "description": "",
+            "icon": "list_alt",
+            "route": "/session/object.session_id/order/object.id/ticket",
+            "visible": ["status", "=", "paid"]
+        }
+    ],
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false,
+            "ACTION.EDIT": false
+        }
+    },
     "layout": {
         "groups": [
             {
@@ -41,6 +57,21 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "has_funding",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Funding",
+                                                "value": "funding_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "label": "Has invoice",
                                                 "value": "has_invoice",
                                                 "width": "50%"
@@ -73,7 +104,18 @@
                                             {
                                                 "type": "field",
                                                 "value": "order_lines_ids",
-                                                "width": "100%"
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "selection": {
+                                                            "default": false
+                                                        },
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.EDIT": false
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
@@ -93,30 +135,17 @@
                                             {
                                                 "type": "field",
                                                 "value": "order_payments_ids",
-                                                "width": "100%"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "section.accounting_entries",
-                        "label": "Accounting Entries",
-                        "visible": ["has_invoice", "=", false],
-                        "rows": [
-                            {
-                                "columns": [
-                                    {
-                                        "width": "100%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "accounting_entries_ids",
                                                 "width": "100%",
                                                 "widget": {
-                                                    "view": "list.order"
+                                                    "header": {
+                                                        "selection": {
+                                                            "default": false
+                                                        },
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.EDIT": false
+                                                        }
+                                                    }
                                                 }
                                             }
                                         ]
