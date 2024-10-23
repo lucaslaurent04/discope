@@ -1,21 +1,22 @@
 {
-    "name": "Cashdesk Sessions",
-    "description": "List of cashdesk logs (sessions).",
+    "name": "Operations",
+    "description": "List of cashdesk operations.",
     "access": {
         "groups": ["pos.default.user"]
     },
-    "domain": ["center_id", "in", "user.centers_ids"],
+    "order": "created",
+    "sort": "desc",
     "layout": {
         "items": [
             {
                 "type": "field",
-                "value": "created",
+                "value": "name",
                 "width": "20%"
             },
             {
                 "type": "field",
-                "value": "amount",
-                "width": "20%"
+                "value": "created",
+                "width": "15%"
             },
             {
                 "type": "field",
@@ -26,6 +27,16 @@
                 "type": "field",
                 "value": "cashdesk_id",
                 "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "type",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "amount",
+                "width": "15%"
             }
         ]
     }

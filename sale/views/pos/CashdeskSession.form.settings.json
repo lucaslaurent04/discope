@@ -20,15 +20,6 @@
             "route": "/session/object.id/close"
         }
     ],
-    "header": {
-        "selection": {
-            "default": false
-        },
-        "actions": {
-            "ACTION.CREATE": false,
-            "ACTION.EDIT": false
-        }
-    },
     "layout": {
         "groups": [
             {
@@ -51,7 +42,6 @@
                                                 "value": "created",
                                                 "width": "66%",
                                                 "widget": {
-                                                    "readonly": true,
                                                     "heading": true
                                                 }
                                             },
@@ -60,7 +50,6 @@
                                                 "value": "amount_opening",
                                                 "width": "33%",
                                                 "widget": {
-                                                    "readonly": true,
                                                     "heading": true
                                                 }
                                             },
@@ -71,9 +60,7 @@
                                                 "type": "field",
                                                 "value": "amount_closing",
                                                 "width": "33%",
-                                                "visible": ["status", "=", "closed"],
                                                 "widget": {
-                                                    "readonly": true,
                                                     "heading": true
                                                 }
                                             }
@@ -89,19 +76,13 @@
                                                 "type": "field",
                                                 "label": "User",
                                                 "value": "user_id",
-                                                "width": "100%",
-                                                "widget": {
-                                                    "readonly": true
-                                                }
+                                                "width": "100%"
                                             },
                                             {
                                                 "type": "field",
                                                 "label": "Cashdesk",
                                                 "value": "cashdesk_id",
-                                                "width": "100%",
-                                                "widget": {
-                                                    "readonly": true
-                                                }
+                                                "width": "100%"
                                             }
                                         ]
                                     }
@@ -127,17 +108,8 @@
                                                 "value": "orders_ids",
                                                 "width": "100%",
                                                 "widget": {
-                                                    "header": {
-                                                        "selection": {
-                                                            "default": false
-                                                        },
-                                                        "actions": {
-                                                            "ACTION.CREATE": false,
-                                                            "ACTION.EDIT": false
-                                                        }
-                                                    }
-                                                },
-                                                "actions": false
+                                                    "view": "list.settings"
+                                                }
                                             }
                                         ]
                                     }
@@ -159,17 +131,8 @@
                                                 "value": "operations_ids",
                                                 "width": "100%",
                                                 "widget": {
-                                                    "header": {
-                                                        "selection": {
-                                                            "default": false
-                                                        },
-                                                        "actions": {
-                                                            "ACTION.CREATE": false,
-                                                            "ACTION.EDIT": false
-                                                        }
-                                                    }
-                                                },
-                                                "actions": false
+                                                    "view": "list.settings"
+                                                }
                                             }
                                         ]
                                     }
@@ -180,7 +143,6 @@
                     {
                         "id":"section.notes",
                         "label": "Closing notes",
-                        "visible": ["status", "=", "closed"],
                         "rows": [
                             {
                                 "columns": [

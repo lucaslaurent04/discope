@@ -1,9 +1,9 @@
 {
-    "name": "Cashdesk",
+    "name": "Cashdesk Sheet Total",
     "description": "",
     "access": {
-        "groups": ["pos.default.user"]
-     },
+        "groups": ["booking.default.user"]
+    },
     "layout": {
         "groups": [
             {
@@ -17,16 +17,18 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "name",
-                                                "width": "50%",
-                                                "widget": {
-                                                    "heading": true
-                                                }
+                                                "value": "center_id",
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "center_id",
-                                                "width": "50%"
+                                                "value": "date_from",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "date_to",
+                                                "width": "25%"
                                             }
                                         ]
                                     }

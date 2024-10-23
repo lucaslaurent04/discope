@@ -14,12 +14,6 @@
             "visible": ["status", "=", "paid"]
         }
     ],
-    "header": {
-        "actions": {
-            "ACTION.CREATE": false,
-            "ACTION.EDIT": false
-        }
-    },
     "layout": {
         "groups": [
             {
@@ -57,7 +51,14 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "has_funding",
+                                                "label": "Has invoice",
+                                                "value": "has_invoice",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Invoice",
+                                                "value": "invoice_id",
                                                 "width": "50%"
                                             },
                                             {
@@ -67,19 +68,8 @@
                                                 "width": "50%"
                                             },
                                             {
-                                                "type": "label",
-                                                "width": "100%"
-                                            },
-                                            {
                                                 "type": "field",
-                                                "label": "Has invoice",
-                                                "value": "has_invoice",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "label": "Invoice",
-                                                "value": "invoice_id",
+                                                "value": "has_funding",
                                                 "width": "50%"
                                             }
                                         ]
@@ -106,15 +96,7 @@
                                                 "value": "order_lines_ids",
                                                 "width": "100%",
                                                 "widget": {
-                                                    "header": {
-                                                        "selection": {
-                                                            "default": false
-                                                        },
-                                                        "actions": {
-                                                            "ACTION.CREATE": false,
-                                                            "ACTION.EDIT": false
-                                                        }
-                                                    }
+                                                    "view": "list.settings"
                                                 }
                                             }
                                         ]
@@ -137,15 +119,31 @@
                                                 "value": "order_payments_ids",
                                                 "width": "100%",
                                                 "widget": {
-                                                    "header": {
-                                                        "selection": {
-                                                            "default": false
-                                                        },
-                                                        "actions": {
-                                                            "ACTION.CREATE": false,
-                                                            "ACTION.EDIT": false
-                                                        }
-                                                    }
+                                                    "view": "list.settings"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.accounting_entries",
+                        "label": "Accounting Entries",
+                        "visible": ["has_invoice", "=", false],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "accounting_entries_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.order"
                                                 }
                                             }
                                         ]

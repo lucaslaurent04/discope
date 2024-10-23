@@ -1,54 +1,53 @@
 {
-    "name": "Cashdesk Sessions",
-    "description": "List of cashdesk logs (sessions).",
+    "name": "Orders",
+    "description": "List of Point of Sale orders.",
     "access": {
         "groups": ["pos.default.user"]
-    },
-    "domain": ["center_id", "in", "user.centers_ids"],
-    "header": {
-        "actions": {
-            "ACTION.CREATE" : false
-        },
-        "advanced_search": {
-            "open": true
-        }
     },
     "layout": {
         "items": [
             {
                 "type": "field",
                 "value": "id",
-                "width": "10%",
-                "visible": false
+                "width": "20%"
             },
             {
                 "type": "field",
                 "value": "name",
-                "width": "30%"
+                "width": "20%"
             },
             {
                 "type": "field",
-                "value": "center_id",
-                "width": "25%"
-            },
-            {
-                "type": "field",
+                "label": "Date",
                 "value": "created",
-                "width": "20%"
+                "width": "15%"
             },
             {
                 "type": "field",
                 "value": "status",
+                "width": "15%"
+            },
+            {
+                "type": "field",
+                "label": "Total",
+                "value": "total",
                 "width": "20%"
             },
             {
                 "type": "field",
-                "value": "amount_opening",
+                "label": "Price",
+                "value": "price",
                 "width": "20%"
             },
             {
                 "type": "field",
-                "value": "status",
+                "value": "has_funding",
+                "width": "15%"
+            },
+            {
+                "type": "field",
+                "label": "Funding",
+                "value": "funding_id",
                 "width": "20%"
             }
         ]

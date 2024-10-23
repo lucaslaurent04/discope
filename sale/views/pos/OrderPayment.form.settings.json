@@ -13,12 +13,6 @@
             "visible": ["status", "=", "pending"]
         }
     ],
-    "header": {
-        "actions": {
-            "ACTION.CREATE": false,
-            "ACTION.EDIT": false
-        }
-    },
     "layout": {
         "groups": [
             {
@@ -59,6 +53,54 @@
                                         ]
                                     }
                                 ]
+                            },
+{
+                                "columns": [
+                                    {
+                                        "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "has_booking",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "booking_id",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "columns": [
+                                    {
+                                        "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "has_funding",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "funding_id",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -80,17 +122,7 @@
                                                 "value": "order_payment_parts_ids",
                                                 "width": "100%",
                                                 "widget": {
-                                                    "domain": ["payment_origin", "=", "cashdesk"],
-                                                    "header": {
-                                                        "selection": {
-                                                            "default": false
-                                                        },
-                                                        "actions": {
-                                                            "ACTION.CREATE": false,
-                                                            "ACTION.EDIT": false
-                                                        }
-                                                    },
-                                                    "actions": false
+                                                    "domain": ["payment_origin", "=", "cashdesk"]
                                                 }
                                             }
                                         ]
@@ -113,15 +145,6 @@
                                                 "value": "order_lines_ids",
                                                 "width": "100%",
                                                 "widget": {
-                                                    "header": {
-                                                        "selection": {
-                                                            "default": false
-                                                        },
-                                                        "actions": {
-                                                            "ACTION.CREATE": false,
-                                                            "ACTION.EDIT": false
-                                                        }
-                                                    },
                                                     "domain": ["order_id", "=", "object.order_id"]
                                                 }
                                             }

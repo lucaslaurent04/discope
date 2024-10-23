@@ -9,22 +9,38 @@
         "items": [
             {
                 "type": "field",
+                "value": "id",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "name",
+                "width": "30%"
+            },
+            {
+                "type": "field",
+                "value": "center_id",
+                "width": "25%"
+            },
+            {
+                "type": "field",
                 "value": "created",
                 "width": "20%"
             },
             {
                 "type": "field",
-                "value": "amount",
+                "value": "status",
                 "width": "20%"
             },
             {
                 "type": "field",
-                "value": "user_id",
+                "value": "amount_opening",
                 "width": "20%"
             },
             {
                 "type": "field",
-                "value": "cashdesk_id",
+                "value": "amount_closing",
                 "width": "20%"
             }
         ]

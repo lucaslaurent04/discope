@@ -4,12 +4,6 @@
     "access": {
         "groups": ["pos.default.user"]
     },
-    "header": {
-        "actions": {
-            "ACTION.CREATE": false,
-            "ACTION.EDIT": false
-        }
-    },
     "layout": {
         "groups": [
             {
@@ -53,14 +47,7 @@
                                                 "type": "field",
                                                 "label": "User",
                                                 "value": "user_id",
-                                                "width": "50%",
-                                                "widget": {
-                                                    "header": {
-                                                        "actions":{
-                                                            "ACTION.CREATE": false
-                                                        }
-                                                    }
-                                                }
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "label",

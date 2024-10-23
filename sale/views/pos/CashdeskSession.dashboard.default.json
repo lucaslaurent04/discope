@@ -7,7 +7,7 @@
                 "label": "Dashboard",
                 "height": "100%",
                 "sections": [
-                    {                
+                    {
                         "rows": [
                             {
                                 "height": "50%",
@@ -20,9 +20,9 @@
                                                 "label": "Alertes",
                                                 "description": "",
                                                 "width": "50%",
-                                                "entity": "core\\alert\\Message",
+                                                "entity": "discope\\core\\alert\\Message",
                                                 "view": "list.dashboard",
-                                                "domain":  ["object_class", "=", "sale\\pos\\*"]
+                                                "domain": [ ["object_class", "=", "sale\\pos\\*"], ["group_id", "in", "user.center_offices_ids"] ]
                                             },
                                             {
                                                 "id": "item.pos2",
@@ -50,7 +50,8 @@
                                                 "description": "",
                                                 "width": "50%",
                                                 "entity": "sale\\pos\\CashdeskSession",
-                                                "view": "chart.default"
+                                                "view": "chart.default",
+                                                "domain": ["center_id", "in", "user.centers_ids"]
                                             },
                                             {
                                                 "id": "item.pos4",
@@ -58,17 +59,17 @@
                                                 "description": "",
                                                 "width": "50%",
                                                 "entity": "sale\\pos\\CashdeskSession",
-                                                "view": "chart.paymentMethod"
+                                                "view": "chart.paymentMethod",
+                                                "domain": ["center_id", "in", "user.centers_ids"]
                                             }
-
                                         ]
                                     }
                                 ]
-                            }                            
+                            }
                         ]
                     }
                 ]
-            }            
+            }
         ]
     }
 }
