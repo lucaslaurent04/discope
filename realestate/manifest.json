@@ -1,6 +1,8 @@
 {
     "name": "realestate",
     "depends_on": [
-        "identity"
+        "core",
+        "identity",
+        "sale"
     ]
 }
