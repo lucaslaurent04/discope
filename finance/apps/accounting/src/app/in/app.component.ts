@@ -18,7 +18,7 @@ export class AppComponent implements OnInit  {
     private getDescriptor() {
         return {
             context: {
-                "entity": "lodging\\sale\\booking\\Invoice",
+                "entity": "sale\\booking\\Invoice",
                 "view": "dashboard.default"
             }
         };

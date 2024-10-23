@@ -18,7 +18,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatement",
+                            "entity": "sale\\booking\\BankStatement",
                             "view": "list.default",
                             "order": "date",
                             "sort": "desc",
@@ -32,7 +32,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatement",
+                            "entity": "sale\\booking\\BankStatement",
                             "view": "list.default",
                             "order": "date",
                             "sort": "desc"
@@ -45,7 +45,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatementLine",
+                            "entity": "sale\\booking\\BankStatementLine",
                             "view": "list.default",
                             "order": "date",
                             "sort": "desc",
@@ -59,7 +59,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatementLine",
+                            "entity": "sale\\booking\\BankStatementLine",
                             "view": "list.default",
                             "order": "date",
                             "sort": "desc"
@@ -72,7 +72,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatementLine",
+                            "entity": "sale\\booking\\BankStatementLine",
                             "view": "list.reconciled",
                             "domain": [
                                 ["status", "=", "reconciled"]
@@ -182,7 +182,7 @@
                         "label": "Waiting for payment",
                         "description": "",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\Funding",
+                            "entity": "sale\\booking\\Funding",
                             "view": "list.default",
                             "domain": ["is_paid", "=", false]
                         }
@@ -193,7 +193,7 @@
                         "label": "Overdue fundings",
                         "description": "",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\Funding",
+                            "entity": "sale\\booking\\Funding",
                             "view": "list.default",
                             "domain": [ ["due_date", "<=", "date.this.day"],  ["is_paid", "=", false] ]
                         }
@@ -213,7 +213,7 @@
                         "label": "All invoices",
                         "description": "",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\Invoice",
+                            "entity": "sale\\booking\\Invoice",
                             "view": "list.default",
                             "domain": ["status", "=", "invoice"]
                         }
@@ -224,7 +224,7 @@
                         "label": "Overdue invoices",
                         "description": "",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\Invoice",
+                            "entity": "sale\\booking\\Invoice",
                             "view": "list.default",
                             "domain": [ ["due_date", "<=", "date.this.day"],  ["is_paid", "=", false] ]
                         }

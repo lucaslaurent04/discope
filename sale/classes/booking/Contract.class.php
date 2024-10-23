@@ -26,13 +26,27 @@ class Contract extends \sale\contract\Contract {
                 'required'          => true
             ],
 
+            'contract_line_groups_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\ContractLineGroup',
+                'foreign_field'     => 'contract_id',
+                'description'       => 'Contract lines that belong to the contract.',
+                'ondetach'          => 'delete'
+            ],
+
             'contract_lines_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\ContractLine',
                 'foreign_field'     => 'contract_id',
                 'description'       => 'Contract lines that belong to the contract.',
                 'ondetach'          => 'delete'
-            ]            
+            ],
+
+            'is_locked' => [
+                "type"              => "boolean",
+                "description"       => "Flag for preventing automated cancellation of the contract.",
+                "default"           => false
+            ]
 
         ];
     }
@@ -40,9 +54,9 @@ class Contract extends \sale\contract\Contract {
     public static function calcName($om, $oids, $lang) {
         $result = [];
 
-        $res = $om->read(get_called_class(), $oids, ['booking_id', 'customer_id.name', 'booking_id.name']);
+        $res = $om->read(self::getType(), $oids, ['booking_id', 'customer_id.name', 'booking_id.name']);
         foreach($res as $oid => $odata) {
-            $ids = $om->search(get_called_class(), ['booking_id', '=', $odata['booking_id']]);
+            $ids = $om->search(self::getType(), ['booking_id', '=', $odata['booking_id']]);
             $result[$oid] = sprintf("%s - %s - %d", $odata['customer_id.name'], $odata['booking_id.name'], count($ids));
         }
         return $result;
@@ -50,8 +64,8 @@ class Contract extends \sale\contract\Contract {
 
 
     /**
-     * Check wether an object can be updated, and perform some additional operations if necessary.
-     * This method can be overriden to define a more precise set of tests.
+     * Check whether an object can be updated, and perform some additional operations if necessary.
+     * This method can be overridden to define a more precise set of tests.
      *
      * @param  object   $om         ObjectManager instance.
      * @param  array    $oids       List of objects identifiers.
@@ -60,10 +74,14 @@ class Contract extends \sale\contract\Contract {
      * @return array    Returns an associative array mapping fields with their error messages. En empty array means that object has been successfully processed and can be updated.
      */
     public static function canupdate($om, $oids, $values, $lang='en') {
-        // only status can be updated
-        if(count($values) > 1 || !isset($values['status'])) {
+        $allowed_fields = ['status', 'is_locked', 'price', 'total'];
+
+        if(count(array_diff(array_keys($values), $allowed_fields))) {
             return ['status' => ['not_allowed' => 'Contract cannot be manually updated.']];
         }
-        return parent::canupdate($om, $oids, $values, $lang);
+
+        return [];
+        // #memo - we prevent parent logic (which uses status but not is_locked)
+        // return parent::canupdate($om, $oids, $values, $lang);
     }
 }

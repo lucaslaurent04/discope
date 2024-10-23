@@ -6,8 +6,8 @@
 */
 namespace sale\pos;
 use equal\orm\Model;
-use lodging\sale\booking\Booking;
-use lodging\sale\booking\Invoice;
+use sale\booking\Booking;
+use sale\booking\Invoice;
 
 class OrderPayment extends Model {
 
@@ -43,7 +43,7 @@ class OrderPayment extends Model {
 
             'booking_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\Booking',
+                'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'Booking the payment relates to.',
                 'visible'           => ['has_booking', '=', true],
                 'ondelete'          => 'null'
@@ -57,7 +57,7 @@ class OrderPayment extends Model {
 
             'funding_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\Funding',
+                'foreign_object'    => 'sale\booking\Funding',
                 'description'       => 'The funding the line relates to, if any.',
                 'visible'           => ['has_funding', '=', true],
                 'onupdate'          => 'onupdateFundingId'
@@ -111,7 +111,7 @@ class OrderPayment extends Model {
 
             'payments_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\booking\Payment',
+                'foreign_object'    => 'sale\booking\Payment',
                 'foreign_field'     => 'order_payment_id',
                 'ondetach'          => 'null',
                 'description'       => 'The payments relating to the OrderPayment (o2o : list length should be 1 or 0).'

@@ -24,7 +24,7 @@ export class InvoicesComponent implements OnInit, AfterViewInit, OnDestroy {
     private default_descriptor: any = {
         // route is current ng route
         context: {
-            entity: 'lodging\\sale\\booking\\Invoice',
+            entity: 'sale\\booking\\Invoice',
             view: "list.default",
             order: "id",
             sort: "desc"

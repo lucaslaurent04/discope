@@ -9,7 +9,7 @@ namespace sale\booking;
 class Contact extends \identity\Partner {
 
     public static function getName() {
-        return "Booking Contact";
+        return "Contact";
     }
 
     public static function getDescription() {
@@ -25,11 +25,43 @@ class Contact extends \identity\Partner {
 
         return [
 
+            'name' => [
+                'type'              => 'computed',
+                'function'          => 'calcName',
+                'result_type'       => 'string',
+                'store'             => true,
+                'description'       => 'The display name of the partner (related organisation name).',
+                "visible"           => ["is_direct_contact", "=", true]
+            ],
+
+            'email' => [
+                'type'              => 'computed',
+                'function'          => 'calcEmail',
+                'result_type'       => 'string',
+                'usage'             => 'email',
+                'store'             => true,
+                'description'       => 'Email of the contact (from Identity).',
+                "visible"           => ["is_direct_contact", "=", true]
+            ],
+
+            'owner_identity_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\Identity',
+                'description'       => 'The organisation which the targeted identity is a partner of.',
+                'default'           => 1
+            ],
+
+            'partner_identity_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\Identity',
+                'description'       => 'The targeted identity (the partner).',
+                'onupdate'          => 'identity\Partner::onupdatePartnerIdentityId'
+            ],
+
             'booking_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
-                'description'       => 'Booking the contact relates to.',
-                'required'          => true
+                'description'       => 'Booking the contact relates to.'
             ],
 
             'relationship' => [
@@ -44,13 +76,54 @@ class Contact extends \identity\Partner {
                     'booking',          // person that is in charge of handling the booking details
                     'invoice',          // person to who the invoice of the booking must be sent
                     'contract',         // person to who the contract(s) must be sent
-                    'sojourn'           // person that will be present during the sojourn (beneficiary)
+                    'sojourn',          // person that will be present during the sojourn (beneficiary)
+                    'guest_list'        // person to who the guest list must be sent
                 ],
                 'description'       => 'The kind of contact, based on its responsibilities.',
                 'default'           => 'booking'
+            ],
+
+            'is_direct_contact' => [
+                'type'              => 'boolean',
+                'description'       => 'The new contact for the person responsible for the guest list.',
+                'visible'           => ['type', '=', 'guest_list'],
+                'default'           => false
             ]
 
         ];
+    }
+
+    public static function onchange($om, $event, $values, $lang='en') {
+        $result = [];
+        if(isset($event['type'])) {
+            $result['is_direct_contact'] = ($event['type'] == "guest_list");
+        }
+        if(isset($event['is_direct_contact'])) {
+            $result['partner_identity_id'] = null;
+        }
+        return $result;
+    }
+
+    public static function calcName($om, $oids, $lang) {
+        $result = [];
+        $contacts = $om->read(self::getType(), $oids, ['partner_identity_id.name'], $lang);
+        foreach($contacts as $oid => $contact) {
+            if(isset($contact['partner_identity_id.name'])) {
+                $result[$oid] = $contact['partner_identity_id.name'];
+            }
+        }
+        return $result;
+    }
+
+    public static function calcEmail($om, $oids, $lang) {
+        $result = [];
+        $contacts = $om->read(get_called_class(), $oids, ['partner_identity_id.email'], $lang);
+        foreach($contacts as $oid => $contact) {
+            if(isset($contact['partner_identity_id.email'])) {
+                $result[$oid] = $contact['partner_identity_id.email'];
+            }
+        }
+        return $result;
     }
 
     public function getUnique() {
@@ -58,6 +131,4 @@ class Contact extends \identity\Partner {
             ['owner_identity_id', 'partner_identity_id', 'booking_id']
         ];
     }
-
-
 }

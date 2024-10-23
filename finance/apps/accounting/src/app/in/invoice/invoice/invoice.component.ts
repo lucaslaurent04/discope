@@ -228,7 +228,7 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
                     this.context.change({
                         context_only: true,   // do not change the view
                         context: {
-                            entity: 'lodging\\sale\\booking\\Booking',
+                            entity: 'sale\\booking\\Booking',
                             type: 'form',
                             purpose: 'view',
                             domain: ['id', '=', this.booking_id]
@@ -305,7 +305,7 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
     }
 
     private async loadBooking() {
-        const result:Array<any> = <Array<any>> await this.api.read("lodging\\sale\\booking\\Booking", [this.booking_id], Object.getOwnPropertyNames(new Booking()));
+        const result:Array<any> = <Array<any>> await this.api.read("sale\\booking\\Booking", [this.booking_id], Object.getOwnPropertyNames(new Booking()));
         if(result && result.length) {
             const item:any = result[0];
             let booking:any = new Booking();
@@ -584,7 +584,7 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
         let descriptor:any = {
             context_silent: true, // do not update sidebar            
             context: {
-                entity: 'lodging\\sale\\booking\\Booking',
+                entity: 'sale\\booking\\Booking',
                 type: 'form',
                 name: 'default',
                 domain: ['id', '=', this.booking_id],
