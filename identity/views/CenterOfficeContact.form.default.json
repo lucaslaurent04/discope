@@ -1,6 +1,6 @@
 {
-    "name": "Cashdesk Sheet Total",
-    "description": "",
+    "name": "Center Office Contact",
+    "description": "A center Office can have several contacts based on roles.",
     "access": {
         "groups": ["booking.default.user"]
     },
@@ -9,33 +9,39 @@
             {
                 "sections": [
                     {
+                        "label": "General Info",
+                        "id": "section.general",
                         "rows": [
                             {
                                 "columns": [
                                     {
-                                        "width": "100%",
+                                        "width": "50%",
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "center_id",
-                                                "width": "50%"
+                                                "value": "email",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "heading": true
+                                                }
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "date_from",
-                                                "width": "25%"
+                                                "value": "type",
+                                                "width": "75%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "date_to",
-                                                "width": "25%"
+                                                "value": "center_office_id",
+                                                "width": "100%",
+                                                "visible": false
                                             }
                                         ]
                                     }
                                 ]
                             }
                         ]
-                    }
+                    }                    
                 ]
             }
         ]

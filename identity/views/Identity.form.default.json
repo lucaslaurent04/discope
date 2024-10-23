@@ -1,6 +1,26 @@
 {
     "name": "Identity",
     "description": "An identity is any kind of person: moral (organisation) or physical (individual).",
+    "access": {
+        "groups": ["sale.default.user", "booking.default.user"]
+    },
+    "routes": [
+        {
+            "id": "item.identity.booking.file",
+            "label": "Créer une réservation",
+            "description": "",
+            "icon": "library_books",
+            "route": "/bookings",
+            "context": {
+                "entity": "sale\\booking\\Booking",
+                "view": "form.create",
+                "mode": "edit",
+                "purpose": "create",
+                "domain": ["customer_identity_id", "=", "object.id"],
+                "reset": true
+            }
+        }
+    ],
     "layout": {
         "groups": [
             {
@@ -15,7 +35,10 @@
                                             {
                                                 "type": "field",
                                                 "value": "legal_name",
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "widget": {
+                                                    "header": false
+                                                }
                                             },
                                             {
                                                 "type": "field",
@@ -25,12 +48,18 @@
                                             {
                                                 "type": "field",
                                                 "value": "firstname",
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "widget": {
+                                                    "header": false
+                                                }
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "lastname",
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "widget": {
+                                                    "header": false
+                                                }
                                             }
                                         ]
                                     },
@@ -43,7 +72,7 @@
                                                 "width": "100%",
                                                 "widget": {
                                                     "header": {
-                                                        "actions": {
+                                                        "actions":{
                                                             "ACTION.CREATE": false,
                                                             "ACTION.OPEN": false
                                                         }
@@ -53,7 +82,44 @@
                                             {
                                                 "type": "field",
                                                 "value": "type",
+                                                "width": "100%",
                                                 "visible": false
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "columns": [
+                                    {
+                                        "width": "33%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "has_duplicate_clue",
+                                                "label": "Might be a duplicate",
+                                                "width": "100%",
+                                                "visible": ["state", "=", "draft"]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "33%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "duplicate_clue_identity_id",
+                                                "label": "Possible duplicate",
+                                                "width": "100%",
+                                                "visible": ["state", "=", "draft"],
+                                                "widget": {
+                                                    "readonly": true,
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
@@ -72,51 +138,69 @@
                             {
                                 "columns": [
                                     {
-                                        "width": "33%",
+                                        "width": "25%",
                                         "align": "left",
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "registration_number",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "citizen_identification",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
                                                 "label": "Language",
                                                 "value": "lang_id",
-                                                "width": "50%"
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.OPEN": false
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "title",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "gender",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_parent",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "parent_id",
+                                                "width": "100%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "has_vat",
-                                                "width": "50%",
+                                                "width": "100%",
                                                 "label": "Subject to VAT",
                                                 "help": "Do the company have a VAT number?"
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "registration_number",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "citizen_identification",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "vat_number",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "title",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "gender",
-                                                "width": "50%"
+                                                "width": "100%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "date_of_birth",
-                                                "width": "50%"
+                                                "width": "100%"
                                             },
                                             {
                                                 "type": "field",
@@ -126,17 +210,22 @@
                                             {
                                                 "type": "field",
                                                 "value": "bank_account_bic",
-                                                "width": "50%"
+                                                "width": "100%"
                                             }
                                         ]
                                     },
                                     {
-                                        "width": "33%",
+                                        "width": "25%",
                                         "align": "left",
                                         "items": [
                                             {
                                                 "type": "field",
                                                 "value": "email",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "email_secondary",
                                                 "width": "100%"
                                             },
                                             {
@@ -157,7 +246,7 @@
                                         ]
                                     },
                                     {
-                                        "width": "33%",
+                                        "width": "50%",
                                         "align": "left",
                                         "items": [
                                             {
@@ -167,63 +256,6 @@
                                                 "width": "100%",
                                                 "domain": ["owner_identity_id", "=", "object.id"]
                                             },
-                                            {
-                                                "type": "field",
-                                                "value": "user_id",
-                                                "width": "100%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "has_parent",
-                                                "width": "100%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "parent_id",
-                                                "width": "100%"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "label": "Settings",
-                        "id": "section.settings",
-                        "rows": [
-                            {
-                                "columns": [
-                                    {
-                                        "width": "100%",
-                                        "align": "left",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "signature",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "description",
-                                                "width": "50%"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "label": "Main address",
-                        "id": "section.identity_main_address",
-                        "rows": [
-                            {
-                                "columns": [
-                                    {
-                                        "width": "50%",
-                                        "align": "left",
-                                        "items": [
                                             {
                                                 "type": "field",
                                                 "value": "address_street",
@@ -236,12 +268,7 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "address_city",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "address_zip",
+                                                "value": "address_country",
                                                 "width": "50%"
                                             },
                                             {
@@ -251,8 +278,100 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "address_country",
+                                                "value": "address_zip",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "address_city",
+                                                "width": "50%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Notes",
+                        "id": "section.history",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "33%",
+                                        "align": "left",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "flag_latepayer",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "flag_damage",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "flag_nuisance",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "66%",
+                                        "align": "left",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "description",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "History",
+                        "id": "section.identity_bookings",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "align": "left",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "bookings_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "domain": ["state", "in", ["instance", "archive"]]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Invoices",
+                        "id": "section.identity_invoices",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "align": "left",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "invoices_ids",
+                                                "width": "100%"
                                             }
                                         ]
                                     }
@@ -314,6 +433,51 @@
                                                 "type": "field",
                                                 "value": "partners_ids",
                                                 "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Duplicates",
+                        "id": "section.identity_duplicates",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "is_duplicate",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "duplicate_identity_id",
+                                                "width": "33%",
+                                                "widget": {
+                                                    "domain": [
+                                                        ["is_duplicate", "=", false],
+                                                        ["id", "<>", "object.id"]
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "duplicate_identities_ids",
+                                                "width": "100%",
+                                                "visible": ["is_duplicate", "=", false],
+                                                "widget": {
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
