@@ -53,7 +53,7 @@ class SojournType extends Model {
 
             'bookings_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'lodging\sale\booking\Booking',
+                'foreign_object'    => 'sale\booking\Booking',
                 'foreign_field'     => 'sojourn_type_id',
                 'description'       => 'List of bookings set to the sojourn type.'
             ]

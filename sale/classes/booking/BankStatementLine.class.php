@@ -6,7 +6,7 @@
 */
 namespace sale\booking;
 
-use lodging\sale\booking\Booking;
+use sale\booking\Booking;
 use sale\booking\Funding;
 use sale\booking\Invoice;
 

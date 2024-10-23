@@ -23,7 +23,7 @@ class SojournProductModelRentalUnitAssignement extends Model {
         return [
             'booking_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\Booking',
+                'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'The booking the line relates to (for consistency, lines should be accessed using the group they belong to).',
                 'ondelete'          => 'cascade'         // delete assignment when parent booking is deleted
             ],

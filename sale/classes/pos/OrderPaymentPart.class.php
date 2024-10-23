@@ -6,7 +6,7 @@
 */
 namespace sale\pos;
 
-use lodging\sale\booking\Booking;
+use sale\booking\Booking;
 use sale\booking\Funding;
 use sale\booking\Invoice;
 
@@ -62,7 +62,7 @@ class OrderPaymentPart extends \sale\booking\Payment {
 
             'booking_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\Booking',
+                'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'Booking the payment part relates to.',
                 'ondelete'          => 'null'
             ],

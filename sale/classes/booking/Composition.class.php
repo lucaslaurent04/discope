@@ -29,7 +29,7 @@ class Composition extends Model {
 
             'booking_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\Booking',
+                'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'The booking the composition relates to.'
             ],
 

@@ -6,7 +6,7 @@
 */
 namespace sale\pos;
 use equal\orm\Model;
-use lodging\sale\booking\Booking;
+use sale\booking\Booking;
 use sale\booking\Invoice;
 
 class OrderPayment extends Model {
@@ -43,7 +43,7 @@ class OrderPayment extends Model {
 
             'booking_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\Booking',
+                'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'Booking the payment relates to.',
                 'visible'           => ['has_booking', '=', true],
                 'ondelete'          => 'null'

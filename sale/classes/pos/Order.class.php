@@ -87,7 +87,7 @@ class Order extends Model {
 
             'booking_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\booking\Booking',
+                'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'Booking the order relates to.',
                 'ondelete'          => 'null'
             ],
