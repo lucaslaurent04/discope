@@ -2,7 +2,7 @@
     "name": "User",
     "description": "Basic form for displaying a User",
     "access": {
-        "groups": ["admin"]
+        "groups": ["admins"]
     },
     "layout": {
         "groups": [
@@ -43,19 +43,19 @@
                                     },
                                     {
                                         "width": "50%",
-                                        "items": [ 
+                                        "items": [
                                             {
                                                 "type": "field",
                                                 "label": "Identity",
                                                 "value": "identity_id",
                                                 "width": "100%"
-                                            }, 
+                                            },
                                             {
                                                 "type": "field",
                                                 "label": "Password",
                                                 "value": "password",
                                                 "width": "50%"
-                                            }, 
+                                            },
                                             {
                                                 "type": "field",
                                                 "label": "Organisation",
@@ -86,11 +86,10 @@
                                                 "value": "groups_ids",
                                                 "width": "100%",
                                                 "widget": {
-                                                    "mode": "view",
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": false,
-                                                            "ACTION.SELECT": false
+                                                            "ACTION.SELECT": true
                                                         }
                                                     }
                                                 }
@@ -115,11 +114,10 @@
                                                 "value": "centers_ids",
                                                 "width": "100%",
                                                 "widget": {
-                                                    "mode": "view",
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": false,
-                                                            "ACTION.SELECT": false
+                                                            "ACTION.SELECT": true
                                                         }
                                                     }
                                                 }
@@ -144,11 +142,10 @@
                                                 "value": "center_offices_ids",
                                                 "width": "100%",
                                                 "widget": {
-                                                    "mode": "view",
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": false,
-                                                            "ACTION.SELECT": false
+                                                            "ACTION.SELECT": true
                                                         }
                                                     }
                                                 }
@@ -177,9 +174,6 @@
                                                         "actions": {
                                                             "ACTION.CREATE": false,
                                                             "ACTION.SELECT": false
-                                                        },
-                                                        "selection": {
-                                                            "default": false
                                                         }
                                                     }
                                                 }
