@@ -6,6 +6,11 @@
     },
     "order": "created",
     "sort": "desc",
+    "header": {
+        "selection": {
+            "default": false
+        }
+    },
     "layout": {
         "items": [
             {
@@ -32,6 +37,11 @@
                 "type": "field",
                 "value": "valid_until",
                 "width": "20%"
+            },
+           {
+                "type": "field",
+                "value": "is_locked",
+                "width": "10%"
             },
             {
                 "type": "field",

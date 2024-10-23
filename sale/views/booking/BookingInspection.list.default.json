@@ -1,0 +1,42 @@
+{
+    "name": "Booking Inspection",
+    "description": "This view is intended for displaying the list of bookings inspections.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "name",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "label": "Booking",
+                "value": "booking_id",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "date_inspection",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "type_inspection",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "status",
+                "width": "10%"
+            }
+        ]
+    }
+}

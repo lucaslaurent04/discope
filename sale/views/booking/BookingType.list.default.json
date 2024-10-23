@@ -16,6 +16,16 @@
                 "label": "Code",
                 "value": "code",
                 "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "days_expiry_option",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "booking_schedule_layout",
+                "width": "20%"
             }
         ]
     }

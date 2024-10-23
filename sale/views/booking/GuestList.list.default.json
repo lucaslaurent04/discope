@@ -1,0 +1,21 @@
+{
+    "name": "Guest Lis",
+    "description": "This view is intended for displaying the list of guest list.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "booking_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "status",
+                "width": "20%"
+            }
+        ]
+    }
+}

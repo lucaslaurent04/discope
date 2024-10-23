@@ -4,6 +4,25 @@
     "access": {
         "groups": ["sale.default.user"]
     },
+    "header": {
+        "actions": {
+            "ACTION.EDIT": true,
+            "ACTION.SAVE": [{"id": "SAVE_AND_EDIT"},{"id": "SAVE_AND_CLOSE"}]
+        }
+    },
+    "actions": [
+        {
+            "id": "action.reconcile",
+            "label": "Reconcile",
+            "description": "Retry to auto-reconcile the statement line.",
+            "controller": "lodging_sale_pay_bankstatementline_do-reconcile",
+            "confirm": true,
+            "params": {
+                "id": "object.id"
+            },
+            "visible": ["status", "<>", "reconciled"]
+        }
+    ],
     "layout": {
         "groups": [
             {
@@ -38,6 +57,12 @@
                                                 "type": "field",
                                                 "value": "amount",
                                                 "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "remaining_amount",
+                                                "visible": false,
+                                                "width": "0"
                                             },
                                             {
                                                 "type": "field",
@@ -87,8 +112,7 @@
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": [ {
-                                                                "view": "form.statement",
-                                                                "domain": [ ["amount", "=", "object.amount"], ["receipt_date", "=", "object.date"] ]
+                                                                "domain": [ ["amount", "=", "object.remaining_amount"], ["receipt_date", "=", "object.date"] ]
                                                             } ]
                                                         }
                                                     }
