@@ -2,6 +2,7 @@
     "name": "documents",
     "depends_on": [
         "core",
+        "communication",
         "identity"
     ],
     "apps": ["documents"]

@@ -1,4 +1,7 @@
 {
     "name": "communication",
-    "depends_on": ["core"]
+    "depends_on": [
+        "core",
+        "documents"
+    ]
 }
