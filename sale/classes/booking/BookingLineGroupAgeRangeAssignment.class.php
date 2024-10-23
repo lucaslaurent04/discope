@@ -9,6 +9,10 @@ use equal\orm\Model;
 
 class BookingLineGroupAgeRangeAssignment extends Model {
 
+    public function getTable() {
+        return 'lodging_sale_booking_bookinglinegroupagerangeassignment';
+    }
+
     public static function getName() {
         return "Age Range Assignment";
     }

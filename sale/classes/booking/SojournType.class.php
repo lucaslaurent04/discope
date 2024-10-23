@@ -9,6 +9,10 @@ use equal\orm\Model;
 
 class SojournType extends Model {
 
+    public function getTable() {
+        return 'lodging_sale_booking_sojourntype';
+    }
+
     public static function getName() {
         return 'Sojourn Type';
     }
