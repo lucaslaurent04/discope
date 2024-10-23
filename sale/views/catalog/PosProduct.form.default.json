@@ -1,13 +1,16 @@
 {
-    "name": "Family",
-    "description": "",
+    "name": "Product",
+    "description": "A Product is a variant of a Product Model. There is always at least one Product for a given Product Model.",
+    "access": {
+        "groups": ["pos.default.user", "sale.default.user"]
+    },
     "layout": {
         "groups": [
             {
                 "sections": [
                     {
-                        "label": "Family info",
-                        "id": "section.family_info",
+                        "label": "General info",
+                        "id": "section.products_Section",
                         "rows": [
                             {
                                 "columns": [
@@ -16,52 +19,37 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "name",
-                                                "width": "50%",
+                                                "value": "label",
+                                                "width": "100%",
                                                 "widget": {
                                                     "heading": true
                                                 }
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "parent_id",
+                                                "value": "sku",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Product Model",
+                                                "value": "product_model_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "description",
+                                                "width": "100%"
                                             }
                                         ]
-                                    }
-                                ]
-                            },
-                            {
-                                "columns": [
+                                    },
                                     {
                                         "width": "50%",
                                         "items": [
-
                                             {
                                                 "type": "field",
-                                                "value": "path",
-                                                "width": "100%"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-
-                        ]
-                    },
-                    {
-                        "label": "Products",
-                        "id": "section.product_model",
-                        "rows": [
-                            {
-                                "columns": [
-                                    {
-                                        "width": "100%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "product_models_ids",
-                                                "width": "100%"
+                                                "value": "can_sell",
+                                                "width": "25%"
                                             }
                                         ]
                                     }
@@ -70,8 +58,9 @@
                         ]
                     },
                     {
-                        "label": "Children",
-                        "id": "section.children_ids",
+                        "label": "Prices",
+                        "id": "section.prices_section",
+                        "visible": ["state", "<>", "draft"],
                         "rows": [
                             {
                                 "columns": [
@@ -80,8 +69,11 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "children_ids",
-                                                "width": "100%"
+                                                "value": "prices_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "domain": ["is_active", "=", true]
+                                                }
                                             }
                                         ]
                                     }
@@ -90,8 +82,9 @@
                         ]
                     },
                     {
-                        "label": "Centres",
-                        "id": "section.centers_ids",
+                        "label": "Groups",
+                        "id": "section.groups",
+                        "visible": ["state", "<>", "draft"],
                         "rows": [
                             {
                                 "columns": [
@@ -100,7 +93,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "centers_ids",
+                                                "value": "groups_ids",
                                                 "width": "100%"
                                             }
                                         ]
@@ -111,6 +104,6 @@
                     }
                 ]
             }
-       ]
+        ]
     }
 }
