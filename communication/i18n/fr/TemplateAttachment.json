@@ -22,6 +22,17 @@
 			"label":"Langue", 
 			"description": "",
 			"help": ""
+		},
+		"attachment_type":{
+			"label":"Type",
+			"description": "",
+			"help": "",
+			"selection": {
+				"all": "Tous",
+				"schools": "Écoles",
+				"individuals": "Individuels",
+				"groups": "Groupes"
+			}
 		}
 	},
 	"view": {
