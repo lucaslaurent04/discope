@@ -1,22 +1,22 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\pos\Order;
 
-// announce script and fetch parameters values
-list($params, $providers) = announce([
+list($params, $providers) = eQual::announce([
     'description'	=>	"Provide a fully loaded tree for a given order.",
     'params' 		=>	[
         'id' => [
-            'description'   => 'Identifier of the order for which the tree is requested.',
+            'description'   => "Identifier of the order for which the tree is requested.",
             'type'          => 'integer',
             'required'      => true
         ],
         'variant' =>  [
-            'description'   => 'Type of tree being requested.',
+            'description'   => "Type of tree being requested.",
             'type'          => 'string',
             'selection'     => [
                 'lines',        // tree with order lines
@@ -26,19 +26,22 @@ list($params, $providers) = announce([
             'default'       => 'lines'
         ]
     ],
-    'access' => [
+    'access'        => [
         'visibility'        => 'protected',
         'groups'            => ['pos.default.user'],
     ],
-    'response' => [
+    'response'      => [
         'content-type'      => 'application/json',
         'charset'           => 'utf-8',
         'accept-origin'     => '*'
     ],
-    'providers' => ['context']
+    'providers'     => ['context']
 ]);
 
-list($context) = [$providers['context']];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 
 $tree = [];
@@ -196,13 +199,14 @@ switch($params['variant']) {
         break;
 }
 
-$orders = Order::id($params['id'])->read($tree)->adapt('txt')->get(true);
+$order = Order::id($params['id'])
+    ->read($tree)
+    ->adapt('json')
+    ->first(true);
 
-if(!$orders || !count($orders)) {
-    throw new Exception("unknown_order", QN_ERROR_UNKNOWN_OBJECT);
+if(is_null($order)) {
+    throw new Exception("unknown_order", EQ_ERROR_UNKNOWN_OBJECT);
 }
-
-$order = reset($orders);
 
 $context->httpResponse()
         ->body($order)
