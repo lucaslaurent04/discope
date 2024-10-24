@@ -1,13 +1,14 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use identity\User;
 
-list($params, $providers) = announce([
-    'description'   => 'Returns descriptor of current User, based on received access_token',
+[$params, $providers] = eQual::announce([
+    'description'   => "Returns descriptor of current User, based on received access_token",
     'response'      => [
         'content-type'      => 'application/json',
         'charset'           => 'UTF-8',
@@ -16,7 +17,12 @@ list($params, $providers) = announce([
     'providers'     => ['context', 'orm', 'auth']
 ]);
 
-list($context, $om, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context                  $context
+ * @var \equal\orm\ObjectManager            $om
+ * @var \equal\auth\AuthenticationManager   $auth
+ */
+['context' => $context, 'om' => $om, 'auth' => $auth] = $providers;
 
 // retrieve current User identifier (HTTP headers lookup through Authentication Manager)
 $user_id = $auth->userId();
@@ -30,7 +36,7 @@ $ids = $om->search('identity\User', ['id', '=', $user_id]);
 if(!count($ids)) {
     throw new Exception('unexpected_error', QN_ERROR_INVALID_USER);
 }
-// user has allways READ right on its own object
+// user has always READ right on its own object
 $user = User::ids($ids)
     ->read([
         'id',
@@ -40,12 +46,11 @@ $user = User::ids($ids)
         'language',
         'organisation_id'
     ])
-    ->adapt('txt')
+    ->adapt('json')
     ->first(true);
 
 $user['groups'] = array_values(array_map(function ($a) {return $a['name'];}, $user['groups_ids']));
 
-// send back basic info of the User object
 $context->httpResponse()
         ->body($user)
         ->send();
