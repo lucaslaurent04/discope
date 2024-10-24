@@ -13,6 +13,11 @@
             "description": "Détails sur le motif du blocage.",
             "help": ""
         },
+        "center_id": {
+            "label": "Centre",
+            "description": "Centre auquel se rapporte l'épisode.",
+            "help": ""
+        },
         "repairs_ids": {
             "label": "Jours",
             "description": "Les jours de blocage de l'épisode.",
@@ -56,5 +61,9 @@
             "layout": {}
         }
     },
-    "error": {}
+    "error": {
+        "id": {
+            "non_editable": "La modification n'est pas autorisée car il y a un conflit avec des consommations existantes."
+        }
+    }
 }

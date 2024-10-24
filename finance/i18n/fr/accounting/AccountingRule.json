@@ -31,11 +31,16 @@
 			"label": "Lignes liées à cette règle",
 			"description": "Lignes liées à cette règle.",
 			"help": ""
+		},
+		"code_legacy": {
+			"label": "Code Historique",
+			"description": "",
+			"help": ""
 		}
 	},
 	"view": {
 		"form.default": {
-			"name": "Règle comptable",
+			"name": "Règles comptables",
 			"description": "Vue par défaut des règles comptables avec tous les champs",
 			"layout": {
 				"section.accounting_rules_section": {
@@ -47,7 +52,7 @@
 			}
 		},
 		"list.default": {
-			"name": "Liste des règles comptables",
+			"name": "Liste des Règles comptables",
 			"description": "Cette vue est destinée à afficher les règles comptables.",
 			"layout": {}
 		}

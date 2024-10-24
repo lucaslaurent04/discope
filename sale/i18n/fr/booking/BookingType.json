@@ -10,7 +10,21 @@
 		},
 		"code": {
 			"label": "Code",
-			"description": "Mnemo pour le type de réservation.",
+			"description": "Memo pour le type de réservation.",
+			"help": ""
+		},
+		"days_expiry_option": {
+			"label": "Jours d'expiration Option",
+			"description": "Nombre de jours d'expiration de la réservation en option.",
+			"help": ""
+		},
+		"booking_schedule_layout": {
+			"label": "Impression des consommations",
+			"description": "Configuration d'impression des consommations.",
+			"selection": {
+				"simple": "simple",
+				"detailed": "détaillé"
+			},
 			"help": ""
 		}
 	},

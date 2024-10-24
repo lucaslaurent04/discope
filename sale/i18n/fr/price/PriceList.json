@@ -28,7 +28,7 @@
             "label": "Nb prix",
             "description": "Nombre de prix de la liste.",
             "help": ""
-        },        
+        },
         "date_from": {
             "label": "A partir de",
             "description": "Début de la période de validité.",

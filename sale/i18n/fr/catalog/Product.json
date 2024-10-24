@@ -1,7 +1,7 @@
 {
     "name": "Produit",
     "plural": "Produits",
-    "description": "",
+    "description": "Les produits offert",
     "model": {
         "name": {
             "label": "Identification",
@@ -92,12 +92,22 @@
             "label": "Age (tranche)",
             "description": "Tranche d'âge cible du produit.",
             "help": ""
+        },
+        "ref_pack_lines_ids": {
+            "label":"Références packs",
+            "description":"",
+            "help": ""
+        },
+        "allow_price_adaptation": {
+            "label": "Prix adaptables",
+            "description": "Le pack est-il candidat aux adaptations de prix (catégories tarifaires).",
+            "help": "Si cette proprété est désactivée, les adaptations de prix (avantages) liées aux catégories tarifaires ne sont pas appliquées sur les produits du pack."
         }
     },
     "view": {
         "form.default": {
             "name": "Produit",
-            "description": "Un produit est une variante de modèle de produit (template). Il y a toujours au moins un produit pour un modèle de produit donné.",
+            "description": "Une famille de produits est un groupe de produits fabriqués sous la même marque. Les familles soutiennent la hiérarchie.",
             "layout": {
                 "section.products_Section": {
                     "label": "Détails"
@@ -113,12 +123,15 @@
                 },
                 "section.pack_lines": {
                     "label": "Produits du pack"
+                },
+                "section.ref_pack_lines": {
+                    "label": "Utilisations packs"
                 }
             }
         },
         "list.default": {
             "name": "Produits",
-            "description": "Liste de toutes les variantes de produits.",
+            "description": "Liste des produits.",
             "layout": {}
         }
     },
