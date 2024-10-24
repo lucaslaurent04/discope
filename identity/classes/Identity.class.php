@@ -904,7 +904,93 @@ class Identity extends Model {
             $result['duplicate_clue_identity_id'] = null;
         }
 
+        if(isset($event['address_zip']) && isset($values['address_country'])) {
+            $list = self::_getCitiesByZip($event['address_zip'], $values['address_country'], $lang);
+            if($list) {
+                $result['address_city'] = [
+                    'selection' => $list
+                ];
+            }
+        }
+
         return $result;
+    }
+
+    /**
+     * Returns cities' names based on a zip code and a country.
+     */
+    private static function _getCitiesByZip($zip, $country, $lang) {
+        $result = null;
+        $file = "packages/identity/i18n/{$lang}/zipcodes/{$country}.json";
+        if(file_exists($file)) {
+            $data = file_get_contents($file);
+            $map_zip = json_decode($data, true);
+            if(isset($map_zip[$zip])) {
+                $result = $map_zip[$zip];
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns a region name based on a zip code and a country.
+     */
+    public static function _getRegionByZip($zip, $country) {
+        $zip = intval($zip);
+
+        if ($country == 'BE') {
+            if ($zip < 1300) {
+                return "Région Bruxelles-Capitale";
+            } elseif ($zip >= 1300 && $zip < 1500) {
+                return "Région wallonne";
+            } elseif ($zip >= 1500 && $zip < 4000) {
+                return "Région flamande";
+            } elseif ($zip >= 4000 && $zip < 8000) {
+                return "Région wallonne";
+            } elseif ($zip >= 8000 && $zip < 10000) {
+                return "Région flamande";
+            }
+            return '';
+        }
+
+        if ($country == 'FR') {
+            $first_two_digits = intval(substr($zip, 0, 2));
+
+            if (in_array($first_two_digits, [75, 77, 78, 91, 92, 93, 94, 95])) {
+                return "Île-de-France";
+            } elseif (in_array($first_two_digits, [21, 58, 71, 89])) {
+                return "Bourgogne-Franche-Comté";
+            } elseif (in_array($first_two_digits, [22, 29, 35, 56])) {
+                return "Bretagne";
+            } elseif (in_array($first_two_digits, [18, 28, 36, 37, 41, 45])) {
+                return "Centre-Val de Loire";
+            } elseif (in_array($first_two_digits, [2])) {
+                return "Corse";
+            } elseif (in_array($first_two_digits, [8, 10, 51, 52])) {
+                return "Grand Est";
+            } elseif (in_array($first_two_digits, [59, 62])) {
+                return "Hauts-de-France";
+            } elseif (in_array($first_two_digits, [13, 83, 84])) {
+                return "Provence-Alpes-Côte d'Azur";
+            } elseif (in_array($first_two_digits, [30, 34, 48, 66])) {
+                return "Occitanie";
+            } elseif (in_array($first_two_digits, [14, 50, 61])) {
+                return "Normandie";
+            } elseif (in_array($first_two_digits, [16, 17, 19, 23, 24, 33, 40, 47, 64, 79, 86, 87])) {
+                return "Nouvelle-Aquitaine";
+            } elseif (in_array($first_two_digits, [9, 11, 12, 31, 32, 46, 65, 81, 82])) {
+                return "Occitanie";
+            } elseif (in_array($first_two_digits, [1, 3, 7, 15, 26, 38, 42, 43, 63, 69, 73, 74])) {
+                return "Auvergne-Rhône-Alpes";
+            } elseif (in_array($first_two_digits, [44, 49, 53, 72, 85])) {
+                return "Pays de la Loire";
+            } elseif (in_array($first_two_digits, [27, 28, 61, 76])) {
+                return "Normandie";
+            }
+            return '';
+        }
+
+        return '';
     }
 
     /**
