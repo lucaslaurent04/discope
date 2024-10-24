@@ -7,6 +7,11 @@
 			"label": "Nom",
 			"description": "Nom du caissier.",
 			"help": ""
+		},
+		"center_id": {
+			"label": "Centre",
+			"description": "Centre auquel est assignée la caisse.",
+			"help": ""
 		}
 	},
 	"view": {
