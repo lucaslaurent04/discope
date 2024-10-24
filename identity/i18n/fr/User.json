@@ -12,13 +12,74 @@
 			"label": "Identité",
 			"description": "Le contact lié à l'utilisateur.",
 			"help": ""
+		},
+		"login": {
+			"label": "Email",
+			"description": "",
+			"help": ""
+		},
+		"language": {
+			"label": "Langue préférée",
+			"description": "Utilisée pour les interfaces utilisateur.",
+			"help": ""
+		},
+		"validated": {
+			"label": "Validé",
+			"description": "Compte validé ?",
+			"help": ""
+		},
+		"groups_ids": {
+			"label": "Groupes",
+			"description": "",
+			"help": ""
+		},
+		"organisation_id": {
+			"label": "Organisation",
+			"description": "L'organisation à laquelle appartient l'utilisateur.",
+			"help": ""
+		},
+		"centers_ids": {
+			"label": "Centres",
+			"description": "",
+			"help": ""
+		},
+		"center_offices_ids": {
+			"label": "Équipes de gestion",
+			"description": "",
+			"help": ""
+		},
+		"setting_values_ids": {
+			"label": "Préférences",
+			"description": "",
+			"help": ""
+		},
+		"permissions_ids":{
+			"label": "Permissions",
+			"description": "",
+			"help": ""
 		}
 	},
 	"view": {
 		"form.default": {
 			"name": "Utilisateur",
 			"description": "Formulaire de base pour afficher un utilisateur.",
-			"layout": {}
+			"layout": {
+				"section.group": {
+					"label": "Groupes"
+				},
+				"section.centers": {
+					"label": "Centres"
+				},
+				"section.center_offices": {
+					"label": "Équipes de gestion"
+				},
+				"section.preferences": {
+					"label": "Préférences"
+				},
+				"section.permissions":{
+					"label": "Permissions"
+				}
+			}
 		},
 		"list.default": {
 			"name": "Utilisateurs",
