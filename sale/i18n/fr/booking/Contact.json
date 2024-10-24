@@ -1,11 +1,26 @@
 {
     "name": "Contact",
     "plural": "Contacts",
-    "description": "Les contacts de réservation sont des personnes impliquées dans l'organisation d'une réservation.",
+    "description": "Les contacts liés à une réservation",
     "model": {
+        "name": {
+            "label": "Nom complet",
+            "description": "Nom complet de la personne à qui la liste des invités doit être connectée.",
+            "help": ""
+        },
         "booking_id": {
             "label": "Réservation",
-            "description": "La réservation à laquelle le contact se rapporte.",
+            "description": "Code de la réservation à laquelle le contact est lié.",
+            "help": ""
+        },
+        "owner_identity_id": {
+            "label": "Organisation",
+            "description": "L'organisation à laquelle l'identité est liée.",
+            "help": ""
+        },
+        "partner_identity_id": {
+            "label": "Identité",
+            "description": "L'identité liée au contact.",
             "help": ""
         },
         "type": {
@@ -16,29 +31,39 @@
                 "booking": "réservation",
                 "invoice": "facturation",
                 "contract": "contrat",
-                "sojourn": "séjour"
+                "sojourn": "séjour",
+                "guest_list": "fiche d'hébergement"
             }
         },
-		"email": {
-			"label": "E-mail",
-			"description": "La réservation à laquelle le contact se rapporte.",
+        "email": {
+            "label": "E-mail",
+            "description": "Email de la personne à qui la liste des invités doit être envoyée.",
             "help": ""
-		},
+        },
 		"phone": {
 			"label": "Téléphone",
 			"description": "Numéro de téléphone du contact.",
             "help": ""
-		}
+		},
+        "is_direct_contact": {
+            "label": "Contact seul ?",
+            "description": "Contact pour la réservation (non lié à une identité).",
+            "help": ""
+        }
     },
     "view": {
         "form.default": {
-            "name": "Contact",
-            "description": "Les contacts de réservation sont des personnes impliquées dans l'organisation d'une réservation.",
-            "layout": {}
+            "name": "Contacts",
+            "description": "Les contacts liés à la réservation.",
+            "layout": {
+                "section.contacts": {
+                    "label": "Contacts"
+                }
+            }
         },
         "list.default": {
             "name": "Contacts",
-            "description": "Liste des contacts.",
+            "description": "",
             "layout": {}
         }
     },
