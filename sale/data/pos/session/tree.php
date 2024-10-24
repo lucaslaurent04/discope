@@ -8,8 +8,8 @@
 use sale\pos\CashdeskSession;
 
 [$params, $providers] = eQual::announce([
-    'description'	=>	"Provide a fully loaded tree for a given CashdeskSession.",
-    'params' 		=>	[
+    'description'   =>	"Provide a fully loaded tree for a given CashdeskSession.",
+    'params'        =>	[
         'id' => [
             'description'   => "Identifier of the session for which the tree is requested.",
             'type'          => 'integer',
