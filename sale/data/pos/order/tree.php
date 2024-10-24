@@ -8,8 +8,8 @@
 use sale\pos\Order;
 
 list($params, $providers) = eQual::announce([
-    'description'	=>	"Provide a fully loaded tree for a given order.",
-    'params' 		=>	[
+    'description'   =>	"Provide a fully loaded tree for a given order.",
+    'params'        =>	[
         'id' => [
             'description'   => "Identifier of the order for which the tree is requested.",
             'type'          => 'integer',
