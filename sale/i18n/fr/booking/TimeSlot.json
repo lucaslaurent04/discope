@@ -1,29 +1,39 @@
 {
     "name": "Créneau horaire",
-    "plural": "Créneaux horaire",
+    "plural": "Créneaux horaires",
     "description": "",
     "model": {
         "name": {
             "label": "Nom",
-            "description": "Nom du créneau horaire.",
+            "description": "Intitulé du créneau horaire.",
+            "help": ""
+        },
+        "description": {
+            "label": "Description",
+            "description": "",
             "help": ""
         },
         "order": {
             "label": "Ordre",
-            "description": "L'ordre des moments au sein d'une journée.",
+            "description": "Ordre pour classer les moments chaque jour.",
             "help": ""
         },
         "schedule_from": {
-            "label": "Départ",
-            "description": "Moment de départ du créneau horaire.",
+            "label": "Horaire de début",
+            "description": "Moment auquel le créneau horaire débute.",
             "help": ""
         },
         "schedule_to": {
-            "label": "Fin",
-            "description": "Moment de fin du créneau horaire.",
+            "label": "Horaire de fin",
+            "description": "Moment auquel le créneau horaire se termine.",
             "help": ""
         }
     },
-    "view": {},
+    "view": {
+        "form.default": {
+        },
+        "list.default": {
+        }
+    },
     "error": {}
 }
