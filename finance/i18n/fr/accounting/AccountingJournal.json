@@ -1,11 +1,11 @@
 {
-    "name": "Journal comptable",
-    "plural": "Journaux comptables",
+    "name": "Journal Comptable",
+    "plural": "Journaux Comptables",
     "description": "Un journal comptable est une liste d'écritures comptables, regroupées par nature.",
     "model": {
         "name": {
             "label": "Nom",
-            "description": "Nom du journal.",
+            "description": "Nom du journal comptable.",
             "help": ""
         },
         "description": {
@@ -34,8 +34,12 @@
             },
             "description": "",
             "help": ""
+        },
+        "center_office_id": {
+            "label": "Équipe de gestion",
+            "description": "Centre de gestion auquel appartient le journal.",
+            "help": ""
         }
-
     },
     "view": {
         "form.default": {
