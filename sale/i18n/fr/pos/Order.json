@@ -31,8 +31,8 @@
         },
         "invoice_id": {
             "label": "Facture",
-			"description": "La facture associée à la commande.",
-			"help": ""
+            "description": "La facture associée à la commande.",
+            "help": ""
         },
         "order_lines_ids": {
             "label": "Lignes de commande",
@@ -48,7 +48,32 @@
             "label": "Total TTC",
             "description": "Somme des totaux TTC des lignes de commande.",
             "help": ""
-        }                
+        },
+        "has_funding": {
+            "label": "Financement ?",
+            "description": "La commande est un paiement de financement.",
+            "help": ""
+        },
+        "funding_id": {
+            "label": "Financement",
+            "description": "Le financement associé à la commande.",
+            "help": ""
+        },
+        "center_id": {
+            "label": "Centre",
+            "description": "Centre où a été passée la commande.",
+            "help": ""
+        },
+        "accounting_entries_ids": {
+            "label": "Écritures comptables",
+            "description": "Écritures comptables correspondant aux lignes de commande.",
+            "help": ""
+        },
+        "customer_id": {
+            "label": "Client",
+            "description": "Le client associé à la commande.",
+            "help": ""
+        }
     },
     "view": {
         "form.default": {
@@ -58,6 +83,9 @@
                 },
                 "section.payments": {
                     "label": "Paiements"
+                },
+                "section.accounting_entries": {
+                    "label": "Écritures comptables"
                 }
             }
         }
