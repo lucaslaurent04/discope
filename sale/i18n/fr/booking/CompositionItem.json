@@ -72,6 +72,11 @@
             "label": "Réservation",
             "description": "La réservation à laquelle se raporte la ligne.",
             "help": ""
+        },
+        "is_coordinator": {
+            "label": "Responsable ?",
+            "description": "La personne est-elle le responsable ?",
+            "help": ""
         }
     },
     "view": {
@@ -90,7 +95,6 @@
                 }
             },
             "layout": {}
-        
         },
         "list.print_form": {
             "name": "Feuille d'hébergement",

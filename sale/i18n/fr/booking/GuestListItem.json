@@ -1,0 +1,29 @@
+{
+    "name": "Invité",
+    "plural": "Invités",
+    "description": "La personne physique qui fait partie d'une réservation précise.",
+    "model": {
+        "is_coordinator": {
+            "label": "Responsable ?",
+            "description": "L'invité est-il le responsable ?",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Invité",
+            "description": "Formulaire de base pour l'affichage du groupe.",
+            "layout": {
+                "section.guest_info": {
+                    "label": "Infos générales"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Liste d'Invité",
+            "description": "Liste de base des invités existantes.",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

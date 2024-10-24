@@ -22,6 +22,11 @@
             "label": "Année",
             "description": "Année d'exercice de la saison.",
             "help": ""
+        },
+        "center_category_id": {
+            "label": "Categorie de Centres",
+            "description": "Catégorie à laquelle est rattachée la saison.",
+            "help": "La catégorie permet de retrouver la liste des centres qui sont affectés par cette saison."
         }
     },
     "view": {

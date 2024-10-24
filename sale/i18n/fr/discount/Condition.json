@@ -15,6 +15,8 @@
 			"selection": {
 				"season": "saison",
 				"nb_pers": "nombre de personnes",
+				"nb_children": "nombre d'enfants",
+				"nb_adults": "nombre d'adultes",
 				"duration": "durée",
 				"count_booking_24": "count_booking_24"
 			}

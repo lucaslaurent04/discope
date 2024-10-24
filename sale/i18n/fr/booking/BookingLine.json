@@ -1,6 +1,6 @@
 {
-    "name": "Ligne de réservation",
-    "plural": "Lignes de réservation",
+    "name": "Ligne de Réservation",
+    "plural": "Lignes de Réservation",
     "description": "Les lignes de réservation décrivent les produits et les quantités qui font partie d'une réservation.",
     "model": {
         "description": {
@@ -10,8 +10,8 @@
         },
         "booking_line_group_id": {
             "label": "Groupe",
-            "description": "Groupe duquel la ligne fait partie.",
-            "help": ""
+            "description": "Groupe auquel la ligne se rapporte.",
+            "help": "Groupe auquel la ligne se rapporte (à leur tour, les groupes se rapportent à leur réservation)."
         },
         "product_id": {
             "label": "Produit",
@@ -59,9 +59,9 @@
             "help": ""
         },
         "price_adapters_ids": {
-            "label": "Adaptateurs de prix",
-            "description": "Adaptateurs de prix qui s'appliquent à la ligne.",
-            "help": ""
+            "label": "Adaptateur de prix",
+            "description": "Des adaptateurs de prix ayant les remises manuelles appliquées.",
+            "help": "Des adaptateurs de prix détenant les remises manuelles appliquées sur la ligne."
         },
         "price": {
             "label": "Prix TTC",
@@ -72,24 +72,79 @@
             "label": "Taux de tva",
             "description": "Taux de TVA qui s'applique à cette ligne.",
             "help": ""
+        },
+        "qty_accounting_method": {
+            "label": "Méthode de comptabilisation de la quantité",
+            "description": "Méthode de comptabilité quantitative (à partir de product_model).",
+            "help": ""
+        },
+        "is_rental_unit": {
+            "label": "Unité locative",
+            "description": "La ligne  de réservation se rapporte à une unité locative.",
+            "help": ""
+        },
+        "is_accomodation": {
+            "label": "Logement",
+            "description": "La ligne de réservation concerne un logement.",
+            "help": ""
+        },
+        "is_meal": {
+            "label": "Repas",
+            "description": "La ligne de réservation se rapporte à un repas.",
+            "help": ""
         }
     },
     "view": {
         "form.default": {
-            "name": "Ligne de réservation",
-            "description": "Les lignes de réservation décrivent les produits et les quantités qui font partie d'une réservation.",
+            "name": "Ligne de Réservation",
+            "description": "Les lignes de réservation prolongées les produits et les quantités qui font partie d'une.",
             "layout": {
-                "section.booking_line": {
-                    "label": "Détails"
+                "section.bookingLine_section": {
+                    "label": "Infos générales"
                 },
-                "section.price_adapter": {
-                    "label": "Adaptateur de prix"
+                "section.priceAdapters_section": {
+                    "label": "Adaptateurs de prix"
+                },
+                "section.consumptions_section": {
+                    "label": "Consommations"
+                },
+                "section.autoDiscounts_section": {
+                    "label": "Remise Automatique"
+                },
+                "section.manualDiscounts_section": {
+                    "label": "Remise Manuelle"
+                }
+            }
+        },
+        "form.settings": {
+            "name": "Ligne de Réservation",
+            "description": "Les lignes de réservation prolongées les produits et les quantités qui font partie d'une.",
+            "layout": {
+                "section.bookingLine_section": {
+                    "label": "Infos générales"
+                },
+                "section.priceAdapters_section": {
+                    "label": "Adaptateurs de prix"
+                },
+                "section.consumptions_section": {
+                    "label": "Consommations"
+                },
+                "section.autoDiscounts_section": {
+                    "label": "Remise Automatique"
+                },
+                "section.manualDiscounts_section": {
+                    "label": "Remise Manuelle"
                 }
             }
         },
         "list.default": {
-            "name": "Lignes de réservation",
-            "description": "Liste des lignes de réservation.",
+            "name": "Lignes de Réservation",
+            "description": "",
+            "layout": {}
+        },
+        "list.settings": {
+            "name": "Lignes de Réservation",
+            "description": "",
             "layout": {}
         }
     },

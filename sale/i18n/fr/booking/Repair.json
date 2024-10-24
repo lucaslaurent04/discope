@@ -1,7 +1,7 @@
 {
-    "name": "Repair",
-    "plural": "Repairs",
-    "description": "A repair is a blocking of a rental unit at a given date, for maintenance and/or repair.",
+    "name": "Blocage",
+    "plural": "Blocages",
+    "description": "Les blocages sont des épisodes de réparations et maintenance impactant une ou plusieurs untiés locatives d'une Centre.",
     "model": {
         "name": {
             "label": "Identification",
@@ -10,10 +10,28 @@
         },
         "type": {
             "label": "Type",
-            "description": "La raison pour laquelle le service est réservé.",
-            "selection": {
-                "ooo": "hors service"
-            },
+            "description": "",
+            "selection": { "ooo" : "ooo"},
+            "help": ""
+        },
+        "repairing_id": {
+            "label": "Blocage",
+            "description": "Blocage.",
+            "help": ""
+        },
+        "is_rental_unit": {
+            "label": "Unité Locative ?",
+            "description": "S'agit-il d'une unité locative?",
+            "help": ""
+        },
+        "qty": {
+            "label": "Quantité",
+            "description": "Nombre de fois que la consommation est assignée.",
+            "help": ""
+        },
+        "rental_unit_id": {
+            "label": "Unité locative",
+            "description": "Unité locative à laquelle est assignée la consommation.",
             "help": ""
         }
     },

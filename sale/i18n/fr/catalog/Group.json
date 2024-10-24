@@ -17,13 +17,25 @@
             "label": "Modèles de produits",
             "description": "Famille de produits à laquelle appartient le groupe actuel.",
             "help": ""
+        },
+        "center_id": {
+            "label": "Centre",
+            "description": "Le nom de la famille.",
+            "help": ""
         }
     },
     "view": {
         "form.default": {
             "name": "Groupe",
             "description": "Une famille de produits est un groupe de produits fabriqués sous la même marque.",
-            "layout": {}
+            "layout": {
+                "section.product_models": {
+                    "label": "Modèles de produit"
+                },
+                "section.products": {
+                    "label": "Produits"
+                }
+            }
         },
         "list.default": {
             "name": "Groupes",
