@@ -1,0 +1,64 @@
+{
+    "name": "Relevé de compteur",
+    "plural": "Relevé de compteur",
+    "description": "",
+    "model": {
+        "booking_id": {
+            "label": "Réservation",
+            "description": "La réservation à laquelle sera associé le relevé de compteur.",
+            "help": ""
+        },
+        "consumption_meter_id": {
+            "label": "Compteur",
+            "description": "La réservation à laquelle sera associé le relevé de compteur.",
+            "help": ""
+        },
+        "booking_inspection_id": {
+            "label": "Inspection de la réservation",
+            "description": "L'inspection de la réservation correspond à la lecture du compteur de consommation.",
+            "help": ""
+        },
+        "center_id": {
+            "label": "Centre",
+            "description": "Le centre associé à la lecture du compteur de consommation.",
+            "help": ""
+        },
+        "date_reading": {
+            "label": "Date",
+            "description": "La date où la lecture du compteur est effectuée.",
+            "help": ""
+        },
+        "index_value": {
+            "label": "Valeur",
+            "description": "Index sur 8 chiffres (5.3).",
+            "help": "La valeur de l'index de la lecture du compteur stocké comme un entier."
+        },
+        "display_value": {
+            "label": "Valeur",
+            "description": "Index sur 8 chiffres (5.3).",
+            "help": "La valeur de l'index de lecture du compteur est formatée avec une virgule."
+        },
+        "price_id": {
+            "label": "Prix",
+            "description": "Le prix associé au compteur et la date de la lecture du compteur.",
+            "help": ""
+        },
+        "unit_price": {
+            "label": "Prix unitaire",
+            "description": "Le prix unitaire pour la lecture du compteur.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Relevé de compteur",
+            "description": "Formulaire d'édition du relevé de compteur",
+            "layout": {
+                "section.consumption_meter_reading_info": {
+                    "label": "Infos générales"
+                }
+            }
+        }
+    },
+    "error": {}
+}

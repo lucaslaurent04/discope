@@ -1,0 +1,74 @@
+{
+    "name": "Inspection",
+    "plural": "Inspections",
+    "description": "",
+    "model": {
+        "name": {
+            "label": "Nom",
+            "description": "Le nom est composé du nom de la réservation et du type d'inspection..",
+            "help": ""
+        },
+        "booking_id": {
+            "label": "Réservation",
+            "description": "La réservation pour laquelle l'inspection sera effectuée.",
+            "help": ""
+        },
+        "date_inspection": {
+            "label": "Date",
+            "description": "La date de l'inspection.",
+            "help": ""
+        },
+        "type_inspection": {
+            "label": "Type",
+            "description": "Le type de l'inspection.",
+            "selection": {
+                "checkedin": "En cours",
+                "checkedout": "terminée"
+            },
+            "help": ""
+        },
+        "status": {
+            "label": "Statut",
+            "description": "Statut de l'inspection.",
+            "selection": {
+                "pending": "En attente",
+                "submitted": "Soumis",
+                "billed": "Facturé"
+            },
+            "help": ""
+        },
+        "has_alert": {
+            "label": "Suivi",
+            "description": "Situation des alertes sur l'inspection.",
+            "help": ""
+        },
+        "has_signature": {
+            "label": "Signature",
+            "description": "Le client a signé l'inspection.",
+            "help": ""
+        },
+        "description": {
+            "label": "Remarques",
+            "description": "Raisons ou commentaires concernant l'inspection de réservation.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Inspection",
+            "description": "Formulaire d'édition d'une inspection",
+            "layout": {
+                "section.booking_inspection_info": {
+                    "label": "Infos générales"
+                },
+                "section.description": {
+                    "label": "Remarques"
+                },
+                "section.consumption_meter_reading_info": {
+                    "label": "Relevés de compteur"
+                }
+            }
+        }
+    },
+    "error": {}
+}

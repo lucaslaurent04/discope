@@ -1,0 +1,95 @@
+{
+    "name": "compteur",
+    "plural": "compteurs",
+    "description": "",
+    "model": {
+        "name": {
+            "label": "Libellé",
+            "description": "Le nom est composé du nom du centre et de la description.",
+            "help": ""
+        },
+        "description_meter": {
+            "label": "Description",
+            "description": "La description courte du compteur",
+            "help": ""
+        },
+        "center_id": {
+            "label": "Centre",
+            "description": "Le centre où se trouve le compteur.",
+            "help": ""
+        },
+        "date_opening": {
+            "label": "Date",
+            "description": "La date de l'ouverture du compteur.",
+            "help": ""
+        },
+        "is_active": {
+            "label": "Compteur actif ?",
+            "description": "Le compteur est actif.",
+            "help": ""
+        },
+        "index_value": {
+            "label": "Index initial",
+            "description": "Valeur de l'index initial du compteur.",
+            "help": ""
+        },
+        "product_id": {
+            "label": "Produit",
+            "description": "Le produit lié au compteur.",
+            "help": ""
+        },
+        "type_meter": {
+            "label": "Type",
+            "description": "Type du meter.",
+            "selection": {
+                "water": "Eau",
+                "gas": "Gaz",
+                "electricity": "Électricité",
+                "gas tank":  "Citerne gaz",
+                "oil tank": "Citerne mazout"
+            },
+            "help": ""
+        },
+        "has_ean": {
+            "label": "EAN",
+            "description": "Marquer le compteur comme étant un numéro d'article européen (EAN).",
+            "help": ""
+        },
+        "meter_number": {
+            "label": "Numéro",
+            "description": "Le code identifiant le fabricant du compteur.",
+            "help": ""
+        },
+        "meter_ean": {
+            "label": "Numéro EAN",
+            "description": "Le code identifiant le numéro d'article européen du compteur.",
+            "help": ""
+        },
+        "meter_unit": {
+            "label": "Unité de mesure ",
+            "description": "L'unité de mesure du compteur.",
+            "help": ""
+        },
+        "coefficient": {
+            "label": "Facteur",
+            "description": "Le facteur établi dans le compteur pour calculer la consommation consommée.",
+            "help": ""
+        }
+
+    },
+    "view": {
+        "form.default": {
+            "name": "Compteur",
+            "description": "Formulaire d'édition d'un compteur",
+            "layout": {
+                "section.booking_inspection_info": {
+                    "label": "Infos générales"
+                },
+                "section.consumption_meter_reading_info": {
+                    "label": "Relevés de compteur"
+                }
+            }
+        }
+    },
+    "error": {}
+}

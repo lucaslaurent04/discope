@@ -1,0 +1,41 @@
+{
+    "name": "Liste des invités",
+    "plural": "Listes des Invités",
+    "description": "Liste des invités liée à une réservation dans un système d'hébergement.",
+    "model": {
+        "booking_id": {
+            "label": "Réservation",
+            "description": "La réservation à laquelle est lié l'invité.",
+            "help": ""
+        },
+        "status": {
+            "label": "Statut",
+            "description": "Statut de la liste d'invités.",
+            "selection": {
+                "pending": "en attente",
+                "sent": "expédié"
+            },
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Liste d'invités",
+            "description": "Formulaire de base pour l'affichage du liste d'invités.",
+            "layout": {
+                "section.guest_list.info": {
+                    "label": "Infos générales"
+                },
+                "section.guest_list_items.info": {
+                    "label": "Invités"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Listes des invités",
+            "description": "Liste de base des invités.",
+            "layout": {}
+        }
+    },
+    "error": {}
+}
