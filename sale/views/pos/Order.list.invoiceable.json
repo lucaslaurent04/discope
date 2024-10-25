@@ -47,7 +47,7 @@
     ],
     "order": "created",
     "sort": "desc",
-    "controller": "lodging_sale_pos_order_invoiceable-collect",
+    "controller": "sale_pos_order_invoiceable-collect",
     "layout": {
         "items": [
             {

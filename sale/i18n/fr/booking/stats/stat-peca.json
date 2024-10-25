@@ -1,0 +1,77 @@
+{
+    "name": "Statistique PECA",
+    "plural": "Statistiques PECA",
+    "description": "",
+    "model": {
+        "center_id": {
+            "label": "Centre",
+            "description": "Centre pour lequel obtenir les stats.",
+            "help": ""
+        },
+        "all_centers": {
+            "label": "Tous les centres",
+            "description": "Tous les centres pour lesquels obtenir les stats.",
+            "help": ""
+        },
+        "center": {
+            "label": "Centre",
+            "description": "Centre auquel est assignée le séjour.",
+            "help": ""
+        },
+        "date_from": {
+            "label": "Jour de départ min.",
+            "description": "Date de début du séjour.",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Jour de départ max.",
+            "description": "Date de fin du séjour.",
+            "help": ""
+        },
+        "client": {
+            "label": "Client",
+            "description": "Nom du client.",
+            "help": ""
+        },
+        "customer_zip": {
+            "label": "CP",
+            "description": "Code postal du client.",
+            "help": ""
+        },
+        "category_animation": {
+            "label": "Catégorie d'animation",
+            "description": "Le nom de la catégorie du modèle de produit..",
+            "help": ""
+        },
+        "nb_3_6": {
+            "label": "Nombre de 3 à 6",
+            "description": "Nombre d’enfants âgés de 3 à 6 ans",
+            "help": ""
+        },
+        "nb_6_12": {
+            "label": "Nombre de 6 à 12",
+            "description": "Nombre d’enfants âgés de 6 à 12 ans",
+            "help": ""
+        },
+        "nb_12_26": {
+            "label": "Nombre de 12 à 26",
+            "description": "Nombre d’adolescents âgés de 12 à 26 ans",
+            "help": ""
+        },
+        "total": {
+            "label": "Total",
+            "description": "Nombre total de participants tous âges confondus",
+            "help": ""
+        }
+    },
+    "view": {
+        "search.default": {
+        },
+        "list.default": {
+        }
+    },
+    "error": {
+        "errors": {
+        }
+    }
+}

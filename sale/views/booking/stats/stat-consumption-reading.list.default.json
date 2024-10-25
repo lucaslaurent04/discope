@@ -1,0 +1,51 @@
+{
+    "name": "Stat Consumption Meter Reading",
+    "description": "",
+    "controller": "sale_booking_stats_stat-consumption-reading",
+    "header": {
+        "actions": {
+            "ACTION.CREATE" : false
+        }
+    },
+    "group_by": ["center"],
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "center",
+                "sortable" : true,
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "meter",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "meter_type",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "meter_unit",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "index_final",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "index_initial",
+                "width": "15%"
+            },
+            {
+                "type": "field",
+                "value": "index_consumption",
+                "width": "10%"
+            }
+        ]
+    }
+}

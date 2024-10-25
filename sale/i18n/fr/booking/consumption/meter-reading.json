@@ -1,0 +1,46 @@
+{
+    "name": "La liste  des relevé de compteur",
+    "description": "La liste des relevés de compteur par réservation.",
+    "model": {
+        "booking_id": {
+            "label": "Réservation",
+            "description": "La réservation à laquelle sera associé le relevé de compteur.",
+            "help": ""
+        },
+        "consumption_meter_id": {
+            "label": "Compteur",
+            "description": "La réservation à laquelle sera associé le relevé de compteur.",
+            "help": ""
+        },
+        "index_initial": {
+            "label": "Index début",
+            "description": "La valeur de l'index de la lecture du compteur au moment du check-in.",
+            "help": ""
+        },
+        "index_final": {
+            "label": "Valeur fin ",
+            "description": "La valeur de l'index de la lecture du compteur au moment du checkout.",
+            "help": ""
+        },
+        "index_difference": {
+            "label": "Valeur consommée",
+            "description": "La valeur de la différence entre le moment du checkout et du check-in.",
+            "help": ""
+        },
+        "unit_price": {
+            "label": "Prix",
+            "description": "Le prix unitaire de la lecture du compteur au moment du check-in.",
+            "help": ""
+        },
+        "total": {
+            "label": "Total",
+            "description": "Le prix total de la lecture du compteur",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+
+        }
+    }
+}

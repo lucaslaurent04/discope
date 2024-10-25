@@ -13,7 +13,7 @@
         "groups": ["pos.default.user"]
     },
     "domain": [ ["status", "=", "paid"], ["center_id", "in", "user.centers_ids"] ],
-    "controller": "lodging_sale_pos_order-collect",
+    "controller": "sale_pos_order-collect",
     "layout": {
         "items": [
             {
