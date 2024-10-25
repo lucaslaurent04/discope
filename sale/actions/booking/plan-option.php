@@ -200,7 +200,7 @@ SojournProductModelRentalUnitAssignement::create([
 */
 
 // might raise 'overbooking_detected'
-eQual::run('do', 'lodging_booking_do-option', ['id' => $booking['id']]);
+eQual::run('do', 'sale_booking_do-option', ['id' => $booking['id']]);
 
 
 $context->httpResponse()

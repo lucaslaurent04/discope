@@ -21,7 +21,7 @@
             "id": "action.quote",
             "label": "Revert to Quote",
             "description": "Rental units will no longer be reserved and will be available for other bookings.",
-            "controller": "lodging_booking_do-quote",
+            "controller": "sale_booking_do-quote",
             "confirm": true,
             "visible": [ ["status", "in", ["option", "confirmed", "validated"]], ["is_from_channelmanager", "=", false] ]
         },
@@ -29,7 +29,7 @@
             "id": "action.option",
             "label": "Set as Option",
             "description": "Rental units will be reserved but no funding will be claimed yet.",
-            "controller": "lodging_booking_do-option",
+            "controller": "sale_booking_do-option",
             "confirm": true,
             "visible": ["status", "=", "quote"]
         },
@@ -37,7 +37,7 @@
             "id": "action.option-confirm",
             "label": "Confirm Booking",
             "description": "Rental units will be reserved and the invoicing plan will be set up.",
-            "controller": "lodging_booking_do-option-confirm",
+            "controller": "sale_booking_do-option-confirm",
             "confirm": true,
             "visible": [["status", "=", "quote"], ["is_price_tbc", "=", false]]
         },
@@ -45,7 +45,7 @@
             "id": "action.confirm",
             "label": "Confirm Booking",
             "description": "Rental units will be reserved and the invoicing plan will be set up.",
-            "controller": "lodging_booking_do-confirm",
+            "controller": "sale_booking_do-confirm",
             "confirm": true,
             "visible": [["status", "=", "option"], ["is_price_tbc", "=", false]]
         },
@@ -53,7 +53,7 @@
             "id": "action.checkin",
             "label": "Check In",
             "description": "The host has arrived: the rental units will be marked as occupied.",
-            "controller": "lodging_booking_do-checkin",
+            "controller": "sale_booking_do-checkin",
             "confirm": true,
             "visible": ["status", "in", ["confirmed", "validated"]]
         },
@@ -61,7 +61,7 @@
             "id": "action.checkout",
             "label": "Check Out",
             "description": "The host is leaving: the rental units will be marked for cleaning.",
-            "controller": "lodging_booking_do-checkout",
+            "controller": "sale_booking_do-checkout",
             "confirm": true,
             "visible": ["status", "in", ["checkedin"]]
         },
@@ -69,7 +69,7 @@
             "id": "action.invoice",
             "label": "Invoice",
             "description": "All additional consumptions have been added. A proforma invoice will be generated.",
-            "controller": "lodging_booking_do-invoice",
+            "controller": "sale_booking_do-invoice",
             "confirm": true,
             "visible": [["status", "=", "checkedout"], ["is_from_channelmanager", "=", false] ]
         },
@@ -77,7 +77,7 @@
             "id": "action.invoice_direct",
             "label": "Invoice",
             "description": "Everything will be invoiced to the booking customer (no alternate payer). A proforma invoice will be generated.",
-            "controller": "lodging_booking_do-invoice-direct",
+            "controller": "sale_booking_do-invoice-direct",
             "confirm": true,
             "visible": [["status", "=", "checkedout"], ["is_from_channelmanager", "=", true] ]
         },
@@ -85,7 +85,7 @@
             "id": "action.invoice_instant",
             "label": "Instant invoice",
             "description": "This will complete the fundings with a manual payment (card) and fundings will be marked as paid.",
-            "controller": "lodging_booking_do-invoice-instant",
+            "controller": "sale_booking_do-invoice-instant",
             "confirm": true,
             "visible": [
                 [ ["status", "=", "checkedout"], ["is_from_channelmanager", "=", true] ],
@@ -96,7 +96,7 @@
             "id": "action.invoice-back",
             "label": "Back to Check Out",
             "description": "Adaptations are still required and the proforma invoice will have to be regenerated.",
-            "controller": "lodging_booking_do-checkout",
+            "controller": "sale_booking_do-checkout",
             "confirm": true,
             "visible": [["is_invoiced", "=", false], ["status", "in", ["invoiced", "debit_balance", "credit_balance", "balanced"]]]
         },
@@ -104,7 +104,7 @@
             "id": "action.cancel",
             "label": "Cancel",
             "description": "The booking will be cancelled and rental units will be freed. Possible cancellation fee will be applied.",
-            "controller": "lodging_booking_do-cancel",
+            "controller": "sale_booking_do-cancel",
             "params": {
                 "id": "object.id"
             },
@@ -123,7 +123,7 @@
             "id": "action.pay_instant",
             "label": "Instant payment",
             "description": "This will complete the fundings with a manual payment (card) and fundings will be marked as paid.",
-            "controller": "lodging_booking_do-pay-instant",
+            "controller": "sale_booking_do-pay-instant",
             "confirm": true,
             "visible": [ ["status", "in", ["debit_balance", "credit_balance"]] ]
         },

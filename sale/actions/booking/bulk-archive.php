@@ -34,7 +34,7 @@ $errors = [];
 
 foreach($params['ids'] as $id) {
     try {
-        eQual::run('do', 'lodging_booking_do-archive', ['id' => $id]);
+        eQual::run('do', 'sale_booking_do-archive', ['id' => $id]);
     }
     catch(Exception $e) {
         throw new Exception($e->getMessage(), QN_ERROR_INVALID_PARAM);

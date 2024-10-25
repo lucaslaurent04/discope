@@ -32,7 +32,7 @@ list($params, $providers) = eQual::announce([
 list($context, $dispatch) = [ $providers['context'], $providers['dispatch']];
 
 foreach($params['ids'] as $id) {
-    eQual::run('do', 'lodging_booking_do-update-check', ['id' => $id]);
+    eQual::run('do', 'sale_booking_do-update-check', ['id' => $id]);
 }
 
 $context->httpResponse()
