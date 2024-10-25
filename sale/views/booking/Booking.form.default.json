@@ -145,7 +145,7 @@
             "id": "action.import-contacts",
             "label": "Import contacts",
             "description": "The contacts from the selected customer will be (re) imported to the booking.",
-            "controller": "lodging_booking_import-contacts",
+            "controller": "sale_booking_import-contacts",
             "params": {
                 "id": "object.id"
             },
