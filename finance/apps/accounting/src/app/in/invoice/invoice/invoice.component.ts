@@ -546,7 +546,7 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
 
         try {
             this.loading = true;
-            const response:any = await this.api.call('?do=lodging_booking_send-invoice', {
+            const response:any = await this.api.call('?do=sale_booking_send-invoice', {
                 invoice_id: this.invoice_id,
                 sender_email: this.sender,
                 recipient_email: this.recipient,
