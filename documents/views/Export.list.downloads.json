@@ -18,7 +18,7 @@
             "label": "Export",
             "description": "Generate new export based on newly available data.",
             "confirm": true,
-            "controller": "lodging_payments_export"
+            "controller": "finance_payments_export"
         }
     ],
     "layout": {
