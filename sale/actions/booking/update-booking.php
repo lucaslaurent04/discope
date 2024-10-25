@@ -59,7 +59,7 @@ if($booking['is_noexpiry']) {
 }
 else {
     // revert to quote
-    eQual::run('do', 'lodging_booking_do-quote', [
+    eQual::run('do', 'sale_booking_do-quote', [
         'id'                    => $params['id'],
         'free_rental_units'     => $params['free_rental_units']
     ]);
