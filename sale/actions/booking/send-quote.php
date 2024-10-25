@@ -193,7 +193,7 @@ $limit = Setting::get_value('sale', 'booking', 'quote.remind_delay', 7);
 $cron->schedule(
     "booking.quote.reminder.{$params['booking_id']}",
     time() + $limit * 86400,
-    'lodging_booking_remind-quote',
+    'sale_booking_remind-quote',
     [ 'id' => $params['booking_id'], 'lang' => $params['lang'] ]
 );
 
