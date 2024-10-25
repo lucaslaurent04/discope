@@ -138,7 +138,7 @@
             "id": "action.update-status",
             "label": "Update status",
             "description": "The status of the booking will be adapted according to the status of its fundings.",
-            "controller": "lodging_booking_update-status",
+            "controller": "sale_booking_update-status",
             "visible": [ ["status", "in", ["invoiced", "debit_balance", "credit_balance"]] ]
         },
         {

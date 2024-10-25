@@ -19,21 +19,21 @@
                     "id": "archive_bulk",
                     "label": "Archiver",
                     "icon": "archive",
-                    "controller": "lodging_booking_bulk-archive",
+                    "controller": "sale_booking_bulk-archive",
                     "confirm": true
                 },
                 {
                     "id": "update_booking_bulk",
                     "label": "Mettre à jour le status",
                     "icon": "update",
-                    "controller": "lodging_booking_bulk-update-status",
+                    "controller": "sale_booking_bulk-update-status",
                     "confirm": true
                 },
                 {
                     "id": "invoice_bulk",
                     "label": "Facture rapide",
                     "icon": "receipt",
-                    "controller": "lodging_booking_bulk-invoice",
+                    "controller": "sale_booking_bulk-invoice",
                     "confirm": true
                 }
             ]
