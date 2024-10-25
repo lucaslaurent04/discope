@@ -257,11 +257,11 @@
             },
             {
                 "id": 21,
-                "name": "finance.invoice.invoice.fiscal_year",
+                "name": "finance.invoice.fiscal_year",
                 "package": "finance",
                 "section_id": 5,
                 "section": "invoice",
-                "code": "invoice.fiscal_year",
+                "code": "fiscal_year",
                 "title": "Année comptable",
                 "description": "Année comptable courrante",
                 "help": "Année courante d'exercice comptable.",

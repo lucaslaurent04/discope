@@ -219,6 +219,13 @@
                 "setting_id": 47,
                 "user_id": 0,
                 "value": "400"
+            },
+            {
+                "id": 47,
+                "name": "finance.invoice.fiscal_year",
+                "setting_id": 21,
+                "user_id": 0,
+                "value": "2024"
             }
         ]
     }
