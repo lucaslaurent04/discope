@@ -83,10 +83,10 @@ $result = eQual::run('do', 'model_update', $params, true);
 // 2) check customer history
 
 // check customer's previous bookings for remaining unpaid amount
-eQual::run('do', 'lodging_booking_check-customer-debtor', ['id' => $booking_id]);
+eQual::run('do', 'sale_booking_check-customer-debtor', ['id' => $booking_id]);
 
 // check customer's history for damages, slow payment or harm caused during previous bookings
-eQual::run('do', 'lodging_booking_check-customer-history', ['id' => $booking_id]);
+eQual::run('do', 'sale_booking_check-customer-history', ['id' => $booking_id]);
 
 
 $context->httpResponse()
