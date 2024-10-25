@@ -114,7 +114,7 @@
             "id": "action.release-rentalunits",
             "label": "Release rental units",
             "description": "Rental units will be released if they haven't been yet.",
-            "controller": "lodging_booking_release-rentalunits",
+            "controller": "sale_booking_release-rentalunits",
             "confirm": true,
             "visible": ["status", "=", "quote"]
         },
@@ -122,7 +122,7 @@
             "id": "action.reimbursed",
             "label": "Mark as reimbursed",
             "description": "The booking will be closed and marked as balanced (the amount already paid by the customer has been reimbursed).",
-            "controller": "lodging_booking_reimbursed",
+            "controller": "sale_booking_reimbursed",
             "visible": ["status", "=", "credit_balance"]
         },
         {
