@@ -9,7 +9,7 @@
             "id": "action.export",
             "label": "Export",
             "description": "Export all reconciled statements for importing into external accounting software.",
-            "controller": "lodging_payments_export"
+            "controller": "finance_payments_export"
         }
     ],
     "header": {
