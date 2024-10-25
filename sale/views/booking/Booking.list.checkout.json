@@ -10,7 +10,7 @@
             [ ["center_office_id", "in", "user.center_offices_ids"],["status", "=", "checkedout"], ["is_from_channelmanager", "=", true] ],
             [ ["center_office_id", "in", "user.center_offices_ids"],["status", "=", "checkedout"], ["nb_pers", "<=", 9] ]
     ],
-    "controller": "lodging_booking_collect",
+    "controller": "sale_booking_collect",
     "header": {
         "selection": {
             "default": false,

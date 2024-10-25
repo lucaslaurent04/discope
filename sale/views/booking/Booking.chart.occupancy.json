@@ -4,7 +4,7 @@
     "access": {
         "groups": ["booking.default.user"]
     },
-    "controller": "lodging_stats_chart-occupancy",
+    "controller": "sale_booking_stats_chart-occupancy",
     "header": {
         "modes": ["grid"]
     },

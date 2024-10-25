@@ -94,7 +94,7 @@ export class SessionOrderLinesSelectionComponent implements OnInit {
      */
     private async loadProducts(filter: string = '') {
         try {
-            this.products = await this.api.fetch('/?get=lodging_sale_catalog_product_collect', { center_id: this.order.session_id.center_id.id, filter: filter });
+            this.products = await this.api.fetch('/?get=sale_catalog_product_collect', { center_id: this.order.session_id.center_id.id, filter: filter });
             this.productsDataSource = new MatTableDataSource(this.products);
             this.productsDataSource.paginator = this.productsPaginator;
         }

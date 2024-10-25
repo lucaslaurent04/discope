@@ -53,20 +53,21 @@ switch($params['variant']) {
             'name',
             'created',
             'status',
+            'center_id',
             'has_invoice',
+            'invoice_id',
             'total',
             'price',
             'total_paid',
             'session_id' => [
-                'id', 'name', 'status'
+                'id',
+                'name',
+                'status',
+                'center_id' => ['pos_default_customer_id']
             ],
             'customer_id' => [
                 'name',
-                'partner_identity_id' => [
-                    'id',
-                    'has_vat',
-                    'vat_number'
-                ]
+                'partner_identity_id' => ['vat_number']
             ],
             'order_lines_ids' => [
                 'id',
@@ -90,19 +91,20 @@ switch($params['variant']) {
             'name',
             'created',
             'status',
+            'center_id',
             'has_invoice',
             'has_funding',
             'total',
             'price',
             'total_paid',
             'session_id' => [
-                'id', 'name', 'status'
+                'id',
+                'name',
+                'status'
             ],
-            'customer_id' => [
+            'customer_id'=>[
                 'name',
                 'partner_identity_id' => [
-                    'id',
-                    'has_vat',
                     'vat_number',
                     'address_city',
                     'address_zip',
@@ -114,6 +116,8 @@ switch($params['variant']) {
                 'order_id',
                 'total_due',
                 'total_paid',
+                'has_funding',
+                'funding_id',
                 'status',
                 'order_lines_ids' => [
                     'id',
@@ -134,6 +138,7 @@ switch($params['variant']) {
                     'id',
                     'order_payment_id',
                     'amount',
+                    'status',
                     'payment_method',
                     'booking_id',
                     'voucher_ref'
@@ -147,6 +152,7 @@ switch($params['variant']) {
             'name',
             'created',
             'status',
+            'center_id',
             'total',
             'price',
             'total_paid',
@@ -163,21 +169,25 @@ switch($params['variant']) {
                         'legal_name',
                         'phone',
                         'email',
-                        'vat_number'
-                    ],
-                    'center_office_id' => [
-                        'name',
+                        'has_vat',
+                        'vat_number',
                         'address_street',
                         'address_city',
                         'address_zip'
+                    ],
+                    'center_office_id' => [
+                        'name',
+                        'legal_name',
+                        'address_street',
+                        'address_city',
+                        'address_zip',
+                        'printer_type'
                     ]
                 ]
             ],
             'customer_id' => [
                 'name',
-                'partner_identity_id'=> [
-                    'id',
-                    'has_vat',
+                'partner_identity_id' => [
                     'vat_number',
                     'address_city',
                     'address_zip',
@@ -193,7 +203,17 @@ switch($params['variant']) {
                 'discount',
                 'free_qty',
                 'total',
-                'price'
+                'price',
+                'has_booking'
+            ],
+            'order_payment_parts_ids' => [
+                'id',
+                'order_payment_id',
+                'booking_id' => ['id', 'name'],
+                'amount',
+                'payment_method',
+                'booking_id',
+                'voucher_ref'
             ]
         ];
         break;

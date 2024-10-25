@@ -12,7 +12,7 @@
             "ACTION.CREATE" : false
         }
     },
-    "controller": "lodging_documents_export-collect",
+    "controller": "documents_export-collect",
     "layout": {
         "items": [
             {

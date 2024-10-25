@@ -1,0 +1,61 @@
+{
+    "name": "List the consumptions meters reading by booking",
+    "description": "",
+    "controller": "sale_booking_consumption_meter-reading",
+    "header": {
+        "actions": {
+            "ACTION.CREATE" : false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "operations": {
+        "total": {
+            "total": {
+                "operation": "SUM",
+                "usage": "numeric/float"
+            }
+        }
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "consumption_meter_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "index_final",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "index_initial",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "index_difference",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "unit_price",
+                "width": "10%",
+                "widget": {
+                    "usage": "amount/money:2"
+                }
+            },
+            {
+                "type": "field",
+                "value": "total",
+                "width": "10%",
+                "widget": {
+                    "usage": "amount/money:2"
+                }
+            }
+        ]
+    }
+}

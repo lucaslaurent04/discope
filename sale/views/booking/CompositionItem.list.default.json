@@ -12,7 +12,7 @@
             "label": "Print form",
             "icon": "print",
             "description": "Print form for manual filling (according to rows count).",
-            "controller": "lodging_composition_print-form",
+            "controller": "sale_booking_composition_print-form",
             "view": "list.print_form"
         }
     ],

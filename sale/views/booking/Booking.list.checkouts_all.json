@@ -10,7 +10,7 @@
         ["center_id", "in", "user.centers_ids"],
         ["status", "not in", ["quote"]]
     ],
-    "controller": "lodging_booking_collect-departures",
+    "controller": "sale_booking_collect-departures",
     "header": {
         "selection": {
             "default": false
