@@ -69,7 +69,7 @@ else {
     }
     else {
         // check quote for blocked rental units (might raise alert lodging.booking.quote.blocking)
-        eQual::run('do', 'lodging_booking_check-quote', ['id' => $params['id']]);
+        eQual::run('do', 'sale_booking_check-quote', ['id' => $params['id']]);
     }
 }
 
