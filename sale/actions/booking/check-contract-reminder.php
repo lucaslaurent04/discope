@@ -84,7 +84,7 @@ if ($booking['status'] == 'confirmed' && $contract['status'] != 'signed') {
     else {
         $dispatch->cancel('lodging.booking.contract.reminder.failed', 'sale\booking\Booking', $booking['id']);
         $result[] = $booking['id'];
-        eQual::run('do', 'lodging_booking_remind-contract', [
+        eQual::run('do', 'sale_booking_remind-contract', [
                 'id'    => $booking['id'],
                 'email' => $recipient['email'],
                 'lang'  => $recipient['lang']
