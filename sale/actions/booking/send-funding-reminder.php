@@ -109,7 +109,7 @@ if ($booking['date_from'] >= time() || in_array($booking['status'], ['credit_bal
     throw new Exception('sending_skipped', 0);
 }
 
-// by convention the most recent contract is listed first (see schema in lodging/classes/sale/booking/Booking.class.php)
+// by convention the most recent contract is listed first (see schema in sale/classes/booking/Booking.class.php)
 $contract_id = array_shift($booking['contracts_ids']);
 
 // generate attachment

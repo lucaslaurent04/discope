@@ -51,7 +51,7 @@ if(!$booking['has_contract'] || empty($booking['contracts_ids'])) {
     $contract_id = 0;
 }
 else {
-    // by convention the most recent contract is listed first (see schema in lodging/classes/sale/booking/Booking.class.php)
+    // by convention the most recent contract is listed first (see schema in sale/classes/booking/Booking.class.php)
     $contract_id = array_shift($booking['contracts_ids']);
     $contract = Contract::id($contract_id)->read(['status'])->first(true);
     $status = $contract['status'];

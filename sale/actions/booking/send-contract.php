@@ -111,7 +111,7 @@ if(!$booking['has_contract'] || empty($booking['contracts_ids'])) {
     throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
 }
 
-// by convention the most recent contract is listed first (see schema in lodging/classes/sale/booking/Booking.class.php)
+// by convention the most recent contract is listed first (see schema in sale/classes/booking/Booking.class.php)
 $contract_id = array_shift($booking['contracts_ids']);
 
 // schedule signature reminder
