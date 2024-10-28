@@ -19,7 +19,7 @@
                     "id": "header.selection.actions.mark_ignored",
                     "label": "Mark as ignored",
                     "icon": "",
-                    "controller": "lodging_sale_booking_bankstatementline_bulk-ignore"
+                    "controller": "sale_booking_bankstatementline_bulk-ignore"
                 }
             ]
         }
