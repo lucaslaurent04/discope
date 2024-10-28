@@ -9,7 +9,7 @@
             "id": "action.cleaned",
             "label": "Mark as cleaned",
             "description": "Rental unit will be marked as none.",
-            "controller": "lodging_realestate_do-cleaned",
+            "controller": "realestate_do-cleaned",
             "confirm": true,
             "visible": ["action_required", "in", ["cleanup_daily","cleanup_full"]]
         }

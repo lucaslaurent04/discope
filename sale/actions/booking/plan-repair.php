@@ -82,7 +82,7 @@ if(!$rental_unit) {
     Create a repairing group for given period and add rental unit to it
 */
 
-$data = eQual::run('do', 'lodging_realestate_check-unit-available', ['id' => $rental_unit['id'], 'date_from' => $params['date_from'], 'date_to' => $params['date_to'] ]);
+$data = eQual::run('do', 'realestate_check-unit-available', ['id' => $rental_unit['id'], 'date_from' => $params['date_from'], 'date_to' => $params['date_to'] ]);
 if(is_array($data) && count($data)) {
     throw new Exception('invalid_rental_unit_booking', QN_ERROR_INVALID_PARAM);
 }
