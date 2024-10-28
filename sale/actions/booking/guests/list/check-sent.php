@@ -70,7 +70,7 @@ if ($guest_list['status'] == 'pending'){
         }
     }
     if(empty($recipient['email'])) {
-        $dispatch->dispatch('lodging.booking.guest.reminder.failed', 'sale\booking\Booking', $booking['id'], 'important', 'lodging_guest_list_check-sent', ['id' => $booking['id']], [], null, $booking['center_office_id']['id']);
+        $dispatch->dispatch('lodging.booking.guest.reminder.failed', 'sale\booking\Booking', $booking['id'], 'important', 'sale_booking_guests_list_check-sent', ['id' => $booking['id']], [], null, $booking['center_office_id']['id']);
         $httpResponse->status(qn_error_http(QN_ERROR_MISSING_PARAM));
     }
     else {
