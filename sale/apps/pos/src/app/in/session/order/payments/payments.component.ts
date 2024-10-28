@@ -73,7 +73,7 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
 
     public async onclickFinish() {
         try {
-            await this.api.fetch('?do=lodging_order_do-pay', {id : this.instance.id });
+            await this.api.fetch('?do=sale_pos_order_do-pay', {id : this.instance.id });
             this.router.navigate(['/session/'+this.instance.session_id.id+'/order/'+this.instance.id+'/ticket']);
         }
         catch(response) {
