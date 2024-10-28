@@ -34,7 +34,7 @@
         {
             "id": "bulk_invoice",
             "label": "Facturer",
-            "controller": "lodging_sale_pos_orders_invoice",
+            "controller": "sale_pos_orders_invoice",
             "confirm": false
         }
     ],
