@@ -1556,6 +1556,53 @@ class Booking extends Model {
         $om->update(self::getType(), $id, ['nb_pers' => null]);
     }
 
+    public static function refreshBookingType($om, $id) {
+
+        $bookings = $om->read(self::getType(), $id, [
+            'id',
+            'booking_lines_groups_ids'
+        ]);
+
+        if($bookings <= 0) {
+            return;
+        }
+
+        $booking = reset($bookings);
+
+        $groups = $om->read(BookingLineGroup::getType(), $booking['booking_lines_groups_ids'], [
+            'id',
+            'booking_id',
+            'is_sojourn',
+            'nb_pers',
+            'pack_id.product_model_id.booking_type_id',
+            'rate_class_id.name'
+        ]);
+
+        foreach($groups as $gid => $group) {
+            // if model of chosen product has a non-generic booking type, update the booking of the group accordingly
+            if(isset($group['pack_id.product_model_id.booking_type_id']) && $group['pack_id.product_model_id.booking_type_id'] != 1) {
+                $om->update(self::getType(), $id, ['type_id' => $group['pack_id.product_model_id.booking_type_id']]);
+            }
+
+            // if model of chosen product has a non-generic booking type, update the booking of the group accordingly
+            if($group['rate_class_id.name'] == 'T5' || $group['rate_class_id.name'] == 'T7') {
+                $om->update(self::getType(), $id, ['type_id' => 4]);
+            }
+            else if($group['is_sojourn'] && $group['rate_class_id.name'] == 'T4') {
+                if($group['nb_pers'] >= 10) {
+                    // booking type 'TPG' (tout public groupe) is for booking with 10 pers. or more
+                    $om->update(self::getType(), $id, ['type_id' => 6]);
+                }
+                else {
+                    // booking type 'TP' (tout public) is for booking with less than 10 pers.
+                    $om->update(self::getType(), $id, ['type_id' => 1]);
+                }
+            }
+
+        }
+
+    }
+
     public static function refreshAutosaleProducts($om, $id) {
         /*
             remove groups related to autosales that already exist
