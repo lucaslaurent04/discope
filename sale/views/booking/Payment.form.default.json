@@ -17,7 +17,7 @@
             "id": "action.transfer",
             "label": "Funding transfer",
             "description": "Allows the transfer of the payment to another funding.",
-            "controller": "lodging_payment_do-transfer",
+            "controller": "sale_booking_payment_do-transfer",
             "confirm": true,
             "access": {
                 "groups": ["finance.default.administrator", "finance.default.user", "booking.default.user"]
