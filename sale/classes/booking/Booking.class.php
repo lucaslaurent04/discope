@@ -535,7 +535,7 @@ class Booking extends Model {
                         $min_date = $group['date_from'];
                     }
                 }
-                $result[$bid] = $min_date;
+                $result[$bid] = ($min_date == PHP_INT_MAX) ? time() : $min_date;
             }
         }
 
