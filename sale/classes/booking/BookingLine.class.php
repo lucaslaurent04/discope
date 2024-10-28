@@ -738,6 +738,7 @@ class BookingLine extends Model {
      * This method is triggered on fields update from BookingLineGroup or onupdateQtyVars from BookingLine.
      *
      */
+    // #todo - use refreshQty
     public static function _updateQty($om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLine:_updateQty", QN_REPORT_DEBUG);
 
@@ -851,6 +852,7 @@ class BookingLine extends Model {
      *
      * @param \equal\orm\ObjectManager $om
      */
+    // #todo - use refreshPriceId
     public static function _updatePriceId($om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLine:_updatePriceId", QN_REPORT_DEBUG);
 
@@ -1386,5 +1388,188 @@ class BookingLine extends Model {
             ]
             */
         ];
+    }
+
+    public static function refreshPrice($om, $id) {
+        $om->update(self::getType(), $id, ['price' => null, 'total' => null, 'fare_benefit' => null]);
+    }
+
+    public static function refreshQty($om, $id) {
+
+        $lines = $om->read(self::getType(), $id, [
+                'product_id.has_age_range',
+                'product_id.age_range_id',
+                'product_id.product_model_id.capacity',
+                'product_id.product_model_id.has_duration',
+                'product_id.product_model_id.duration',
+                'product_id.product_model_id.is_repeatable',
+                'booking_line_group_id.is_sojourn',
+                'booking_line_group_id.is_event',
+                'booking_line_group_id.nb_pers',
+                'booking_line_group_id.nb_nights',
+                'booking_line_group_id.age_range_assignments_ids',
+                'booking_line_group_id.has_pack',
+                'booking_line_group_id.pack_id.has_age_range',
+                'qty_vars',
+                'has_own_qty',
+                'is_rental_unit',
+                'is_accomodation',
+                'is_meal',
+                'qty_accounting_method'
+            ]);
+
+        if($lines <= 0) {
+            return;
+        }
+
+        $line = reset($lines);
+
+        if($line['has_own_qty']) {
+            // own quantity has been assigned in onupdateProductId
+            return;
+        }
+
+        // #memo - since something impacted qty, qty_var is reset
+
+        // retrieve number of persons to whom the product will be delivered (either nb_pers or age_range.qty)
+        $nb_pers = $line['booking_line_group_id.nb_pers'];
+        // #memo - if parent group has a age_range set, keep `booking_line_group_id.nb_pers`
+        if($line['product_id.has_age_range'] && !($line['booking_line_group_id.has_pack'] && $line['booking_line_group_id.pack_id.has_age_range'])) {
+            $age_range_assignments = $om->read(BookingLineGroupAgeRangeAssignment::getType(), $line['booking_line_group_id.age_range_assignments_ids'], ['age_range_id', 'qty']);
+            foreach($age_range_assignments as $assignment) {
+                if($assignment['age_range_id'] == $line['product_id.age_range_id']) {
+                    $nb_pers = $assignment['qty'];
+                    break;
+                }
+            }
+        }
+        // default number of times the product is repeated (accounting method = 'unit' with no own quantity and non-repeatable)
+        $nb_repeat = 1;
+        if($line['product_id.product_model_id.has_duration']) {
+            $nb_repeat = $line['product_id.product_model_id.duration'];
+        }
+        elseif($line['booking_line_group_id.is_sojourn']) {
+            if($line['product_id.product_model_id.is_repeatable']) {
+                $nb_repeat = max(1, $line['booking_line_group_id.nb_nights']);
+            }
+        }
+        elseif($line['booking_line_group_id.is_event']) {
+            if($line['product_id.product_model_id.is_repeatable']) {
+                $nb_repeat = $line['booking_line_group_id.nb_nights'] + 1;
+            }
+        }
+        // retrieve quantity to consider
+        $qty = self::_computeLineQty(
+                $line['qty_accounting_method'],
+                $nb_repeat,
+                $nb_pers,
+                $line['product_id.product_model_id.is_repeatable'],
+                $line['is_accomodation'],
+                $line['product_id.product_model_id.capacity']
+            );
+        // fill qty_vars with zeros
+        $qty_vars = array_fill(0, $nb_repeat, 0);
+        // #memo - triggers onupdateQty and onupdateQtyVar
+        $om->update(self::getType(), $id, ['qty' => $qty, 'qty_vars' => json_encode($qty_vars)]);
+
+    }
+
+    public static function refreshPriceId($om, $id) {
+        // trigger_error("ORM::calling sale\booking\BookingLine:_updatePriceId", QN_REPORT_DEBUG);
+
+        /*
+            There are 2 situations :
+
+            1) either the booking is not locked by a contract, in which case, we perform a regular lookup for an applicable pricelist
+            2) or the booking has a locked contract, then we start by looking for a price amongst existing line targeting the same product (if not found, fallback to regular pricelist search)
+        */
+
+        $lines = $om->read(self::getType(), $id, [
+            'booking_line_group_id.date_from',
+            'product_id',
+            'booking_id',
+            'booking_id.is_locked',
+            'booking_id.center_id.price_list_category_id',
+            'has_manual_unit_price',
+            'has_manual_vat_rate'
+        ]);
+
+        if($lines <= 0) {
+            return;
+        }
+
+        $line = reset($lines);
+
+
+        $found = false;
+
+        /**
+         * Locked booking relate to a contract that has been locked : this guarantees that additional services must be billed at the same price
+         * than equivalent services subscribed when the contract was established, whatever the current price lists
+         */
+        if($line['booking_id.is_locked']) {
+            // search booking line from same booking, targeting the same product
+            $booking_lines_ids = $om->search(self::getType(), [['booking_id', '=', $line['booking_id']],  ['product_id', '=', $line['product_id']], ['id', '<>', $id]]);
+            if($booking_lines_ids > 0 && count($booking_lines_ids)) {
+                $booking_lines = $om->read(self::getType(), $booking_lines_ids, ['product_id', 'price_id', 'unit_price', 'vat_rate']);
+                if($booking_lines > 0 && count($booking_lines)) {
+                    $booking_line = reset($booking_lines);
+                    $found = true;
+                    // #memo - price_id is set for consistency, but since we want to force the same price regardless of the advantages linked to the group, we copy unit_price and vat_rate
+                    $om->update(self::getType(), $id, ['price_id' => $booking_line['price_id']]);
+                    // #memo - this will set the has_manual_unit_price and has_manual_vat_rate to true
+                    $om->update(self::getType(), $id, ['unit_price' => $booking_line['unit_price'], 'vat_rate' => $booking_line['vat_rate']]);
+                    trigger_error("ORM::assigned price from {$booking_line['product_id']}", QN_REPORT_WARNING);
+                }
+            }
+        }
+
+        /*
+            Find the Price List that matches the criteria from the booking (shortest duration first)
+        */
+        if(!$found) {
+            $is_tbc = false;
+            $selected_price_id = 0;
+
+            $product_id = $line['product_id'];
+
+            // 1) use searchPriceId (published price lists)
+            $prices = self::searchPriceId($om, [$id], $product_id);
+
+            if(isset($prices[$id])) {
+                $selected_price_id = $prices[$id];
+            }
+            // 2) if not found, search for a matching Price within the pending Price Lists
+            else {
+                $prices = self::searchPriceIdUnpublished($om, [$id], $product_id);
+                if(isset($prices[$id])) {
+                    $is_tbc = true;
+                    $selected_price_id = $prices[$id];
+                }
+            }
+
+            if($selected_price_id > 0) {
+                // assign found Price to current line
+                $om->update(self::getType(), $id, ['price_id' => $selected_price_id]);
+                if($is_tbc) {
+                    // found price is TBC: mark booking as to be confirmed
+                    $om->update(Booking::getType(), $line['booking_id'], ['is_price_tbc' => true]);
+                }
+                $date = date('Y-m-d', $line['booking_line_group_id.date_from']);
+                trigger_error("ORM::assigned price {$selected_price_id} ({$is_tbc}) for product {$line['product_id']} for date {$date}", QN_REPORT_INFO);
+            }
+            else {
+                $om->update(self::getType(), $id, ['price_id' => null, 'price' => null]);
+                if(!$line['has_manual_unit_price']) {
+                    $om->update(self::getType(), $id, ['unit_price' => 0]);
+                }
+                if(!$line['has_manual_vat_rate']) {
+                    $om->update(self::getType(), $id, ['vat_rate' => 0]);
+                }
+                $date = date('Y-m-d', $line['booking_line_group_id.date_from']);
+                trigger_error("ORM::no matching price found for product {$line['product_id']} for date {$date}", QN_REPORT_WARNING);
+            }
+        }
+
     }
 }
