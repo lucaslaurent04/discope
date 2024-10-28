@@ -50,7 +50,7 @@ if($booking['status'] == 'balanced') {
 foreach($booking['fundings_ids'] as $funding) {
     if( $funding['type'] == 'installment' || (isset($funding['invoice_id']['is_deposit']) && $funding['invoice_id']['is_deposit'] === false) ) {
         try {
-            eQual::run('do', 'lodging_funding_do-pay-append', ['id' => $funding['id']]);
+            eQual::run('do', 'sale_booking_funding_do-pay-append', ['id' => $funding['id']]);
         }
         catch(Exception $e) {
             // ignore errors raised while appending payments

@@ -186,7 +186,7 @@ class Funding extends Model {
                     "booking.funding.overdue.{$fid}",
                     // remind on day following due_date
                     $values['due_date'] + 86400,
-                    'lodging_funding_check-payment',
+                    'sale_booking_funding_check-payment',
                     [ 'id' => $fid ]
                 );
             }
