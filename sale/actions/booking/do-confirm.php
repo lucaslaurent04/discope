@@ -533,7 +533,7 @@ try {
                     $new_funding = Funding::create($funding)->read(['id', 'name'])->first(true);
                     if($deadline['type'] == 'invoice') {
                         // an invoice was requested: convert the installment to an invoice
-                        eQual::run('do', 'lodging_funding_convert', ['id' => $new_funding['id'], 'partner_id' => $booking['customer_id']['id']]);
+                        eQual::run('do', 'sale_booking_funding_convert', ['id' => $new_funding['id'], 'partner_id' => $booking['customer_id']['id']]);
                     }
                 }
                 catch(Exception $e) {
