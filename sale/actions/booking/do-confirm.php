@@ -318,7 +318,7 @@ Booking::id($params['id'])->update(['status' => 'confirmed']);
     Pre-fill composition with customer details as first line (ease for single booking)
 */
 try {
-    eQual::run('do', 'lodging_composition_generate', ['booking_id' => $params['id']]);
+    eQual::run('do', 'sale_booking_composition_generate', ['booking_id' => $params['id']]);
 }
 catch(Exception $e) {
     // ignore errors at this stage
