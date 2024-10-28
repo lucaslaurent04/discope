@@ -107,23 +107,6 @@ if($rental_unit['has_children']) {
     $collection->update(['rental_units_ids' => $rental_unit['children_ids']]);
 }
 
-/*
-    Check if consistency must be maintained with channel manager (if repairing impacts a rental unit that is linked to a channelmanager room type)
-*/
-$repairing = $collection->first(true);
-
-$cron->schedule(
-        "channelmanager.check-contingencies.{$repairing['id']}",
-        time(),
-        'lodging_booking_check-contingencies',
-        [
-            'date_from'         => date('c', $params['date_from']),
-            // repairings completely cover the last day of the date range
-            'date_to'           => date('c', strtotime('+1 day', $params['date_to'])),
-            'rental_units_ids'  => array_merge([ $params['rental_unit_id'] ], $rental_unit['children_ids'])
-        ]
-    );
-
 $context->httpResponse()
         ->status(204)
         ->send();
