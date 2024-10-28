@@ -15,7 +15,7 @@
             "id": "action.reconcile",
             "label": "Reconcile",
             "description": "Retry to auto-reconcile the statement line.",
-            "controller": "lodging_sale_pay_bankstatementline_do-reconcile",
+            "controller": "sale_pay_bankstatementline_do-reconcile",
             "confirm": true,
             "params": {
                 "id": "object.id"

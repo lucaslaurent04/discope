@@ -60,7 +60,7 @@ class BankStatementLine extends \sale\pay\BankStatementLine {
 
     /**
      * Try to automatically reconcile a newly created statement line with a funding.
-     * This method is called by current class (onupdateCenterOfficeId) and controller `lodging_sale_pay_bankstatementline_do-reconcile`
+     * This method is called by current class (onupdateCenterOfficeId) and controller `sale_pay_bankstatementline_do-reconcile`
      */
     public static function reconcile($om, $ids, $values, $lang) {
         $lines = $om->read(self::getType(), $ids, ['id','status', 'amount', 'center_office_id', 'structured_message', 'message', 'bank_statement_id', 'payments_ids.amount', 'payments_ids.funding_id']);
