@@ -493,7 +493,7 @@ try {
                 // special case: immediate creation of balance invoice with no funding
                 if($deadline['type'] == 'invoice' && $deadline['is_balance_invoice']) {
                     // create proforma balance invoice and do not create funding (raise Exception on failure)
-                    eQual::run('do', 'lodging_invoice_generate', ['id' => $params['id']]);
+                    eQual::run('do', 'sale_booking_invoice_generate', ['id' => $params['id']]);
                     break;
                 }
 

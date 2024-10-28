@@ -120,7 +120,7 @@ foreach($fundings as $funding) {
 */
 
 // generate balance invoice (proforma) (raise exception on failure)
-eQual::run('do', 'lodging_invoice_generate', $params);
+eQual::run('do', 'sale_booking_invoice_generate', $params);
 
 // update booking status
 Booking::id($params['id'])->update(['status' => 'invoiced']);

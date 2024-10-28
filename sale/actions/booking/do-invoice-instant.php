@@ -68,7 +68,7 @@ if(!$invoice) {
     throw new Exception("invoice_not_found", QN_ERROR_MISSING_PARAM);
 }
 
-eQual::run('do', 'lodging_invoice_do-emit', $invoice);
+eQual::run('do', 'sale_booking_invoice_do-emit', $invoice);
 
 $context->httpResponse()
         ->status(204)
