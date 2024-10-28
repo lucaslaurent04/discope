@@ -42,7 +42,7 @@ if($user_id <= 0) {
 }
 
 // parse the CODA data
-$data = eQual::run('get', 'lodging_payments_coda-parse', ['data' => $params['data']]);
+$data = eQual::run('get', 'sale_booking_payments_coda-parse', ['data' => $params['data']]);
 
 if(empty($data)) {
     throw new Exception('invalid_file', QN_ERROR_INVALID_PARAM);
