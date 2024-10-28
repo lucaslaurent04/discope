@@ -184,36 +184,6 @@ catch(Exception $e) {
     throw new Exception('unexpected: '.$e->getMessage(), QN_ERROR_UNKNOWN);
 }
 
-
-/*
-    Check if consistency must be maintained with channel manager (if booking impacts a rental unit that is linked to a channelmanager room type)
-*/
-
-$map_rental_units_ids = [];
-
-// availability might be impacted by original rental units...
-$consumptions = Consumption::ids($original_consumptions_ids)->read(['rental_unit_id'])->get(true);
-foreach($consumptions as $consumption) {
-    $map_rental_units_ids[$consumption['rental_unit_id']] = true;
-}
-// ... or by new assignments
-foreach($params['assignments'] as $assignment) {
-    $map_rental_units_ids[$assignment['rental_unit_id']] = true;
-}
-
-if(count($map_rental_units_ids)) {
-    $cron->schedule(
-            "channelmanager.check-contingencies.{$group['booking_id']['id']}",
-            time(),
-            'lodging_booking_check-contingencies',
-            [
-                'date_from'         => date('c', $group['date_from']),
-                'date_to'           => date('c', $group['date_to']),
-                'rental_units_ids'  => array_keys($map_rental_units_ids)
-            ]
-        );
-}
-
 // if everything went well, remove old consumptions
 Consumption::ids($original_consumptions_ids)->delete(true);
 
