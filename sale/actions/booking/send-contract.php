@@ -225,7 +225,7 @@ if ($email !== null  && $lang !== null ) {
     $cron->schedule(
         "booking.guest.email.send.invite.{$params['booking_id']}",
         time() + 600,
-        'lodging_guests_list_invite',
+        'sale_booking_guests_list_invite',
         [
             'id'    => $params['booking_id'],
             'email' => $params['recipient_email'],
