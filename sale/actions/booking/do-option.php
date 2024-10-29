@@ -198,34 +198,6 @@ Booking::id($params['id'])->update(['status' => 'option']);
 eQual::run('do', 'sale_booking_check-consistency', ['id' => $booking['id']]);
 
 
-/*
-    Check if consistency must be maintained with channel manager (if booking impacts a rental unit that is linked to a channelmanager room type)
-*/
-
-// #memo - through map_rental_units_ids, we consider consumptions BEFORE the booking being set as option (in case of a booking reverted to quote) AND consumptions created AFTER
-$booking = Booking::id($params['id'])
-    ->read(['date_from', 'date_to', 'consumptions_ids' => ['is_accomodation', 'rental_unit_id']])
-    ->first(true);
-
-foreach($booking['consumptions_ids'] as $consumption) {
-    if($consumption['is_accomodation']) {
-        $map_rental_units_ids[$consumption['rental_unit_id']] = true;
-    }
-}
-
-if(count($map_rental_units_ids)) {
-    $cron->schedule(
-            "channelmanager.check-contingencies.{$params['id']}",
-            time(),
-            'lodging_booking_check-contingencies',
-            [
-                'date_from'         => date('c', $booking['date_from']),
-                'date_to'           => date('c', $booking['date_to']),
-                'rental_units_ids'  => array_keys($map_rental_units_ids)
-            ]
-        );
-}
-
 $context->httpResponse()
         ->status(204)
         ->send();
