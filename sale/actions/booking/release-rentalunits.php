@@ -5,6 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use core\setting\Setting;
 use sale\booking\Booking;
 use sale\booking\Consumption;
 
@@ -27,13 +28,14 @@ use sale\booking\Consumption;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context']
+    'providers'     => ['context', 'cron']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context      $context
+ * @var \equal\cron\Scheduler   $cron
  */
-['context' => $context] = $providers;
+['context' => $context, 'cron' => $cron] = $providers;
 
 $booking = Booking::id($params['id'])
     ->read(['id', 'status'])
@@ -45,6 +47,35 @@ if(!$booking) {
 
 if($booking['status'] != 'quote') {
     throw new Exception("invalid_status", QN_ERROR_INVALID_PARAM);
+}
+
+$channelmanager_enabled = Setting::get_value('sale', 'channelmanager', 'enabled', false);
+if($channelmanager_enabled) {
+    // rental units were released: check if consistency must be maintained with channel manager (if booking impacts a rental unit that is linked to a channelmanager room type)
+    $map_rental_units_ids = [];
+
+    $booking = Booking::id($params['id'])
+        ->read(['date_from', 'date_to', 'consumptions_ids' => ['is_accomodation', 'rental_unit_id']])
+        ->first(true);
+
+    foreach($booking['consumptions_ids'] as $consumption) {
+        if($consumption['is_accomodation']) {
+            $map_rental_units_ids[$consumption['rental_unit_id']] = true;
+        }
+    }
+
+    if(count($map_rental_units_ids)) {
+        $cron->schedule(
+            "channelmanager.check-contingencies.{$params['id']}",
+            time(),
+            'sale_booking_check-contingencies',
+            [
+                'date_from'         => date('c', $booking['date_from']),
+                'date_to'           => date('c', $booking['date_to']),
+                'rental_units_ids'  => array_keys($map_rental_units_ids)
+            ]
+        );
+    }
 }
 
 Consumption::search(['booking_id', '=', $params['id']])
