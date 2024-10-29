@@ -36,23 +36,10 @@ $result = [
     'logs'      => []
 ];
 
-// map customer to dedicated "vente comptoir"
-$map_centers_customers = [
-    24 => 9,    // EUPEN
-    25 => 11,   // VSG
-    26 => 8,    // HSL
-    27 => 13,   // OVIFAT
-    28 => 12,   // LLN
-    29 => 6,    // ROCHEFORT
-    30 => 7,    // WANNE
-    32 => 14    // HVG
-];
-
-
 $orders = Order::ids($params['ids'])
     ->read([
         'id', 'name', 'status', 'created',
-        'center_id' => ['id', 'center_office_id'],
+        'center_id' => ['id', 'center_office_id', 'pos_default_customer_id'],
         'invoice_id',
         'funding_id',
         'booking_id',
@@ -93,7 +80,7 @@ foreach($orders as $order) {
     }
     try {
         // retrieve customer id
-        $customer_id = $map_centers_customers[$order['center_id']['id']];
+        $customer_id = $order['center_id']['pos_default_customer_id'];
 
         // create payment(s)
         foreach($order['order_payments_ids'] as $order_payment) {

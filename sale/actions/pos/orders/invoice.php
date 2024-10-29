@@ -59,19 +59,6 @@ $adaptOut = function($value, $type) use (&$adapter) {
     return $adapter->adaptOut($value, $type);
 };
 
-
-// map customer to dedicated "vente comptoir"
-$map_centers_customers = [
-    24 => 9,    // EUPEN
-    25 => 11,   // VSG
-    26 => 8,    // HSL
-    27 => 13,   // OVIFAT
-    28 => 12,   // LLN
-    29 => 6,    // ROCHEFORT
-    30 => 7,    // WANNE
-    32 => 14    // HVG
-];
-
 if(isset($params['params']['all_months'])) {
     $all_months = $adaptIn($params['params']['all_months'], 'bool');
     if($all_months) {
@@ -82,21 +69,22 @@ if(isset($params['params']['all_months'])) {
 if(!isset($params['params']['center_id'])) {
     throw new Exception('missing_center', EQ_ERROR_INVALID_PARAM);
 }
-else {
-    $center_id = $adaptIn($params['params']['center_id'], 'int');
-    if($center_id <= 0) {
-        throw new Exception('missing_center', EQ_ERROR_INVALID_PARAM);
-    }
+
+$center_id = $adaptIn($params['params']['center_id'], 'int');
+if($center_id <= 0) {
+    throw new Exception('missing_center', EQ_ERROR_INVALID_PARAM);
 }
 
-if(!isset($map_centers_customers[$center_id])) {
-    throw new Exception('unsupported_center', EQ_ERROR_INVALID_PARAM);
-}
-
-$center = Center::id($center_id)->read(['organisation_id', 'center_office_id'])->first(true);
+$center = Center::id($center_id)
+    ->read(['pos_default_customer_id', 'organisation_id', 'center_office_id'])
+    ->first(true);
 
 if(!$center) {
     throw new Exception('missing_center', EQ_ERROR_UNKNOWN_OBJECT);
+}
+
+if(!$center['pos_default_customer_id']) {
+    throw new Exception('unsupported_center', EQ_ERROR_INVALID_PARAM);
 }
 
 if(!isset($params['params']['date'])) {
@@ -141,7 +129,7 @@ $orders = Order::search([
     ->get(true);
 
 // retrieve customer id
-$customer_id = $map_centers_customers[$center_id];
+$customer_id = $center['pos_default_customer_id'];
 
 // create invoice and invoice lines
 $invoice = Invoice::create([
