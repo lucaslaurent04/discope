@@ -18,6 +18,14 @@
     },
     "actions": [
         {
+            "id": "action.delete",
+            "label": "Delete",
+            "description": "This action is made for booking that were erroneously imported while not yet validated at channelmanager side. WARNING: this cannot be undone (double-check with Channel Manager).",
+            "controller": "sale_booking_do-delete",
+            "confirm": true,
+            "visible": [ ["is_from_channelmanager", "=", true] ]
+        },
+        {
             "id": "action.quote",
             "label": "Revert to Quote",
             "description": "Rental units will no longer be reserved and will be available for other bookings.",
