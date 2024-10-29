@@ -38,7 +38,7 @@
             "id": "action.mark_paid",
             "label": "Mark as paid",
             "description": "Funding will be arbitrary marked as paid (this has no impact on actual payments).",
-            "controller": "lodging_funding_do-paid",
+            "controller": "sale_booking_funding_do-paid",
             "confirm": true,
             "access": {
                 "groups": ["finance.default.administrator", "finance.default.user"]
@@ -49,7 +49,7 @@
             "id": "action.mark_unpaid",
             "label": "Mark as non-paid",
             "description": "Funding will be arbitrary marked as non paid (this has no impact on actual payments).",
-            "controller": "lodging_funding_do-unpaid",
+            "controller": "sale_booking_funding_do-unpaid",
             "confirm": true,
             "access": {
                 "groups": ["finance.default.administrator", "finance.default.user"]

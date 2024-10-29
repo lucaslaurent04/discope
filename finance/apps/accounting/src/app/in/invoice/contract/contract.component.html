@@ -33,7 +33,7 @@
                     <mat-hint *ngIf="mode=='grouped'">Groupes + lignes, prix / groupe</mat-hint>
                     <mat-hint *ngIf="mode=='detailed'">Groupes + lignes, prix / ligne</mat-hint>
                 </mat-form-field>
-                <a target="_blank" [attr.href]="'/?get=lodging_booking_print-contract&view_id=print.default&lang=' + lang + '&mode=' + mode + '&id=' + booking_id">
+                <a target="_blank" [attr.href]="'/?get=sale_booking_print-contract&view_id=print.default&lang=' + lang + '&mode=' + mode + '&id=' + booking_id">
                     <button mat-stroked-button>Voir le contrat</button>
                 </a>
                 <button mat-flat-button color="accent" (click)="onSend()" [disabled]="is_sent">Envoyer</button>

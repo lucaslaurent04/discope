@@ -5,7 +5,7 @@
         "groups": ["booking.default.user"]
     },
     "domain": ["center_office_id", "in", "user.center_offices_ids"],
-    "controller": "lodging_sale_booking_funding-collect",
+    "controller": "sale_booking_funding-collect",
     "layout": {
         "items": [
             {

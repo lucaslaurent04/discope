@@ -20,7 +20,7 @@
     },
     "order": "created",
     "sort": "asc",
-    "controller": "lodging_core_alert_collect",
+    "controller": "discope_core_alert_collect",
     "layout": {
         "items": [
             {

@@ -540,7 +540,7 @@ export class BookingQuoteComponent implements OnInit, AfterContentInit {
 
         try {
             this.loading = true;
-            const response:any = await this.api.call('?do=lodging_booking_send-quote', {
+            const response:any = await this.api.call('?do=sale_booking_send-quote', {
                 booking_id: this.booking_id,
                 sender_email: this.sender,
                 recipient_email: this.recipient,

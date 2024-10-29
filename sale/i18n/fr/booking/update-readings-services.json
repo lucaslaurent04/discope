@@ -1,0 +1,21 @@
+{
+    "name": "Créer des services pour les relevés",
+    "description": "Créer des services supplémentaires pour la lecture des compteurs de consommation.",
+    "model": {
+        "id": {
+            "label": "Identifiant",
+            "description": "Identifiant de la réservation ciblée.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "unknown_booking": "Réservation inconnue.",
+            "incompatible_status": "Action impossible pour ce statut de réservation.",
+            "incompatible_center_office": "L'équipe de gestion doit être le Gîtes de Groupes.",
+            "missing_bookings_inspections_ids": "Inspection inconnue.",
+            "incompatible_status_inspections": "Les inspections sont déjà facturées.",
+            "missing_consumptions_meter_reading_ids": "Les relevés de compteurs sont inconnus."
+        }
+    }
+}

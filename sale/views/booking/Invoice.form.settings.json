@@ -18,7 +18,7 @@
             "id": "action.invoice",
             "label": "Emit invoice",
             "description": "A new invoice will be generated from the proforma version. A number will be assigned to the invoice which will become read-only.",
-            "controller": "lodging_invoice_do-emit",
+            "controller": "sale_booking_invoice_do-emit",
             "confirm": true,
             "visible": ["status", "=", "proforma"]
         },
@@ -26,7 +26,7 @@
             "id": "action.remove",
             "label": "Delete invoice",
             "description": "The proforma invoice will be deleted.",
-            "controller": "lodging_invoice_do-delete",
+            "controller": "sale_booking_invoice_do-delete",
             "confirm": true,
             "visible": ["status", "=", "proforma"],
             "access": {
@@ -37,7 +37,7 @@
             "id": "action.reverse",
             "label": "Reverse",
             "description": "A new credit note will be generated from the invoice. The invoice will be cancelled and reversing accounting entries will be created.",
-            "controller": "lodging_invoice_do-reverse",
+            "controller": "sale_booking_invoice_do-reverse",
             "confirm": true,
             "visible": [["status", "=", "invoice"], ["type", "=", "invoice"]]
         },
@@ -45,7 +45,7 @@
             "id": "action.refresh_paid",
             "label": "Refresh",
             "description": "A new credit note will be generated from the invoice. The invoice will be cancelled and reversing accounting entries will be created.",
-            "controller": "lodging_invoice_do-refresh",
+            "controller": "sale_booking_invoice_do-refresh",
             "confirm": false,
             "visible": [["is_paid", "=", false]]
         },
@@ -53,7 +53,7 @@
             "id": "action.refresh_fundings",
             "label": "(Re)generate funding",
             "description": "A check will be made on the invoice and funding will be generated if missing. And the non-invoiced (partially) paid fundings will be attached to it.",
-            "controller": "lodging_invoice_do-funding",
+            "controller": "sale_booking_invoice_do-funding",
             "confirm": false,
             "visible": [["status", "=", "invoice"], ["type", "=", "invoice"]],
             "access": {

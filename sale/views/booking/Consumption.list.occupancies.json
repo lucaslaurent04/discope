@@ -22,7 +22,7 @@
     },
     "limit": 500,
     "order": "date",
-    "controller": "lodging_consumption_collect",
+    "controller": "sale_booking_consumption_collect",
     "layout": {
         "items": [
             {

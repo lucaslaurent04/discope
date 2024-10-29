@@ -7,7 +7,7 @@
     "order": "date",
     "sort": "desc",
     "domain": ["center_office_id", "in", "user.center_offices_ids"],
-    "controller": "lodging_sale_booking_invoice-collect",
+    "controller": "sale_booking_invoice-collect",
     "layout": {
         "items": [
             {

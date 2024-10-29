@@ -100,7 +100,7 @@ export class PaymentsImportComponent implements OnInit, AfterContentInit {
 
         try {
 
-          const response:any = await this.api.call('?do=lodging_payments_import', {
+          const response:any = await this.api.call('?do=finance_payments_import', {
               name: file.name,
               type: file.type,
               data: data

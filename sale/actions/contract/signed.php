@@ -1,60 +1,76 @@
 <?php
 /*
-    This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
-    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2024
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-use sale\contract\Contract;
 
-use core\Task;
+use sale\booking\Contract;
+use sale\booking\Booking;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Mark a contract as signed (signed version has been received).",
     'params'        => [
         'id' =>  [
-            'description'   => 'Identifier of the targeted contract.',
             'type'          => 'integer',
+            'description'   => "Identifier of the targeted contract.",
             'min'           => 1,
             'required'      => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'public',		// 'public' (default) or 'private' (can be invoked by CLI only)
-        'groups'            => ['booking.default.user'],// list of groups ids or names granted 
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user'],
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']     
+    'providers'     => ['context', 'orm', 'cron', 'dispatch']
 ]);
 
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
+ * @var \equal\cron\Scheduler       $cron
+ * @var \equal\dispatch\Dispatcher  $dispatch
+ */
+['context' => $context, 'orm' => $orm, 'cron' => $cron, 'dispatch' => $dispatch] = $providers;
 
 // read contract object
 $contract = Contract::id($params['id'])
-                  ->read(['id', 'name', 'status', 'valid_until'])
-                  ->first();
-                  
+    ->read(['id', 'name', 'status', 'booking_id', 'valid_until'])
+    ->first(true);
+
 if(!$contract) {
     throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
 }
 
 if($contract['valid_until'] < time()) {
-    throw new Exception("outdated_contract", QN_ERROR_NOT_ALLOWED);
+    // #memo - we allow this in order to relieve from the paperwork
+    // throw new Exception("outdated_contract", QN_ERROR_NOT_ALLOWED);
 }
 
+/*
+// #memo - we allow marking a contract directly as signed, even if not previously sent
 if($contract['status'] != 'sent') {
     throw new Exception("invalid_status", QN_ERROR_NOT_ALLOWED);
 }
+*/
 
 // Update booking status
 Contract::id($params['id'])->update(['status' => 'signed']);
 
+// remove any existing scheduled overdue check (set up in `send-contract`)
+$cron->cancel("booking.contract.overdue.{$contract['booking_id']}");
 
-// #todo - check if required payment have been paid in the meantime
+// remove any pending alert
+$dispatch->cancel('lodging.booking.contract.unsigned', 'sale\booking\Booking', $contract['booking_id']);
+
+// Check if required payment have been paid in the meantime and update booking accordingly
+Booking::updateStatusFromFundings($orm, [$contract['booking_id']]);
 
 $context->httpResponse()
-        ->status(204)
+        ->status(200)
         ->send();

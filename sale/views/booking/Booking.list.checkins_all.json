@@ -12,7 +12,7 @@
         ["nb_pers" ,">", 0],
         ["status", "in", ["validated", "confirmed", "checkedin"]]
     ],
-    "controller": "lodging_booking_collect-arrivals",
+    "controller": "sale_booking_collect-arrivals",
     "header": {
         "selection": {
             "default": false
@@ -29,7 +29,7 @@
             "label": "Print Arrival listing",
             "icon": "print",
             "description": "Print arrivals for given dates and center.",
-            "controller": "lodging_booking_print-arrivals",
+            "controller": "sale_booking_print-arrivals",
             "view": "print.arrivals"
         }
     ],

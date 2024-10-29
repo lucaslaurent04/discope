@@ -12,7 +12,7 @@
             "id": "action.import",
             "label": "Import",
             "description": "Import from a Bank Statements file.",
-            "controller": "lodging_payments_import",
+            "controller": "finance_payments_import",
             "confirm": true
         }
     ],

@@ -12,7 +12,7 @@
         ["nb_pers" ,">", 0],
         ["status", "in", ["validated", "confirmed"]]
     ],
-    "controller": "lodging_booking_collect-arrivals",
+    "controller": "sale_booking_collect-arrivals",
     "header": {
         "selection": {
             "default": false

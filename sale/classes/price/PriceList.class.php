@@ -155,7 +155,7 @@ class PriceList extends Model {
                     $cron->schedule(
                         "booking.is_tbc.confirm",
                         time() + 60,
-                        'lodging_pricelist_check-bookings',
+                        'sale_booking_pricelist_check-bookings',
                         [ 'id' => $pid ]
                     );
                 }

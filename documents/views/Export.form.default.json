@@ -14,7 +14,7 @@
             "id": "action.download",
             "label": "Download",
             "description": "Download the export.",
-            "controller": "lodging_documents_export_download",
+            "controller": "documents_export_download",
             "params": {
                 "id": "object.id"
             }

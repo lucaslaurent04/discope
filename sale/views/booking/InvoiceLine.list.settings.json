@@ -24,7 +24,7 @@
             "ACTION.SAVE": false
         }
     },
-    "controller": "lodging_sale_booking_invoiceLine-collect",
+    "controller": "sale_booking_invoiceLine-collect",
     "limit": 100,
     "layout": {
         "items": [
