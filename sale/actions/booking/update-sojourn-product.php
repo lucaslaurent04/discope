@@ -10,7 +10,7 @@ use sale\catalog\Product;
 
 // announce script and fetch parameters values
 list($params, $providers) = announce([
-    'description'	=>	"Updates a sojourn based on partial patch of the main product. This script is meant to be called by the `booking/services` UI.",
+    'description'	=>	"Updates a sojourn based on partial patch of the 'summary' product (not necessarily a pack). This script is meant to be called by the `booking/services` UI.",
     'params' 		=>	[
         'id' =>  [
             'description'       => 'Identifier of the targeted sojourn.',
@@ -52,11 +52,11 @@ $group = BookingLineGroup::id($params['id'])
     ->first(true);
 
 if(!$group) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if(!in_array($group['booking_id']['status'], ['quote', 'checkedout']) && !$group['is_extra']) {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 // find targeted product
@@ -69,7 +69,7 @@ $product = Product::id($params['product_id'])
     ->first(true);
 
 if(!$product) {
-    throw new Exception("unknown_product", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_product", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // update group according to the services it holds (sojourn, event, or arbitrary)
