@@ -4,6 +4,8 @@
     Author: Yesbabylon SRL, 2020-2022
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use core\setting\Setting;
 use sale\booking\Booking;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
@@ -117,11 +119,38 @@ Booking::id($params['id'])->update(['is_price_tbc' => false, 'price' => null, 't
 $om->callonce(BookingLine::getType(), 'updatePriceId', $booking['booking_lines_ids']);
 
 
-// in case rental units were freed
+// in case rental units were freed, check if consistency must be maintained with channel manager (if booking impacts a rental unit that is linked to a channelmanager room type)
 if($params['free_rental_units']) {
 
     // remove consumptions if requested (link & part)
     Consumption::search(['booking_id', '=', $params['id']])->delete(true);
+
+    $channelmanager_enabled = Setting::get_value('sale', 'channelmanager', 'enabled', false);
+    if($channelmanager_enabled) {
+        $booking = Booking::id($params['id'])
+            ->read(['date_from', 'date_to', 'consumptions_ids' => ['is_accomodation', 'rental_unit_id']])
+            ->first(true);
+
+        $map_rental_units_ids = [];
+        foreach($booking['consumptions_ids'] as $consumption) {
+            if($consumption['is_accomodation']) {
+                $map_rental_units_ids[$consumption['rental_unit_id']] = true;
+            }
+        }
+
+        if(count($map_rental_units_ids)) {
+            $cron->schedule(
+                "channelmanager.check-contingencies.{$params['id']}",
+                time(),
+                'sale_booking_check-contingencies',
+                [
+                    'date_from'         => date('c', $booking['date_from']),
+                    'date_to'           => date('c', $booking['date_to']),
+                    'rental_units_ids'  => array_keys($map_rental_units_ids)
+                ]
+            );
+        }
+    }
 }
 
 // remove pending alerts relating to booking checks, if any
@@ -136,5 +165,5 @@ $dispatch->cancel('lodging.booking.payments', 'sale\booking\Booking', $booking['
 $dispatch->cancel('lodging.booking.prices_assignment', 'sale\booking\Booking', $booking['id']);
 
 $context->httpResponse()
-        ->status(204)
-        ->send();
+    ->status(204)
+    ->send();
