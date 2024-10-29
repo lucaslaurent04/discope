@@ -9,7 +9,7 @@
             "id": "action.remove",
             "label": "Remove",
             "description": "Repairing episode will be removed. The rental unit will be released and made available for bookings.",
-            "controller": "lodging_repairing_do-remove",
+            "controller": "sale_booking_repairing_do-remove",
             "confirm": true,
             "visible": ["state", "<>", "draft"]
         }

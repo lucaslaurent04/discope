@@ -73,7 +73,7 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
 
     public async onclickFinish() {
         try {
-            await this.api.fetch('?do=lodging_order_do-pay', {id : this.instance.id });
+            await this.api.fetch('?do=sale_pos_order_do-pay', {id : this.instance.id });
             this.router.navigate(['/session/'+this.instance.session_id.id+'/order/'+this.instance.id+'/ticket']);
         }
         catch(response) {
@@ -104,7 +104,7 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
     async load(order_id: number) {
         if (order_id > 0) {
             try {
-                const data = await this.api.fetch('/?get=lodging_sale_pos_order_tree', { id: order_id, variant: 'payments' });
+                const data = await this.api.fetch('/?get=sale_pos_order_tree', { id: order_id, variant: 'payments' });
                 if (data) {
                     this.update(data);
                 }

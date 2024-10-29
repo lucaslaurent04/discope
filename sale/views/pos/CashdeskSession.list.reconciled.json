@@ -5,7 +5,7 @@
         "groups": ["pos.default.user"]
     },
     "domain": [ ["status", "=", "closed"], ["center_id", "in", "user.centers_ids"] ],
-    "controller": "lodging_sale_pos_cashdeskSession-collect",
+    "controller": "sale_pos_cashdeskSession-collect",
     "header": {
         "actions": {
             "ACTION.CREATE": false

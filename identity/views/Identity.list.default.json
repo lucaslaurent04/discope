@@ -1,7 +1,7 @@
 {
     "name": "Identity list",
     "description": "Listing of all existing identities.",
-    "controller": "lodging_identity_collect",
+    "controller": "identity_collect",
     "header": {
         "filters": {
             "custom": true,

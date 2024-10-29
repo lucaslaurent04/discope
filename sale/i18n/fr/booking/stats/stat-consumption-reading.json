@@ -1,0 +1,84 @@
+{
+    "name": "Statistique Ureba",
+    "plural": "Statistiques Ureba",
+    "description": "",
+    "model": {
+        "center_id": {
+            "label": "Centre",
+            "description": "Centre pour lequel obtenir les statistiques.",
+            "help": ""
+        },
+        "all_centers": {
+            "label": "Tous les centres",
+            "description": "Tous les centres pour lesquels obtenir les statistiques.",
+            "help": ""
+        },
+        "date_from": {
+            "label": "Du",
+            "description": "Date de début de la lecture du compteur de consommation",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "Date de fin de la lecture du compteur de consommation.",
+            "help": ""
+        },
+        "type_meter": {
+            "label": "Type",
+            "description": "Type de compteur.",
+            "selection": {
+                "all": "Tous",
+                "water": "Eau",
+                "gas": "Gaz",
+                "electricity": "Électricité",
+                "gas tank":  "Citerne gaz",
+                "oil tank": "Citerne mazout"
+            },
+            "help": ""
+        },
+        "center": {
+            "label": "Centre",
+            "description": "Centre auquel le compteur est assigné.",
+            "help": ""
+        },
+        "meter": {
+            "label": "Compteur",
+            "description": "Le relevé de compteur permettant d'obtenir les indices.",
+            "help": ""
+        },
+        "meter_type": {
+            "label": "Type",
+            "description": "Type du meter."
+        },
+        "meter_unit": {
+            "label": "Unité de mesure ",
+            "description": "L'unité de mesure du compteur.",
+            "help": ""
+        },
+        "index_initial": {
+            "label": "Index de début",
+            "description": "Valeur initiale de l'index de la lecture du compteur.",
+            "help": ""
+        },
+        "index_final": {
+            "label": "Index de fin",
+            "description": "Valeur finale de l'index de la lecture du compteur.",
+            "help": ""
+        },
+        "index_consumption": {
+            "label": "Consommation",
+            "description": "Consommation mesurée par le compteur.",
+            "help": ""
+        }
+    },
+    "view": {
+        "search.default": {
+        },
+        "list.default": {
+        }
+    },
+    "error": {
+        "errors": {
+        }
+    }
+}

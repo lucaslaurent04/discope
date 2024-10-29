@@ -7,7 +7,7 @@
     "order": "created",
     "sort": "desc",
     "domain": ["center_office_id", "in", "user.center_offices_ids"],
-    "controller": "lodging_booking_collect",
+    "controller": "sale_booking_collect",
     "header": {
         "selection": {
             "default": false,
@@ -16,14 +16,14 @@
                     "id": "archive_bulk",
                     "label": "Archiver",
                     "icon": "archive",
-                    "controller": "lodging_booking_bulk-archive",
+                    "controller": "sale_booking_bulk-archive",
                     "confirm": true
                 },
                 {
                     "id": "update_booking_bulk",
                     "label": "Mettre à jour le status",
                     "icon": "update",
-                    "controller": "lodging_booking_bulk-update-status",
+                    "controller": "sale_booking_bulk-update-status",
                     "confirm": true
                 }
             ]

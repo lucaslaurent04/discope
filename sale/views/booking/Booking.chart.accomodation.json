@@ -4,7 +4,7 @@
     "access": {
         "groups": ["booking.default.user"]
     },
-    "controller": "lodging_consumption_chart",
+    "controller": "sale_booking_consumption_chart",
     "layout": {
         "entity": "sale\\booking\\Consumption",
         "group_by": "range",

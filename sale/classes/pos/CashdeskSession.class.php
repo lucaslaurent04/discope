@@ -231,7 +231,7 @@ class CashdeskSession extends Model {
     public static function calcLinkSheet($om, $ids, $lang) {
         $result = [];
         foreach($ids as $id) {
-            $result[$id] = '/?get=lodging_sale_pos_print-cashdeskSession-day&id='.$id;
+            $result[$id] = '/?get=sale_pos_print-cashdeskSession-day&id='.$id;
         }
         return $result;
     }

@@ -13,7 +13,7 @@
                     "icon": "cleaning_services",
                     "label": "Marquer Nettoyé",
                     "description": "Rentals units will be marked as cleaned.",
-                    "controller": "lodging_booking_bulk-cleaned",
+                    "controller": "sale_booking_bulk-cleaned",
                     "confirm": true
                 }
             ]
@@ -35,7 +35,7 @@
         }
     },
     "limit": 500,
-    "controller": "lodging_consumption_collect-clean",
+    "controller": "sale_booking_consumption_collect-clean",
     "layout": {
         "items": [
             {

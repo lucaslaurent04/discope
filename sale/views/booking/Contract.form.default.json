@@ -14,7 +14,7 @@
             "id": "action.sent",
             "label": "Mark as sent",
             "description": "Contract will be marked as sent and waiting for customer's signature.",
-            "controller": "lodging_contract_sent",
+            "controller": "sale_contract_sent",
             "confirm": true,
             "visible": ["status", "=", "pending"]
         },
@@ -22,7 +22,7 @@
             "id": "action.signed",
             "label": "Mark as signed",
             "description": "Contract will be marked as signed. Booking will be validated as soon as the payment is received.",
-            "controller": "lodging_contract_signed",
+            "controller": "sale_contract_signed",
             "confirm": true,
             "visible": ["status", "in", ["pending", "sent"]]
         },
@@ -30,7 +30,7 @@
             "id": "action.lock",
             "label": "Lock contract",
             "description": "Contract will be locked. Users will not be able to updated it nor cancel it (and related booking) while locked.",
-            "controller": "lodging_contract_lock",
+            "controller": "sale_contract_lock",
             "confirm": true,
             "access": {
                 "groups": ["booking.default.administrator", "sale.default.administrator"]
@@ -42,7 +42,7 @@
             "label": "Unlock contract",
             "description": "Contract will be unlocked and users will be able to cancel it when reverting bookings to quotes.",
             "help": "Unlike the locking feature, unlocking a contract is available to all Booking users.",
-            "controller": "lodging_contract_unlock",
+            "controller": "sale_contract_unlock",
             "confirm": true,
             "visible": ["is_locked", "=", true]
         }

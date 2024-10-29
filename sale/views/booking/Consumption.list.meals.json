@@ -13,7 +13,7 @@
     "domain": [[ ["center_id", "in", "user.centers_ids"], ["is_meal", "=", true], ["disclaimed", "=", false] ],  [ ["center_id", "in", "user.centers_ids"], ["is_snack", "=", true], ["disclaimed", "=", false] ]],
     "limit": 500,
     "order": "date",
-    "controller": "lodging_consumption_collect-meals",
+    "controller": "sale_booking_consumption_collect-meals",
     "operations": {
         "total": {
             "qty": {

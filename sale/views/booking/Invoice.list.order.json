@@ -13,7 +13,7 @@
             "ACTION.CREATE": false
         }
     },
-    "controller": "lodging_sale_booking_invoice-collect",
+    "controller": "sale_booking_invoice-collect",
     "layout": {
         "items": [
             {

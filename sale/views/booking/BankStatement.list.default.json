@@ -7,14 +7,14 @@
     "order": "created",
     "sort": "desc",
     "domain": ["center_office_id", "in", "user.center_offices_ids"],
-    "controller": "lodging_sale_booking_bankStatement-collect",
+    "controller": "sale_booking_bankStatement-collect",
     "actions_disabled": [
         {
             "id": "action.import",
             "label": "Import",
             "description": "Import from a Bank Statements file.",
             "help": "This has been disabled since the resulting request in sent using GET which easily hits the max-header limit from NGINX.",
-            "controller": "lodging_payments_import"
+            "controller": "finance_payments_import"
         }
     ],
     "header": {

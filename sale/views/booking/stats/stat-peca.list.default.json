@@ -1,0 +1,76 @@
+{
+    "name": "Stat PECA",
+    "description": "",
+    "controller": "sale_booking_stats_stat-peca",
+    "header": {
+        "actions": {
+            "ACTION.CREATE" : false
+        }
+    },
+    "operations": {
+        "Total": {
+            "nb_3_6":{
+                "operation": "SUM",
+                "usage": "integer"
+            },
+            "nb_6_12":{
+                "operation": "SUM",
+                "usage": "integer"
+            },
+            "nb_12_26":{
+                "operation": "SUM",
+                "usage": "integer"
+            },
+            "total":{
+                "operation": "SUM",
+                "usage": "integer"
+            }
+        }
+    },
+    "group_by": [{"field": "center"}],
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "center",
+                "sortable" : true,
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "category_animation",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "client",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "code_postal",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "nb_3_6",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "nb_6_12",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "nb_12_26",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "total",
+                "width": "15%"
+            }
+        ]
+    }
+}
