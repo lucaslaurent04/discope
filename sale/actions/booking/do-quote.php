@@ -114,7 +114,7 @@ Booking::id($params['id'])->update(['is_price_tbc' => false, 'price' => null, 't
 
 // we also need to force re-assignment of the price_id of each line, since the applicable price list might have changed
 // #memo - this will not reset values for fields marked with `has_manual_*`
-$om->callonce(BookingLine::getType(), '_updatePriceId', $booking['booking_lines_ids']);
+$om->callonce(BookingLine::getType(), 'updatePriceId', $booking['booking_lines_ids']);
 
 
 // in case rental units were freed
