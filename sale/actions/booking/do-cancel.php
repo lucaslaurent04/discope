@@ -20,7 +20,7 @@ list($params, $providers) = eQual::announce([
             'min'           => 1,
             'required'      => true
         ],
-        // this must remain synched with field definition Booking::cancellation_reason
+        // this must remain synced with field definition Booking::cancellation_reason
         'reason' =>  [
             'description'   => 'Reason of the booking cancellation.',
             'type'          => 'string',
@@ -31,6 +31,7 @@ list($params, $providers) = eQual::announce([
                 'internal_impediment',      // cancellation due to an incident impacting the rental units
                 'external_impediment',      // cancellation due to external delivery failure (organization, means of transport, ...)
                 'health_impediment',        // cancellation for medical or mourning reason
+                'ota'                       // cancellation was made through the channel manager
             ],
             'required'       => true
         ]
@@ -43,19 +44,20 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context' , 'dispatch']
+    'providers'     => ['context', 'cron', 'dispatch']
 ]);
 
 /**
  * @var \equal\php\Context          $context
+ * @var \equal\cron\Scheduler       $cron
  * @var \equal\dispatch\Dispatcher  $dispatch
  */
-['context' => $context, 'dispatch' => $dispatch] = $providers;
+['context' => $context, 'cron' => $cron, 'dispatch' => $dispatch] = $providers;
 
 // read booking object
 $booking = Booking::id($params['id'])
-                  ->read(['id', 'name', 'is_cancelled', 'status', 'paid_amount', 'date_from', 'date_to'])
-                  ->first(true);
+    ->read(['id', 'name', 'is_cancelled', 'status', 'paid_amount', 'date_from', 'date_to'])
+    ->first(true);
 
 if(!$booking) {
     throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
@@ -74,7 +76,7 @@ if(in_array($booking['status'], ['debit_balance', 'credit_balance', 'balanced'])
 // #memo - this doesn't work for booking at advanced stage (cancelling a "checkedin" booking will raise an error)
 /*
 if($booking['status'] != 'quote') {
-    $json = run('do', 'sale_booking_do-quote', ['id' => $params['id'], 'free_rental_units' => true]);
+    $json = run('do', 'lodging_booking_do-quote', ['id' => $params['id'], 'free_rental_units' => true]);
     $data = json_decode($json, true);
     if(isset($data['errors'])) {
         // raise an exception with returned error code
@@ -84,6 +86,41 @@ if($booking['status'] != 'quote') {
     }
 }
 */
+
+
+/*
+    Check if consistency must be maintained with channel manager (if booking impacts a rental unit that is linked to a channelmanager room type)
+*/
+
+// retrieve rental units impacted by this operation
+$map_rental_units_ids = [];
+$consumptions = Consumption::search(['booking_id', '=', $params['id']])->read(['id', 'is_accomodation', 'rental_unit_id'])->get(true);
+
+foreach($consumptions as $consumption) {
+    if($consumption['is_accomodation']) {
+        $map_rental_units_ids[$consumption['rental_unit_id']] = true;
+    }
+}
+
+// schedule an update check-contingencies
+// #memo - since there is a delay between 2 sync (during which availability might be impacted) we need to set back the channelmanager availabilities
+if(count($map_rental_units_ids) /*&& $params['reason'] != 'ota'*/) {
+    $cron->schedule(
+        "channelmanager.check-contingencies.{$params['id']}",
+        time(),
+        'sale_booking_check-contingencies',
+        [
+            'date_from'         => date('c', $booking['date_from']),
+            'date_to'           => date('c', $booking['date_to']),
+            'rental_units_ids'  => array_keys($map_rental_units_ids)
+        ]
+    );
+}
+
+// if the cancellation was made by the OTA/channel manager, cancel all contracts
+if($params['reason'] == 'ota') {
+    Contract::search(['booking_id', '=', $params['id']])->update(['status' => 'cancelled']);
+}
 
 // release rental units (remove consumptions, if any)
 Consumption::search(['booking_id', '=', $params['id']])->delete(true);
