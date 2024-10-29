@@ -1423,6 +1423,12 @@ class Booking extends Model {
 
     }
 
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Creates auto sale groups (scope 'booking'), with booking lines, based on AutosaleList associated to the Center.
+     */
     public static function refreshAutosaleProducts($om, $id) {
         /*
             remove groups related to autosales that already exist
