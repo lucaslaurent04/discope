@@ -29,16 +29,14 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'cron', 'dispatch']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
  */
-list($context, $orm, $cron, $dispatch) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['dispatch']];
+list($context, $orm) = [$providers['context'], $providers['orm']];
 
 $group = BookingLineGroup::id($params['id'])->read(['id', 'nb_pers', 'is_extra', 'has_consumptions', 'date_from', 'date_to', 'time_from', 'time_to', 'booking_id' => ['center_id']])->first(true);
 
@@ -117,30 +115,6 @@ foreach($params['assignments'] as $assignment) {
 $orm->call(BookingLineGroup::getType(), 'createConsumptions', $params['id']);
 
 BookingLineGroup::id($params['id'])->update(['has_consumptions' => true]);
-
-// rental units were assigned: check if consistency must be maintained with channel manager (if booking impacts a rental unit that is linked to a channelmanager room type)
-$map_rental_units_ids = [];
-
-$group = BookingLineGroup::id($params['id'])->read(['date_from', 'date_to', 'consumptions_ids' => ['is_accomodation', 'rental_unit_id']])->first(true);
-
-foreach($group['consumptions_ids'] as $consumption) {
-    if($consumption['is_accomodation']) {
-        $map_rental_units_ids[$consumption['rental_unit_id']] = true;
-    }
-}
-
-if(count($map_rental_units_ids)) {
-    $cron->schedule(
-            "channelmanager.check-contingencies.{$params['id']}",
-            time(),
-            'lodging_booking_check-contingencies',
-            [
-                'date_from'         => date('c', $group['date_from']),
-                'date_to'           => date('c', $group['date_to']),
-                'rental_units_ids'  => array_keys($map_rental_units_ids)
-            ]
-        );
-}
 
 $context->httpResponse()
         ->status(204)
