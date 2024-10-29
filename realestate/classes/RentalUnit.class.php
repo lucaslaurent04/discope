@@ -221,7 +221,7 @@ class RentalUnit extends Model {
 
             'room_types_ids' => [
                 'type'              => 'many2many',
-                'foreign_object'    => 'lodging\sale\booking\channelmanager\RoomType',
+                'foreign_object'    => 'sale\booking\channelmanager\RoomType',
                 'foreign_field'     => 'rental_units_ids',
                 'rel_table'         => 'lodging_rental_unit_rel_room_type',
                 'rel_foreign_key'   => 'room_type_id',
