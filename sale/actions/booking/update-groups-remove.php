@@ -1,0 +1,78 @@
+<?php
+/*
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2022
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
+*/
+use sale\booking\Booking;
+use sale\booking\BookingLineGroup;
+
+list($params, $providers) = eQual::announce([
+    'description'   => "Checks if the composition is complete for a given booking.",
+    'params'        => [
+        'id' =>  [
+            'description'   => 'Identifier of targeted booking.',
+            'type'          => 'integer',
+            'required'      => true
+        ],
+        'booking_line_group_id' => [
+            'description'   => 'Identifier of the targeted group to remove.',
+            'type'          => 'integer',
+            'required'      => true
+        ],
+
+    ],
+    'access' => [
+        'visibility'        => 'protected'
+    ],
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
+    ],
+    'providers'     => ['context', 'orm', 'auth', 'dispatch']
+]);
+
+/**
+ * @var \equal\php\Context                  $context
+ * @var \equal\orm\ObjectManager            $orm
+ * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\dispatch\Dispatcher          $dispatch
+ */
+['context'=> $context, 'orm' => $orm, 'auth' => $auth, 'dispatch' => $dispatch] = $providers;
+
+
+// ensure booking object exists and is readable
+$booking = Booking::id($params['id'])->read(['id', 'name', 'status'])->first(true);
+
+if(!$booking) {
+    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+}
+
+$sojourn = BookingLineGroup::id($params['booking_line_group_id'])->read(['id', 'name', 'booking_id'])->first(true);
+
+if(!$sojourn) {
+    throw new Exception("unknown_sojourn", QN_ERROR_UNKNOWN_OBJECT);
+}
+
+if($sojourn['booking_id'] != $booking['id']) {
+    throw new Exception("mismatch_booking", QN_ERROR_UNKNOWN_OBJECT);
+}
+
+// Callbacks are defined on Booking, BookingLine, and BookingLineGroup to ensure consistency across these entities.
+// While these callbacks are useful for maintaining data integrity (they and are used in tests),
+// they need to be disabled here to prevent recursive cycles that could lead to deep cycling issues.
+$orm->disableEvents();
+
+BookingLineGroup::id($params['booking_line_group_id'])->delete(true);
+
+Booking::refreshPrice($orm, $booking['id']);
+Booking::refreshDate($orm, $booking['id']);
+Booking::refreshNbPers($orm, $booking['id']);
+
+// restore events (in case this controller is chained with others)
+$orm->enableEvents();
+
+$context->httpResponse()
+        ->status(204)
+        ->send();
