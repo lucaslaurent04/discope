@@ -79,7 +79,7 @@ class BookingLineGroupAgeRangeAssignment extends Model {
     public static function onupdateAgeRangeId($om, $oids, $values, $lang) {
         $assignments = $om->read(self::getType(), $oids, ['booking_line_group_id'], $lang);
         $booking_line_groups_ids = array_map(function ($a) {return $a['booking_line_group_id'];}, $assignments);
-        $om->callonce(\sale\booking\BookingLineGroup::getType(), '_updatePack', $booking_line_groups_ids, [], $lang);
+        $om->callonce(\sale\booking\BookingLineGroup::getType(), 'updatePack', $booking_line_groups_ids, [], $lang);
     }
 
     /**
