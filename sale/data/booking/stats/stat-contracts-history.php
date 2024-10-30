@@ -144,13 +144,13 @@ $adaptIn = function($value, $type) use (&$adapter) {
     if(is_a($adapter, 'equal\data\DataAdapter')) {
         return $adapter->adapt($value, $type);
     }
-    return $adapter->adaptIn($value, $type);
+    return $adapter->adaptIn($value, \equal\orm\Field::MAP_TYPE_USAGE[$type] ?? $type);
 };
 $adaptOut = function($value, $type) use (&$adapter) {
     if(is_a($adapter, 'equal\data\DataAdapter')) {
         return $adapter->adapt($value, $type, 'txt', 'php');
     }
-    return $adapter->adaptOut($value, $type);
+    return $adapter->adaptOut($value, \equal\orm\Field::MAP_TYPE_USAGE[$type] ?? $type);
 };
 
 
