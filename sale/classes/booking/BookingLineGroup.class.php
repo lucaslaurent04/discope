@@ -3585,6 +3585,31 @@ class BookingLineGroup extends Model {
 
     }
 
+    public static function refreshSPM($om, $id) {
+        $groups = $om->read(self::getType(), $id, ['booking_lines_ids', 'sojourn_product_models_ids']);
+
+        if($groups <= 0) {
+            return;
+        }
+
+        $group = reset($groups);
+
+
+        $spms = $om->read(SojournProductModel::getType(), $group['sojourn_product_models_ids'], ['is_accomodation', 'product_model_id']);
+        $lines = $om->read(\sale\booking\BookingLine::getType(), $group['booking_lines_ids'], ['id', 'is_accomodation', 'product_model_id']);
+
+        foreach($spms as $sid => $spm) {
+            // #memo - all rental units must be handled, even non-accomodation (ex.: meeting rooms)
+            foreach($lines as $lid => $line) {
+                if($line['product_model_id'] == $spm['product_model_id']) {
+                    continue 2;
+                }
+            }
+            $om->delete(SojournProductModel::getType(), $sid, true);
+        }
+
+    }
+
     /**
      * This method is called by `update-sojourn-[...]` controllers.
      * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
@@ -3674,7 +3699,9 @@ class BookingLineGroup extends Model {
         }
 
         // remove all previous SPM and rental_unit assignments (cascade)
-        $om->update(self::getType(), $id, ['sojourn_product_models_ids' => array_map(function($a) { return "-$a";}, $group['sojourn_product_models_ids'])]);
+        // #memo - we cannot do that otherwise we loose data
+        // $om->update(self::getType(), $id, ['sojourn_product_models_ids' => array_map(function($a) { return "-$a";}, $group['sojourn_product_models_ids'])]);
+        self::refreshSPM($om, $id);
 
         $nb_pers = $group['nb_pers'];
         $date_from = $group['date_from'] + $group['time_from'];
