@@ -3864,7 +3864,7 @@ class BookingLineGroup extends Model {
                     "booking.assign.units.{$group['booking_id']}",
                     // run as soon as possible
                     time() + 60,
-                    'lodging_booking_check-units-assignments',
+                    'sale_booking_check-units-assignments',
                     [ 'id' => $group['booking_id'] ]
                 );
 
