@@ -8,6 +8,10 @@ namespace sale\booking\channelmanager;
 
 class RoomType extends \equal\orm\Model {
 
+    public function getTable() {
+        return 'lodging_sale_booking_channelmanager_roomtype';
+    }
+
     public static function getDescription() {
         return "RoomTypes are used as an interface to map a Property (hotel) from the channel manager with a Center, a product Model and a list of rental units (accommodations).";
     }

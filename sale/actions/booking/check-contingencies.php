@@ -167,7 +167,7 @@ if($params['date_from'] <= $last_updatable_day) {
                 // send an update to Cubilis (set_availability) with the new value of availability for these dates (Cubilis crawls the date span based on nights / last date is discarded)
                 try {
                     // echo "$date_index : updating room type {$room_type['extref_roomtype_id']}, setting availability to {$count_available}".PHP_EOL;
-                    eQual::run('do', 'lodging_cubilis_update-availability', [
+                    eQual::run('do', 'sale_booking_channelmanager_cubilis_update-availability', [
                             'property_id'   => $room_type['property_id']['extref_property_id'],
                             'room_type_id'  => $room_type['extref_roomtype_id'],
                             'date'          => $date_index,

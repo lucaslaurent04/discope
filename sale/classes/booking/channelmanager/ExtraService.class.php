@@ -8,6 +8,10 @@ namespace sale\booking\channelmanager;
 
 class ExtraService extends \equal\orm\Model {
 
+    public function getTable() {
+        return 'lodging_sale_booking_channelmanager_extraservice';
+    }
+
     public static function getDescription() {
         return "Extra services are used as interface for mapping local product Model with Services from the channel manager.";
     }

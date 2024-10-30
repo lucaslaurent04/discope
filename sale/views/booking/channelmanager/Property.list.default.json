@@ -10,7 +10,7 @@
             "label": "Synchroniser",
             "description": "Forcer la resynchronisation.",
             "confirm": true,
-            "controller": "lodging_booking_sync-contingencies"
+            "controller": "sale_booking_channelmanager_cubilis_sync-contingencies"
         }
     ],
     "layout": {
