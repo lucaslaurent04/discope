@@ -83,7 +83,7 @@ $orm->disableEvents();
 
 BookingLineGroupAgeRangeAssignment::id($params['age_range_assignment_id'])->delete(true);
 
-eQual::run('do', 'lodging_booking_update-sojourn-nbpers', ['id' => $params['id'], 'nb_pers' => $group['nb_pers'] - $age_range_assignment['qty']]);
+eQual::run('do', 'sale_booking_update-sojourn-nbpers', ['id' => $params['id'], 'nb_pers' => $group['nb_pers'] - $age_range_assignment['qty']]);
 
 // restore events in case this controller is chained with others
 $orm->enableEvents();

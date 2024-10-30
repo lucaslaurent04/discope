@@ -48,11 +48,11 @@ $auth->su();
 
 // get associative array mapping rental units and dates with consumptions
 $result = Consumption::getExistingConsumptions(
-        $orm,
-        $params['centers_ids'],
-        $params['date_from'],
-        $params['date_to']
-    );
+    $orm,
+    $params['centers_ids'],
+    $params['date_from'],
+    $params['date_to']
+);
 
 $consumptions_ids = [];
 foreach($result as $rental_unit_id => $dates) {

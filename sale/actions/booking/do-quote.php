@@ -1,48 +1,50 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2022
+    Author: Yesbabylon SRL, 2020-2024
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use core\setting\Setting;
 use sale\booking\Booking;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\booking\Contract;
 use sale\booking\Consumption;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Reverts a booking to 'quote' status. Booking status of rental units is maintained unless there is an explicit request for releasing them.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the targeted booking.',
-            'type'          => 'integer',
-            'min'           => 1,
-            'required'      => true
+        'id' => [
+            'type'              => 'integer',
+            'description'       => "Identifier of the targeted booking.",
+            'min'               => 1,
+            'required'          => true
         ],
-        'free_rental_units' =>  [
-            'description'   => 'Flag for marking reserved rental units to be release immediately, if any.',
-            'type'          => 'boolean',
-            'default'       => false
+        'free_rental_units' => [
+            'type'              => 'boolean',
+            'description'       => "Flag for marking reserved rental units to be release immediately, if any.",
+            'default'           => false
         ]
     ],
-    'access' => [
+    'access'        => [
         'groups'            => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'  => 'application/json',
-        'charset'       => 'utf-8',
-        'accept-origin' => '*'
+        'content-type'      => 'application/json',
+        'charset'           => 'utf-8',
+        'accept-origin'     => '*'
     ],
     'providers'     => ['context', 'orm', 'cron', 'dispatch']
 ]);
 
 /**
  * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $om
+ * @var \equal\orm\ObjectManager            $orm
  * @var \equal\cron\Scheduler               $cron
  * @var \equal\dispatch\Dispatcher          $dispatch
  */
-list($context, $om, $cron, $dispatch) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['dispatch']];
+['context' => $context, 'orm' => $orm, 'cron' => $cron, 'dispatch' => $dispatch] = $providers;
 
 // read booking object
 $booking = Booking::id($params['id'])
@@ -50,15 +52,15 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($booking['status'] == 'quote') {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 if($booking['is_locked']) {
-    throw new Exception("locked_contract", QN_ERROR_INVALID_PARAM);
+    throw new Exception("locked_contract", EQ_ERROR_INVALID_PARAM);
 }
 
 /*
@@ -108,20 +110,47 @@ Booking::id($params['id'])->update(['has_contract' => false, 'fundings_ids' => $
 */
 
 // #memo - this does not reset `has_manual_*` fields
-$om->callonce(BookingLine::getType(), '_resetPrices', $booking['booking_lines_ids']);
+$orm->callonce(BookingLine::getType(), '_resetPrices', $booking['booking_lines_ids']);
 BookingLineGroup::ids($booking['booking_lines_groups_ids'])->update(['unit_price' => null, 'price' => null, 'vat_rate' => null, 'total' => null]);
 Booking::id($params['id'])->update(['is_price_tbc' => false, 'price' => null, 'total' => null]);
 
 // we also need to force re-assignment of the price_id of each line, since the applicable price list might have changed
 // #memo - this will not reset values for fields marked with `has_manual_*`
-$om->callonce(BookingLine::getType(), 'updatePriceId', $booking['booking_lines_ids']);
+$orm->callonce(BookingLine::getType(), 'updatePriceId', $booking['booking_lines_ids']);
 
 
-// in case rental units were freed
+// in case rental units were freed, check if consistency must be maintained with channel manager (if booking impacts a rental unit that is linked to a channelmanager room type)
 if($params['free_rental_units']) {
 
     // remove consumptions if requested (link & part)
     Consumption::search(['booking_id', '=', $params['id']])->delete(true);
+
+    $channelmanager_enabled = Setting::get_value('sale', 'channelmanager', 'enabled', false);
+    if($channelmanager_enabled) {
+        $booking = Booking::id($params['id'])
+            ->read(['date_from', 'date_to', 'consumptions_ids' => ['is_accomodation', 'rental_unit_id']])
+            ->first(true);
+
+        $map_rental_units_ids = [];
+        foreach($booking['consumptions_ids'] as $consumption) {
+            if($consumption['is_accomodation']) {
+                $map_rental_units_ids[$consumption['rental_unit_id']] = true;
+            }
+        }
+
+        if(count($map_rental_units_ids)) {
+            $cron->schedule(
+                "channelmanager.check-contingencies.{$params['id']}",
+                time(),
+                'sale_booking_check-contingencies',
+                [
+                    'date_from'         => date('c', $booking['date_from']),
+                    'date_to'           => date('c', $booking['date_to']),
+                    'rental_units_ids'  => array_keys($map_rental_units_ids)
+                ]
+            );
+        }
+    }
 }
 
 // remove pending alerts relating to booking checks, if any
