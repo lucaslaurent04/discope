@@ -1833,7 +1833,7 @@ class BookingLineGroup extends Model {
                 continue;
             }
             if(!$rentalunits_manual_assignment) {
-                // remove all previous SPM and rental_unit assignements
+                // remove all previous SPM and rental_unit assignments
                 $om->update(self::getType(), $gid, ['sojourn_product_models_ids' => array_map(function($a) { return "-$a";}, $group['sojourn_product_models_ids'])]);
             }
             // attempt to auto-assign rental units
@@ -2894,11 +2894,14 @@ class BookingLineGroup extends Model {
         // 2) Create booking lines according to pack composition.
 
         $order = 1;
-        $age_assignments = [];
         $children_age_range_id = 0;
 
         // retrieve age_range assignments (there must be at least one)
         $age_assignments = $om->read(BookingLineGroupAgeRangeAssignment::getType(), $group['age_range_assignments_ids'], ['age_range_id']);
+
+        if($age_assignments < 0) {
+            $age_assignments = [];
+        }
 
         // #todo - temporary solution - remove and deprecate
         if($group['pack_id.has_age_range'] && isset($group['pack_id.age_range_id'])) {
@@ -3664,9 +3667,7 @@ class BookingLineGroup extends Model {
             $prefs = reset($offices_preferences);
             $rentalunits_manual_assignment = (bool) $prefs['rentalunits_manual_assignment'];
         }
-        if($rentalunits_manual_assignment) {
-            return;
-        }
+
         // ignore groups with explicitly locked rental unit assignments
         if($group['has_locked_rental_units'] && count($group['sojourn_product_models_ids'])) {
             return;
@@ -3746,106 +3747,105 @@ class BookingLineGroup extends Model {
         }
 
         // do not auto-assign rental units if manual assignment is set in prefs
-        if($rentalunits_manual_assignment) {
-            return;
-        }
+        if(!$rentalunits_manual_assignment) {
 
-        // read targeted booking lines (received as method param)
-        $lines = $om->read(\sale\booking\BookingLine::getType(), $group['booking_lines_ids'], [
-            'booking_id.center_id',
-            'product_id',
-            'product_id.product_model_id',
-            'qty_accounting_method',
-            'is_rental_unit'
-        ]);
+            // read targeted booking lines (received as method param)
+            $lines = $om->read(\sale\booking\BookingLine::getType(), $group['booking_lines_ids'], [
+                'booking_id.center_id',
+                'product_id',
+                'product_id.product_model_id',
+                'qty_accounting_method',
+                'is_rental_unit'
+            ]);
 
-        // drop lines that do not relate to rental units
-        $lines = array_filter($lines, function($a) { return $a['is_rental_unit']; });
+            // drop lines that do not relate to rental units
+            $lines = array_filter($lines, function($a) { return $a['is_rental_unit']; });
 
-        if(count($lines)) {
-            // pass-2 : process lines
-            $group_assigned_rental_units_ids = [];
-            $has_processed_accomodation_by_person = false;
-            foreach($lines as $lid => $line) {
+            if(count($lines)) {
+                // pass-2 : process lines
+                $group_assigned_rental_units_ids = [];
+                $has_processed_accomodation_by_person = false;
+                foreach($lines as $lid => $line) {
 
-                $center_id = $line['booking_id.center_id'];
+                    $center_id = $line['booking_id.center_id'];
 
-                $is_accomodation = $product_models[$line['product_id.product_model_id']]['is_accomodation'];
-                // 'accomodation', 'person', 'unit'
-                $qty_accounting_method = $product_models[$line['product_id.product_model_id']]['qty_accounting_method'];
+                    $is_accomodation = $product_models[$line['product_id.product_model_id']]['is_accomodation'];
+                    // 'accomodation', 'person', 'unit'
+                    $qty_accounting_method = $product_models[$line['product_id.product_model_id']]['qty_accounting_method'];
 
-                // 'category', 'capacity', 'auto'
-                // #memo - the assignment-based filtering is done in `Consumption::getAvailableRentalUnits`
-                $rental_unit_assignment = $product_models[$line['product_id.product_model_id']]['rental_unit_assignement'];
+                    // 'category', 'capacity', 'auto'
+                    // #memo - the assignment-based filtering is done in `Consumption::getAvailableRentalUnits`
+                    $rental_unit_assignment = $product_models[$line['product_id.product_model_id']]['rental_unit_assignement'];
 
-                // all lines with same product_model are processed at the first line, remaining lines must be ignored
-                if($qty_accounting_method == 'person' && $is_accomodation && $has_processed_accomodation_by_person) {
-                    continue;
-                }
-
-                $nb_pers_to_assign = $nb_pers;
-
-                if($qty_accounting_method == 'accomodation') {
-                    $nb_pers_to_assign = min($product_models[$line['product_id.product_model_id']]['capacity'], $group['nb_pers']);
-                }
-                elseif($qty_accounting_method == 'unit') {
-                    $nb_pers_to_assign = $group['nb_pers'];
-                }
-
-                // find available rental units (sorted by capacity, desc; filtered on product model category)
-                $rental_units_ids = \sale\booking\Consumption::getAvailableRentalUnits($om, $center_id, $line['product_id.product_model_id'], $date_from, $date_to);
-
-                // #memo - we cannot append rental units from consumptions of own booking :this leads to an edge case
-                // (use case "come and go between 'quote' and 'option'" is handled with 'realease-rentalunits' action)
-
-                // remove rental units that are no longer unavailable
-                $rental_units_ids = array_diff($rental_units_ids,
-                    $group_assigned_rental_units_ids,               // assigned to other lines (current loop)
-                    $booking_assigned_rental_units_ids              // assigned within other groups
-                );
-
-                // retrieve rental units with matching capacities (best match first)
-                $rental_units = self::_getRentalUnitsMatches($om, $rental_units_ids, $nb_pers_to_assign);
-
-                $remaining = $nb_pers_to_assign;
-                $assigned_rental_units = [];
-
-                // min serie for available capacity starts from max(0, i-1)
-                for($j = 0, $n = count($rental_units) ;$j < $n; ++$j) {
-                    $rental_unit = $rental_units[$j];
-                    $assigned = min($rental_unit['capacity'], $remaining);
-                    $rental_unit['assigned'] = $assigned;
-                    $assigned_rental_units[] = $rental_unit;
-                    $remaining -= $assigned;
-                    if($remaining <= 0) break;
-                }
-
-                if($remaining > 0) {
-                    // no availability !
-                    trigger_error("ORM::no availability", QN_REPORT_DEBUG);
-                }
-                else {
-                    foreach($assigned_rental_units as $rental_unit) {
-                        $assignement = [
-                            'booking_id'                    => $group['booking_id'],
-                            'booking_line_group_id'         => $id,
-                            'sojourn_product_model_id'      => $group_product_models_ids[$line['product_id.product_model_id']],
-                            'qty'                           => $rental_unit['assigned'],
-                            'rental_unit_id'                => $rental_unit['id']
-                        ];
-                        trigger_error("ORM::assigning {$rental_unit['assigned']} p. to {$rental_unit['id']}", QN_REPORT_DEBUG);
-                        $om->create(SojournProductModelRentalUnitAssignement::getType(), $assignement);
-                        // remember assigned rental units (for next lines processing)
-                        $group_assigned_rental_units_ids[]= $rental_unit['id'];
+                    // all lines with same product_model are processed at the first line, remaining lines must be ignored
+                    if($qty_accounting_method == 'person' && $is_accomodation && $has_processed_accomodation_by_person) {
+                        continue;
                     }
 
-                    if($qty_accounting_method == 'person' && $is_accomodation) {
-                        $has_processed_accomodation_by_person = true;
+                    $nb_pers_to_assign = $nb_pers;
+
+                    if($qty_accounting_method == 'accomodation') {
+                        $nb_pers_to_assign = min($product_models[$line['product_id.product_model_id']]['capacity'], $group['nb_pers']);
+                    }
+                    elseif($qty_accounting_method == 'unit') {
+                        $nb_pers_to_assign = $group['nb_pers'];
+                    }
+
+                    // find available rental units (sorted by capacity, desc; filtered on product model category)
+                    $rental_units_ids = \sale\booking\Consumption::getAvailableRentalUnits($om, $center_id, $line['product_id.product_model_id'], $date_from, $date_to);
+
+                    // #memo - we cannot append rental units from consumptions of own booking :this leads to an edge case
+                    // (use case "come and go between 'quote' and 'option'" is handled with 'realease-rentalunits' action)
+
+                    // remove rental units that are no longer unavailable
+                    $rental_units_ids = array_diff($rental_units_ids,
+                        $group_assigned_rental_units_ids,               // assigned to other lines (current loop)
+                        $booking_assigned_rental_units_ids              // assigned within other groups
+                    );
+
+                    // retrieve rental units with matching capacities (best match first)
+                    $rental_units = self::_getRentalUnitsMatches($om, $rental_units_ids, $nb_pers_to_assign);
+
+                    $remaining = $nb_pers_to_assign;
+                    $assigned_rental_units = [];
+
+                    // min serie for available capacity starts from max(0, i-1)
+                    for($j = 0, $n = count($rental_units) ;$j < $n; ++$j) {
+                        $rental_unit = $rental_units[$j];
+                        $assigned = min($rental_unit['capacity'], $remaining);
+                        $rental_unit['assigned'] = $assigned;
+                        $assigned_rental_units[] = $rental_unit;
+                        $remaining -= $assigned;
+                        if($remaining <= 0) break;
+                    }
+
+                    if($remaining > 0) {
+                        // no availability !
+                        trigger_error("ORM::no availability", QN_REPORT_DEBUG);
+                    }
+                    else {
+                        foreach($assigned_rental_units as $rental_unit) {
+                            $assignement = [
+                                'booking_id'                    => $group['booking_id'],
+                                'booking_line_group_id'         => $id,
+                                'sojourn_product_model_id'      => $group_product_models_ids[$line['product_id.product_model_id']],
+                                'qty'                           => $rental_unit['assigned'],
+                                'rental_unit_id'                => $rental_unit['id']
+                            ];
+                            trigger_error("ORM::assigning {$rental_unit['assigned']} p. to {$rental_unit['id']}", QN_REPORT_DEBUG);
+                            $om->create(SojournProductModelRentalUnitAssignement::getType(), $assignement);
+                            // remember assigned rental units (for next lines processing)
+                            $group_assigned_rental_units_ids[]= $rental_unit['id'];
+                        }
+
+                        if($qty_accounting_method == 'person' && $is_accomodation) {
+                            $has_processed_accomodation_by_person = true;
+                        }
                     }
                 }
             }
-        }
 
+        }
 
         // 2-nd pass: in any situation, if the group targets additional services (is_extra), we dispatch a notification about required assignment
 
