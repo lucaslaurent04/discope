@@ -1034,6 +1034,8 @@ class BookingLineGroup extends Model {
                             return ['status' => ['non_editable' => 'Non-extra services can only be changed for quote bookings.']];
                         }
                     }
+                    /*
+                    // nb_pers change must force reset of age ranges
                     if(isset($values['nb_pers']) && count($group['age_range_assignments_ids']) > 1 ) {
                         $assignments = $om->read(BookingLineGroupAgeRangeAssignment::getType(), $group['age_range_assignments_ids'], ['qty'], $lang);
                         $qty = array_reduce($assignments, function($c, $a) { return $c+$a['qty']; }, 0);
@@ -1041,6 +1043,7 @@ class BookingLineGroup extends Model {
                             return ['nb_pers' => ['count_mismatch' => 'Number of persons does not match the age ranges.']];
                         }
                     }
+                    */
                     if(isset($values['has_locked_rental_units']) && $values['has_locked_rental_units']) {
                         if(!count($group['sojourn_product_models_ids'])) {
                             return ['has_locked_rental_units' => ['invalid_status' => 'Cannot lock an empty assignment.']];
