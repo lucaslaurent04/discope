@@ -88,6 +88,7 @@ BookingLineGroup::refreshAutosaleProducts($orm, $group['id']);
     and are applied both on group and each of its lines
 */
 BookingLineGroup::refreshPriceAdapters($orm, $group['id']);
+
 BookingLineGroup::refreshMealPreferences($orm, $group['id']);
 
 // refresh price_id, qty and price for all lines
