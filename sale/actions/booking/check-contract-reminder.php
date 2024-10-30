@@ -78,12 +78,12 @@ if ($booking['status'] == 'confirmed' && $contract['status'] != 'signed') {
         }
     }
     if(empty($recipient['email'])) {
+        $result[] = $booking['id'];
         $dispatch->dispatch('lodging.booking.contract.reminder.failed', 'sale\booking\Booking', $booking['id'], 'important', 'sale_booking_check-contract-reminder', ['id' => $booking['id']], [], null, $booking['center_office_id']['id']);
         $httpResponse->status(qn_error_http(QN_ERROR_MISSING_PARAM));
     }
     else {
         $dispatch->cancel('lodging.booking.contract.reminder.failed', 'sale\booking\Booking', $booking['id']);
-        $result[] = $booking['id'];
         eQual::run('do', 'sale_booking_remind-contract', [
                 'id'    => $booking['id'],
                 'email' => $recipient['email'],
