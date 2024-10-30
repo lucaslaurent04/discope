@@ -1,0 +1,17 @@
+{
+    "name": "Réconciliation",
+    "description": "Réconciliation d'une ligne de relevé bancaire en utilisant sa communication (VCS ou message en texte libre)",
+    "model": {
+        "id": {
+            "label": "Identifiant",
+            "description": "Identifiant de la ligne de relevé bancaire à réconcilier",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "invalid_bankStatementLine": "Il n'est pas possible de faire une réconciliation pour un remboursement avec une communication structurée.",
+            "invalid_structured_message": "La communication structurée de la ligne ne correspond pas à la communication de la réservation."
+        }
+    }
+}
