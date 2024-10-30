@@ -58,8 +58,11 @@ class BookingLine extends Model {
             ],
 
             'product_model_id' => [
-                'type'              => 'many2one',
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\catalog\ProductModel',
+                'relation'          => ['product_id' => 'product_model_id'],
+                'store'             => true,
                 'description'       => 'The product model the line relates to (from product).',
             ],
 
