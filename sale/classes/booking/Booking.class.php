@@ -1075,6 +1075,17 @@ class Booking extends Model {
                 if(is_null($booking['customer_identity_id']) || $booking['customer_identity_id'] <= 0) {
                     continue;
                 }
+                // ignore special case where customer is the organisation itself
+                if($booking['customer_identity_id'] == 1) {
+                    continue;
+                }
+
+                // remove all previously auto created contacts
+                $previous_contacts_ids = $om->search(\sale\booking\Contact::getType(), [ ['booking_id', '=', $bid], ['origin', '=', 'auto'] ] );
+                if($previous_contacts_ids > 0) {
+                    $om->delete(\sale\booking\Contact::getType(), $previous_contacts_ids, true);
+                }
+
                 $partners_ids = [];
                 $existing_partners_ids = [];
                 // read all contacts (to prevent importing contacts twice)
@@ -1097,14 +1108,16 @@ class Booking extends Model {
                 }
                 // append customer identity's own contact
                 $partners_ids[] = $booking['customer_identity_id'];
-                // keep only partners_ids not present yet
-                $partners_ids = array_diff($partners_ids, $existing_partners_ids);
+                // keep only partners_ids not present yet - limit to max 5 contacts
+                // #todo - store MAX value in Settings
+                $partners_ids = array_slice(array_diff($partners_ids, $existing_partners_ids), 0, 5);
                 // create booking contacts
                 foreach($partners_ids as $partner_id) {
                     $om->create(\sale\booking\Contact::getType(), [
                         'booking_id'            => $bid,
                         'owner_identity_id'     => $booking['customer_identity_id'],
-                        'partner_identity_id'   => $partner_id
+                        'partner_identity_id'   => $partner_id,
+                        'origin'                => 'auto'
                     ]);
                 }
             }
