@@ -4,6 +4,8 @@
     Author: Yesbabylon SRL, 2020-2022
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use core\setting\Setting;
 use realestate\RentalUnit;
 use sale\booking\Repairing;
 
@@ -88,9 +90,9 @@ if(is_array($data) && count($data)) {
 }
 
 $collection = Repairing::create([
-        'center_id'         => $rental_unit['center_id'],
-        'description'       => $params['description']
-    ])
+    'center_id'         => $rental_unit['center_id'],
+    'description'       => $params['description']
+])
     ->update([
         'rental_units_ids'  => [ $params['rental_unit_id'] ],
         'date_from'         => $params['date_from'],
@@ -105,6 +107,26 @@ if($rental_unit['has_parent']) {
 // mark all children as 'ooo' as well
 if($rental_unit['has_children']) {
     $collection->update(['rental_units_ids' => $rental_unit['children_ids']]);
+}
+
+$channelmanager_enabled = Setting::get_value('sale', 'channelmanager', 'enabled', false);
+if($channelmanager_enabled) {
+    /*
+        Check if consistency must be maintained with channel manager (if repairing impacts a rental unit that is linked to a channelmanager room type)
+    */
+    $repairing = $collection->first(true);
+
+    $cron->schedule(
+        "channelmanager.check-contingencies.{$repairing['id']}",
+        time(),
+        'sale_booking_check-contingencies',
+        [
+            'date_from'        => date('c', $params['date_from']),
+            // repairings completely cover the last day of the date range
+            'date_to'          => date('c', strtotime('+1 day', $params['date_to'])),
+            'rental_units_ids' => array_merge([$params['rental_unit_id']], $rental_unit['children_ids'])
+        ]
+    );
 }
 
 $context->httpResponse()

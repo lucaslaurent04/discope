@@ -5,6 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use core\setting\Setting;
 use sale\booking\BookingLineGroup;
 use sale\booking\Consumption;
 use realestate\RentalUnit;
@@ -12,38 +13,37 @@ use sale\booking\SojournProductModel;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 use sale\catalog\ProductModel;
 
-// announce script and fetch parameters values
-list($params, $providers) = announce([
+list($params, $providers) = eQual::announce([
     'description'	=>	"Update the assignments of a given sojourn for a specific product model.",
     'params' 		=>	[
         'product_model_id' =>  [
             'type'              => 'many2one',
-            'description'       => 'Identifier of the Product Model the assignments relate to.',
+            'description'       => "Identifier of the Product Model the assignments relate to.",
             'foreign_object'    => 'sale\catalog\ProductModel',
             'required'          => true
         ],
         'booking_line_group_id' =>  [
             'type'              => 'many2one',
-            'description'       => 'Identifier of the sojourn (services group) the assignments relate to.',
+            'description'       => "Identifier of the sojourn (services group) the assignments relate to.",
             'foreign_object'    => 'sale\booking\BookingLineGroup',
             'required'          => true
         ],
         'assignments' => [
             'type'              => 'array',
-            'description'       => 'List of assignments with rental unit id and quantity (rental_unit_id; qty).',
+            'description'       => "List of assignments with rental unit id and quantity (rental_unit_id; qty).",
             'required'          => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'orm', 'cron']
+    'providers'     => ['context', 'orm', 'cron']
 ]);
 
 /**
@@ -61,9 +61,9 @@ foreach($params['assignments'] as $assignment) {
 // fetch the group (nb_pers)
 $group = BookingLineGroup::id($params['booking_line_group_id'])
     ->read([
-            'id', 'nb_pers', 'nb_nights', 'date_from', 'date_to', 'time_from', 'time_to',
-            'booking_id' => ['id', 'center_id']
-        ])
+        'id', 'nb_pers', 'nb_nights', 'date_from', 'date_to', 'time_from', 'time_to',
+        'booking_id' => ['id', 'center_id']
+    ])
     ->first(true);
 
 if(!$group) {
@@ -154,13 +154,13 @@ SojournProductModelRentalUnitAssignement::ids($spm_assignments_ids)->delete(true
 // create new assignments
 foreach($params['assignments'] as $assignment) {
     SojournProductModelRentalUnitAssignement::create([
-            'booking_id'                => $group['booking_id']['id'],
-            'booking_line_group_id'     => $group['id'],
-            'sojourn_product_model_id'  => $spm['id'],
-            'qty'                       => $assignment['qty'],
-            'rental_unit_id'            => $assignment['rental_unit_id'],
-            'is_accomodation'           => $spm['is_accomodation']
-        ]);
+        'booking_id'                => $group['booking_id']['id'],
+        'booking_line_group_id'     => $group['id'],
+        'sojourn_product_model_id'  => $spm['id'],
+        'qty'                       => $assignment['qty'],
+        'rental_unit_id'            => $assignment['rental_unit_id'],
+        'is_accomodation'           => $spm['is_accomodation']
+    ]);
 }
 
 // retrieve new resulting consumptions
@@ -182,6 +182,37 @@ catch(Exception $e) {
     // something went wrong : abort
     Consumption::ids($new_consumptions_ids)->delete(true);
     throw new Exception('unexpected: '.$e->getMessage(), QN_ERROR_UNKNOWN);
+}
+
+$channelmanager_enabled = Setting::get_value('sale', 'channelmanager', 'enabled', false);
+if($channelmanager_enabled) {
+    /*
+        Check if consistency must be maintained with channel manager (if booking impacts a rental unit that is linked to a channelmanager room type)
+    */
+    $map_rental_units_ids = [];
+
+    // availability might be impacted by original rental units...
+    $consumptions = Consumption::ids($original_consumptions_ids)->read(['rental_unit_id'])->get(true);
+    foreach($consumptions as $consumption) {
+        $map_rental_units_ids[$consumption['rental_unit_id']] = true;
+    }
+    // ... or by new assignments
+    foreach($params['assignments'] as $assignment) {
+        $map_rental_units_ids[$assignment['rental_unit_id']] = true;
+    }
+
+    if(count($map_rental_units_ids)) {
+        $cron->schedule(
+            "channelmanager.check-contingencies.{$group['booking_id']['id']}",
+            time(),
+            'sale_booking_check-contingencies',
+            [
+                'date_from'         => date('c', $group['date_from']),
+                'date_to'           => date('c', $group['date_to']),
+                'rental_units_ids'  => array_keys($map_rental_units_ids)
+            ]
+        );
+    }
 }
 
 // if everything went well, remove old consumptions

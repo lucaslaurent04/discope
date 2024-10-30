@@ -30,11 +30,11 @@ list($params, $providers) = eQual::announce([
             'description'   => 'The number of days for the option to expire.',
             'type'          => 'integer',
             'default'       =>  Setting::get_value('sale', 'booking', 'option.validity', 10)
-        ],
+        ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -175,7 +175,7 @@ else {
             'date_expiry' => strtotime(' +' . $days_expiry . ' days')
         ]);
 
-    // setup a scheduled job to set back the booking to a quote according to delay set by Setting `option.validity`
+    // set up a scheduled job to set back the booking to a quote according to delay set by Setting `option.validity`
     $cron->schedule(
         "booking.option.deprecation.{$params['id']}",             // assign a reproducible unique name
         time() + $days_expiry  * 86400,                 // remind after {sale.booking.option.validity} days (default 10 days), or manually given value
@@ -197,6 +197,36 @@ Booking::id($params['id'])->update(['status' => 'option']);
 // check booking rental units assignment
 eQual::run('do', 'sale_booking_check-consistency', ['id' => $booking['id']]);
 
+$channelmanager_enabled = Setting::get_value('sale', 'channelmanager', 'enabled', false);
+if($channelmanager_enabled) {
+    /*
+        Check if consistency must be maintained with channel manager (if booking impacts a rental unit that is linked to a channelmanager room type)
+    */
+
+    // #memo - through map_rental_units_ids, we consider consumptions BEFORE the booking being set as option (in case of a booking reverted to quote) AND consumptions created AFTER
+    $booking = Booking::id($params['id'])
+        ->read(['date_from', 'date_to', 'consumptions_ids' => ['is_accomodation', 'rental_unit_id']])
+        ->first(true);
+
+    foreach($booking['consumptions_ids'] as $consumption) {
+        if($consumption['is_accomodation']) {
+            $map_rental_units_ids[$consumption['rental_unit_id']] = true;
+        }
+    }
+
+    if(count($map_rental_units_ids)) {
+        $cron->schedule(
+            "channelmanager.check-contingencies.{$params['id']}",
+            time(),
+            'sale_booking_check-contingencies',
+            [
+                'date_from'         => date('c', $booking['date_from']),
+                'date_to'           => date('c', $booking['date_to']),
+                'rental_units_ids'  => array_keys($map_rental_units_ids)
+            ]
+        );
+    }
+}
 
 $context->httpResponse()
         ->status(204)
