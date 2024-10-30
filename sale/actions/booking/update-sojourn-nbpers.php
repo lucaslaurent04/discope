@@ -93,6 +93,9 @@ BookingLineGroup::refreshMealPreferences($orm, $group['id']);
 // refresh price_id, qty and price for all lines
 BookingLineGroup::refreshLines($orm, $group['id']);
 
+// handle auto assignment of rental units (depending on center office prefs)
+BookingLineGroup::refreshRentalUnitsAssignments($orm, $group['id']);
+
 BookingLineGroup::refreshPrice($orm, $group['id']);
 Booking::refreshPrice($orm, $group['booking_id']['id']);
 
