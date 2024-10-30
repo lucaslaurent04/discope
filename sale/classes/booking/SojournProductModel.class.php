@@ -76,9 +76,10 @@ class SojournProductModel extends Model {
     public static function calcQty($om, $ids, $lang) {
         $result = [];
         $models = $om->read(self::getType(), $ids, ['rental_unit_assignments_ids.qty'], $lang);
-        foreach($models as $oid => $model) {
+        foreach($models as $id => $model) {
+            $result[$id] = 0;
             if($model['rental_unit_assignments_ids.qty']) {
-                $result[$oid] = array_reduce((array) $model['rental_unit_assignments_ids.qty'], function($c, $a) { return $a['qty'] + $c; }, 0);
+                $result[$id] = array_reduce((array) $model['rental_unit_assignments_ids.qty'], function($c, $a) { return $a['qty'] + $c; }, 0);
             }
         }
         return $result;
@@ -87,8 +88,8 @@ class SojournProductModel extends Model {
     public static function calcIsAccomodation($om, $ids, $lang) {
         $result = [];
         $models = $om->read(self::getType(), $ids, ['product_model_id.is_accomodation'], $lang);
-        foreach($models as $oid => $model) {
-            $result[$oid] = $model['product_model_id.is_accomodation'];
+        foreach($models as $id => $model) {
+            $result[$id] = $model['product_model_id.is_accomodation'];
         }
         return $result;
     }
