@@ -83,6 +83,15 @@ class Contact extends \identity\Partner {
                 'default'           => 'booking'
             ],
 
+            'origin' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'auto',          // contact imported from customer contacts
+                    'manual'         // manually created contact
+                ],
+                'default'           => 'manual'
+            ],
+
             'is_direct_contact' => [
                 'type'              => 'boolean',
                 'description'       => 'The new contact for the person responsible for the guest list.',
