@@ -287,7 +287,7 @@ $values = [
     'center_email'          => $booking['center_id']['email'],
     'center_signature'      => $booking['center_id']['organisation_id']['signature'],
     'center_office'         => $center_office_code,
-    'period'                => date('d/m/Y', $booking['date_from']) . ' print-contract.php' .date('H:i', $booking['time_from']).' - '.date('d/m/Y', $booking['date_to']).' '.date('H:i', $booking['time_to']),
+    'period'                => date('d/m/Y', $booking['date_from']).' '.date('H:i', $booking['time_from']).' - '.date('d/m/Y', $booking['date_to']).' '.date('H:i', $booking['time_to']),
 
     'price'                 => $contract['price'],
     'total'                 => $contract['total'],
@@ -660,7 +660,7 @@ foreach($lines as $line) {
 foreach($booking['contacts_ids'] as $contact) {
     if(strlen($values['contact_name']) == 0 || $contact['type'] == 'booking') {
         // overwrite data of customer with contact info
-        $values['contact_name'] = str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title']) . ' print-contract.php' . $contact['partner_identity_id']['display_name'];
+        $values['contact_name'] = str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title']) . ' ' . $contact['partner_identity_id']['display_name'];
         $values['contact_phone'] = (strlen($contact['partner_identity_id']['phone']))?$contact['partner_identity_id']['phone']:$contact['partner_identity_id']['mobile'];
         $values['contact_email'] = $contact['partner_identity_id']['email'];
     }
@@ -910,7 +910,7 @@ try {
     $currency = Setting::get_value('core', 'units', 'currency', '€');
     // #todo - temp workaround against LOCALE mixups
     $filter = new \Twig\TwigFilter('format_money', function ($value) use($currency) {
-        return number_format((float)($value), 2, ",", ".") . ' print-contract.php' .$currency;
+        return number_format((float)($value), 2, ",", ".") . ' ' .$currency;
     });
     $twig->addFilter($filter);
 
