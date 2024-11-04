@@ -51,7 +51,8 @@ $group = BookingLineGroup::id($params['id'])
         'name',
         'nb_pers',
         'date_from',
-        'booking_id' => ['id', 'status']
+        'booking_id' => ['id', 'status'],
+        'age_range_assignments_ids'
     ])
     ->first(true);
 
@@ -68,6 +69,10 @@ if(!$group) {
     throw new Exception("unknown_sojourn", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
+if(count($group['id']) < 2) {
+    throw new Exception("mandatory_age_range_assignment", EQ_ERROR_INVALID_PARAM);
+}
+
 if(!in_array($group['booking_id']['status'], ['quote', 'checkedout']) && !$group['is_extra']) {
     throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
@@ -76,6 +81,7 @@ if(!$age_range_assignment) {
     throw new Exception("unknown_age_range_assignment", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
+
 // Callbacks are defined on Booking, BookingLine, and BookingLineGroup to ensure consistency across these entities.
 // While these callbacks are useful for maintaining data integrity (they and are used in tests),
 // they need to be disabled here to prevent recursive cycles that could lead to deep cycling issues.
@@ -83,7 +89,41 @@ $orm->disableEvents();
 
 BookingLineGroupAgeRangeAssignment::id($params['age_range_assignment_id'])->delete(true);
 
-eQual::run('do', 'sale_booking_update-sojourn-nbpers', ['id' => $params['id'], 'nb_pers' => $group['nb_pers'] - $age_range_assignment['qty']]);
+BookingLineGroup::id($group['id'])
+    ->update([
+        'nb_pers' => $group['nb_pers'] - $age_range_assignment['qty']
+    ]);
+
+// #memo - this impacts autosales at booking level
+Booking::refreshNbPers($orm, $group['booking_id']['id']);
+// #memo - this might create new groups
+Booking::refreshAutosaleProducts($orm, $group['booking_id']['id']);
+
+// #memo - this might create new lines
+BookingLineGroup::refreshAutosaleProducts($orm, $group['id']);
+
+// #memo - here we don't refresh Age Range assignments
+
+/*
+    #memo - adapters depend on date_from, nb_nights, nb_pers, nb_children
+        rate_class_id,
+        center_id.discount_list_category_id,
+        center_office_id.freebies_manual_assignment,
+    and are applied both on group and each of its lines
+*/
+BookingLineGroup::refreshPriceAdapters($orm, $group['id']);
+
+BookingLineGroup::refreshMealPreferences($orm, $group['id']);
+
+// refresh price_id, qty and price for all lines
+BookingLineGroup::refreshLines($orm, $group['id']);
+
+// handle auto assignment of rental units (depending on center office prefs)
+BookingLineGroup::refreshRentalUnitsAssignments($orm, $group['id']);
+
+BookingLineGroup::refreshPrice($orm, $group['id']);
+Booking::refreshPrice($orm, $group['booking_id']['id']);
+
 
 // restore events in case this controller is chained with others
 $orm->enableEvents();
