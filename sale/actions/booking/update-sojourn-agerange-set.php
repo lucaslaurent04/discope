@@ -61,6 +61,7 @@ $group = BookingLineGroup::id($params['id'])
     ->read([
         'id', 'is_extra',
         'name',
+        'has_pack',
         'nb_pers',
         'date_from',
         'booking_id' => ['id', 'status']
@@ -127,6 +128,12 @@ BookingLineGroup::id($group['id'])
 Booking::refreshNbPers($orm, $group['booking_id']['id']);
 // #memo - this might create new groups
 Booking::refreshAutosaleProducts($orm, $group['booking_id']['id']);
+
+if($group['has_pack']) {
+    // append/refresh lines based on pack configuration
+    BookingLineGroup::refreshPack($orm, $group['id']);
+}
+
 // #memo - this might create new lines
 BookingLineGroup::refreshAutosaleProducts($orm, $group['id']);
 
@@ -138,10 +145,14 @@ BookingLineGroup::refreshAutosaleProducts($orm, $group['id']);
     and are applied both on group and each of its lines
 */
 BookingLineGroup::refreshPriceAdapters($orm, $group['id']);
+
 BookingLineGroup::refreshMealPreferences($orm, $group['id']);
 
 // refresh price_id, qty and price for all lines
 BookingLineGroup::refreshLines($orm, $group['id']);
+
+// handle auto assignment of rental units (depending on center office prefs)
+BookingLineGroup::refreshRentalUnitsAssignments($orm, $group['id']);
 
 BookingLineGroup::refreshPrice($orm, $group['id']);
 Booking::refreshPrice($orm, $group['booking_id']['id']);

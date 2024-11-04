@@ -99,13 +99,13 @@ BookingLineGroup::id($group['id'])
 // #memo - this impacts autosales at booking level
 Booking::refreshNbPers($orm, $group['booking_id']['id']);
 
+// #memo - this might create new groups
+Booking::refreshAutosaleProducts($orm, $group['booking_id']['id']);
+
 if($group['has_pack']) {
     // append/refresh lines based on pack configuration
     BookingLineGroup::refreshPack($orm, $group['id']);
 }
-
-// #memo - this might create new groups
-Booking::refreshAutosaleProducts($orm, $group['booking_id']['id']);
 
 // #memo - this might create new lines
 BookingLineGroup::refreshAutosaleProducts($orm, $group['id']);
