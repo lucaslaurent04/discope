@@ -69,7 +69,7 @@ if(!$group) {
     throw new Exception("unknown_sojourn", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-if(count($group['id']) < 2) {
+if(count($group['age_range_assignments_ids']) < 2) {
     throw new Exception("mandatory_age_range_assignment", EQ_ERROR_INVALID_PARAM);
 }
 
