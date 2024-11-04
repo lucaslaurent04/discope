@@ -273,7 +273,7 @@ $values = [
     'customer_has_vat'      => (int) $booking['customer_id']['partner_identity_id']['has_vat'],
     'customer_vat'          => $booking['customer_id']['partner_identity_id']['vat_number'],
 
-    'member'                => -contract . phpsubstr($member_name, 0, 33) . ((strlen($member_name) > 33) ? '...' : ''),
+    'member'                => substr($member_name, 0, 33) . ((strlen($member_name) > 33) ? '...' : ''),
     'date'                  => date('d/m/Y', $contract['created']),
     'code'                  => sprintf("%03d.%03d", intval($booking['name']) / 1000, intval($booking['name']) % 1000),
     'center'                => $booking['center_id']['name'],
