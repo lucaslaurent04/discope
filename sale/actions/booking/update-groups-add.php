@@ -40,7 +40,7 @@ list($context, $orm, $auth, $dispatch) = [ $providers['context'], $providers['or
 
 // ensure booking object exists and is readable
 $booking = Booking::id($params['id'])->read([
-        'id', 'name', 'date_from', 'date_to', 'booking_lines_groups_ids', 'center_office_id',
+        'id', 'name', 'status', 'date_from', 'date_to', 'booking_lines_groups_ids', 'center_office_id',
         'customer_id' => ['rate_class_id'],
         'center_id' => ['name', 'sojourn_type_id']]
     )
@@ -61,6 +61,10 @@ $values = [
     'date_from'  => ((int) $booking['date_from'] > 0) ? $booking['date_from'] : time(),
     'date_to'    => ((int) $booking['date_to'] > 0) ? $booking['date_to'] : time() + 86400
 ];
+
+if($booking['status'] != 'quote') {
+    $values['is_extra'] = true;
+}
 
 // default rate class is the rate_class of the customer of the booking
 if($booking['customer_id']['rate_class_id']) {
