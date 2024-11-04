@@ -50,6 +50,7 @@ $group = BookingLineGroup::id($params['id'])
     ->read([
         'id', 'is_extra',
         'name',
+        'has_pack',
         'nb_pers',
         'date_from',
         'booking_id' => ['id', 'status'],
@@ -97,6 +98,12 @@ BookingLineGroup::id($group['id'])
 
 // #memo - this impacts autosales at booking level
 Booking::refreshNbPers($orm, $group['booking_id']['id']);
+
+if($group['has_pack']) {
+    // append/refresh lines based on pack configuration
+    BookingLineGroup::refreshPack($orm, $group['id']);
+}
+
 // #memo - this might create new groups
 Booking::refreshAutosaleProducts($orm, $group['booking_id']['id']);
 
