@@ -2881,7 +2881,7 @@ class BookingLineGroup extends Model {
         $pack_product_models_ids = array_map(function($a) {return $a['child_product_model_id'];}, $pack_lines);
 
         // remove booking lines that are part of the pack (others might have been added manually, we leave them untouched)
-        $booking_lines = $om->read(\sale\booking\BookingLine::getType(), $group['booking_lines_ids'], ['product_id.product_model_id']);
+        $booking_lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], ['product_id.product_model_id']);
         if($booking_lines > 0) {
             $filtered_lines_ids = [];
             foreach($booking_lines as $lid => $line) {
@@ -3599,11 +3599,11 @@ class BookingLineGroup extends Model {
 
 
         $spms = $om->read(SojournProductModel::getType(), $group['sojourn_product_models_ids'], ['is_accomodation', 'product_model_id']);
-        $lines = $om->read(\sale\booking\BookingLine::getType(), $group['booking_lines_ids'], ['id', 'is_accomodation', 'product_model_id']);
+        $lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], ['id', 'is_accomodation', 'product_model_id']);
 
         foreach($spms as $sid => $spm) {
             // #memo - all rental units must be handled, even non-accomodation (ex.: meeting rooms)
-            foreach($lines as $lid => $line) {
+            foreach($lines as $line) {
                 if($line['product_model_id'] == $spm['product_model_id']) {
                     continue 2;
                 }
@@ -3742,10 +3742,10 @@ class BookingLineGroup extends Model {
         }
 
         // read children booking lines
-        $lines = $om->read(\sale\booking\BookingLine::getType(), $group['booking_lines_ids'], [
+        $lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], [
             'booking_id.center_id',
             'product_id',
-            'product_id.product_model_id',
+            'product_model_id',
             'qty_accounting_method',
             'is_rental_unit'
         ]);
@@ -3756,12 +3756,12 @@ class BookingLineGroup extends Model {
         if(count($lines)) {
 
             // read all related product models at once
-            $product_models_ids = array_map(function($oid) use($lines) {return $lines[$oid]['product_id.product_model_id'];}, array_keys($lines));
+            $product_models_ids = array_map(function($oid) use($lines) {return $lines[$oid]['product_model_id'];}, array_keys($lines));
             $product_models = $om->read('sale\catalog\ProductModel', $product_models_ids, ['is_accomodation', 'qty_accounting_method', 'rental_unit_assignement', 'capacity']);
 
             // pass-1 : withdraw persons assigned to units accounted by 'accomodation' from nb_pers, and create SPMs
             foreach($lines as $lid => $line) {
-                $product_model_id = $line['product_id.product_model_id'];
+                $product_model_id = $line['product_model_id'];
                 if($product_models[$product_model_id]['qty_accounting_method'] == 'accomodation') {
                     $nb_pers -= $product_models[$product_model_id]['capacity'];
                 }
