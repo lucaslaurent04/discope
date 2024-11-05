@@ -105,7 +105,7 @@ class Document extends Model {
         ];
     }
 
-    function calcReadableSize($om, $oids, $lang) {
+    public static function calcReadableSize($om, $oids, $lang) {
         $res = $om->read(__CLASS__, $oids, ['size']);
         $precision = 1;
         $suffixes = array('B', 'KB', 'MB', 'GB');
