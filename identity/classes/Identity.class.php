@@ -822,7 +822,9 @@ class Identity extends Model {
 
         if($identities > 0) {
             foreach($identities as $oid => $identity) {
-                if(!in_array($identity['reference_partner_id.partner_identity_id'], array_map( function($a) { return $a['partner_identity_id']; }, (array) $identity['contacts_ids.partner_identity_id']))) {
+                if(isset($identity['reference_partner_id.partner_identity_id'])
+                    && !in_array($identity['reference_partner_id.partner_identity_id'], array_map( function($a) { return $a['partner_identity_id']; }, (array) $identity['contacts_ids.partner_identity_id']))
+                ) {
                     // create a contact with the customer as 'booking' contact
                     $om->create('identity\Partner', [
                         'owner_identity_id'     => $oid,
