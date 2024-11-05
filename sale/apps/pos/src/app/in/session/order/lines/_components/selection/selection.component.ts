@@ -99,7 +99,7 @@ export class SessionOrderLinesSelectionComponent implements OnInit {
             this.productsDataSource.paginator = this.productsPaginator;
         }
         catch(response) {
-            console.log('error while retrieveing products.', response);
+            console.log('error while retrieving products.', response);
         }
     }
 
