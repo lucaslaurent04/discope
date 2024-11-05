@@ -1103,7 +1103,9 @@ class Booking extends Model {
                 if($identity_contacts_ids > 0 && count($identity_contacts_ids) > 0) {
                     $contacts = $om->read(\identity\Contact::getType(), $identity_contacts_ids, ['partner_identity_id']);
                     foreach($contacts as $cid => $contact) {
-                        $partners_ids[] = $contact['partner_identity_id'];
+                        if($contact['partner_identity_id']) {
+                            $partners_ids[] = $contact['partner_identity_id'];
+                        }
                     }
                 }
                 // append customer identity's own contact
@@ -1113,6 +1115,9 @@ class Booking extends Model {
                 $partners_ids = array_slice(array_diff($partners_ids, $existing_partners_ids), 0, 5);
                 // create booking contacts
                 foreach($partners_ids as $partner_id) {
+                    if(!$partner_id) {
+                        continue;
+                    }
                     $om->create(\sale\booking\Contact::getType(), [
                         'booking_id'            => $bid,
                         'owner_identity_id'     => $booking['customer_identity_id'],
