@@ -1398,7 +1398,6 @@ class Booking extends Model {
 
         $bookings = $om->read(self::getType(), $id, [
             'id',
-            'type_id',
             'booking_lines_groups_ids',
             'booking_lines_ids'
         ]);
@@ -1410,7 +1409,7 @@ class Booking extends Model {
         $booking = reset($bookings);
 
         // within checks, compare with currently assigned type
-        $type_id = $booking['type_id'];
+        $type_id = 1;
 
 
         // pass-1 - check at group level
@@ -1444,14 +1443,14 @@ class Booking extends Model {
                 }
             }
 
-            if($type_id != $booking['type_id']) {
+            if($type_id != 1) {
                 break;
             }
 
         }
 
         // pass-2 - check at lines level (if no new type found so far)
-        if($type_id == $booking['type_id']) {
+        if($type_id == 1) {
             $lines = $om->read(BookingLine::getType(), $booking['booking_lines_ids'], [
                 'id',
                 'product_id.product_model_id.booking_type_id'
@@ -1463,16 +1462,13 @@ class Booking extends Model {
                     $type_id = $line['product_id.product_model_id.booking_type_id'];
                 }
 
-                if($type_id != $booking['type_id']) {
+                if($type_id != 1) {
                     break;
                 }
             }
         }
 
-        if($type_id != $booking['type_id']) {
-            $om->update(self::getType(), $id, ['type_id' => $type_id]);
-        }
-
+        $om->update(self::getType(), $id, ['type_id' => $type_id]);
     }
 
 
@@ -1529,11 +1525,8 @@ class Booking extends Model {
             }
         }
 
-        if($is_tbc) {
-            // found price is TBC: mark booking as to be confirmed
-            $om->update(self::getType(), $id, ['is_price_tbc' => true]);
-        }
-
+        // mark booking according to found TBC flag
+        $om->update(self::getType(), $id, ['is_price_tbc' => $is_tbc]);
     }
 
     /**
