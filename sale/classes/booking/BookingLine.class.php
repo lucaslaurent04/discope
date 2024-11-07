@@ -812,6 +812,8 @@ class BookingLine extends Model {
      * If no value is found for a line, the result is not set.
      * #memo This method has the same format and behavior as regular calc_() methods but `price_id` is not a computed field.
      *
+     * #todo - should be deprecated and use refresh...() methods instead
+     *
      */
     public static function searchPriceIdUnpublished($om, $ids, $product_id) {
         $result = [];
