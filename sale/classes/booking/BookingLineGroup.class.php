@@ -2812,12 +2812,12 @@ class BookingLineGroup extends Model {
 
         // price_id is only relevant for packs
         if(!$group['has_pack']) {
-            continue;
+            return;
         }
 
         // ignore if pack is not marked as having its own price
         if(!isset($group['pack_id.product_model_id.has_own_price']) || !$group['pack_id.product_model_id.has_own_price']) {
-            continue;
+            return;
         }
 
         /*
