@@ -1475,6 +1475,67 @@ class Booking extends Model {
 
     }
 
+
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Updates is_price_tbc according to price lists targeted by packs and lines (if it includes non-published price list, then booking is marked as TBC).
+     */
+    public static function refreshIsTbc($om, $id) {
+        $bookings = $om->read(self::getType(), $id, [
+            'id',
+            'booking_lines_groups_ids',
+            'booking_lines_ids'
+        ]);
+
+        if($bookings <= 0) {
+            return;
+        }
+
+        $booking = reset($bookings);
+
+        $is_tbc = false;
+
+        // pass-1 - check at groups level
+        $groups = $om->read(BookingLineGroup::getType(), $booking['booking_lines_groups_ids'], [
+            'id',
+            'has_pack',
+            'price_id.price_list_id.status',
+        ]);
+
+        foreach($groups as $gid => $group) {
+            if(!$group['has_pack'] || !isset($group['price_id.price_list_id.status'])) {
+                continue;
+            }
+            if($group['price_id.price_list_id.status'] != 'pending') {
+                $is_tbc = true;
+                break;
+            }
+        }
+
+        // pass-2 - check at lines level
+        if(!$is_tbc) {
+            $lines = $om->read(BookingLine::getType(), $booking['booking_lines_ids'], [
+                'id',
+                'price_id.price_list_id.status'
+            ]);
+
+            foreach($lines as $lid => $line) {
+                if(isset($line['price_id.price_list_id.status']) && $line['price_id.price_list_id.status'] != 'pending') {
+                    $is_tbc = true;
+                    break;
+                }
+            }
+        }
+
+        if($is_tbc) {
+            // found price is TBC: mark booking as to be confirmed
+            $om->update(self::getType(), $id, ['is_price_tbc' => true]);
+        }
+
+    }
+
     /**
      * This method is called by `update-sojourn-[...]` controllers.
      * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
