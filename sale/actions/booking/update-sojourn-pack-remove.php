@@ -4,6 +4,7 @@
     Author: Yesbabylon SRL, 2020-2022
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+use sale\booking\Booking;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\booking\SojournProductModel;
