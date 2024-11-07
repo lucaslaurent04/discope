@@ -75,8 +75,8 @@ BookingLine::ids($group['booking_lines_ids'])->delete(true);
 
 SojournProductModel::ids($group['sojourn_product_models_ids'])->delete(true);
 
-// reset lock and pack_id
-BookingLineGroup::id($group['id'])->update(['is_locked' => false, 'pack_id' => null ]);
+// reset attributes related to pack
+BookingLineGroup::id($group['id'])->update(['is_locked' => false, 'has_pack' => false, 'pack_id' => null ]);
 
 BookingLineGroup::refreshPrice($orm, $group['id']);
 
