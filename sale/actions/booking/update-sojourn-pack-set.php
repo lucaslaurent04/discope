@@ -106,8 +106,10 @@ if($pack['product_model_id']['qty_accounting_method'] == 'accomodation' && $pack
             'nb_pers' =>  $pack['product_model_id']['capacity']
         ]);
     Booking::refreshNbPers($orm, $group['booking_id']['id']);
-    Booking::refreshAutosaleProducts($orm, $group['booking_id']['id']);
 }
+
+// #memo - this must remain out of conditions blocks for supporting various cases
+Booking::refreshAutosaleProducts($orm, $group['booking_id']['id']);
 
 // append new lines based on pack configuration
 BookingLineGroup::refreshPack($orm, $group['id']);
@@ -131,8 +133,14 @@ BookingLineGroup::refreshLines($orm, $group['id']);
 // handle auto assignment of rental units (depending on center office prefs)
 BookingLineGroup::refreshRentalUnitsAssignments($orm, $group['id']);
 
+// #memo - this only affects Groups that relate to a model marked with `has_own_price`
+BookingLineGroup::refreshPriceId($orm, $group['id']);
+
 BookingLineGroup::refreshPrice($orm, $group['id']);
+
+// #memo - booking type might be impacted by the chosen pack or one of its lines
 Booking::refreshBookingType($orm, $group['booking_id']['id']);
+
 Booking::refreshPrice($orm, $group['booking_id']['id']);
 
 // restore events in case this controller is chained with others

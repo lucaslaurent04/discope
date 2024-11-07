@@ -96,6 +96,8 @@ BookingLineGroup::refreshRentalUnitsAssignments($orm, $group['id']);
 BookingLineGroup::refreshPrice($orm, $group['id']);
 
 Booking::refreshPrice($orm, $group['booking_id']['id']);
+
+// #memo - for booking date_from and date_to respectively match the first and the last date of all sojourns
 Booking::refreshDate($orm, $group['booking_id']['id']);
 
 // restore events in case this controller is chained with others

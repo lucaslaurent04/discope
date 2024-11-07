@@ -2792,6 +2792,95 @@ class BookingLineGroup extends Model {
     }
 
     /**
+     * This applies only to groups (sojourns) that act as a single product (i.e. locked pack with own price)
+     */
+	public static function refreshPriceId($om, $id) {
+        $groups = $om->read(self::getType(), $id, [
+            'has_pack',
+            'date_from',
+            'pack_id',
+            'pack_id.product_model_id.has_own_price',
+            'booking_id',
+            'booking_id.center_id.price_list_category_id'
+        ]);
+
+        if($groups <= 0) {
+            return;
+        }
+
+        $group = reset($groups);
+
+        // price_id is only relevant for packs
+        if(!$group['has_pack']) {
+            continue;
+        }
+
+        // ignore if pack is not marked as having its own price
+        if(!isset($group['pack_id.product_model_id.has_own_price']) || !$group['pack_id.product_model_id.has_own_price']) {
+            continue;
+        }
+
+        /*
+            Find the Price List that matches the criteria from the booking with the shortest duration
+        */
+        $price_lists_ids = $om->search(
+            'sale\price\PriceList', [
+                [
+                    ['price_list_category_id', '=', $group['booking_id.center_id.price_list_category_id']],
+                    ['date_from', '<=', $group['date_from']],
+                    ['date_to', '>=', $group['date_from']],
+                    ['status', 'in', ['pending', 'published']]
+                ],
+                // #todo - quick workaround for inclusion of GA pricelist
+                [
+                    ['price_list_category_id', '=', 9],
+                    ['date_from', '<=', $group['date_from']],
+                    ['date_to', '>=', $group['date_from']],
+                    ['status', 'in', ['pending', 'published']]
+                ]
+            ],
+            ['duration' => 'asc']
+        );
+
+        $selected_price_id = 0;
+
+        /*
+            Search for a matching Price within the found Price Lists
+        */
+        if($price_lists_ids > 0 && count($price_lists_ids)) {
+            // check status and, if 'pending', evaluate if there is a 'published' alternative
+            $price_lists = $om->read(\sale\price\PriceList::getType(), $price_lists_ids, [ 'status' ]);
+
+            foreach($price_lists as $price_list_id => $price_list) {
+                $prices_ids = $om->search(\sale\price\Price::getType(), [ ['price_list_id', '=', $price_list_id], ['product_id', '=', $group['pack_id']] ]);
+                if($prices_ids > 0 && count($prices_ids)) {
+                    $selected_price_id = reset($prices_ids);
+                    if($price_list['status'] != 'pending') {
+                        // first matching published price is always preferred: stop searching
+                        break;
+                    }
+                    // keep on looping until we reach end of candidates or we find one with status 'published'
+                }
+            }
+        }
+        else {
+            $date = date('Y-m-d', $group['date_from']);
+            trigger_error("ORM::no price list candidates for group pack {$group['pack_id']} for date {$date}", QN_REPORT_WARNING);
+        }
+
+        if($selected_price_id > 0) {
+            // assign found Price to current group
+            $om->update(self::getType(), $id, ['price_id' => $selected_price_id, 'vat_rate' => null, 'unit_price' => null]);
+        }
+        else {
+            $om->update(self::getType(), $id, ['price_id' => null, 'vat_rate' => 0.00, 'unit_price' => 0.00]);
+            $date = date('Y-m-d', $group['date_from']);
+            trigger_error("ORM::no matching price found for group pack {$group['pack_id']} for date {$date}", QN_REPORT_WARNING);
+        }
+
+    }
+
+    /**
      * This method is called by `update-sojourn-[...]` controllers.
      * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
      */
@@ -2979,7 +3068,7 @@ class BookingLineGroup extends Model {
                     // #memo - price_id and qty are auto assigned upon line assignation to a product
                     $om->update('sale\booking\BookingLine', $lid, $line);
                     $om->update(self::getType(), $id, ['booking_lines_ids' => ["+$lid"] ]);
-                    // #kaleo - special case for school sojourn: adults use children price
+                    // #kaleo - special case for school sojourn (adults use children prices)
                     if($age_range_id == $children_age_range_id) {
                         $lines = $om->read('sale\booking\BookingLine', $lid, ['price_id']);
                         $line = reset($lines);
@@ -2992,7 +3081,7 @@ class BookingLineGroup extends Model {
             }
         }
 
-        // pass-2 : for school sojourns only - update price_id according to product model
+        // pass-2 : for school sojourns only - update price_id of the lines according to their product model (adults use children prices)
         if($group['pack_id.product_model_id.booking_type_id.code'] == 'SEJ') {
             $lines = $om->read('sale\booking\BookingLine', $new_lines_ids, ['product_model_id', 'price_id']);
             foreach($lines as $lid => $line) {
@@ -3150,7 +3239,8 @@ class BookingLineGroup extends Model {
 					&& isset($group['pack_id.product_model_id.booking_type_id.code'])
 					&& $group['pack_id.product_model_id.booking_type_id.code'] == 'SEJ'
 					&& $autosale['product_id.sku'] == 'KA-CTaxSej-A'
-					&& !$center['has_citytax_school']) {
+					&& !$center['has_citytax_school']
+                ) {
 					continue;
 				}
 
@@ -3179,7 +3269,9 @@ class BookingLineGroup extends Model {
 					}
 					trigger_error(" testing {$operand} {$operator} {$value}", QN_REPORT_DEBUG);
 					$valid = $valid && (bool) eval("return ( {$operand} {$operator} {$value});");
-					if(!$valid) break;
+					if(!$valid) {
+                        break;
+                    }
 				}
 				if($valid) {
 					trigger_error("ORM:: all conditions fullfilled", QN_REPORT_DEBUG);
