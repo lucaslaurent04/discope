@@ -1362,6 +1362,7 @@ class BookingLine extends Model {
             Find the Price List that matches the criteria from the booking (shortest duration first)
         */
         if(!$found) {
+            // #todo - leave TBC handling to Booking::refreshIsTbc()
             $is_tbc = false;
             $selected_price_id = 0;
 
