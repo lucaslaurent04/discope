@@ -208,6 +208,7 @@ class Payment extends \sale\pay\Payment {
      * @return array    Associative array mapping fields with their resulting values.
      */
     public static function onchange($om, $event, $values, $lang='en') {
+        $result = [];
         if(isset($event['funding_id'])) {
             $fundings = $om->read(Funding::getType(), $event['funding_id'],
                 [
@@ -240,6 +241,7 @@ class Payment extends \sale\pay\Payment {
                 $result['amount'] = $max;
             }
         }
+        return $result;
     }
 
 
