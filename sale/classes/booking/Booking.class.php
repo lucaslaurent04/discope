@@ -1504,7 +1504,7 @@ class Booking extends Model {
             if(!$group['has_pack'] || !isset($group['price_id.price_list_id.status'])) {
                 continue;
             }
-            if($group['price_id.price_list_id.status'] != 'pending') {
+            if($group['price_id.price_list_id.status'] != 'published') {
                 $is_tbc = true;
                 break;
             }
@@ -1518,7 +1518,7 @@ class Booking extends Model {
             ]);
 
             foreach($lines as $lid => $line) {
-                if(isset($line['price_id.price_list_id.status']) && $line['price_id.price_list_id.status'] != 'pending') {
+                if(isset($line['price_id.price_list_id.status']) && $line['price_id.price_list_id.status'] != 'published') {
                     $is_tbc = true;
                     break;
                 }
@@ -1713,7 +1713,11 @@ class Booking extends Model {
                         'has_own_qty'               => $product['has_own_qty'],
                         'qty'                       => $product['qty']
                     ];
-                    $om->create('sale\booking\BookingLine', $line);
+                    $lid = $om->create('sale\booking\BookingLine', $line);
+                    if($lid > 0) {
+                        // resolve price
+                        BookingLine::refreshPriceId($om, $lid);
+                    }
                 }
             }
         }
