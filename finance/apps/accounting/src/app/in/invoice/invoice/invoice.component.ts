@@ -118,14 +118,14 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
     public languages: any[] = [];
 
     // #memo - we need to keep both the ID and the code of the selected language
-    private lang_id: number = 0;
+    private lang_id: number = 2;
+    public lang: string = 'fr';
 
-    public lang: string = '';
     public mode:string = 'simple';
     public title: string = '';
     public message: string = '';
     public sender: string = '';
-    public recipient: string = '';    
+    public recipient: string = '';
 
 
     public vm: vmModel;
@@ -183,7 +183,7 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
         this.vm.title.formControl.valueChanges.pipe(debounceTime(300)).subscribe( (title:string) => this.title = title);
         this.vm.message.formControl.valueChanges.pipe(debounceTime(500)).subscribe( (message:string) => this.message = message);
         this.vm.sender.formControl.valueChanges.subscribe( (sender:string) => this.sender = sender);
-        this.vm.recipient.formControl.valueChanges.subscribe( (recipient:string) => this.recipient = recipient);                
+        this.vm.recipient.formControl.valueChanges.subscribe( (recipient:string) => this.recipient = recipient);
     }
 
     /**
@@ -582,7 +582,7 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
 
     public onclickBooking() {
         let descriptor:any = {
-            context_silent: true, // do not update sidebar            
+            context_silent: true, // do not update sidebar
             context: {
                 entity: 'sale\\booking\\Booking',
                 type: 'form',
@@ -600,12 +600,12 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
 
         // prevent angular lifecycles while a context is open
         this.cd.detach();
-        this.context.change(descriptor);        
+        this.context.change(descriptor);
     }
 
     public onclickCustomer() {
         let descriptor:any = {
-            context_silent: true, // do not update sidebar            
+            context_silent: true, // do not update sidebar
             context: {
                 entity: 'sale\\customer\\Customer',
                 type: 'form',
@@ -623,6 +623,6 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
 
         // prevent angular lifecycles while a context is open
         this.cd.detach();
-        this.context.change(descriptor);          
+        this.context.change(descriptor);
     }
 }
