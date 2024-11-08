@@ -910,6 +910,7 @@ class Identity extends Model {
             $list = self::_getCitiesByZip($event['address_zip'], $values['address_country'], $lang);
             if($list) {
                 $result['address_city'] = [
+                    'value' => '',
                     'selection' => $list
                 ];
             }
