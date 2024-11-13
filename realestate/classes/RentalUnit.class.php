@@ -6,6 +6,8 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace realestate;
+
+use core\setting\Setting;
 use equal\orm\Model;
 
 class RentalUnit extends Model {
@@ -201,7 +203,7 @@ class RentalUnit extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\SojournType',
                 'description'       => 'Default sojourn type of the rental unit.',
-                'default'           => 1,
+                'default'           => 'defaultSojournTypeId',
                 'visible'           => ['is_accomodation', '=', true]
             ],
 
@@ -341,6 +343,10 @@ class RentalUnit extends Model {
         }
 
         return $result;
+    }
+
+    public static function defaultSojournTypeId() {
+        return Setting::get_value('realestate', 'default.rental_unit', 'sojourn_type_id', null);
     }
 
     public static function generateName() {
