@@ -6,6 +6,8 @@
 */
 namespace identity;
 
+use core\setting\Setting;
+
 class Center extends \identity\Establishment {
 
     public static function getName() {
@@ -34,7 +36,7 @@ class Center extends \identity\Establishment {
             'use_office_details' => [
                 'type'              => 'boolean',
                 'description'       => "Use the Center Group contact details in booking communications (instead of the ones of the center)?",
-                'default'           => false
+                'default'           => 'defaultUseOfficeDetails'
             ],
 
             /*
@@ -143,7 +145,8 @@ class Center extends \identity\Establishment {
             'pos_default_customer_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\Customer',
-                'description'       => 'Default customer for sales at POS.'
+                'description'       => 'Default customer for sales at POS.',
+                'default'           => 'defaultPosDefaultCustomerId'
             ],
 
             'extref_property_id' => [
@@ -154,7 +157,7 @@ class Center extends \identity\Establishment {
             'has_citytax_school' => [
                 'type'              => 'boolean',
                 'description'       => "The center has the tourist tax for school stays?",
-                'default'           => false
+                'default'           => 'defaultHasCitytaxSchool'
             ],
 
             'consumptions_meters_ids' => [
@@ -174,7 +177,6 @@ class Center extends \identity\Establishment {
         ];
     }
 
-
     public static function getConstraints() {
         return array_merge(parent::getConstraints(), [
             'code_alpha' =>  [
@@ -186,5 +188,17 @@ class Center extends \identity\Establishment {
                 ]
             ]
         ]);
+    }
+
+    public static function defaultUseOfficeDetails() {
+        return Setting::get_value('identity', 'default.center', 'use_office_details', false);
+    }
+
+    public static function defaultPosDefaultCustomerId() {
+        return Setting::get_value('identity', 'default.center', 'pos_default_customer_id', null);
+    }
+
+    public static function defaultHasCitytaxSchool() {
+        return Setting::get_value('identity', 'default.center', 'has_citytax_school', false);
     }
 }
