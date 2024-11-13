@@ -143,18 +143,18 @@ class CenterOffice extends \identity\Establishment {
     }
 
     public static function defaultDocsDefaultMode() {
-        return Setting::get_value('identity', 'default.center_office', 'docs_default_mode', 'simple');
+        return Setting::get_value('identity', 'default', 'center_office.docs_default_mode', 'simple');
     }
 
     public static function defaultPrinterType() {
-        return Setting::get_value('identity', 'default.center_office', 'printer_type', 'iso-a4');
+        return Setting::get_value('identity', 'default', 'center_office.printer_type', 'iso-a4');
     }
 
     public static function defaultRentalunitsManualAssignment() {
-        return Setting::get_value('identity', 'default.center_office', 'rentalunits_manual_assignment', false);
+        return Setting::get_value('identity', 'default', 'center_office.rentalunits_manual_assignment', false);
     }
 
     public static function defaultFreebiesManualAssignment() {
-        return Setting::get_value('identity', 'default.center_office', 'freebies_manual_assignment', false);
+        return Setting::get_value('identity', 'default', 'center_office.freebies_manual_assignment', false);
     }
 }
