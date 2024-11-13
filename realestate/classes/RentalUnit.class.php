@@ -346,7 +346,7 @@ class RentalUnit extends Model {
     }
 
     public static function defaultSojournTypeId() {
-        return Setting::get_value('realestate', 'default.rental_unit', 'sojourn_type_id', null);
+        return Setting::get_value('realestate', 'default', 'rental_unit.sojourn_type_id', 1);
     }
 
     public static function generateName() {

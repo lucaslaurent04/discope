@@ -192,14 +192,14 @@ class Center extends \identity\Establishment {
     }
 
     public static function defaultUseOfficeDetails() {
-        return Setting::get_value('identity', 'default.center', 'use_office_details', false);
+        return Setting::get_value('identity', 'default', 'center.use_office_details', false);
     }
 
     public static function defaultPosDefaultCustomerId() {
-        return Setting::get_value('identity', 'default.center', 'pos_default_customer_id', null);
+        return Setting::get_value('identity', 'default', 'center.pos_default_customer_id', null);
     }
 
     public static function defaultHasCitytaxSchool() {
-        return Setting::get_value('identity', 'default.center', 'has_citytax_school', false);
+        return Setting::get_value('identity', 'default', 'center.has_citytax_school', false);
     }
 }
