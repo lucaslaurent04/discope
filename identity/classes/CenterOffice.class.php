@@ -6,7 +6,6 @@
 */
 namespace identity;
 
-use core\setting\Setting;
 use equal\data\DataGenerator;
 
 class CenterOffice extends \identity\Establishment {
@@ -78,7 +77,8 @@ class CenterOffice extends \identity\Establishment {
                     'detailed'
                 ],
                 'description'       => 'Default mode to use when rendering official documents.',
-                'default'           => 'defaultDocsDefaultMode'
+                'default'           => 'defaultFromSetting',
+                'setting_default'   => 'simple'
             ],
 
             'printer_type' => [
@@ -88,19 +88,22 @@ class CenterOffice extends \identity\Establishment {
                     'iso-a4'
                 ],
                 'description'       => 'Printer format to be used for PoS tickets.',
-                'default'           => 'defaultPrinterType'
+                'default'           => 'defaultFromSetting',
+                'setting_default'   => 'iso-a4'
             ],
 
             'rentalunits_manual_assignment' => [
                 'type'              => 'boolean',
                 'description'       => 'Flag for forcing manual assignment of the rental units during booking.',
-                'default'           => 'defaultRentalunitsManualAssignment'
+                'default'           => 'defaultFromSetting',
+                'setting_default'   => false
             ],
 
             'freebies_manual_assignment' => [
                 'type'              => 'boolean',
                 'description'       => 'Deprecated. Flag for forcing manual assignment of the freebies during booking.',
-                'default'           => 'defaultFreebiesManualAssignment'
+                'default'           => 'defaultFromSetting',
+                'setting_default'   => false
             ],
 
             'accounting_journals_ids' => [
@@ -140,21 +143,5 @@ class CenterOffice extends \identity\Establishment {
 
     public static function generateName() {
         return DataGenerator::legalName();
-    }
-
-    public static function defaultDocsDefaultMode() {
-        return Setting::get_value('identity', 'default', 'center_office.docs_default_mode', 'simple');
-    }
-
-    public static function defaultPrinterType() {
-        return Setting::get_value('identity', 'default', 'center_office.printer_type', 'iso-a4');
-    }
-
-    public static function defaultRentalunitsManualAssignment() {
-        return Setting::get_value('identity', 'default', 'center_office.rentalunits_manual_assignment', false);
-    }
-
-    public static function defaultFreebiesManualAssignment() {
-        return Setting::get_value('identity', 'default', 'center_office.freebies_manual_assignment', false);
     }
 }
