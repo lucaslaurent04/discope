@@ -8,6 +8,7 @@
 namespace sale\booking;
 use equal\orm\Model;
 use identity\Center;
+use sale\catalog\ProductModel;
 
 class BookingLineGroup extends Model {
 
@@ -2787,6 +2788,8 @@ class BookingLineGroup extends Model {
     /**
      * This method is called by `update-sojourn-[...]` controllers.
      * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Resets `total` and `price` computed fields.
      */
 	public static function refreshPrice($om, $id) {
         $om->update(self::getType(), $id, ['total' => null, 'price' => null]);
@@ -2794,6 +2797,13 @@ class BookingLineGroup extends Model {
 
     /**
      * This applies only to groups (sojourns) that act as a single product (i.e. locked pack with own price)
+     *
+     * Attempts to assign a 'price_id' on a given group, and resets 'vat_rate' and 'unit_price'.
+     * This applies only to groups marked as Pack (`has_pack`).
+     *
+     * Notes:
+     *  - The selected price list might be marked as 'pending' / to be confirmed).
+     *  - After a call to this method, `refreshIsTbc()` should be applied on the Parent Booking.
      */
 	public static function refreshPriceId($om, $id) {
         $groups = $om->read(self::getType(), $id, [
@@ -2884,6 +2894,8 @@ class BookingLineGroup extends Model {
     /**
      * This method is called by `update-sojourn-[...]` controllers.
      * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Resets the nb_night computed field.
      */
     public static function refreshNbNights($om, $id) {
         $om->update(self::getType(), $id, ['nb_nights' => null]);
@@ -2892,6 +2904,8 @@ class BookingLineGroup extends Model {
     /**
      * This method is called by `update-sojourn-[...]` controllers.
      * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Attempts to assign `is_sojourn` and `is_event` to consistent values, based on `group_type`.
      */
     public static function refreshType($om, $id) {
         $groups = $om->read(self::getType(), $id, ['group_type']);
@@ -2923,6 +2937,8 @@ class BookingLineGroup extends Model {
      * This method is called by `update-sojourn-[...]` controllers.
      * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
      *
+     * Resets lines according to PackLines assigned to it, according to `pack_id`.
+     * This only applies to groups marked as Pack (`has_pack`).
      */
     public static function refreshPack($om, $id) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:updatePack", QN_REPORT_DEBUG);
@@ -2932,6 +2948,7 @@ class BookingLineGroup extends Model {
             'booking_lines_ids',
             'age_range_assignments_ids',
             'nb_pers',
+            'has_pack',
             'pack_id.is_locked',
             'pack_id.has_age_range',
             'pack_id.age_range_id',
@@ -2946,7 +2963,10 @@ class BookingLineGroup extends Model {
 
         $group = reset($groups);
 
-        // #memo - we assume that current group has 'has_pack' set to true
+        // this is only relevant for groups marked as Pack
+        if(!$group['has_pack']) {
+            return;
+        }
 
         // 1) Update current group according to selected pack
 
@@ -3059,7 +3079,7 @@ class BookingLineGroup extends Model {
                     $line['has_own_duration'] = true;
                     $line['own_duration'] = $pack_line['own_duration'];
                 }
-                $lid = $om->create('sale\booking\BookingLine', [
+                $lid = $om->create(BookingLine::getType(), [
                     'booking_id'                => $group['booking_id'],
                     'booking_line_group_id'     => $id,
                 ]);
@@ -3067,11 +3087,11 @@ class BookingLineGroup extends Model {
                 if($lid > 0) {
                     $new_lines_ids[] = $lid;
                     // #memo - price_id and qty are auto assigned upon line assignation to a product
-                    $om->update('sale\booking\BookingLine', $lid, $line);
+                    $om->update(BookingLine::getType(), $lid, $line);
                     $om->update(self::getType(), $id, ['booking_lines_ids' => ["+$lid"] ]);
-                    // #kaleo - special case for school sojourn (adults use children prices)
+                    // #kaleo - special case for school sojourns (adults use children prices)
                     if($age_range_id == $children_age_range_id) {
-                        $lines = $om->read('sale\booking\BookingLine', $lid, ['price_id']);
+                        $lines = $om->read(BookingLine::getType(), $lid, ['price_id']);
                         $line = reset($lines);
                         $map_prices[$pack_line['child_product_model_id']] = $line['price_id'];
                     }
@@ -3082,17 +3102,64 @@ class BookingLineGroup extends Model {
             }
         }
 
+        // #kaleo - special case for school sojourns
         // pass-2 : for school sojourns only - update price_id of the lines according to their product model (adults use children prices)
         if($group['pack_id.product_model_id.booking_type_id.code'] == 'SEJ') {
-            $lines = $om->read('sale\booking\BookingLine', $new_lines_ids, ['product_model_id', 'price_id']);
+            $lines = $om->read(BookingLine::getType(), $new_lines_ids, ['product_model_id', 'price_id']);
             foreach($lines as $lid => $line) {
                 if(isset($map_prices[$line['product_model_id']]) && $line['price_id'] != $map_prices[$line['product_model_id']]) {
-                    $om->update('sale\booking\BookingLine', $lid, ['price_id' => $map_prices[$line['product_model_id']] ]);
+                    $om->update(BookingLine::getType(), $lid, ['price_id' => $map_prices[$line['product_model_id']] ]);
                 }
             }
         }
 
     }
+
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Attempts to assign Group `time_from` and `time_to` based on ProductModels relating to BookingLines marked as rental units.
+     */
+    public static function refreshTime($om, $id) {
+        $groups = $om->read(self::getType(), $id, ['booking_lines_id']);
+        if($groups <= 0) {
+            return;
+        }
+
+        $group = reset($groups);
+
+        $lines = $om->read(BookingLine::getType(), $group['booking_lines_id'], [
+                'is_rental_unit',
+                'product_id.product_model_id'
+            ]);
+
+        foreach($lines as $lid => $line) {
+
+            // if line is a rental unit, use its related product info to update parent group schedule, if possible
+            if($line['is_rental_unit']) {
+                $models = $om->read(ProductModel::getType(), $line['product_id.product_model_id'], ['type', 'service_type', 'schedule_type', 'schedule_default_value']);
+                if($models <= 0 ) {
+                    continue;
+                }
+                $model = reset($models);
+                if($model['type'] == 'service' && $model['service_type'] == 'schedulable' && $model['schedule_type'] == 'timerange') {
+                    // retrieve relative timestamps
+                    $schedule = $model['schedule_default_value'];
+                    if(strlen($schedule)) {
+                        $times = explode('-', $schedule);
+                        $parts = explode(':', $times[0]);
+                        $schedule_from = ($parts[0] * 3600) + ($parts[1] * 60);
+                        $parts = explode(':', $times[1]);
+                        $schedule_to = ($parts[0] * 3600) + ($parts[1] * 60);
+                        // update the parent group schedule
+                        $om->update(self::getType(), $id, ['time_from' => $schedule_from, 'time_to' => $schedule_to]);
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * This method is called by `update-sojourn-[...]` controllers.
@@ -3115,9 +3182,9 @@ class BookingLineGroup extends Model {
             $om->update(self::getType(), $id, ['nb_children' => null]);
 
             if($group['is_sojourn']) {
-                // create default age_range assignment
+                // create default age_range assignment (default to 'adult' age range)
                 $assignment = [
-                    'age_range_id'          => 1,                       // adults
+                    'age_range_id'          => 1,
                     'booking_line_group_id' => $id,
                     'booking_id'            => $group['booking_id'],
                     'qty'                   => $group['nb_pers']
@@ -3641,7 +3708,8 @@ class BookingLineGroup extends Model {
                             (
                                 $line['is_accomodation'] || $line['is_meal']
                             )
-                        ) ) {
+                        )
+                    ) {
                         trigger_error("ORM:: creating price adapter", QN_REPORT_DEBUG);
                         $factor = $group['nb_nights'];
 
