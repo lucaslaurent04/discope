@@ -3154,6 +3154,7 @@ class BookingLineGroup extends Model {
                         $schedule_to = ($parts[0] * 3600) + ($parts[1] * 60);
                         // update the parent group schedule
                         $om->update(self::getType(), $id, ['time_from' => $schedule_from, 'time_to' => $schedule_to]);
+                        break;
                     }
                 }
             }
