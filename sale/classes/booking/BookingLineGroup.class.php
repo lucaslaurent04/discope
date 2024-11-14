@@ -3122,14 +3122,14 @@ class BookingLineGroup extends Model {
      * Attempts to assign Group `time_from` and `time_to` based on ProductModels relating to BookingLines marked as rental units.
      */
     public static function refreshTime($om, $id) {
-        $groups = $om->read(self::getType(), $id, ['booking_lines_id']);
+        $groups = $om->read(self::getType(), $id, ['booking_lines_ids']);
         if($groups <= 0) {
             return;
         }
 
         $group = reset($groups);
 
-        $lines = $om->read(BookingLine::getType(), $group['booking_lines_id'], [
+        $lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], [
                 'is_rental_unit',
                 'product_id.product_model_id'
             ]);
