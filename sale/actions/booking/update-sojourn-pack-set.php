@@ -138,6 +138,7 @@ BookingLineGroup::refreshRentalUnitsAssignments($orm, $group['id']);
 // #memo - this only affects Groups that relate to a model marked with `has_own_price`
 BookingLineGroup::refreshPriceId($orm, $group['id']);
 
+// recompute the group price according to pack or new lines
 BookingLineGroup::refreshPrice($orm, $group['id']);
 
 // #memo - new lines have been added, that could be rental units relating to a product model set as schedulable service with its own schedule
