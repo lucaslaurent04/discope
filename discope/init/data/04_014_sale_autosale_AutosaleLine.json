@@ -1,0 +1,17 @@
+[
+    {
+        "name": "sale\\autosale\\AutosaleLine",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "description": "Taxe de séjour",
+                "has_own_qty": 0,
+                "qty": 1,
+                "scope": "group",
+                "product_id": 3,
+                "autosale_list_id": 1
+            }
+        ]
+    }
+]

@@ -1,0 +1,16 @@
+[
+    {
+        "name": "sale\\autosale\\AutosaleList",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "OR 2023",
+                "description": null,
+                "date_from": "2023-01-01",
+                "date_to": "2023-12-31",
+                "autosale_list_category_id": 1
+            }
+        ]
+    }
+]
