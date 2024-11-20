@@ -114,7 +114,7 @@ if($centers_ids) {
     $centers = Center::ids($centers_ids)->read(['name', 'rental_units_ids' => ['is_accomodation', 'capacity', 'parent_id']])->get();
 
     if($centers) {
-        // initialize results_map as an empty associative array of intervals map
+        // initialize map_results as an empty associative array of intervals map
         $index_map = [];
         $next_date = $params['range_from'];
         while($next_date < $params['range_to']) {
@@ -126,7 +126,7 @@ if($centers_ids) {
         }
     }
 
-    $results_map = [];
+    $map_results = [];
 
     foreach($centers_ids as $center_id) {
         $center = $centers[$center_id];
@@ -137,9 +137,9 @@ if($centers_ids) {
                 $capacity += $rental_unit['capacity'];
             }
         }
-        $results_map[$center_id] = [];
+        $map_results[$center_id] = [];
         foreach($index_map as $index => $days) {
-            $results_map[$center_id][$index] = [
+            $map_results[$center_id][$index] = [
                 'capacity'  => $capacity * $days,
                 'occupancy' => 0
             ];
@@ -175,12 +175,12 @@ if($centers_ids) {
                 continue;
             }
 
-            if(isset($results_map[$consumption['center_id']][$date_index]) && isset($rental_units[$consumption['rental_unit_id']]) ) {
+            if(isset($map_results[$consumption['center_id']][$date_index]) && isset($rental_units[$consumption['rental_unit_id']]) ) {
                 if($consumption['type'] == 'ooo') {
-                    $results_map[$consumption['center_id']][$date_index]['capacity'] -= $rental_units[$consumption['rental_unit_id']]['capacity'];
+                    $map_results[$consumption['center_id']][$date_index]['capacity'] -= $rental_units[$consumption['rental_unit_id']]['capacity'];
                 }
                 elseif($consumption['type'] == 'book') {
-                    $results_map[$consumption['center_id']][$date_index]['occupancy'] += $consumption['qty'];
+                    $map_results[$consumption['center_id']][$date_index]['occupancy'] += $consumption['qty'];
                 }
             }
 
@@ -192,7 +192,7 @@ if($centers_ids) {
         $results['legends'] = [];
         $results['datasets'] = [];
     }
-    foreach($results_map as $center_id => $map) {
+    foreach($map_results as $center_id => $map) {
         if($params['mode'] == 'chart') {
             $results['legends'][] = $centers[$center_id]['name'];
             $item = [];
@@ -224,7 +224,7 @@ if($centers_ids) {
     }
 
     if($params['all_centers']) {
-        usort($result, function ($a, $b) {
+        usort($results, function ($a, $b) {
             return strcmp($a['center'], $b['center']);
         });
     }
