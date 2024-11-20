@@ -38,10 +38,9 @@ jobs:
       # create an empty database
       - run: php run.php --do=init_db
       # initialize database with demo data
-      - run: php run.php --do=init_package --package=discope --import=true
+      - run: php run.php --do=init_package --package=discope
       # run test units
       - run: php run.php --do=test_package --package=core
-      - run: php run.php --do=test_package --package=discope
       # export logs on failure
       - run:
           command: |
