@@ -78,7 +78,7 @@ if(!$pack) {
 
 // Callbacks are defined on Booking, BookingLine, and BookingLineGroup to ensure consistency across these entities.
 // While these callbacks are useful for maintaining data integrity (they and are used in tests),
-// they need to be disabled here to prevent recursive cycles that could lead to deep cycling issues.
+// they need to be disabled here to prevent deep cycling that can lead to performance issues.
 $orm->disableEvents();
 
 BookingLineGroup::id($group['id'])->update([
@@ -147,6 +147,7 @@ BookingLineGroup::refreshTime($orm, $group['id']);
 // #memo - booking type might be impacted by the chosen pack or one of its lines
 Booking::refreshBookingType($orm, $group['booking_id']['id']);
 
+// recompute total price of the booking
 Booking::refreshPrice($orm, $group['booking_id']['id']);
 
 // #memo - if booking includes a price from an unpublished pricelist, it is marked as ToBeConfirmed (`is_price_tbc`)
