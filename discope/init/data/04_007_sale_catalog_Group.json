@@ -1,0 +1,15 @@
+[
+    {
+        "name": "sale\\catalog\\Group",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "state": "instance",
+                "name": "Group default",
+                "family_id": null,
+                "center_id": 1
+            }
+        ]
+    }
+]
