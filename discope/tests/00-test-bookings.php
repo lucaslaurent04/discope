@@ -103,10 +103,10 @@ $tests = [
                     $booking['price'] == $total_price_blg);
         },
         'rollback'          =>  function () {
-        //    Booking::search(['description', 'like', '%'. 'Booking test for a single client and multiple days'.'%'])->delete(true);
+           Booking::search(['description', 'like', '%'. 'Booking test for a single client and multiple days'.'%'])->delete(true);
         }
 
-    ],/*
+    ],
     '0002' => [
         'description'       =>  'Create a booking for 10 persons only for 1 day.',
         'help'              =>  "
@@ -361,7 +361,7 @@ $tests = [
         },
         'rollback'          =>  function () {
 
-        //    Booking::search(['description', 'like', '%'. 'Create a booking at Your Establisment'.'%' ])->delete(true);
+            Booking::search(['description', 'like', '%'. 'Create a booking at Your Establisment'.'%' ])->delete(true);
 
         }
 
@@ -449,5 +449,5 @@ $tests = [
 
         }
 
-    ]*/
+    ]
 ];
