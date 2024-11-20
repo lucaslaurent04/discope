@@ -1,0 +1,14 @@
+[
+    {
+        "name": "sale\\catalog\\Category",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "Catégorie default",
+                "code": "CD",
+                "description": null
+            }
+        ]
+    }
+]
