@@ -67,8 +67,13 @@ $orm->disableEvents();
 
 BookingLineGroup::id($params['booking_line_group_id'])->delete(true);
 
+// recompute total price of the booking
 Booking::refreshPrice($orm, $booking['id']);
+
+// recompute date_from and date_to according to sojourns
 Booking::refreshDate($orm, $booking['id']);
+
+// recompute total nb_pers according to sojourns
 Booking::refreshNbPers($orm, $booking['id']);
 
 // restore events (in case this controller is chained with others)
