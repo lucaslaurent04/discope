@@ -1,0 +1,15 @@
+[
+    {
+        "name": "sale\\autosale\\Condition",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "operand": "nb_nights",
+                "operator": ">=",
+                "value": "1",
+                "autosale_line_id": 1
+            }
+        ]
+    }
+]

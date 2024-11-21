@@ -1,0 +1,16 @@
+[
+    {
+        "name": "sale\\price\\PriceList",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "Price 2023",
+                "date_from": "2023-01-01",
+                "date_to": "2023-12-31",
+                "status": "published",
+                "price_list_category_id" : 1
+            }
+        ]
+    }
+]
