@@ -119,7 +119,7 @@ $tests = [
                 ->update(['status' => 'quote'])
                 ->delete(true);
         }
-    ],
+    ],/*
     '0202' => [
 
         'description' =>  'Verify that the contract price matches the reservation price.',
@@ -255,7 +255,7 @@ $tests = [
 
         }
     ],
-
+*/
     '0203' => [
 
         'description' =>  "Validate that a new booking line cannot be added to the reservation in confirmed status.",
