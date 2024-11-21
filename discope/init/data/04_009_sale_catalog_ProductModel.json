@@ -160,7 +160,7 @@
                 "tracking_type": "sku",
                 "description_delivery": null,
                 "description_receipt": null,
-                "qty_accounting_method": "unit",
+                "qty_accounting_method": "person",
                 "booking_type_id": 4,
                 "is_repeatable": 1,
                 "is_accomodation": 0,
