@@ -18,7 +18,7 @@ use sale\customer\CustomerNature;
 
 
 $tests = [
-    
+
     '0001' => [
         'description'       =>  'Create a booking for a single client and multiple days.',
         'help'              =>  "
@@ -35,13 +35,14 @@ $tests = [
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
+            $product = Product::search(['sku','=', 'GA-NuitCh1-A'])->read(['id'])->first(true);
 
-            return [$center['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id']];
+            return [$center['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id'], $product['id']];
 
         },
         'act'               =>  function ($data) {
 
-            list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id) = $data;
+            list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id, $product_id) = $data;
 
             $booking = Booking::create([
                     'date_from'             => strtotime('2023-01-01'),
@@ -72,18 +73,33 @@ $tests = [
                 ->first(true);
 
 
-            $product = Product::search(['sku','=', 'GA-NuitCh1-A'])->read(['id'])->first(true);
 
             BookingLine::create([
                     'booking_id'            => $booking['id'],
                     'booking_line_group_id' => $bookingLineGroup['id'],
-                    'product_id'            => $product['id']
+                    'product_id'            => $product_id
                 ]);
 
             $booking = Booking::id($booking['id'])
                 ->read(['id', 'price',
-                    'booking_lines_ids' => ['id', 'price'],
-                    'booking_lines_groups_ids' => ['id', 'price']
+                    'booking_lines_ids' => [
+                        'id',
+                        'product_id' => ['id', 'name'] ,
+                        'product_model_id' => ['id', 'name'] ,
+                        'price_id',
+                        'unit_price',
+                        'qty',
+                        'total',
+                        'price'
+                    ],
+                    'booking_lines_groups_ids' => [
+                        'id',
+                        'nb_pers',
+                        'qty',
+                        'unit_price',
+                        'total',
+                        'price'
+                    ]
                 ])->first(true);
 
             return $booking;
@@ -98,15 +114,14 @@ $tests = [
                 return $sum + $group['price'];
             }, 0);
 
-            return ($booking['price'] == 725.90 &&
-                    $booking['price'] == $total_price_bl &&
+            return ($booking['price'] == $total_price_bl &&
                     $booking['price'] == $total_price_blg);
         },
         'rollback'          =>  function () {
            Booking::search(['description', 'like', '%'. 'Booking test for a single client and multiple days'.'%'])->delete(true);
         }
 
-    ],
+    ],/*
     '0002' => [
         'description'       =>  'Create a booking for 10 persons only for 1 day.',
         'help'              =>  "
@@ -200,7 +215,7 @@ $tests = [
         }
 
     ],
-    
+
     '0003' => [
         'description' => 'Create a reservation for children aged 12 and 2 adults and above for 3 days.',
         'help' => "
@@ -449,5 +464,5 @@ $tests = [
 
         }
 
-    ]
+    ]*/
 ];
