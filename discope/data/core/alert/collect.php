@@ -44,7 +44,8 @@ list($context, $orm) = [ $providers['context'], $providers['orm'] ];
 $domain = $params['domain'];
 
 if(isset($params['center_office_id']) && $params['center_office_id'] > 0) {
-    $domain = Domain::conditionAdd($domain, ['center_office_id', '=', $params['center_office_id']]);
+    // #memo - center_office_id does not exist on Message and group_id is used instead
+    $domain = Domain::conditionAdd($domain, ['group_id', '=', $params['center_office_id']]);
 }
 
 if(isset($params['booking_id']) && $params['booking_id'] > 0) {
