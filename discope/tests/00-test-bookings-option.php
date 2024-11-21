@@ -50,8 +50,8 @@ $tests = [
                     'has_pack'       => false,
                     'name'           => 'Séjour pour 1 personne pendant 2 nuitées',
                     'order'          => 1,
-                    'rate_class_id'  => 4, //'general public'
-                    'sojourn_type_id'=> 1 //'GA'
+                    'rate_class_id'  => 4,
+                    'sojourn_type_id'=> 1
                 ])
                 ->update([
                     'date_from'      => $booking['date_from'],
@@ -104,7 +104,7 @@ $tests = [
         'help'              =>  "
             Create a reservation for a client for one night.
             Change the reservation status from 'devis' to 'option'.
-            Create a new booking line with the product 'Nuit Chambre 2 pers'.
+            Create a new booking line with the product 'Nuit Chambre'.
             Retrieve the error message for the new booking line.\n
             Verify the error message.
             Verify that the reservation price has not been modified.",
@@ -206,7 +206,7 @@ $tests = [
         'help'              =>  "
             Create a reservation for a client for one night.
             Change the reservation status from 'devis' to 'option'.
-            Change the product  to 'Nuit Chambre 2 pers'  in the booking line.
+            Change the product  to 'Nuit Chambre'  in the booking line.
             Retrieve the error message for the new booking line.\n
             Verify the error message.
             Verify that the reservation price has not been modified.",
@@ -256,7 +256,7 @@ $tests = [
                 ->read(['id'])
                 ->first(true);
 
-            $product = Product::search(['sku','=', 'GA-NuitDort-A' ])->read(['id','label'])->first(true);
+            $product = Product::search(['sku','=', 'GA-NuitCh1-A'])->read(['id','label'])->first(true);
 
             $bookingLine = BookingLine::create([
                     'booking_id'            => $booking['id'],

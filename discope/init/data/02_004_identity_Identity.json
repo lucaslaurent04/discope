@@ -14,9 +14,18 @@
             },
             {
                 "id": 2,
+                "name": "John DOE",
+                "display_name": "John DOE",
                 "type_id": 1,
+                "type": "I",
+                "has_vat": 0,
+                "nationality": "BE",
+                "has_parent": 0,
+                "address_country": "BE",
+                "phone": "047896540",
                 "firstname": "John",
-                "lastname": "Doe"
+                "lastname": "Doe",
+                "lang_id": 2
             }
         ]
     }
