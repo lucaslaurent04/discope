@@ -1,7 +1,11 @@
 {
     "name": "Messages list",
     "description": "Listing of pending messages. #todo - change to sale\\booking\\Booking (once change have been made in DB)",
-    "domain":  [ ["object_class", "=", "lodging\\sale\\booking\\Booking"], ["group_id", "in", "user.center_offices_ids"], ["severity", "=", "important"] ],
+    "#todo": "Domain includes lodging\\sale\\booking\\Booking, but this should be removed once Kaleo will have been fully migrated (jan 2025).",
+    "domain":  [
+        [ ["object_class", "=", "lodging\\sale\\booking\\Booking"], ["group_id", "in", "user.center_offices_ids"], ["severity", "=", "important"] ],
+        [ ["object_class", "=", "sale\\booking\\Booking"], ["group_id", "in", "user.center_offices_ids"], ["severity", "=", "important"]  ]
+    ],
     "header": {
         "actions": {
             "ACTION.CREATE": false
