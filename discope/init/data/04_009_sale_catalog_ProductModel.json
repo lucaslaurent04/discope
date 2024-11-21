@@ -19,20 +19,13 @@
                 "tracking_type": "sku"
             },
             {
-                "id": 1,
-                "name": "Deposit",
-                "family_id": 1,
-                "buying_accounting_rule_id": 1,
-                "can_buy": false,
-                "can_sell": true,
-                "is_pack": false,
-                "has_own_price": false,
-                "type": "service",
-                "service_type": "simple",
-                "tracking_type": "sku"
-            },
-            {
                 "id": 2,
+                "creator": 1,
+                "created": "2024-11-21 08:16:03",
+                "modifier": 1,
+                "modified": "2024-11-21 15:19:10",
+                "deleted": 0,
+                "state": "instance",
                 "name": "Nuit Chambre 1 pers",
                 "family_id": 1,
                 "selling_accounting_rule_id": null,
@@ -62,7 +55,7 @@
                 "rental_unit_assignement": "category",
                 "has_duration": 0,
                 "duration": 1,
-                "capacity": 1,
+                "capacity": null,
                 "rental_unit_category_id": null,
                 "rental_unit_id": null,
                 "allow_price_adaptation": 1
