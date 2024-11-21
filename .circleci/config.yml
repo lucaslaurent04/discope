@@ -29,6 +29,13 @@ jobs:
           name: Copy core package
           command: |
             cp -r ~/repo/packages.core/core ~/repo/packages/
+      - run:
+          name: List files in config directory
+          command: ls -la /var/www/html/config/
+      - run:
+          name: Check existing config file
+          command: |
+            cat /var/www/html/config/config.json
       # create a config file with Discope specifics
       - run:
           name: Create a config file with Discope specifics
