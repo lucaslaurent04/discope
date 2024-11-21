@@ -1214,6 +1214,19 @@ class BookingLine extends Model {
     }
 
     public static function refreshPrice($om, $id) {
+        $lines = $om->read(self::getType(), $id, ['has_manual_unit_price']);
+
+        if($lines <= 0) {
+            return;
+        }
+
+        $line = reset($lines);
+
+        if(!$line['has_manual_unit_price']) {
+            // #memo - unit_price depends on applied PriceAdapters, unless if assigned manually
+            $om->update(self::getType(), $id, ['unit_price' => null]);
+        }
+
         $om->update(self::getType(), $id, ['price' => null, 'total' => null, 'fare_benefit' => null]);
     }
 
