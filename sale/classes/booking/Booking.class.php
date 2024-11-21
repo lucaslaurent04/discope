@@ -1396,8 +1396,16 @@ class Booking extends Model {
 
         $booking = reset($bookings);
 
+        $has_sojourn = false;
+        foreach($booking['booking_lines_groups_ids.group_type'] as $gid => $group) {
+            if($group['group_type'] !== 'simple') {
+                $has_sojourn = true;
+                break;
+            }
+        }
+
         // #memo - do not refresh Booking if there are no sojourns (so that last set dates remain)
-        if($booking['booking_lines_groups_ids.group_type'] == 'simple') {
+        if(!$has_sojourn) {
             return;
         }
 
