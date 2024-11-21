@@ -557,7 +557,7 @@ class Booking extends Model {
                             $max_date = $group['date_to'];
                         }
                     }
-                    $result[$bid] = $max_date;
+                    $result[$bid] = ($max_date == 0) ? time() : $max_date;
                 }
             }
         }
