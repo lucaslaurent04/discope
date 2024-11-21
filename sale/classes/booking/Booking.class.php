@@ -525,7 +525,7 @@ class Booking extends Model {
 
     public static function calcDateFrom($om, $oids, $lang) {
         $result = [];
-        $bookings = $om->read(__CLASS__, $oids, ['booking_lines_groups_ids']);
+        $bookings = $om->read(self::getType(), $oids, ['booking_lines_groups_ids']);
 
         foreach($bookings as $bid => $booking) {
             $min_date = PHP_INT_MAX;
@@ -545,7 +545,7 @@ class Booking extends Model {
 
     public static function calcDateTo($om, $oids, $lang) {
         $result = [];
-        $bookings = $om->read(__CLASS__, $oids, ['booking_lines_groups_ids']);
+        $bookings = $om->read(self::getType(), $oids, ['booking_lines_groups_ids']);
 
         if($bookings > 0) {
             foreach($bookings as $bid => $booking) {
@@ -1388,6 +1388,19 @@ class Booking extends Model {
     }
 
     public static function refreshDate($om, $id) {
+        $bookings = $om->read(self::getType(), $id, ['booking_lines_groups_ids.group_type']);
+
+        if($bookings <= 0) {
+            return;
+        }
+
+        $booking = reset($bookings);
+
+        // #memo - do not refresh Booking if there are no sojourns (so that last set dates remain)
+        if($booking['booking_lines_groups_ids.group_type'] == 'simple') {
+            return;
+        }
+
         $om->update(self::getType(), $id, ['date_from' => null, 'date_to' => null, 'time_from' => null, 'time_to' => null]);
     }
 

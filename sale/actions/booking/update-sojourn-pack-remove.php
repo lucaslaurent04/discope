@@ -79,8 +79,10 @@ SojournProductModel::ids($group['sojourn_product_models_ids'])->delete(true);
 // reset attributes related to pack
 BookingLineGroup::id($group['id'])->update(['is_locked' => false, 'has_pack' => false, 'pack_id' => null ]);
 
+// recompute the group price according to pack or new lines
 BookingLineGroup::refreshPrice($orm, $group['id']);
 
+// recompute total price of the booking
 Booking::refreshPrice($orm, $group['booking_id']['id']);
 
 // #memo - if booking includes a price from an unpublished pricelist, it is marked as ToBeConfirmed (`is_price_tbc`)
