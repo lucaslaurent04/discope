@@ -77,11 +77,15 @@ $tests = [
             BookingLine::create([
                     'booking_id'            => $booking['id'],
                     'booking_line_group_id' => $bookingLineGroup['id'],
-                    'product_id'            => $product_id
-                ]);
+                ])
+                ->update(['product_id'            => $product_id]);
 
             $booking = Booking::id($booking['id'])
-                ->read(['id', 'price',
+                ->read(['id',
+                    'is_locked',
+                    'is_price_tbc',
+                    'center_id' => ['price_list_category_id'],
+                    'price',
                     'booking_lines_ids' => [
                         'id',
                         'product_id' => ['id', 'name'] ,
@@ -94,6 +98,7 @@ $tests = [
                     ],
                     'booking_lines_groups_ids' => [
                         'id',
+                        'date_from',
                         'nb_pers',
                         'qty',
                         'unit_price',
