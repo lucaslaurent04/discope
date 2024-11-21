@@ -75,7 +75,8 @@ list($params, $providers) = eQual::announce([
             'type'              => 'many2one',
             'foreign_object'    => 'sale\customer\TourOperator',
             'domain'            => ['is_tour_operator', '=', true],
-            'description'       => 'Mark the booking as completed by a Tour Operator.'
+            'description'       => 'Mark the booking as completed by a Tour Operator.',
+            'visible'           => ['has_tour_operator', '=', true]
         ],
 
         'tour_operator_ref' => [
@@ -121,6 +122,14 @@ if(isset($params['date_to'])) {
 
 if(isset($params['has_tour_operator']) && $params['has_tour_operator'] === true ) {
     $domain = Domain::conditionAdd($domain, ['has_tour_operator', '=', true]);
+}
+
+if(isset($params['tour_operator_id']) && ($params['tour_operator_id'] > 0 )) {
+    $domain = Domain::conditionAdd($domain, ['tour_operator_id', '=', $params['tour_operator_id']]);
+}
+
+if(isset($params['tour_operator_ref']) && strlen($params['tour_operator_ref']) > 0) {
+    $domain = Domain::conditionAdd($domain, ['tour_operator_ref', 'like', $params['tour_operator_ref']]);
 }
 
 if(isset($params['extref_reservation_id']) && ($params['extref_reservation_id'] > 0 )) {
@@ -222,16 +231,16 @@ if(isset($params['identity_id']) && $params['identity_id'] > 0) {
     rental_unit : search amongst rental_unit_assignment
 */
 if(isset($params['rental_unit_id']) && $params['rental_unit_id'] > 0) {
-    $assignements = SojournProductModelRentalUnitAssignement::search(['rental_unit_id', '=', $params['rental_unit_id']])->read(['booking_id'])->get();
-    if(count($assignements)) {
+    $assignments = SojournProductModelRentalUnitAssignement::search(['rental_unit_id', '=', $params['rental_unit_id']])->read(['booking_id'])->get();
+    if(count($assignments)) {
         if(count($bookings_ids)) {
             $bookings_ids = array_intersect(
                     $bookings_ids,
-                    array_map(function ($a) { return $a['booking_id']; }, $assignements )
+                    array_map(function ($a) { return $a['booking_id']; }, $assignments )
                 );
         }
         else {
-            $bookings_ids = array_map(function ($a) { return $a['booking_id']; }, $assignements );
+            $bookings_ids = array_map(function ($a) { return $a['booking_id']; }, $assignments );
         }
         if(empty($bookings_ids)) {
             // add a constraint to void the result set
