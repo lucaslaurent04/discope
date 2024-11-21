@@ -1,0 +1,52 @@
+[
+    {
+        "name": "realestate\\RentalUnit",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "OR- 001",
+                "order": 1,
+                "code": "OR- 001",
+                "description": null,
+                "type": "bedroom",
+                "category": "hostel",
+                "is_accomodation": 1,
+                "capacity": 5,
+                "has_children": 0,
+                "has_parent": null,
+                "can_rent": 1,
+                "can_partial_rent": 0,
+                "parent_id": null,
+                "status": "ready",
+                "action_required": "none",
+                "rental_unit_category_id": null,
+                "center_id": 1,
+                "sojourn_type_id": null,
+                "color": null
+            },
+            {
+                "id": 2,
+                "name": "OR- 002",
+                "order": 1,
+                "code": "OR- 001",
+                "description": null,
+                "type": "building",
+                "category": "hostel",
+                "is_accomodation": 1,
+                "capacity": 1,
+                "has_children": 0,
+                "has_parent": null,
+                "can_rent": 1,
+                "can_partial_rent": 0,
+                "parent_id": null,
+                "status": "ready",
+                "action_required": "none",
+                "rental_unit_category_id": 2,
+                "center_id": 1,
+                "sojourn_type_id": null,
+                "color": null
+            }
+        ]
+    }
+]
