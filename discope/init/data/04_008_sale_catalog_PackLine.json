@@ -1,0 +1,92 @@
+[
+    {
+        "name": "sale\\catalog\\PackLine",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "Nuitée Séjour scolaire",
+                "parent_product_id": 4,
+                "child_product_id": null,
+                "child_product_model_id": 5,
+                "has_own_qty": 0,
+                "own_qty": null,
+                "has_own_duration": 0,
+                "own_duration": null,
+                "share": 1
+            },
+            {
+                "id": 2,
+                "name": "Petit Déjeuner Séjour scolaire (matin) Secondaire ",
+                "parent_product_id": 4,
+                "child_product_id": null,
+                "child_product_model_id": 6,
+                "has_own_qty": 0,
+                "own_qty": null,
+                "has_own_duration": 0,
+                "own_duration": null,
+                "share": 1
+            },
+            {
+                "id": 3,
+                "name": "Lunch Séjour scolaire (Midi)",
+                "parent_product_id": 4,
+                "child_product_id": null,
+                "child_product_model_id": 7,
+                "has_own_qty": 0,
+                "own_qty": null,
+                "has_own_duration": 0,
+                "own_duration": null,
+                "share": 1
+            },
+            {
+                "id": 4,
+                "name": "Repas Séjour scolaire (soir)",
+                "parent_product_id": 4,
+                "child_product_id": null,
+                "child_product_model_id": 8,
+                "has_own_qty": 0,
+                "own_qty": null,
+                "has_own_duration": 0,
+                "own_duration": null,
+                "share": 1
+            },
+            {
+                "id": 5,
+                "name": "Repas chaud arrivée Séjour scolaire (midi)",
+                "parent_product_id": 4,
+                "child_product_id": null,
+                "child_product_model_id": 9,
+                "has_own_qty": 0,
+                "own_qty": null,
+                "has_own_duration": 0,
+                "own_duration": null,
+                "share": 1
+            },
+            {
+                "id": 6,
+                "name": "Nuitée Arbrefontaine - Petite",
+                "parent_product_id": 22,
+                "child_product_id": null,
+                "child_product_model_id": 11,
+                "has_own_qty": 0,
+                "own_qty": null,
+                "has_own_duration": 0,
+                "own_duration": null,
+                "share": 1
+            },
+            {
+                "id": 7,
+                "name": "Frais Arbrefontaine Pt Maison",
+                "parent_product_id": 22,
+                "child_product_id": null,
+                "child_product_model_id": 12,
+                "has_own_qty": 1,
+                "own_qty": 1,
+                "has_own_duration": 0,
+                "own_duration": null,
+                "share": 1
+            }
+        ]
+    }
+]

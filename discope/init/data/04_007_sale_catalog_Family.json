@@ -1,0 +1,22 @@
+[
+    {
+        "name": "sale\\catalog\\Family",
+        "lang": "en",
+        "data": [
+            {
+                "id": 1,
+                "name": "Default family"
+            }
+        ]
+    },
+    {
+        "name": "sale\\catalog\\Family",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "Famille par défaut"
+            }
+        ]
+    }
+]

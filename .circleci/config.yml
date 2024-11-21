@@ -29,6 +29,18 @@ jobs:
           name: Copy core package
           command: |
             cp -r ~/repo/packages.core/core ~/repo/packages/
+      - run:
+          name: List files in config directory
+          command: ls -la ~/repo/config/
+      # create a config file with Discope specifics
+      - run:
+          name: Create a config file with Discope specifics
+          command: |
+            echo '{"DEFAULT_LANG": "fr", "ORM_EVENTS_FORCE_ONUPDATE_AT_CREATION": true}' > ~/repo/config/config.json
+      # Verify the content of the file
+      - run:
+          name: Verify the content of the config file
+          command: cat ~/repo/config/config.json
       # assign folders permissions
       - run: php run.php --do=init_fs
       # check that mandatory directories are present and have correct access rights set
@@ -41,6 +53,7 @@ jobs:
       - run: php run.php --do=init_package --package=discope
       # run test units
       - run: php run.php --do=test_package --package=core
+      - run: php run.php --do=test_package --package=discope
       # export logs on failure
       - run:
           command: |

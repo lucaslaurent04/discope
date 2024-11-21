@@ -1,0 +1,42 @@
+[
+    {
+        "name": "identity\\Center",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "Your Establisment",
+                "legal_name": "Establisment",
+                "description": null,
+                "organisation_id": 1,
+                "phone": null,
+                "fax": null,
+                "email": null,
+                "address_street": null,
+                "address_dispatch": null,
+                "address_city": null,
+                "address_zip": null,
+                "address_state": null,
+                "address_country": null,
+                "registration_number": null,
+                "bank_account_iban": null,
+                "bank_account_bic": null,
+                "analytic_section_id": null,
+                "signature": null,
+                "center_office_id": null,
+                "code_alpha": null,
+                "use_office_details": null,
+                "manager_id": null,
+                "price_list_category_id": 1,
+                "discount_list_category_id": null,
+                "autosale_list_category_id": 1,
+                "season_category_id": null,
+                "template_category_id": null,
+                "sojourn_type_id": null,
+                "pos_default_customer_id": null,
+                "extref_property_id": null,
+                "has_citytax_school": null
+            }
+        ]
+    }
+]
