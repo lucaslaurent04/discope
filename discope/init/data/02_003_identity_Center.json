@@ -27,7 +27,7 @@
                 "code_alpha": null,
                 "use_office_details": null,
                 "manager_id": null,
-                "price_list_category_id": null,
+                "price_list_category_id": 1,
                 "discount_list_category_id": null,
                 "autosale_list_category_id": 1,
                 "season_category_id": null,
