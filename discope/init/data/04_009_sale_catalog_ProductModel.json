@@ -52,7 +52,7 @@
                 "tracking_type": "sku",
                 "description_delivery": null,
                 "description_receipt": null,
-                "qty_accounting_method": "accomodation",
+                "qty_accounting_method": "person",
                 "booking_type_id": 0,
                 "is_repeatable": 1,
                 "is_accomodation": 1,
