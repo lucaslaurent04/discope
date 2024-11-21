@@ -1150,7 +1150,7 @@ class Booking extends Model {
                 $center_offices = $om->read(CenterOffice::getType(), $booking['center_id.center_office_id'], ['id', 'organisation_id']);
                 $center_office = reset($center_offices);
                 $om->update(self::getType(), $bid, ['center_office_id' => $booking['center_id.center_office_id'],
-                                                    'organisation_id' => $center_office['organisation_id'] ]);
+                                                    'organisation_id' => $center_office['organisation_id'] ?? null]);
             }
         }
     }
