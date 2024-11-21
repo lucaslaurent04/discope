@@ -32,10 +32,6 @@ jobs:
       - run:
           name: List files in config directory
           command: ls -la ~/repo/config/
-      - run:
-          name: Check existing config file
-          command: |
-            cat ~/repo/config/config.json
       # create a config file with Discope specifics
       - run:
           name: Create a config file with Discope specifics
