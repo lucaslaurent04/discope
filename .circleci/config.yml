@@ -30,10 +30,14 @@ jobs:
           command: |
             cp -r ~/repo/packages.core/core ~/repo/packages/
       # create a config file with Discope specifics
-      - run: |
-            echo "{\"DEFAULT_LANG\": \"fr\", \"ORM_EVENTS_FORCE_ONUPDATE_AT_CREATION\": true}" > /var/www/html/config/config.json
+      - run:
+          name: Create a config file with Discope specifics
+          command: |
+            echo '{"DEFAULT_LANG": "fr", "ORM_EVENTS_FORCE_ONUPDATE_AT_CREATION": true}' > /var/www/html/config/config.json
       # Verify the content of the file
-      - run: cat /var/www/html/config/config.json
+      - run:
+          name: Verify the content of the config file
+          command: cat /var/www/html/config/config.json
       # assign folders permissions
       - run: php run.php --do=init_fs
       # check that mandatory directories are present and have correct access rights set
