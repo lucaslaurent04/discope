@@ -1,0 +1,12 @@
+[
+    {
+        "name": "sale\\price\\PriceListCategory",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "OR"
+            }
+        ]
+    }
+]
