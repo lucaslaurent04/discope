@@ -463,11 +463,11 @@ if(isset($envelope['children'][0])) {
                                 $guarantee_entry['mode'] = str_replace(['PaymentCard'], ['card'], $payment_mode['name']);
                                 if(isset($payment_mode['attributes']['CardNumber'])) {
                                     $card_num = $payment_mode['attributes']['CardNumber'];
-                                    $guarantee_entry['card_number'] = reservations . phpstr_repeat('*', strlen($card_num) - 4) . substr($card_num, -4);
+                                    $guarantee_entry['card_number'] = str_repeat('*', strlen($card_num) - 4) . substr($card_num, -4);
                                 }
                                 if(isset($payment_mode['attributes']['ExpireDate'])) {
                                     $card_expire = $payment_mode['attributes']['ExpireDate'];
-                                    $guarantee_entry['card_expire'] = substr($card_expire, 0, 2) . 'reservations.php/' .substr($card_expire, 2, 2);
+                                    $guarantee_entry['card_expire'] = substr($card_expire, 0, 2) . '/' .substr($card_expire, 2, 2);
                                 }
                                 if(isset($payment_mode['attributes']['CardCode'])) {
                                     $guarantee_entry['card_type'] = $payment_mode['attributes']['CardCode'];;
