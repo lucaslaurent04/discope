@@ -241,7 +241,7 @@ $tests = [
         }
 
     ],
-    /*
+
     '0003' => [
         'description' => 'Create a reservation for children aged 12 and 2 adults and above for 3 days.',
         'help' => "
@@ -470,11 +470,32 @@ $tests = [
                     ['booking_id', '=', $booking['id']],
                 ])->update(['age_range_id' => 2]);
 
-            return Booking::id($booking['id'])
-                    ->read(['price',
-                        'booking_lines_ids' => ['id', 'price'],
-                        'booking_lines_groups_ids' => ['id', 'price']
-                    ])->first(true);
+            $booking = Booking::id($booking['id'])
+                ->read(['id',
+                    'center_id' => ['price_list_category_id'],
+                    'price',
+                    'booking_lines_ids' => [
+                        'id',
+                        'product_id' => ['id', 'name'] ,
+                        'product_model_id' => ['id', 'name'] ,
+                        'price_id',
+                        'unit_price',
+                        'qty',
+                        'total',
+                        'price'
+                    ],
+                    'booking_lines_groups_ids' => [
+                        'id',
+                        'date_from',
+                        'nb_pers',
+                        'qty',
+                        'unit_price',
+                        'total',
+                        'price'
+                    ]
+                ])->first(true);
+
+            return $booking;
         },
         'assert'            =>  function ($booking) {
 
@@ -482,7 +503,7 @@ $tests = [
                 return $sum + $group['price'];
             }, 0);
 
-            return ($booking['price'] == $total_price_blg && $booking['price'] == 914);
+            return ($booking['price'] == $total_price_blg && $booking['price'] == 937);
         },
         'rollback'          =>  function () {
 
@@ -490,5 +511,5 @@ $tests = [
 
         }
 
-    ]*/
+    ]
 ];
