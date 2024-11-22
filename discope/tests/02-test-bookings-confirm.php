@@ -179,8 +179,7 @@ $tests = [
             BookingLine::create([
                     'booking_id'            => $booking['id'],
                     'booking_line_group_id' => $booking_line_group['id'],
-                    'product_id'            => $product['id'],
-                    'is_accomodation'       =>true
+                    'product_id'            => $product['id']
                 ]);
 
             $sojourn_product_model = SojournProductModel::search([
@@ -227,7 +226,7 @@ $tests = [
                     'booking_lines_ids' => [
                         'id',
                         'product_id' => ['id', 'name'] ,
-                        'product_model_id' => ['id',  'is_accomodation', 'name'] ,
+                        'product_model_id' => ['id',  'is_accomodation','is_rental_unit', 'name'] ,
                         'price_id',
                         'unit_price',
                         'qty',
