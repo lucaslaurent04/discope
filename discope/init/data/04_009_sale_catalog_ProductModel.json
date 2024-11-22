@@ -55,6 +55,10 @@
                 "allow_price_adaptation": 1
             },
             {
+                "id": 2,
+                "is_accomodation": 1
+            },
+            {
                 "id": 3,
                 "name": "Taxe Séjour",
                 "family_id": 1,
