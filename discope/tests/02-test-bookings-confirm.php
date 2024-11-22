@@ -119,7 +119,7 @@ $tests = [
                 ->update(['status' => 'quote'])
                 ->delete(true);
         }
-    ],/*
+    ],
     '0202' => [
 
         'description' =>  'Verify that the contract price matches the reservation price.',
@@ -179,7 +179,8 @@ $tests = [
             BookingLine::create([
                     'booking_id'            => $booking['id'],
                     'booking_line_group_id' => $booking_line_group['id'],
-                    'product_id'            => $product['id']
+                    'product_id'            => $product['id'],
+                    'is_accomodation'       =>true
                 ]);
 
             $sojourn_product_model = SojournProductModel::search([
@@ -206,6 +207,12 @@ $tests = [
 
             try {
                 eQual::run('do', 'sale_booking_do-option', ['id' => $booking['id']]);
+            }
+            catch(Exception $e) {
+                $e->getMessage();
+            }
+
+            try {
                 eQual::run('do', 'sale_booking_do-confirm', ['id' => $booking['id'], 'instant_payment' => true]);
             }
             catch(Exception $e) {
@@ -217,6 +224,16 @@ $tests = [
                     'id',
                     'status',
                     'price',
+                    'booking_lines_ids' => [
+                        'id',
+                        'product_id' => ['id', 'name'] ,
+                        'product_model_id' => ['id',  'is_accomodation', 'name'] ,
+                        'price_id',
+                        'unit_price',
+                        'qty',
+                        'total',
+                        'price'
+                    ],
                     'contracts_ids' => [
                         'id',
                         'name',
@@ -255,7 +272,7 @@ $tests = [
 
         }
     ],
-*/
+
     '0203' => [
 
         'description' =>  "Validate that a new booking line cannot be added to the reservation in confirmed status.",

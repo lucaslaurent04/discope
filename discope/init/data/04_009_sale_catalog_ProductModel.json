@@ -20,12 +20,6 @@
             },
             {
                 "id": 2,
-                "creator": 1,
-                "created": "2024-11-21 08:16:03",
-                "modifier": 1,
-                "modified": "2024-11-21 15:19:10",
-                "deleted": 0,
-                "state": "instance",
                 "name": "Nuit Chambre 1 pers",
                 "family_id": 1,
                 "selling_accounting_rule_id": null,
