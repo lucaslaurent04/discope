@@ -1,0 +1,36 @@
+[
+    {
+        "name": "identity\\CenterOffice",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "Your Center Office",
+                "legal_name": null,
+                "description": null,
+                "organisation_id": null,
+                "phone": null,
+                "fax": null,
+                "email": null,
+                "address_street": null,
+                "address_dispatch": null,
+                "address_city": null,
+                "address_zip": null,
+                "address_state": null,
+                "address_country": null,
+                "registration_number": null,
+                "bank_account_iban": null,
+                "bank_account_bic": null,
+                "analytic_section_id": null,
+                "signature": null,
+                "code": null,
+                "docs_default_mode": "simple",
+                "printer_type": "iso-a4",
+                "rentalunits_manual_assignment": 0,
+                "freebies_manual_assignment": 0,
+                "email_alt": null,
+                "email_bcc": null
+            }
+        ]
+    }
+]
