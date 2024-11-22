@@ -7,5 +7,8 @@
         "sale",
         "realestate",
         "communication"
+    ],
+    "apps": [
+        "booking"
     ]
 }
