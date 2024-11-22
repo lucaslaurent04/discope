@@ -474,6 +474,26 @@
                 "allow_price_adaptation": 1,
                 "has_age_range": 0,
                 "age_range_id": null
+            },
+            {
+                "id": 25,
+                "name": "Boisson (GA-Boisson-A)",
+                "code_legacy": null,
+                "label": "Boisson",
+                "sku": "GA-Boisson-A",
+                "ean": null,
+                "description": null,
+                "product_model_id": 13,
+                "family_id": null,
+                "is_pack": null,
+                "has_own_price": null,
+                "is_locked": 0,
+                "stat_section_id": null,
+                "can_buy": 0,
+                "can_sell": 1,
+                "allow_price_adaptation": 1,
+                "has_age_range": 0,
+                "age_range_id": null
             }
         ]
     }
