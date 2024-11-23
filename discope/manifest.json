@@ -9,6 +9,7 @@
         "communication"
     ],
     "apps": [
+        "booking"
         "discope_settings"
     ]
 }
