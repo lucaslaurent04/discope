@@ -23,7 +23,7 @@
                 "bank_account_bic": null,
                 "analytic_section_id": null,
                 "signature": null,
-                "center_office_id": null,
+                "center_office_id": 1,
                 "code_alpha": null,
                 "use_office_details": null,
                 "manager_id": null,
