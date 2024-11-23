@@ -3629,7 +3629,7 @@ class BookingLineGroup extends Model {
             }
 
             // guaranteed rate (rate_min) is always granted
-            if($discount_list['rate_min'] > 0) {
+            if($discount_list['rate_min'] > 0.01) {
                 $rate_to_apply += $discount_list['rate_min'];
                 $discounts_to_apply[0] = [
                     'type'      => 'percent',
