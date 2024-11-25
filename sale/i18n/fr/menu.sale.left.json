@@ -69,6 +69,14 @@
             "label": "Financements en retard",
             "help": ""
         },
+        "item.payments": {
+            "label": "Paiements",
+            "help": ""
+        },
+        "item.payments.all": {
+            "label": "Tous les paiements",
+            "help": ""
+        },
         "item.invoices": {
             "label": "Factures",
             "help": ""
