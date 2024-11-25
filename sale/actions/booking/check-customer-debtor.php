@@ -42,7 +42,7 @@ if(!$booking) {
 }
 
 
-$bookings_ids = Booking::search([ ['customer_id', '=', $booking['customer_id']], ['price', '>', 0], ['paid_amount', '=', 0] ])->ids();
+$bookings_ids = Booking::search([ ['customer_id', '=', $booking['customer_id']], ['id', '<>', $params['id']], ['price', '>', 0], ['paid_amount', '=', 0] ])->ids();
 
 /*
     This controller is a check: an empty response means that no alert was raised
