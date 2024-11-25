@@ -1,0 +1,13 @@
+[
+    {
+        "name": "sale\\discount\\DiscountListCategory",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "OR",
+                "description": "Listes de réduction Organisation"
+            }
+        ]
+    }
+]

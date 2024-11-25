@@ -37,7 +37,7 @@
                 "address_zip": "1030",
                 "address_state": "etat",
                 "address_country": "BE",
-                "email": null,
+                "email": "johndoe@example.com",
                 "phone": "047896540",
                 "mobile": null,
                 "fax": null,
