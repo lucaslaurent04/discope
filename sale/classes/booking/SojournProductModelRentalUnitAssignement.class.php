@@ -63,6 +63,13 @@ class SojournProductModelRentalUnitAssignement extends Model {
                 'onupdate'          => 'onupdateRentalUnitId'
             ],
 
+            'capacity' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => 'The number of persons that may stay in the unit.',
+                'relation'          => ['rental_unit_id' => ['capacity']]
+            ],
+
             'is_accomodation' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
