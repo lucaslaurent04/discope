@@ -58,10 +58,6 @@ if(!$group) {
     throw new Exception("unknown_sojourn", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-if(!in_array($group['booking_id']['status'], ['quote', 'checkedout']) && !$group['is_extra']) {
-    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
-}
-
 // Callbacks are defined on Booking, BookingLine, and BookingLineGroup to ensure consistency across these entities.
 // While these callbacks are useful for maintaining data integrity (they and are used in tests),
 // they need to be disabled here to prevent recursive cycles that could lead to deep cycling issues.

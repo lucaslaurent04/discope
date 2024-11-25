@@ -1013,13 +1013,31 @@ class BookingLineGroup extends Model {
 
         if(count(array_diff(array_keys($values), $allowed_fields))) {
 
-            $groups = $om->read(self::getType(), $oids, ['booking_id.status', 'date_from', 'date_to', 'is_extra', 'has_schedulable_services', 'has_consumptions', 'is_sojourn', 'sojourn_type_id', 'age_range_assignments_ids', 'sojourn_product_models_ids'], $lang);
+            $groups = $om->read(self::getType(), $oids, [
+                    'booking_id.status',
+                    'date_from',
+                    'date_to',
+                    'is_extra',
+                    'has_schedulable_services',
+                    'has_consumptions',
+                    'is_sojourn',
+                    'has_pack',
+                    'pack_id.family_id',
+                    'sojourn_type_id',
+                    'age_range_assignments_ids',
+                    'sojourn_product_models_ids'
+                ], $lang);
 
             if($groups > 0) {
                 foreach($groups as $group) {
-                    // for GG the number of persons does not impact the booking (GG only has pricing by_accomodation), so we allow change of nb_pers at any time
-                    if($group['is_sojourn'] && $group['sojourn_type_id'] == 2) {
-                        if(count($values) == 1 && isset($values['nb_pers'])) {
+                    // nb_pers can never be updated once the booking has been invoiced
+                    if(in_array($group['booking_id.status'], ['proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced'])) {
+                        return ['status' => ['non_editable' => 'Booking services cannot be changed after invoicing.']];
+                    }
+                    // #memo - for GG, the number of persons does not impact the booking (GG only has pricing by_accomodation), so we allow change of nb_pers under specific circumstances
+                    if($group['is_sojourn'] && count($values) == 1 && isset($values['nb_pers'])) {
+                        // #todo - use a dedicated setting for the family_id to be exempted from nb_pers restriction
+                        if($group['has_pack'] && $group['pack_id.family_id'] == 3) {
                             continue;
                         }
                     }
