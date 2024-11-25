@@ -61,6 +61,10 @@
             "label": "Financements",
             "help": ""
         },
+        "item.fundings.all": {
+            "label": "Tous les financements",
+            "help": ""
+        },
         "item.fundings.waiting": {
             "label": "Financements en attente",
             "help": ""
