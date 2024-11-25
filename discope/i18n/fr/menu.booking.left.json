@@ -10,7 +10,7 @@
             "help": ""
         },
         "item.bookings.all": {
-            "label": "Toutes les réservations",
+            "label": "Réservations (toutes)",
             "help": ""
         },
         "item.bookings.quotes": {
@@ -22,23 +22,43 @@
             "help": ""
         },
         "item.bookings.confirmed": {
-            "label": "Réservations confirmées",
+            "label": "Confirmées",
             "help": ""
         },
         "item.bookings.in_progress": {
-            "label": "Réservations en cours",
+            "label": "En cours",
+            "help": ""
+        },
+        "item.bookings.checkedout": {
+            "label": "Terminées (toutes)",
+            "help": ""
+        },
+        "item.bookings.checkedout.to-invoice": {
+            "label": "Terminées (OTA)",
+            "help": ""
+        },
+        "item.bookings.checkedout_cancelled": {
+            "label": "Annulées",
             "help": ""
         },
         "item.bookings.invoiced": {
-            "label": "Réservations facturées",
+            "label": "Facturées",
             "help": ""
         },
         "item.bookings.balanced": {
-            "label": "Réservations cloturées",
+            "label": "Cloturées",
+            "help": ""
+        },
+        "item.bookings.credit_balance": {
+            "label": "A rembourser",
+            "help": ""
+        },
+        "item.bookings.debit_balance": {
+            "label": "En attente de paiement",
             "help": ""
         },
         "item.bookings.archives": {
-            "label": "Réservations archivées",
+            "label": "Archivées",
             "help": ""
         },
         "item.customers": {
@@ -65,12 +85,16 @@
             "label": "Planning",
             "help": ""
         },
-        "item.planning.arrivals": {
-            "label": "Arrivées (checkin)",
-            "help": ""
-        },
         "item.planning.meals": {
             "label": "Repas",
+            "help": ""
+        },
+        "item.planning.meals.all": {
+            "label": "Repas (tous)",
+            "help": ""
+        },
+        "item.planning.meals.stat": {
+            "label": "Consolidé",
             "help": ""
         },
         "item.planning.cleanups": {
@@ -79,6 +103,10 @@
         },
         "item.planning.occupancies": {
             "label": "Occupations",
+            "help": ""
+        },
+        "item.planning.roomtypes": {
+            "label": "Calendrier Cubilis",
             "help": ""
         },
         "item.repairings": {
