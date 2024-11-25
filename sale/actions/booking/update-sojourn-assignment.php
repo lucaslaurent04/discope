@@ -185,8 +185,8 @@ catch(Exception $e) {
     throw new Exception('unexpected: '.$e->getMessage(), QN_ERROR_UNKNOWN);
 }
 
-$channelmanager_enabled = Setting::get_value('sale', 'channelmanager', 'enabled', false);
-if($channelmanager_enabled) {
+$is_channelmanager_enabled = Setting::get_value('sale', 'channelmanager', 'enabled', false);
+if($is_channelmanager_enabled) {
     /*
         Check if consistency must be maintained with channel manager (if booking impacts a rental unit that is linked to a channelmanager room type)
     */
