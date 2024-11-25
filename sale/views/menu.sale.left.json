@@ -4,7 +4,8 @@
         "groups": ["sale.default.user"]
     },
     "layout": {
-        "items": [{
+        "items": [
+            {
                 "id": "item.bank_statements",
                 "label": "Statements",
                 "description": "",
@@ -22,7 +23,7 @@
                             "view": "list.default",
                             "order": "date",
                             "sort": "desc",
-                            "domain": ["status", "=", "pending"]
+                            "domain": [ ["status", "=", "pending"] ]
                         }
                     },
                     {
@@ -49,7 +50,7 @@
                             "view": "list.default",
                             "order": "date",
                             "sort": "desc",
-                            "domain": ["status", "=", "pending"]
+                            "domain": [ ["status", "=", "pending"] ]
                         }
                     },
                     {
@@ -74,9 +75,7 @@
                         "context": {
                             "entity": "sale\\booking\\BankStatementLine",
                             "view": "list.reconciled",
-                            "domain": [
-                                ["status", "=", "reconciled"]
-                            ]
+                            "domain": [ ["status", "=", "reconciled"] ]
                         }
                     }
                 ]
@@ -129,29 +128,14 @@
                         ]
                     },
                     {
-                        "id": "item.new_customer",
-                        "type": "entry",
-                        "label": "New customer",
-                        "description": "",
-                        "icon": "add",
-                        "route": "/",
-                        "context": {
-                            "entity": "sale\\customer\\Customer",
-                            "view": "form.create",
-                            "purpose": "create",
-                            "domain": ["relationship", "=", "customer"]
-                        }
-                    },
-                    {
                         "id": "item.all_customers",
                         "type": "entry",
                         "label": "All customers",
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "sale\\customer\\Customer",
-                            "view": "list.default",
-                            "domain": ["relationship", "=", "customer"]
+                            "entity": "identity\\Identity",
+                            "view": "list.default"
                         }
                     },
                     {
@@ -168,7 +152,6 @@
 
                 ]
             },
-
             {
                 "id": "item.fundings",
                 "label": "Fundings",
@@ -177,14 +160,24 @@
                 "type": "parent",
                 "children": [
                     {
+                        "id": "item.fundings.all",
+                        "type": "entry",
+                        "label": "All fundings",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\booking\\Funding",
+                            "view": "list.sale"
+                        }
+                    },
+                    {
                         "id": "item.fundings.waiting",
                         "type": "entry",
                         "label": "Waiting for payment",
                         "description": "",
                         "context": {
                             "entity": "sale\\booking\\Funding",
-                            "view": "list.default",
-                            "domain": ["is_paid", "=", false]
+                            "view": "list.sale",
+                            "domain": [ ["is_paid", "=", false] ]
                         }
                     },
                     {
@@ -194,8 +187,27 @@
                         "description": "",
                         "context": {
                             "entity": "sale\\booking\\Funding",
-                            "view": "list.default",
+                            "view": "list.sale",
                             "domain": [ ["due_date", "<=", "date.this.day"],  ["is_paid", "=", false] ]
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "item.payments",
+                "label": "Payments",
+                "description": "",
+                "icon": "payments",
+                "type": "parent",
+                "children": [
+                    {
+                        "id": "item.payments.all",
+                        "type": "entry",
+                        "label": "All Payments",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\booking\\Payment",
+                            "view": "list.default"
                         }
                     }
                 ]
@@ -204,7 +216,7 @@
                 "id": "item.invoices",
                 "label": "Invoices",
                 "description": "",
-                "icon": "person",
+                "icon": "monetization_on",
                 "type": "parent",
                 "children": [
                     {
@@ -226,7 +238,17 @@
                         "context": {
                             "entity": "sale\\booking\\Invoice",
                             "view": "list.default",
-                            "domain": [ ["due_date", "<=", "date.this.day"],  ["is_paid", "=", false] ]
+                            "domain": [ ["due_date", "<=", "date.this.day"], ["is_paid", "=", false] ]
+                        }
+                    },
+                    {
+                        "id": "item.invoicesLines.all",
+                        "type": "entry",
+                        "label": "All invoices lines",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\booking\\InvoiceLine",
+                            "view": "list.settings"
                         }
                     }
                 ]
