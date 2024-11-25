@@ -14,15 +14,15 @@
             "help": ""
         },
         "item.bank_statements.lines_to_review": {
-            "label": "Paiements à réconcilier",
+            "label": "Lignes à réconcilier",
             "help": ""
         },
         "item.bank_statements.statements_ready": {
-            "label": "Paiements réconciliés",
+            "label": "Lignes réconciliées",
             "help": ""
         },
         "item.bank_statements.all_lines": {
-            "label": "Tous les paiements",
+            "label": "Toutes les lignes",
             "help": ""
         },
         "item.customers": {
@@ -62,11 +62,11 @@
             "help": ""
         },
         "item.fundings.waiting": {
-            "label": "Paiements en attente",
+            "label": "Financements en attente",
             "help": ""
         },
         "item.fundings.overdue": {
-            "label": "Paiements en retard",
+            "label": "Financements en retard",
             "help": ""
         },
         "item.invoices": {
