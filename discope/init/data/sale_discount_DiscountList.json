@@ -1,0 +1,19 @@
+[
+    {
+        "name": "sale\\discount\\DiscountList",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "OR T5 - 2023",
+                "description": null,
+                "valid_from": "2023-01-01",
+                "valid_until": "2023-12-31",
+                "discount_list_category_id": 1,
+                "rate_min": 0.1,
+                "rate_max": 0.8,
+                "rate_class_id": 5
+            }
+        ]
+    }
+]
