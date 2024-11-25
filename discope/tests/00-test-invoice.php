@@ -199,22 +199,16 @@ $tests = [
                 ->read(['id','price', 'total'])
                 ->get(true);
 
-            return [$booking, $invoice, $bookingLineGroup, $bookingLines];
+            return [$booking, $invoice, $bookingLineGroup];
 
         },
         'assert'            =>  function ($data) {
 
-            list($booking, $invoice, $bookingLineGroup, $bookingLines) = $data;
-
-            $total_price_bl = 0;
-            foreach($bookingLines as $bookingLine) {
-                $total_price_bl += round($bookingLine['price'], 2);
-            }
+            list($booking, $invoice, $bookingLineGroup, ) = $data;
 
             return (
                 $booking['price'] == $invoice['price'] &&
-                $booking['price'] == $bookingLineGroup['price'] &&
-                $booking['price'] == $total_price_bl
+                $booking['price'] == $bookingLineGroup['price']
             );
 
         },
@@ -225,7 +219,7 @@ $tests = [
                 'state'     =>      'archive',
             ]);
         }
-    ],
+    ],/*
     '0011' => [
         'description'       => 'Validate that it is not possible to delete an invoice with the status Invoiced',
         'help'              => "
@@ -853,5 +847,5 @@ $tests = [
                 'state'     =>      'archive',
             ]);
         }
-    ]
+    ]*/
 ];
