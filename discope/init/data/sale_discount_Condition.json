@@ -1,0 +1,128 @@
+[
+    {
+        "name": "sale\\discount\\Condition",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "  ",
+                "operand": "nb_children",
+                "operator": ">=",
+                "value": "10",
+                "discount_id": 1
+            },
+            {
+                "id": 2,
+                "name": "  ",
+                "operand": "nb_children",
+                "operator": "<",
+                "value": "20",
+                "discount_id": 1
+            },
+            {
+                "id": 3,
+                "name": "  ",
+                "operand": "duration",
+                "operator": ">",
+                "value": "2",
+                "discount_id": 1
+            },
+            {
+                "id": 4,
+                "name": "  ",
+                "operand": "nb_children",
+                "operator": ">=",
+                "value": "20",
+                "discount_id": 2
+            },
+            {
+                "id": 5,
+                "name": "  ",
+                "operand": "nb_children",
+                "operator": "<",
+                "value": "30",
+                "discount_id": 2
+            },
+            {
+                "id": 6,
+                "name": "  ",
+                "operand": "duration",
+                "operator": ">=",
+                "value": "2",
+                "discount_id": 2
+            },
+            {
+                "id": 7,
+                "name": "  ",
+                "operand": "nb_children",
+                "operator": ">=",
+                "value": "30",
+                "discount_id": 3
+            },
+            {
+                "id": 8,
+                "name": "  ",
+                "operand": "nb_children",
+                "operator": "<",
+                "value": "40",
+                "discount_id": 3
+            },
+            {
+                "id": 9,
+                "name": "  ",
+                "operand": "duration",
+                "operator": ">=",
+                "value": "2",
+                "discount_id": 3
+            },
+            {
+                "id": 10,
+                "name": "  ",
+                "operand": "nb_children",
+                "operator": ">=",
+                "value": "40",
+                "discount_id": 4
+            },
+            {
+                "id": 11,
+                "name": "  ",
+                "operand": "nb_children",
+                "operator": "<",
+                "value": "50",
+                "discount_id": 4
+            },
+            {
+                "id": 12,
+                "name": "  ",
+                "operand": "duration",
+                "operator": ">=",
+                "value": "2",
+                "discount_id": 4
+            },
+            {
+                "id": 13,
+                "name": "  ",
+                "operand": "nb_children",
+                "operator": ">=",
+                "value": "50",
+                "discount_id": 5
+            },
+            {
+                "id": 14,
+                "name": "  ",
+                "operand": "nb_children",
+                "operator": "<",
+                "value": "60",
+                "discount_id": 5
+            },
+            {
+                "id": 15,
+                "name": "  ",
+                "operand": "duration",
+                "operator": ">=",
+                "value": "2",
+                "discount_id": 5
+            }
+        ]
+    }
+]

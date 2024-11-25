@@ -1,0 +1,68 @@
+[
+    {
+        "name": "sale\\discount\\Discount",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "Gratuité 1 accompagnant",
+                "description": "Gratuité accompagnant 10+",
+                "value": 1,
+                "discount_list_id": 1,
+                "discount_category_id": 2,
+                "type": "freebie",
+                "has_age_ranges": true,
+                "age_ranges_ids" : [1],
+                "value_max": "nb_adults"
+            },
+            {
+                "id": 2,
+                "name": "Gratuité 2 accompagnants",
+                "description": "Gratuité 2 accompagnants",
+                "value": 2,
+                "discount_list_id": 1,
+                "discount_category_id": null,
+                "type": "freebie",
+                "has_age_ranges": true,
+                "age_ranges_ids" : [1],
+                "value_max": "nb_adults"
+            },
+            {
+                "id": 3,
+                "name": "Gratuité 3 accompagnants",
+                "description": "Gratuité accompagnant 30+",
+                "value": 3,
+                "discount_list_id": 1,
+                "discount_category_id": null,
+                "type": "freebie",
+                "has_age_ranges": true,
+                "age_ranges_ids" : [1],
+                "value_max": "nb_adults"
+            },
+            {
+                "id": 4,
+                "name": "Gratuité 4 accompagnants",
+                "description": "Gratuité accompagnant 40+",
+                "value": 4,
+                "discount_list_id": 1,
+                "discount_category_id": null,
+                "type": "freebie",
+                "has_age_ranges": true,
+                "age_ranges_ids" : [1],
+                "value_max": "nb_adults"
+            },
+            {
+                "id": 5,
+                "name": "Gratuité 5 accompagnants",
+                "description": "Gratuité accompagnant 50+",
+                "value": 5,
+                "discount_list_id": 1,
+                "discount_category_id": null,
+                "type": "freebie",
+                "has_age_ranges": true,
+                "age_ranges_ids" : [1],
+                "value_max": "nb_adults"
+            }
+        ]
+    }
+]
