@@ -136,7 +136,7 @@ class Consumption extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\catalog\Product',
                 'description'       => "The Product the consumption relates to.",
-                'required'          => true
+                'readonly'          => true
             ],
 
             'is_rental_unit' => [
