@@ -3823,24 +3823,23 @@ class BookingLineGroup extends Model {
     public static function refreshRentalUnitsAssignments($om, $id) {
         // #memo - this is a merge of createRentalUnitsAssignments and createRentalUnitsAssignmentsFromLines
         /*
-            Update of the rental-units assignments
+            rental-units assignments must be updated when:
 
-            ## when we "add" a booking line (onupdateProductId)
-            * we create new rental-unit assignments depending on the product_model of the line
+            ## adding a booking line (onupdateProductId)
+            * create new rental-unit assignments depending on the product_model of the line
 
-            ## when we remove a booking line (onupdateBookingLinesIds)
-            * we do a reset of the rental-unit assignments
+            ## removing a booking line (onupdateBookingLinesIds)
+            * do a reset of the rental-unit assignments
 
-            ## when we update nb_pers (onupdateNbPers) or age range qty fields
-            * we do a reset of the rental-unit assignments
+            ## updating nb_pers (onupdateNbPers) or age range qty fields
+            * do a reset of the rental-unit assignments
 
-            ## when we update a pack (`onupdatePackId`)
+            ## updating a pack (`onupdatePackId`)
+            * reset rental-unit assignments
+            * create an assignment for all line at once (_createRentalUnitsAssignements)
 
-            * we reset rental-unit assignments
-            * we create an assignment for all line at once (_createRentalUnitsAssignements)
-
-            ## when we remove an age-range (ondelete)
-            * we remove all lines whose product_id relates to that age-range
+            ## removing an age-range (ondelete)
+            * remove all lines whose product_id relates to that age-range
         */
 
         /* find existing SPM (for resetting) */
@@ -3858,7 +3857,7 @@ class BookingLineGroup extends Model {
             'time_from',
             'time_to',
             'sojourn_product_models_ids',
-            'rental_unit_assignments_ids.rental_unit_id'
+            'rental_unit_assignments_ids'
         ]);
 
         if($groups <= 0) {
@@ -3890,15 +3889,14 @@ class BookingLineGroup extends Model {
         $date_from = $group['date_from'] + $group['time_from'];
         $date_to = $group['date_to'] + $group['time_to'];
 
-        // retrieve rental units that are already assigned by other groups within the same time range, if any
-        // (we need to withdraw those from available units)
+        // retrieve rental units that are already assigned by other groups within the same time range, if any (we need to withdraw those from available units)
         $booking_assigned_rental_units_ids = [];
         $bookings = $om->read(Booking::getType(), $group['booking_id'], ['booking_lines_groups_ids', 'rental_unit_assignments_ids']);
         if($bookings > 0 && count($bookings)) {
             $booking = reset($bookings);
             $groups = $om->read(self::getType(), $booking['booking_lines_groups_ids'], ['id', 'date_from', 'date_to', 'time_from', 'time_to']);
-            $assignments = $om->read(SojournProductModelRentalUnitAssignement::getType(), $booking['rental_unit_assignments_ids'], ['rental_unit_id', 'booking_line_group_id']);
-            foreach($assignments as $oid => $assignment) {
+            $booking_assignments = $om->read(SojournProductModelRentalUnitAssignement::getType(), $booking['rental_unit_assignments_ids'], ['rental_unit_id', 'qty', 'booking_line_group_id']);
+            foreach($booking_assignments as $oid => $assignment) {
                 // process rental units from other groups
                 if($assignment['booking_line_group_id'] != $id) {
                     $group_id = $assignment['booking_line_group_id'];
@@ -3959,8 +3957,29 @@ class BookingLineGroup extends Model {
         // do not auto-assign rental units if manual assignment is set in prefs
         if(!$rentalunits_manual_assignment) {
 
+            // exclude complex situations (force refresh)
+            if(count($group['rental_unit_assignments_ids']) > 1) {
+                $om->delete(SojournProductModelRentalUnitAssignement::getType(), $group['rental_unit_assignments_ids'], true);
+            }
+            elseif(count($group['rental_unit_assignments_ids']) == 1) {
+                // group current assignment, if any
+                $group_assignments = $om->read(SojournProductModelRentalUnitAssignement::getType(), $group['rental_unit_assignments_ids'], ['id', 'capacity', 'qty']);
+                $group_assignment = reset($group_assignments);
+                // if capacity of assignment (rental unit) is higher than nb_pers
+                if($group_assignment['capacity'] >= $group['nb_pers']) {
+                    // assign nb_pers to it
+                    $om->update(SojournProductModelRentalUnitAssignement::getType(), $group_assignment['id'], ['qty' => $group['nb_pers']]);
+                    // stop processing
+                    return;
+                }
+                else {
+                    // remove assignment and refresh (continue)
+                    $om->delete(SojournProductModelRentalUnitAssignement::getType(), $group['rental_unit_assignments_ids'], true);
+                }
+            }
+
             // read targeted booking lines (received as method param)
-            $lines = $om->read(\sale\booking\BookingLine::getType(), $group['booking_lines_ids'], [
+            $lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], [
                 'booking_id.center_id',
                 'product_id',
                 'product_id.product_model_id',
@@ -4002,7 +4021,7 @@ class BookingLineGroup extends Model {
                     }
 
                     // find available rental units (sorted by capacity, desc; filtered on product model category)
-                    $rental_units_ids = \sale\booking\Consumption::getAvailableRentalUnits($om, $center_id, $line['product_id.product_model_id'], $date_from, $date_to);
+                    $rental_units_ids = Consumption::getAvailableRentalUnits($om, $center_id, $line['product_id.product_model_id'], $date_from, $date_to);
 
                     // #memo - we cannot append rental units from consumptions of own booking :this leads to an edge case
                     // (use case "come and go between 'quote' and 'option'" is handled with 'realease-rentalunits' action)
@@ -4061,7 +4080,7 @@ class BookingLineGroup extends Model {
 
         if($group['is_extra']) {
             // read children booking lines
-            $lines = $om->read(\sale\booking\BookingLine::getType(), $group['booking_lines_ids'], [
+            $lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], [
                 'is_rental_unit'
             ]);
 
