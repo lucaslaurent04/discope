@@ -20,7 +20,7 @@ $tests = [
         'description'       =>  'Validate create an empty guest list item based on the guest list ID.',
         'arrange'           =>  function () {
 
-            $center = Center::search(['name', 'like', '%Your Establisment%'])->read(['id'])->first(true);
+            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
             $booking_type = BookingType::search(['name', 'like', '%Tout public%'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search(['display_name', '=', 'John DOE'])->read(['id'])->first(true);
@@ -98,7 +98,7 @@ $tests = [
         'description'       =>  'Validate delete hard guest list item.',
         'arrange'           =>  function () {
 
-            $center = Center::search(['name', 'like', '%Your Establisment%'])->read(['id'])->first(true);
+            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
             $booking_type = BookingType::search(['name', 'like', '%Tout public%'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search(['display_name', '=', 'John DOE'])->read(['id'])->first(true);
@@ -188,7 +188,7 @@ $tests = [
         'description'       =>  'This test validates the update of the guest list item from an empty guest list item.',
         'arrange'           =>  function () {
 
-            $center = Center::search(['name', 'like', '%Your Establisment%'])->read(['id'])->first(true);
+            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
             $booking_type = BookingType::search(['name', 'like', '%Tout public%'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search(['display_name', '=', 'John DOE'])->read(['id'])->first(true);
