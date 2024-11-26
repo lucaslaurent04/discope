@@ -15,9 +15,7 @@ use realestate\RentalUnit;
 use sale\booking\BookingType;
 use sale\booking\SojournProductModel;
 use sale\booking\SojournProductModelRentalUnitAssignement;
-use sale\booking\SojournType;
 use sale\catalog\Product;
-use sale\catalog\ProductModel;
 use sale\customer\CustomerNature;
 use sale\pos\Order;
 use sale\pos\OrderLine;
@@ -29,7 +27,6 @@ use sale\booking\Contract;
 use sale\booking\Payment;
 
 $tests = [
-
 
     '2200' => [
         'description'       =>  'Ensure the order is created successfully and that the reservation funding reflects accurate payment method and origin as cashdesk',
@@ -52,7 +49,6 @@ $tests = [
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
-            
             return [$center['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id']];
 
         },
@@ -323,7 +319,7 @@ $tests = [
             Booking::id($booking['id'])->update(['status' => 'quote'])->delete(true);
 
         }
-    ],/*
+    ],
     '2201' => [
         'description'       =>  'Validate product sales and associate them with the reservation using the cashdesk',
         'help'              =>  "
@@ -340,18 +336,16 @@ $tests = [
         ",
         'arrange'           =>  function () {
 
-            $center = Center::search(['name', 'like', '%Louvain-la-Neuve%'])->read(['id'])->first(true);
+            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
-            $sojourn_type = SojournType::search(['name', '=', 'GA'])->read(['id'])->first(true);
-
-            return [$center['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id'], $sojourn_type['id']];
+            return [$center['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id']];
 
         },
         'act'               =>  function ($data) {
 
-            list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id, $sojourn_type_id ) = $data;
+            list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id) = $data;
 
             $booking = Booking::create([
                     'date_from'             => strtotime('2023-08-01'),
@@ -387,27 +381,20 @@ $tests = [
                     'booking_id'            => $booking['id'],
                     'booking_line_group_id' => $booking_line_group['id'],
                     'product_id'            => $product['id']
-                ])
-                ->read(['id','name','price'])
-                ->first(true);
-
-            $product_model = ProductModel::id($product['product_model_id'])
-                ->read(['id', 'name'])
-                ->first(true);
+                ]);
 
             $sojourn_product_model = SojournProductModel::search([
                     ['booking_line_group_id' , "=" , $booking_line_group['id']],
-                    ['product_model_id' , "=" , $product_model['id']]
+                    ['product_model_id' , "=" , $product['product_model_id']]
                 ])
                 ->read(['id'])
                 ->first(true);
 
             $rental_units = RentalUnit::search([
                     ['center_id', '=' , $center_id],
-                    ['sojourn_type_id', '=' , $sojourn_type_id],
                     ['is_accomodation', '=' , true],
                 ])
-                ->read(['id','name','sojourn_type_id','capacity','room_types_ids']);
+                ->read(['id','name','capacity']);
 
             $num_rua = 0;
             foreach ($rental_units as $rental_unit) {
@@ -489,7 +476,7 @@ $tests = [
                 $e->getMessage();
             }
 
-            $session = CashdeskSession::search(['name' ,'like', '%'. 'Test - Caisse Mozaïk' . '%'])
+            $session = CashdeskSession::search(['name' ,'like', '%'. 'Test - Caisse Organisation' . '%'])
                 ->read(['id','user_id', 'name'])
                 ->first(true);
 
@@ -508,7 +495,7 @@ $tests = [
                 ->first(true);
 
 
-            $product = Product::search(['sku','=', 'LO-Sandwich-A' ])->read(['id', 'name'])->first(true);
+            $product = Product::search(['sku','=', 'GA-Boisson-A' ])->read(['id', 'name'])->first(true);
 
             $order_line = OrderLine::create([
                     'order_id'          => $order['id'],
@@ -606,7 +593,7 @@ $tests = [
         },
         'assert'            =>  function ($order) {
 
-            $product = Product::search(['sku','=', 'LO-Sandwich-A' ])->read(['id'])->first(true);
+            $product = Product::search(['sku','=', 'GA-Boisson-A' ])->read(['id'])->first(true);
 
             $booking_line = current(array_filter(
                 $order['booking_id']['booking_lines_ids'],
@@ -653,9 +640,8 @@ $tests = [
         ",
         'arrange'           =>  function () {
 
-            $center = Center::search(['name', 'like', '%Louvain-la-Neuve%'])->read(['id'])->first(true);
-            $customer_identity = Identity::search([['firstname', '=', 'LOUVAIN'], ['lastname', '=', 'CLIENT PASSAGE']])->read(['id'])->first(true);
-
+            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $customer_identity = Identity::search([['firstname', '=', 'ORGANISATION'], ['lastname', '=', 'CLIENT PASSAGE']])->read(['id'])->first(true);
             return [$center['id'], $customer_identity['id']];
 
         },
@@ -663,7 +649,7 @@ $tests = [
 
             list($center_id, $customer_identity_id) = $data;
 
-            $session = CashdeskSession::search(['name' ,'like', '%'. 'Test - Caisse Mozaïk' . '%'])
+            $session = CashdeskSession::search(['name' ,'like', '%'. 'Test - Caisse Organisation' . '%'])
                 ->read(['id','user_id', 'name'])
                 ->first(true);
 
@@ -682,7 +668,7 @@ $tests = [
                 ->first(true);
 
 
-            $product = Product::search(['sku','=', 'LO-Sandwich-A' ])->read(['id', 'name'])->first(true);
+            $product = Product::search(['sku','=', 'GA-Boisson-A' ])->read(['id', 'name'])->first(true);
 
             $order_line = OrderLine::create([
                     'order_id'          => $order['id'],
@@ -777,7 +763,7 @@ $tests = [
         },
         'assert'            =>  function ($order) {
 
-            $product = Product::search(['sku', '=', 'LO-Sandwich-A'])->read(['id'])->first(true);
+            $product = Product::search(['sku', '=', 'GA-Boisson-A'])->read(['id'])->first(true);
 
             $product_line = current(array_filter(
                 $order['order_payments_ids'][0]['order_lines_ids'],
@@ -798,5 +784,5 @@ $tests = [
         'rollback'          =>  function () {
 
         }
-    ]*/
+    ]
 ];
