@@ -86,6 +86,30 @@
                 "has_own_duration": 0,
                 "own_duration": null,
                 "share": 1
+            },
+            {
+                "id": 8,
+                "name": "Nuit Chambre 1 pers",
+                "parent_product_id": 26,
+                "child_product_id": null,
+                "child_product_model_id": 2,
+                "has_own_qty": 1,
+                "own_qty": 1,
+                "has_own_duration": 0,
+                "own_duration": null,
+                "share": 1
+            },
+            {
+                "id": 9,
+                "name": "Petit Déjeuner Séjour scolaire (matin) Secondaire ",
+                "parent_product_id": 26,
+                "child_product_id": null,
+                "child_product_model_id": 6,
+                "has_own_qty": 1,
+                "own_qty": 2,
+                "has_own_duration": 0,
+                "own_duration": null,
+                "share": 1
             }
         ]
     }
