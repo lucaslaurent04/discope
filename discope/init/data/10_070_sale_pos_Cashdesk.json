@@ -1,0 +1,14 @@
+[
+    {
+        "name": "sale\\pos\\Cashdesk",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "Caisse Organisation",
+                "center_id": 1,
+                "establishment_id": null
+            }
+        ]
+    }
+]
