@@ -3782,14 +3782,19 @@ class BookingLineGroup extends Model {
         $lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], ['id', 'is_accomodation', 'product_model_id']);
 
         foreach($spms as $sid => $spm) {
-            // #memo - all rental units must be handled, even non-accomodation (ex.: meeting rooms)
+            // #memo - all rental units must be handled, even non-accommodation (ex.: meeting rooms)
+            // if at least one line matches the product model, keep the SPM
             foreach($lines as $line) {
                 if($line['product_model_id'] == $spm['product_model_id']) {
                     continue 2;
                 }
             }
+            // otherwise, remove SPM
             $om->delete(SojournProductModel::getType(), $sid, true);
         }
+
+        // reset qty computed field (required when resulting from a refreshAssignments)
+        $om->update(SojournProductModel::getType(), $group['sojourn_product_models_ids'], ['qty' => null]);
 
     }
 
@@ -3880,8 +3885,8 @@ class BookingLineGroup extends Model {
             return;
         }
 
-        // remove all previous SPM and rental_unit assignments (cascade)
         // #memo - we cannot do that otherwise we loose data
+        // remove all previous SPM and rental_unit assignments (cascade)
         // $om->update(self::getType(), $id, ['sojourn_product_models_ids' => array_map(function($a) { return "-$a";}, $group['sojourn_product_models_ids'])]);
         self::refreshSPM($om, $id);
 
