@@ -3792,6 +3792,10 @@ class BookingLineGroup extends Model {
             // otherwise, remove SPM
             $om->delete(SojournProductModel::getType(), $sid, true);
         }
+
+        // reset qty computed field (required when resulting from a refreshRentalUnitsAssignments)
+        $om->update(SojournProductModel::getType(), $group['sojourn_product_models_ids'], ['qty' => null]);
+
     }
 
     /**
@@ -4075,8 +4079,6 @@ class BookingLineGroup extends Model {
                 }
             }
 
-            // reset SPM qty computed field
-            $om->update(SojournProductModel::getType(), $group_product_models_ids, ['qty' => null]);
         }
 
         // 2-nd pass: in any situation, if the group targets additional services (is_extra), we dispatch a notification about required assignment
