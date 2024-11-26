@@ -1,0 +1,20 @@
+[
+    {
+        "name": "sale\\pos\\CashdeskSession",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "Test - Caisse Organisation",
+                "amount": null,
+                "amount_opening": 0.00,
+                "amount_closing": 0.00,
+                "note": "",
+                "user_id": 1,
+                "cashdesk_id": 1,
+                "center_id": 1,
+                "status": "pending"
+            }
+        ]
+    }
+]
