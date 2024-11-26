@@ -22,7 +22,7 @@ use sale\catalog\Product;
 use sale\catalog\ProductModel;
 use sale\booking\BookingType;
 use sale\customer\CustomerNature;
-
+use equal\orm\ModelFactory;
 
 $tests = [
 
@@ -45,20 +45,19 @@ $tests = [
         ",
         'arrange'           =>  function () {
 
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id', 'center_office_id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
-            $sojourn_type = SojournType::search(['name', '=', 'GA'])->read(['id'])->first(true);
 
-            return [$center['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id'], $sojourn_type['id']];
+            return [$center['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id']];
 
         },
         'act'               =>  function ($data) {
 
             $PAYMENT_REFERENCE = '150041111782';
 
-            list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id, $sojourn_type_id ) = $data;
+            list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id) = $data;
 
             $booking = Booking::create([
                     'date_from'             => strtotime('2023-02-17'),
@@ -108,7 +107,6 @@ $tests = [
 
             $rental_units = RentalUnit::search([
                     ['center_id', '=', $center_id],
-                    ['sojourn_type_id', '=', $sojourn_type_id],
                     ['is_accomodation', '=', true],
                 ])->read(['id', 'capacity']);
 
@@ -163,10 +161,12 @@ $tests = [
                                     'center_office_id'  =>  $booking['center_office_id']
                         ])
                         ->update(['payment_reference' => $PAYMENT_REFERENCE])
-                        ->read(['id'])
+                        ->read(['id', 'due_amount'])
                         ->first(true);
 
-            $bank_statement_line = BankStatementLine::search(['structured_message', '=', $PAYMENT_REFERENCE])->read(['id'])->first(true);
+            $bank_statement_line = BankStatementLine::search(['structured_message' , '=', $PAYMENT_REFERENCE])
+                    ->read(['id'])
+                    ->first(true);
 
             try {
                 eQual::run('do', 'sale_pay_bankstatementline_do-reconcile', ['id' => $bank_statement_line['id']]);
@@ -178,7 +178,7 @@ $tests = [
             $booking = Booking::id($booking['id'])
                 ->read(['id','status' , 'payment_reference', 'price', 'total',
                             'fundings_ids' => [
-                                'id', 'payment_reference', 'is_paid', 'paid_amount', 'due_amount',
+                                'id','booking_id', 'center_office_id', 'payment_reference', 'is_paid', 'paid_amount', 'due_amount',
                                 'payments_ids' => [
                                     'id' , 'statement_line_id', 'payment_origin', 'payment_method'
                                 ]
@@ -216,7 +216,6 @@ $tests = [
 
         }
     ],
-
     '1602' => [
         'description'       =>  'Verification the Manual bank statement line reconciliation',
         'help'              =>  "
@@ -235,14 +234,13 @@ $tests = [
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
-            $sojourn_type = SojournType::search(['name', '=', 'GA'])->read(['id'])->first(true);
-
-            return [$center['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id'], $sojourn_type['id']];
+            
+            return [$center['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id']];
 
         },
         'act'               =>  function ($data) {
 
-            list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id, $sojourn_type_id ) = $data;
+            list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id) =  $data;
 
             $booking = Booking::create([
                     'date_from'             => strtotime('2023-02-20'),
@@ -290,7 +288,6 @@ $tests = [
 
             $rental_units = RentalUnit::search([
                     ['center_id', '=' , $center_id],
-                    ['sojourn_type_id', '=' , $sojourn_type_id],
                     ['is_accomodation', '=' , true],
                 ])
                 ->read(['id','capacity']);
@@ -342,9 +339,11 @@ $tests = [
 
             Funding::search(['booking_id'  ,'=',  $booking['id']])->update(['state' => 'archive']);
 
-            $funding = Funding::create(['booking_id'       =>  $booking['id'],
-                                    'due_amount'        =>  $booking['price'],
-                                    'center_office_id'  =>  $booking['center_office_id']])
+            $funding = Funding::create([
+                            'booking_id'       =>  $booking['id'],
+                            'due_amount'        =>  $booking['price'],
+                            'center_office_id'  =>  $booking['center_office_id']
+                        ])
                         ->read(['id'])
                         ->first(true);
 
