@@ -18,14 +18,13 @@ use realestate\RentalUnit;
 use sale\booking\BookingType;
 use sale\booking\SojournProductModel;
 use sale\booking\SojournProductModelRentalUnitAssignement;
-use sale\booking\SojournType;
 use sale\catalog\Product;
 use sale\catalog\ProductModel;
 use sale\customer\CustomerNature;
 
 
 $tests = [
-    /*'1701' => [
+    '1701' => [
         'description'       =>  'Validate the contract creation process based on the booking.',
         'help'              =>  "
             Validate that the customer in the contract is the same as in the booking.
@@ -361,7 +360,7 @@ $tests = [
                 ->delete(true);
 
         }
-    ],*/
+    ],
     '1703' => [
         'description'       =>  'Validate that when the contract is locked, it is not possible to modify the reservation.',
         'help'              =>  "",
@@ -377,7 +376,7 @@ $tests = [
         },
         'act'               =>  function ($data) {
 
-            list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id, $sojourn_type_id ) = $data;
+            list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id) = $data;
 
             $booking = Booking::create([
                     'date_from'             => strtotime('2023-05-10'),
@@ -428,7 +427,6 @@ $tests = [
 
             $rental_units = RentalUnit::search([
                     ['center_id', '=' , $center_id],
-                    ['sojourn_type_id', '=' , $sojourn_type_id],
                     ['is_accomodation', '=' , true],
                 ])
                 ->read(['id','name','sojourn_type_id','capacity','room_types_ids']);
