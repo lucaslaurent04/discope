@@ -4076,7 +4076,7 @@ class BookingLineGroup extends Model {
             }
 
             // reset SPM qty computed field
-            $om->update(SojournProductModel::getType(), array_unique(array_values($group_product_models_ids)), ['qty' => null]);
+            $om->update(SojournProductModel::getType(), $group_product_models_ids, ['qty' => null]);
         }
 
         // 2-nd pass: in any situation, if the group targets additional services (is_extra), we dispatch a notification about required assignment
