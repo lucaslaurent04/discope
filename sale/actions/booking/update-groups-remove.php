@@ -77,7 +77,7 @@ Booking::refreshDate($orm, $booking['id']);
 Booking::refreshNbPers($orm, $booking['id']);
 
 // #memo - if booking no longer includes a price from an unpublished pricelist, un-mark it as ToBeConfirmed
-Booking::refreshIsTbc($orm, $group['booking_id']['id']);
+Booking::refreshIsTbc($orm, $booking['id']);
 
 // restore events (in case this controller is chained with others)
 $orm->enableEvents();
