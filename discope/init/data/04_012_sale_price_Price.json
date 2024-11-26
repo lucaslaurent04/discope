@@ -283,6 +283,19 @@
                 "accounting_rule_id": null,
                 "product_id": 24,
                 "vat_rate": null
+            },
+            {
+                "id": 23,
+                "name": "GA-ChBBWo79-A - Price 2023",
+                "price": 74.9,
+                "price_vat": null,
+                "type": "direct",
+                "calculation_method_id": null,
+                "price_list_id": 1,
+                "is_active": null,
+                "accounting_rule_id": null,
+                "product_id": 26,
+                "vat_rate": null
             }
         ]
     }
