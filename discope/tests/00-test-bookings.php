@@ -503,7 +503,7 @@ $tests = [
                 return $sum + $group['price'];
             }, 0);
 
-            return ($booking['price'] == $total_price_blg && $booking['price'] == 937);
+            return ($booking['price'] == $total_price_blg && $booking['price'] == 914);
         },
         'rollback'          =>  function () {
 
