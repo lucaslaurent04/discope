@@ -67,8 +67,11 @@ jobs:
             }' > ~/repo/composer.json
       # Verify the composer of the file
       - run:
-          name: Verify the content of the config file
+          name: Verify the composer of the config file
           command: cat ~/repo/composer.json
+      - run:
+          name: Initialize Composer Dependencies
+          command: php run.php --do=init_composer
       # assign folders permissions
       - run: php run.php --do=init_fs
       # check that mandatory directories are present and have correct access rights set
