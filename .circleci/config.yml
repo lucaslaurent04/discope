@@ -41,6 +41,9 @@ jobs:
       - run:
           name: Verify the content of the config file
           command: cat ~/repo/config/config.json
+      - run:
+          name: List files in repo directory
+          command: ls -la ~/repo/
       # assign folders permissions
       - run: php run.php --do=init_fs
       # check that mandatory directories are present and have correct access rights set
