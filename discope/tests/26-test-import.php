@@ -155,19 +155,14 @@ $tests = [
                 ]);
             }
             catch(Exception $e) {
-                $e->getMessage();
+                $message = $e->getMessage();
             }
 
-            $bank_statement_line = BankStatementLine::search(['structured_message' , '=', $PAYMENT_REFERENCE])
-                ->read( ['id', 'amount'])
-                ->first(true);
-
-
-            return $bank_statement_line;
+            return $message ;
         },
-        'assert'            =>  function ($bank_statement_line) {
+        'assert'            =>  function ($message) {
 
-            return (isset($bank_statement_line));
+            return (isset($message));
 
         },
         'rollback'          =>  function () {
