@@ -2810,7 +2810,7 @@ class BookingLineGroup extends Model {
      * Resets `total` and `price` computed fields.
      */
 	public static function refreshPrice($om, $id) {
-        $om->update(self::getType(), $id, ['total' => null, 'price' => null]);
+        $om->update(self::getType(), $id, ['total' => null, 'price' => null, 'fare_benefit' => null]);
     }
 
     /**
