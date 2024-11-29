@@ -351,10 +351,18 @@ $tests = [
                 $message = $e->getMessage();
             }
 
-            return $message;
+            $booking = Booking::id($booking['id'])
+                ->read(['id',
+                    'price',
+                    'composition_id' => [
+                        'composition_items_ids' => ['id', 'name', 'firstname', 'lastname']
+                    ],
+                ])->first(true);
+
+            return $booking;
         },
-        'assert'            =>  function ($message) {
-            return ($message);
+        'assert'            =>  function ($booking) {
+            return ($booking);
         },
         'rollback'          =>  function () {
 
