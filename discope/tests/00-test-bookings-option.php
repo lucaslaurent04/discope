@@ -93,7 +93,7 @@ $tests = [
         'rollback'          =>  function () {
 
             Booking::search(['description', 'like', '%'. 'Reservation cannot be deleted in the option'.'%'])
-                ->update(['status' => 'option'])
+                ->update(['status' => 'quote'])
                 ->delete(true);
 
         }
@@ -195,7 +195,7 @@ $tests = [
         'rollback'          =>  function () {
 
             Booking::search(['description', 'like', '%'. 'Validate that new booking line cannot be added to the reservation'.'%'])
-                ->update(['status' => 'option'])
+                ->update(['status' => 'quote'])
                 ->delete(true);
 
         }
