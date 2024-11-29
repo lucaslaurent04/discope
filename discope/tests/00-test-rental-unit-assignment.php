@@ -126,7 +126,7 @@ $tests = [
             $booking = Booking::search(['id','=', $spm_rental_unit_assignement['booking_id']])
                 ->read(['id','nb_pers','rental_unit_assignments_ids'])
                 ->first(true);
-            print_r($booking);
+
 
             $rental_unit_assignments_ids = $booking['rental_unit_assignments_ids'];
 
@@ -136,7 +136,6 @@ $tests = [
                     ->first(true);
             }
 
-            print_r($b_spm_rental_unit_assignement);
             return (
                     $booking['id'] == $spm_rental_unit_assignement['booking_id'] &&
                     $b_spm_rental_unit_assignement['id'] == $spm_rental_unit_assignement['id']
