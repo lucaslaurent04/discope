@@ -271,7 +271,7 @@ $tests = [
                 ->first(true);
 
             return ($booking['status'] == 'quote' &&
-                    count($booking['consumptions_ids']) ==  0 );
+            empty($booking['consumptions_ids']));
         },
         'rollback'          =>  function () {
 
@@ -414,7 +414,7 @@ $tests = [
 
             return $booking['status'] == 'quote' &&
                 $contract['status'] == 'cancelled' &&
-                count($booking['fundings_ids']) == 0;
+                empty($booking['fundings_ids']);
         },
         'rollback'          =>  function () {
 
