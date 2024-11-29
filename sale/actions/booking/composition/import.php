@@ -25,15 +25,15 @@ list($params, $providers) = announce([
         ]
     ],
     'access' => [
-        'visibility'        => 'public',		// 'public' (default) or 'private' (can be invoked by CLI only)		
-        'groups'            => ['booking.default.user'],// list of groups ids or names granted 
+        'visibility'        => 'public',		// 'public' (default) or 'private' (can be invoked by CLI only)
+        'groups'            => ['booking.default.user'],// list of groups ids or names granted
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth'] 
+    'providers'     => ['context', 'orm', 'auth']
 ]);
 
 
@@ -50,7 +50,7 @@ $content = $params['data'];
 $size = strlen($content);
 
 // retrieve content_type from MIME
-$finfo = new finfo(FILEINFO_MIME);    
+$finfo = new finfo(FILEINFO_MIME);
 $content_type = explode(';', $finfo->buffer($content))[0];
 
 if($content_type != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
@@ -58,7 +58,9 @@ if($content_type != "application/vnd.openxmlformats-officedocument.spreadsheetml
 }
 
 $filename = 'bin/'.uniqid(rand(), true).'.xlsx';
-file_put_contents($filename, $content);
+if (file_put_contents($filename, $content) === false) {
+    throw new Exception('file_write_error', QN_ERROR_INVALID_PARAM);
+}
 
 /** @var string */
 $filetype = IOFactory::identify($filename);
@@ -73,10 +75,10 @@ $objects = [];
 foreach ($worksheetData as $worksheet) {
 
     $sheetname = $worksheet['worksheetName'];
-    
+
     $reader->setLoadSheetsOnly($sheetname);
     $spreadsheet = $reader->load($filename);
-    
+
     $worksheet = $spreadsheet->getActiveSheet();
     $data = $worksheet->toArray();
 
@@ -93,7 +95,7 @@ foreach ($worksheetData as $worksheet) {
         5 => 'nationality',
         6 => 'registration_number',
         7 => 'address',
-        8 => 'address_zip',   
+        8 => 'address_zip',
         9 => 'address_city',
         10 => 'phone',
         11 => 'email',
