@@ -183,7 +183,7 @@ $tests = [
                 $booking['price'] == $funding['due_amount'] &&
                 $funding['due_amount'] == $funding['paid_amount'] &&
                 $funding['is_paid'] == true &&
-                count($funding['payments_ids']) == 0
+                empty($funding['payments_ids'])
             );
         },
         'rollback'          =>  function () {
@@ -535,7 +535,7 @@ $tests = [
             return (
                 $funding['paid_amount'] == 0 &&
                 $funding['is_paid'] == false &&
-                count($funding['payments_ids']) == 0
+                empty($funding['payments_ids'])
             );
         },
         'rollback'          =>  function () {
@@ -708,7 +708,7 @@ $tests = [
             return (
                 $funding['paid_amount'] == 0 &&
                 $funding['is_paid'] == false &&
-                count($funding['payments_ids']) == 0
+                empty($funding['payments_ids'])
             );
         },
         'rollback'          =>  function () {
@@ -1168,7 +1168,7 @@ $tests = [
 
             return (
                 $booking_original['customer_id']['id'] == $booking_target['customer_id']['id'] &&
-                count($funding_original) == 0 &&
+                empty($funding_original) &&
                 $booking_original['price'] == $funding_target['due_amount'] &&
                 $funding_target['due_amount'] ==  $funding_target['paid_amount'] &&
                 $funding_target['is_paid'] == true
