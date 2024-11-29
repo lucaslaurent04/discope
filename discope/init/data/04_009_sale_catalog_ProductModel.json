@@ -116,7 +116,7 @@
                 "description_delivery": null,
                 "description_receipt": null,
                 "qty_accounting_method": "unit",
-                "booking_type_id": 1,
+                "booking_type_id": 4,
                 "is_repeatable": 0,
                 "is_accomodation": null,
                 "is_rental_unit": 0,
