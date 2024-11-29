@@ -125,6 +125,55 @@ jobs:
           name: Copy core package
           command: |
             cp -r ~/repo/packages.core/core ~/repo/packages/
+      - run:
+          name: List files in config directory
+          command: ls -la ~/repo/config/
+      # create a config file with Discope specifics
+      - run:
+          name: Create a config file with Discope specifics
+          command: |
+            echo '{"DEFAULT_LANG": "fr", "ORM_EVENTS_FORCE_ONUPDATE_AT_CREATION": true}' > ~/repo/config/config.json
+      # Verify the content of the file
+      - run:
+          name: Verify the content of the config file
+          command: cat ~/repo/config/config.json
+      - run:
+          name: List files in repo directory
+          command: ls -la ~/repo/
+      - run:
+          name: Create a composer.json file
+          command: |
+            echo '{
+              "require": {
+                "swiftmailer/swiftmailer": "^6.2",
+                "phpoffice/phpspreadsheet": "^1.4",
+                "dompdf/dompdf": "^0.8.3",
+                "electrolinux/phpquery": "^0.9.6",
+                "twig/twig": "^2.0",
+                "twig/intl-extra": "^3.3",
+                "smhg/sepa-qr-data": "^1.1",
+                "endroid/qr-code": "^4.3",
+                "codelicious/php-coda-parser": "^2.0"
+              },
+              "require-dev": {
+                "phpunit/phpunit": "^9.5",
+                "phpunit/php-code-coverage": "^9.2",
+                "symplify/easy-coding-standard": "^11.1"
+              }
+            }' > ~/repo/composer.json
+      # Verify the composer of the file
+      - run:
+          name: Verify the composer of the config file
+          command: cat ~/repo/composer.json
+      - run:
+          name: Initialize Composer Dependencies
+          command: php run.php --do=init_composer
+      - run:
+          name: Create a bin folder with write permissions
+          command: mkdir -p ~/repo/bin && chmod 775 ~/repo/bin
+      - run:
+          name: List files in repo directory
+          command: ls -la ~/repo/
       # assign folders permissions
       - run: php run.php --do=init_fs
       # check that mandatory directories are present and have correct access rights set
