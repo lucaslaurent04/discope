@@ -19,7 +19,7 @@
                 "address_state": null,
                 "address_country": null,
                 "registration_number": null,
-                "bank_account_iban": null,
+                "bank_account_iban": "BE52191158279209",
                 "bank_account_bic": null,
                 "analytic_section_id": null,
                 "signature": null,
