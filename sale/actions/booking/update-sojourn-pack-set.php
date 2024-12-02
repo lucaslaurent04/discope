@@ -144,6 +144,9 @@ BookingLineGroup::refreshPrice($orm, $group['id']);
 // #memo - new lines have been added, that could be rental units relating to a product model set as schedulable service with its own schedule
 BookingLineGroup::refreshTime($orm, $group['id']);
 
+// recompute time (could be based on product associated with pack or based on product associated with lines)
+Booking::refreshTime($orm, $group['booking_id']['id']);
+
 // #memo - booking type might be impacted by the chosen pack or one of its lines
 Booking::refreshBookingType($orm, $group['booking_id']['id']);
 
