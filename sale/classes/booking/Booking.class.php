@@ -1412,6 +1412,10 @@ class Booking extends Model {
         $om->update(self::getType(), $id, ['date_from' => null, 'date_to' => null, 'time_from' => null, 'time_to' => null]);
     }
 
+    public static function refreshTime($om, $id) {
+        $om->update(self::getType(), $id, ['time_from' => null, 'time_to' => null]);
+    }
+
     public static function refreshNbPers($om, $id) {
         $om->update(self::getType(), $id, ['nb_pers' => null]);
     }
