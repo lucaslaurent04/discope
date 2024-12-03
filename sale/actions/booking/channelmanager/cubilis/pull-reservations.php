@@ -53,6 +53,7 @@ list($params, $providers) = eQual::announce([
  */
 list($context, $orm, $cron, $dispatch) = [ $providers['context'], $providers['orm'], $providers['cron'], $providers['dispatch'] ];
 
+// #todo - @kaleo - this must be adapted according to new domain
 // #memo - temporary solution to prevent calls from non-production server
 if(constant('ROOT_APP_URL') != 'https://discope.yb.run') {
     throw new Exception('wrong_host', QN_ERROR_INVALID_CONFIG);
