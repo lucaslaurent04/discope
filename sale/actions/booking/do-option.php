@@ -178,11 +178,27 @@ else {
 
     // set up a scheduled job to set back the booking to a quote according to delay set by Setting `option.validity`
     $cron->schedule(
-        "booking.option.deprecation.{$params['id']}",             // assign a reproducible unique name
-        time() + $days_expiry  * 86400,                 // remind after {sale.booking.option.validity} days (default 10 days), or manually given value
+        // assign a reproducible unique name
+        "booking.option.deprecation.{$params['id']}",
+        // remind after {sale.booking.option.validity} days (default 10 days), or manually given value
+        time() + $days_expiry  * 86400,
         'sale_booking_update-booking',
         [ 'id' => $params['id'], 'free_rental_units' => $params['free_rental_units'] ]
     );
+
+
+    // #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
+    // setup a scheduled job to set back the booking to a quote according to delay set by Setting `option.validity`
+    $cron->schedule(
+        // assign a reproducible unique name
+        "booking.option.deprecation.{$params['id']}",
+        // remind after {sale.booking.option.validity} days (default 10 days), or manually given value
+        time() + $days_expiry  * 86400,
+        'lodging_booking_update-booking',
+        [ 'id' => $params['id'], 'free_rental_units' => $params['free_rental_units'] ]
+    );
+
+
 }
 
 /*
