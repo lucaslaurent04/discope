@@ -198,6 +198,14 @@ $cron->schedule(
     [ 'id' => $params['booking_id'], 'lang' => $params['lang'] ]
 );
 
+// #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
+$cron->schedule(
+    "booking.quote.reminder.{$params['booking_id']}",
+    time() + $limit * 86400,
+    'lodging_booking_remind-quote',
+    [ 'id' => $params['booking_id'], 'lang' => $params['lang'] ]
+);
+
 $context->httpResponse()
         ->status(204)
         ->send();
