@@ -96,6 +96,8 @@ for ($current_date = $start_date; $current_date <= $end_date; $current_date = st
                 'rental_units_ids'  => $room_type['rental_units_ids']
             ]
         );
+
+        // #memo - @kaleo - this doesn't work while old instance is in use
         ++$j;
     }
     ++$i;

@@ -764,6 +764,13 @@ try {
                                         [ 'id' => $payment['id'] ]
                                     );
 
+                                // #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
+                                $cron->schedule(
+                                        "psp.fetch.{$payment['id']}",
+                                        time(),
+                                        'lodging_payments_fetch-psp',
+                                        [ 'id' => $payment['id'] ]
+                                    );
                             }
 
                         }

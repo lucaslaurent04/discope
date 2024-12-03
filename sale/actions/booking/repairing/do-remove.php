@@ -66,6 +66,19 @@ if($channelmanager_enabled) {
                 'rental_units_ids'  => array_keys($map_rental_units_ids)
             ]
         );
+
+        // #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
+        $cron->schedule(
+            "channelmanager.check-contingencies.{$params['id']}",
+            time(),
+            'lodging_booking_check-contingencies',
+            [
+                'date_from'         => date('c', $repairing['date_from']),
+                // repairings completely cover the last day of the date range
+                'date_to'           => date('c', strtotime('+1 day', $repairing['date_to'])),
+                'rental_units_ids'  => array_keys($map_rental_units_ids)
+            ]
+        );
     }
 }
 

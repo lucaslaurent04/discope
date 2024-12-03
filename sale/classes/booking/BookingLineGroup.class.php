@@ -1904,6 +1904,15 @@ class BookingLineGroup extends Model {
                 'sale_booking_check-units-assignments',
                 [ 'id' => $booking_id ]
             );
+
+            // #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
+            $cron->schedule(
+                "booking.assign.units.{$booking_id}",
+                // run as soon as possible
+                time() + 60,
+                'lodging_booking_check-units-assignments',
+                [ 'id' => $booking_id ]
+            );
         }
 
     }
@@ -2520,6 +2529,16 @@ class BookingLineGroup extends Model {
                     'sale_booking_check-units-assignments',
                     [ 'id' => $booking_id ]
                 );
+
+                // #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
+                $cron->schedule(
+                    "booking.assign.units.{$booking_id}",
+                    // run as soon as possible
+                    time() + 60,
+                    'lodging_booking_check-units-assignments',
+                    [ 'id' => $booking_id ]
+                );
+
             }
         }
 
@@ -4099,6 +4118,15 @@ class BookingLineGroup extends Model {
                     // run as soon as possible
                     time() + 60,
                     'sale_booking_check-units-assignments',
+                    [ 'id' => $group['booking_id'] ]
+                );
+
+                // #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
+                $cron->schedule(
+                    "booking.assign.units.{$group['booking_id']}",
+                    // run as soon as possible
+                    time() + 60,
+                    'lodging_booking_check-units-assignments',
                     [ 'id' => $group['booking_id'] ]
                 );
 
