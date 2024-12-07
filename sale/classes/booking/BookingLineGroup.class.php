@@ -167,7 +167,8 @@ class BookingLineGroup extends Model {
                 'type'              => 'integer',
                 'description'       => 'Amount of persons this group is about.',
                 'default'           => 1,
-                'onupdate'          => 'onupdateNbPers'
+                'onupdate'          => 'onupdateNbPers',
+                'dependents'        => ['nb_children']
             ],
 
             'nb_children' => [
@@ -665,7 +666,8 @@ class BookingLineGroup extends Model {
         $om->callonce(self::getType(), '_resetPrices', $ids, [], $lang);
 
         // 2) invalidate nb children
-        $om->callonce(self::getType(), '_resetNbChildren', $ids, [], $lang);
+        // #memo - nb_children is amongst nb_pers dependents
+        // $om->callonce(self::getType(), '_resetNbChildren', $ids, [], $lang);
 
         $groups = $om->read(self::getType(), $ids, [
             'booking_id',
@@ -1431,7 +1433,8 @@ class BookingLineGroup extends Model {
                                 (
                                     $line['is_accomodation'] || $line['is_meal']
                                 )
-                            ) ) {
+                            )
+                        ) {
                             trigger_error("ORM:: creating price adapter", QN_REPORT_DEBUG);
                             $factor = $group['nb_nights'];
 
