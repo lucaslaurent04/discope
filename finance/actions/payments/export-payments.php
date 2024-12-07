@@ -92,7 +92,7 @@ $payments_ids = Payment::search([
             ['psp_type', '=', 'stripe']
         ],
 /*
-// #memo - waiting to be confirmed (the teams to be ready for the accounting)
+// #todo - #memo - waiting to be confirmed (the teams to be ready for the accounting)
         [
             ['is_exported', '=', false],
             ['center_office_id', '=', $params['center_office_id']],
