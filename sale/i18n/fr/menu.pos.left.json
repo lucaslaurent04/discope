@@ -1,28 +1,52 @@
 {
     "description": "",
     "view": {
-        "item.pos_sessions": {
-            "label": "Sessions", 
+        "pos.sessions": {
+            "label": "Sessions",
             "help": ""
         },
-        "item.pos_sessions.pending": {
-            "label": "Sessions en cours", 
+        "pos.sessions.pending": {
+            "label": "Sessions en cours",
             "help": ""
         },
-        "item.pos_sessions.history": {
-            "label": "Historique", 
+        "pos.sessions.history": {
+            "label": "Historique",
             "help": ""
         },
-        "item.pos_orders.orders":{
-            "label": "Commandes", 
+        "pos.sessions.history.cashdeskSession": {
+            "label": "Session",
             "help": ""
         },
-        "item.pos_orders.operations": {
-            "label": "Opérations", 
+        "pos.sessions.history.orders": {
+            "label": "Commandes (toutes)",
             "help": ""
         },
-        "item.pos_orders.payments": {
-            "label": "Paiements", 
+        "pos.catalog": {
+            "label": "Catalogue",
+            "help": ""
+        },
+        "pos.catalog.products": {
+            "label": "Produits",
+            "help": ""
+        },
+        "pos.catalog.pricelists": {
+            "label": "Listes de prix",
+            "help": ""
+        },
+        "pos.sessions.invoicing": {
+            "label": "Facturation",
+            "help": ""
+        },
+        "pos.order.toinvoice": {
+            "label": "Commandes à facturer",
+            "help": ""
+        },
+        "pos.sessions.invoicing.waiting": {
+            "label": "Factures en attente",
+            "help": ""
+        },
+        "pos.sessions.invoicing.all": {
+            "label": "Toutes les factures",
             "help": ""
         }
     }
