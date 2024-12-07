@@ -6,14 +6,14 @@
     "layout": {
         "items": [
             {
-                "id": "item.pos_sessions",
+                "id": "pos.sessions",
                 "label": "Sessions",
                 "description": "",
                 "icon": "menu_book",
                 "type": "parent",
                 "children": [
                     {
-                        "id": "item.pos_sessions.pending",
+                        "id": "pos.sessions.pending",
                         "type": "entry",
                         "label": "Pending sessions",
                         "description": "",
@@ -23,52 +23,125 @@
                             "view": "list.default",
                             "order": "created",
                             "sort": "desc",
-                            "domain": [ ["status", "=", "pending"] ]
+                            "domain": [ ["status", "=", "pending"], ["center_id", "in", "user.centers_ids"] ]
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "pos.catalog",
+                "label": "Catalog",
+                "description": "",
+                "icon": "library_books",
+                "type": "parent",
+                "children": [
+                    {
+                        "id": "pos.catalog.products",
+                        "type": "entry",
+                        "label": "Products",
+                        "icon": "style",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\catalog\\PosProductModel",
+                            "view": "list.default"
                         }
                     },
                     {
-                        "id": "item.pos_sessions.history",
+                        "id": "pos.catalog.pricelists",
+                        "type": "entry",
+                        "label": "Price lists",
+                        "icon": "attach_money",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\catalog\\PosPriceList",
+                            "view": "list.default",
+                            "domain": [["is_active", "=", true], ["price_list_category_id", "in", "user.center_offices_ids"]]
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "pos.sessions.invoicing",
+                "label": "Invoicing",
+                "description": "",
+                "icon": "receipt_long",
+                "type": "parent",
+                "children": [
+                    {
+                        "id": "pos.order.toinvoice",
+                        "type": "entry",
+                        "label": "Order to invoice",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\pos\\Order",
+                            "view": "list.invoiceable"
+                        }
+                    },
+                    {
+                        "id": "pos.sessions.invoicing.waiting",
+                        "type": "entry",
+                        "label": "Waiting",
+                        "route": "/",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\booking\\Invoice",
+                            "view": "list.order",
+                            "domain": [ ["status", "=", "proforma"] ]
+                        }
+                    },
+                    {
+                        "id": "pos.sessions.invoicing.all",
+                        "type": "entry",
+                        "label": "All invoices",
+                        "route": "/",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\booking\\Invoice",
+                            "view": "list.order",
+                            "domain": [ ["status", "=", "invoice"] ]
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "pos.sessions.history",
+                "label": "Sessions",
+                "description": "",
+                "icon": "auto_stories",
+                "type": "parent",
+                "children": [
+                    {
+                        "id": "pos.sessions.history.cashdeskSession",
                         "type": "entry",
                         "label": "Reconciled lines",
-                        "description": "", 
-                        "route": "/sessions",                    
+                        "description": "",
+                        "route": "/sessions",
                         "context": {
                             "entity": "sale\\pos\\CashdeskSession",
                             "view": "list.reconciled",
                             "order": "created",
                             "sort": "desc",
-                            "domain": [ ["status", "=", "closed"] ]
+                            "domain": [ ["status", "=", "closed"], ["center_id", "in", "user.centers_ids"] ]
                         }
                     },
                     {
-                        "id": "item.pos_orders.orders",
+                        "id": "pos.sessions.consolidated",
                         "type": "entry",
-                        "label": "Orders  ",
-                        "description": "", 
+                        "label": "Consolidé",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\pos\\stat-cashdeskSession",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "pos.sessions.history.orders",
+                        "type": "entry",
+                        "label": "Orders",
+                        "description": "",
                         "context": {
                             "entity": "sale\\pos\\Order",
-                            "view": "list.default",
-                            "domain": [[["status", "=", "pending"]]]
-                        }
-                    },
-                    {
-                        "id": "item.pos_orders.operations",
-                        "type": "entry",
-                        "label": "Operations",
-                        "description": "", 
-                        "context": {
-                            "entity": "sale\\pos\\Operation",
-                            "view": "list.default"
-                        }
-                    },
-                    {
-                        "id": "item.pos_orders.payments",
-                        "type": "entry",
-                        "label": "Payments",
-                        "description": "", 
-                        "context": {
-                            "entity": "sale\\pos\\OrderPayment",
-                            "view": "list.default"
+                            "view": "list.paid"
                         }
                     }
                 ]
