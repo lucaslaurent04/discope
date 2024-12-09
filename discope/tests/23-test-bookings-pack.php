@@ -229,7 +229,16 @@ $tests = [
 
             $booking = Booking::id($booking['id'])
                 ->read(['id', 'price',
-                    'booking_lines_ids' => ['id', 'price'],
+                    'booking_lines_ids' => [
+                        'id',
+                        'product_id' => ['id', 'name'] ,
+                        'product_model_id' => ['id', 'name'] ,
+                        'price_id',
+                        'unit_price',
+                        'qty',
+                        'total',
+                        'price'
+                    ],
                     'booking_lines_groups_ids' => ['id', 'price']
                 ])->first(true);
 
@@ -254,7 +263,7 @@ $tests = [
             );
         },
         'rollback'          =>  function () {
-            Booking::search(['description', 'like', '%'. 'Create a booking for a pack whose price depends on the price of the booking line'.'%'])->delete(true);
+           Booking::search(['description', 'like', '%'. 'Create a booking for a pack whose price depends on the price of the booking line'.'%'])->delete(true);
         }
 
     ],
@@ -265,8 +274,7 @@ $tests = [
             Creates a booking with configuration below and test the consistency between booking price, sum of groups prices and sum of the lines. \n \n
             Dates from: 02-08-2023
             Dates to: 08-08-2023 (3 nights)
-            Persons: 52
-            Pack: Séjour Daverdisse entier (DA-DaveFul-A)",
+            Persons: 52",
         'arrange'           =>  function () {
 
             $center = Center::search(['name', 'like', '%Your Establisment%'])->read(['id'])->first(true);
