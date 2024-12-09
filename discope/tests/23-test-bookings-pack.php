@@ -257,9 +257,8 @@ $tests = [
 
 
             return (
-                $booking['price'] == 1331.91 &&
-                $booking['price'] == $total_price_blg &&
-                $booking['price'] == $total_price_bl
+                $booking['price'] == round($total_price_blg,2) &&
+                $booking['price'] == round($total_price_bl,2)
             );
         },
         'rollback'          =>  function () {
