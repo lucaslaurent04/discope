@@ -20,7 +20,7 @@
             [noResult]="'Pas de correspondance'" 
             [required]="true"
             (itemSelected)="onselectCashdesk($event)" 
-            [domain]="['id', 'in', user?.centers_ids]">
+            [domain]="['center_id', 'in', user?.centers_ids]">
             Caisse
         </sb-m2o-select>
     </div>
