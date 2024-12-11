@@ -14,6 +14,48 @@
                 "type": "parent",
                 "children": [
                     {
+                        "id": "security",
+                        "label": "Security",
+                        "description": "",
+                        "icon": "lock_open",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "permissions",
+                                "type": "entry",
+                                "label": "Permissions",
+                                "icon": "how_to_reg",
+                                "description": "",
+                                "context": {
+                                    "entity": "core\\Permission",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "users",
+                                "type": "entry",
+                                "label": "Users",
+                                "icon": "person",
+                                "description": "",
+                                "context": {
+                                    "entity": "core\\User",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "groups",
+                                "type": "entry",
+                                "label": "Groups",
+                                "icon": "group",
+                                "description": "",
+                                "context": {
+                                    "entity": "core\\Group",
+                                    "view": "list.default"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "id": "organisation",
                         "label": "Organisation",
                         "description": "",
