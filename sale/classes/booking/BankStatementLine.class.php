@@ -166,6 +166,7 @@ class BankStatementLine extends \sale\pay\BankStatementLine {
                             // mark the line as successfully reconciled
                             $om->update(self::getType(), $lid, ['status' => 'reconciled']);
                             // create a new payment with assigned amount
+                            // #todo - receipt_date should be set according to $line['date']
                             $payment_id = $om->create(Payment::getType(), [
                                 'funding_id'        => $matching_funding['id'],
                                 'booking_id'        => $matching_funding['booking_id'],
