@@ -16,10 +16,10 @@
     <div class="elements-select">
         <sb-m2o-select [entity]="'sale\\pos\\Cashdesk'"
             [placeholder]="'Commencez à taper le nom'"
-            [hint]="'Caisse sur laquelle ouvrir une session'" 
-            [noResult]="'Pas de correspondance'" 
+            [hint]="'Caisse sur laquelle ouvrir une session'"
+            [noResult]="'Pas de correspondance'"
             [required]="true"
-            (itemSelected)="onselectCashdesk($event)" 
+            (itemSelected)="onselectCashdesk($event)"
             [domain]="['center_id', 'in', user?.centers_ids]">
             Caisse
         </sb-m2o-select>
