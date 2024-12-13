@@ -37,7 +37,7 @@ list($params, $providers) = eQual::announce([
  */
 list($context, $orm, $dispatch) = [$providers['context'], $providers['orm'], $providers['dispatch']];
 
-$line = BankStatementLine::id($params['id'])->read(['id', 'structured_message', 'message' , 'amount'])->first(true);
+$line = BankStatementLine::id($params['id'])->read(['id', 'structured_message', 'message' , 'amount', 'center_office_id'])->first(true);
 if($line['amount'] < 0 && $line['structured_message']){
     throw new Exception('invalid_bankStatementLine', EQ_ERROR_INVALID_PARAM);
 }
@@ -56,6 +56,10 @@ $booking_before = Booking::search([[['name', '=', $booking_name]], [['extref_res
 
 if($line['structured_message'] && ($booking_before['payment_reference'] != $line['structured_message'])){
     throw new Exception('invalid_structured_message', EQ_ERROR_INVALID_PARAM);
+}
+
+if($booking_before['center_office_id'] != $line['center_office_id']){
+    throw new Exception('invalid_center_office', EQ_ERROR_INVALID_PARAM);
 }
 
 $orm->call(BankStatementLine::getType(), 'reconcile', (array) $params['id']);
