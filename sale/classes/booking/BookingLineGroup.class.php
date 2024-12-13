@@ -1273,8 +1273,7 @@ class BookingLineGroup extends Model {
                 Search for matching Discounts within the found Discount List
             */
             if($discount_list_id) {
-                $count_booking_24 = self::calcCountBooking24($om,  $group['booking_id'], $group['booking_id.customer_id'],$group['date_from']);
-
+                $count_booking_24 = self::computeCountBooking24($om, $group['booking_id'], $group['booking_id.customer_id'], $group['date_from']);
 
                 $operands = [
                     'count_booking_24'  => $count_booking_24,     // qty of customer bookings from 2 years ago to present
@@ -1475,7 +1474,7 @@ class BookingLineGroup extends Model {
         }
     }
 
-    public static function calcCountBooking24($om, $booking_id, $customer_id, $date_from) {
+    private static function computeCountBooking24($om, $booking_id, $customer_id, $date_from) {
 
         $bookings_ids = $om->search(Booking::getType(),[
             ['id', '<>', $booking_id],
@@ -1488,9 +1487,10 @@ class BookingLineGroup extends Model {
         return ($bookings_ids > 0)?count($bookings_ids):0;
     }
 
-    public static function calcCountBooking12($om, $customer_id, $date_from) {
+    private static function computeCountBooking12($om, $booking_id, $customer_id, $date_from) {
 
-        $bookings_ids = $om->search(Booking::getType(),[
+        $bookings_ids = $om->search(Booking::getType(), [
+            ['id', '<>', $booking_id],
             ['customer_id', '=', $customer_id],
             ['date_from', '>=', strtotime('-365 days', $date_from)],
             ['is_cancelled', '=', false],
@@ -1583,7 +1583,7 @@ class BookingLineGroup extends Model {
                 Search for matching Discounts within the found Discount List
             */
             if($discount_list_id) {
-                $count_booking_24 = self::calcCountBooking24($om,  $group['booking_id'], $group['booking_id.customer_id'],$group['date_from']);
+                $count_booking_24 = self::computeCountBooking24($om, $group['booking_id'], $group['booking_id.customer_id'], $group['date_from']);
 
                 $operands = [
                     'count_booking_24'  => $count_booking_24,     // qty of customer bookings from 2 years ago to present
@@ -3323,7 +3323,7 @@ class BookingLineGroup extends Model {
 
 			// for now, we only support member cards for customer that haven't booked a service for more thant 12 months
 
-			$operands['count_booking_12'] = self::calcCountBooking12($om, $group['booking_id.customer_id'], $group['date_from']);
+			$operands['count_booking_12'] = self::computeCountBooking12($om, $group['booking_id'], $group['booking_id.customer_id'], $group['date_from']);
 			$operands['nb_pers'] = $group['nb_pers'];
 			$operands['nb_nights'] = $group['nb_nights'];
 
@@ -3591,7 +3591,7 @@ class BookingLineGroup extends Model {
             Search for matching Discounts within the found Discount List
         */
         if($discount_list_id) {
-            $count_booking_24 = self::calcCountBooking24($om,  $group['booking_id'], $group['booking_id.customer_id'],$group['date_from']);
+            $count_booking_24 = self::computeCountBooking24($om, $group['booking_id'], $group['booking_id.customer_id'], $group['date_from']);
 
             $operands = [
                 'count_booking_24'  => $count_booking_24,     // qty of customer bookings from 2 years ago to present
