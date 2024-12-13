@@ -11,7 +11,8 @@
     "error": {
         "errors": {
             "invalid_bankStatementLine": "Il n'est pas possible de faire une réconciliation pour un remboursement avec une communication structurée.",
-            "invalid_structured_message": "La communication structurée de la ligne ne correspond pas à la communication de la réservation."
+            "invalid_structured_message": "La communication structurée de la ligne ne correspond pas à la communication de la réservation.",
+            "invalid_center_office": "L'équipe de gestion de la ligne d'extrait bancaire ne correspond pas à l'équipe de gestion de la réservation"
         }
     }
 }
