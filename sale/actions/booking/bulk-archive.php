@@ -6,10 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use sale\booking\Booking;
-
-// announce script and fetch parameters values
-list($params, $providers) = announce([
+list($params, $providers) = eQual::announce([
     'description'	=>	"Mark a selection of Booking as archive.",
     'params' 		=>	[
         'ids' => [
@@ -29,7 +26,7 @@ list($params, $providers) = announce([
     'providers' => ['context']
 ]);
 
-list($context) = [$providers['context']];
+['context' => $context] = $providers;
 
 $errors = [];
 
@@ -38,7 +35,7 @@ foreach($params['ids'] as $id) {
         eQual::run('do', 'sale_booking_do-archive', ['id' => $id]);
     }
     catch(Exception $e) {
-        throw new Exception($e->getMessage(), QN_ERROR_INVALID_PARAM);
+        $errors[] = "unable to archive Booking {$id} : ".$e->getMessage();
     }
 }
 
