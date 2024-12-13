@@ -544,7 +544,7 @@ foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
                     'vat_rate'      => null,
                     'qty'           => $booking_line['qty'],
                     'discount'      => null,
-                    'free_qty'      => null,
+                    'free_qty'      => $booking_line['free_qty'],
                     'is_group'      => false,
                     'is_pack'       => false
                 ];
