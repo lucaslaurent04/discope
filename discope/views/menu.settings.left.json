@@ -38,8 +38,8 @@
                                 "icon": "person",
                                 "description": "",
                                 "context": {
-                                    "entity": "core\\User",
-                                    "view": "list.default"
+                                    "entity": "identity\\User",
+                                    "view": "list.admin"
                                 }
                             },
                             {
