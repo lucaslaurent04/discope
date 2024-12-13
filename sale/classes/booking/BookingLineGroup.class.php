@@ -1273,7 +1273,8 @@ class BookingLineGroup extends Model {
                 Search for matching Discounts within the found Discount List
             */
             if($discount_list_id) {
-                $count_booking_24 = self::calcCountBooking24($om, $group['booking_id.customer_id'], $group['date_from']);
+                $count_booking_24 = self::calcCountBooking24($om,  $group['booking_id'], $group['booking_id.customer_id'],$group['date_from']);
+
 
                 $operands = [
                     'count_booking_24'  => $count_booking_24,     // qty of customer bookings from 2 years ago to present
@@ -1474,9 +1475,10 @@ class BookingLineGroup extends Model {
         }
     }
 
-    public static function calcCountBooking24($om, $customer_id, $date_from) {
+    public static function calcCountBooking24($om, $booking_id, $customer_id, $date_from) {
 
         $bookings_ids = $om->search(Booking::getType(),[
+            ['id', '<>', $booking_id],
             ['customer_id', '=', $customer_id],
             ['date_from', '>=', strtotime('-2 years', $date_from)],
             ['is_cancelled', '=', false],
@@ -1581,7 +1583,7 @@ class BookingLineGroup extends Model {
                 Search for matching Discounts within the found Discount List
             */
             if($discount_list_id) {
-                $count_booking_24 = self::calcCountBooking24($om, $group['booking_id.customer_id'], $group['date_from']);
+                $count_booking_24 = self::calcCountBooking24($om,  $group['booking_id'], $group['booking_id.customer_id'],$group['date_from']);
 
                 $operands = [
                     'count_booking_24'  => $count_booking_24,     // qty of customer bookings from 2 years ago to present
@@ -3589,7 +3591,7 @@ class BookingLineGroup extends Model {
             Search for matching Discounts within the found Discount List
         */
         if($discount_list_id) {
-            $count_booking_24 = self::calcCountBooking24($om, $group['booking_id.customer_id'], $group['date_from']);
+            $count_booking_24 = self::calcCountBooking24($om,  $group['booking_id'], $group['booking_id.customer_id'],$group['date_from']);
 
             $operands = [
                 'count_booking_24'  => $count_booking_24,     // qty of customer bookings from 2 years ago to present
