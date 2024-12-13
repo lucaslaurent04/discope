@@ -7,8 +7,8 @@
 
 use sale\booking\Booking;
 
-list($params, $providers) = announce([
-    'description'	=>	" Archives outdated booking records in batch. Targets bookings with  status quote, created over 12 months ago, amount paint is zero ",
+list($params, $providers) = eQual::announce([
+    'description'	=>	" Archives outdated booking records in batch. Targets bookings with status 'quote', created over 12 months ago, with no amount paid.",
     'access' => [
         'visibility'        => 'protected',
         'groups'            => ['booking.default.user'],
@@ -21,14 +21,13 @@ list($params, $providers) = announce([
     'providers' => ['context']
 ]);
 
-list($context) = [$providers['context']];
+['context' => $context] = $providers;
 
 $bookings = Booking::search([
                 ['status', '=', 'quote'],
                 ['created', '<=' , strtotime('-12 months')],
                 ['state', '=', 'instance'],
-                ['paid_amount' , '=' , 0 ],
-                ['deleted', '=', 0]
+                ['paid_amount' , '=' , 0 ]
             ])->ids();
 
 if($bookings){
