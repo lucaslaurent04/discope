@@ -1011,7 +1011,7 @@ class Identity extends Model {
         $identities = $om->read(self::getType(), $oids, ['is_readonly', 'is_duplicate'], $lang);
         foreach($identities as $identity) {
             if($identity['is_readonly']) {
-                return ['id' => ['non_updateable_identity' => 'Temporary identities cannot be updated.']];
+                return ['id' => ['non_updateable_identity' => 'Static identities cannot be updated.']];
             }
 
             if(isset($values['has_duplicate_clue']) && $values['has_duplicate_clue'] && $identity['is_duplicate']) {
