@@ -21,7 +21,7 @@ list($params, $providers) = eQual::announce([
         ]
     ],
     'access' => [
-        'groups'            => ['booking.default.user', 'sale.default.administrator']
+        'groups'            => ['finance.default.administrator', 'finance.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
