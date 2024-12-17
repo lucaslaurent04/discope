@@ -1008,15 +1008,16 @@ class Identity extends Model {
      * @return array    Returns an associative array mapping fields with their error messages. En empty array means that object has been successfully processed and can be updated.
      */
     public static function canupdate($om, $oids, $values, $lang='en') {
-        $identities = $om->read(self::getType(), $oids, ['is_readonly'], $lang);
+        $identities = $om->read(self::getType(), $oids, ['is_readonly', 'is_duplicate'], $lang);
         foreach($identities as $identity) {
             if($identity['is_readonly']) {
                 return ['id' => ['non_updateable_identity' => 'Temporary identities cannot be updated.']];
             }
-        }
 
-        if(isset($values['has_duplicate_clue']) && $values['has_duplicate_clue']) {
-            return ['has_duplicate_clue' => ['might_be_duplicate' => 'Cannot save possible duplicate without unchecking.']];
+            if(isset($values['has_duplicate_clue']) && $values['has_duplicate_clue'] && $identity['is_duplicate']) {
+                return ['has_duplicate_clue' => ['might_be_duplicate' => 'Cannot save possible duplicate without unchecking.']];
+            }
+
         }
 
         if(isset($values['type_id'])) {
@@ -1202,7 +1203,7 @@ class Identity extends Model {
 
     public static function onupdateIsDuplicate($om, $ids, $values, $lang) {
         if(isset($values['is_duplicate']) && !$values['is_duplicate']) {
-            $om->update(self::getType(), $ids, ['duplicate_identity_id' => null], $lang);
+            $om->update(self::getType(), $ids, ['duplicate_identity_id' => null, 'has_duplicate_clue' => false], $lang);
         }
     }
 
