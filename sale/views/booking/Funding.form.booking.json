@@ -41,7 +41,7 @@
             "controller": "sale_booking_funding_do-pay-append",
             "confirm": true,
             "access": {
-                "groups": ["finance.default.administrator", "finance.default.user"]
+                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
             },
             "visible": ["is_paid", "=", false]
         },
@@ -63,7 +63,7 @@
             "controller": "sale_booking_funding_do-paid",
             "confirm": true,
             "access": {
-                "groups": ["finance.default.administrator", "finance.default.user"]
+                "groups": ["finance.accounting.administrator"]
             },
             "visible": ["is_paid", "=", false]
         },
@@ -74,7 +74,7 @@
             "controller": "sale_booking_funding_do-transfer",
             "confirm": true,
             "access": {
-                "groups": ["finance.default.administrator", "finance.default.user", "booking.default.user"]
+                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
             },
             "visible": ["type", "<>", "invoice"]
         },
@@ -85,7 +85,7 @@
             "controller": "sale_booking_funding_do-delete",
             "confirm": true,
             "access": {
-                "groups": ["finance.default.administrator", "finance.default.user", "booking.default.user"]
+                "groups": ["booking.default.user", "finance.default.administrator"]
             },
             "visible": [["type", "<>", "invoice"], ["due_amount", "<", 0]]
         }
