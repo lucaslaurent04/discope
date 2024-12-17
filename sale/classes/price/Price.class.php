@@ -178,4 +178,21 @@ class Price extends Model {
     }
 
 
+    /**
+     * Signature for single object change from views.
+     *
+     * @param  array    $event     Associative array holding changed fields as keys, and their related new values.
+     * @param  array    $values    Copy of the current (partial) state of the object.
+     * @return array    Associative array mapping fields with their resulting values.
+     */
+    public static function onchange($event, $values) {
+        $result = [];
+        if(isset($event['price'])) {
+            $result['price_vat'] = round($event['price'] * (1 + $values['vat_rate'] ?? 0), 4);
+        }
+        elseif(isset($event['price_vat'])) {
+            $result['price'] = round($event['price_vat'] / (1 + $values['vat_rate'] ?? 0), 4);
+        }
+        return $result;
+    }
 }
