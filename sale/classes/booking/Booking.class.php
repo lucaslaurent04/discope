@@ -1327,8 +1327,8 @@ class Booking extends Model {
      */
     public static function onafterdelete($orm, $ids) {
         // #memo - we do this to handle case where auto products (by groups) are re-created during the delete cycle
-        $groups_ids = $orm->search(\sale\booking\BookingLineGroup::getType(), ['booking_id', 'in', $ids]);
-        $orm->delete(\sale\booking\BookingLineGroup::getType(), $groups_ids, true);
+        $groups_ids = $orm->search(BookingLineGroup::getType(), ['booking_id', 'in', $ids]);
+        $orm->delete(BookingLineGroup::getType(), $groups_ids, true);
     }
 
     /**
@@ -1340,18 +1340,19 @@ class Booking extends Model {
     public static function createConsumptions($om, $ids, $values, $lang) {
         $bookings = $om->read(self::getType(), $ids, ['consumptions_ids'], $lang);
 
-        // remove consumptions
-        foreach($bookings as $id => $booking) {
-            $om->delete(\sale\booking\Consumption::getType(), $booking['consumptions_ids'], true);
-        }
-
         // get in-memory list of consumptions for all lines
         $consumptions = $om->call(self::getType(), 'getResultingConsumptions', $ids, [], $lang);
 
         // recreate consumptions objects
         foreach($consumptions as $consumption) {
-            $om->create(\sale\booking\Consumption::getType(), $consumption, $lang);
+            $om->create(Consumption::getType(), $consumption, $lang);
         }
+
+        // if everything went well, remove old consumptions
+        foreach($bookings as $id => $booking) {
+            $om->delete(Consumption::getType(), $booking['consumptions_ids'], true);
+        }
+
     }
 
 
