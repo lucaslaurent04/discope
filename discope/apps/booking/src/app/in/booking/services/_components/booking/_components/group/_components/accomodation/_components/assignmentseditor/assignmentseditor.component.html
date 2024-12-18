@@ -34,7 +34,7 @@
     </div>
     <!-- right pane -->
     <div class="list" cdkDropList (cdkDropListDropped)="addSelection()" style="flex: 0 1 calc(50% - 10px); border: solid 1px darkgrey;">
-        <div *ngFor="let assignment of rentalUnitsAssignments"
+        <div *ngFor="let assignment of rentalUnitsAssignments; let index = index"
                 class="rentalunit-line line-assignment">
             <booking-services-booking-group-accomodation-assignmentseditor-assignment
                 [model]="assignment"
@@ -42,8 +42,8 @@
                 [booking]="booking"
                 [group]="group"
                 [mode]="'edit'"
-                (updated)="onupdateAssignment($event)"
-                (deleted)="ondeleteAssignment(assignment.id)"
+                (updated)="onupdateAssignment($event, index)"
+                (deleted)="ondeleteAssignment(index)"
             ></booking-services-booking-group-accomodation-assignmentseditor-assignment>
         </div>
     </div>
