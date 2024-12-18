@@ -51,7 +51,7 @@ $group = BookingLineGroup::id($params['id'])
     ->read([
         'id', 'is_extra', 'is_sojourn',
         'has_pack',
-        'pack' => ['family_id'],
+        'pack_id' => ['family_id'],
         'booking_id' => ['id', 'status']
     ])
     ->first(true);
