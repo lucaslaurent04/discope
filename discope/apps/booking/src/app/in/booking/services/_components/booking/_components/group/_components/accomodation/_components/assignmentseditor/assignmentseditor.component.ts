@@ -85,9 +85,9 @@ export class BookingServicesBookingGroupAccomodationAssignmentsEditorComponent i
         }
     }
 
-    public async ondeleteAssignment(assignment_id: any) {
+    public async ondeleteAssignment(index: any) {
         // add related rental unit back to left pane
-        let assignment = this.rentalUnitsAssignments.find( (e:any) => e.id == assignment_id );
+        let assignment = this.rentalUnitsAssignments[index];
         if(assignment) {
             // retrieve original rental unit, if loaded
             let originalRentalUnit = this.originalAvailableRentalUnits.find( (e:any) => e.id == assignment.rental_unit_id.id );
@@ -117,12 +117,11 @@ export class BookingServicesBookingGroupAccomodationAssignmentsEditorComponent i
         }
 
         // remove assignment from right pane
-        this.rentalUnitsAssignments.splice(this.rentalUnitsAssignments.findIndex( (e:any) => e.id == assignment_id ), 1);
+        this.rentalUnitsAssignments.splice(index, 1);
     }
 
-    public async onupdateAssignment(assignment:any) {
-        console.log("AssignmentEditor::onupdateAssignment", assignment);
-        let index = this.rentalUnitsAssignments.findIndex( (e:any) => e.id == assignment.id );
+    public async onupdateAssignment(assignment:any, index:any) {
+        console.log("AssignmentEditor::onupdateAssignment", assignment, this.rentalUnitsAssignments);
         if(index >= 0) {
             this.rentalUnitsAssignments[index].qty = assignment.qty;
         }
