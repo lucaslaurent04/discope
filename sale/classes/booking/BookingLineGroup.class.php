@@ -1032,8 +1032,8 @@ class BookingLineGroup extends Model {
 
             if($groups > 0) {
                 foreach($groups as $group) {
-                    // nb_pers can never be updated once the booking has been invoiced
-                    if(in_array($group['booking_id.status'], ['proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced'])) {
+                    // booking can never be updated once it has been invoiced
+                    if(in_array($group['booking_id.status'], ['invoiced', 'debit_balance', 'credit_balance', 'balanced'])) {
                         return ['status' => ['non_editable' => 'Booking services cannot be changed after invoicing.']];
                     }
                     // #memo - for GG, the number of persons does not impact the booking (GG only has pricing by_accomodation), so we allow change of nb_pers under specific circumstances
