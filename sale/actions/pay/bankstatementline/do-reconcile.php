@@ -38,7 +38,8 @@ list($params, $providers) = eQual::announce([
 list($context, $orm, $dispatch) = [$providers['context'], $providers['orm'], $providers['dispatch']];
 
 $line = BankStatementLine::id($params['id'])->read(['id', 'structured_message', 'message' , 'amount', 'center_office_id'])->first(true);
-if($line['amount'] < 0 && $line['structured_message']){
+
+if($line['amount'] < 0 && $line['structured_message']) {
     throw new Exception('invalid_bankStatementLine', EQ_ERROR_INVALID_PARAM);
 }
 
@@ -54,16 +55,19 @@ $booking_before = Booking::search([[['name', '=', $booking_name]], [['extref_res
     ->read(['id', 'status', 'payment_reference', 'center_office_id'])
     ->first(true);
 
-if($line['structured_message'] && ($booking_before['payment_reference'] != $line['structured_message'])){
-    throw new Exception('invalid_structured_message', EQ_ERROR_INVALID_PARAM);
-}
+if($booking_before) {
+    if($line['structured_message'] && ($booking_before['payment_reference'] != $line['structured_message'])){
+        throw new Exception('invalid_structured_message', EQ_ERROR_INVALID_PARAM);
+    }
 
-// prevent assigning a statement line from an office bank account to a reservation of another office
-if( $booking_before && $booking_before['center_office_id'] != $line['center_office_id']){
-    throw new Exception('invalid_center_office', EQ_ERROR_INVALID_PARAM);
+    // prevent assigning a statement line from an office bank account to a reservation of another office
+    if($booking_before['center_office_id'] != $line['center_office_id']) {
+        throw new Exception('invalid_center_office', EQ_ERROR_INVALID_PARAM);
+    }
 }
 
 $orm->call(BankStatementLine::getType(), 'reconcile', (array) $params['id']);
+
 if($booking_before) {
     $booking_after = Booking::id($booking_before['id'])
         ->read(['status'])
