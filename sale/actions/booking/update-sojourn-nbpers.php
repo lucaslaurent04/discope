@@ -70,7 +70,7 @@ if(in_array($group['booking_id']['status'], ['invoiced', 'debit_balance', 'credi
 $orm->disableEvents();
 
 
-// special case for booking which price in not impacted by the nb_pers
+// a) special case for booking which price in not impacted by `nb_pers`
 if($group['booking_id']['status'] != 'quote') {
     // #memo - for GG, the number of persons does not impact the booking (GG only has pricing by_accomodation), so we allow change of nb_pers under specific circumstances
     // #todo - use a dedicated setting for the family_id to be exempted from nb_pers restriction
@@ -92,7 +92,7 @@ if($group['booking_id']['status'] != 'quote') {
     }
 
 }
-// common case : change of nb_pers while booking is 'quote'
+// b) common case : change of nb_pers while booking is 'quote'
 else {
 
     BookingLineGroup::id($group['id'])
