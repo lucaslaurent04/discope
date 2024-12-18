@@ -83,7 +83,7 @@ if($group['booking_id']['status'] != 'quote') {
         BookingLineGroup::refreshRentalUnitsAssignments($orm, $group['id']);
 
         // re-create consumptions (if any, previous consumptions will be removed)
-        $orm->call(Booking::getType(), 'createConsumptions', $params['id']);
+        $orm->call(Booking::getType(), 'createConsumptions', $group['booking_id']['id']);
 
         // #todo - we should also update the composition (what if already received or partially completed ?)
     }
