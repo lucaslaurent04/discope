@@ -59,7 +59,7 @@ if($line['structured_message'] && ($booking_before['payment_reference'] != $line
 }
 
 // prevent assigning a statement line from an office bank account to a reservation of another office
-if($booking_before['center_office_id'] != $line['center_office_id']){
+if( $booking_before && $booking_before['center_office_id'] != $line['center_office_id']){
     throw new Exception('invalid_center_office', EQ_ERROR_INVALID_PARAM);
 }
 
