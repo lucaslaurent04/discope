@@ -50,11 +50,13 @@ class Consumption extends Model {
                 'description'       => 'The booking the consumption relates to.',
                 'ondelete'          => 'cascade',        // delete consumption when parent booking is deleted
                 'readonly'          => true,
-                'onupdate'          => 'onupdateBookingId'
+                'dependents'        => ['customer_id']
             ],
 
             'customer_id' => [
-                'type'              => 'many2one',
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'relation'          => ['booking_id' => ['customer_id']],
                 'foreign_object'    => 'sale\customer\Customer',
                 'description'       => "The customer whom the consumption relates to (computed).",
             ],
@@ -276,15 +278,6 @@ class Consumption extends Model {
             }
         }
         parent::onupdate($om, $oids, $values, $lang);
-    }
-
-    public static function onupdateBookingId($om, $oids, $values, $lang) {
-        $consumptions = $om->read(__CLASS__, $oids, ['booking_id.customer_id'], $lang);
-        if($consumptions) {
-            foreach($consumptions as $cid => $consumption) {
-                $om->update(__CLASS__, $cid, [ 'customer_id' => $consumption['booking_id.customer_id'] ], $lang);
-            }
-        }
     }
 
     /**
