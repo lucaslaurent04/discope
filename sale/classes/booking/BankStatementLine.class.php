@@ -134,6 +134,13 @@ class BankStatementLine extends \sale\pay\BankStatementLine {
                     }
 
                     if($found_booking) {
+                        // prevent assigning a statement line from an office bank account to a reservation of another office
+                        $bookings = $om->read(Booking::getType(), $booking_id, ['center_office_id']);
+                        $booking = reset($bookings);
+                        if($booking['center_office_id'] != $line['center_office_id']) {
+                            continue;
+                        }
+
                         if($candidates_fundings_ids > 0 && count($candidates_fundings_ids)) {
                             $fundings = $om->read(Funding::getType(), $candidates_fundings_ids, ['id', 'due_amount', 'paid_amount', 'booking_id', 'booking_id.customer_id', 'invoice_id']);
                             if($fundings > 0 && count($fundings)) {
