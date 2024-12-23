@@ -83,6 +83,7 @@ foreach($property['room_types_ids'] as $room_type) {
     // #memo - this logic is duplicated in `check-contingencies`
 
     // #memo - this returns the compacted version of the consumptions (with virtual consumptions that span over several days) holding a date_from and date_to computed fields
+    // #memo - consumptions includes direct occupancy ('book') along with related occupancies (parents - 'part' & children rental units - 'link')
     $map_existing_consumptions = Consumption::getExistingConsumptions($orm, [$room_type['center_id']], $params['date_from'], $params['date_to']);
 
     foreach($map_existing_consumptions as $rental_unit_id => $dates) {
