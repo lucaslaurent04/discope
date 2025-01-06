@@ -10,7 +10,7 @@ use equal\orm\Domain;
 use identity\User;
 use sale\booking\Booking;
 
-list($params, $providers) = announce([
+list($params, $providers) = eQual::announce([
     'description'   => 'Advanced search functionality for compositions, returning a collection of compositions based on additional specific parameters.',
     'params'        => [
         'all_centers' => [
@@ -49,25 +49,23 @@ list($params, $providers) = announce([
         'nb_person' => [
             'type'              => 'integer',
             'description'       => 'Total number of people included.',
-        ],
-
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'adapt','auth' ]
+    'providers'     => [ 'context', 'auth' ]
 ]);
 
 /**
  * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
- * @var \equal\data\DataAdapter     $adapter
  * @var \equal\auth\AuthenticationManager $auth
  */
-list($context, $orm, $adapter, $auth) = [ $providers['context'], $providers['orm'], $providers['adapt'] , $providers['auth']];
+['context' => $context, 'auth' => $auth] = $providers;
 
+$result = [];
 
 $domain = $params['domain'];
 
@@ -98,50 +96,40 @@ if(isset($params['center_id']) || $params['all_centers']) {
     }
 }
 
-$bookings = [];
+$domain = Domain::conditionAdd($domain, ['guest_list_id', '>', 0]);
 
-if($domain){
-    $domain = Domain::conditionAdd($domain, ['guest_list_id', '>', 0]);
-    $bookings = Booking::search($domain, ['sort'  => ['date_from' => 'asc']])
-        ->read([
-                'id',
-                'name',
-                'date_from',
-                'guest_list_id',
-                'center_id' => ['id','name'],
-                'composition_items_ids'  =>[
-                    'name', 'gender',  'email', 'phone'
-                ]
-            ])
-        ->get(true);
-}
+$bookings = Booking::search($domain, ['sort'  => ['date_from' => 'asc']])
+    ->read([
+            'id',
+            'name',
+            'date_from',
+            'guest_list_id',
+            'center_id' => ['id','name'],
+            'composition_items_ids'
+        ])
+    ->get(true);
 
-
-$result = [];
 $map_centers_compositions = [];
 
 foreach($bookings as $booking) {
 
-    $center_id =  $booking['center_id']['name'];
-    $booking_index = $booking['name'];
+    $center_id = $booking['center_id']['id'];
+    $booking_id = $booking['id'];
 
-    foreach ($booking['composition_items_ids'] as $id => $item) {
-        if(!isset($map_centers_compositions[$center_id])) {
-            $map_centers_compositions[$center_id] = [];
-        }
-
-        if (!isset($map_centers_compositions[$center_id][$booking_index])) {
-            $map_centers_compositions[$center_id][$booking_index] = [
-                'center'                => $center_id,
-                'booking'               => $booking_index,
-                'date'                  => date('Y/m/d', $booking['date_from']),
-                'nb_person'             => 0
-            ];
-        }
-
-        $qty = 1;
-        $map_centers_compositions[$center_id][$booking_index]['nb_person'] += $qty;
+    if(!isset($map_centers_compositions[$center_id])) {
+        $map_centers_compositions[$center_id] = [];
     }
+
+    if(!isset($map_centers_compositions[$center_id][$booking_id])) {
+        $map_centers_compositions[$center_id][$booking_id] = [
+            'center'                => $booking['center_id']['name'],
+            'booking'               => $booking['name'],
+            'date'                  => date('Y/m/d', $booking['date_from']),
+            'nb_person'             => 0
+        ];
+    }
+
+    $map_centers_compositions[$center_id][$booking_id]['nb_person'] += count($booking['composition_items_ids']);
 }
 
 foreach($map_centers_compositions as $center_id => $bookings) {
@@ -155,20 +143,21 @@ foreach($map_centers_compositions as $center_id => $bookings) {
     }
 }
 
-if ($params['all_centers']){
+if($params['all_centers']){
     usort($result, function($a, $b) {
         $result = strcmp($a['center'], $b['center']);
-        if ($result === 0) {
+        if($result === 0) {
             return strcmp($a['date'], $b['date']);
         }
         return $result;
     });
 }
-elseif ($params['center_id']) {
+elseif($params['center_id']) {
     usort($result, function ($a, $b) {
         return strcmp($a['date'], $b['date']);
     });
 }
+
 
 $context->httpResponse()
         ->body($result)
