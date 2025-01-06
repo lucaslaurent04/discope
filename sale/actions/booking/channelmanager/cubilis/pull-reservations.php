@@ -231,18 +231,30 @@ try {
                                 // The ID 2 is for French
                                 $lang_id = $language['id'] ?? 2;
 
-                                // update customer
-                                Identity::id($booking['customer_identity_id'])->update([
-                                        'firstname'         => $reservation['customer']['firstname'],
-                                        'lastname'          => $reservation['customer']['lastname'],
-                                        'address_street'    => $reservation['customer']['address_street'],
-                                        'address_city'      => $reservation['customer']['address_city'],
-                                        'address_zip'       => $reservation['customer']['address_zip'],
-                                        'address_country'   => $reservation['customer']['address_country'],
-                                        'phone'             => $reservation['customer']['phone'],
-                                        'email'             => $reservation['customer']['email'],
-                                        'lang_id'           => $lang_id
-                                    ]);
+                                $fields = [
+                                    'firstname'       => 'firstname',
+                                    'lastname'        => 'lastname',
+                                    'address_street'  => 'address_street',
+                                    'address_city'    => 'address_city',
+                                    'address_zip'     => 'address_zip',
+                                    'address_country' => 'address_country',
+                                    'phone'           => 'phone',
+                                    'email'           => 'email',
+                                ];
+
+                                $updateData = [
+                                    'lang_id' => $lang_id,
+                                ];
+
+                                foreach ($fields as $fieldKey => $fieldValue) {
+                                    if (isset($reservation['customer'][$fieldValue]) && !empty($reservation['customer'][$fieldValue])) {
+                                        $updateData[$fieldKey] = $reservation['customer'][$fieldValue];
+                                    }
+                                }
+
+                                if (!empty($updateData)) {
+                                    Identity::id($booking['customer_identity_id'])->update($updateData);
+                                }
 
                                 // update additional values that might have changed
                                 Booking::id($booking['id'])->update([
