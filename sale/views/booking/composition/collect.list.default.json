@@ -1,0 +1,57 @@
+{
+    "name": "Composition Guest",
+    "description": "",
+    "controller": "sale_booking_composition_collect",
+    "header": {
+        "actions": {
+            "ACTION.CREATE" : false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "group_by": [
+        {
+            "field": "center",
+            "operation": ["SUM", "object.nb_person"]
+        },
+        {
+            "field": "date",
+            "operation": ["SUM", "object.nb_person"]
+        }
+    ],
+    "operations": {
+        "total": {
+            "nb_person": {
+                "operation": "SUM",
+                "usage": "numeric/integer",
+                "suffix": "p."
+            }
+        }
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "center",
+                "sortable" : true,
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "date",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "booking",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "nb_person",
+                "width": "10%"
+            }
+        ]
+    }
+}

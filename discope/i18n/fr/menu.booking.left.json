@@ -105,6 +105,10 @@
             "label": "Occupations",
             "help": ""
         },
+        "item.planning.composition": {
+            "label": "Compositions",
+            "help": ""
+        },
         "item.planning.roomtypes": {
             "label": "Calendrier Cubilis",
             "help": ""

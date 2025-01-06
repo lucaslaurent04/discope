@@ -359,6 +359,17 @@
                         }
                     },
                     {
+                        "id": "item.planning.composition",
+                        "type": "entry",
+                        "label": "Compositions",
+                        "description": "",
+                        "route": "/consumptions",
+                        "context": {
+                            "entity": "sale\\booking\\composition\\collect",
+                            "view": "list.default"
+                        }
+                    },
+                    {
                         "id": "item.planning.roomtypes",
                         "type": "entry",
                         "label": "RoomTypes Calendar",
