@@ -1,0 +1,57 @@
+{
+    "name": "Recherche avancée de composition",
+    "plural": "Recherches avancées de composition",
+    "description": "",
+    "model": {
+        "center_id": {
+            "label": "Centre",
+            "description": "Centre pour lequel obtenir les compositions.",
+            "help": ""
+        },
+        "all_centers": {
+            "label": "Tous les centres",
+            "description": "Inclure tous les centres dans la recherche.",
+            "help": ""
+        },
+        "date_from": {
+            "label": "Du",
+            "description": "Date de début du séjour.",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "Date de fin du séjour.",
+            "help": ""
+        },
+        "center": {
+            "label": "Centre",
+            "description": "Nom du centre assigné au séjour.",
+            "help": ""
+        },
+        "booking": {
+            "label": "Réservation",
+            "description": "Nom de la réservation.",
+            "help": ""
+        },
+        "date": {
+            "label": "Date",
+            "description": "Date de la réservation.",
+            "help": ""
+        },
+        "nb_person": {
+            "label": "Nombre de personnes",
+            "description": "Nombre total de personnes dans la réservation.",
+            "help": "."
+        }
+    },
+    "view": {
+        "search.default": {
+        },
+        "list.default": {
+        }
+    },
+    "error": {
+        "errors": {
+        }
+    }
+}
