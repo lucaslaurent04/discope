@@ -290,13 +290,13 @@
                                                 "widget": {
                                                     "readonly": true
                                                 },
-                                                "visible": ["is_noexpiry", "=", false]
+                                                "visible": [["status", "=", "option"], ["is_noexpiry", "=", false]]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "is_noexpiry",
                                                 "width": "50%",
-                                                "visible": ["is_noexpiry", "=", true],
+                                                "visible": [["status", "=", "option"], ["is_noexpiry", "=", true]],
                                                 "widget": {
                                                     "readonly": true
                                                 }
