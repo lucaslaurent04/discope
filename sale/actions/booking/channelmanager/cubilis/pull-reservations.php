@@ -226,34 +226,22 @@ try {
                                 Funding::search(['payments_ids' , 'contains' , $payments_ids_to_delete])->delete(true);
                                 Payment::ids($payments_ids_to_delete)->delete(true);
 
+                                if(isset($reservation['customer']) && is_array($reservation['customer'])) {
+                                    $language = Lang::search(['code', '=', $reservation['customer']['lang'] ?? 'fr'])->read(['id']) ->first(true);
 
-                                $language = Lang::search(['code', '=', $reservation['customer']['lang']]) ->read(['id']) ->first(true);
-                                // The ID 2 is for French
-                                $lang_id = $language['id'] ?? 2;
+                                    $updated_identity = [
+                                        'lang_id' => $language['id']
+                                    ];
 
-                                $fields = [
-                                    'firstname'       => 'firstname',
-                                    'lastname'        => 'lastname',
-                                    'address_street'  => 'address_street',
-                                    'address_city'    => 'address_city',
-                                    'address_zip'     => 'address_zip',
-                                    'address_country' => 'address_country',
-                                    'phone'           => 'phone',
-                                    'email'           => 'email',
-                                ];
-
-                                $updateData = [
-                                    'lang_id' => $lang_id,
-                                ];
-
-                                foreach ($fields as $fieldKey => $fieldValue) {
-                                    if (isset($reservation['customer'][$fieldValue]) && !empty($reservation['customer'][$fieldValue])) {
-                                        $updateData[$fieldKey] = $reservation['customer'][$fieldValue];
+                                    foreach(array_keys($reservation['customer']) as $field) {
+                                        if(!in_array($field, ["firstname","lastname","phone","email","address_street","address_city","address_zip","address_country"])) {
+                                            continue;
+                                        }
+                                        if(!empty($reservation['customer'][$field])) {
+                                            $updated_identity[$field] = $reservation['customer'][$field];
+                                        }
                                     }
-                                }
-
-                                if (!empty($updateData)) {
-                                    Identity::id($booking['customer_identity_id'])->update($updateData);
+                                    Identity::id($booking['customer_identity_id'])->update($updated_identity);
                                 }
 
                                 // update additional values that might have changed
