@@ -63,6 +63,7 @@ class Funding extends \sale\pay\Funding {
                 'description'       => "Total amount that has been received (can be greater than due_amount).",
                 'function'          => 'calcPaidAmount',
                 'store'             => true,
+                'instant'           => true
                 // 'dependencies'      => ['booking_id.paid_amount', 'invoice_id.is_paid']
             ],
 
