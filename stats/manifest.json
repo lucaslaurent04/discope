@@ -1,5 +1,26 @@
 {
     "name": "stats",
     "depends_on": ["core"],
-    "apps": ["stats"]
+    "apps": [
+        {
+            "id": "stats",
+            "name": "APPS_APP_STATS",
+            "extends": "app",
+            "show_in_apps": true,
+            "description": "Statistiques.",
+            "icon": "filter_alt",
+            "color": "#653BB5",
+            "access": {
+                "groups": [
+                    "stats.default.user",
+                    "stats.default.administrator"
+                ]
+            },
+            "params": {
+                "menus": {
+                    "left": "stats.left"
+                }
+            }
+        }
+    ]
 }
