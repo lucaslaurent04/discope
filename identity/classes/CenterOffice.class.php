@@ -36,7 +36,8 @@ class CenterOffice extends \identity\Establishment {
             'code' => [
                 'type'              => 'string',
                 'description'       => 'Numeric identifier of group (1 hex. digit).',
-                'usage'             => 'number/hexadecimal:1'
+                'usage'             => 'number/hexadecimal:1',
+                'default'           => '1'
             ],
 
             'centers_ids' => [
