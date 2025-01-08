@@ -4,245 +4,7 @@
         "lang": "fr",
         "data": [
             {
-                "id": 1,
-                "name": "core.locale.numbers.thousands_separator",
-                "package": "core",
-                "section_id": 1,
-                "section": "locale",
-                "code": "numbers.thousands_separator",
-                "title": "Séparateur de milliers",
-                "description": "Caractère de séparation de milliers",
-                "help": "Caractère de séparation de milliers (e.g. '.', ',', ' ').",
-                "type": "string",
-                "form_control": "select",
-                "is_multilang": 0
-            },
-            {
-                "id": 2,
-                "name": "core.locale.currency.symbol_position",
-                "package": "core",
-                "section_id": 1,
-                "section": "locale",
-                "code": "currency.symbol_position",
-                "title": "Position de devise",
-                "description": "Position du symbole de monnaie par rapport à sa valeur",
-                "help": "Position du symbole de monnaie par rapport à sa valeur ('before', 'after', 'decimal_separator').",
-                "type": "string",
-                "form_control": "select",
-                "is_multilang": 0
-            },
-            {
-                "id": 3,
-                "name": "core.locale.currency.decimal_precision",
-                "package": "core",
-                "section_id": 1,
-                "section": "locale",
-                "code": "currency.decimal_precision",
-                "title": "Nombre de décimales (Prix)",
-                "description": "Nombre de décimales pour les prix",
-                "help": "Nombre de décimales à conserver pour les champs à usage 'Price'.",
-                "type": "integer",
-                "form_control": "select",
-                "is_multilang": 0
-            },
-            {
-                "id": 4,
-                "name": "core.locale.numbers.decimal_separator",
-                "package": "core",
-                "section_id": 1,
-                "section": "locale",
-                "code": "numbers.decimal_separator",
-                "title": "Type de décimales",
-                "description": "Type de décimales (e.g. '.', ',')",
-                "help": "Caractère de séparation entre les parties entière et décimale (e.g. '.', ',').",
-                "type": "string",
-                "form_control": "select",
-                "is_multilang": 0
-            },
-            {
-                "id": 5,
-                "name": "core.locale.numbers.decimal_precision",
-                "package": "core",
-                "section_id": 1,
-                "section": "locale",
-                "code": "numbers.decimal_precision",
-                "title": "Nombre de décimales",
-                "description": "Nombre de décimales",
-                "help": "Nombre de décimales à conserver pour les champs de type 'float'.",
-                "type": "integer",
-                "form_control": "select",
-                "is_multilang": 0
-            },
-            {
-                "id": 6,
-                "name": "core.locale.date_format",
-                "package": "core",
-                "section_id": 1,
-                "section": "locale",
-                "code": "date_format",
-                "title": "Format de date",
-                "description": "Format de date",
-                "help": "Format pour l'affichage des dates.",
-                "type": "string",
-                "form_control": "select",
-                "is_multilang": 0
-            },
-            {
-                "id": 7,
-                "name": "core.locale.time_format",
-                "package": "core",
-                "section_id": 1,
-                "section": "locale",
-                "code": "time_format",
-                "title": "Format des heures",
-                "description": "Format des heures",
-                "help": "Format pour l'affichage des heures.",
-                "type": "string",
-                "form_control": "select",
-                "is_multilang": 0
-            },
-            {
-                "id": 8,
-                "name": "core.main.company.id",
-                "package": "core",
-                "section_id": 2,
-                "section": "main",
-                "code": "company.id",
-                "title": "Entreprise",
-                "description": "Nom de l'entreprise",
-                "help": "Identifiant de l'entreprise principale de l'installation courante.",
-                "type": "integer",
-                "form_control": "select",
-                "is_multilang": 0
-            },
-            {
-                "id": 9,
-                "name": "core.main.formats.paper",
-                "package": "core",
-                "section_id": 2,
-                "section": "main",
-                "code": "formats.paper",
-                "title": "Format du papier",
-                "description": "Taille papier par défaut",
-                "help": "Taille papier par défaut (e.g. 'A4', 'legal_US', 'letter_US').",
-                "type": "string",
-                "form_control": "select",
-                "is_multilang": 0
-            },
-            {
-                "id": 10,
-                "name": "core.security.account_creation",
-                "package": "core",
-                "section_id": 3,
-                "section": "security",
-                "code": "account_creation",
-                "title": "Création de compte",
-                "description": "Autoriser la création de compte",
-                "help": "Autoriser les visiteurs à créer un compte utilisateur.",
-                "type": "boolean",
-                "form_control": "toggle",
-                "is_multilang": 0
-            },
-            {
-                "id": 11,
-                "name": "core.security.import",
-                "package": "core",
-                "section_id": 3,
-                "section": "security",
-                "code": "import",
-                "title": "Importer",
-                "description": "Autoriser l'importation",
-                "help": "Autoriser les utilisateurs à importer des données depuis des fichiers  (CSV/XLS/XLSX/ODS).",
-                "type": "boolean",
-                "form_control": "toggle",
-                "is_multilang": 0
-            },
-            {
-                "id": 12,
-                "name": "core.security.export",
-                "package": "core",
-                "section_id": 3,
-                "section": "security",
-                "code": "export",
-                "title": "Exporter",
-                "description": "Autoriser l'exportation",
-                "help": "Autoriser les utilisateurs à exporter des données vers des fichiers (CSV/XLS/PDF).",
-                "type": "boolean",
-                "form_control": "toggle",
-                "is_multilang": 0
-            },
-            {
-                "id": 13,
-                "name": "core.units.currency",
-                "package": "core",
-                "section_id": 4,
-                "section": "units",
-                "code": "currency",
-                "title": "Devise",
-                "description": "Devise des prix",
-                "help": "Devise à utiliser pour les champs à usage 'Price' (ISO 4217).",
-                "type": "string",
-                "form_control": "select",
-                "is_multilang": 0
-            },
-            {
-                "id": 14,
-                "name": "core.units.length",
-                "package": "core",
-                "section_id": 4,
-                "section": "units",
-                "code": "length",
-                "title": "Longueur",
-                "description": "Unité de longueur",
-                "help": "Unité par défaut pour les mesures de longueur.",
-                "type": "string",
-                "form_control": "select",
-                "is_multilang": 0
-            },
-            {
-                "id": 15,
-                "name": "core.units.weight",
-                "package": "core",
-                "section_id": 4,
-                "section": "units",
-                "code": "weight",
-                "title": "Poids",
-                "description": "Unité de poids",
-                "help": "Unité par défaut pour les mesures de poids (e.g. 'kg' kilogram, 'lb' pound).",
-                "type": "string",
-                "form_control": "select",
-                "is_multilang": 0
-            },
-            {
-                "id": 16,
-                "name": "core.units.volume",
-                "package": "core",
-                "section_id": 4,
-                "section": "units",
-                "code": "volume",
-                "title": "Volume",
-                "description": "Unité de volume",
-                "help": "Unité par défaut pour les unités de volume (e.g. 'm3' cubic meter, 'ft3' cubic foot).",
-                "type": "string",
-                "form_control": "select",
-                "is_multilang": 0
-            },
-            {
-                "id": 17,
-                "name": "core.units.surface",
-                "package": "core",
-                "section_id": 4,
-                "section": "units",
-                "code": "surface",
-                "title": "Surface",
-                "description": "Unité de surface",
-                "help": "Unité par défaut pour les unités de surface (e.g. 'm2' square meter, 'ft2' square foot).",
-                "type": "string",
-                "form_control": "select",
-                "is_multilang": 0
-            },
-            {
-                "id": 18,
+                "id": 118,
                 "name": "sale.invoice.invoice.sequence.1",
                 "package": "sale",
                 "section_id": 5,
@@ -256,7 +18,7 @@
                 "is_multilang": 0
             },
             {
-                "id": 21,
+                "id": 121,
                 "name": "finance.invoice.fiscal_year",
                 "package": "finance",
                 "section_id": 5,
@@ -270,7 +32,7 @@
                 "is_multilang": 0
             },
             {
-                "id": 22,
+                "id": 122,
                 "name": "finance.invoice.invoice.sequence_format",
                 "package": "finance",
                 "section_id": 5,
@@ -284,7 +46,7 @@
                 "is_multilang": 0
             },
             {
-                "id": 23,
+                "id": 123,
                 "name": "sale.booking.booking.sequence_format",
                 "package": "sale",
                 "section_id": 6,
@@ -298,7 +60,7 @@
                 "is_multilang": 0
             },
             {
-                "id": 24,
+                "id": 124,
                 "name": "sale.booking.booking.sequence.1",
                 "package": "sale",
                 "section_id": 6,
@@ -312,7 +74,7 @@
                 "is_multilang": 0
             },
             {
-                "id": 32,
+                "id": 132,
                 "name": "sale.booking.option.validity",
                 "package": "sale",
                 "section_id": 6,
@@ -326,7 +88,7 @@
                 "is_multilang": 0
             },
             {
-                "id": 33,
+                "id": 133,
                 "name": "sale.invoice.downpayment.enable",
                 "package": "sale",
                 "section_id": 5,
@@ -340,7 +102,7 @@
                 "is_multilang": 0
             },
             {
-                "id": 34,
+                "id": 134,
                 "name": "sale.invoice.downpayment.sku.1",
                 "package": "sale",
                 "section_id": 5,
@@ -354,7 +116,7 @@
                 "is_multilang": 0
             },
             {
-                "id": 35,
+                "id": 135,
                 "name": "sale.invoice.downpayment.account",
                 "package": "finance",
                 "section_id": 5,
@@ -368,7 +130,7 @@
                 "is_multilang": 0
             },
             {
-                "id": 36,
+                "id": 136,
                 "name": "sale.locale.terms.contract",
                 "package": "sale",
                 "section_id": 1,
@@ -382,7 +144,7 @@
                 "is_multilang": 1
             },
             {
-                "id": 37,
+                "id": 137,
                 "name": "sale.booking.quote.remind_delay",
                 "package": "sale",
                 "section_id": 6,
@@ -396,7 +158,7 @@
                 "is_multilang": 0
             },
             {
-                "id": 41,
+                "id": 141,
                 "name": "sale.locale.terms.invoice",
                 "package": "sale",
                 "section_id": 1,
@@ -410,7 +172,7 @@
                 "is_multilang": 1
             },
             {
-                "id": 42,
+                "id": 142,
                 "name": "sale.locale.terms.downpayments",
                 "package": "sale",
                 "section_id": 1,
@@ -424,7 +186,7 @@
                 "is_multilang": 1
             },
             {
-                "id": 43,
+                "id": 143,
                 "name": "sale.locale.terms.installment",
                 "package": "sale",
                 "section_id": 1,
@@ -438,7 +200,7 @@
                 "is_multilang": 1
             },
             {
-                "id": 44,
+                "id": 144,
                 "name": "sale.locale.terms.quote",
                 "package": "sale",
                 "section_id": 1,
@@ -452,7 +214,7 @@
                 "is_multilang": 1
             },
             {
-                "id": 45,
+                "id": 145,
                 "name": "finance.invoice.account.sales",
                 "package": "finance",
                 "section_id": 5,
@@ -466,7 +228,7 @@
                 "is_multilang": 0
             },
             {
-                "id": 46,
+                "id": 146,
                 "name": "finance.invoice.account.sales_taxes",
                 "package": "finance",
                 "section_id": 5,
@@ -480,7 +242,7 @@
                 "is_multilang": 0
             },
             {
-                "id": 47,
+                "id": 147,
                 "name": "finance.invoice.account.trade_debtors",
                 "package": "finance",
                 "section_id": 5,
