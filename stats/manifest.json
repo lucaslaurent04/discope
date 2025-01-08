@@ -4,7 +4,7 @@
     "apps": [
         {
             "id": "stats",
-            "name": "APPS_APP_STATS",
+            "name": "Statistiques",
             "extends": "app",
             "show_in_apps": true,
             "description": "Statistiques.",
