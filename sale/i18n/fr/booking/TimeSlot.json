@@ -18,6 +18,24 @@
             "description": "Ordre pour classer les moments chaque jour.",
             "help": ""
         },
+        "code": {
+            "label": "Code",
+            "description": "Le code associé à l’identifiant du créneau horaire.",
+            "selection": {
+                "B" : "Petit-déjeuner",
+                "AM" : "Activités (matin)",
+                "L" : "Déjeuner",
+                "PM" : "Activités (après-midi)",
+                "D" : "Dîner",
+                "EV": "Veillée (après le dîner)"
+            },
+            "help": ""
+        },
+        "is_meal": {
+            "label": "Repas",
+            "description": "La tranche horaire est associée à un repas.",
+            "help": ""
+        },
         "schedule_from": {
             "label": "Horaire de début",
             "description": "Moment auquel le créneau horaire débute.",
