@@ -809,22 +809,25 @@ foreach($consumptions_detailed as $cid => $consumption) {
         if ($consumption['is_accomodation']) {
             $consumption_time_slot = TimeSlot::search(["code", "=", "EV"])->read(['id'])->first(true);
             $consumption_time_slot_id = $consumption_time_slot['id'];
-        } else {
+        }
+        else {
             $consumption_time_slot_id = $consumption['time_slot_id']['id'];
         }
     }
     $time_slot = TimeSlot::id($consumption_time_slot_id)->read(['name'], $params['lang'])->first(true);
     $time_slot_index = $time_slot['name'];
 
-    if ($consumption['is_meal']) {
+    if($consumption['is_meal']) {
         $consumptions_map_detailed[$date]['time_slots'][$time_slot_index]['total_meals'] += $consumption['qty'];
         $consumptions_map_detailed['total']['total_meals'] += $consumption['qty'];
-    } elseif ($consumption['is_accomodation'] && $consumption['type'] == 'book') {
-        $consumptions_map_detailed[$date]['total_nights'] += $consumption['qty'];
-        $consumptions_map_detailed['total']['total_nights'] += $consumption['qty'];
-    } elseif ($consumption['is_snack']) {
+    }
+    elseif($consumption['is_snack']) {
         $consumptions_map_detailed[$date]['time_slots'][$time_slot_index]['total_snack'] += $consumption['qty'];
         $consumptions_map_detailed['total']['total_snack'] += $consumption['qty'];
+    }
+    elseif($consumption['is_accomodation'] && $consumption['type'] == 'book') {
+        $consumptions_map_detailed[$date]['total_nights'] += $consumption['qty'];
+        $consumptions_map_detailed['total']['total_nights'] += $consumption['qty'];
     }
 }
 

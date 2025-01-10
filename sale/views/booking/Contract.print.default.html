@@ -494,7 +494,7 @@ hr {
                                 <td style="text-align: center;">{{ (totals.total_meals | default(0)) > 0 ? totals.total_meals : '' }}</td>
                             {% endif %}
                             {% if show_nights %}
-                                <td rowspan="{{ map.time_slots | length }}" style="text-align: center;">{{ totals.total_nights | default(0) }}</td>
+                                <td rowspan="{{ map.time_slots | length }}" style="text-align: center;">{{ map.total_nights | default(0) }}</td>
                                 {% set show_nights = false %}
                             {% else %}
                             {% endif %}
