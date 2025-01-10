@@ -485,7 +485,7 @@ hr {
                     {% for slot_name, totals in map.time_slots %}
                         <tr>
                             {% if date_index != last_date %}
-                                <td rowspan="5" style="text-align: center;">{{ date_index }}</td>
+                                <td rowspan="{{ map.time_slots | length }}" style="text-align: center;">{{ date_index }}</td>
                                 {% set last_date = date_index %}
                             {% endif %}
                             <td style="text-align: center;">{{ slot_name }}</td>
@@ -494,7 +494,7 @@ hr {
                                 <td style="text-align: center;">{{ totals.total_meals | default("") }}</td>
                             {% endif %}
                             {% if show_nights %}
-                                <td rowspan="5" style="text-align: center;">{{ map.total_nights | default("0") }}</td>
+                                <td rowspan="{{ map.time_slots | length }}" style="text-align: center;">{{ map.total_nights | default("0") }}</td>
                                 {% set show_nights = false %}
                             {% else %}
                             {% endif %}
