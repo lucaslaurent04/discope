@@ -24,73 +24,43 @@
                 "value": "1"
             },
             {
-                "id": 35,
                 "name": "finance.invoice.downpayment.account",
-                "setting_id": 35,
-                "user_id": 0,
                 "value": "4460000"
             },
             {
-                "id": 40,
                 "name": "sale.locale.terms.installment",
-                "setting_id": 43,
-                "user_id": 0,
                 "value": "versement"
             },
             {
-                "id": 41,
                 "name": "sale.locale.terms.invoice",
-                "setting_id": 41,
-                "user_id": 0,
                 "value": "facture"
             },
             {
-                "id": 42,
                 "name": "sale.locale.terms.downpayments",
-                "setting_id": 42,
-                "user_id": 0,
                 "value": "acomptes"
             },
             {
-                "id": 43,
                 "name": "sale.locale.terms.contract",
-                "setting_id": 36,
-                "user_id": 0,
                 "value": "Contrat"
             },
             {
-                "id": 44,
                 "name": "sale.locale.terms.quote",
-                "setting_id": 44,
-                "user_id": 0,
                 "value": "Devis"
             },
             {
-                "id": 45,
                 "name": "finance.invoice.account.sales",
-                "setting_id": 45,
-                "user_id": 0,
                 "value": "7000000"
             },
             {
-                "id": 46,
                 "name": "finance.invoice.account.sales_taxes",
-                "setting_id": 46,
-                "user_id": 0,
                 "value": "451"
             },
             {
-                "id": 47,
                 "name": "finance.invoice.account.trade_debtors",
-                "setting_id": 47,
-                "user_id": 0,
                 "value": "400"
             },
             {
-                "id": 47,
                 "name": "finance.invoice.fiscal_year",
-                "setting_id": 21,
-                "user_id": 0,
                 "value": "2024"
             }
         ]
