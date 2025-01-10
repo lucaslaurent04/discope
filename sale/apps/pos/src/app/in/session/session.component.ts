@@ -43,7 +43,7 @@ export class SessionComponent implements OnInit {
             // sync routes on menu pane
             let descriptor:any = {
                 context: {
-                    entity:  'lodging\\sale\\pos\\CashdeskSession',
+                    entity:  'sale\\pos\\CashdeskSession',
                     type:    'form',
                     name:    'default',
                     mode:    'view',

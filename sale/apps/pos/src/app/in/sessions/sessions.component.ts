@@ -14,7 +14,7 @@ export class SessionsComponent implements OnInit {
 
     // rx subject for unsubscribing subscriptions on destroy
     private ngUnsubscribe = new Subject<void>();
-    
+
     public ready: boolean = false;
 
     // flag telling if the route to which the component is associated with is currently active (amongst routes defined in first parent routing module)
@@ -23,7 +23,7 @@ export class SessionsComponent implements OnInit {
     private default_descriptor: any = {
         // route is current ng route
         context: {
-            entity: 'lodging\\sale\\pos\\CashdeskSession',
+            entity: 'sale\\pos\\CashdeskSession',
             view: "list.default",
             order: "id",
             sort: "desc"

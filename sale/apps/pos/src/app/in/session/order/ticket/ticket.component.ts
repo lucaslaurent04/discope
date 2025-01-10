@@ -77,7 +77,7 @@ export class SessionOrderTicketComponent extends TreeComponent<Order, OrderCompo
     async load(order_id: number) {
         if (order_id > 0) {
             try {
-                const data = await this.api.fetch('?get=lodging_sale_pos_order_tree', { id: order_id, variant: 'ticket' });
+                const data = await this.api.fetch('?get=sale_pos_order_tree', { id: order_id, variant: 'ticket' });
                 if (data) {
                     this.update(data);
                     this.printerType = data.session_id.center_id.center_office_id.printer_type;

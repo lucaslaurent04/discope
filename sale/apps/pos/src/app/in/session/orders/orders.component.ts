@@ -58,7 +58,7 @@ export class SessionOrdersComponent implements OnInit, AfterViewInit {
             // sync routes on menu pane
             let descriptor:any = {
                 context: {
-                    entity:  'lodging\\sale\\pos\\CashdeskSession',
+                    entity:  'sale\\pos\\CashdeskSession',
                     type:    'form',
                     name:    'default',
                     mode:    'view',
@@ -153,7 +153,7 @@ export class SessionOrdersComponent implements OnInit, AfterViewInit {
 
     public async onclickModifyOrder(order: any) {
         try {
-            await this.api.fetch('?do=lodging_order_do-unpay', { id : order.id });
+            await this.api.fetch('?do=sale_pos_order_do-unpay', { id : order.id });
 
             this.onclickSelectOrder({
                 ...order,

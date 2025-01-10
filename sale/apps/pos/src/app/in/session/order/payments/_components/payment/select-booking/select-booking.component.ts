@@ -59,7 +59,7 @@ export class SessionOrderPaymentsSelectBookingComponent implements OnInit {
 
     private async fetchBooking(id: number) {
         const bookings = await this.api.collect(
-                'lodging\\sale\\booking\\Booking',
+                'sale\\booking\\Booking',
                 ['id', '=', id],
                 ['id', 'name', 'customer_id.name']
             );
@@ -116,7 +116,7 @@ export class SessionOrderPaymentsSelectBookingComponent implements OnInit {
 
         try {
             bookings = await this.api.get(
-                '?get=lodging_booking_pos-search',
+                '?get=sale_booking_pos-search',
                 {
                     clue: clue,
                     domain: JSON.stringify(domain),

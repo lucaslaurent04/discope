@@ -87,7 +87,7 @@ export class SessionOrderLinesComponent extends TreeComponent<Order, OrderCompon
     async load(order_id: number) {
         if (order_id > 0) {
             try {
-                const data = await this.api.fetch('?get=lodging_sale_pos_order_tree', { id: order_id, variant: 'lines' });
+                const data = await this.api.fetch('?get=sale_pos_order_tree', { id: order_id, variant: 'lines' });
                 if (data) {
                     this.update(data);
                 }
@@ -349,7 +349,7 @@ export class SessionOrderLinesComponent extends TreeComponent<Order, OrderCompon
 
         try {
             fundings = await this.api.read(
-                'lodging\\sale\\booking\\Funding',
+                'sale\\booking\\Funding',
                 [id],
                 ['booking_id.customer_id']
             );
