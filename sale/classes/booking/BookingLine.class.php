@@ -1013,7 +1013,7 @@ class BookingLine extends Model {
                         }
                     }
                     // #memo - when price is adapted, it no longer holds more than 2 decimals (so that unit_price x qty = displayed price)
-                    $price = round(($price * (1 - $disc_percent)) - $disc_value, 2);
+                    $price = max(0, round(($price * (1 - $disc_percent)) - $disc_value, 2));
                 }
                 // if no adapters, leave price given from price_id (might have more than 2 decimal digits)
                 $result[$oid] = $price;
@@ -1077,7 +1077,8 @@ class BookingLine extends Model {
             foreach($lines as $lid => $line) {
                 // delta between final price and catalog price
                 $catalog_price = $line['price_id.price'] * $line['qty'] * (1.0 + $line['vat_rate']);
-                $fare_price = $line['unit_price'] * ($line['qty'] - $line['free_qty']) * (1.0 + $line['vat_rate']);
+                $qty = max(0, $line['qty'] - $line['free_qty']);
+                $fare_price = $line['unit_price'] * ($qty) * (1.0 + $line['vat_rate']);
                 $benefit = round($catalog_price - $fare_price, 2);
                 $result[$lid] = max(0.0, $benefit);
             }
@@ -1120,8 +1121,8 @@ class BookingLine extends Model {
                     $result[$oid] = 0.0;
                     continue;
                 }
-
-                $result[$oid] = round($line['unit_price'] * (1.0 - $line['discount']) * ($line['qty'] - $line['free_qty']), 4);
+                $qty = max(0, $line['qty'] - $line['free_qty']);
+                $result[$oid] = round($line['unit_price'] * (1.0 - $line['discount']) * ($qty), 4);
             }
         }
 
