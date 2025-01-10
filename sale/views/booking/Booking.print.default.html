@@ -454,8 +454,8 @@ hr {
                             {% endif %}
                             <td style="text-align: center;">{{ slot_name }}</td>
                             {% if center_office == 'GA' %}
-                                <td style="text-align: center;">{{ totals.total_snack | default("0") }}</td>
-                                <td style="text-align: center;">{{ totals.total_meals | default("0") }}</td>
+                                <td style="text-align: center;">{{ totals.total_snack | default("") }}</td>
+                                <td style="text-align: center;">{{ totals.total_meals | default("") }}</td>
                             {% endif %}
                             {% if show_nights %}
                                 <td rowspan="5" style="text-align: center;">{{ map.total_nights | default("0") }}</td>
