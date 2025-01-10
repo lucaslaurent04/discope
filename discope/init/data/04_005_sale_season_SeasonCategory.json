@@ -5,17 +5,11 @@
         "data": [
             {
                 "id": 1,
-                "name": "OR"
-            }
-        ]
-    },
-    {
-        "name": "sale\\season\\SeasonCategory",
-        "lang": "en",
-        "data": [
+                "name": "GA"
+            },
             {
-                "id": 1,
-                "name": "OR"
+                "id": 2,
+                "name": "GG"
             }
         ]
     }
