@@ -9,8 +9,22 @@ body {
   overflow: hidden;
 }
 
+@media print {
+    @page {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        &::-webkit-scrollbar-thumb {
+            background: transparent;
+        }
+    }
+}
+
 /* prevent showing vertical scrollbar if not necessary when a dialog opens */
-.cdk-global-scrollblock {  
+.cdk-global-scrollblock {
   overflow: auto !important;
 }
 
@@ -36,7 +50,7 @@ body {
 
   .timepicker-dial__control {
     outline: none;
-  }  
+  }
 
   .clock-face__clock-hand {
     background-color: #3f51b5 !important;
@@ -67,4 +81,21 @@ ngx-material-timepicker-toggle {
       fill: #646464;
     }
   }
+}
+
+.mat-tab-body-content {
+    height: 100%;
+    overflow: auto;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+        overflow-y: scroll;
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--mdc-theme-primary, #6200ee);
+        border-radius: 10px;
+    }
+
 }
