@@ -28,7 +28,7 @@ a {
     border-bottom: 1px solid #c8ced3;
     z-index: 1020;
     width: 100%;
-    flex: 0 0 55px;    
+    flex: 0 0 55px;
 }
 
 .app-body {
@@ -44,6 +44,9 @@ a {
 }
 
 .app-body .app-main {
+    @media print {
+        margin: 0 !important;
+    }
     position: relative;
     flex: 1;
     min-width: 0;
@@ -61,6 +64,9 @@ a {
 }
 
 .app-body .app-sidebar {
+    @media print {
+        display: none;
+    }
     position: relative;
     display: flex;
     margin-top: 55px;
@@ -81,16 +87,20 @@ a {
 
 .app-body .app-asidemenu {
     display: flex;
-    margin-top: 55px;    
+    margin-top: 55px;
     flex-direction: column;
     padding: 0;
 
-    background: rgba(0,0,0,0.04);    
+    background: rgba(0,0,0,0.04);
 
     margin-right: -250px;
     width: 250px;
     flex: 0 0 250px;
     order: 3;
+
+    @media print {
+        display: none;
+    }
 }
 
 .app-body .app-sidebar .side-inner {
@@ -107,4 +117,12 @@ a {
 
 .app-header, .app-asidemenu, .app-main, .app-sidebar {
     transition: margin-left .25s,margin-right .25s,width .25s,flex .25s;
+}
+
+.app-main {
+    app-footer {
+        @media print {
+            display: none;
+        }
+    }
 }
