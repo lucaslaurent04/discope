@@ -45,6 +45,25 @@ class TimeSlot extends Model {
                 'description'       => 'For sorting the moments within a day.'
             ],
 
+            'code' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'B',
+                    'AM',
+                    'L',
+                    'PM',
+                    'D',
+                    'EV'
+                ],
+                'description'       => 'Represents the code associated with the ID of the time slot'
+            ],
+
+            'is_meal' => [
+                'type'              => 'boolean',
+                'description'       => 'Does the time slot relate to a meal?',
+                'default'           => false
+            ],
+
             'schedule_from' => [
                 'type'              => 'time',
                 'required'          => true,

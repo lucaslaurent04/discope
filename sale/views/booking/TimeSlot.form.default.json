@@ -35,13 +35,18 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "order",
-                                                "width": "50%"                                               
+                                                "value": "code",
+                                                "width": "30%"
                                             },
                                             {
-                                                "type": "label",
-                                                "width": "50%",
-                                                "value": ""
+                                                "type": "field",
+                                                "value": "is_meal",
+                                                "width": "30%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "order",
+                                                "width": "30%"
                                             },
                                             {
                                                 "type": "field",
@@ -58,7 +63,7 @@
                                 ]
                             }
                         ]
-                    }                    
+                    }
                 ]
             }
         ]
