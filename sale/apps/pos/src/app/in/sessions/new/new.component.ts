@@ -28,11 +28,11 @@ export class SessionsNewComponent implements OnInit {
     public user : UserClass;
 
 
-    constructor( 
+    constructor(
         public auth : AuthService,
-        public api : ApiService, 
+        public api : ApiService,
         private router: Router,
-        private dialog: MatDialog
+        private dialog: MatDialog,
     ) { }
 
 
@@ -52,7 +52,7 @@ export class SessionsNewComponent implements OnInit {
     public onDisplayCoins() {
         this.displayTablet = true;
         const dialogRef = this.dialog.open(SessionsNewInventoryDialog, {});
-    
+
         dialogRef.afterClosed().subscribe(
             data => {
                 console.log(data)
@@ -82,19 +82,19 @@ export class SessionsNewComponent implements OnInit {
                 if(cash_inventory) {
                     // #todo - add inventory as note
                     try {
-                        const session = await this.api.create(CashdeskSession.entity, {amount_opening: cash_inventory.total, cashdesk_id: this.cashdesk_id, user_id: this.user.id, });        
+                        const session = await this.api.create(CashdeskSession.entity, {amount_opening: cash_inventory.total, cashdesk_id: this.cashdesk_id, user_id: this.user.id, });
                         this.router.navigate(['/session/' + session.id + '/orders']);
                     }
                     catch(response) {
                         console.log(response);
                     }
                 }
-            });            
+            });
         }
     }
 
     public onselectCashdesk(cashdesk:any) {
-        this.cashdesk_id = cashdesk.id;        
+        this.cashdesk_id = cashdesk.id;
     }
 
 }

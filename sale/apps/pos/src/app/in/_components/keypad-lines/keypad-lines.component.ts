@@ -13,9 +13,9 @@ import { AppPadTypeToggleComponent } from '../pad/type-toggle/type-toggle.compon
 export class AppKeypadLinesComponent implements OnInit {
 
     @ViewChild('togglePad') togglePad: AppPadTypeToggleComponent;
-    
-    @Input() customer : any;    
-    @Input() hasInvoice : boolean;    
+
+    @Input() customer : any;
+    @Input() hasInvoice : boolean;
 
     @Output() requestInvoiceChange = new EventEmitter();
     @Output() nextClick = new EventEmitter();
@@ -23,7 +23,7 @@ export class AppKeypadLinesComponent implements OnInit {
     @Output() onTypeMode = new EventEmitter();
     @Output() customerChange : any = new EventEmitter();
 
-    
+
     public actionType: any = "qty";
     public select_customer = false;
     public posLineDisplay: string = "main";
@@ -38,12 +38,15 @@ export class AppKeypadLinesComponent implements OnInit {
 
     public reset() {
         this.select_customer = false;
-        this.togglePad?.reset();        
+        this.togglePad?.reset();
     }
 
     public onclickInvoice() {
+        // #memo - centers cannot emit invoices that are not related to a booking
+        /*
         this.hasInvoice = !this.hasInvoice;
         this.requestInvoiceChange.emit(this.hasInvoice);
+        */
     }
 
     public onclickNext(value: string) {

@@ -1,5 +1,5 @@
 export class CashdeskSession {
-    static readonly entity = 'sale\\pos\\CashdeskSession';
+    static readonly entity = 'lodging\\sale\\pos\\CashdeskSession';
 
     constructor(
       public id: number = 0,
@@ -9,7 +9,7 @@ export class CashdeskSession {
       public user_id: number = 0,
       public status: string = '',
       public cashdesk_id: number = 0,
-      public orders_ids: [] = [],
-      public operations_ids: [] = []
+      public orders_ids: any[] = [],
+      public operations_ids: any[] = []
     ) {}
 }

@@ -31,6 +31,7 @@ export class SessionOrderTicketComponent extends TreeComponent<Order, OrderCompo
     public ready: boolean = false;
     public focus: string;
     public user: UserClass = null;
+    public printerType: 'pos-80'|'iso-a4' = 'pos-80';
 
     constructor(
         private router: Router,
@@ -76,9 +77,10 @@ export class SessionOrderTicketComponent extends TreeComponent<Order, OrderCompo
     async load(order_id: number) {
         if (order_id > 0) {
             try {
-                const data = await this.api.fetch('/?get=sale_pos_order_tree', { id: order_id, variant: 'ticket' });
+                const data = await this.api.fetch('?get=lodging_sale_pos_order_tree', { id: order_id, variant: 'ticket' });
                 if (data) {
                     this.update(data);
+                    this.printerType = data.session_id.center_id.center_office_id.printer_type;
                 }
             }
             catch (response) {
@@ -87,11 +89,23 @@ export class SessionOrderTicketComponent extends TreeComponent<Order, OrderCompo
         }
     }
 
+    public getMethodLabel(method:string):string {
+        const map: any = {
+            "cash":         "espèces",
+            "bank_card":    "carte",
+            "booking":      "réservation",
+            "voucher":      "voucher"
+        };
+        return map.hasOwnProperty(method)?map[method]:method;
+    }
 
     public getPaymentModesMap() : {[key: string]: number} {
         let payments_map: any = {};
         for(let part of this.instance.order_payment_parts_ids) {
             let mode = part.payment_method;
+            if(part.payment_method == 'booking') {
+                mode = this.getMethodLabel(part.payment_method)+' [' + part.booking_id.name + ']';
+            }
             if(!payments_map.hasOwnProperty(mode)) {
                 payments_map[mode] = 0.0;
             }

@@ -30,6 +30,7 @@ export class SessionCloseComponent implements OnInit, AfterViewInit {
     public closing_note: string = "Note de fermeture: \n";
 
 
+    public has_unpaid_order = false;
     public checked = false;
     public submitted = false;
 
@@ -72,7 +73,7 @@ export class SessionCloseComponent implements OnInit, AfterViewInit {
     private async load(id: number) {
         if(id > 0) {
             try {
-                const data = await this.api.fetch('/?get=sale_pos_session_tree', { id: id });
+                const data = await this.api.fetch('?get=sale_pos_session_tree', { id: id });
 
                 if(data) {
                     this.session = <CashdeskSession> data;
@@ -89,6 +90,14 @@ export class SessionCloseComponent implements OnInit, AfterViewInit {
                             this.total_moves += operation.amount;
                         }
                     });
+
+                    // check if there are unpaid orders
+                    for(let order of this.session.orders_ids) {
+                        if(order.status != 'paid') {
+                            this.has_unpaid_order = true;
+                            break;
+                        }
+                    }
                 }
             }
             catch(response) {

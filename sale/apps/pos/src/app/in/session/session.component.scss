@@ -31,6 +31,9 @@
 
 
         .header {
+            @media print {
+                display: none;
+            }
             width: 100%;
             padding-left: 12px;
             height: 48px;
@@ -38,13 +41,13 @@
             border-bottom: solid 1px lightgrey;
             font-size: 22px;
         }
-    
+
         .body {
             height: calc(100vh - 123px);
             width: 100%;
             overflow-y: scroll;
             padding: 12px;
-            
+
             .actions {
                 display: flex;
 
@@ -58,37 +61,37 @@
 
                 .actions-view {
                     margin-left: auto;
-                    
+
                     button:not(:last-child) {
                         margin-right: 12px;
                     }
                 }
-        
+
             }
 
             .view {
-                margin-top: 30px;    
+                margin-top: 30px;
             }
 
         }
-    
+
         .body::-webkit-scrollbar {
             width: 6px;
             overflow-y: scroll;
             background: transparent;
-        
+
         }
-        
+
         .body::-webkit-scrollbar-thumb {
             background: var(--mdc-theme-primary, #6200ee);
             border-radius: 10px;
-        }        
+        }
 
-        
+
     }
 
     .container.hidden {
         display: none;
-    }      
-    
+    }
+
 }

@@ -1,47 +1,49 @@
 :host {
+    display: block;
+    height: 100%;
+    width: 100%;
 
-
- 
     mat-tab-group {
 
-    
-    .tab-product-pane-body {
-        width: 100%;
-        height: calc(100vh - 270px);
-        overflow: auto;                
-        cursor: pointer;
-        user-select: none;
-        
-        &::-webkit-scrollbar {
-            width: 6px;
-            overflow-y: scroll;
-            background: transparent;
+        height: 100%;
+
+        .tab-product-pane-body {
+            width: 100%;
+            height: calc(100vh - 270px);
+            overflow: auto;
+            cursor: pointer;
+            user-select: none;
+
+            &::-webkit-scrollbar {
+                width: 6px;
+                overflow-y: scroll;
+                background: transparent;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: var(--mdc-theme-primary, #6200ee);
+                border-radius: 10px;
+            }
+
+            ::ng-deep thead {
+                display: none;
+            }
+
         }
 
-        &::-webkit-scrollbar-thumb {
-            background: var(--mdc-theme-primary, #6200ee);
-            border-radius: 10px;
-        }
+        .tab-product-pane-header {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid lightgrey;
 
-        ::ng-deep thead {
-            display: none;
-        }
+            mat-form-field {
+                margin-left: 24px;
+            }
 
-    }
-
-    .tab-product-pane-header {
-        display: flex;     
-        align-items: center;
-        border-bottom: 1px solid lightgrey;
-
-        mat-form-field {
-            margin-left: 24px;
+            mat-paginator{
+                margin-left: auto;
+            }
         }
-        
-        mat-paginator{
-            margin-left: auto;
-        }
-    }
 
         ::ng-deep .mat-tab-labels {
             height: 72px;

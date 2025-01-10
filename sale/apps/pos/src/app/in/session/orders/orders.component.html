@@ -2,7 +2,7 @@
 
 <div class="container" *ngIf="ready">
     <div class="header-wrap">
-        <div class="header">Session › {{session.name}} <small>[{{session.id}}]</small> › Commandes en cours</div>
+        <div class="header">Session › <a style="text-decoration: none;" [attr.href]="'#/session/'+session.id">{{session.name}} <small>[{{session.id}}]</small></a> › Commandes</div>
         <div style="display: flex; align-items: center;">
             <button mat-icon-button class="screen" (click)="onclickFullscreen()"><mat-icon>open_in_full</mat-icon></button>
         </div>
@@ -10,33 +10,54 @@
     <div class="body">
         <div class="actions">
             <div class="actions-std">
-                <button mat-flat-button color="accent" (click)="onclickNewOrder()">Nouvelle commande</button>
-                <a [attr.href]="'#/session/'+session.id+'/move'"><button mat-flat-button color="primary" style="margin-left: 120px;">Mouvement de caisse</button></a>
-            </div>
-            <div class="actions-view">
-                <button mat-raised-button (click)="onclickCloseSession()" style="transform: scale(1.5); margin-right: 45px;">Fermer la session</button>
+                <button [disabled]="session.status != 'pending'" mat-flat-button color="accent" (click)="onclickNewOrder()">Nouvelle commande</button>
+                <a *ngIf="session.status == 'pending'" [attr.href]="'#/session/'+session.id+'/move'"><button mat-flat-button color="primary" style="margin-left: 120px;">Mouvement de caisse</button></a>
+                <button *ngIf="session.status != 'pending'" [disabled]="session.status != 'pending'" mat-flat-button color="primary" style="margin-left: 120px;">Mouvement de caisse</button>
             </div>
         </div>
 
         <div class="view">
-            <div *ngIf="session.status != 'pending'">Cette session n'est plus active.</div>
+            <div *ngIf="session.status != 'pending'">
+                <div class="warning">Cette session a été clôturée et n'est plus active.</div>
+            </div>
             <div *ngIf="session.status == 'pending'" class="orders-container">
                 <div class="order-header order-row">
                     <div class="item-col item-head">Date</div>
                     <div class="item-col item-head">Commande</div>
                     <div class="item-col item-head">Client</div>
                     <div class="item-col item-head">Total</div>
+                    <div class="item-col item-head">Status</div>
                     <div class="item-col item-head">Action</div>
                 </div>
-
-                <div class="order-item order-row" *ngFor="let order of orders">
+                <div class="order-item order-row" *ngFor="let order of orders" [class.is-paid]="order.status == 'paid'">
                     <div class="item-col">{{order.created | date:'short'}}</div>
                     <div class="item-col">{{order.name}}</div>
                     <div class="item-col">{{order.customer_id.name}}</div>
                     <div class="item-col">{{order.price | currency:'EUR'}}</div>
+                    <div class="item-col">{{getOrderStatus(order)}}</div>
                     <div class="item-col" style="display: flex; justify-content: space-around;">
-                        <button mat-icon-button color="primary" (click)="onclickSelectOrder(order.id)"><mat-icon>play_circle</mat-icon></button>
-                        <button [disabled]="order.total > 0" mat-icon-button (click)="onclickDeleteOrder(order.id)"><mat-icon>delete</mat-icon></button>
+                        <button
+                            mat-icon-button color="primary"
+                            (click)="onclickSelectOrder(order)"
+                        >
+                            <mat-icon>play_circle</mat-icon>
+                        </button>
+
+                        <button
+                            [disabled]="!order.paid_editable"
+                            mat-icon-button color="primary"
+                            (click)="onclickModifyOrder(order)"
+                        >
+                            <mat-icon>edit</mat-icon>
+                        </button>
+
+                        <button
+                            [disabled]="order.status == 'paid'"
+                            mat-icon-button
+                            (click)="onclickDeleteOrder(order)"
+                        >
+                            <mat-icon>remove_circle</mat-icon>
+                        </button>
                     </div>
                 </div>
             </div>

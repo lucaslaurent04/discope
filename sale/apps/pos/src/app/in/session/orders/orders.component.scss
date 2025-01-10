@@ -42,6 +42,7 @@
                 height: 48px;
                 line-height: 48px;
                 font-size: 22px;
+                overflow: hidden;
             }
         }
 
@@ -59,7 +60,12 @@
                 }
 
                 .actions-std {
-                    flex: 0 1 50%;
+                    flex: 1 1 50%;
+                    height: 64px;
+                    max-height: 64px;
+                    line-height: 64px;
+                    overflow: hidden;
+
                     button {
                         transform: scale(1.5);
                         margin-left: 45px;
@@ -80,12 +86,25 @@
             .view {
                 margin-top: 30px;
 
+                .warning {
+                    display: block;
+                    border: solid 1px var(--mdc-theme-secondary);
+                    border-radius: 5px;
+                    padding: 5px 10px;
+                    padding: 5px 10px;
+                    background-color: #ed143d10;
+                }
+
                 .orders-container {
                     .order-row {
                         padding: 0 12px;
-                        height: 76px;
+                        height: 60px;
                         display: flex;
                         align-items: center;
+
+                        &.is-paid {
+                            opacity: 0.6;
+                        }
 
                         .item-head {
                             text-transform: uppercase;
@@ -109,8 +128,9 @@
                     }
 
                     .order-item {
-                        margin-top: 12px;
+                        margin-top: 8px;
                         border: solid 1px lightgrey;
+                        border-radius: 6px;
                     }
                 }
             }

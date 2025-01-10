@@ -40,6 +40,18 @@ export class SessionComponent implements OnInit {
 
     private async load(id: number) {
         if(id > 0) {
+            // sync routes on menu pane
+            let descriptor:any = {
+                context: {
+                    entity:  'lodging\\sale\\pos\\CashdeskSession',
+                    type:    'form',
+                    name:    'default',
+                    mode:    'view',
+                    purpose: 'view',
+                    domain: ['id', '=', id]
+                }
+            };
+            this.context.change(descriptor);
             try {
                 const result:any = await this.api.read(CashdeskSession.entity, [id], Object.getOwnPropertyNames(new CashdeskSession()));
                 if(result && result.length) {

@@ -76,7 +76,7 @@ export class OrderPaymentPart {
         public order_payment_id: number = 0,
         public amount: number = 0.0,
         public payment_method: string = '',
-        public booking_id: number = 0.0,
+        public booking_id: any = {},
         public voucher_ref: string = ''
     ) {}
 }

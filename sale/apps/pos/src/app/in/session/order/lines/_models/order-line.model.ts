@@ -2,7 +2,7 @@ export class OrderLine {
     // index signature
     [key: string]: any;
     // model entity
-    public get entity():string { return 'sale\\pos\\OrderLine'};
+    public get entity():string { return 'lodging\\sale\\pos\\OrderLine'};
     // constructor with public properties
     constructor(
         public id: number = 0,

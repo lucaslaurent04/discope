@@ -53,7 +53,7 @@
             overflow-y: scroll;
             overflow-x: hidden;
             padding: 12px;
-            
+
             .actions {
                 display: flex;
 
@@ -67,35 +67,42 @@
 
                 .actions-view {
                     margin-left: auto;
-                    
+
                     button:not(:last-child) {
                         margin-right: 12px;
                     }
                 }
-        
+
             }
 
             .view {
                 margin-top: 30px;
-                
-                
+
+                .warning {
+                    display: block;
+                    border: solid 1px var(--mdc-theme-secondary);
+                    border-radius: 5px;
+                    padding: 5px 10px;
+                    padding: 5px 10px;
+                    background-color: #ed143d10;
+                }
             }
 
         }
-    
+
         .body::-webkit-scrollbar {
             width: 6px;
             overflow-y: scroll;
             background: transparent;
-        
+
         }
-        
+
         .body::-webkit-scrollbar-thumb {
             background: var(--mdc-theme-primary, #6200ee);
             border-radius: 10px;
-        }        
+        }
 
-        
+
     }
-    
+
 }

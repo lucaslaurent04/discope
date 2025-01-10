@@ -19,11 +19,6 @@ export class SessionOrderLinesSelectionComponent implements OnInit {
 
     @Input() order: Order;
 
-    @ViewChild('productspaginator') productsPaginator: MatPaginator;
-    @ViewChild('bookingsPaginator') bookingsPaginator: MatPaginator;
-    @ViewChild('fundingsPaginator') fundingsPaginator: MatPaginator;
-
-
     public ready: boolean = false;
 
     public bookings: any;
@@ -94,9 +89,8 @@ export class SessionOrderLinesSelectionComponent implements OnInit {
      */
     private async loadProducts(filter: string = '') {
         try {
-            this.products = await this.api.fetch('/?get=sale_catalog_product_pos-collect', { center_id: this.order.session_id.center_id.id, filter: filter });
+            this.products = await this.api.fetch('?get=lodging_sale_catalog_product_pos-collect', { center_id: this.order.session_id.center_id.id, filter: filter });
             this.productsDataSource = new MatTableDataSource(this.products);
-            this.productsDataSource.paginator = this.productsPaginator;
         }
         catch(response) {
             console.log('error while retrieving products.', response);
@@ -104,40 +98,58 @@ export class SessionOrderLinesSelectionComponent implements OnInit {
     }
 
     private async loadBookings(filter: string = '') {
-
-        let domain: any[] = [
-            ['name', 'ilike', '%'+filter+'%'],
+        const domain = [
+            ['name', 'ilike', `%${filter}%`],
+            // #todo - to remove
+            ['is_cancelled', '=', false],
             ['status', 'not in', ['quote', 'credit_balance', 'balanced']],
             ['center_id', '=', this.order.session_id.center_id.id]
         ];
 
-        // if current customer is the default customer of the cashdesk center, then display all bookings
-        // otherwise, display only bookings related to selected customer
-        if(this.order.customer_id.id != this.order.session_id.center_id.pos_default_customer_id) {
-            domain.push(['customer_id', '=', this.order.customer_id.id]);
+        const isNotDefaultPosCustomer =
+            this.order.customer_id.id != this.order.session_id.center_id.pos_default_customer_id;
+
+        if(isNotDefaultPosCustomer) {
+            domain.push(['customer_id', '=', this.order.customer_id.id])
         }
+
+        const fields = ['customer_id.name', 'center_id', 'total', 'date_from', 'date_to', 'price'];
 
         try {
-            //  #todo - bookings du centre en cours + non payés (au moins un funding)
-            this.bookings = await this.api.collect('sale\\booking\\Booking', domain, ['customer_id.name', 'center_id', 'total', 'date_from', 'date_to', 'price']);
+            this.bookings = await this.api.get(
+                '?get=lodging_booking_collect-unpaid',
+                {
+                    domain: JSON.stringify(domain),
+                    fields: JSON.stringify(fields)
+                }
+            );
 
             this.bookingsDataSource = new MatTableDataSource(this.bookings);
-            this.bookingsDataSource.paginator = this.bookingsPaginator;
         }
         catch(response) {
-            console.log('error while retrieveing bookings.', response);
+            console.log('error while retrieving unpaid bookings.', response);
         }
     }
 
-
-    private async loadFundings(booking: any) {
+    private async loadFundings(booking_id: number) {
         try {
-            this.fundings = await this.api.collect('sale\\booking\\Funding', [[['booking_id', '=', booking.id], ['is_paid', '=', false]]], ['name', 'description', 'due_amount', 'due_date', 'booking_id.customer_id']);
+            const bookingFundings = await this.api.collect(
+                'lodging\\sale\\booking\\Funding',
+                [
+                    ['booking_id', '=', booking_id],
+                    ['is_paid', '=', false]
+                ],
+                ['name', 'description', 'due_amount', 'is_paid', 'paid_amount', 'due_date', 'booking_id.customer_id']
+            );
+
+            this.fundings = bookingFundings.filter(
+                (funding: { is_paid: boolean }) => !funding.is_paid
+            );
+
             this.fundingsDataSource = new MatTableDataSource(this.fundings);
-            this.fundingsDataSource.paginator = this.fundingsPaginator;
         }
         catch(response) {
-            console.log('error while retrieveing fundings.', response);
+            console.log('error while retrieving fundings.', response);
         }
     }
 
@@ -165,11 +177,11 @@ export class SessionOrderLinesSelectionComponent implements OnInit {
         this.createOrderLine(row, 'product');
     }
 
-    public async selectBooking(booking: any) {
+    public async selectBooking(booking: { id: number }) {
         // show level 2 of booking pane
         this.funding = true;
         // load related fundings
-        this.loadFundings(booking);
+        this.loadFundings(booking.id);
     }
 
     public selectFunding(row: any) {
