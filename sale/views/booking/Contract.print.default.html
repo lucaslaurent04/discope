@@ -438,9 +438,9 @@ hr {
             <tr>
                 <td>{{ date_index }}</td>
                 {% if center_office == 'GA' %}
-                    <td style="text-align: center;">{{ map["B"] | default("0") }}</td><!-- meals in the morning -->
-                    <td style="text-align: center;">{{ map["L"] | default("0") }}</td><!-- meals at lunchtime -->
-                    <td style="text-align: center;">{{ map["D"] | default("0")}}</td><!-- meals in the evening -->
+                    <td style="text-align: center;">{{ map["B"] | default("") }}</td><!-- meals in the morning -->
+                    <td style="text-align: center;">{{ map["L"] | default("") }}</td><!-- meals at lunchtime -->
+                    <td style="text-align: center;">{{ map["D"] | default("")}}</td><!-- meals in the evening -->
                 {% endif %}
                 <td style="text-align: center;">{{ map['night'] | default("0")}}</td>
             </tr>
@@ -490,8 +490,8 @@ hr {
                             {% endif %}
                             <td style="text-align: center;">{{ slot_name }}</td>
                             {% if center_office == 'GA' %}
-                                <td style="text-align: center;">{{ totals.total_snack | default("0") }}</td>
-                                <td style="text-align: center;">{{ totals.total_meals | default("0") }}</td>
+                                <td style="text-align: center;">{{ totals.total_snack | default("") }}</td>
+                                <td style="text-align: center;">{{ totals.total_meals | default("") }}</td>
                             {% endif %}
                             {% if show_nights %}
                                 <td rowspan="5" style="text-align: center;">{{ map.total_nights | default("0") }}</td>
