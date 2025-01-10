@@ -9,6 +9,7 @@
 use equal\orm\Domain;
 use identity\User;
 use sale\booking\Booking;
+use sale\booking\TimeSlot;
 
 list($params, $providers) = announce([
     'description'   => 'Advanced search for Consumptions: returns a collection of Consumptions according to extra parameters.',
@@ -119,6 +120,21 @@ if(isset($params['consumption_type']) && $params['consumption_type']!= 'all') {
 $params['domain'] = $domain;
 
 $result = eQual::run('get', 'model_collect', $params, true);
+
+$time_slots = TimeSlot::search([])->read(['id', 'code', 'order'])->get();
+
+$time_slot_details = [];
+foreach ($time_slots as $time_slot) {
+    $time_slot_details[$time_slot['id']] = [
+        'order' => $time_slot['order']
+    ];
+}
+
+foreach ($result as &$item) {
+    if (isset($item['time_slot_id']['id']) && isset($time_slot_details[$item['time_slot_id']['id']])) {
+        $item['time_slot_id']['order'] = $time_slot_details[$item['time_slot_id']['id']]['order'];
+    }
+}
 
 if(in_array('time_slot_id.name', $params['fields'])) {
     $dates = array_map(function ($a) { return $a['date'];}, $result);
