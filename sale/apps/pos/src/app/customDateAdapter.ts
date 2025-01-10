@@ -3,13 +3,13 @@ import { NativeDateAdapter } from '@angular/material/core';
 import { parse, format as dateFnsFormat } from 'date-fns';
 
 export class CustomDateAdapter extends NativeDateAdapter {
-    
+
 
   /*
-   * 
+   *
    * #todo - adapt this to run according the current user's locale
    */
-  
+
   getDisplayFormat() : string {
     let lang = this.locale;
     var date_format = 'MM/dd/yyyy';
@@ -18,7 +18,7 @@ export class CustomDateAdapter extends NativeDateAdapter {
     const parts = this.locale.split('-');
     if(parts.length > 1) {
       lang = parts[0];
-    }      
+    }
 
     switch(lang) {
       case 'en':
@@ -29,7 +29,7 @@ export class CustomDateAdapter extends NativeDateAdapter {
         break;
     }
     return date_format;
-  }        
+  }
 
   parse(value: string | null): Date | null {
     var DT_FORMAT = this.getDisplayFormat();
