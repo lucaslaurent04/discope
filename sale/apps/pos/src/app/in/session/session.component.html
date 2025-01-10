@@ -5,7 +5,7 @@
     <div class="body">
         <div class="actions">
             <div class="actions-std"></div>
-            <div class="actions-view"><button mat-stroked-button color="primary" (click)="onclickSessionsList()">Historique des sessions</button> <button mat-stroked-button color="primary">Voir les commandes</button></div>
+            <div class="actions-view"><a [attr.href]="'#/session/'+session.id+'/orders'"><button mat-stroked-button color="primary">Voir les commandes</button></a></div>
         </div>
         <div class="view">
             <div *ngIf="session.status != 'pending'">Cette sesion n'est plus active.</div>
