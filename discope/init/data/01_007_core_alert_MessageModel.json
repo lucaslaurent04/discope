@@ -1,0 +1,148 @@
+[
+    {
+        "name": "core\\alert\\MessageModel",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "lodging.booking.overbooking",
+                "label": "Surbooking détecté",
+                "description": "Certaines unités locatives ne sont plus disponibles pour les dates spécifiées.",
+                "type": "booking"
+            },
+            {
+                "id": 2,
+                "name": "lodging.booking.ready",
+                "label": "Liste de prix publiée",
+                "description": "La réservation est prête à être confirmée: le montant du devis se base sur une liste de prix publiée.",
+                "type": "booking"
+            },
+            {
+                "id": 3,
+                "name": "lodging.booking.payments",
+                "label": "Paiement en attente",
+                "description": "Un ou plusieurs paiements dus sont en retard pour cette réservation.",
+                "type": "booking"
+            },
+            {
+                "id": 4,
+                "name": "lodging.booking.composition",
+                "label": "Composition incomplète",
+                "description": "La composition de la réservation est manquante ou incomplète.",
+                "type": "booking"
+            },
+            {
+                "id": 5,
+                "name": "lodging.booking.empty",
+                "label": "Réservation vide",
+                "description": "La réservation ne comporte aucun service.",
+                "type": "booking"
+            },
+            {
+                "id": 6,
+                "name": "lodging.booking.option.expired",
+                "label": "Option expirée",
+                "description": "L'option est expirée. La réservation est repassée en devis et les unités locatives associées ont été libérées.",
+                "type": "booking"
+            },
+            {
+                "id": 7,
+                "name": "lodging.booking.quote.blocking",
+                "label": "Unités locatives bloquées",
+                "description": "Cette réservation est en devis et bloque des unités locatives. (Passer la réservation en option ?)",
+                "type": "booking"
+            },
+            {
+                "id": 8,
+                "name": "lodging.booking.rental_units_assignment",
+                "label": "Allocation incorrecte",
+                "description": "L'assignation des unités locatives du séjour est erronée: le nombre d'hôtes ne correspond pas.",
+                "type": "booking"
+            },
+            {
+                "id": 9,
+                "name": "lodging.booking.ages_assignment",
+                "label": "Répartition des âges incorrecte",
+                "description": "La composition des âges des hôtes est erronée: le nombre d'hôtes ne correspond pas.",
+                "type": "booking"
+            },
+            {
+                "id": 10,
+                "name": "lodging.booking.contract.unsigned",
+                "label": "Contrat non signé",
+                "description": "Le contrat lié à la réservation n'a pas encore été marqué comme signé.",
+                "type": "booking"
+            },
+            {
+                "id": 11,
+                "name": "lodging.booking.customer.uncomplete",
+                "label": "Données client incomplètes",
+                "description": "Des données client de facturation sont manquantes. Vérifiez les coordonnées et l'adresse du client.",
+                "type": "booking"
+            },
+            {
+                "id": 13,
+                "name": "lodging.booking.sojourns_accomodations",
+                "label": "Incohérence logements",
+                "description": "Un séjour ne contient pas de logement; compte plus d'un type de logement; ou contient un logement sans être un séjour ni un événement.",
+                "type": "booking"
+            },
+            {
+                "id": 18,
+                "name": "lodging.booking.consistency",
+                "label": "Erreur détectée",
+                "description": "Un problème de cohérence a été détecté dans la réservation (unités locatives non-assignées ?).",
+                "type": "booking"
+            },
+            {
+                "id": 19,
+                "name": "lodging.accounting.invoice.invalid",
+                "label": "Facture invalide",
+                "description": "Une des lignes n'a pas de correspondance de prix ou de règle comptable.",
+                "type": "invoice"
+            },
+            {
+                "id": 20,
+                "name": "lodging.booking.confirm",
+                "label": "Vérifier les contacts",
+                "description": "La réservation doit avoir au moins un contact avec un numéro de téléphone valide.",
+                "type": "booking"
+            },
+            {
+                "id": 21,
+                "name": "lodging.booking.prices_assignment",
+                "label": "Assignation de prix incorrecte",
+                "description": "Au moins un produit sélectionné n'a pas de prix défini pour la période correspondante.",
+                "type": "booking"
+            },
+            {
+                "id": 22,
+                "name": "lodging.booking.date.checkin",
+                "label": "Date check-in incorrecte",
+                "description": "Vérifier que la date d'arrivée soit comprise dans les dates de réservation.",
+                "type": "booking"
+            },
+            {
+                "id": 23,
+                "name": "lodging.booking.email.send",
+                "label": "Échec e-mail contrat",
+                "description": "L'envoi du dernier e-mail de contact a échoué.",
+                "type": "booking"
+            },
+            {
+                "id": 25,
+                "name": "lodging.booking.payment.overpaid",
+                "label": "Paiement en excès",
+                "description": "Il a été détecté un paiement excédentaire de la part du client. Veuillez procéder au remboursement de l'excédent.",
+                "type": "booking"
+            },
+            {
+                "id": 26,
+                "name": "lodging.pos.close-discrepancy",
+                "label": "Divergence entre ouverture et fermeture",
+                "description": "Une différence a été constatée entre le montant d'ouverture et le montant de fermeture de la caisse.",
+                "type": "pos"
+            }
+        ]
+    }
+]
