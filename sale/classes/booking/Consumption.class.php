@@ -339,17 +339,19 @@ class Consumption extends Model {
     }
 
     public static function _updateTimeSlotId($om, $oids, $values, $lang) {
-        $consumptions = $om->read(self::getType(), $oids, ['schedule_from', 'schedule_to']);
+        $consumptions = $om->read(self::getType(), $oids, ['schedule_from', 'schedule_to', 'is_meal']);
         if($consumptions > 0) {
             $moments_ids = $om->search('sale\booking\TimeSlot', [], ['order' => 'asc']);
-            $moments = $om->read('sale\booking\TimeSlot', $moments_ids, ['schedule_from', 'schedule_to']);
+            $moments = $om->read('sale\booking\TimeSlot', $moments_ids, ['schedule_from', 'schedule_to', 'is_meal']);
             foreach($consumptions as $cid => $consumption) {
                 // retrieve timeslot according to schedule_from
                 $moment_id = 1;
                 foreach($moments as $mid => $moment) {
                     if($consumption['schedule_from'] >= $moment['schedule_from'] && $consumption['schedule_to'] <= $moment['schedule_to']) {
                         $moment_id = $mid;
-                        break;
+                        if($moment['is_meal'] && $consumption['is_meal']) {
+                            break;
+                        }
                     }
                 }
                 $om->update(self::getType(), $cid, ['time_slot_id' => $moment_id]);
