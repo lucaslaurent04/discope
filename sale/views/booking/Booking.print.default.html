@@ -449,16 +449,16 @@ hr {
                     {% for slot_name, totals in map.time_slots %}
                         <tr>
                             {% if date_index != last_date %}
-                                <td rowspan="5" style="text-align: center;">{{ date_index }}</td>
+                                <td rowspan="{{ map.time_slots | length }}" style="text-align: center;">{{ date_index }}</td>
                                 {% set last_date = date_index %}
                             {% endif %}
                             <td style="text-align: center;">{{ slot_name }}</td>
                             {% if center_office == 'GA' %}
-                                <td style="text-align: center;">{{ totals.total_snack | default("") }}</td>
-                                <td style="text-align: center;">{{ totals.total_meals | default("") }}</td>
+                                <td style="text-align: center;">{{ (totals.total_snack | default(0)) > 0 ? totals.total_snack : '' }}</td>
+                                <td style="text-align: center;">{{ (totals.total_meals | default(0)) > 0 ? totals.total_meals : '' }}</td>
                             {% endif %}
                             {% if show_nights %}
-                                <td rowspan="5" style="text-align: center;">{{ map.total_nights | default("0") }}</td>
+                                <td rowspan="{{ map.time_slots | length }}" style="text-align: center;">{{ map.total_nights | default(0) }}</td>
                                 {% set show_nights = false %}
                             {% else %}
                             {% endif %}
@@ -469,8 +469,8 @@ hr {
             <tr>
                 <td colspan="2" style="text-align: center;"><b>TOTAL</b></td>
                 {% if center_office == 'GA' %}
-                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_detailed['total']['total_snack']  | default("0") }}</td>
-                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_detailed['total']['total_meals']  | default("0")}}</td>
+                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_detailed['total']['total_snack'] | default("0") }}</td>
+                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_detailed['total']['total_meals'] | default("0")}}</td>
                 {% endif %}
                 <td style="text-align: center; font-weight: bold;">{{ consumptions_map_detailed['total']['total_nights'] | default("0")}}</td>
             </tr>
