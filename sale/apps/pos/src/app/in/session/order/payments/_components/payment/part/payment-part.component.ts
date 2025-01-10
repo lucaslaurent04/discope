@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { ApiService, ContextService, TreeComponent } from 'sb-shared-lib';
 import { OrderPayment } from '../../../_models/payment.model';
+import { Order } from '../../../_models/order.model';
 import { OrderPaymentPart } from '../../../_models/payment-part.model';
 import { Customer } from '../../../_models/customer.model';
 
@@ -18,11 +19,12 @@ interface OrderPaymentPartComponentsMap {
     styleUrls: ['payment-part.component.scss']
 })
 export class SessionOrderPaymentsPaymentPartComponent extends TreeComponent<OrderPaymentPart, OrderPaymentPartComponentsMap> implements OnInit, AfterViewInit  {
-    // servel-model relayed by parent
+    // server-model relayed by parent
     @Input() set model(values: any) { this.update(values) }
 
     @Input() customer: Customer;
     @Input() payment: OrderPayment;
+    @Input() order: Order;
 
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
@@ -30,8 +32,14 @@ export class SessionOrderPaymentsPaymentPartComponent extends TreeComponent<Orde
     public ready: boolean = false;
 
 
-    public amount:FormControl = new FormControl();
+    public amount: FormControl = new FormControl();
+    public maxAmount: number = null;
+    public initialAmount: number = 0;
+
     public voucher_ref:FormControl = new FormControl();
+
+    public allowedPaymentMethods: string[] = [];
+    public canValidate: boolean = true;
 
     public get partLabel():string {
         const map: any = {
@@ -65,13 +73,26 @@ export class SessionOrderPaymentsPaymentPartComponent extends TreeComponent<Orde
             if(this.instance.amount == 0) {
                 this.amount.setValue(this.payment.total_due-this.payment.total_paid);
             }
+            this.canValidate = this.calcCanValidate();
             this.ready = true;
         }
     }
 
     public async ngOnInit() {
-        this.amount.valueChanges.subscribe( (value:number)  => this.instance.amount = value );
+        this.initialAmount = this.instance.amount;
+
+        this.amount.valueChanges.subscribe((value: number) => {
+            this.instance.amount = value;
+            this.canValidate = this.calcCanValidate();
+        });
+
+        if(this.payment.total_due < 0) {
+            this.amount.disable();
+        }
+
         this.voucher_ref.valueChanges.subscribe( (value:number)  => this.instance.voucher_ref = value );
+
+        this.allowedPaymentMethods = this.getAllowedPaymentMethod();
     }
 
     public update(values:any) {
@@ -90,18 +111,35 @@ export class SessionOrderPaymentsPaymentPartComponent extends TreeComponent<Orde
     }
 
     public async onchangeBookingId(booking: any) {
-        this.instance.booking_id = booking.id;
+        if(booking.hasOwnProperty('id')) {
+            this.instance.booking_id = booking.id;
+            await this.api.update((new OrderPaymentPart()).entity, [this.instance.id], {booking_id: booking.id, payment_method: 'booking'});
+            if(booking.customer_id && booking.customer_id.id) {
+                await this.api.update((new Order()).entity, [this.payment.order_id], {customer_id: booking.customer_id.id});
+            }
+            this.updated.emit();
+        }
     }
 
     public async onValidate() {
         try {
-            await this.api.update(this.instance.entity, [this.instance.id], {
+            let values:any = {
                 amount: this.instance.amount,
                 payment_method: this.instance.payment_method,
-                booking_id: this.instance.booking_id,
-                voucher_ref: this.instance.voucher_ref,
                 status: 'paid'
-            });
+            };
+
+            if(this.instance.payment_method == 'booking') {
+                values.amount = this.payment.total_due;
+            }
+            if(typeof this.instance.booking_id != 'object' && this.instance.booking_id > 0) {
+                values.booking_id = this.instance.booking_id;
+            }
+            if(typeof this.instance.voucher_ref != 'object' && this.instance.voucher_ref > 0) {
+                values.voucher_ref = this.instance.voucher_ref;
+            }
+
+            await this.api.update(this.instance.entity, [this.instance.id], values);
             this.updated.emit();
         }
         catch(response) {
@@ -109,7 +147,41 @@ export class SessionOrderPaymentsPaymentPartComponent extends TreeComponent<Orde
         }
     }
 
-    public displayBooking (item : any): string{
-        return item.name + ' - ' + item.customer_id.name;
+    public changePaymentMethod(paymentMethod: string) {
+        this.instance.payment_method = paymentMethod;
+        this.maxAmount = paymentMethod === 'bank_card' ? this.initialAmount : null;
+
+        this.canValidate = this.calcCanValidate();
+    }
+
+    public hasFunding() {
+        return this.payment?.has_funding;
+    }
+
+    public getAllowedPaymentMethod(): string[] {
+        if(this.payment.total_due < 0) {
+            return ['cash'];
+        }
+
+        const paymentParts = this.payment.order_payment_parts_ids;
+        if(!paymentParts.length || paymentParts[0].status !== 'paid') {
+            return ['cash', 'bank_card', 'booking'];
+        }
+
+        return paymentParts[0].payment_method === 'booking' ?
+            ['booking'] :
+            ['cash', 'bank_card'];
+    }
+
+    private calcCanValidate() {
+        return this.instance.amount !== null
+            && (
+                this.instance.payment_method !== 'booking'
+                || this.instance.booking_id
+            )
+            && (
+                this.instance.payment_method !== 'bank_card'
+                || this.instance.amount <= this.maxAmount
+            );
     }
 }

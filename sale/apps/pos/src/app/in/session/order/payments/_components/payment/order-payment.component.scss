@@ -1,19 +1,16 @@
 :host {
-
-    margin-top: 0.25rem;
-
-    &:last-child {
-        .body {
-
-            .row-parts {
-                min-height: 350px;
-            }
-
-        }        
-    }
+    position: absolute;
+    display: block;
+    height: 100%;
+    width: 100%;
+    top: 0;
 
     .disabled {
         background-color: grey;
+    }
+
+    .hidden {
+        display: none;
     }
 
     .mat-mini-fab {
@@ -31,7 +28,7 @@
         height: 51px;
         margin: 5px;
         border-bottom: 1px solid lightgray;
-
+        background-color: white;
 
         span {
             font-weight: 600;
@@ -46,6 +43,35 @@
     }
 
     .body {
+        height: calc(100% - 56px);
+
+        .row-paymentparts {
+            height: 100%;
+
+            .header {
+                display: flex;
+                margin: 0.25rem;
+                align-items: center;
+            }
+
+            .body {
+                overflow-x: hidden;
+                overflow-y: scroll;
+
+                &::-webkit-scrollbar {
+                    width: 6px;
+                    overflow-y: scroll;
+                    background: transparent;
+
+                }
+
+                &::-webkit-scrollbar-thumb {
+                    background: var(--mdc-theme-primary, #6200ee);
+                    border-radius: 10px;
+                }
+            }
+        }
+
         .row-products {
             display: flex;
             justify-content: space-evenly;
@@ -69,6 +95,6 @@
             }
 
         }
-    }    
+    }
 
 }

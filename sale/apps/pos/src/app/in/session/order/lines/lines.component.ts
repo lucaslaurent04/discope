@@ -28,8 +28,6 @@ export class SessionOrderLinesComponent extends TreeComponent<Order, OrderCompon
 
     public ready: boolean = false;
 
-    private last_stroke: number = Date.now();
-
     public get taxes () {
         return Math.round( (this.instance.price - this.instance.total) * 100) / 100;
     }
@@ -41,8 +39,13 @@ export class SessionOrderLinesComponent extends TreeComponent<Order, OrderCompon
     // local copy of selected line
     public selectedLine: OrderLine;
 
+    private previousSelectedLineId: number = null;
+
     // pane to be displayed : 'main', 'discount'
     public current_pane: string = "main";
+
+    private keypad_str:string = '0';
+    private last_stroke: number = Date.now();
 
     constructor(
         private router: Router,
@@ -84,15 +87,9 @@ export class SessionOrderLinesComponent extends TreeComponent<Order, OrderCompon
     async load(order_id: number) {
         if (order_id > 0) {
             try {
-                const data = await this.api.fetch('/?get=sale_pos_order_tree', { id: order_id, variant: 'lines' });
+                const data = await this.api.fetch('?get=lodging_sale_pos_order_tree', { id: order_id, variant: 'lines' });
                 if (data) {
                     this.update(data);
-                }
-                if(this.instance.status == 'payment') {
-                    this.router.navigate(['/session/'+this.instance.session_id.id+'/order/'+this.instance.id+'/payments']);
-                }
-                if(this.instance.status == 'paid') {
-                    this.router.navigate(['/session/'+this.instance.session_id.id+'/order/'+this.instance.id+'/ticket']);
                 }
             }
             catch (response) {
@@ -145,12 +142,11 @@ export class SessionOrderLinesComponent extends TreeComponent<Order, OrderCompon
 
     public onSelectLine(line: any) {
         let index = this.sessionOrderLinesOrderLineComponents.toArray().findIndex( (l:any) => l.instance.id == line.id );
-
         this.selectedLineComponent = this.sessionOrderLinesOrderLineComponents.toArray()[index];
         // create a clone of the selected line
         this.selectedLine = <OrderLine> {...this.selectedLineComponent.instance};
-        // reset the defaut mode on keypad
-        this.keypad.reset();
+        // #memo - it is more convenient for user to manually switch between modes
+        // this.keypad.reset();
     }
 
 
@@ -174,137 +170,125 @@ export class SessionOrderLinesComponent extends TreeComponent<Order, OrderCompon
             return;
         }
 
-
-        // retrieve current string from keypad
-        let keypad_str:string = '0';
-
         let now: number = Date.now();
 
-        // after a while, the stroke replaces the value
-        // otherwise, the key is append to the value
-        if(now - this.last_stroke < 2000) {
-            switch (this.selected_field) {
-                case 'qty':
-                    keypad_str = this.selectedLine.qty.toString();
-                    break;
-                case 'free_qty':
-                    keypad_str = this.selectedLine.free_qty.toString();
-                    break;
-                case 'unit_price':
-                    keypad_str = this.selectedLine.unit_price.toString();
-                    break;
-                case 'discount':
-                    keypad_str = (this.selectedLine.discount * 100).toString();
-                    break;
-                case 'vat_rate':
-                    keypad_str = (this.selectedLine.vat_rate * 100).toString();
-                    break;
-            }
+        // after 1.5 sec, the stroke replaces the value; otherwise, the key is append to the value
+        if(now - this.last_stroke > 1500 || this.selectedLine.id !== this.previousSelectedLineId) {
+            this.keypad_str = '0';
         }
+
         this.last_stroke = now;
 
         // adapt string based on received key
         if (key == ",") {
-            if(!keypad_str.includes('.')) {
-                keypad_str += ".001";
+            if(!this.keypad_str.includes('.')) {
+                this.keypad_str += ".00001";
             }
+            return;
         }
         else if (['+', '-'].indexOf(key) >= 0) {
             if (key == "-") {
-                if (keypad_str.includes('-')) {
-                    keypad_str = keypad_str.replace('-', '');
+                if (this.keypad_str.includes('-')) {
+                    this.keypad_str = this.keypad_str.replace('-', '');
                 }
                 else {
-                    keypad_str = '-' + keypad_str;
+                    this.keypad_str = '-' + this.keypad_str;
                 }
             }
-            else if (key == "+" && keypad_str.includes('-')) {
-                keypad_str = keypad_str.replace('-', '');
+            else if (key == "+" && this.keypad_str.includes('-')) {
+                this.keypad_str = this.keypad_str.replace('-', '');
             }
         }
         else if (key == 'backspace') {
-            if (keypad_str.length) {
+            if (this.keypad_str.length) {
                 // remove last char(s)
 
-                if(keypad_str.includes('.')) {
-                    let dec_part: string = keypad_str.split(".")[1];
+                if(this.keypad_str.includes('.')) {
+                    let dec_part: string = this.keypad_str.split(".")[1];
                     if(dec_part.length > 2) {
-                        keypad_str = keypad_str.slice(0, -2);
-                        let last = keypad_str.slice(-1);
+                        this.keypad_str = this.keypad_str.slice(0, -2);
+                        let last = this.keypad_str.slice(-1);
                         if(last == '0') {
-                            keypad_str = keypad_str.slice(0, -1);
+                            this.keypad_str = this.keypad_str.slice(0, -1);
                         }
                     }
                     else {
-                        keypad_str = keypad_str.slice(0, -1);
+                        this.keypad_str = this.keypad_str.slice(0, -1);
                     }
                 }
                 else {
-                    keypad_str = keypad_str.slice(0, -1);
+                    this.keypad_str = this.keypad_str.slice(0, -1);
                 }
 
-                if (!keypad_str.length) {
-                    keypad_str = "0";
+                if (!this.keypad_str.length) {
+                    this.keypad_str = "0";
                 }
                 // remove decimal separator if unnecessary
-                else if(keypad_str.includes('.')) {
-                    let num_val = parseFloat(keypad_str);
+                else if(this.keypad_str.includes('.')) {
+                    let num_val = parseFloat(this.keypad_str);
                     if(Number.isInteger(num_val)) {
-                        keypad_str = num_val.toString();
+                        this.keypad_str = num_val.toString();
                     }
                 }
             }
         }
         else if (/^[0-9]{1}/.test(key)) {
-            if(keypad_str.includes('.')) {
-                let value: number = parseFloat(keypad_str);
-                let int_part = Math.trunc(value);
-                let dec_part = parseInt(keypad_str.split(".")[1], 10);
+            console.log(this.keypad_str);
+            if(this.keypad_str.includes('.')) {
+                console.log('point detected', this.keypad_str);
+                let value: number = parseFloat(this.keypad_str);
+                let int_part: string = '';
+                let dec_part: string = '';
 
-                // first decimal
-                if(dec_part < 100) {
-                    dec_part -= Math.trunc(dec_part/1000) * 1000;
-                    dec_part += parseInt(key, 10) * 100;
-                    keypad_str = int_part + '.' + dec_part + '1';
+                let parts: string[] = this.keypad_str.split(".");
+                if(parts.length > 0) {
+                    int_part = parts[0];
                 }
-                // second decimal
+                if(parts.length > 1) {
+                    dec_part = parts[1];
+                    // remove trailing 1, if any
+                    dec_part = dec_part.substring(0, 4);
+                    // remove trailing zeros
+                    dec_part = dec_part.replace(/0+$/, '');
+                }
+
+                let new_part: string = '';
+                if(dec_part == '0' || dec_part == '') {
+                    new_part = '' + key;
+                }
                 else {
-                    console.log(dec_part);
-                    let first_dec = Math.trunc(dec_part/100);
-                    console.log(first_dec);
-                    keypad_str = int_part + '.' + first_dec + key + '1';
+                    new_part = '' + dec_part + key;
                 }
+                this.keypad_str = int_part + '.' + (new_part).padEnd(4, '0') + '1';
             }
             else {
-                keypad_str += key;
+                if(this.keypad_str == "0") {
+                    this.keypad_str = '' + key;
+                }
+                else {
+                    this.keypad_str += '' + key;
+                }
             }
         }
 
         // update local copy
         switch (this.selected_field) {
             case 'qty':
-                this.selectedLine = <OrderLine> {...this.selectedLine, qty: parseInt(keypad_str, 10)};
+                this.selectedLine = <OrderLine> {...this.selectedLine, qty: parseInt(this.keypad_str, 10)};
                 break;
             case 'free_qty':
-                this.selectedLine = <OrderLine> {...this.selectedLine, free_qty: parseInt(keypad_str, 10)};
+                this.selectedLine = <OrderLine> {...this.selectedLine, free_qty: parseInt(this.keypad_str, 10)};
                 break;
             case 'unit_price':
-                let unit_price: number = parseFloat(keypad_str);
-                let int_part = Math.trunc(unit_price);
-                let dec_part = (unit_price - int_part) * 1000;
-                if(dec_part > 0) {
-                    unit_price = parseFloat(unit_price.toFixed(3));
-                }
-                else {
-                    unit_price = parseInt(keypad_str);
-                }
+                let price: number = parseFloat(this.keypad_str);
+                let unit_price = parseFloat((price / (1 + this.selectedLine.vat_rate)).toFixed(4));
                 this.selectedLine = <OrderLine> {...this.selectedLine, unit_price: unit_price};
                 break;
             case 'discount':
-                this.selectedLine = <OrderLine> {...this.selectedLine, discount: parseFloat(keypad_str) / 100};
+                this.selectedLine = <OrderLine> {...this.selectedLine, discount: parseFloat(this.keypad_str) / 100};
                 break;
             case 'vat_rate':
-                this.selectedLine = <OrderLine> {...this.selectedLine, vat_rate: parseFloat(keypad_str) / 100};
+                this.selectedLine = <OrderLine> {...this.selectedLine, vat_rate: parseFloat(this.keypad_str) / 100};
                 break;
         }
 
@@ -312,6 +296,8 @@ export class SessionOrderLinesComponent extends TreeComponent<Order, OrderCompon
         this.selectedLineComponent.update(this.selectedLine);
         // trigger a relay to server
         this.selectedLineComponent.onchange();
+        // update previously selected line
+        this.previousSelectedLineId = this.selectedLine.id;
     }
 
     public async onRequestInvoiceChange(value: any) {
@@ -320,10 +306,23 @@ export class SessionOrderLinesComponent extends TreeComponent<Order, OrderCompon
         await this.load(this.instance.id);
     }
 
-    public async onclickNext(value: any) {
+    public async onclickNext(status: string) {
+        const orderData: Partial<Order> = { status };
+
+        if(!this.instance.order_lines_ids.length) {
+            this.alertNoOrderLinesSelected();
+            return;
+        }
+        else if(this.instance.order_lines_ids.length === 1 && this.instance.order_lines_ids[0].has_funding) {
+            const fundingCustomerId = await this.getFundingCustomerId(this.instance.order_lines_ids[0].funding_id);
+            if(fundingCustomerId && fundingCustomerId !== this.instance.customer_id.id) {
+                orderData.customer_id = fundingCustomerId;
+            }
+        }
+
         // update order status
         try {
-            await this.api.update(this.instance.entity, [this.instance.id], { status: 'payment' });
+            await this.api.update(this.instance.entity, [this.instance.id], orderData);
             // this.current_pane = value;
             let newRoute = this.router.url.replace('lines', 'payments');
             this.router.navigateByUrl(newRoute);
@@ -332,6 +331,35 @@ export class SessionOrderLinesComponent extends TreeComponent<Order, OrderCompon
             // unexpected error
             console.log(response);
         }
+    }
+
+    private alertNoOrderLinesSelected() {
+        this.dialog.open(SbDialogNotifyDialog, {
+            width: '33vw',
+            data: {
+                title: 'Opération impossible',
+                message: 'Sélectionnez des produits ou un financement pour passer au paiement de la commande.',
+                ok: 'Fermer'
+            }
+        });
+    }
+
+    private async getFundingCustomerId(id: number): Promise<number> {
+        let fundings = [];
+
+        try {
+            fundings = await this.api.read(
+                'lodging\\sale\\booking\\Funding',
+                [id],
+                ['booking_id.customer_id']
+            );
+        }
+        catch(response) {
+            // unexpected error
+            console.log(response);
+        }
+
+        return fundings.length ? fundings[0].booking_id.customer_id : null;
     }
 
     public switchPane(event: string) {
@@ -378,7 +406,7 @@ export class SessionOrderLinesComponent extends TreeComponent<Order, OrderCompon
                 width: '33vw',
                 data: {
                     title: "Opération impossible",
-                    message: "Les commandes ne peuvent comporter à la fois des produits et des financements. Si vous souhaitez ajouter ce financement, retirez d'abord les produits.",
+                    message: "Les commandes doivent comporter soit exclusivement des produits, soit un seul financement.\nSi vous souhaitez ajouter ce financement, retirez d'abord les produits déjà présents.",
                     ok: 'Fermer'
                 }
             });
@@ -390,7 +418,7 @@ export class SessionOrderLinesComponent extends TreeComponent<Order, OrderCompon
 
         try {
             // create a new line
-            const line = await this.api.create((new OrderLine()).entity, { order_id: this.instance.id, unit_price: funding.due_amount, qty: 1, has_funding: true, funding_id: funding.id, name: funding.name });
+            const line = await this.api.create((new OrderLine()).entity, { order_id: this.instance.id, unit_price: (funding.due_amount-funding.paid_amount), qty: 1, has_funding: true, funding_id: funding.id, name: funding.name });
             // add line to current order
             await this.api.update(this.instance.entity, [this.instance.id], { customer_id: funding.booking_id.customer_id, order_lines_ids: [line.id] });
             await this.load(this.instance.id);
@@ -428,9 +456,11 @@ export class SessionOrderLinesComponent extends TreeComponent<Order, OrderCompon
             return;
         }
         try {
+            console.log('create order line', product);
             const line = await this.api.create((new OrderLine()).entity, {
                 order_id: this.instance.id,
-                unit_price: 0,      // we don't know the price yet (will be resolved by back-end)
+                // price yet is resolved by back-end
+                unit_price: 0,
                 qty: 1,
                 name: product.sku,
                 product_id: product.id

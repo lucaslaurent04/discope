@@ -17,7 +17,7 @@
         margin-top: 20px;
     }
     h2{
-        text-align:center; 
+        text-align:center;
         text-decoration: underline;
         margin-bottom: 15px;
     }
@@ -28,21 +28,23 @@
     align-items: center;
     justify-content: space-evenly;
     margin-top: 30px;
-    
+
     .elements-select {
         flex: 1 1 30%;
         max-width: 500px;
+        width: auto;
         sb-m2o-select {
             font-size: 28px;
             line-height: 32px;
             font-weight: 400;
+            width: 100%;
         }
         .mat-form-field{
             width: 100% !important;
             font-size: 28px;
             line-height: 32px;
-            font-weight: 400; 
-              
+            font-weight: 400;
+
         }
     }
 }

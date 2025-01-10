@@ -26,6 +26,8 @@ export class SessionOrderPaymentsOrderPaymentComponent extends TreeComponent<Ord
     // servel-model relayed by parent
     @Input() set model(values: any) { this.update(values) }
     @Input() customer: Customer;
+    @Input() order: Order;
+    @Input() areAllOrderLinesAssigned: boolean;
 
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
@@ -72,8 +74,12 @@ export class SessionOrderPaymentsOrderPaymentComponent extends TreeComponent<Ord
     }
 
     public update(values:any) {
-        console.log('line item update', values);
         super.update(values);
+    }
+
+    public getPaymentParts() {
+        let payment_parts_ids = [...this.instance.order_payment_parts_ids];
+        return payment_parts_ids.reverse();
     }
 
     public getPaymentPart() : SessionOrderPaymentsPaymentPartComponent {
@@ -81,12 +87,31 @@ export class SessionOrderPaymentsOrderPaymentComponent extends TreeComponent<Ord
         return children[this.index];
     }
 
+    public hasNotValidPaymentPart(): boolean {
+        const paymentPart = this.getPaymentPart();
+
+        return paymentPart
+            && paymentPart.instance.status == 'pending'
+            && !paymentPart.canValidate;
+    }
+
     public canAddPart() {
-        return ( this.instance.total_due > 0 &&  this.instance.total_paid < this.instance.total_due && this.instance.status != 'paid');
+        const absTotalDue = Math.abs(this.instance.total_due);
+        const absTotalPaid = Math.abs(this.instance.total_paid);
+
+        return absTotalDue > 0
+            && absTotalPaid < absTotalDue
+            && this.instance.status != 'paid';
     }
 
     public canValidate() {
-        return ( this.instance.total_due > 0 && this.instance.total_paid >= this.instance.total_due && this.instance.status != 'paid');
+        const absTotalDue = Math.abs(this.instance.total_due);
+        const absTotalPaid = Math.abs(this.instance.total_paid);
+
+        return absTotalDue > 0
+            && absTotalPaid >= absTotalDue
+            && this.instance.status != 'paid'
+            && this.areAllOrderLinesAssigned;
     }
 
     public calcDueRemaining() {
@@ -102,6 +127,10 @@ export class SessionOrderPaymentsOrderPaymentComponent extends TreeComponent<Ord
         this.deleted.emit();
     }
 
+    /**
+     * User clicked on the validation button of a payment part
+     * @param part_id
+     */
     public async onupdatePart(part_id:number) {
         // relay to parent component
         this.updated.emit();
@@ -118,20 +147,67 @@ export class SessionOrderPaymentsOrderPaymentComponent extends TreeComponent<Ord
             this.instance.order_lines_ids.splice(this.instance.order_lines_ids.findIndex((e:any)=>e.id == line_id), 1);
         }
         catch(response) {
-            console.log('unexepected error', response);
+            console.log('unexpected error', response);
 
         }
     }
 
-    public async onclickCreateNewPart() {
+    public async onclickAddPart() {
+        if(this.hasNotValidPaymentPart()) {
+            return;
+        }
+
+        if(this.instance.total_due < 0) {
+            await this.getPaymentPart().onValidate();
+            return;
+        }
+
         try {
-            await this.api.create((new OrderPaymentPart()).entity, {order_payment_id: this.instance.id, amount: this.calcDueRemaining()});
-            this.updated.emit();
+            // if there is an active payment part being edited, validate it
+            let amount_remaining: number = this.calcDueRemaining();
+            let paymentPart = this.getPaymentPart();
+            if(paymentPart && paymentPart.instance.status != 'paid') {
+                if(paymentPart.instance.payment_method === 'booking') {
+                    amount_remaining = 0;
+                }
+                else {
+                    amount_remaining -= paymentPart.instance.amount;
+                }
+
+                await paymentPart.onValidate();
+            }
+            if(amount_remaining > 0) {
+                await this.api.create((new OrderPaymentPart()).entity, {order_payment_id: this.instance.id, amount: amount_remaining});
+                this.updated.emit();
+            }
         }
         catch(response) {
             console.log('unexpected error', response);
         }
     }
+
+    public async onclickConfirmPayment() {
+        if(this.hasNotValidPaymentPart()) {
+            return;
+        }
+
+        try {
+            // mark all payment parts as paid (cannot be reversed)
+            await this.api.update((new OrderPaymentPart).entity, this.instance.order_payment_parts_ids.map((a:any) => a.id), {status: 'paid'});
+            let paymentPart = this.getPaymentPart();
+            if(paymentPart && paymentPart.instance.status != 'paid') {
+                paymentPart.onValidate();
+            }
+            else {
+                // delegate payment validation to parent component
+                this.validated.emit();
+            }
+        }
+        catch(response) {
+            console.log('unexpected error', response)
+        }
+    }
+
 
     public onDisplayProducts() {
         this.displayPaymentProducts.emit();
@@ -145,46 +221,10 @@ export class SessionOrderPaymentsOrderPaymentComponent extends TreeComponent<Ord
         this.selectedPaymentPartIndex.emit(index);
     }
 
-    public async onConfirmOrderPayment() {
-        // check if there is any pending payment part
-        let found: boolean = false;
-        for(let partComponent of this.sessionOrderPaymentsPaymentPartComponents) {
-            // if found, force validation
-            if(partComponent.instance.status == 'pending') {
-                partComponent.onValidate();
-                found = true;
-            }
-        }
-        if(found) {
-            return;
-        }
-
-        try {
-            let funding_id: number = 0;
-            // check if payment relates to a funding
-            for(let line of this.instance.order_lines_ids) {
-                if(line.has_funding && line.funding_id) {
-                    funding_id = line.funding_id;
-                    await this.api.update((new OrderPaymentPart).entity, this.instance.order_payment_parts_ids.map((a:any) => a.id), {funding_id: line.funding_id});
-                    break;
-                }
-            }
-            // attach payment to found funding, if any
-            if(funding_id > 0) {
-                await this.api.update(this.instance.entity, [this.instance.id], {funding_id: funding_id});
-            }
-            // delegate payment validation to parent component
-            this.validated.emit();
-        }
-        catch(response) {
-            console.log('unexpected error', response)
-        }
-    }
-
     public async changeQuantity(line : any){
         // Remove the number of elements indicated, and create a new object with the difference
-        if(parseInt(this.line_quantity) <line.qty) {
-            await this.api.create('sale\\pos\\OrderLine', {
+        if(parseInt(this.line_quantity) < line.qty) {
+            await this.api.create('lodging\\sale\\pos\\OrderLine', {
                 order_id: line.order_id,
                 order_payment_id: 0,
                 order_unit_price: line.unit_price,
@@ -196,11 +236,11 @@ export class SessionOrderPaymentsOrderPaymentComponent extends TreeComponent<Ord
                 name: line.name,
                 qty: line.qty-parseInt(this.line_quantity)
             });
-            await this.api.update('sale\\pos\\OrderLine', [line.id], {
+            await this.api.update('lodging\\sale\\pos\\OrderLine', [line.id], {
                 qty : parseInt(this.line_quantity)
             });
         }else{
-            await this.api.update('sale\\pos\\OrderLine', [line.id], {
+            await this.api.update('lodging\\sale\\pos\\OrderLine', [line.id], {
                 qty : parseInt(this.line_quantity)
             });
         }

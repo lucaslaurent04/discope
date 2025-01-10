@@ -3,30 +3,33 @@
     <span [class.accent]="calcReturnedAmount() > 0">Rendu: {{ calcReturnedAmount() | number : '1.2-2'}}€</span>
     <div>
         <button mat-icon-button color="primary" (click)="onDisplayProducts()"><mat-icon>list</mat-icon></button>
-        <button mat-mini-fab color="accent" *ngIf="instance.status != 'paid'" (click)="onclickDelete()"><mat-icon>delete</mat-icon></button>
+        <button mat-mini-fab color="accent" (click)="onclickDelete()" style="transform: scale(0.75);"><mat-icon>delete</mat-icon></button>
     </div>
 </div>
 <div class="body">
     <!-- show payment parts -->
-    <div class="row-parts" *ngIf="display !='products'">
-        <div style="display: flex; margin: 0.25rem; display: flex; align-items: center;">
+    <div class="row-paymentparts" *ngIf="display != 'products'">
+        <div class="header">
             <h3 style="max-height: fit-content;">Encaissements</h3>
-            <button *ngIf="canAddPart()" mat-mini-fab color="accent" (click)="onclickCreateNewPart()" style="transform: scale(0.75);">
+            <button *ngIf="canAddPart()" mat-mini-fab color="accent" (click)="onclickAddPart()" style="transform: scale(0.75);">
                 <mat-icon>add</mat-icon>
             </button>
-            <button *ngIf="canValidate()" mat-mini-fab color="accent" (click)="onConfirmOrderPayment()" style="margin-left: auto;">
+            <button *ngIf="canValidate()" mat-mini-fab color="accent" (click)="onclickConfirmPayment()" style="margin-left: auto;">
                 <mat-icon>check</mat-icon>
             </button>
         </div>
-        <session-order-payments-payment-part
-            *ngFor="let part of instance.order_payment_parts_ids; index as i"
-            [model]="part"
-            [payment]="instance"
-            [customer]="customer"
-            (updated)="onupdatePart(part.id)"
-            (deleted)="ondeletePart(part.id)"
-            (click)="onSelectedPaymentPart(i)">
-        </session-order-payments-payment-part>
+        <div class="body">
+            <session-order-payments-payment-part
+                *ngFor="let part of getPaymentParts(); index as i;"
+                [model]="part"
+                [payment]="instance"
+                [customer]="customer"
+                [order]="order"
+                (updated)="onupdatePart(part.id)"
+                (deleted)="ondeletePart(part.id)"
+                (click)="onSelectedPaymentPart(i)">
+            </session-order-payments-payment-part>
+        </div>
     </div>
     <!-- show selected products -->
     <div class="row-products" *ngIf="display =='products'">

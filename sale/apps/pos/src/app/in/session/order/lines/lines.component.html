@@ -4,9 +4,9 @@
 
 <div class="container" *ngIf="ready">
     <div class="header-wrap">
-        <div class="header">Session › {{instance.session_id?.name}} <small>[{{instance.session_id?.id}}]</small> › <a [attr.href]="'#/session/'+instance.session_id?.id+'/orders'">Commandes en cours</a></div>
+        <div class="header">Sessions › <a style="text-decoration: none;" [attr.href]="'#/session/'+instance.session_id?.id+'/orders'">{{instance.session_id?.name}} <small>[{{instance.session_id?.id}}]</small></a> › Commande {{instance.name}} [{{instance.id}}]</div>
         <div style="display: flex; align-items: center;">
-            <a [attr.href]="'#/session/'+instance.session_id?.id+'/close'"><button mat-raised-button color="accent" style="margin-right: 10px;">Fermer la session</button></a>
+            <!-- <a [attr.href]="'#/session/'+instance.session_id?.id+'/close'"><button mat-raised-button color="accent" style="margin-right: 10px; text-transform: uppercase;">Fermer la session</button></a> -->
             <button mat-icon-button class="screen" (click)="onclickFullscreen()"><mat-icon>open_in_full</mat-icon></button>
         </div>
     </div>
@@ -56,7 +56,7 @@
                     </app-keypad-lines>
                 </div>
             </div>
-            <div style="width: 100%; height: 100vh;">
+            <div class="panes">
                 <session-order-lines-selection #selection
                     [order]="instance"
                     (addedFunding)="onAddFunding($event)"

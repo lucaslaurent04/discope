@@ -4,7 +4,7 @@
 
 <div class="container" *ngIf="ready">
     <div class="header-wrap">
-        <div class="header">Session › {{session.name}} <small>[{{session.id}}]</small> › Mouvement</div>
+        <div class="header">Sessions › <a style="text-decoration: none;" [attr.href]="'#/session/'+session.id+'/orders'">{{session.name}} <small>[{{session.id}}]</small></a> › Mouvement</div>
     </div>
     <div class="body">
         <div class="actions">

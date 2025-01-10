@@ -16,8 +16,9 @@
 
             <h2 style="text-align:center">Contrôle de fermeture</h2>
             <div style="background-color:#F5F5F5; padding: 3rem">
-                <div style="display: flex; justify-content: space-between; align-items:center; border-bottom: 1px solid lightgrey; margin-bottom: 20px;">
-                    <div style="display: flex; flex-direction:column">
+                <div style="border-bottom: 1px solid lightgrey; margin-bottom: 20px;">
+                    <div class="warning" *ngIf="has_unpaid_order">ATTENTION: cette session comporte des commandes non terminées et ne peut pas être côturée : <a href="#/session/{{session.id}}/orders">Voir la liste des commandes</a></div>
+                    <div >
                         <p>Total {{session.orders_ids.length}} commande(s) <span>: {{total_orders | number : '1.2-2'}}€ </span></p>
                     </div>
                 </div>
@@ -73,7 +74,7 @@
                         </div>
                         <mat-error *ngIf="calcDifference() != 0 && !checked && submitted" style="font-size: 14px;">Cocher pour fermer la session</mat-error>
                     </div>
-                    <button mat-raised-button color="primary" (click)="onSessionCloseClick()" style="margin-left: auto;">Fermer la Session</button>
+                    <button mat-raised-button [disabled]="has_unpaid_order" color="primary" (click)="onSessionCloseClick()" style="margin-left: auto; text-transform: uppercase;">Fermer la Session</button>
                 </div>
             </div>
 

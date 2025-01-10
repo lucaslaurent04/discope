@@ -5,13 +5,15 @@ import { CashdeskSession } from '../../_models/session.model';
 import { Order } from './_models/order.model';
 import { OrderPayment } from './_models/payment.model';
 import { OrderPaymentPart } from './_models/payment-part.model';
+import { OrderLine } from './_models/order-line.model';
 import { SessionOrderPaymentsOrderPaymentComponent } from './_components/payment/order-payment.component';
 import { SessionOrderPaymentsPaymentPartComponent } from './_components/payment/part/payment-part.component';
 
 
 import { MatTableDataSource } from '@angular/material/table';
-import {DataSource, SelectionModel} from '@angular/cdk/collections';
+import { DataSource, SelectionModel } from '@angular/cdk/collections';
 import { AppKeypadPaymentComponent } from 'src/app/in/_components/keypad-payment/keypad-payment.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 // declaration of the interface for the map associating relational Model fields with their components
@@ -43,16 +45,21 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
     public change: any;
     public session: CashdeskSession = new CashdeskSession();
 
-    public orderLines : any;
+    public orderLines : OrderLine[];
+    public areAllOrderLinesAssigned: boolean = false;
 
-    public dataSource : any;
-    public selection : any;
+    public orderPayments: OrderPayment[];
+    public areAllPaymentsPaid: boolean = false;
+
+    public dataSource: MatTableDataSource<OrderLine>;
+    public selection: SelectionModel<OrderLine>;
 
     constructor(
         private router: Router,
         private route: ActivatedRoute,
         private api: ApiService,
-        private context: ContextService
+        private context: ContextService,
+        private snack: MatSnackBar
     ) {
         super(new Order());
     }
@@ -73,11 +80,12 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
 
     public async onclickFinish() {
         try {
-            await this.api.fetch('?do=sale_pos_order_do-pay', {id : this.instance.id });
+            await this.api.fetch('?do=lodging_order_do-pay', {id : this.instance.id });
             this.router.navigate(['/session/'+this.instance.session_id.id+'/order/'+this.instance.id+'/ticket']);
         }
         catch(response) {
             console.warn(response);
+            this.snack.open('Impossible de finaliser la commande', 'ERROR');
         }
     }
 
@@ -104,8 +112,8 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
     async load(order_id: number) {
         if (order_id > 0) {
             try {
-                const data = await this.api.fetch('/?get=sale_pos_order_tree', { id: order_id, variant: 'payments' });
-                if (data) {
+                const data = await this.api.fetch('?get=lodging_sale_pos_order_tree', { id: order_id, variant: 'payments' });
+                if(data) {
                     this.update(data);
                 }
                 if(this.instance.status == 'paid') {
@@ -117,6 +125,8 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
                 this.selection = new SelectionModel(true, []);
                 // select all lines by default
                 this.selection.select(...this.dataSource.data);
+
+                this.calcAreAllOrderLinesAssigned();
             }
             catch (response) {
                 console.log(response);
@@ -136,6 +146,9 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
      */
     public update(values: any) {
         super.update(values);
+
+        this.orderPayments = values.order_payments_ids;
+        this.calcAreAllPaymentsPaid();
     }
 
     public async ondeletePayment(line_id: number) {
@@ -161,7 +174,7 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
      * Handler for payment-add button.
      * Adds a new payment only if all payments are paid and there is some due amount left.
      */
-    public async onclickCreateNewPayment() {
+    public async onclickAddPayment() {
         // check consistency
         if(!this.canAddPayment()) {
             return;
@@ -183,7 +196,7 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
         const order_lines_ids: number[] = this.selection.selected.map( (a:any) => a.id);
 
         // find a suitable payment to add the lines to
-        let orderPayment: any;
+        let orderPayment: any = null;
         for(let payment of this.instance.order_payments_ids) {
             if(payment.status != 'paid') {
                 orderPayment = payment;
@@ -194,9 +207,10 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
         // no suitable payment : create a new one
         if(!orderPayment) {
             orderPayment = await this.api.create((new OrderPayment()).entity, { order_id: this.instance.id });
-            let amount: number = this.selection.selected.reduce( (c:any, a:any) => c + a.price, 0.0);
-            // create a default part with remaining amount
-            await this.api.create((new OrderPaymentPart()).entity, { order_id: this.instance.id, order_payment_id: orderPayment.id, amount: amount });
+        }
+
+        if(this.areAllExistingPaymentPartsPaid(orderPayment.id)) {
+            await this.createDefaultPaymentPart(orderPayment);
         }
 
         try {
@@ -215,6 +229,52 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
         }
     }
 
+    private async createDefaultPaymentPart(orderPayment: OrderPayment) {
+        const amount: number = this.selection.selected.reduce(
+            (ac: number, orderLine: OrderLine) => ac + orderLine.price,
+            0.0
+        );
+
+        const firstPaidPaymentPart = this.getFirstPaidPaymentPart();
+
+        try {
+            if(firstPaidPaymentPart && firstPaidPaymentPart.payment_method === 'booking') {
+                await this.updatePaymentPartAmount(firstPaidPaymentPart, amount);
+            }
+            else {
+                await this.api.create(
+                    (new OrderPaymentPart()).entity,
+                    { order_id: this.instance.id, order_payment_id: orderPayment.id, amount }
+                );
+            }
+        }
+        catch (response) {
+            console.log('unexpected error', response);
+        }
+    }
+
+    private getFirstPaidPaymentPart(): OrderPaymentPart {
+        for(const paymentComponent of this.sessionOrderPaymentsOrderPaymentComponents) {
+            for(const paymentPartComponent of paymentComponent.sessionOrderPaymentsPaymentPartComponents) {
+                if(paymentPartComponent.instance.status === 'paid') {
+                    return paymentPartComponent.instance;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private async updatePaymentPartAmount(paymentPart: OrderPaymentPart, amountToAdd: number) {
+        await this.api.update(
+            (new OrderPaymentPart()).entity,
+            [paymentPart.id],
+            {
+                amount: paymentPart.amount + amountToAdd
+            }
+        );
+    }
+
     public onclickPayment(index: number) {
         this.selectedPaymentIndex = index;
     }
@@ -230,35 +290,37 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
         let child = children[this.selectedPaymentIndex];
         let payment = child;
 
-        console.log(child);
         if (child.display != "products") {
 
             let paymentPart: SessionOrderPaymentsPaymentPartComponent = payment?.getPaymentPart();
 
             // retrieve the payment method
             let payment_method = paymentPart?.instance.payment_method;
+            let payment_amount = (paymentPart && paymentPart.instance.amount)?paymentPart.instance.amount:0;
 
             if (this.digits?.toString()?.includes('.') && this.digits[this.digits.length - 1] == ".") {
-                this.digits = paymentPart?.instance.amount + ".";
+                this.digits = payment_amount + ".";
             }
             else {
-                this.digits = paymentPart?.instance.amount
+                this.digits = payment_amount
             }
 
             value = value.toString();
             this.digits = this.digits?.toString();
-            if (value == "50" || value == "10" || value == "20") {
+            if(value == "50" || value == "10" || value == "20") {
                 value = parseInt(value);
                 this.digits = parseFloat(this.digits);
                 this.digits += value;
             }
-            else if (value == ",") {
+            else if(value == ",") {
                 if (!this.digits?.includes('.')) {
                     this.digits += ".";
                 }
             }
-            else if (value == 'backspace') {
-                // On enlève deux éléments (chiffre et virgule) si la valeur est une virgule
+            else if(value == 'backspace') {
+                this.digits = 0;
+                /*
+                // we remove two chars (digits + comma) if value is a comma
                 let test = this.digits?.slice(0, -1);
                 if (test?.slice(-1) == '.') test = test?.slice(0, -1);
                 this.digits = test;
@@ -266,28 +328,28 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
                 if (this.digits == "") {
                     this.digits = 0;
                 }
+                */
             }
-            else if (value != 'backspace' && value != ',' && value != '+/-') {
+            else if(value != '+/-') {
                 this.digits += value;
             }
 
             paymentPart.update({ amount: parseFloat(this.digits), payment_method: payment_method });
-
         }
     }
 
     public onclickFullscreen() {
         const elem:any = document.documentElement;
-        if (elem.requestFullscreen) {
+        if(elem.requestFullscreen) {
             elem.requestFullscreen();
         }
-        else if (elem.mozRequestFullScreen) {
+        else if(elem.mozRequestFullScreen) {
             elem.mozRequestFullScreen();
         }
-        else if (elem.webkitRequestFullscreen) {
+        else if(elem.webkitRequestFullscreen) {
             elem.webkitRequestFullscreen();
         }
-        else if (elem.msRequestFullscreen) {
+        else if(elem.msRequestFullscreen) {
             elem.msRequestFullscreen();
         }
     }
@@ -304,7 +366,7 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
     }
 
     public canAddPayment() {
-        // check if all payment parts are marked as paid
+        // check if all payment are marked as paid
         if(this.instance.order_payments_ids.length) {
             // do not allow creation of new payment if there is still one open
             for(let payment of this.instance.order_payments_ids) {
@@ -320,23 +382,51 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
     }
 
     public canFinish() {
-        // all order_lines must be assigned
-        if(this.orderLines && this.orderLines.length) {
-            for(let line of this.orderLines) {
-                if(!line['order_payment_id']) {
-                    return false;
-                }
-            }
+        if(!this.areAllOrderLinesAssigned || !this.areAllPaymentsPaid) {
+            return false;
         }
-        // all payment parts must be paid
-        if(this.sessionOrderPaymentsOrderPaymentComponents && this.sessionOrderPaymentsOrderPaymentComponents.length) {
-            for(let paymentComponent of this.sessionOrderPaymentsOrderPaymentComponents) {
-                if(paymentComponent.instance.status != 'paid') {
-                    return false;
-                }
-            }
-        }
+
         return (this.ready && this.instance.price <= this.instance.total_paid);
+    }
+
+    private calcAreAllOrderLinesAssigned() {
+        let allAssigned = true;
+        for(const line of this.orderLines) {
+            if(!line.order_payment_id) {
+                allAssigned = false;
+                break;
+            }
+        }
+
+        this.areAllOrderLinesAssigned = allAssigned;
+    }
+
+    private calcAreAllPaymentsPaid() {
+        let areAllPaymentsPaid = true;
+        for(const orderPayment of this.orderPayments) {
+            if(orderPayment.status !== 'paid') {
+                areAllPaymentsPaid = false;
+                break;
+            }
+        }
+
+        this.areAllPaymentsPaid = areAllPaymentsPaid;
+    }
+
+    private areAllExistingPaymentPartsPaid(orderPaymentId?: number) {
+        for(const paymentComponent of this.sessionOrderPaymentsOrderPaymentComponents) {
+            if(orderPaymentId && paymentComponent.instance.id !== orderPaymentId) {
+                continue;
+            }
+
+            for(const paymentPartComponent of paymentComponent.sessionOrderPaymentsPaymentPartComponents) {
+                if(paymentPartComponent.instance.status != 'paid') {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     public async onchangeCustomer(event: any){

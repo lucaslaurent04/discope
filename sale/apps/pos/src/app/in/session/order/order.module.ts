@@ -10,6 +10,7 @@ import { SessionOrderPaymentsComponent } from './payments/payments.component';
 import { SessionOrderPaymentsOrderPaymentComponent } from './payments/_components/payment/order-payment.component';
 import { SessionOrderPaymentsOrderLineComponent } from './payments/_components/payment/line/order-line.component';
 import { SessionOrderPaymentsPaymentPartComponent } from './payments/_components/payment/part/payment-part.component';
+import { SessionOrderPaymentsSelectBookingComponent } from './payments/_components/payment/select-booking/select-booking.component';
 
 import { SessionOrderTicketComponent } from './ticket/ticket.component';
 
@@ -35,6 +36,7 @@ import { AppSharedModule } from '../../../shared.module';
     SessionOrderLinesOrderLineComponent,
     SessionOrderPaymentsOrderLineComponent,
     SessionOrderPaymentsPaymentPartComponent,
+    SessionOrderPaymentsSelectBookingComponent,
 
     SessionOrderLinesDiscountPaneComponent,
 

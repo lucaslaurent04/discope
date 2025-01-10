@@ -12,13 +12,14 @@ import { AppPadValueIncrementsComponent } from '../pad/value-increments/value-in
 export class AppKeypadPaymentComponent implements OnInit {
     @ViewChild('incrementsPad') togglePad: AppPadValueIncrementsComponent;
 
-    @Input() customer : any;    
+    @Input() customer : any;
     @Input() disabledKeys : any;
     @Input() hasInvoice : boolean;
+    @Input() canSelectCustomer: boolean;
 
     @Output() requestInvoiceChange = new EventEmitter();
     @Output() nextClick = new EventEmitter();
-    @Output() keyPress = new EventEmitter();    
+    @Output() keyPress = new EventEmitter();
     @Output() customerChange : any = new EventEmitter();
 
     public actionType : any = "quantity";
@@ -33,14 +34,17 @@ export class AppKeypadPaymentComponent implements OnInit {
     }
 
     public onclickInvoice(){
+        // #memo - centers cannot emit invoices that are not related to a booking
+        /*
         this.hasInvoice = !this.hasInvoice;
         this.requestInvoiceChange.emit(this.hasInvoice);
+        */
     }
 
     public onclickNext(){
         this.nextClick.emit();
     }
-    
+
     public onclickKey(event: any) {
         this.keyPress.emit(event);
     }
