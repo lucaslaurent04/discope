@@ -4,12 +4,23 @@
     "access": {
         "groups": ["booking.default.user"]
      },
+    "order": "order",
     "layout": {
         "items": [
             {
                 "type": "field",
                 "value": "name",
                 "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "code",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "is_meal",
+                "width": "25%"
             },
             {
                 "type": "field",
