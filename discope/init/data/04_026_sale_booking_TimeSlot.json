@@ -1,0 +1,140 @@
+[
+    {
+        "name": "sale\\booking\\TimeSlot",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "Matin",
+                "description": "Services planifiés pendant la matinée.",
+                "order": 2,
+                "code": "AM",
+                "is_meal": false,
+                "schedule_from": "08:00:00",
+                "schedule_to": "11:30:00"
+            },
+            {
+                "id": 2,
+                "name": "Déjeuner",
+                "description": "Services planifiés pendant la pause déjeuner.",
+                "order": 3,
+                "code": "L",
+                "is_meal": true,
+                "schedule_from": "12:00:00",
+                "schedule_to": "13:00:00"
+            },
+            {
+                "id": 3,
+                "name": "Après-midi",
+                "description": "Services planifiés durant l'après-midi.",
+                "order": 4,
+                "code": "PM",
+                "is_meal": false,
+                "schedule_from": "13:00:00",
+                "schedule_to": "18:00:00"
+            },
+            {
+                "id": 4,
+                "name": "Dîner",
+                "description": "Services planifiés en début de soirée.",
+                "order": 5,
+                "code": "D",
+                "is_meal": true,
+                "schedule_from": "19:00:00",
+                "schedule_to": "20:00:00"
+            },
+            {
+                "id": 5,
+                "name": "Petit-déjeuner",
+                "description": "Services planifiés tôt le matin.",
+                "order": 1,
+                "code": "B",
+                "is_meal": true,
+                "schedule_from": "07:00:00",
+                "schedule_to": "08:00:00"
+            },
+            {
+                "id": 6,
+                "name": "Veillée",
+                "description": "Services planifiés en soirée, après le dîner.",
+                "order": 6,
+                "code": "EV",
+                "is_meal": false,
+                "schedule_from": "20:00:00",
+                "schedule_to": "22:00:00"
+            }
+        ]
+    },
+    {
+        "name": "sale\\booking\\TimeSlot",
+        "lang": "en",
+        "data": [
+            {
+                "id": 1,
+                "name": "Morning",
+                "description": "Scheduled services during the morning."
+            },
+            {
+                "id": 2,
+                "name": "Lunch",
+                "description": "Scheduled services during the lunch break."
+            },
+            {
+                "id": 3,
+                "name": "Afternoon",
+                "description": "Scheduled services during the afternoon."
+            },
+            {
+                "id": 4,
+                "name": "Dinner",
+                "description": "Scheduled services in the early evening."
+            },
+            {
+                "id": 5,
+                "name": "Breakfast",
+                "description": "Scheduled services early in the morning."
+            },
+            {
+                "id": 6,
+                "name": "Evening",
+                "description": "Scheduled services in the evening, after dinner."
+            }
+        ]
+    },
+    {
+        "name": "sale\\booking\\TimeSlot",
+        "lang": "nl",
+        "data": [
+            {
+                "id": 1,
+                "name": "Ochtend",
+                "description": "Geplande diensten gedurende de ochtend."
+            },
+            {
+                "id": 2,
+                "name": "Lunch",
+                "description": "Geplande diensten tijdens de lunchpauze."
+            },
+            {
+                "id": 3,
+                "name": "Middag",
+                "description": "Geplande diensten gedurende de middag."
+            },
+            {
+                "id": 4,
+                "name": "Avondeten",
+                "description": "Geplande diensten in de vroege avond."
+            },
+            {
+                "id": 5,
+                "name": "Ontbijt",
+                "description": "Geplande diensten vroeg in de ochtend."
+            },
+            {
+                "id": 6,
+                "name": "Avond",
+                "description": "Geplande diensten in de avond, na het avondeten."
+            }
+        ]
+    }
+]
