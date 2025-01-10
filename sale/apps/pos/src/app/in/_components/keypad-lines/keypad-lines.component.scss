@@ -1,6 +1,6 @@
 .pos-pad {
 
-    padding: 5px 5px 24px 5px;
+    padding: 5px;
     height: max-content;
     background-color: #F5F5F5;
     display: flex;
@@ -10,25 +10,27 @@
     width: 100%;
 
     .customer {
-        display: flex; 
+        display: flex;
         justify-content: space-between;
-        align-items: center;        
+        align-items: center;
         background-color: lightgray;
         border-radius: 4px;
         width: 382px;
         height: 65px;
+        margin-bottom: 4px;
         font-weight: bold;
 
         .customer-display {
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             width: 100%;
             padding: 0.4rem;
         }
 
         .customer-select {
             width: 100%;
+            padding: 5px 10px;
         }
 
         .mat-mini-fab {
@@ -40,7 +42,7 @@
             width: 297px;
         }
         @media only screen and (max-width: 1350px) {
-            width: 247px; 
+            width: 247px;
         }
     }
 
@@ -49,16 +51,16 @@
         justify-content: center;
         width: max-content;
 
-        .details-payment{              
+        .details-payment{
             display: grid;
             grid-template-columns: repeat(1, 100px);
-            grid-template-rows: max-content; 
+            grid-template-rows: 100%;
             @media only screen and (max-width: 1500px) {
                 grid-template-columns: repeat(1, 75px);
             }
             @media only screen and (max-width: 1350px) {
                 grid-template-columns: repeat(1, 75px);
-                grid-template-rows: 60px; 
+                grid-template-rows: 60px;
             }
 
             .selected {
@@ -70,7 +72,7 @@
                 margin: 0;
             }
 
-            mat-button-toggle {            
+            mat-button-toggle {
                 ::ng-deep .mat-button-toggle-focus-overlay {
                     border: 0;
                 }
@@ -106,5 +108,5 @@
                 height: calc(100% - 2px);
             }
         }
-    } 
+    }
 }
