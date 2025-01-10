@@ -23,7 +23,7 @@ export class SessionsComponent implements OnInit {
     private default_descriptor: any = {
         // route is current ng route
         context: {
-            entity: 'sale\\pos\\CashdeskSession',
+            entity: 'lodging\\sale\\pos\\CashdeskSession',
             view: "list.default",
             order: "id",
             sort: "desc"
