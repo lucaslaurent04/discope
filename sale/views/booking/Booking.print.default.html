@@ -402,9 +402,9 @@ hr {
             <tr>
                 <td>{{ date_index }}</td>
                 {% if center_office == 'GA' %}
-                    <td style="text-align: center;">{{ map["B"] | default("0") }}</td><!-- meals in the morning -->
-                    <td style="text-align: center;">{{ map["L"] | default("0") }}</td><!-- meals at lunchtime -->
-                    <td style="text-align: center;">{{ map["D"] | default("0")}}</td><!-- meals in the evening -->
+                    <td style="text-align: center;">{{ map["B"] | default("") }}</td><!-- meals in the morning -->
+                    <td style="text-align: center;">{{ map["L"] | default("") }}</td><!-- meals at lunchtime -->
+                    <td style="text-align: center;">{{ map["D"] | default("")}}</td><!-- meals in the evening -->
                 {% endif %}
                 <td style="text-align: center;">{{ map['night'] | default("0")}}</td>
             </tr>
