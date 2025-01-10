@@ -2,7 +2,7 @@ export class Order {
     // index signature
     [key: string]: any;
     // model entity
-    public get entity():string { return 'lodging\\sale\\pos\\Order'};    
+    public get entity():string { return 'sale\\pos\\Order'};
     // constructor with public properties
     constructor(
         public id: number = 0,
@@ -12,7 +12,7 @@ export class Order {
         public total: number = 0,
         public price: number = 0,
         public has_invoice: boolean = false,
-        public session_id: any = {},        
+        public session_id: any = {},
         public customer_id: any = {},
         public order_lines_ids: any[] = []
     ) {}

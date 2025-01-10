@@ -89,7 +89,7 @@ export class SessionOrderLinesSelectionComponent implements OnInit {
      */
     private async loadProducts(filter: string = '') {
         try {
-            this.products = await this.api.fetch('?get=lodging_sale_catalog_product_pos-collect', { center_id: this.order.session_id.center_id.id, filter: filter });
+            this.products = await this.api.fetch('?get=sale_catalog_product_pos-collect', { center_id: this.order.session_id.center_id.id, filter: filter });
             this.productsDataSource = new MatTableDataSource(this.products);
         }
         catch(response) {
@@ -117,7 +117,7 @@ export class SessionOrderLinesSelectionComponent implements OnInit {
 
         try {
             this.bookings = await this.api.get(
-                '?get=lodging_booking_collect-unpaid',
+                '?get=sale_booking_collect-unpaid',
                 {
                     domain: JSON.stringify(domain),
                     fields: JSON.stringify(fields)
@@ -134,7 +134,7 @@ export class SessionOrderLinesSelectionComponent implements OnInit {
     private async loadFundings(booking_id: number) {
         try {
             const bookingFundings = await this.api.collect(
-                'lodging\\sale\\booking\\Funding',
+                'sale\\booking\\Funding',
                 [
                     ['booking_id', '=', booking_id],
                     ['is_paid', '=', false]

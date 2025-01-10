@@ -2,7 +2,7 @@ export class Order {
     // index signature
     [key: string]: any;
     // model entity
-    public get entity():string { return 'lodging\\sale\\pos\\Order'};
+    public get entity():string { return 'sale\\pos\\Order'};
     // constructor with public properties
     constructor(
         public id: number = 0,

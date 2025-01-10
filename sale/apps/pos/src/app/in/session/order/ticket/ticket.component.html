@@ -13,7 +13,7 @@
         <div class="actions">
             <div style="position: absolute; right: 180px;">
                 <div class="actions-view">
-                    <a *ngIf="instance.has_invoice" target="_blank" [attr.href]="'/?get=lodging_booking_print-invoice&view_id=print.default&id='+instance.invoice_id+'&lang=fr'" style="margin-right: 10px;">
+                    <a *ngIf="instance.has_invoice" target="_blank" [attr.href]="'/?get=sale_booking_print-invoice&view_id=print.default&id='+instance.invoice_id+'&lang=fr'" style="margin-right: 10px;">
                         <button mat-stroked-button color="primary">Voir la facture</button>
                     </a>
                     <button mat-flat-button color="accent" (click)="onPrint()">Imprimer le ticket</button>
