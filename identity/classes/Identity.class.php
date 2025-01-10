@@ -908,7 +908,7 @@ class Identity extends Model {
         }
 
         if(isset($event['address_zip']) && isset($values['address_country'])) {
-            $list = self::_getCitiesByZip($event['address_zip'], $values['address_country'], $lang);
+            $list = self::getCitiesByZip($event['address_zip'], $values['address_country'], $lang);
             if($list) {
                 $result['address_city'] = [
                     'value' => '',
@@ -923,7 +923,7 @@ class Identity extends Model {
     /**
      * Returns cities' names based on a zip code and a country.
      */
-    private static function _getCitiesByZip($zip, $country, $lang) {
+    private static function getCitiesByZip($zip, $country, $lang) {
         $result = null;
         $file = "packages/identity/i18n/{$lang}/zipcodes/{$country}.json";
         if(file_exists($file)) {
