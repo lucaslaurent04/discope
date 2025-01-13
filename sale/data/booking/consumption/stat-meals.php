@@ -224,7 +224,7 @@ foreach($map_consumptions as $date => $ages) {
 }
 
 usort($result, function ($a, $b) {
-    return strcmp($a['date'], $b['date']);
+    return strcmp($a['date'], $b['date']) ?: strcmp($a['age_range_id']['id'], $b['age_range_id']['id']);
 });
 
 $context->httpResponse()
