@@ -526,7 +526,7 @@ foreach($payments as $payment) {
         continue;
     }
 
-    $date = $payment['created'];
+    $date = $payment['receipt_date'];
     // if payment refers to a statement line, use the date of the latter
     if($payment['statement_line_id']) {
         $date = $payment['statement_line_id']['date'];
