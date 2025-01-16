@@ -241,7 +241,7 @@ if(isset($booking['customer_id']['lang_id']['code'])) {
 }
 
 /**
- * Add lines relating to fundings, if any (paid installments and invoice downpayments)
+ * Add lines relating to fundings, if any (paid installments and invoiced downpayments)
  */
 
 // find all fundings of given booking
@@ -321,7 +321,7 @@ if($fundings) {
                         // consider the invoice as a paid downpayment
                         $i_line = [
                             'invoice_id'                => $invoice['id'],
-                            'description'               => ucfirst($installment_label) . ' generate.php' .date('Y-m', $funding_invoice['created']),
+                            'description'               => ucfirst($installment_label) . ' ' .date('Y-m', $funding_invoice['created']),
                             'product_id'                => $downpayment_product_id,
                             'vat_rate'                  => 0.0,
                             // #memo - by convention, price is always a positive value (so that price, credit and debit remain positive at all time)
@@ -377,7 +377,7 @@ if($fundings) {
                 // #memo - if paid_amount is greater than due_amount, the invoice might become negative (fundings are reimbursed by the Accounting department given instruction from Booking departement)
                 $i_line = [
                     'invoice_id'                => $invoice['id'],
-                    'description'               => ucfirst($installment_label) . ' generate.php' .date('Y-m'),
+                    'description'               => ucfirst($installment_label) . ' ' . date('Y-m'),
                     'product_id'                => $downpayment_product_id,
                     'vat_rate'                  => 0.0,
                     // #memo - by convention, price is always a positive value (so that price, credit and debit remain positive at all time)
