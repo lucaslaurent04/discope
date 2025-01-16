@@ -1,6 +1,6 @@
 {
     "name": "Réservation",
-    "description": "Retournez la réservation avec les groupes de lignes de réservation et la ligne des invités.",
+    "description": "Retournez la réservation avec les groupes de lignes de réservation et la ligne des hôtes.",
     "model": {
         "id": {
             "label": "Identifiant",

@@ -1,7 +1,7 @@
 {
-    "name": "Liste des invités",
-    "plural": "Listes des Invités",
-    "description": "Liste des invités liée à une réservation dans un système d'hébergement.",
+    "name": "Liste des hôtes",
+    "plural": "Listes des hôtes",
+    "description": "Liste des hôtes liée à une réservation dans un système d'hébergement.",
     "model": {
         "booking_id": {
             "label": "Réservation",
@@ -10,7 +10,7 @@
         },
         "status": {
             "label": "Statut",
-            "description": "Statut de la liste d'invités.",
+            "description": "Statut de la liste d'hôtes.",
             "selection": {
                 "pending": "en attente",
                 "sent": "expédié"
@@ -20,20 +20,20 @@
     },
     "view": {
         "form.default": {
-            "name": "Liste d'invités",
-            "description": "Formulaire de base pour l'affichage du liste d'invités.",
+            "name": "Liste d'hôtes",
+            "description": "Formulaire de base pour l'affichage du liste d'hôtes.",
             "layout": {
                 "section.guest_list.info": {
                     "label": "Infos générales"
                 },
                 "section.guest_list_items.info": {
-                    "label": "Invités"
+                    "label": "Hôtes"
                 }
             }
         },
         "list.default": {
-            "name": "Listes des invités",
-            "description": "Liste de base des invités.",
+            "name": "Listes d'hôtes",
+            "description": "Liste de base des hôtes.",
             "layout": {}
         }
     },

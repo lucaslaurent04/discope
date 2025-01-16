@@ -1,18 +1,18 @@
 {
-    "name": "Invité",
-    "plural": "Invités",
-    "description": "La personne physique qui fait partie d'une réservation précise.",
+    "name": "Hote",
+    "plural": "Hotes",
+    "description": "La personne physique faisant partie d'une réservation.",
     "model": {
         "is_coordinator": {
             "label": "Responsable ?",
-            "description": "L'invité est-il le responsable ?",
+            "description": "L'hôte est-il le responsable ?",
             "help": ""
         }
     },
     "view": {
         "form.default": {
-            "name": "Invité",
-            "description": "Formulaire de base pour l'affichage du groupe.",
+            "name": "Hôte",
+            "description": "Formulaire de base pour l'affichage d'un hôte.",
             "layout": {
                 "section.guest_info": {
                     "label": "Infos générales"
@@ -20,8 +20,8 @@
             }
         },
         "list.default": {
-            "name": "Liste d'Invité",
-            "description": "Liste de base des invités existantes.",
+            "name": "Liste d'Hôtes",
+            "description": "Liste de base des hôtes existantes.",
             "layout": {}
         }
     },
