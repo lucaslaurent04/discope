@@ -687,7 +687,7 @@ class BookingLineGroup extends Model {
             foreach($groups as $group) {
                 if($group['is_sojourn'] && $group['rate_class_id.name'] == 'T4') {
                     if($group['nb_pers'] >= 10) {
-                        // booking type 'TPG' (tout public groupe) is for booking with 10 pers. or more
+                        // booking type 'TPG' (tout public / groupe) is for booking with 10 pers. or more
                         $om->update(Booking::getType(), $group['booking_id'], ['type_id' => 6]);
                     }
                     else {
