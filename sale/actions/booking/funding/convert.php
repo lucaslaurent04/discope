@@ -58,7 +58,10 @@ if(!count($partners)) {
 }
 
 $funding = Funding::id($params['id'])
-                    ->read(['type'])
+                    ->read([
+                        'type',
+                        'booking_id' => ['status']
+                    ])
                     ->first(true);
 
 if(!$funding) {
@@ -69,6 +72,12 @@ if(!$funding) {
 if($funding['type'] == 'invoice') {
     // already an invoice
     throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+}
+
+
+if(in_array($funding['booking_id']['status'], ['invoiced','debit_balance','credit_balance','balanced'])) {
+    // deposit invoice cannot be emitted after balance invoice
+    throw new Exception("incompatible_booking_status", QN_ERROR_INVALID_PARAM);
 }
 
 // convert the installment to a proforma invoice
