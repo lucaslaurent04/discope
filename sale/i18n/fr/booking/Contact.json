@@ -5,7 +5,7 @@
     "model": {
         "name": {
             "label": "Nom complet",
-            "description": "Nom complet de la personne à qui la liste des invités doit être connectée.",
+            "description": "Nom complet de la personne à qui la liste des hôtes doit être connectée.",
             "help": ""
         },
         "booking_id": {
@@ -37,7 +37,7 @@
         },
         "email": {
             "label": "E-mail",
-            "description": "Email de la personne à qui la liste des invités doit être envoyée.",
+            "description": "Email de la personne à qui la liste des hôtes doit être envoyée.",
             "help": ""
         },
 		"phone": {

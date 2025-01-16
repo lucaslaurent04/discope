@@ -519,15 +519,15 @@
             "help": ""
         },
         "settings.guest.advanced": {
-            "label": "Invités",
+            "label": "Hôtes",
             "help": ""
         },
         "guest.list.settings": {
-            "label": "Liste d'Invités",
+            "label": "Liste d'hôtes",
             "help": ""
         },
         "guest.items.settings": {
-            "label": "Invités",
+            "label": "Hôtes",
             "help": ""
         }
     }
