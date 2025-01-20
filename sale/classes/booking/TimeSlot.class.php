@@ -74,6 +74,13 @@ class TimeSlot extends Model {
                 'type'              => 'time',
                 'required'          => true,
                 'description'       => 'Time at which the slots ends (excluded).'
+            ],
+
+            'product_models_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\catalog\ProductModel',
+                'foreign_field'     => 'time_slot_id',
+                'description'       => 'The product models associated with the slot.'
             ]
 
         ];
