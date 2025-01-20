@@ -56,7 +56,13 @@ if(!$booking) {
 $result = [];
 $httpResponse = $context->httpResponse()->status(200);
 
-if( !$booking['is_from_channelmanager'] && (!strlen($booking['customer_identity_id']['address_street']) || !strlen($booking['customer_identity_id']['address_city']) || !strlen($booking['customer_identity_id']['address_zip'])) ) {
+if( !$booking['is_from_channelmanager']
+    && (
+        !strlen($booking['customer_identity_id']['address_street'])
+        || !strlen($booking['customer_identity_id']['address_city'])
+        || !strlen($booking['customer_identity_id']['address_zip'])
+    )
+) {
     $result[] = $booking['id'];
     $links = [];
     $links[] = "[{$booking['customer_identity_id']['display_name']}](/booking/#/identity/{$booking['customer_identity_id']['id']})";
