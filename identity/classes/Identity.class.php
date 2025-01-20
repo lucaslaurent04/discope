@@ -939,7 +939,7 @@ class Identity extends Model {
     /**
      * Returns a region name based on a zip code and a country.
      */
-    public static function _getRegionByZip($zip, $country) {
+    public static function getRegionByZip($zip, $country) {
         $zip = intval($zip);
 
         if ($country == 'BE') {
