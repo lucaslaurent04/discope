@@ -138,6 +138,13 @@ class ProductModel extends Model {
                 'visible'           => [ ['type', '=', 'service'], ['service_type', '=', 'schedulable'] ]
             ],
 
+            'time_slot_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\booking\TimeSlot',
+                'description'       => "The time slot to classify when the service take place.",
+                'visible'           => [ ['type', '=', 'service'], ['service_type', '=', 'schedulable'] ]
+            ],
+
             'tracking_type' => [
                 'type'              => 'string',
                 'selection'         => [
