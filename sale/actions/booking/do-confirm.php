@@ -61,7 +61,8 @@ $booking = Booking::id($params['id'])
         'type_id',
         'date_from',
         'date_to',
-        'price',                                  // total price VAT incl.
+        // total price VAT incl.
+        'price',
         'contracts_ids',
         'contacts_ids' => [
             'email'
