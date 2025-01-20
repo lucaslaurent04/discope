@@ -237,7 +237,7 @@ if(isset($params['center_id']) || $params['all_centers']) {
                 'customer_name'     => $booking['customer_identity_id']['name'],
                 'customer_zip'      => $booking['customer_identity_id']['address_zip'],
                 'customer_country'  => $booking['customer_identity_id']['address_country'],
-                'customer_region'   => Identity::_getRegionByZip($booking['customer_identity_id']['address_zip'], $booking['customer_identity_id']['address_country']),
+                'customer_region'   => Identity::getRegionByZip($booking['customer_identity_id']['address_zip'], $booking['customer_identity_id']['address_country']),
                 'customer_lang'     => $booking['customer_identity_id']['lang_id']['code'],
             ];
         }
