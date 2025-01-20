@@ -306,7 +306,7 @@ class Consumption extends Model {
                 }
             }
         }
-        $om->callonce(self::getType(), '_updateTimeSlotId', $oids, $values, $lang);
+        $om->callonce(self::getType(), 'updateTimeSlotId', $oids, $values, $lang);
     }
 
     /**
@@ -335,15 +335,19 @@ class Consumption extends Model {
                 }
             }
         }
-        $om->callonce(self::getType(), '_updateTimeSlotId', $oids, $values, $lang);
+        $om->callonce(self::getType(), 'updateTimeSlotId', $oids, $values, $lang);
     }
 
-    public static function _updateTimeSlotId($om, $oids, $values, $lang) {
+    /**
+     * #todo - make this method private (cannot while called through callonce)
+     */
+    public static function updateTimeSlotId($om, $oids, $values, $lang) {
         $consumptions = $om->read(self::getType(), $oids, ['schedule_from', 'schedule_to', 'is_meal']);
         if($consumptions > 0) {
             $moments_ids = $om->search('sale\booking\TimeSlot', [], ['order' => 'asc']);
             $moments = $om->read('sale\booking\TimeSlot', $moments_ids, ['schedule_from', 'schedule_to', 'is_meal']);
             foreach($consumptions as $cid => $consumption) {
+                // #todo - use timeslot_id if available in product model
                 // retrieve timeslot according to schedule_from
                 $moment_id = 1;
                 foreach($moments as $mid => $moment) {
