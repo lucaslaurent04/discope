@@ -671,10 +671,11 @@ $days_names = array_map(function($day) use ($params) {
     return $day[$params['lang']];
 }, $days_languages);
 
-/*
-    Generate consumptions map simple
-*/
 
+
+/*
+    Generate simple consumptions map
+*/
 
 $consumptions_map_simple = [];
 
@@ -713,15 +714,24 @@ foreach($consumptions_simple as $cid => $consumption) {
     }
 
     if($consumption['is_meal']) {
-        $comsumption_time_slot_code = $consumption['time_slot_id']['code'];
-        if(!isset($consumptions_map_simple[$date][$comsumption_time_slot_code])) {
-            $consumptions_map_simple[$date][$comsumption_time_slot_code] = 0;
+        $consumption_time_slot_code = $consumption['time_slot_id']['code'];
+
+        // #todo - remove this temporary mapping (once time_slot_id will be correctly set)
+        $consumption_time_slot_code = [
+                1 => 'B',
+                2 => 'L',
+                3 => 'D',
+                4 => 'D'
+            ][$consumption['time_slot_id']['id']];
+
+        if(!isset($consumptions_map_simple[$date][$consumption_time_slot_code])) {
+            $consumptions_map_simple[$date][$consumption_time_slot_code] = 0;
         }
-        if(!isset($consumptions_map_simple['total'][$comsumption_time_slot_code])) {
-            $consumptions_map_simple['total'][$comsumption_time_slot_code] = 0;
+        if(!isset($consumptions_map_simple['total'][$consumption_time_slot_code])) {
+            $consumptions_map_simple['total'][$consumption_time_slot_code] = 0;
         }
-        $consumptions_map_simple[$date][$comsumption_time_slot_code] += $consumption['qty'];
-        $consumptions_map_simple['total'][$comsumption_time_slot_code] += $consumption['qty'];
+        $consumptions_map_simple[$date][$consumption_time_slot_code] += $consumption['qty'];
+        $consumptions_map_simple['total'][$consumption_time_slot_code] += $consumption['qty'];
     }
     elseif($consumption['is_accomodation']) {
         if(!isset($consumptions_map_simple[$date]['night'])) {
@@ -739,10 +749,8 @@ $values['consumptions_map_simple'] = $consumptions_map_simple;
 
 
 /*
-    Generate consumptions map detailed
+    Generate detailed consumptions map
 */
-
-
 
 $consumptions_map_detailed = [
         'total' => [
