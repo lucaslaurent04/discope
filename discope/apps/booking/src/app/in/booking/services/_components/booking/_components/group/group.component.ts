@@ -820,7 +820,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
             });
             this.action_in_progress = true;
             try {
-                await this.api.call('/?do=sale_sojourn_create-extra-consumptions', {
+                await this.api.call('/?do=sale_booking_sojourn_create-extra-consumptions', {
                     id: this.instance.id
                 });
                 this.action_in_progress = false;
