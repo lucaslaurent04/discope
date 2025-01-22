@@ -87,12 +87,9 @@ class Consumption extends Model {
             ],
 
             'time_slot_id' => [
-                'type'              => 'computed',
-                'result_type'       => 'many2one',
+                'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\TimeSlot',
-                'description'       => 'Indicator of the moment of the day when the consumption occurs (from schedule).',
-                'function'          => 'calcTimeSlotId',
-                'store'             => true
+                'description'       => 'Indicator of the moment of the day when the consumption occurs (from schedule).'
             ],
 
             'date' => [
@@ -367,6 +364,9 @@ class Consumption extends Model {
     }
 
 
+    /**
+     * #memo - this method is not used, but left as example
+     */
     public static function calcTimeSlotId($self) {
         $result = [];
         $self->read(['schedule_from', 'schedule_to', 'is_meal']);
