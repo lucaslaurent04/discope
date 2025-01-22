@@ -138,7 +138,19 @@ class CenterOffice extends \identity\Establishment {
                 'type'              => 'string',
                 'usage'             => 'email',
                 'description'       => 'Service email address for sending copies of sent messages.'
+            ],
+
+            'task_models_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\booking\followup\TaskModel',
+                'foreign_field'     => 'center_offices_ids',
+                'rel_table'         => 'identity_center_office_rel_sale_task_model',
+                'rel_foreign_key'   => 'task_models_id',
+                'rel_local_key'     => 'center_office_id',
+                'description'       => "Follow up tasks models that are associated with the center office.",
+                'help'              => "When a booking is created for a center office, follow up tasks are generated depending on its associated models."
             ]
+
         ];
     }
 

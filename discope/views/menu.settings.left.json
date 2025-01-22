@@ -1264,6 +1264,48 @@
                         }
                     }
                 ]
+            },
+            {
+                "id": "tasks",
+                "label": "Tasks",
+                "description": "",
+                "icon": "task",
+                "type": "parent",
+                "children": [
+                    {
+                        "id": "settings.tasks.events",
+                        "type": "entry",
+                        "label": "Events",
+                        "description": "",
+                        "icon": "event",
+                        "context": {
+                            "entity": "sale\\booking\\followup\\TaskEvent",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "settings.tasks.models",
+                        "type": "entry",
+                        "label": "Models",
+                        "description": "",
+                        "icon": "description",
+                        "context": {
+                            "entity": "sale\\booking\\followup\\TaskModel",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "settings.tasks.tasks",
+                        "type": "entry",
+                        "label": "Tasks",
+                        "description": "",
+                        "icon": "task",
+                        "context": {
+                            "entity": "sale\\booking\\followup\\Task",
+                            "view": "list.default"
+                        }
+                    }
+                ]
             }
         ]
     }
