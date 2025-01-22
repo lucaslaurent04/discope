@@ -1,15 +1,17 @@
 {
     "name": "Task Models",
     "description": "This view is intended for displaying the list of task models.",
-    "access": {
-        "groups": ["booking.default.user"]
-    },
     "layout": {
         "items": [
             {
                 "type": "field",
                 "value": "name",
                 "width": "40%"
+            },
+            {
+                "type": "field",
+                "value": "entity",
+                "width": "20%"
             },
             {
                 "type": "field",

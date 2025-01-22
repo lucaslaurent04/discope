@@ -1,9 +1,6 @@
 {
     "name": "Task Events",
     "description": "List of follow up task events.",
-    "access": {
-        "groups": ["booking.default.user"]
-    },
     "layout": {
         "items": [
             {

@@ -25,6 +25,11 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "entity",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "task_group",
                                                 "width": "33%"
                                             }

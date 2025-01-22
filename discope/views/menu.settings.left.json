@@ -1267,7 +1267,7 @@
             },
             {
                 "id": "tasks",
-                "label": "Tasks",
+                "label": "Booking tasks",
                 "description": "",
                 "icon": "task",
                 "type": "parent",

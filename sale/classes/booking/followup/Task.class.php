@@ -7,10 +7,10 @@
 
 namespace sale\booking\followup;
 
-use equal\orm\Model;
+use discope\followup\Task as DiscopeTask;
 
-class Task extends Model {
-    
+class Task extends DiscopeTask {
+
     public static function getDescription(): string {
         return "Booking task that must be realized.";
     }
@@ -18,94 +18,43 @@ class Task extends Model {
     public static function getColumns(): array {
         return [
 
-            'name' => [
-                'type'              => 'string',
-                'description'       => "Name of the task.",
-                'required'          => true
-            ],
-
-            'is_done' => [
-                'type'              => 'boolean',
-                'description'       => "Whether the task is done.",
-                'default'           => false,
-                'onupdate'          => 'onupdateDone'
-            ],
-
-            'done_by' => [
-                'type'              => 'computed',
-                'result_type'       => 'many2one',
-                'foreign_object'    => 'core\User',
-                'description'       => "The user who completed the task.",
-                'function'          => 'calcDoneBy',
-                'store'             => true
-            ],
-
-            'done_date' => [
-                'type'              => 'computed',
-                'result_type'       => 'date',
-                'description'       => "Date on which the task was completed.",
-                'function'          => 'calcDoneDate',
-                'store'             => true
-            ],
-
-            'visible_date' => [
-                'type'              => 'date',
-                'description'       => "Date on which the task must be visible.",
-                'help'              => "Always visible if the date is not set."
-            ],
-
-            'deadline_date' => [
-                'type'              => 'date',
-                'description'       => "Date on which the task as to be completed."
-            ],
-
             'task_model_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\followup\TaskModel',
                 'description'       => "The model used to create the task."
             ],
 
-            'notes' => [
-                'type'              => 'string',
-                'usage'             => 'text/plain',
-                'description'       => "Notes about the task."
-            ],
-
             'entity' => [
                 'type'              => 'string',
                 'description'       => "Namespace of the concerned entity.",
-                'required'          => true
+                'required'          => true,
+                'default'           => 'sale\booking\followup\Task'
+            ],
+
+            'entity_id' => [
+                'type'              => 'integer',
+                'description'       => "Id of the associated entity. In this case it is the booking id.",
+                'required'          => true,
+                'dependencies'      => ['booking_id']
             ],
 
             'booking_id' => [
-                'type'              => 'many2one',
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
                 'description'       => "Booking the task relates to.",
-                'required'          => true
+                'store'             => true,
+                'function'          => 'calcBookingId'
             ]
 
         ];
     }
 
-    public static function calcDoneDate($self): array {
+    public static function calcBookingId($self): array {
         $result = [];
-        $self->read(['is_done']);
+        $self->read(['entity_id']);
         foreach($self as $id => $task) {
-            $result[$id] = $task['is_done'] ? time() : null;
-        }
-
-        return $result;
-    }
-
-    public static function calcDoneBy($self): array {
-        /** @var \equal\auth\AuthenticationManager $auth */
-        ['auth' => $auth] = \eQual::inject(['auth']);
-        $user_id = $auth->userId();
-
-        $result = [];
-        $self->read(['is_done']);
-        foreach($self as $id => $task) {
-            $result[$id] = $task['is_done'] ? $user_id : null;
+            $result[$id] = $task['entity_id'];
         }
 
         return $result;

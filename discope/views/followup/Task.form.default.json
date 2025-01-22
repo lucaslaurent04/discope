@@ -22,7 +22,12 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "booking_id",
+                                                "value": "entity",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "entity_id",
                                                 "width": "33%"
                                             }
                                         ]

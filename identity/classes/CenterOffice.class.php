@@ -144,7 +144,7 @@ class CenterOffice extends \identity\Establishment {
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\booking\followup\TaskModel',
                 'foreign_field'     => 'center_offices_ids',
-                'rel_table'         => 'identity_center_office_rel_sale_task_model',
+                'rel_table'         => 'identity_center_office_rel_sale_booking_task_model',
                 'rel_foreign_key'   => 'task_models_id',
                 'rel_local_key'     => 'center_office_id',
                 'description'       => "Follow up tasks models that are associated with the center office.",
