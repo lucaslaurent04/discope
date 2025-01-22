@@ -91,7 +91,8 @@ class Consumption extends Model {
                 'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\booking\TimeSlot',
                 'description'       => 'Indicator of the moment of the day when the consumption occurs (from schedule).',
-                'function'          => 'calcTimeSlotId'
+                'function'          => 'calcTimeSlotId',
+                'store'             => true
             ],
 
             'date' => [
