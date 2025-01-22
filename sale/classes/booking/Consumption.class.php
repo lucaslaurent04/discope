@@ -87,9 +87,11 @@ class Consumption extends Model {
             ],
 
             'time_slot_id' => [
-                'type'              => 'many2one',
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\booking\TimeSlot',
                 'description'       => 'Indicator of the moment of the day when the consumption occurs (from schedule).',
+                'function'          => 'calcTimeSlotId'
             ],
 
             'date' => [
@@ -361,6 +363,28 @@ class Consumption extends Model {
                 $om->update(self::getType(), $cid, ['time_slot_id' => $moment_id]);
             }
         }
+    }
+
+
+    public static function calcTimeSlotId($self) {
+        $result = [];
+        $self->read(['schedule_from', 'schedule_to', 'is_meal']);
+
+        $moments = TimeSlot::search([], ['order' => 'asc'])->read(['schedule_from', 'schedule_to', 'is_meal'])->get();
+
+        foreach($self as $id => $consumption) {
+            $result[$id] = 1;
+            foreach($moments as $mid => $moment) {
+                if($consumption['schedule_from'] >= $moment['schedule_from'] && $consumption['schedule_to'] <= $moment['schedule_to']) {
+                    $result[$id] = $mid;
+                    if($moment['is_meal'] && $consumption['is_meal']) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
