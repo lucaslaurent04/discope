@@ -4,12 +4,21 @@
     "access": {
         "groups": ["booking.default.user"]
     },
+    "order": "deadline_date",
+    "sort": "asc",
     "layout": {
         "items": [
             {
                 "type": "field",
                 "value": "name",
                 "width": "40%"
+            },
+            {
+                "type": "field",
+                "label": "Booking",
+                "value": "booking_id",
+                "width": "20%",
+                "visible": false
             },
             {
                 "type": "field",

@@ -44,6 +44,7 @@ class Task extends DiscopeTask {
                 'foreign_object'    => 'sale\booking\Booking',
                 'description'       => "Booking the task relates to.",
                 'store'             => true,
+                'instant'           => true,
                 'function'          => 'calcBookingId'
             ]
 
