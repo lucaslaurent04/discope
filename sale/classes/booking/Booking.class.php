@@ -920,6 +920,10 @@ class Booking extends Model {
                 if($booking['status'] == 'confirmed') {
                     $om->update(self::getType(), $id, ['has_contract' => true], $lang);
                 }
+
+                \eQual::run('do', 'sale_booking_followup_generate-task', [
+                    'booking_id' => $id,
+                ]);
             }
         }
     }
