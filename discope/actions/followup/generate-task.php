@@ -79,15 +79,17 @@ foreach($task_models as $task_model) {
     ) {
         $visible_date = time() + (86400 * $task_model['trigger_event_id']['offset']);
 
-        if($task_model['deadline_event_id']['event_type'] !== 'date_field') {
-            continue;
+        $deadline_date = null;
+        if($task_model['deadline_event_id']['event_type'] === 'date_field') {
+            $ent = $params['entity']::id($entity['id'])
+                ->read([$task_model['deadline_event_id']['entity_date_field']])
+                ->first(true);
+
+            $deadline_date = $ent[$task_model['deadline_event_id']['entity_date_field']] + (86400 * $task_model['deadline_event_id']['offset']);
         }
-
-        $ent = $params['entity']::id($entity['id'])
-            ->read([$task_model['deadline_event_id']['entity_date_field']])
-            ->first(true);
-
-        $deadline_date = $ent[$task_model['deadline_event_id']['entity_date_field']] + (86400 * $task_model['deadline_event_id']['offset']);
+        else {
+            $deadline_date = time() + (86400 * $task_model['deadline_event_id']['offset']);
+        }
 
         $task = Task::search([
             ['task_model_id', '=', $task_model['id']],
