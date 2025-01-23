@@ -18,7 +18,7 @@ use sale\booking\followup\TaskModel;
             'foreign_object'    => 'sale\booking\Booking',
             'description'       => "Booking the status has just changed.",
             'required'          => true
-        ],
+        ]
 
     ],
     'access'        => [
@@ -81,7 +81,21 @@ foreach($task_models as $task_model) {
 
         $deadline_date = $book[$task_model['deadline_event_id']['entity_date_field']] + (86400 * $task_model['deadline_event_id']['offset']);
 
-        // TODO: Handle already exists
+        $task = Task::search([
+            ['task_model_id', '=', $task_model['id']],
+            ['entity', '=', 'sale\booking\Booking'],
+            ['entity_id', '=', $booking['id']]
+        ])
+            ->read(['notes'])
+            ->first(true);
+
+        $notes = null;
+        if(!is_null($task)) {
+            // Keep notes of existing task, but remove it to be replaced
+            $notes = $task['notes'];
+
+            Task::id($task['id'])->delete();
+        }
 
         Task::create([
             'name'          => $task_model['name'],
@@ -89,7 +103,8 @@ foreach($task_models as $task_model) {
             'deadline_date' => $deadline_date,
             'task_model_id' => $task_model['id'],
             'entity'        => 'sale\booking\Booking',
-            'entity_id'     => $booking['id']
+            'entity_id'     => $booking['id'],
+            'notes'         => $notes
         ]);
     }
 }
