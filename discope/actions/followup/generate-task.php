@@ -89,7 +89,21 @@ foreach($task_models as $task_model) {
 
         $deadline_date = $ent[$task_model['deadline_event_id']['entity_date_field']] + (86400 * $task_model['deadline_event_id']['offset']);
 
-        // TODO: Handle already exists
+        $task = Task::search([
+            ['task_model_id', '=', $task_model['id']],
+            ['entity', '=', $params['entity']],
+            ['entity_id', '=', $entity['id']],
+        ])
+            ->read(['notes'])
+            ->first();
+
+        $notes = null;
+        if(!is_null($task)) {
+            // Keep notes of existing task, but remove it to be replaced
+            $notes = $task['notes'];
+
+            Task::id($task['id'])->delete();
+        }
 
         Task::create([
             'name'          => $task_model['name'],
@@ -97,7 +111,8 @@ foreach($task_models as $task_model) {
             'deadline_date' => $deadline_date,
             'task_model_id' => $task_model['id'],
             'entity'        => $params['entity'],
-            'entity_id'     => $entity['id']
+            'entity_id'     => $entity['id'],
+            'notes'         => $notes
         ]);
     }
 }
