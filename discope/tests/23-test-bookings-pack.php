@@ -257,8 +257,8 @@ $tests = [
 
 
             return (
-                $booking['price'] == round($total_price_blg,2) &&
-                $booking['price'] == round($total_price_bl,2)
+                $booking['price'] == round($total_price_blg, 2) &&
+                $booking['price'] == round($total_price_bl, 2)
             );
         },
         'rollback'          =>  function () {
@@ -348,14 +348,13 @@ $tests = [
         'assert'            =>  function ($booking) {
 
             $total_price_bl = array_reduce($booking['booking_lines_ids'], function($sum, $line) {
-                return $sum + $line['price'];
+                return round($sum + $line['price'], 2);
             }, 0);
 
 
             $total_price_blg = array_reduce($booking['booking_lines_groups_ids'], function($sum, $group) {
-                return $sum + $group['price'];
+                return round($sum + $group['price'], 2);
             }, 0);
-
 
             return (
                 $booking['price'] == 1412.9  &&
