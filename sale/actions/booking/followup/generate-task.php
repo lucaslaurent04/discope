@@ -22,7 +22,7 @@ use sale\booking\followup\TaskModel;
 
     ],
     'access'        => [
-        'visibility'        => 'private'
+        'visibility'        => 'protected'
     ],
     'response'      => [
         'content-type'      => 'application/json',
