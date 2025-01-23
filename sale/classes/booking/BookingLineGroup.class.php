@@ -3410,9 +3410,9 @@ class BookingLineGroup extends Model {
 						'has_own_qty'               => $product['has_own_qty']
 					];
 					$line_id = $om->create(BookingLine::getType(), $line);
-					// set product_id (will trigger recompute)
+					// set product_id (#memo - we're in a refresh method called with disabled events - this does not trigger recompute)
 					$om->update(BookingLine::getType(), $line_id, ['product_id' => $product['id']]);
-					// #memo - we should do this beforehand (onupdateProductId should be split to a standalone method for checking if a product has a price in a given context)
+					BookingLine::refreshPriceId($om, $line_id);
 					// read the resulting product
 					$lines = $om->read(BookingLine::getType(), $line_id, ['price_id', 'price_id.price']);
 					// prevent adding autosale products for which a price could not be retrieved (invoices with lines without accounting rule are invalid)
