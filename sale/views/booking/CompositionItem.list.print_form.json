@@ -4,7 +4,7 @@
     "access": {
         "groups": ["booking.default.user"]
     },
-    "limit": "100",
+    "limit": "500",
     "filters": false,
     "order": "rental_unit_id",
     "layout": {
