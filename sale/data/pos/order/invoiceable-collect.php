@@ -31,7 +31,7 @@ list($params, $providers) = announce([
             'type'              => 'date',
             'description'       => "Date of the creation.",
             'usage'             => 'date/month',
-            'default'           => strtotime('Today')
+            'default'           => function() { return strtotime('Today'); }
         ]
     ],
     'response'      => [
