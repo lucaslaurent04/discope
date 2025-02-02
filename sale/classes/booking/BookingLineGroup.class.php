@@ -2128,7 +2128,7 @@ class BookingLineGroup extends Model {
 
                 if($lines > 0 && count($lines)) {
 
-                    // read all related product models at once
+                    // read all related product models before hand
                     $product_models_ids = array_map(function($oid) use($lines) {return $lines[$oid]['product_id.product_model_id'];}, array_keys($lines));
                     $product_models = $om->read(\sale\catalog\ProductModel::getType(), $product_models_ids, [
                         'type',
@@ -2167,6 +2167,7 @@ class BookingLineGroup extends Model {
                         }
 
                         // retrieve default time for consumption
+                        // #todo - improve by using time_slot_id
                         list($hour_from, $minute_from, $hour_to, $minute_to) = [12, 0, 13, 0];
                         $schedule_default_value = $product_models[$line['product_id.product_model_id']]['schedule_default_value'];
                         if(strpos($schedule_default_value, ':')) {
@@ -2186,13 +2187,13 @@ class BookingLineGroup extends Model {
 
                         // #memo - number of consumptions differs for accommodations (rooms are occupied nb_nights + 1, until sometime in the morning)
                         // #memo - sojourns are accounted in nights, while events are accounted in days
-                        $nb_products = ($group['is_sojourn'])?$group['nb_nights']:(($group['is_event'])?$group['nb_nights']+1:1);
+                        $nb_products = ($group['is_sojourn']) ? $group['nb_nights'] : (($group['is_event']) ? ($group['nb_nights']+1) : 1);
                         if(!$product_models[$line['product_id.product_model_id']]['is_repeatable']) {
                             $nb_products = 1;
                         }
                         $nb_times = $group['nb_pers'];
 
-                        // adapt nb_pers based on if product from line has age_range
+                        // adapt nb_times based on if product relating to line is marked with has_age_range
                         if($qty_accounting_method == 'person') {
                             $age_assignments = $om->read(BookingLineGroupAgeRangeAssignment::getType(), $group['age_range_assignments_ids'], ['age_range_id', 'qty']);
                             if($line['product_id.has_age_range']) {
@@ -2210,11 +2211,12 @@ class BookingLineGroup extends Model {
 
                         list($day, $month, $year) = [ date('j', $group['date_from']), date('n', $group['date_from']), date('Y', $group['date_from']) ];
                         // fetch the offset, in days, for the scheduling (only applies on sojourns)
-                        $offset = ($group['is_sojourn'])?$product_models[$line['product_id.product_model_id']]['schedule_offset']:0;
+                        $offset = ($group['is_sojourn']) ? $product_models[$line['product_id.product_model_id']]['schedule_offset'] : 0;
 
+                        // #todo - ? why don't we use the qty - it should already be set according to the criteria (including variations, if any)
                         $days_nb_times = array_fill(0, $nb_products, $nb_times);
 
-                        if( $qty_accounting_method == 'person' && ($nb_times * $nb_products) != $line['qty']) {
+                        if($qty_accounting_method == 'person' && ($nb_times * $nb_products) != $line['qty']) {
                             // $nb_times varies from one day to another : load specific days_nb_times array
                             $qty_vars = json_decode($line['qty_vars']);
                             // qty_vars is set and valid
@@ -2242,6 +2244,7 @@ class BookingLineGroup extends Model {
                             }
 
                             // create a single consumption with the quantity set accordingly (may vary from one day to another)
+                            // #todo - if the sojourn (BookingLineGroup) has a single age range assignment, then the related age_range_id prevails over product_id.age_range_id
                             $consumption = [
                                 'booking_id'            => $group['booking_id'],
                                 'booking_line_group_id' => $gid,
@@ -2259,14 +2262,14 @@ class BookingLineGroup extends Model {
                                 'qty'                   => $days_nb_times[$i],
                                 'type'                  => 'book'
                             ];
-                            // for meals, we add the age ranges and prefs with the description field
+                            // for meals, we store the age ranges and prefs within the description field
                             if($is_meal) {
                                 $description = '';
                                 $age_range_assignments = $om->read(BookingLineGroupAgeRangeAssignment::getType(), $group['age_range_assignments_ids'], ['age_range_id.name','qty'], $lang);
-                                $meal_preferences = $om->read(\sale\booking\MealPreference::getType(), $group['meal_preferences_ids'], ['type','pref', 'qty'], $lang);
                                 foreach($age_range_assignments as $oid => $assignment) {
                                     $description .= "<p>{$assignment['age_range_id.name']} : {$assignment['qty']} ; </p>";
                                 }
+                                $meal_preferences = $om->read(\sale\booking\MealPreference::getType(), $group['meal_preferences_ids'], ['type','pref', 'qty'], $lang);
                                 foreach($meal_preferences as $oid => $preference) {
                                     // #todo : use translation file
                                     $type = ($preference['type'] == '3_courses')?'3 services':'2 services';
