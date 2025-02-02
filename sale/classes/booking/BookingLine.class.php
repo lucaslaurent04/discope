@@ -69,7 +69,7 @@ class BookingLine extends Model {
 
             'price_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \sale\price\Price::getType(),
+                'foreign_object'    => 'sale\price\Price',
                 'description'       => 'The price the line relates to (retrieved by price list).',
                 'onupdate'          => 'onupdatePriceId'
             ],
@@ -140,6 +140,7 @@ class BookingLine extends Model {
                 'default'           => 1
             ],
 
+            // #todo #deprecate - it seems this is no longer used
             'payment_mode' => [
                 'type'              => 'string',
                 'selection'         => [
@@ -481,7 +482,7 @@ class BookingLine extends Model {
                     }
                 }
                 // retrieve quantity to consider
-                $qty = self::_computeLineQty(
+                $qty = self::computeLineQty(
                     $line['qty_accounting_method'],
                     $nb_repeat,
                     $nb_pers,
@@ -643,7 +644,7 @@ class BookingLine extends Model {
                         }
                     }
                     // retrieve quantity to consider
-                    $qty = self::_computeLineQty(
+                    $qty = self::computeLineQty(
                         $line['qty_accounting_method'],
                         $nb_repeat,
                         $nb_pers,
@@ -861,7 +862,7 @@ class BookingLine extends Model {
      * @param boolean   $is_accommodation   Flag marking the line as an accommodation.
      * @param boolean   $capacity           Capacity of the product model the line refers to.
      */
-    public static function _computeLineQty($method, $nb_repeat, $nb_pers, $is_repeatable, $is_accommodation, $capacity) {
+    private static function computeLineQty($method, $nb_repeat, $nb_pers, $is_repeatable, $is_accommodation, $capacity) {
         // default quantity (duration of the group or own quantity or method = 'unit')
         $qty = $nb_repeat;
         // service is accounted by accommodation
@@ -1302,7 +1303,7 @@ class BookingLine extends Model {
             }
         }
         // retrieve quantity to consider
-        $qty = self::_computeLineQty(
+        $qty = self::computeLineQty(
                 $line['qty_accounting_method'],
                 $nb_repeat,
                 $nb_pers,
