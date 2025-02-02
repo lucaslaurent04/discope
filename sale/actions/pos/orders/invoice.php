@@ -194,7 +194,16 @@ foreach($orders as $order) {
 
 // create (exportable) payments for involved orders
 // #memo - waiting to be confirmed (the teams to be ready for the accounting)
-if($center_id == 27 && $date >= strtotime('2024-04-01 00:00:00')) {
+/*
+* Ovifat : 27
+* Wanne  : 30
+* LLN : 28
+* Eupen: 24
+* HSL : 26
+* VSG : 25
+* HVG : 32
+*/
+if(in_array($center_id, [27, 30, 28, 24, 26]) && $date >= strtotime('2024-04-01 00:00:00')) {
     eQual::run('do', 'sale_pos_orders_payments', [
             'ids' => $orders_ids
         ]);
