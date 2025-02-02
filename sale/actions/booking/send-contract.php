@@ -250,6 +250,9 @@ if ($email !== null  && $lang !== null ) {
         ]
     );
 }
+
+// #todo - also schedule a guest_list_check-sent (same way than contract)
+
 */
 
 
