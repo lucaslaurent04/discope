@@ -10,6 +10,7 @@ use equal\data\DataGenerator;
 use equal\orm\Model;
 use sale\booking\Booking;
 use sale\booking\Invoice;
+use core\setting\Setting;
 
 /**
  * This class is meant to be used as an interface for other entities (organisation and partner).
@@ -204,6 +205,14 @@ class Identity extends Model {
                 'foreign_field'     => 'owner_identity_id',
                 'domain'            => [ ['partner_identity_id', '<>', 'object.id'] ],
                 'description'       => 'List of contacts related to the organisation (not necessarily employees), if any.'
+            ],
+
+            'accounting_account' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Unique code identifying the associated accounting account.",
+                'function'          => 'calcAccount',
+                'store'             => true
             ],
 
             /*
@@ -710,6 +719,40 @@ class Identity extends Model {
             ]
 
         ];
+    }
+
+    public static function calcAccount($self) {
+        $result = [];
+        $self->read(['id','name']);
+        foreach($self as $id => $identity) {
+
+            $prefix_account = Setting::get_value('identity', 'locale', 'account.prefix');
+            $sequence_account = Setting::get_value('identity', 'locale', 'account.sequence');
+            $format = Setting::get_value('identity', 'locale', 'account.sequence_format', '%3d{prefix}-%7d{sequence}');
+
+            if(isset($prefix_account) && isset($sequence_account) && $format) {
+                Setting::set_value('identity', 'locale', 'account.sequence', $sequence_account + 1);
+
+                $acounting_value = Setting::parse_format($format, [
+                    'prefix'    => $prefix_account,
+                    'sequence'  => $sequence_account
+                ]);
+
+                $identity_found = Identity::search([
+                                ['id', '<>' , $identity['id']],
+                                ['accounting_account' ,  '=',  $acounting_value]
+                            ])
+                            ->read('id')
+                            ->first(true);
+
+                if(!$identity_found){
+                    $result[$id] = $acounting_value;
+                }
+
+            }
+
+        }
+        return $result;
     }
 
     /**

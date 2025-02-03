@@ -242,6 +242,11 @@
                                                 "type": "field",
                                                 "value": "website",
                                                 "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "accounting_account",
+                                                "width": "100%"
                                             }
                                         ]
                                     },
