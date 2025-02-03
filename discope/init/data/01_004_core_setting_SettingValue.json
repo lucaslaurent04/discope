@@ -62,6 +62,16 @@
             {
                 "name": "finance.invoice.fiscal_year",
                 "value": "2024"
+            },
+            {
+                "name": "identity.locale.account.sequence",
+                "setting_id": 149,
+                "value": "1000000"
+            },
+            {
+                "name": "identity.locale.account.sequence_format",
+                "setting_id": 150,
+                "value": "%3d{prefix}-%7d{sequence}"
             }
         ]
     }
