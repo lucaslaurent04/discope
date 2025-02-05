@@ -728,7 +728,7 @@ class Identity extends Model {
 
             $prefix_account = Setting::get_value('identity', 'locale', 'account.prefix');
             $sequence_account = Setting::get_value('identity', 'locale', 'account.sequence');
-            $format = Setting::get_value('identity', 'locale', 'account.sequence_format', '%3d{prefix}-%7d{sequence}');
+            $format = Setting::get_value('identity', 'locale', 'account.sequence_format', '%3d{prefix}%5d{sequence}');
 
             if(isset($prefix_account) && isset($sequence_account) && $format) {
                 Setting::set_value('identity', 'locale', 'account.sequence', $sequence_account + 1);
