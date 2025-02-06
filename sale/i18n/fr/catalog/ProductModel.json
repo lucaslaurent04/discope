@@ -94,6 +94,11 @@
             "description": "Décalage, en jours, à partir de la date de début de séjour.",
             "help": ""
         },
+        "time_slots_ids": {
+            "label": "Tranches horaires",
+            "description": "Les créneaux horaires pour classer quand le service peut avoir lieu.",
+            "help": ""
+        },
         "tracking_type": {
             "label": "Type de suivi",
             "description": "Manière dont le produit est identifé pour les suivis.",

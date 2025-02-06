@@ -138,10 +138,14 @@ class ProductModel extends Model {
                 'visible'           => [ ['type', '=', 'service'], ['service_type', '=', 'schedulable'] ]
             ],
 
-            'time_slot_id' => [
-                'type'              => 'many2one',
+            'time_slots_ids' => [
+                'type'              => 'many2many',
                 'foreign_object'    => 'sale\booking\TimeSlot',
-                'description'       => "The time slot to classify when the service take place.",
+                'foreign_field'     => 'product_models_ids',
+                'rel_table'         => 'sale_catalog_product_model_rel_sale_booking_timeslot',
+                'rel_foreign_key'   => 'time_slot_id',
+                'rel_local_key'     => 'product_model_id',
+                'description'       => "The time slots to classify when the service can take place.",
                 'visible'           => [ ['type', '=', 'service'], ['service_type', '=', 'schedulable'] ]
             ],
 
