@@ -91,11 +91,6 @@
                                                 "type": "field",
                                                 "value": "schedule_offset",
                                                 "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "time_slot_id",
-                                                "width": "50%"
                                             }
                                         ]
                                     }
@@ -293,6 +288,33 @@
                                                 "type": "field",
                                                 "value": "categories_ids",
                                                 "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Time slots",
+                        "id": "section.time-slots",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "time_slots_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }

@@ -77,10 +77,14 @@ class TimeSlot extends Model {
             ],
 
             'product_models_ids' => [
-                'type'              => 'one2many',
+                'type'              => 'many2many',
                 'foreign_object'    => 'sale\catalog\ProductModel',
-                'foreign_field'     => 'time_slot_id',
-                'description'       => 'The product models associated with the slot.'
+                'foreign_field'     => 'time_slots_ids',
+                'rel_table'         => 'sale_catalog_product_model_rel_sale_booking_timeslot',
+                'rel_foreign_key'   => 'product_model_id',
+                'rel_local_key'     => 'time_slot_id',
+                'description'       => "The product models that can be scheduled during this time slot.",
+                'visible'           => [ ['type', '=', 'service'], ['service_type', '=', 'schedulable'] ]
             ]
 
         ];
