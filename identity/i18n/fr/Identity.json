@@ -269,6 +269,11 @@
             "label": "Origine OTA",
             "description": "Est-ce que l'identité est originaire d'un OTA.",
             "help": ""
+        },
+        "accounting_account": {
+            "label": "Compte Comptable",
+            "description": "Code unique identifiant le compte comptable associé.",
+            "help": ""
         }
     },
     "view": {
