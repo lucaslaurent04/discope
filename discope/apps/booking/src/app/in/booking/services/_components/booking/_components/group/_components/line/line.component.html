@@ -173,9 +173,22 @@
                         <div style="width: 100%;">
                             <div *ngFor="let delta of vm.qty_vars.values | keyvalue; let index = index;"
                                 style="display: flex; align-items: center; height: 38px;">
-                                <div style="flex: 0 1 35%; display: flex;">
+                                <div style="flex: 0 1 35%; display: flex; align-items: center;">
                                     <span style="text-decoration: underline"> Jour {{index + 1 + ((group.is_sojourn)?(instance.product_id?.product_model_id?.schedule_offset):0)}}</span>
-                                    <span style="margin-left: 12px; width: 100px;">({{getOffsetDate(index + ((group.is_sojourn)?(instance.product_id?.product_model_id?.schedule_offset):0)) | date : 'EEE d LLL'}})</span>
+                                    <span *ngIf="instance.product_id.product_model_id.type !== 'service' || instance.product_id.product_model_id.service_type !== 'schedulable' || instance.product_id.product_model_id.is_repeatable"
+                                          style="margin-left: 12px; width: 100px;"
+                                    >
+                                        ({{getOffsetDate(index + ((group.is_sojourn)?(instance.product_id?.product_model_id?.schedule_offset):0)) | date : 'EEE d LLL'}})
+                                    </span>
+
+                                    <mat-form-field style="margin-left: 20px; max-width: 100px">
+                                        <mat-select *ngIf="instance.product_id.product_model_id.type === 'service' && instance.product_id.product_model_id.service_type === 'schedulable' && !instance.product_id.product_model_id.is_repeatable"
+                                                    [formControl]="vm.service_date.formControl"
+                                                    (selectionChange)="vm.service_date.change()"
+                                        >
+                                            <mat-option *ngFor="let date of getServicePossibleDates()" [value]="date">{{ date | date:'dd/MM/YY' }}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
                                 </div>
                                 <div style="width: 65px; margin-left: 24px;">
                                     <mat-form-field>
