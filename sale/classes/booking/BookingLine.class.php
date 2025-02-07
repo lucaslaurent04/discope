@@ -286,6 +286,24 @@ class BookingLine extends Model {
                 'default'           => false
             ],
 
+            'service_date' => [
+                'type'              => 'computed',
+                'result_type'       => 'date',
+                'description'       => 'Specific date on which the service is delivered.',
+                'help'              => 'Only needed when the ProductModel is schedulable and not repeatable.',
+                'store'             => true,
+                'function'          => 'calcServiceDate'
+            ],
+
+            'time_slot_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\booking\TimeSlot',
+                'description'       => 'Specific day time slot on which the service is delivered.',
+                'store'             => true,
+                'function'          => 'calcTimeSlotId'
+            ]
+
         ];
     }
 
@@ -1196,6 +1214,44 @@ class BookingLine extends Model {
                 $result[$oid] = $odata['product_id.product_model_id.qty_accounting_method'];
             }
         }
+        return $result;
+    }
+
+    public static function calcServiceDate($self): array {
+        $result = [];
+        $self->read([
+            'booking_id'        => ['date_from'],
+            'product_model_id'  => ['type', 'service_type', 'is_repeatable', 'schedule_offset']
+        ]);
+        foreach($self as $id => $booking_line) {
+            $product_model = $booking_line['product_model_id'];
+            if(
+                $product_model['type'] === 'service'
+                && $product_model['service_type'] === 'schedulable'
+                && !$product_model['is_repeatable']
+            ) {
+                $offset_seconds = $product_model['schedule_offset'] * 86400;
+                $result[$id] = $booking_line['booking_id']['date_from'] + $offset_seconds;
+            }
+        }
+
+        return $result;
+    }
+
+    public static function calcTimeSlotId($self): array {
+        $result = [];
+        $self->read(['product_model_id' => ['type', 'service_type', 'time_slots_ids']]);
+        foreach($self as $id => $booking_line) {
+            $product_model = $booking_line['product_model_id'];
+            if(
+                $product_model['type'] === 'service'
+                && $product_model['service_type'] === 'schedulable'
+                && !empty($product_model['time_slots_ids'])
+            ) {
+                $result[$id] = $product_model['time_slots_ids'][0];
+            }
+        }
+
         return $result;
     }
 

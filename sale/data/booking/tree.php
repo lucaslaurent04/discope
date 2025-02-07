@@ -125,6 +125,8 @@ $tree = [
             'is_rental_unit',
             'is_accomodation',
             'is_meal',
+            'service_date',
+            'time_slot_id',
             'price_id',
             'product_id' => [
                 'name',
@@ -135,7 +137,10 @@ $tree = [
                     'schedule_offset',
                     'has_duration',
                     'duration',
-                    'capacity'
+                    'capacity',
+                    'type',
+                    'service_type',
+                    'is_repeatable'
                 ]
             ],
             'auto_discounts_ids' => [

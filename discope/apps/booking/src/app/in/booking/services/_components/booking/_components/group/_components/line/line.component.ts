@@ -39,6 +39,10 @@ interface vmModel {
         formControl: FormControl,
         change: () => void
     },
+    service_date: {
+        formControl: FormControl,
+        change: () => void
+    },
     qty_vars: {
         values: any,
         change: (index: number, event: any) => void,
@@ -96,6 +100,10 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
             description: {
                 formControl:    new FormControl(),
                 change:         () => this.descriptionChange()
+            },
+            service_date: {
+                formControl:    new FormControl(),
+                change:         () => this.serviceDateChange()
             },
             qty_vars: {
                 values:         {},
@@ -167,6 +175,8 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         this.vm.qty.formControl.setValue(this.instance.qty);
         // description
         this.vm.description.formControl.setValue(this.instance.description);
+        // service_date
+        this.vm.service_date.formControl.setValue(this.instance.service_date.toISOString().split('T')[0]);
         // qty_vars
         if(this.instance.qty_vars && this.instance.qty_vars.length) {
             this.vm.qty_vars.values = JSON.parse(this.instance.qty_vars);
@@ -277,6 +287,23 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         }
     }
 
+    private async serviceDateChange() {
+        if(this.instance.service_date == this.vm.service_date.formControl.value) {
+            return;
+        }
+
+        // notify back-end about the change
+        try {
+            const service_date = new Date(this.vm.service_date.formControl.value);
+            await this.api.update(this.instance.entity, [this.instance.id], {service_date: service_date.getTime() / 1000});
+            // relay change to parent component
+            this.updated.emit();
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+    }
+
     private async qtyChange() {
         if(this.instance.qty != this.vm.qty.formControl.value) {
             // notify back-end about the change
@@ -310,8 +337,20 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
     }
 
     private async qtyVarsReset() {
-        this.vm.qty_vars.values = new Array(this.group.nb_nights);
-        this.vm.qty_vars.values.fill(0);
+        const product_model = this.instance.product_id.product_model_id;
+
+        if(
+            product_model.type === 'service'
+            && product_model.service_type === 'schedulable'
+            && !product_model.is_repeatable
+        ) {
+            this.vm.qty_vars.values = [0];
+        }
+        else {
+            this.vm.qty_vars.values = new Array(this.group.nb_nights);
+            this.vm.qty_vars.values.fill(0);
+        }
+
         let qty_vars = JSON.stringify(Object.values(this.vm.qty_vars.values));
         // notify back-end about the change
         try {
@@ -392,6 +431,17 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         let date = new Date(this.group.date_from.getTime());
         date.setDate(date.getDate() + offset);
         return date;
+    }
+
+    public getServicePossibleDates(): string[] {
+        const dates: string[] = [];
+        const nights_indexes = Array.from(Array(this.group.nb_nights).keys());
+        nights_indexes.forEach((night_index) => {
+            const date = new Date(this.group.date_from.getTime() + night_index * 86400 * 1000);
+            dates.push(date.toISOString().split('T')[0]);
+        });
+
+        return dates;
     }
 
     public openPriceEdition() {
