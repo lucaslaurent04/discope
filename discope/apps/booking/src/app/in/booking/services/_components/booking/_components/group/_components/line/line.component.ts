@@ -43,6 +43,10 @@ interface vmModel {
         formControl: FormControl,
         change: () => void
     },
+    time_slot_id: {
+        formControl: FormControl,
+        change: () => void
+    },
     qty_vars: {
         values: any,
         change: (index: number, event: any) => void,
@@ -104,6 +108,10 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
             service_date: {
                 formControl:    new FormControl(),
                 change:         () => this.serviceDateChange()
+            },
+            time_slot_id: {
+                formControl:    new FormControl(),
+                change:         () => this.timeSlotIdChange()
             },
             qty_vars: {
                 values:         {},
@@ -177,6 +185,8 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         this.vm.description.formControl.setValue(this.instance.description);
         // service_date
         this.vm.service_date.formControl.setValue(this.instance.service_date.toISOString().split('T')[0]);
+        // time_slot_id
+        this.vm.time_slot_id.formControl.setValue(this.instance.time_slot_id);
         // qty_vars
         if(this.instance.qty_vars && this.instance.qty_vars.length) {
             this.vm.qty_vars.values = JSON.parse(this.instance.qty_vars);
@@ -304,6 +314,22 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         }
     }
 
+    private async timeSlotIdChange() {
+        if(this.instance.time_slot_id == this.vm.time_slot_id.formControl.value) {
+            return;
+        }
+
+        // notify back-end about the change
+        try {
+            await this.api.update(this.instance.entity, [this.instance.id], {time_slot_id: this.vm.time_slot_id.formControl.value});
+            // relay change to parent component
+            this.updated.emit();
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+    }
+
     private async qtyChange() {
         if(this.instance.qty != this.vm.qty.formControl.value) {
             // notify back-end about the change
@@ -420,7 +446,6 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         catch(response) {
             this.api.errorFeedback(response);
         }
-
     }
 
     public async onupdateDiscount(discount_id:any) {
@@ -433,7 +458,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         return date;
     }
 
-    public getServicePossibleDates(): string[] {
+    public getPossibleServiceDates(): string[] {
         const dates: string[] = [];
         const nights_indexes = Array.from(Array(this.group.nb_nights).keys());
         nights_indexes.forEach((night_index) => {
@@ -442,6 +467,10 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         });
 
         return dates;
+    }
+
+    public getPossibleTimeSlots(): any[] {
+        return this.instance.product_id.product_model_id.time_slots_ids;
     }
 
     public openPriceEdition() {

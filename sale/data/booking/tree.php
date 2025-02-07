@@ -140,7 +140,8 @@ $tree = [
                     'capacity',
                     'type',
                     'service_type',
-                    'is_repeatable'
+                    'is_repeatable',
+                    'time_slots_ids' => ['name']
                 ]
             ],
             'auto_discounts_ids' => [
