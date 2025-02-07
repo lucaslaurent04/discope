@@ -247,6 +247,121 @@ class ProductModel extends Model {
                 'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false] , ['is_snack', '=', false] ]
             ],
 
+            'is_transport' => [
+                'type'              => 'boolean',
+                'description'       => 'Indicates whether the product is a transport service.',
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false] ]
+            ],
+
+            'is_activity' => [
+                'type'              => 'boolean',
+                'description'       => 'Indicates whether the product is an activity or animation.',
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_transport', '=', false], ['is_snack', '=', false], ['is_meal', '=', false] ]
+            ],
+
+            'activity_scope' => [
+                'type'              => 'string',
+                'description'       => 'Specifies whether the activity is internal or external.',
+                'selection'         => [
+                    'internal',
+                    'external',
+                ],
+                'default'           => 'internal',
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+            ],
+
+            'has_activity_duration' => [
+                'type'              => 'boolean',
+                'description'       => 'Indicates whether the activity has a specific duration.',
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+            ],
+
+            'activity_duration' => [
+                'type'              => 'float',
+                'description'       => 'Specifies the duration of the activity (in hours).',
+                'default'           => 4,
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_activity_duration', '=', true] ]
+            ],
+
+            'has_transport' => [
+                'type'              => 'boolean',
+                'description'       => 'Indicates whether the activity requires transport.',
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+            ],
+
+            'transport_product_model_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\catalog\ProductModel',
+                'description'       => 'References the transport product model associated with the activity.',
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_transport', '=', true] ]
+            ],
+
+            'has_supply' => [
+                'type'              => 'boolean',
+                'description'       => 'Indicates whether the product requires specific supplies.',
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+            ],
+
+            'supplies_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\catalog\Supply',
+                'foreign_field'     => 'product_models_ids',
+                'rel_table'         => 'sale_catalog_product_model_rel_sale_catalog_supplies',
+                'rel_foreign_key'   => 'supply_id',
+                'rel_local_key'     => 'product_model_id',
+                'description'       => 'References the supplies required for the activity.',
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_supply', '=', true] ]
+            ],
+
+            'has_provider' => [
+                'type'              => 'boolean',
+                'description'       => 'Indicates whether the product requires specific supplies.',
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+            ],
+
+            'providers_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\provider\Provider',
+                'foreign_field'     => 'product_models_ids',
+                'rel_table'         => 'sale_catalog_product_model_rel_sale_provider_providers',
+                'rel_foreign_key'   => 'provider_id',
+                'rel_local_key'     => 'product_model_id',
+                'description'       => 'References the providers required for the activity.',
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_provider', '=', true] ]
+            ],
+
+
+            'is_fullday' => [
+                'type'        => 'boolean',
+                'description' => 'Indicates whether the animation lasts the full day. If true, assignments must include both AM and PM; otherwise, only one of them.',
+                'default'     => false,
+                'visible'     => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+            ],
+
+            'activity_periods' => [
+                'type'        => 'string',
+                'description' => 'Specifies whether the activity takes place in the morning (AM), afternoon (PM).',
+                'selection'   => [
+                    'AM',
+                    'PM'
+                ],
+                'default'     => 'AM',
+                'visible'     => [ ['type', '=', 'service'], ['is_activity', '=', true], ['is_fullday' , '=' , false] ]
+            ],
+
+            'is_billable' => [
+                'type'        => 'boolean',
+                'description' => 'Indicates whether the activity is billable (generates a service line in invoicing).',
+                'default'     => true,
+                'visible'     => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+            ],
+
             'is_snack' => [
                 'type'              => 'boolean',
                 'description'       => 'Is the product a snack?.',
@@ -270,14 +385,19 @@ class ProductModel extends Model {
                 'type'              => 'boolean',
                 'description'       => 'Does the product have a specific duration.',
                 'default'           => false,
-                'visible'           => ['type', '=', 'service']
+                'visible'           => [
+                                            [ ['type', '=', 'service'], ['is_snack', '=', true ]],
+                                            [ ['type', '=', 'service'], ['is_meal', '=', true ]],
+                                            [ ['type', '=', 'service'], ['is_accomodation', '=', true ]],
+                                            [ ['type', '=', 'service'], ['is_rental_unit', '=', true ]],
+                                     ]
             ],
 
             'duration' => [
                 'type'              => 'integer',
                 'description'       => 'Duration of the service (in days), used for planning.',
                 'default'           => 1,
-                'visible'           => [ ['type', '=', 'service'], ['has_duration', '=', true] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', false ], ['has_duration', '=', true] ]
             ],
 
             'capacity' => [
