@@ -91,6 +91,11 @@
                                                 "type": "field",
                                                 "value": "schedule_offset",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_repeatable",
+                                                "width": "50%"
                                             }
                                         ]
                                     }
@@ -114,6 +119,21 @@
                                             {
                                                 "type": "field",
                                                 "value": "allow_price_adaptation",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_billable",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_supply",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_provider",
                                                 "width": "100%"
                                             }
                                         ]
@@ -154,17 +174,42 @@
                                             {
                                                 "type": "field",
                                                 "value": "is_meal",
-                                                "width": "100%"
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "is_snack",
-                                                "width": "100%",
+                                                "width": "50%",
                                                 "sortable": true
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "is_accomodation",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_transport",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_activity",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "activity_scope",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_transport",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "transport_product_model_id",
                                                 "width": "100%"
                                             }
                                         ]
@@ -184,7 +229,22 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "is_repeatable",
+                                                "value": "has_activity_duration",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "activity_duration",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_fullday",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "activity_periods",
                                                 "width": "100%"
                                             }
                                         ]
@@ -311,6 +371,63 @@
                                                 "widget": {
                                                     "header": {
                                                         "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.ADD": true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Suppliers",
+                        "id": "section.supliers",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "supplies_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.ADD": true,
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Providers",
+                        "id": "section.providers",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "providers_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.ADD": true,
                                                             "ACTION.CREATE": false
                                                         }
                                                     }

@@ -219,6 +219,74 @@
             "label": "Prix adaptables",
             "description": "Le pack est-il candidat aux adaptations de prix (catégories tarifaires).",
             "help": "Si cette proprété est désactivée, les adaptations de prix (avantages) liées aux catégories tarifaires ne sont pas appliquées sur les produits du pack."
+        },
+        "is_transport": {
+            "label": "Est un transport",
+            "description": "Le produit est-il un service de transport ?",
+            "help": "Le produit est-il un service de transport ? (ceci inclut les transferts entre lieux, les navettes, etc.)"
+        },
+        "is_activity": {
+            "label": "Est une activité",
+            "description": "Le produit est-il une activité ?",
+            "help": "Le produit est-il une activité ? (cela inclut des activités comme des jeux, des ateliers, etc.)"
+        },
+        "activity_scope": {
+            "label": "Portée de l'activité",
+            "description": "Précise si l'activité est interne ou externe.",
+            "selection": {
+                "internal": "Interne",
+                "external": "Externe"
+            },
+            "help": "L'activité se déroule-t-elle à l'intérieur de l'entreprise ou nécessite-t-elle une externalisation ?"
+        },
+        "has_activity_duration": {
+            "label": "Durée spécifique de l'activité",
+            "description": "Indique si l'activité a une durée spécifique.",
+            "help": "L'activité a-t-elle une durée définie, par exemple, en heures ou en minutes ?"
+        },
+        "activity_duration": {
+            "label": "Durée de l'activité",
+            "description": "Précise la durée de l'activité (en heures).",
+            "help": "Indiquer la durée de l'activité en heures pour planifier et allouer les ressources."
+        },
+        "has_transport": {
+            "label": "Transport requis",
+            "description": "Indique si l'activité nécessite un transport.",
+            "help": "L'activité nécessite-t-elle un transport pour les participants ? (par exemple, des bus ou des véhicules pour se déplacer)."
+        },
+        "transport_product_model_id": {
+            "label": "Modèle de produit de transport",
+            "description": "Référence le modèle de produit de transport associé à l'activité.",
+            "help": "Sélectionnez le modèle de produit de transport qui sera utilisé pour l'activité."
+        },
+        "has_supply": {
+            "label": "Fourniture nécessaire",
+            "description": "Indique si le produit nécessite des fournitures spécifiques.",
+            "help": "Le produit nécessite-t-il des fournitures spéciales ou des équipements supplémentaires ?"
+        },
+        "has_provider": {
+            "label": "Prestataire nécessaire",
+            "description": "Indique si le produit nécessite un prestataire spécifique.",
+            "help": "Le produit nécessite-t-il un prestataire externe ?"
+        },
+        "is_fullday": {
+            "label": "Activité journée complète",
+            "description": "Indique si l'activité dure toute la journée. Si vrai, les assignations doivent inclure AM et PM ; sinon, l'une ou l'autre.",
+            "help": "L'activité se déroule-t-elle sur toute la journée ? Si oui, il faut prévoir des assignations pour le matin (AM) et l'après-midi (PM)."
+        },
+        "activity_periods": {
+            "label": "Période de l'activité",
+            "description": "Précise si l'activité a lieu le matin (AM) ou l'après-midi (PM).",
+            "selection": {
+                "AM": "Matin",
+                "PM": "Après-midi"
+            },
+            "help": "Indiquer si l'activité se déroule le matin ou l'après-midi. Si l'activité dure toute la journée, les deux périodes sont nécessaires."
+        },
+        "is_billable": {
+            "label": "Est facturable",
+            "description": "L'activité est-elle facturable ? (génère une ligne de service lors de la facturation).",
+            "help": "Permet d'indiquer si une activité est facturable, ce qui entraînera la création d'une ligne de service dans la facturation."
         }
     },
     "view": {
@@ -246,6 +314,15 @@
                 },
                 "description.receipt": {
                     "label": "Pour les achats"
+                },
+                "section.time-slots": {
+                    "label": "Tranches horaires"
+                },
+                "section.supliers": {
+                    "label": "Fournitures"
+                },
+                "section.providers": {
+                    "label": "Prestataires"
                 }
             }
         },
