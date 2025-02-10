@@ -67,6 +67,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
     @Input() set model(values: any) { this.update(values) }
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
+    @Input() time_slots: { id: number, name: string, is_meal: boolean }[];
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
 
@@ -469,8 +470,20 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         return dates;
     }
 
-    public getPossibleTimeSlots(): any[] {
-        return this.instance.product_id.product_model_id.time_slots_ids;
+    public getPossibleTimeSlots(): { id: number, name: string }[] {
+        if(this.instance.product_id.product_model_id.time_slots_ids && this.instance.product_id.product_model_id.time_slots_ids.length > 0) {
+            return this.instance.product_id.product_model_id.time_slots_ids;
+        }
+
+        let time_slots: { id: number, name: string }[];
+        if(this.instance.product_id.product_model_id.is_meal) {
+            time_slots = this.time_slots.filter((time_slot) => time_slot.is_meal);
+        }
+        else {
+            time_slots = this.time_slots.filter((time_slot) => !time_slot.is_meal);
+        }
+
+        return time_slots;
     }
 
     public openPriceEdition() {
