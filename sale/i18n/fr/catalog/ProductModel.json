@@ -249,7 +249,7 @@
             "description": "Précise la durée de l'activité (en heures).",
             "help": "Indiquer la durée de l'activité en heures pour planifier et allouer les ressources."
         },
-        "has_transport": {
+        "has_transport_required": {
             "label": "Transport requis",
             "description": "Indique si l'activité nécessite un transport.",
             "help": "L'activité nécessite-t-elle un transport pour les participants ? (par exemple, des bus ou des véhicules pour se déplacer)."
@@ -287,6 +287,16 @@
             "label": "Est facturable",
             "description": "L'activité est-elle facturable ? (génère une ligne de service lors de la facturation).",
             "help": "Permet d'indiquer si une activité est facturable, ce qui entraînera la création d'une ligne de service dans la facturation."
+        },
+        "has_staff_required": {
+            "label": "Nécessite du personnel",
+            "description": "Indique si l'activité nécessite la présence de personnel dédié.",
+            "help": "Permet de marquer si une activité requiert un personnel spécifique pour être réalisée."
+        },
+        "employee_id": {
+            "label": "Employé assigné",
+            "description": "L'employé associé à cette activité, le cas échéant.",
+            "help": "Indique l'employé assigné à l'activité, si nécessaire."
         }
     },
     "view": {

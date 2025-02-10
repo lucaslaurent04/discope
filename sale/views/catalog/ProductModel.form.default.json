@@ -165,6 +165,16 @@
                                                 "type": "field",
                                                 "value": "rental_unit_id",
                                                 "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_staff_required",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "employee_id",
+                                                "width": "100%"
                                             }
                                         ]
                                     },
@@ -204,7 +214,7 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "has_transport",
+                                                "value": "has_transport_required",
                                                 "width": "100%"
                                             },
                                             {

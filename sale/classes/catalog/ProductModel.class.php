@@ -286,7 +286,7 @@ class ProductModel extends Model {
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_activity_duration', '=', true] ]
             ],
 
-            'has_transport' => [
+            'has_transport_required' => [
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the activity requires transport.',
                 'default'           => false,
@@ -338,28 +338,42 @@ class ProductModel extends Model {
 
 
             'is_fullday' => [
-                'type'        => 'boolean',
-                'description' => 'Indicates whether the animation lasts the full day. If true, assignments must include both AM and PM; otherwise, only one of them.',
-                'default'     => false,
-                'visible'     => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+                'type'              => 'boolean',
+                'description'       => 'Indicates whether the animation lasts the full day. If true, assignments must include both AM and PM; otherwise, only one of them.',
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
             ],
 
             'activity_periods' => [
-                'type'        => 'string',
-                'description' => 'Specifies whether the activity takes place in the morning (AM), afternoon (PM).',
-                'selection'   => [
+                'type'              => 'string',
+                'description'       => 'Specifies whether the activity takes place in the morning (AM), afternoon (PM).',
+                'selection'         => [
                     'AM',
                     'PM'
                 ],
-                'default'     => 'AM',
-                'visible'     => [ ['type', '=', 'service'], ['is_activity', '=', true], ['is_fullday' , '=' , false] ]
+                'default'           => 'AM',
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['is_fullday' , '=' , false] ]
             ],
 
             'is_billable' => [
-                'type'        => 'boolean',
-                'description' => 'Indicates whether the activity is billable (generates a service line in invoicing).',
-                'default'     => true,
-                'visible'     => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+                'type'              => 'boolean',
+                'description'       => 'Indicates whether the activity is billable (generates a service line in invoicing).',
+                'default'           => true,
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+            ],
+
+            'has_staff_required' => [
+                'type'              => 'boolean',
+                'description'       => 'Indicates whether the activity requires dedicated staff to be assigned.',
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+            ],
+
+            'employee_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'hr\employee\Employee',
+                'description'       => 'The employee associated with this activity, if applicable.',
+                'visible'           => [ ['is_activity', '=', true], ['has_staff_required', '=', true] ]
             ],
 
             'is_snack' => [
