@@ -461,7 +461,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
 
     public getPossibleServiceDates(): string[] {
         const dates: string[] = [];
-        const nights_indexes = Array.from(Array(this.group.nb_nights).keys());
+        const nights_indexes = Array.from(Array(this.group.nb_nights + 1).keys());
         nights_indexes.forEach((night_index) => {
             const date = new Date(this.group.date_from.getTime() + night_index * 86400 * 1000);
             dates.push(date.toISOString().split('T')[0]);

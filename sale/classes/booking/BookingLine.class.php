@@ -1220,8 +1220,8 @@ class BookingLine extends Model {
     public static function calcServiceDate($self): array {
         $result = [];
         $self->read([
-            'booking_id'        => ['date_from'],
-            'product_model_id'  => ['type', 'service_type', 'is_repeatable', 'schedule_offset']
+            'booking_line_group_id' => ['date_from', 'date_to'],
+            'product_model_id'      => ['type', 'service_type', 'is_repeatable', 'schedule_offset']
         ]);
         foreach($self as $id => $booking_line) {
             $product_model = $booking_line['product_model_id'];
@@ -1231,7 +1231,12 @@ class BookingLine extends Model {
                 && !$product_model['is_repeatable']
             ) {
                 $offset_seconds = $product_model['schedule_offset'] * 86400;
-                $result[$id] = $booking_line['booking_id']['date_from'] + $offset_seconds;
+                $service_date = $booking_line['booking_line_group_id']['date_from'] + $offset_seconds;
+                if($service_date > $booking_line['booking_line_group_id']['date_to']) {
+                    $service_date = $booking_line['booking_line_group_id']['date_to'];
+                }
+
+                $result[$id] = $service_date;
             }
         }
 
