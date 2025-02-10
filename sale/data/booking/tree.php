@@ -141,7 +141,8 @@ $tree = [
                     'type',
                     'service_type',
                     'is_repeatable',
-                    'time_slots_ids' => ['name']
+                    'is_meal',
+                    'time_slots_ids' => ['name', 'is_meal']
                 ]
             ],
             'auto_discounts_ids' => [

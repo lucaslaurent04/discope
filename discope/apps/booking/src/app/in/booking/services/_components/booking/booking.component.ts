@@ -52,6 +52,7 @@ export class BookingServicesBookingComponent
     public ready: boolean = false;
     public loading: boolean = true;
     public maximized_group_id: number = 0;
+    public time_slots: { id: number, name: string, is_meal: boolean }[] = [];
 
     constructor(
         private dialog: MatDialog,
@@ -81,7 +82,8 @@ export class BookingServicesBookingComponent
         this.componentsMap = map;
     }
 
-    public ngOnInit() {
+    public async ngOnInit() {
+        this.time_slots = await this.api.collect('sale\\booking\\TimeSlot', [], ['id', 'name', 'is_meal']);
     }
 
     /**
