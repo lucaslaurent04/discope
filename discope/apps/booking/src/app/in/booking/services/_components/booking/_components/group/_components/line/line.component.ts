@@ -478,15 +478,15 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         let time_slot_codes: ('B'|'AM'|'L'|'PM'|'D'|'EV')[] = [];
         if(this.instance.product_id.product_model_id.is_meal) {
             // If is meal allow Breakfast, Lunch and Diner
-            time_slot_codes = ['B','D','L'];
+            time_slot_codes = ['B', 'L', 'D'];
         }
         else if(this.instance.product_id.product_model_id.is_snack) {
             // If is snack allow Morning and Afternoon
-            time_slot_codes = ['AM','PM'];
+            time_slot_codes = ['AM', 'PM'];
         }
         else {
             // Else allow Morning, Afternoon and Evening
-            time_slot_codes = ['AM','PM','EV'];
+            time_slot_codes = ['AM', 'PM', 'EV'];
         }
 
         return this.time_slots.filter((time_slot) => time_slot_codes.includes(time_slot.code));
