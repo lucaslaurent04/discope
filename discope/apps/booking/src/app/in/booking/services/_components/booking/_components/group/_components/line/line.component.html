@@ -175,26 +175,22 @@
                                 style="display: flex; align-items: center; height: 38px;">
                                 <div style="flex: 0 1 35%; display: flex; align-items: center;">
                                     <span style="text-decoration: underline"> Jour {{index + 1 + ((group.is_sojourn)?(instance.product_id?.product_model_id?.schedule_offset):0)}}</span>
-                                    <span *ngIf="instance.product_id.product_model_id.type !== 'service' || instance.product_id.product_model_id.service_type !== 'schedulable' || instance.product_id.product_model_id.is_repeatable"
+                                    <span *ngIf="instance.product_id.product_model_id.type !== 'service' || instance.product_id.product_model_id.service_type !== 'schedulable' || instance.product_id.product_model_id.is_repeatable || instance.product_id.product_model_id.has_duration"
                                           style="margin-left: 12px; width: 100px;"
                                     >
                                         ({{getOffsetDate(index + ((group.is_sojourn)?(instance.product_id?.product_model_id?.schedule_offset):0)) | date : 'EEE d LLL'}})
                                     </span>
 
-                                    <mat-form-field style="margin-left: 20px; max-width: 100px">
-                                        <mat-select *ngIf="instance.product_id.product_model_id.type === 'service' && instance.product_id.product_model_id.service_type === 'schedulable' && !instance.product_id.product_model_id.is_repeatable"
-                                                    [formControl]="vm.service_date.formControl"
-                                                    (selectionChange)="vm.service_date.change()"
-                                        >
+                                    <mat-form-field *ngIf="instance.product_id.product_model_id.type === 'service' && instance.product_id.product_model_id.service_type === 'schedulable' && !instance.product_id.product_model_id.is_repeatable && !instance.product_id.product_model_id.has_duration"
+                                                    style="margin-left: 20px; max-width: 100px">
+                                        <mat-select [formControl]="vm.service_date.formControl" (selectionChange)="vm.service_date.change()">
                                             <mat-option *ngFor="let date of getPossibleServiceDates()" [value]="date">{{ date | date:'dd/MM/YY' }}</mat-option>
                                         </mat-select>
                                     </mat-form-field>
 
-                                    <mat-form-field style="margin-left: 20px; max-width: 100px">
-                                        <mat-select *ngIf="instance.product_id.product_model_id.type === 'service' && instance.product_id.product_model_id.service_type === 'schedulable' && !instance.product_id.product_model_id.is_repeatable"
-                                                    [formControl]="vm.time_slot_id.formControl"
-                                                    (selectionChange)="vm.time_slot_id.change()"
-                                        >
+                                    <mat-form-field *ngIf="instance.product_id.product_model_id.type === 'service' && instance.product_id.product_model_id.service_type === 'schedulable' && !instance.product_id.product_model_id.is_repeatable && !instance.product_id.product_model_id.has_duration"
+                                                    style="margin-left: 20px; max-width: 100px">
+                                        <mat-select [formControl]="vm.time_slot_id.formControl" (selectionChange)="vm.time_slot_id.change()">
                                             <mat-option *ngFor="let time_slot of getPossibleTimeSlots()" [value]="time_slot.id">
                                                 {{ time_slot.name}}
                                             </mat-option>
