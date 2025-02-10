@@ -104,9 +104,6 @@ $tree = [
         'meal_preferences_ids' => [
             'type', 'pref', 'qty'
         ],
-        'age_range_assignments_ids' => [
-            'age_range_id', 'qty'
-        ],
         'booking_lines_ids' => [
             'id',
             'name',
@@ -142,7 +139,8 @@ $tree = [
                     'service_type',
                     'is_repeatable',
                     'is_meal',
-                    'time_slots_ids' => ['name', 'is_meal']
+                    'is_snack',
+                    'time_slots_ids' => ['name', 'code']
                 ]
             ],
             'auto_discounts_ids' => [

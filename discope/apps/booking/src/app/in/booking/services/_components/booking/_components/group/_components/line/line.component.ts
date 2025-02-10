@@ -67,7 +67,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
     @Input() set model(values: any) { this.update(values) }
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
-    @Input() time_slots: { id: number, name: string, is_meal: boolean }[];
+    @Input() time_slots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
 
@@ -475,15 +475,21 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
             return this.instance.product_id.product_model_id.time_slots_ids;
         }
 
-        let time_slots: { id: number, name: string }[];
+        let time_slot_codes: ('B'|'AM'|'L'|'PM'|'D'|'EV')[] = [];
         if(this.instance.product_id.product_model_id.is_meal) {
-            time_slots = this.time_slots.filter((time_slot) => time_slot.is_meal);
+            // If is meal allow Breakfast, Lunch and Diner
+            time_slot_codes = ['B','D','L'];
+        }
+        else if(this.instance.product_id.product_model_id.is_snack) {
+            // If is snack allow Morning and Afternoon
+            time_slot_codes = ['AM','PM'];
         }
         else {
-            time_slots = this.time_slots.filter((time_slot) => !time_slot.is_meal);
+            // Else allow Morning, Afternoon and Evening
+            time_slot_codes = ['AM','PM','EV'];
         }
 
-        return time_slots;
+        return this.time_slots.filter((time_slot) => time_slot_codes.includes(time_slot.code));
     }
 
     public openPriceEdition() {
