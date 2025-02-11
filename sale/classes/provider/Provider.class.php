@@ -36,7 +36,8 @@ class Provider extends \identity\Partner {
                 'result_type'       => 'string',
                 'function'          => 'calcAddress',
                 'description'       => 'Main address from related Identity.',
-                'store'             => true
+                'store'             => true,
+                'instant'           => true
             ],
 
 
@@ -45,7 +46,8 @@ class Provider extends \identity\Partner {
                 'result_type'       => 'string',
                 'description'       => 'Value Added Tax identification number, if any.',
                 'function'          => 'calcVatNumber',
-                'store'             => true
+                'store'             => true,
+                'instant'           => true
             ],
 
             'registration_number' => [
@@ -53,7 +55,8 @@ class Provider extends \identity\Partner {
                 'result_type'       => 'string',
                 'description'       => 'Organisation registration number (company number).',
                 'function'          => 'calcRegistrationNumber',
-                'store'             => true
+                'store'             => true,
+                'instant'           => true
             ],
 
             'partner_identity_id' => [
@@ -61,7 +64,8 @@ class Provider extends \identity\Partner {
                 'foreign_object'    => 'identity\Identity',
                 'description'       => 'The targeted identity (the partner).',
                 'onupdate'          => 'onupdatePartnerIdentityId',
-                'required'          => true
+                'required'          => true,
+                'instant'           => true
             ],
 
             'product_models_ids' => [

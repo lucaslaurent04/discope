@@ -240,7 +240,7 @@
             "help": "L'activité se déroule-t-elle à l'intérieur de l'entreprise ou nécessite-t-elle une externalisation ?"
         },
         "has_activity_duration": {
-            "label": "Durée spécifique de l'activité",
+            "label": "Durée spécifique?",
             "description": "Indique si l'activité a une durée spécifique.",
             "help": "L'activité a-t-elle une durée définie, par exemple, en heures ou en minutes ?"
         },
@@ -255,7 +255,7 @@
             "help": "L'activité nécessite-t-elle un transport pour les participants ? (par exemple, des bus ou des véhicules pour se déplacer)."
         },
         "transport_product_model_id": {
-            "label": "Modèle de produit de transport",
+            "label": "Produit de transport",
             "description": "Référence le modèle de produit de transport associé à l'activité.",
             "help": "Sélectionnez le modèle de produit de transport qui sera utilisé pour l'activité."
         },
@@ -274,15 +274,6 @@
             "description": "Indique si l'activité dure toute la journée. Si vrai, les assignations doivent inclure AM et PM ; sinon, l'une ou l'autre.",
             "help": "L'activité se déroule-t-elle sur toute la journée ? Si oui, il faut prévoir des assignations pour le matin (AM) et l'après-midi (PM)."
         },
-        "activity_periods": {
-            "label": "Période de l'activité",
-            "description": "Précise si l'activité a lieu le matin (AM) ou l'après-midi (PM).",
-            "selection": {
-                "AM": "Matin",
-                "PM": "Après-midi"
-            },
-            "help": "Indiquer si l'activité se déroule le matin ou l'après-midi. Si l'activité dure toute la journée, les deux périodes sont nécessaires."
-        },
         "is_billable": {
             "label": "Est facturable",
             "description": "L'activité est-elle facturable ? (génère une ligne de service lors de la facturation).",
@@ -293,10 +284,15 @@
             "description": "Indique si l'activité nécessite la présence de personnel dédié.",
             "help": "Permet de marquer si une activité requiert un personnel spécifique pour être réalisée."
         },
-        "employee_id": {
-            "label": "Employé assigné",
-            "description": "L'employé associé à cette activité, le cas échéant.",
-            "help": "Indique l'employé assigné à l'activité, si nécessaire."
+        "has_age_range": {
+            "label": "Tranche d'âge?",
+            "description": "Assigné à une tranche d'âge spécifique.",
+            "help": ""
+        },
+        "age_minimum": {
+            "label": "Âge minimum",
+            "description": "Spécifie l'âge minimum requis pour participer à l'activité.",
+            "help": ""
         }
     },
     "view": {
@@ -324,6 +320,12 @@
                 },
                 "description.receipt": {
                     "label": "Pour les achats"
+                },
+                "section.activity": {
+                    "label": "Activité"
+                },
+                "section.age-ranges": {
+                    "label": "Tranche d'âges"
                 },
                 "section.time-slots": {
                     "label": "Tranches horaires"
