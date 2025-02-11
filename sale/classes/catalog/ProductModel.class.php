@@ -146,7 +146,12 @@ class ProductModel extends Model {
                 'rel_foreign_key'   => 'time_slot_id',
                 'rel_local_key'     => 'product_model_id',
                 'description'       => "The time slots to classify when the service can take place.",
-                'visible'           => [ ['type', '=', 'service'], ['service_type', '=', 'schedulable'] ]
+                'visible'           => [
+                                         ['type', '=', 'service'],
+                                         ['service_type', '=', 'schedulable'] ,
+                                         ['is_activity', '=', true],
+                                         ['is_fullday', '=', false]
+                                        ]
             ],
 
             'tracking_type' => [
@@ -297,7 +302,7 @@ class ProductModel extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\catalog\ProductModel',
                 'description'       => 'References the transport product model associated with the activity.',
-                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_transport', '=', true] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_transport_required', '=', true] ]
             ],
 
             'has_supply' => [
@@ -344,17 +349,6 @@ class ProductModel extends Model {
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
             ],
 
-            'activity_periods' => [
-                'type'              => 'string',
-                'description'       => 'Specifies whether the activity takes place in the morning (AM), afternoon (PM).',
-                'selection'         => [
-                    'AM',
-                    'PM'
-                ],
-                'default'           => 'AM',
-                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['is_fullday' , '=' , false] ]
-            ],
-
             'is_billable' => [
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the activity is billable (generates a service line in invoicing).',
@@ -369,11 +363,28 @@ class ProductModel extends Model {
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
             ],
 
-            'employee_id' => [
-                'type'              => 'many2one',
-                'foreign_object'    => 'hr\employee\Employee',
-                'description'       => 'The employee associated with this activity, if applicable.',
-                'visible'           => [ ['is_activity', '=', true], ['has_staff_required', '=', true] ]
+            'has_age_range' => [
+                'type'              => 'boolean',
+                'description'       => "Indicates whether the product model has age-based participation restrictions.",
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+            ],
+
+            'age_minimum' => [
+                'type'              => 'integer',
+                'description'       => "Specifies the minimum age required to participate in the activity.",
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] , ['has_age_range', '=', true]]
+            ],
+
+            'age_ranges_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\customer\AgeRange',
+                'foreign_field'     => 'product_models_ids',
+                'rel_table'         => 'sale_catalog_product_model_rel_sale_customer_age_ranges',
+                'rel_foreign_key'   => 'age_range_id',
+                'rel_local_key'     => 'product_model_id',
+                'description'       => "Defines the applicable age ranges for the product model, ensuring age-specific eligibility for activities or services.",
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] , ['has_age_range', '=', true]]
             ],
 
             'is_snack' => [
