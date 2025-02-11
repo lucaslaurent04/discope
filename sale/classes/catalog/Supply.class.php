@@ -25,7 +25,7 @@ class Supply extends \sale\catalog\ProductModel{
                 'rel_table'         => 'sale_catalog_product_model_rel_sale_catalog_supplies',
                 'rel_foreign_key'   => 'product_model_id',
                 'rel_local_key'     => 'supply_id',
-                'description'       => "The product models that can be supplies."
+                'description'       => "The product models that need the supply."
             ]
 
 
