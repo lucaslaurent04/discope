@@ -325,7 +325,7 @@ class ProductModel extends Model {
 
             'has_provider' => [
                 'type'              => 'boolean',
-                'description'       => 'Indicates whether the product requires specific supplies.',
+                'description'       => 'Indicates whether the product requires specific provider.',
                 'default'           => false,
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
             ],
