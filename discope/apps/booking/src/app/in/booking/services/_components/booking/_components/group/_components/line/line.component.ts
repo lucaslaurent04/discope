@@ -455,14 +455,35 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
     }
 
     public getPossibleServiceDates(): string[] {
-        const dates: string[] = [];
         const nights_indexes = Array.from(Array(this.group.nb_nights + 1).keys());
+        if(this.instance.product_id.product_model_id.has_duration && this.instance.product_id.product_model_id.duration > 1) {
+            nights_indexes.splice(-1 * this.instance.product_id.product_model_id.duration + 1);
+        }
+
+        const dates: string[] = [];
         nights_indexes.forEach((night_index) => {
             const date = new Date(this.group.date_from.getTime() + night_index * 86400 * 1000);
             dates.push(date.toISOString().split('T')[0]);
         });
 
         return dates;
+    }
+
+    public getDateAfterServiceDate(index: number): string {
+        const date = new Date(this.instance.service_date.getTime() + index * 86400 * 1000);
+        return date.toISOString().split('T')[0];
+    }
+
+    public getTimeSlotName(): string {
+        let time_slot_name = '';
+        for(let time_slot of this.getPossibleTimeSlots()) {
+            if(this.instance.time_slot_id === time_slot.id) {
+                time_slot_name = time_slot.name;
+                break;
+            }
+        }
+
+        return time_slot_name;
     }
 
     public getPossibleTimeSlots(): { id: number, name: string }[] {

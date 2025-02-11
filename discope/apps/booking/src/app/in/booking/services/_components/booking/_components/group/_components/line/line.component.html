@@ -172,36 +172,48 @@
                     <div class="row row-thin" *ngIf="!vProduct.variations.folded">
                         <div style="width: 100%;">
                             <div *ngFor="let delta of vm.qty_vars.values | keyvalue; let index = index;"
-                                style="display: flex; align-items: center; height: 38px;">
-                                <div style="flex: 0 1 35%; display: flex; align-items: center;">
-                                    <span style="text-decoration: underline"> Jour {{index + 1 + ((group.is_sojourn)?(instance.product_id?.product_model_id?.schedule_offset):0)}}</span>
-                                    <span *ngIf="instance.product_id.product_model_id.type !== 'service' || instance.product_id.product_model_id.service_type !== 'schedulable' || instance.product_id.product_model_id.is_repeatable || instance.product_id.product_model_id.has_duration"
-                                          style="margin-left: 12px; width: 100px;"
-                                    >
+                                 style="display: flex; align-items: center; height: 38px;"
+                            >
+                                <div *ngIf="instance.product_id.product_model_id.type !== 'service' || instance.product_id.product_model_id.service_type !== 'schedulable' || instance.product_id.product_model_id.is_repeatable"
+                                     style="flex: 0 1 35%; display: flex; align-items: center;"
+                                >
+                                    <span style="text-decoration: underline">
+                                        Jour {{index + 1 + ((group.is_sojourn)?(instance.product_id?.product_model_id?.schedule_offset):0)}}
+                                    </span>
+                                    <span style="margin-left: 12px; width: 100px;">
                                         ({{getOffsetDate(index + ((group.is_sojourn)?(instance.product_id?.product_model_id?.schedule_offset):0)) | date : 'EEE d LLL'}})
                                     </span>
+                                </div>
 
-                                    <mat-form-field *ngIf="instance.product_id.product_model_id.type === 'service' && instance.product_id.product_model_id.service_type === 'schedulable' && !instance.product_id.product_model_id.is_repeatable && !instance.product_id.product_model_id.has_duration"
-                                                    style="margin-left: 20px; max-width: 100px">
+                                <div *ngIf="instance.product_id.product_model_id.type === 'service' && instance.product_id.product_model_id.service_type === 'schedulable' && !instance.product_id.product_model_id.is_repeatable"
+                                     style="flex: 0 1 35%; display: flex; align-items: center;"
+                                >
+                                    <mat-form-field *ngIf="index === 0" style="max-width: 100px">
                                         <mat-select [formControl]="vm.service_date.formControl" (selectionChange)="vm.service_date.change()">
                                             <mat-option *ngFor="let date of getPossibleServiceDates()" [value]="date">{{ date | date:'dd/MM/YY' }}</mat-option>
                                         </mat-select>
                                     </mat-form-field>
+                                    <div *ngIf="index > 0" style="width: 100px">
+                                        {{getDateAfterServiceDate(index) | date:'dd/MM/YY'}}
+                                    </div>
 
-                                    <mat-form-field *ngIf="instance.product_id.product_model_id.type === 'service' && instance.product_id.product_model_id.service_type === 'schedulable' && !instance.product_id.product_model_id.is_repeatable && !instance.product_id.product_model_id.has_duration"
-                                                    style="margin-left: 20px; max-width: 100px">
+                                    <mat-form-field *ngIf="index === 0" style="margin-left: 20px; max-width: 100px">
                                         <mat-select [formControl]="vm.time_slot_id.formControl" (selectionChange)="vm.time_slot_id.change()">
                                             <mat-option *ngFor="let time_slot of getPossibleTimeSlots()" [value]="time_slot.id">
                                                 {{ time_slot.name}}
                                             </mat-option>
                                         </mat-select>
                                     </mat-form-field>
+                                    <div *ngIf="index > 0" style="margin-left: 20px; width: 100px;">
+                                        {{getTimeSlotName()}}
+                                    </div>
                                 </div>
+
                                 <div style="width: 65px; margin-left: 24px;">
                                     <mat-form-field>
                                         <input style="text-align: right;" matInput type="number" min="0"
-                                            [ngModel]="calcQtyVar(index)"
-                                            (blur)="vm.qty_vars.change(index, $event)">
+                                               [ngModel]="calcQtyVar(index)"
+                                               (blur)="vm.qty_vars.change(index, $event)">
                                     </mat-form-field>
                                 </div>
                             </div>
