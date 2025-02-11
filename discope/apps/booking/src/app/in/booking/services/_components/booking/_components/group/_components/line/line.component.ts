@@ -364,19 +364,14 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
     }
 
     private async qtyVarsReset() {
+        let qty_vars_qty = this.group.nb_nights;
         const product_model = this.instance.product_id.product_model_id;
+        if(product_model.type === 'service' && product_model.service_type === 'schedulable' && !product_model.is_repeatable) {
+            qty_vars_qty = product_model.has_duration ? product_model.duration : 1;
+        }
 
-        if(
-            product_model.type === 'service'
-            && product_model.service_type === 'schedulable'
-            && !product_model.is_repeatable
-        ) {
-            this.vm.qty_vars.values = [0];
-        }
-        else {
-            this.vm.qty_vars.values = new Array(this.group.nb_nights);
-            this.vm.qty_vars.values.fill(0);
-        }
+        this.vm.qty_vars.values = new Array(qty_vars_qty);
+        this.vm.qty_vars.values.fill(0);
 
         let qty_vars = JSON.stringify(Object.values(this.vm.qty_vars.values));
         // notify back-end about the change
