@@ -349,6 +349,7 @@ class Consumption extends Model {
             $moments = $om->read('sale\booking\TimeSlot', $moments_ids, ['schedule_from', 'schedule_to', 'is_meal']);
             foreach($consumptions as $cid => $consumption) {
                 if(isset($consumption['time_slot_id'])) {
+                    // Ignore update of schedule_from and schedule_to if already set, because it could've been already set from origin booking_line_group.
                     continue;
                 }
                 // retrieve timeslot according to schedule_from
