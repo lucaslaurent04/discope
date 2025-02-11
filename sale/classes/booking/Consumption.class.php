@@ -343,12 +343,14 @@ class Consumption extends Model {
      * #todo - make this method private (cannot while called through callonce)
      */
     public static function updateTimeSlotId($om, $oids, $values, $lang) {
-        $consumptions = $om->read(self::getType(), $oids, ['schedule_from', 'schedule_to', 'is_meal']);
+        $consumptions = $om->read(self::getType(), $oids, ['schedule_from', 'schedule_to', 'is_meal', 'time_slot_id']);
         if($consumptions > 0) {
             $moments_ids = $om->search('sale\booking\TimeSlot', [], ['order' => 'asc']);
             $moments = $om->read('sale\booking\TimeSlot', $moments_ids, ['schedule_from', 'schedule_to', 'is_meal']);
             foreach($consumptions as $cid => $consumption) {
-                // #todo - use timeslot_id if available in product model
+                if(isset($consumption['time_slot_id'])) {
+                    continue;
+                }
                 // retrieve timeslot according to schedule_from
                 $moment_id = 1;
                 foreach($moments as $mid => $moment) {
