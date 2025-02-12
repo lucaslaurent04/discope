@@ -24,13 +24,6 @@ class Provider extends \identity\Partner {
                 'description'       => 'Force relationship to Provider.'
             ],
 
-            'type_id' => [
-                'type'              => 'many2one',
-                'foreign_object'    => 'identity\IdentityType',
-                'default'           => 3,
-                'description'       => 'Type of identity.',
-            ],
-
             'address' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
