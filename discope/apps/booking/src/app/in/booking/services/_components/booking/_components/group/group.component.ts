@@ -96,6 +96,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     // server-model relayed by parent
     @Input() set model(values: any) { this.update(values) }
     @Input() booking: Booking;
+    @Input() time_slots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
     @Output() toggle  = new EventEmitter();

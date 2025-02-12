@@ -2120,6 +2120,8 @@ class BookingLineGroup extends Model {
                     'product_id',
                     'qty',
                     'qty_vars',
+                    'service_date',
+                    'time_slot_id',
                     'product_id.product_model_id',
                     'product_id.has_age_range',
                     'product_id.age_range_id'
@@ -2209,7 +2211,9 @@ class BookingLineGroup extends Model {
                             $nb_products = $product_models[$line['product_id.product_model_id']]['duration'];
                         }
 
-                        list($day, $month, $year) = [ date('j', $group['date_from']), date('n', $group['date_from']), date('Y', $group['date_from']) ];
+                        $date_from = $line['service_date'] ?? $group['date_from'];
+
+                        list($day, $month, $year) = [ date('j', $date_from), date('n', $date_from), date('Y', $date_from) ];
                         // fetch the offset, in days, for the scheduling (only applies on sojourns)
                         $offset = ($group['is_sojourn']) ? $product_models[$line['product_id.product_model_id']]['schedule_offset'] : 0;
 
@@ -2235,6 +2239,7 @@ class BookingLineGroup extends Model {
                         // $nb_products represent each day of the stay
                         for($i = 0; $i < $nb_products; ++$i) {
                             $c_date = mktime(0, 0, 0, $month, $day+$i+$offset, $year);
+                            $c_time_slot_id = $line['time_slot_id'];
                             $c_schedule_from = $schedule_from;
                             $c_schedule_to = $schedule_to;
 
@@ -2251,6 +2256,7 @@ class BookingLineGroup extends Model {
                                 'booking_line_id'       => $lid,
                                 'center_id'             => $group['booking_id.center_id'],
                                 'date'                  => $c_date,
+                                'time_slot_id'          => $c_time_slot_id,
                                 'schedule_from'         => $c_schedule_from,
                                 'schedule_to'           => $c_schedule_to,
                                 'product_model_id'      => $line['product_id.product_model_id'],
