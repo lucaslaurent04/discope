@@ -73,33 +73,39 @@ class Provider extends \identity\Partner {
         ];
     }
 
-    public static function calcAddress($om, $oids, $lang) {
+    public static function calcAddress($self) {
         $result = [];
-
-        $providers = $om->read(__CLASS__, $oids, ['partner_identity_id.address_street', 'partner_identity_id.address_city'], $lang);
-        foreach($providers as $oid => $provider) {
-            $result[$oid] = "{$provider['partner_identity_id.address_street']} {$provider['partner_identity_id.address_city']}";
+        $self->read(['partner_identity_id' => ['address_street', 'address_city']]);
+        foreach($self as $id => $provider) {
+            if(isset($provider['partner_identity_id']['address_street'], $provider['partner_identity_id']['address_city'])) {
+                $result[$id] = "{$provider['partner_identity_id']['address_street']} ${$provider['partner_identity_id']['address_city']}";
+            }
         }
+
         return $result;
     }
 
-    public static function calcVatNumber($om, $oids, $lang) {
+    public static function calcVatNumber($self) {
         $result = [];
-
-        $providers = $om->read(__CLASS__, $oids, ['partner_identity_id.vat_number'], $lang);
-        foreach($providers as $oid => $provider) {
-            $result[$oid] = "{$provider['partner_identity_id.vat_number']}";
+        $self->read(['partner_identity_id' => ['vat_number']]);
+        foreach($self as $id => $provider) {
+            if(isset($provider['partner_identity_id']['vat_number'])) {
+                $result[$id] = $provider['partner_identity_id']['vat_number'];
+            }
         }
+
         return $result;
     }
 
-    public static function calcRegistrationNumber($om, $oids, $lang) {
+    public static function calcRegistrationNumber($self) {
         $result = [];
-
-        $providers = $om->read(__CLASS__, $oids, ['partner_identity_id.registration_number'], $lang);
-        foreach($providers as $oid => $provider) {
-            $result[$oid] = "{$provider['partner_identity_id.registration_number']}";
+        $self->read(['partner_identity_id' => ['registration_number']]);
+        foreach($self as $id => $provider) {
+            if(isset($provider['partner_identity_id']['registration_number'])) {
+                $result[$id] = $provider['partner_identity_id']['registration_number'];
+            }
         }
+
         return $result;
     }
 }
