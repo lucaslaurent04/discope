@@ -5,8 +5,8 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-namespace sale\provider;
 
+namespace sale\provider;
 
 class Provider extends \identity\Partner {
 
@@ -15,7 +15,6 @@ class Provider extends \identity\Partner {
     }
 
     public static function getColumns() {
-
         return [
 
             'relationship' => [
@@ -68,16 +67,12 @@ class Provider extends \identity\Partner {
                 'rel_table'         => 'sale_catalog_product_model_rel_sale_provider_providers',
                 'rel_foreign_key'   => 'product_model_id',
                 'rel_local_key'     => 'provider_id',
-                'description'       => "The product models that can be reauired providers.",
+                'description'       => "The product models that can be required providers.",
             ]
+
         ];
     }
 
-
-    /**
-     * Computes the number of bookings made by the provider during the last two years.
-     *
-     */
     public static function calcAddress($om, $oids, $lang) {
         $result = [];
 
@@ -107,6 +102,4 @@ class Provider extends \identity\Partner {
         }
         return $result;
     }
-
-
 }
