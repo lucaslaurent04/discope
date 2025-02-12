@@ -61,8 +61,17 @@ class AgeRange extends Model {
                 'rel_foreign_key'   => 'discount_id',
                 'rel_local_key'     => 'age_range_id',
                 'description'       => 'The conditions that apply to the discount.'
-            ]
+            ],
 
+            'product_models_ids' => [
+                'type'            => 'many2many',
+                'foreign_object'  => 'sale\catalog\ProductModel',
+                'foreign_field'   => 'age_ranges_ids',
+                'rel_table'       => 'sale_catalog_product_model_rel_sale_customer_age_ranges',
+                'rel_foreign_key' => 'product_model_id',
+                'rel_local_key'   => 'age_range_id',
+                'description'     => "Specifies the product models associated with particular age ranges, which may influence applicable discounts or eligibility conditions."
+            ]
         ];
     }
 
