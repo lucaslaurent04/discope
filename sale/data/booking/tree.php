@@ -140,6 +140,7 @@ $tree = [
                     'is_repeatable',
                     'is_meal',
                     'is_snack',
+                    'is_fullday',
                     'time_slots_ids' => ['name', 'code']
                 ]
             ],
