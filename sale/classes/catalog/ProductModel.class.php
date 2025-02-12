@@ -410,19 +410,14 @@ class ProductModel extends Model {
                 'type'              => 'boolean',
                 'description'       => 'Does the product have a specific duration.',
                 'default'           => false,
-                'visible'           => [
-                                            [ ['type', '=', 'service'], ['is_snack', '=', true ]],
-                                            [ ['type', '=', 'service'], ['is_meal', '=', true ]],
-                                            [ ['type', '=', 'service'], ['is_accomodation', '=', true ]],
-                                            [ ['type', '=', 'service'], ['is_rental_unit', '=', true ]],
-                                     ]
+                'visible'           => ['type', '=', 'service']
             ],
 
             'duration' => [
                 'type'              => 'integer',
                 'description'       => 'Duration of the service (in days), used for planning.',
                 'default'           => 1,
-                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', false ], ['has_duration', '=', true] ]
+                'visible'           => [ ['type', '=', 'service'], ['has_duration', '=', true] ]
             ],
 
             'capacity' => [
