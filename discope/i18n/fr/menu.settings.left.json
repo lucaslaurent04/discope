@@ -38,6 +38,14 @@
             "label": "Tour Opérateurs",
             "help": ""
         },
+        "sales.providers": {
+            "label": "Prestaires",
+            "help": ""
+        },
+        "sales.providers.all": {
+            "label": "Tous les Prestaires",
+            "help": ""
+        },
         "sales.customers": {
             "label": "Clients",
             "help": ""
