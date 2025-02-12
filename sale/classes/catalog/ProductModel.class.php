@@ -341,7 +341,6 @@ class ProductModel extends Model {
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_provider', '=', true] ]
             ],
 
-
             'is_fullday' => [
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the animation lasts the full day. If true, assignments must include both AM and PM; otherwise, only one of them.',
