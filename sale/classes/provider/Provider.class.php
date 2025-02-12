@@ -28,18 +28,15 @@ class Provider extends \identity\Partner {
                 'result_type'       => 'string',
                 'function'          => 'calcAddress',
                 'description'       => 'Main address from related Identity.',
-                'store'             => true,
-                'instant'           => true
+                'store'             => true
             ],
-
 
             'vat_number' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
                 'description'       => 'Value Added Tax identification number, if any.',
                 'function'          => 'calcVatNumber',
-                'store'             => true,
-                'instant'           => true
+                'store'             => true
             ],
 
             'registration_number' => [
@@ -47,8 +44,7 @@ class Provider extends \identity\Partner {
                 'result_type'       => 'string',
                 'description'       => 'Organisation registration number (company number).',
                 'function'          => 'calcRegistrationNumber',
-                'store'             => true,
-                'instant'           => true
+                'store'             => true
             ],
 
             'partner_identity_id' => [
@@ -57,7 +53,7 @@ class Provider extends \identity\Partner {
                 'description'       => 'The targeted identity (the partner).',
                 'onupdate'          => 'onupdatePartnerIdentityId',
                 'required'          => true,
-                'instant'           => true
+                'dependencies'      => ['address', 'vat_number', 'registration_number']
             ],
 
             'product_models_ids' => [
@@ -67,7 +63,7 @@ class Provider extends \identity\Partner {
                 'rel_table'         => 'sale_catalog_product_model_rel_sale_provider_providers',
                 'rel_foreign_key'   => 'product_model_id',
                 'rel_local_key'     => 'provider_id',
-                'description'       => "The product models that can be required providers.",
+                'description'       => "The product models that can be required providers."
             ]
 
         ];
@@ -78,7 +74,7 @@ class Provider extends \identity\Partner {
         $self->read(['partner_identity_id' => ['address_street', 'address_city']]);
         foreach($self as $id => $provider) {
             if(isset($provider['partner_identity_id']['address_street'], $provider['partner_identity_id']['address_city'])) {
-                $result[$id] = "{$provider['partner_identity_id']['address_street']} ${$provider['partner_identity_id']['address_city']}";
+                $result[$id] = "{$provider['partner_identity_id']['address_street']}, {$provider['partner_identity_id']['address_city']}";
             }
         }
 
