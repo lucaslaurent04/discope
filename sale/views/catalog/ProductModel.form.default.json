@@ -2,8 +2,11 @@
     "name": "Product Model",
     "description": "Product Models act as common denominator for products variants (referred to as \"Products\").",
     "access": {
-        "groups": ["pos.default.user", "sale.default.user"]
-     },
+        "groups": [
+            "pos.default.user",
+            "sale.default.user"
+        ]
+    },
     "layout": {
         "groups": [
             {
@@ -91,6 +94,11 @@
                                                 "type": "field",
                                                 "value": "schedule_offset",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_repeatable",
+                                                "width": "50%"
                                             }
                                         ]
                                     }
@@ -154,18 +162,28 @@
                                             {
                                                 "type": "field",
                                                 "value": "is_meal",
-                                                "width": "100%"
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "is_snack",
-                                                "width": "100%",
+                                                "width": "50%",
                                                 "sortable": true
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "is_accomodation",
-                                                "width": "100%"
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_transport",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_activity",
+                                                "width": "50%"
                                             }
                                         ]
                                     },
@@ -180,11 +198,6 @@
                                             {
                                                 "type": "field",
                                                 "value": "duration",
-                                                "width": "100%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "is_repeatable",
                                                 "width": "100%"
                                             }
                                         ]
@@ -228,6 +241,157 @@
                                                 "type": "field",
                                                 "value": "description_receipt",
                                                 "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Activity",
+                        "id": "section.activity",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "33%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "is_billable",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "activity_scope",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_staff_required",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_activity_duration",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "activity_duration",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_transport_required",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "transport_product_model_id",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "33%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "has_age_range",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "age_minimum",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "age_ranges_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.activity",
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.ADD": true,
+                                                            "ACTION.DELETE" :true
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_fullday",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "time_slots_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.activity",
+                                                    "header": {
+                                                        "selection": {
+                                                            "default": false
+                                                        },
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.ADD": true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "33%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "has_provider",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "providers_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.activity",
+                                                    "header": {
+                                                        "selection": {
+                                                            "default": false
+                                                        },
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.ADD": true
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_supply",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "supplies_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.activity",
+                                                    "header": {
+                                                        "selection": {
+                                                            "default": false
+                                                        },
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.ADD": true
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
@@ -288,33 +452,6 @@
                                                 "type": "field",
                                                 "value": "categories_ids",
                                                 "width": "100%"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "label": "Time slots",
-                        "id": "section.time-slots",
-                        "rows": [
-                            {
-                                "columns": [
-                                    {
-                                        "width": "100%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "time_slots_ids",
-                                                "width": "100%",
-                                                "widget": {
-                                                    "header": {
-                                                        "actions": {
-                                                            "ACTION.CREATE": false
-                                                        }
-                                                    }
-                                                }
                                             }
                                         ]
                                     }
