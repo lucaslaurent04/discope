@@ -139,9 +139,26 @@
                     <mat-hint>Texte descriptif de remplacement (facultatif)</mat-hint>
                 </mat-form-field>
                 <div *ngIf="instance.product_id.product_model_id.type === 'service' && instance.product_id.product_model_id.service_type === 'schedulable' && !instance.product_id.product_model_id.is_repeatable"
-                     style="margin-top: 20px"
+                     style="margin-top: 20px; display: flex; align-items: center;"
                 >
-                    Date: <i>{{instance.service_date | date:'dd/MM/YY'}}</i>
+                    <div style="width: 50px">
+                        Date:
+                    </div>
+                    <mat-form-field style="max-width: 100px">
+                        <mat-select [formControl]="vm.service_date.formControl" (selectionChange)="vm.service_date.change()">
+                            <mat-option *ngFor="let date of getPossibleServiceDates()" [value]="date">{{ date | date:'dd/MM/YY' }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field *ngIf="!instance.product_id.product_model_id.is_fullday" style="margin-left: 20px; max-width: 100px">
+                        <mat-select [formControl]="vm.time_slot_id.formControl" (selectionChange)="vm.time_slot_id.change()">
+                            <mat-option *ngFor="let time_slot of getPossibleTimeSlots()" [value]="time_slot.id">
+                                {{ time_slot.name}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <div *ngIf="instance.product_id.product_model_id.is_fullday" style="margin-left: 20px; width: 100px">
+                        Journée entière
+                    </div>
                 </div>
             </div>
         </div>
@@ -189,34 +206,19 @@
                                         ({{getOffsetDate(index + ((group.is_sojourn)?(instance.product_id?.product_model_id?.schedule_offset):0)) | date : 'EEE d LLL'}})
                                     </span>
                                 </div>
-
                                 <div *ngIf="instance.product_id.product_model_id.type === 'service' && instance.product_id.product_model_id.service_type === 'schedulable' && !instance.product_id.product_model_id.is_repeatable"
                                      style="flex: 0 1 35%; display: flex; align-items: center;"
                                 >
-                                    <mat-form-field *ngIf="index === 0" style="max-width: 100px">
-                                        <mat-select [formControl]="vm.service_date.formControl" (selectionChange)="vm.service_date.change()">
-                                            <mat-option *ngFor="let date of getPossibleServiceDates()" [value]="date">{{ date | date:'dd/MM/YY' }}</mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
-                                    <div *ngIf="index > 0" style="width: 100px">
+                                    <div style="width: 100px">
                                         {{getDateAfterServiceDate(index) | date:'dd/MM/YY'}}
                                     </div>
-
-                                    <mat-form-field *ngIf="index === 0 && !instance.product_id.product_model_id.is_fullday" style="margin-left: 20px; max-width: 100px">
-                                        <mat-select [formControl]="vm.time_slot_id.formControl" (selectionChange)="vm.time_slot_id.change()">
-                                            <mat-option *ngFor="let time_slot of getPossibleTimeSlots()" [value]="time_slot.id">
-                                                {{ time_slot.name}}
-                                            </mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
-                                    <div *ngIf="index > 0 && !instance.product_id.product_model_id.is_fullday" style="margin-left: 20px; width: 100px;">
+                                    <div *ngIf="!instance.product_id.product_model_id.is_fullday" style="margin-left: 20px; width: 100px;">
                                         {{getTimeSlotName()}}
                                     </div>
                                     <div *ngIf="instance.product_id.product_model_id.is_fullday" style="margin-left: 20px; width: 100px;">
                                         Journée complète
                                     </div>
                                 </div>
-
                                 <div style="width: 65px; margin-left: 24px;">
                                     <mat-form-field>
                                         <input style="text-align: right;" matInput type="number" min="0"
