@@ -1,9 +1,10 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2025
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace hr\employee;
 
 class Employee extends \identity\Partner {
@@ -17,7 +18,6 @@ class Employee extends \identity\Partner {
     }
 
     public static function getColumns() {
-
         return [
 
             'role_id' => [
@@ -57,6 +57,15 @@ class Employee extends \identity\Partner {
                 'foreign_object'    => 'hr\absence\Absence',
                 'foreign_field'     => 'employee_id',
                 'description'       => 'Absences relating to the employee.',
+            ],
+
+            'consumptions_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\booking\Consumption',
+                'foreign_field'     => 'employees_ids',
+                'rel_table'         => 'sale_booking_consumption_rel_hr_employee',
+                'rel_foreign_key'   => 'consumption_id',
+                'rel_local_key'     => 'employee_id'
             ]
 
         ];
@@ -67,5 +76,4 @@ class Employee extends \identity\Partner {
             ['owner_identity_id', 'partner_identity_id', 'role_id']
         ];
     }
-
 }

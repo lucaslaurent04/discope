@@ -2065,6 +2065,10 @@ class BookingLineGroup extends Model {
                                     'is_rental_unit'        => true,
                                     'is_accomodation'       => $spm['product_model_id.is_accomodation'],
                                     'is_meal'               => false,
+                                    'is_activity'           => false,
+                                    'has_provider'          => false,
+                                    'activity_provider_id'  => null,
+                                    'has_staff_required'    => false,
                                     'rental_unit_id'        => $rental_unit_id,
                                     'qty'                   => $assignment['qty'],
                                     'type'                  => 'book'
@@ -2113,7 +2117,7 @@ class BookingLineGroup extends Model {
                 }
             }
 
-            // pass-2 : create consumptions for booking lines targeting non-rental_unit products (any other schedulable product, e.g. meals)
+            // pass-2 : create consumptions for booking lines targeting non-rental_unit products (any other schedulable product, e.g. meals or activity)
             foreach($groups as $gid => $group) {
 
                 $lines = $om->read(\sale\booking\BookingLine::getType(), $group['booking_lines_ids'], [
@@ -2124,7 +2128,10 @@ class BookingLineGroup extends Model {
                     'time_slot_id',
                     'product_id.product_model_id',
                     'product_id.has_age_range',
-                    'product_id.age_range_id'
+                    'product_id.age_range_id',
+                    'product_id.description',
+                    'time_slot_id.schedule_from',
+                    'time_slot_id.schedule_to',
                 ],
                     $lang);
 
@@ -2145,7 +2152,11 @@ class BookingLineGroup extends Model {
                         'is_accomodation',
                         'is_meal',
                         'is_snack',
-                        'is_repeatable'
+                        'is_repeatable',
+                        'is_activity',
+                        'has_provider',
+                        'providers_ids',
+                        'has_staff_required'
                     ]);
 
                     // create consumptions according to each line product and quantity
@@ -2169,22 +2180,34 @@ class BookingLineGroup extends Model {
                         }
 
                         // retrieve default time for consumption
-                        // #todo - improve by using time_slot_id
-                        list($hour_from, $minute_from, $hour_to, $minute_to) = [12, 0, 13, 0];
-                        $schedule_default_value = $product_models[$line['product_id.product_model_id']]['schedule_default_value'];
-                        if(strpos($schedule_default_value, ':')) {
-                            $parts = explode('-', $schedule_default_value);
-                            list($hour_from, $minute_from) = explode(':', $parts[0]);
-                            list($hour_to, $minute_to) = [$hour_from+1, $minute_from];
-                            if(count($parts) > 1) {
-                                list($hour_to, $minute_to) = explode(':', $parts[1]);
+                        if(!isset($line['time_slot_id'])) {
+                            list($hour_from, $minute_from, $hour_to, $minute_to) = [12, 0, 13, 0];
+                            $schedule_default_value = $product_models[$line['product_id.product_model_id']]['schedule_default_value'];
+                            if(strpos($schedule_default_value, ':')) {
+                                $parts = explode('-', $schedule_default_value);
+                                list($hour_from, $minute_from) = explode(':', $parts[0]);
+                                list($hour_to, $minute_to) = [$hour_from+1, $minute_from];
+                                if(count($parts) > 1) {
+                                    list($hour_to, $minute_to) = explode(':', $parts[1]);
+                                }
                             }
+                            $schedule_from  = $hour_from * 3600 + $minute_from * 60;
+                            $schedule_to    = $hour_to * 3600 + $minute_to * 60;
                         }
-                        $schedule_from  = $hour_from * 3600 + $minute_from * 60;
-                        $schedule_to    = $hour_to * 3600 + $minute_to * 60;
+                        else {
+                            $schedule_from  = $line['time_slot_id.schedule_from'];
+                            $schedule_to    = $line['time_slot_id.schedule_to'];
+                        }
 
                         $is_meal = $product_models[$line['product_id.product_model_id']]['is_meal'];
                         $is_snack = $product_models[$line['product_id.product_model_id']]['is_snack'];
+                        $is_activity = $product_models[$line['product_id.product_model_id']]['is_activity'];
+                        $has_provider = $product_models[$line['product_id.product_model_id']]['has_provider'];
+                        $activity_provider_id = null;
+                        if(count($product_models[$line['product_id.product_model_id']]['providers_ids']) === 1) {
+                            $activity_provider_id = $product_models[$line['product_id.product_model_id']]['providers_ids'][0];
+                        }
+                        $has_staff_required = $product_models[$line['product_id.product_model_id']]['has_staff_required'];
                         $qty_accounting_method = $product_models[$line['product_id.product_model_id']]['qty_accounting_method'];
 
                         // #memo - number of consumptions differs for accommodations (rooms are occupied nb_nights + 1, until sometime in the morning)
@@ -2265,6 +2288,10 @@ class BookingLineGroup extends Model {
                                 'is_accomodation'       => false,
                                 'is_meal'               => $is_meal,
                                 'is_snack'              => $is_snack,
+                                'is_activity'           => $is_activity,
+                                'has_provider'          => $has_provider,
+                                'activity_provider_id'  => $activity_provider_id,
+                                'has_staff_required'    => $has_staff_required,
                                 'qty'                   => $days_nb_times[$i],
                                 'type'                  => 'book'
                             ];
@@ -2283,6 +2310,9 @@ class BookingLineGroup extends Model {
                                     $description .= "<p>{$type} / {$pref} : {$preference['qty']} ; </p>";
                                 }
                                 $consumption['description'] = $description;
+                            }
+                            elseif($is_activity) {
+                                $consumption['description'] = $line['product_id.description'];
                             }
                             $consumptions[] = $consumption;
                         }
