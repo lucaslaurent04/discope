@@ -16,7 +16,7 @@ class Consumption extends Model {
     }
 
     public static function getDescription() {
-        return "A Consumption is a service delivery that can be scheduled, relates to a booking, and is independant from the fare rate and the invoicing.";
+        return "A Consumption is a service delivery that can be scheduled, relates to a booking, and is independent from the fare rate and the invoicing.";
     }
 
     public static function getColumns() {
@@ -158,7 +158,7 @@ class Consumption extends Model {
 
             'disclaimed' => [
                 'type'              => 'boolean',
-                'description'       => 'Delivery is planed by the customer has explicitely renounced to it.',
+                'description'       => 'Delivery is planed by the customer has explicitly renounced to it.',
                 'default'           => false
             ],
 
@@ -202,6 +202,46 @@ class Consumption extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\AgeRange',
                 'description'       => 'Customers age range the product is intended for.'
+            ],
+
+            'is_activity' => [
+                'type'              => 'boolean',
+                'description'       => 'Does the consumption relate to an activity?',
+                'help'              => 'Need to be linked to an activity provider.',
+                'default'           => false
+            ],
+
+            'has_provider' => [
+                'type'              => 'boolean',
+                'description'       => "Indicates whether the consumption requires a specific provider.",
+                'default'           => false,
+                'visible'           => ['is_activity', '=', true]
+            ],
+
+            'activity_provider_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\provider\Provider',
+                'description'       => "The activity provider the consumption is assigned to.",
+                'visible'           => [ ['is_activity', '=', true], ['has_provider', '=', true] ]
+            ],
+
+            'has_staff_required' => [
+                'type'              => 'boolean',
+                'description'       => "Indicates whether the activity requires dedicated staff to be assigned.",
+                'default'           => false,
+                'visible'           => ['is_activity', '=', true]
+            ],
+
+            'employees_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'hr\employee\Employee',
+                'foreign_field'     => 'consumptions_ids',
+                'rel_table'         => 'sale_booking_consumption_rel_hr_employee',
+                'rel_foreign_key'   => 'employee_id',
+                'rel_local_key'     => 'consumption_id',
+                'description'       => "The staff members that may need to attend the group during the activity.",
+                'help'              => "In most cases there should be only one employee selected when activity take place.",
+                'visible'           => [ ['is_activity', '=', true], ['has_staff_required', '=', true] ]
             ]
 
         ];
