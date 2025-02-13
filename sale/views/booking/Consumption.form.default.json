@@ -74,8 +74,30 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "description",
-                                                "width": "100%"
+                                                "value": "is_activity",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_staff_required",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_provider",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "value",
+                                                "value": "",
+                                                "width": "66%",
+                                                "visible": ["has_provider", "=", true]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "activity_provider_id",
+                                                "width": "33%",
+                                                "visible": ["has_provider", "=", true]
                                             }
                                         ]
                                     },
@@ -96,22 +118,79 @@
                                             {
                                                 "type": "field",
                                                 "value": "date",
-                                                "width": "33%"
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "time_slot_id",
+                                                "width": "25%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "schedule_from",
-                                                "width": "33%"
+                                                "width": "25%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "schedule_to",
-                                                "width": "33%"
+                                                "width": "25%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "qty",
                                                 "width": "25%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "sections": [
+                    {
+                        "id": "section.description",
+                        "label": "Description",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "description",
+                                                "width": "50%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.employees",
+                        "label": "Employés responsables",
+                        "visible": ["has_staff_required", "=", true],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "employees_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }

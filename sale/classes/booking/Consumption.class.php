@@ -145,7 +145,8 @@ class Consumption extends Model {
             'is_rental_unit' => [
                 'type'              => 'boolean',
                 'description'       => 'Does the consumption relate to a rental unit?',
-                'default'           => false
+                'default'           => false,
+                'visible'           => ['is_activity', '=', false]
             ],
 
             'rental_unit_id' => [
@@ -153,7 +154,8 @@ class Consumption extends Model {
                 'foreign_object'    => 'realestate\RentalUnit',
                 'description'       => "The rental unit the consumption is assigned to.",
                 'readonly'          => true,
-                'onupdate'          => 'onupdateRentalUnitId'
+                'onupdate'          => 'onupdateRentalUnitId',
+                'visible'           => ['is_rental_unit', '=', true]
             ],
 
             'disclaimed' => [
@@ -208,7 +210,8 @@ class Consumption extends Model {
                 'type'              => 'boolean',
                 'description'       => 'Does the consumption relate to an activity?',
                 'help'              => 'Need to be linked to an activity provider.',
-                'default'           => false
+                'default'           => false,
+                'visible'           => ['is_rental_unit', '=', false]
             ],
 
             'has_provider' => [
