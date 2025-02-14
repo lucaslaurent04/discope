@@ -7,7 +7,7 @@
         </div>
 
         <div class="inner-wrapper" *ngIf="instance.booking_lines_groups_ids.length">
-            <div class="groups-list">
+            <div class="groups-list" cdkDropList (cdkDropListDropped)="ondropGroup($event)">
                 <!-- groups -->
                 <ng-container *ngFor="let group of instance.booking_lines_groups_ids;">
                     <div class="group-item"

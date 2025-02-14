@@ -71,6 +71,10 @@
                         }
 
                         .group-handle {
+                            cursor: move;
+                            cursor: grab;
+                            cursor: -moz-grab;
+                            cursor: -webkit-grab;
                             flex: 0 0 30px;
                             width: 30px;
                             transform: translateX(4px) translateY(14px);

@@ -1,8 +1,10 @@
 import { AfterViewInit, Component, Input, OnChanges, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { Booking } from '../../../services/_components/booking/_models/booking.model';
 import { ApiService, TreeComponent, RootTreeComponent } from 'sb-shared-lib';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { BookingActivitiesBookingGroupComponent } from './_components/group/group.component';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { BookingLineGroup } from '../../../services/_components/booking/_models/booking_line_group.model';
 
 // declaration of the interface for the map associating relational Model fields with their components
 interface BookingComponentsMap {
@@ -92,6 +94,15 @@ export class BookingActivitiesBookingComponent
                         window.location.href = '/auth';
                     }
                 });
+        }
+    }
+
+    public ondropGroup(event:CdkDragDrop<any>) {
+        moveItemInArray(this.instance.booking_lines_groups_ids, event.previousIndex, event.currentIndex);
+        for(let i = Math.min(event.previousIndex, event.currentIndex), n = Math.max(event.previousIndex, event.currentIndex); i <= n; ++i) {
+            // #todo #refresh
+            this.api.update((new BookingLineGroup()).entity, [this.instance.booking_lines_groups_ids[i].id], {order: i+1})
+                .catch(response => this.api.errorFeedback(response));
         }
     }
 }
