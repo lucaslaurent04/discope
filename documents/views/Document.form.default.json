@@ -63,7 +63,12 @@
                                             {
                                                 "type": "field",
                                                  "value": "public",
-                                                 "width": "10%"
+                                                 "width": "30%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                 "value": "identity_id",
+                                                 "width": "30%"
                                             }
                                         ]
                                     }
