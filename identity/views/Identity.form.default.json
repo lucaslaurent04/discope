@@ -304,6 +304,11 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "value": "document_id",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "flag_latepayer",
                                                 "width": "100%"
                                             },
