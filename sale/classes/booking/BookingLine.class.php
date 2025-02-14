@@ -265,6 +265,51 @@ class BookingLine extends Model {
                 'store'             => true
             ],
 
+            'is_activity' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => 'Line relates to an activity (from product_model).',
+                'function'          => 'calcIsActivity',
+                'store'             => true
+            ],
+
+            'has_provider' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => 'Line relates to an activity that has a provider (from product_model).',
+                'function'          => 'calcHasProvider',
+                'store'             => true,
+                'visible'           => ['is_activity', '=', true]
+            ],
+
+            'activity_provider_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\provider\Provider',
+                'description'       => "The activity provider the consumption is assigned to.",
+                'visible'           => [ ['is_activity', '=', true], ['has_provider', '=', true] ]
+            ],
+
+            'has_staff_required' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => 'Line relates to an activity that needs a facilitator (from product_model).',
+                'function'          => 'calcHasStaffRequired',
+                'store'             => true,
+                'visible'           => ['is_activity', '=', true]
+            ],
+
+            'employees_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'hr\employee\Employee',
+                'foreign_field'     => 'booking_lines_ids',
+                'rel_table'         => 'sale_booking_line_rel_hr_employee',
+                'rel_foreign_key'   => 'employee_id',
+                'rel_local_key'     => 'booking_line_id',
+                'description'       => "The staff members that may need to attend the group during the activity.",
+                'help'              => "In most cases there should be only one employee selected when activity take place.",
+                'visible'           => [ ['is_activity', '=', true], ['has_staff_required', '=', true] ]
+            ],
+
             'qty_accounting_method' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
@@ -397,7 +442,7 @@ class BookingLine extends Model {
         /*
             reset computed fields related to product model
         */
-        $om->update(self::getType(), $oids, ['name' => null, 'qty_accounting_method' => null, 'is_rental_unit' => null, 'is_accomodation' => null, 'is_meal' => null]);
+        $om->update(self::getType(), $oids, ['name' => null, 'qty_accounting_method' => null, 'is_rental_unit' => null, 'is_accomodation' => null, 'is_meal' => null, 'is_activity' => null]);
 
         /*
             update SPM, if necessary
@@ -1199,6 +1244,42 @@ class BookingLine extends Model {
                 $result[$oid] = $odata['product_id.product_model_id.is_meal'];
             }
         }
+        return $result;
+    }
+
+    public static function calcIsActivity($self) {
+        trigger_error("ORM::calling sale\booking\BookingLine:calcIsActivity", QN_REPORT_DEBUG);
+
+        $result = [];
+        $self->read(['product_id' => ['product_model_id' => ['is_activity']]]);
+        foreach($self as $id => $booking_line) {
+            $result[$id] = $booking_line['product_id']['product_model_id']['is_activity'];
+        }
+
+        return $result;
+    }
+
+    public static function calcHasProvider($self) {
+        trigger_error("ORM::calling sale\booking\BookingLine:calcHasProvider", QN_REPORT_DEBUG);
+
+        $result = [];
+        $self->read(['product_id' => ['product_model_id' => ['has_provider']]]);
+        foreach($self as $id => $booking_line) {
+            $result[$id] = $booking_line['product_id']['product_model_id']['has_provider'];
+        }
+
+        return $result;
+    }
+
+    public static function calcHasStaffRequired($self) {
+        trigger_error("ORM::calling sale\booking\BookingLine:calcHasStaffRequired", QN_REPORT_DEBUG);
+
+        $result = [];
+        $self->read(['product_id' => ['product_model_id' => ['has_staff_required']]]);
+        foreach($self as $id => $booking_line) {
+            $result[$id] = $booking_line['product_id']['product_model_id']['has_staff_required'];
+        }
+
         return $result;
     }
 

@@ -64,6 +64,20 @@ class Provider extends \identity\Partner {
                 'rel_foreign_key'   => 'product_model_id',
                 'rel_local_key'     => 'provider_id',
                 'description'       => "The product models that can be required providers."
+            ],
+
+            'booking_lines_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\BookingLine',
+                'foreign_field'     => 'activity_provider_id',
+                'description'       => 'The booking lines that must be provided.'
+            ],
+
+            'consumptions_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\Consumption',
+                'foreign_field'     => 'activity_provider_id',
+                'description'       => 'The consumptions that must be provided.'
             ]
 
         ];
