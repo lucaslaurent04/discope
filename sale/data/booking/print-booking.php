@@ -156,7 +156,8 @@ $fields = [
             'vat_number',
             'bank_account_iban',
             'bank_account_bic',
-            'signature'
+            'signature',
+            'document_id' => ['id' ,'data']
         ]
     ],
     'contacts_ids' => [
@@ -209,30 +210,16 @@ if(!$booking) {
     throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
 }
 
-$img_path = 'public/assets/img/brand/Kaleo.png';
-$img_url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=';
-
-if($booking['center_id']['organisation_id']['id'] == 2) {
-    $img_path = 'public/assets/img/brand/Villers.png';
-}
-elseif($booking['center_id']['organisation_id']['id'] == 3) {
-    $img_path = 'public/assets/img/brand/Mozaik.png';
-}
-elseif($booking['center_id']['organisation_id']['id'] == 100) {
-    $img_path = 'public/assets/img/brand/Fer_a_cheval.png';
-}
-
-
-if(file_exists($img_path)) {
-    $img = file_get_contents($img_path);
-    $img_url = "data:image/png;base64, ".base64_encode($img);
+$document_data = $booking['center_id']['organisation_id']['document_id']['data'];
+if($document_data) {
+    $img_url = "data:image/png;base64, ".base64_encode($document_data);
 }
 
 $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
 
 $values = [
-    'header_img_url'        => $img_url,
+    'header_img_url'        => $img_url ?? '',
     'quote_header_html'     => '',
     'quote_notice_html'     => '',
     'status'                => $booking['status'],
