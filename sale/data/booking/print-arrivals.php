@@ -387,5 +387,5 @@ function lodging_booking_print_booking_formatMember($booking) {
 
 function lodging_booking_print_booking_formatName($booking) {
     $code = (string) $booking['name'];
-    return substr($code, 0, 3) . 'booking' .substr($code, 3, 3);
+    return substr($code, 0, 3) . '.' .substr($code, 3, 3);
 }
