@@ -4,12 +4,14 @@
 
     <div class="group-expand" style="position: absolute;right: 6px;" *ngIf="folded">
         <button mat-icon-button
+                [disabled]="!instance.is_sojourn"
                 (click)="toggleFold()">
             <mat-icon>expand_more</mat-icon>
         </button>
     </div>
     <div class="group-collapse" style="position: absolute;right: 6px;" *ngIf="!folded">
         <button mat-icon-button
+                [disabled]="!instance.is_sojourn"
                 (click)="toggleFold()">
             <mat-icon>expand_less</mat-icon>
         </button>

@@ -17,6 +17,7 @@
                          [class.group-selected]="maximized_group_id == group.id"
                          [class.group-extra]="group.is_extra"
                          [class.group-autosale]="group.is_autosale"
+                         [class.group-disabled]="!group.is_sojourn"
                          [class.hidden]="maximized_group_id != 0 && maximized_group_id != group.id"
                          [@groupInOutAnimation]
                     >

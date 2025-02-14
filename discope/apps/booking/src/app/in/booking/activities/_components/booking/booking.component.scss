@@ -69,6 +69,10 @@
                             background-color: #00008f1f;
                         }
 
+                        &.group-disabled {
+                            opacity: 0.5;
+                        }
+
                         .group-handle {
                             cursor: move;
                             cursor: grab;
