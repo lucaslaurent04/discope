@@ -179,6 +179,14 @@ class BookingLineGroup extends Model {
                 'store'             => true
             ],
 
+            'nb_activities' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => 'Amount of activities this group is about.',
+                'function'          => 'calcNbActivities',
+                'store'             => true
+            ],
+
             /* a booking can be split into several groups on which distinct rate classes apply, by default the rate_class of the customer is used */
             'rate_class_id' => [
                 'type'              => 'many2one',
@@ -596,6 +604,8 @@ class BookingLineGroup extends Model {
         $om->callonce(self::getType(), '_resetPrices', $oids, [], $lang);
         // reset rental units assignments
         $om->callonce(self::getType(), 'createRentalUnitsAssignments', $oids, [], $lang);
+        // force recompute of nb_activities
+        $om->update(self::getType(), $oids, ['nb_activities' => null]);
         // force parent booking to recompute times and prices
         $groups = $om->read(self::getType(), $oids, ['booking_id'], $lang);
         if($groups > 0) {
@@ -757,6 +767,22 @@ class BookingLineGroup extends Model {
 
                 $result[$gid] = $children_qty;
             }
+        }
+
+        return $result;
+    }
+
+    public static function calcNbActivities($self) {
+        $result = [];
+        $self->read(['booking_lines_ids' => ['is_activity']]);
+        foreach($self as $id => $booking_line_group) {
+            $nb_activities = 0;
+            foreach($booking_line_group['booking_lines_ids'] as $booking_line_id) {
+                if($booking_line_id['is_activity']) {
+                    $nb_activities++;
+                }
+            }
+            $result[$id] = $nb_activities;
         }
 
         return $result;

@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { BookingComponent } from './booking.component';
 import { BookingServicesComponent } from './services/services.component';
+import { BookingActivitiesComponent } from './activities/activities.component';
 import { BookingCompositionComponent } from './composition/composition.component';
 import { BookingCompositionInviteComponent } from './composition/invite/invite.component';
 import { BookingQuoteComponent } from './quote/quote.component';
@@ -13,6 +14,10 @@ const routes: Routes = [
     {
         path: 'services',
         component: BookingServicesComponent
+    },
+    {
+        path: 'activities',
+        component: BookingActivitiesComponent
     },
     {
         path: 'composition',

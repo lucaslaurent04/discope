@@ -25,6 +25,7 @@ export class BookingLineGroup {
         public time_to: string = '',
         public nb_pers: number = 0,
         public nb_nights: number = 0,
+        public nb_activities: number = 0,
         public is_sojourn: boolean = false,
         public is_event: boolean = false,
         public group_type: string = '',

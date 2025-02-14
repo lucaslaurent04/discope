@@ -30,6 +30,10 @@ import { BookingCompositionLinesComponent } from './composition/_components/book
 import { BookingQuoteComponent } from './quote/quote.component';
 import { BookingInvoiceComponent } from './invoice/invoice.component';
 import { BookingOptionComponent } from './option/option.component';
+import { BookingActivitiesComponent } from './activities/activities.component';
+import { BookingActivitiesBookingComponent } from './activities/_components/booking/booking.component';
+import { BookingActivitiesBookingGroupComponent } from './activities/_components/booking/_components/group/group.component';
+import { BookingActivitiesBookingGroupLineComponent } from './activities/_components/booking/_components/group/_components/line/line.component';
 
 @NgModule({
   imports: [
@@ -47,6 +51,8 @@ import { BookingOptionComponent } from './option/option.component';
     BookingServicesBookingGroupLineDiscountComponent,
     BookingServicesBookingGroupLinePriceDialogComponent,
     BookingServicesBookingGroupLinePriceadapterComponent,
+    BookingActivitiesComponent, BookingActivitiesBookingComponent,
+    BookingActivitiesBookingGroupComponent, BookingActivitiesBookingGroupLineComponent,
     BookingCompositionComponent, BookingCompositionDialogConfirm,
     BookingCompositionInviteComponent,
     BookingCompositionLinesComponent,

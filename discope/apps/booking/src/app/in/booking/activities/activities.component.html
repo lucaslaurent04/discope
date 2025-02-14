@@ -1,0 +1,17 @@
+<div class="container" [class.hidden]="!ready">
+    <div class="booking-header"><a href="#/bookings">Réservations</a><span> › </span> <a href="#/booking/{{booking.id}}">Réservation <small>[{{booking.name}} - {{booking.id}}]</small></a> <span> › </span> Activités réservées</div>
+    <div class="booking-body">
+        <div class="sb-view-header-actions" style="height: 46px; margin-top: 10px;display: flex; align-items: center;">
+            <div style="flex: 0 1 50%; scale: 1.5; transform-origin: 0;">
+                {{booking.display_name}}
+            </div>
+            <div style="margin-left: auto;">
+                <span style="line-height: 46px; margin-right: 12px;">Statut : <strong>{{status[booking.status]}}</strong></span>
+            </div>
+        </div>
+
+        <div>
+            <booking-activities-booking [booking_id]="booking_id"></booking-activities-booking>
+        </div>
+    </div>
+</div>

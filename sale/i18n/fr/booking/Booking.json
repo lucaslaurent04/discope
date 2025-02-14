@@ -298,6 +298,9 @@
                 "item.booking.edit": {
                     "label": "Services réservés"
                 },
+                "item.booking.edit-activity": {
+                    "label": "Activités réservées"
+                },
                 "item.booking.composition": {
                     "label": "Composition"
                 },
@@ -470,6 +473,9 @@
                 },
                 "item.booking.edit": {
                     "label": "Services réservés"
+                },
+                "item.booking.edit-activity": {
+                    "label": "Activités réservées"
                 },
                 "item.booking.composition": {
                     "label": "Composition"

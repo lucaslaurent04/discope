@@ -1,0 +1,72 @@
+<div #vGroup="var" [var]="{identification: {folded: true}, products: {folded: true}, accomodations: {folded: false}, meals: {folded: true}}"></div>
+
+<div [class.hidden]="!ready">
+
+    <div class="group-expand" style="position: absolute;right: 6px;" *ngIf="folded">
+        <button mat-icon-button
+                (click)="toggleFold()">
+            <mat-icon>expand_more</mat-icon>
+        </button>
+    </div>
+    <div class="group-collapse" style="position: absolute;right: 6px;" *ngIf="!folded">
+        <button mat-icon-button
+                (click)="toggleFold()">
+            <mat-icon>expand_less</mat-icon>
+        </button>
+    </div>
+
+    <!-- one liner : summarized group / sojourn -->
+    <!-- #memo - blocks are hidden instead of ngIf-ied to allow dynamic DOM updates -->
+    <div [class.hidden]="!folded" class="group-liner" style="height: 35px; padding: 8px 100px 0 15px; cursor: pointer;">
+        <div style="display: flex;">
+            <!-- group summary (main product) -->
+            <div class="group-liner-part" style="width: 25%; margin-right: 18px;">
+                <div style="white-space: nowrap; overflow: hidden;">
+                    {{instance.name}}
+                </div>
+            </div>
+            <!-- group type -->
+            <div class="group-liner-part" style="width: 10%; margin-right: 18px;">
+                <div style="white-space: nowrap; overflow: hidden;">
+                    <span *ngIf="instance.group_type == 'simple'">simple</span>
+                    <span *ngIf="instance.group_type == 'sojourn'">séjour</span>
+                    <span *ngIf="instance.group_type == 'event'">événement</span>
+                    <span *ngIf="instance.group_type == 'camp'">stage</span>
+                </div>
+            </div>
+            <!-- date(s) -->
+            <div class="group-liner-part" style="width: 35%; margin-right: 18px;">
+                <ng-container *ngIf="instance.group_type == 'event' || instance.group_type == 'sojourn' || instance.group_type == 'camp'">
+                    <div style="white-space: nowrap; overflow: hidden;">
+                        {{instance?.date_from | date: 'dd/MM/YY'}}
+                        -
+                        {{instance?.date_to | date: 'dd/MM/YY'}}&nbsp;
+                        <small>
+                            <ng-container *ngIf="instance.group_type == 'sojourn' || instance.group_type == 'camp'">({{instance.nb_nights}} nuit<span *ngIf="instance.nb_nights > 1">s</span>)</ng-container>
+                            <ng-container *ngIf="instance.group_type == 'event'">({{instance.nb_nights + 1}} jour<span *ngIf="instance.nb_nights+1 > 1">s</span>)</ng-container>
+                        </small>
+                    </div>
+                </ng-container>
+            </div>
+            <!-- nb pers -->
+            <div class="group-liner-part" style="width: 15%;">
+                <div style="white-space: nowrap; overflow: hidden;">{{instance.nb_pers}} pers.</div>
+            </div>
+            <!-- nb activities -->
+            <div class="group-liner-part" style="width: 15%;">
+                <div style="white-space: nowrap; overflow: hidden;"><b>{{instance.nb_activities}} activités</b></div>
+            </div>
+            <!-- price -->
+            <div class="group-liner-part" style="width: 10%; text-align: right;">
+                <div style="margin-left: auto; white-space: nowrap; overflow: hidden;">{{ instance?.price ?? 0 | number : '1.2-2' }}€</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- expanded pane : all details of group / sojourn -->
+    <div [class.hidden]="folded">
+        <div class="loader-overlay" *ngIf="loading">
+            <div class="loader"><mat-spinner></mat-spinner></div>
+        </div>
+    </div>
+</div>

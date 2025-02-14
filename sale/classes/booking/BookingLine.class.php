@@ -626,6 +626,14 @@ class BookingLine extends Model {
         }
 
         /*
+            reset group nb_activities
+         */
+        foreach($lines as $line) {
+            $gid = $line['booking_line_group_id'];
+            $om->update(BookingLineGroup::getType(), $gid, ['nb_activities' => null]);
+        }
+
+        /*
             reset computed fields related to price
         */
         $om->callonce(self::getType(), '_resetPrices', $oids, [], $lang);

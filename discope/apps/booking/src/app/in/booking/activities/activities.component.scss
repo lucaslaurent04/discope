@@ -1,0 +1,70 @@
+:host {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+
+    .overlay-container {
+        position: relative;
+        height: 100vh;
+        width: 100%;
+
+        mat-spinner {
+            position: absolute;
+            top: 25%;
+            left: calc(50% - 50px);
+        }
+    }
+
+    .container {
+        height: 100%;
+        width: 100%;
+
+        &.hidden {
+            display: none;
+        }
+
+        .booking-header {
+            width: 100%;
+            padding-left: 12px;
+            height: 48px;
+            line-height: 48px;
+            border-bottom: solid 1px lightgrey;
+            font-size: 24px;
+
+            a {
+                color: var(--mdc-theme-primary);
+                text-decoration: none;
+            }
+        }
+
+        .booking-body {
+            height: calc(100vh - 123px);
+            width: 100%;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            padding: 0 12px;
+
+            ::ng-deep mat-tab-group .mat-tab-header  {
+                margin-bottom: 20px;
+            }
+
+            .sb-view-header-actions-view {
+                margin-left: 0 !important;
+            }
+        }
+
+        .booking-body::-webkit-scrollbar {
+            width: 6px;
+            overflow-y: scroll;
+            background: transparent;
+
+        }
+
+        .booking-body::-webkit-scrollbar-thumb {
+            background: var(--mdc-theme-primary, #6200ee);
+            border-radius: 10px;
+        }
+    }
+}
