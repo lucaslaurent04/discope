@@ -334,12 +334,10 @@
                                                 "widget": {
                                                     "view": "list.activity",
                                                     "header": {
-                                                        "selection": {
-                                                            "default": false
-                                                        },
                                                         "actions": {
                                                             "ACTION.CREATE": false,
-                                                            "ACTION.ADD": true
+                                                            "ACTION.ADD": true,
+                                                            "ACTION.DELETE" :true
                                                         }
                                                     }
                                                 }
@@ -361,12 +359,10 @@
                                                 "widget": {
                                                     "view": "list.activity",
                                                     "header": {
-                                                        "selection": {
-                                                            "default": false
-                                                        },
                                                         "actions": {
                                                             "ACTION.CREATE": false,
-                                                            "ACTION.ADD": true
+                                                            "ACTION.ADD": true,
+                                                            "ACTION.DELETE" :true
                                                         }
                                                     }
                                                 }
@@ -383,12 +379,10 @@
                                                 "widget": {
                                                     "view": "list.activity",
                                                     "header": {
-                                                        "selection": {
-                                                            "default": false
-                                                        },
                                                         "actions": {
                                                             "ACTION.CREATE": false,
-                                                            "ACTION.ADD": true
+                                                            "ACTION.ADD": true,
+                                                            "ACTION.DELETE" :true
                                                         }
                                                     }
                                                 }
