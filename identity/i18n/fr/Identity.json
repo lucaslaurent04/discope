@@ -269,6 +269,11 @@
             "label": "Origine OTA",
             "description": "Est-ce que l'identité est originaire d'un OTA.",
             "help": ""
+        },
+        "document_id": {
+            "label": "Document",
+            "description": "Le document contenant le logo associé à l'organisation.",
+            "help": ""
         }
     },
     "view": {
