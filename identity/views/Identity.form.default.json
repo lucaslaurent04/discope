@@ -242,6 +242,11 @@
                                                 "type": "field",
                                                 "value": "website",
                                                 "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "logo_document_id",
+                                                "width": "100%"
                                             }
                                         ]
                                     },
@@ -302,11 +307,6 @@
                                         "width": "33%",
                                         "align": "left",
                                         "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "logo_document_id",
-                                                "width": "100%"
-                                            },
                                             {
                                                 "type": "field",
                                                 "value": "flag_latepayer",
