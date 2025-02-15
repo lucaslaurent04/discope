@@ -123,8 +123,10 @@ class Document extends Model {
         $res = $om->read(__CLASS__, $oids, ['hash']);
 
         $result = [];
-        foreach($res as $oid => $odata) {
-            $result[$oid] = '/document/'.$odata['hash'];
+        foreach($res as $id => $odata) {
+            if(strlen($odata['hash'])) {
+                $result[$id] = '/document/'.$odata['hash'];
+            }
         }
 
         return $result;
