@@ -527,7 +527,7 @@ class Identity extends Model {
             // Companies can also have an official website.
             'website' => [
                 'type'              => 'string',
-                'usage'             => 'url',
+                'usage'             => 'uri/url',
                 'description'       => 'Organisation main official website URL, if any.',
                 'visible'           => ['type', '<>', 'I']
             ],
@@ -622,6 +622,13 @@ class Identity extends Model {
                 'foreign_field'     => 'partner_identity_id',
                 'description'       => 'Partnerships that relate to the identity.',
                 'domain'            => ['owner_identity_id', '<>', 'object.id']
+            ],
+
+            'customer_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\customer\Customer',
+                'foreign_field'     => 'partner_identity_id',
+                'description'       => 'Customer associated to this identity, if any.'
             ],
 
             'flag_latepayer' => [
