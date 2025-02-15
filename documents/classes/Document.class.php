@@ -58,7 +58,7 @@ class Document extends Model {
             'link' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
-                'usage'             => 'uri/url',
+                //'usage'             => 'uri/url',
                 'description'       => 'Direct URL to the document (uses hash).',
                 'function'          => 'calcLink',
                 'store'             => true,
@@ -101,6 +101,13 @@ class Document extends Model {
                 'foreign_object'    => 'communication\TemplateAttachment',
                 'foreign_field'     => 'document_id',
                 'description'       => "The links between document and templates."
+            ],
+
+            'identity_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\Identity',
+                'description'       => 'The identity associated with the document.',
+                'readonly'          => true
             ]
 
         ];

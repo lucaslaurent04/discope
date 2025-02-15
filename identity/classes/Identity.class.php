@@ -6,6 +6,8 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace identity;
+
+use documents\Document;
 use equal\data\DataGenerator;
 use equal\orm\Model;
 use sale\booking\Booking;
@@ -714,7 +716,16 @@ class Identity extends Model {
                 'description'       => 'Is the identity readonly, used for static identities that should not be updated trivially.',
                 'default'           => false,
                 'readonly'          => true
-            ]
+            ],
+
+            'document_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'documents\Document',
+                'description'       => 'The document containing the logo associated with the identity.',
+                'onupdate'          => 'onupdateDocumentId',
+                'visible'           => ['type' ,'=' , 'NP']
+            ],
+
 
         ];
     }
@@ -806,6 +817,13 @@ class Identity extends Model {
             // force re-computing of related partners names
             $om->update('identity\Partner', $partners_ids, [ 'name' => null ], $lang);
             $om->read('identity\Partner', $partners_ids, ['name'], $lang);
+        }
+    }
+
+    public static function onupdateDocumentId($self): void {
+        $self->read(['id','document_id']);
+        foreach($self as $id) {
+            Document::id($id['document_id'])->update(['identity_id' => $id['id']]);
         }
     }
 

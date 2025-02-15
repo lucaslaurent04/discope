@@ -57,7 +57,12 @@
             "label": "Pièces jointes",
             "description": "Pièces jointes utilisant le document.",
             "help": ""
-        }        
+        },
+        "identity_id":{
+            "label": "Organisation",
+            "description": "L'organisation associée au document.",
+            "help": ""
+        }
     },
     "view": {
         "form.default": {
