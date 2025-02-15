@@ -703,14 +703,12 @@ class Identity extends Model {
                 'description'       => 'List of invoices relating to the identity (as customer).'
             ],
 
-            // ota
             'is_ota' => [
                 'type'              => 'boolean',
                 'description'       => 'Is the identity from OTA origin.',
                 'default'           => false
             ],
 
-            // readonly
             'is_readonly' => [
                 'type'              => 'boolean',
                 'description'       => 'Is the identity readonly, used for static identities that should not be updated trivially.',
@@ -718,12 +716,11 @@ class Identity extends Model {
                 'readonly'          => true
             ],
 
-            'document_id' => [
+            'logo_document_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'documents\Document',
                 'description'       => 'The document containing the logo associated with the identity.',
-                'onupdate'          => 'onupdateDocumentId',
-                'visible'           => ['type' ,'=' , 'NP']
+                'visible'           => ['type' ,'<>' , 'I']
             ],
 
 
@@ -817,13 +814,6 @@ class Identity extends Model {
             // force re-computing of related partners names
             $om->update('identity\Partner', $partners_ids, [ 'name' => null ], $lang);
             $om->read('identity\Partner', $partners_ids, ['name'], $lang);
-        }
-    }
-
-    public static function onupdateDocumentId($self): void {
-        $self->read(['id','document_id']);
-        foreach($self as $id) {
-            Document::id($id['document_id'])->update(['identity_id' => $id['id']]);
         }
     }
 

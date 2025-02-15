@@ -157,7 +157,7 @@ $fields = [
             'bank_account_iban',
             'bank_account_bic',
             'signature',
-            'document_id' => ['id' ,'data']
+            'logo_document_id' => ['id', 'type', 'data']
         ]
     ],
     'contacts_ids' => [
@@ -210,16 +210,16 @@ if(!$booking) {
     throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
 }
 
-$document_data = $booking['center_id']['organisation_id']['document_id']['data'];
-if($document_data) {
-    $img_url = "data:image/png;base64, ".base64_encode($document_data);
+$logo_document_data = $booking['center_id']['organisation_id']['logo_document_id']['data'] ?? null;
+if($logo_document_data) {
+    $content_type = $booking['center_id']['organisation_id']['logo_document_id']['type'] ?? 'image/png';
+    $img_url = "data:{$content_type};base64, ".base64_encode($logo_document_data);
 }
 
 $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
-
 $values = [
-    'header_img_url'        => $img_url ?? '',
+    'header_img_url'        => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
     'quote_header_html'     => '',
     'quote_notice_html'     => '',
     'status'                => $booking['status'],

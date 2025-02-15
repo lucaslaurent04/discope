@@ -118,7 +118,7 @@ $fields = [
         'signature',
         'bank_account_iban',
         'bank_account_bic',
-        'document_id' => ['id' ,'data']
+        'logo_document_id' => ['id', 'type', 'data']
     ],
     'center_office_id' => [
         'code',
@@ -256,13 +256,14 @@ if($downpayment_sku) {
 $booking = $invoice['booking_id'];
 
 
-$document_data = $invoice['organisation_id']['document_id']['data'];
-if($document_data) {
-    $img_url = "data:image/png;base64, ".base64_encode($document_data);
+$logo_document_data = $invoice['organisation_id']['logo_document_id']['data'] ?? null;
+if($logo_document_data) {
+    $content_type = $booking['center_id']['organisation_id']['logo_document_id']['type'] ?? 'image/png';
+    $img_url = "data:{$content_type};base64, ".base64_encode($logo_document_data);
 }
 
 $values = [
-    'header_img_url'        => $img_url ?? '',
+    'header_img_url'        => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
     'invoice_header_html'  => '',
     'invoice_notice_html'  => '',
 
