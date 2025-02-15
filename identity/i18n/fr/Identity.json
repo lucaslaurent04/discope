@@ -40,11 +40,6 @@
             "description": "Nom utilisé en interne pour identifier l'organisation.",
             "help": "Le nom usuel n'est jamais présenté au client et peut contenir tout caractère ou mot permettant de faciliter l'identification de l'organisation (acronyme ou nom abrégé)."
         },
-        "description": {
-            "label": "Description",
-            "description": "Court contexte pour aider à identifier l'organisation.",
-            "help": "Court contexte pour aider à identifier l'organisation ou remémorer des infos spécifiques."
-        },
         "has_parent": {
             "label": "Département ou filiale",
             "description": "Cette identité est un département d'une organisation.",
@@ -201,7 +196,7 @@
             "label": "Langue",
             "description": "Langue parlée préférée.",
             "help": ""
-        },        
+        },
         "bank_account_iban": {
             "label": "IBAN",
             "description": "Compte bancaire.",
@@ -214,13 +209,8 @@
         },
         "description": {
             "label": "Observations",
-            "description": "Notes spécifiques au client (non visible par le client), ajoutées aux observation des réservations liées.",
-            "help": ""
-        },
-        "contacts_ids": {
-            "label": "Contacts",
-            "description": "Contacts liés à l'identité.",
-            "help": ""
+            "description": "Notes spécifiques (non visible par le client).",
+            "help": "Court contexte pour aider à identifier l'identité ou remémorer des infos spécifiques, ajoutées aux observation des réservations liées."
         },
         "flag_latepayer": {
             "label": "Mauvais payeur",
@@ -270,7 +260,7 @@
             "description": "Est-ce que l'identité est originaire d'un OTA.",
             "help": ""
         },
-        "document_id": {
+        "logo_document_id": {
             "label": "Document",
             "description": "Le document contenant le logo associé à l'organisation.",
             "help": ""
