@@ -58,7 +58,7 @@ class Document extends Model {
             'link' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
-                //'usage'             => 'uri/url',
+                'usage'             => 'uri/url',
                 'description'       => 'Direct URL to the document (uses hash).',
                 'function'          => 'calcLink',
                 'store'             => true,
@@ -101,13 +101,6 @@ class Document extends Model {
                 'foreign_object'    => 'communication\TemplateAttachment',
                 'foreign_field'     => 'document_id',
                 'description'       => "The links between document and templates."
-            ],
-
-            'identity_id' => [
-                'type'              => 'many2one',
-                'foreign_object'    => 'identity\Identity',
-                'description'       => 'The identity associated with the document.',
-                'readonly'          => true
             ]
 
         ];
@@ -169,7 +162,7 @@ class Document extends Model {
      * @param $content_type string  The content_type found for for the file.
      * @param $name string  (optional) The name of the file, if any.
      *
-     * @return string | bool    In case of success, the extesnion is return. If no extension matches the content type, it returns false.
+     * @return string | bool    In case of success, the extension is return. If no extension matches the content type, it returns false.
      */
     public static function _getExtensionFromType($content_type, $name = '') {
 
