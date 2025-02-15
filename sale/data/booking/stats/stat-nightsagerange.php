@@ -208,7 +208,7 @@ foreach($bookings as $booking) {
             }
 
             $age_range_id = $group_age_range_id;
-            $nb_pers = $group['nb_pers'];
+            $nb_pers = $line['qty'];
             if($line['product_id']['has_age_range']) {
                 $age_range_id = $line['product_id']['age_range_id']['id'];
                 // discard lines not matching given age_range
@@ -216,7 +216,7 @@ foreach($bookings as $booking) {
                     continue;
                 }
                 foreach($group['age_range_assignments_ids'] as $age_range_assignment) {
-                    if($age_range_assignment['id'] == $age_range_id) {
+                    if($age_range_assignment['age_range_id'] == $age_range_id) {
                         $nb_pers = $age_range_assignment['qty'];
                         break;
                     }
