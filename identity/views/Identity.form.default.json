@@ -304,7 +304,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "document_id",
+                                                "value": "logo_document_id",
                                                 "width": "100%"
                                             },
                                             {
