@@ -57,15 +57,6 @@ class Employee extends \identity\Partner {
                 'foreign_object'    => 'hr\absence\Absence',
                 'foreign_field'     => 'employee_id',
                 'description'       => 'Absences relating to the employee.',
-            ],
-
-            'consumptions_ids' => [
-                'type'              => 'many2many',
-                'foreign_object'    => 'sale\booking\Consumption',
-                'foreign_field'     => 'employees_ids',
-                'rel_table'         => 'sale_booking_consumption_rel_hr_employee',
-                'rel_foreign_key'   => 'consumption_id',
-                'rel_local_key'     => 'employee_id'
             ]
 
         ];
