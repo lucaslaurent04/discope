@@ -587,7 +587,8 @@ class Identity extends Model {
                 'type'              => 'string',
                 'selection'         => ['M' => 'Male', 'F' => 'Female', 'X' => 'Non-binary'],
                 'description'       => 'Reference contact gender.',
-                'visible'           => ['type', '=', 'I']
+                'visible'           => ['type', '=', 'I'],
+                'default'           => 'M'
             ],
 
             'title' => [
