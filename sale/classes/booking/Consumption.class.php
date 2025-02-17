@@ -230,18 +230,6 @@ class Consumption extends Model {
                 'description'       => "Indicates whether the activity requires dedicated staff to be assigned.",
                 'default'           => false,
                 'visible'           => ['is_activity', '=', true]
-            ],
-
-            'employees_ids' => [
-                'type'              => 'many2many',
-                'foreign_object'    => 'hr\employee\Employee',
-                'foreign_field'     => 'consumptions_ids',
-                'rel_table'         => 'sale_booking_consumption_rel_hr_employee',
-                'rel_foreign_key'   => 'employee_id',
-                'rel_local_key'     => 'consumption_id',
-                'description'       => "The staff members that may need to attend the group during the activity.",
-                'help'              => "In most cases there should be only one employee selected when activity take place.",
-                'visible'           => [ ['is_activity', '=', true], ['has_staff_required', '=', true] ]
             ]
 
         ];
