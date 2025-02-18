@@ -81,7 +81,7 @@ class CompositionItem extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'realestate\RentalUnit',
                 'description'       => "The rental unit the person is assigned to.",
-            #    'domain'            => ['id', 'in', 'object.rental_units_ids']
+                // 'domain'            => ['id', 'in', 'object.rental_units_ids']
             ],
 
             'composition_id' => [
@@ -99,7 +99,7 @@ class CompositionItem extends Model {
                 'description'       => 'The booking the composition relates to.'
             ],
 
-            #memo - this seems incorrect and generates an error when printing the listing
+            // #memo - this seems incorrect and generates an error when printing the listing
             'rental_units_ids' => [
                 'type'              => 'computed',
                 'result_type'       => 'one2many',
