@@ -100,6 +100,7 @@ class CompositionItem extends Model {
             ],
 
             // #memo - this seems incorrect and generates an error when printing the listing
+            /*
             'rental_units_ids' => [
                 'type'              => 'computed',
                 'result_type'       => 'one2many',
@@ -107,6 +108,7 @@ class CompositionItem extends Model {
                 'foreign_object'    => 'realestate\RentalUnit',
                 'description'       => "The rental units attached to the current booking."
             ],
+            */
 
             // #memo - values provided by OTA might not be valid values
 
@@ -143,10 +145,10 @@ class CompositionItem extends Model {
         foreach($items as $oid => $odata) {
 
             $rental_units_ids = [];
-            $assignments_ids = $om->search(\sale\booking\SojournProductModelRentalUnitAssignement::getType(), ['booking_id', '=', $odata['composition_id.booking_id']]);
+            $assignments_ids = $om->search(SojournProductModelRentalUnitAssignement::getType(), ['booking_id', '=', $odata['composition_id.booking_id']]);
 
             if($assignments_ids > 0 && count($assignments_ids)) {
-                $assignments = $om->read(\sale\booking\SojournProductModelRentalUnitAssignement::getType(), $assignments_ids, ['rental_unit_id']);
+                $assignments = $om->read(SojournProductModelRentalUnitAssignement::getType(), $assignments_ids, ['rental_unit_id']);
                 $rental_units_ids = array_filter(array_map(function($a) { return $a['rental_unit_id']; }, array_values($assignments)), function($a) {return $a > 0;});
             }
             $result[$oid] = $rental_units_ids;
