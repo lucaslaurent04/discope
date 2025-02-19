@@ -307,11 +307,10 @@ class BookingLine extends Model {
             ],
 
             'booking_activity_id' => [
-                'result_type'       => 'many2one',
+                'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingActivity',
                 'description'       => 'Booking Activity this line relates to.',
-                'help'              => 'If the line refers to a transport/supply, it means that the transport/supply is needed for a specific activity.',
-                'ondelete'          => 'cascade'
+                'help'              => 'If the line refers to a transport/supply, it means that the transport/supply is needed for a specific activity.'
             ],
 
             'service_date' => [
@@ -494,6 +493,15 @@ class BookingLine extends Model {
                     }
                 }
             }
+
+            // if line is an activity, create the booking activity and link it to the line
+            if($line['product_id.product_model_id.is_activity']) {
+                $booking_activity = BookingActivity::create(['activity_booking_line_id' => $lid])
+                    ->read(['id'])
+                    ->first(true);
+
+                $om->update(self::getType(), $lid, ['booking_activity_id' => $booking_activity['id']]);
+            }
         }
 
         // #memo - qty must always be recomputed, even if given amongst (updated) $values (when a new line is created the default qty is 1.0)
@@ -540,9 +548,6 @@ class BookingLine extends Model {
             }
             if($qty != $line['qty'] || $line['is_rental_unit']) {
                 $om->update(self::getType(), $lid, ['qty' => $qty]);
-            }
-            if($line['product_id.product_model_id.is_activity']) {
-                BookingActivity::create(['activity_booking_line_id' => $lid]);
             }
         }
 
@@ -1016,7 +1021,7 @@ class BookingLine extends Model {
         if($lines > 0) {
             foreach($lines as $oid => $odata) {
                 if($odata['product_id.product_model_id.is_activity']) {
-                    BookingActivity::search(['activity_booking_line_id', '=', $oid])->delete();
+                    BookingActivity::search(['activity_booking_line_id', '=', $oid])->delete(true);
                 }
             }
         }

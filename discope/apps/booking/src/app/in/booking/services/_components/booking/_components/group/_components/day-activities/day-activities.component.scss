@@ -29,5 +29,12 @@
 
     .activities-container {
         width: 100%;
+
+        .activity-remove {
+            position: absolute;
+            right: 0;
+            top: 5px;
+            z-index: 2;
+        }
     }
 }

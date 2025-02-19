@@ -118,4 +118,13 @@ class BookingActivity extends Model {
 
         return $result;
     }
+
+    public static function ondelete($self): void {
+        $self->read(['booking_lines_ids']);
+        foreach($self as $booking_activity) {
+            if(!empty($booking_activity['booking_lines_ids'])) {
+                BookingLine::search(['id', 'in', $booking_activity['booking_lines_ids']])->delete();
+            }
+        }
+    }
 }
