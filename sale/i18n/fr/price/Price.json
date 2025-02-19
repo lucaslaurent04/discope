@@ -56,7 +56,17 @@
 			"label": "Actif?",
 			"description": "Le prix est en cours d'application.",
 			"help": ""
-		}
+		},
+        "has_rate_class": {
+            "label": "Catégorie tarifaire ?",
+            "description": "Indique si le prix dépend d'une catégorie tarifaire.",
+            "help": ""
+        },
+        "rate_class_id": {
+            "label": "Catégorie tarifaire",
+            "description": "La catégorie tarifaire qui s'applique au prix, définissant les variations en fonction du public cible.",
+            "help": ""
+        }
     },
     "view": {
         "form.default": {
@@ -65,8 +75,8 @@
             "layout": {}
         },
         "list.default": {
-            "name": "Liste de Prix",
-            "description": "Liste des prix.",
+            "name": "Liste de tous les prix",
+            "description": "Liste de tous les prix.",
             "layout": {}
         }
     },
