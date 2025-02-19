@@ -286,6 +286,24 @@ class BookingLine extends Model {
                 'default'           => false
             ],
 
+            'service_date' => [
+                'type'              => 'computed',
+                'result_type'       => 'date',
+                'description'       => 'Specific date on which the service is delivered.',
+                'help'              => 'Only needed when the ProductModel is schedulable and not repeatable.',
+                'store'             => true,
+                'function'          => 'calcServiceDate'
+            ],
+
+            'time_slot_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\booking\TimeSlot',
+                'description'       => 'Specific day time slot on which the service is delivered.',
+                'store'             => true,
+                'function'          => 'calcTimeSlotId'
+            ]
+
         ];
     }
 
@@ -778,6 +796,7 @@ class BookingLine extends Model {
         $result = [];
         $lines = $om->read(self::getType(), $ids, [
             'booking_line_group_id.date_from',
+            'booking_line_group_id.rate_class_id',
             'booking_id.center_id.price_list_category_id',
         ]);
 
@@ -798,8 +817,27 @@ class BookingLine extends Model {
 
             if($price_lists_ids > 0 && count($price_lists_ids)) {
                 foreach($price_lists_ids as $price_list_id) {
-                    $prices_ids = $om->search(\sale\price\Price::getType(), [ ['price_list_id', '=', $price_list_id], ['product_id', '=', $product_id] ]);
-                    if($prices_ids > 0 && count($prices_ids)) {
+
+                    $prices_ids = $om->search(\sale\price\Price::getType(), [
+                        ['price_list_id', '=', $price_list_id],
+                        ['product_id', '=', $product_id],
+                        [ 'has_rate_class' , '=', true],
+                        ['rate_class_id', '=', $line['booking_line_group_id.rate_class_id']],
+                    ]);
+
+                    if (!empty($prices_ids)) {
+                        $result[$line_id] = reset($prices_ids);
+                        file_put_contents('/var/www/html/log/error.log', " searchPriceId In the if  rate_class_id" . PHP_EOL, FILE_APPEND);
+                        break;
+                    }
+
+                    $prices_ids = $om->search(\sale\price\Price::getType(), [
+                        ['price_list_id', '=', $price_list_id],
+                        ['product_id', '=', $product_id],
+                    ]);
+
+                    if (!empty($prices_ids)) {
+                        file_put_contents('/var/www/html/log/error.log', " searchPriceId Not  rate_class_id" . PHP_EOL, FILE_APPEND);
                         $result[$line_id] = reset($prices_ids);
                         break;
                     }
@@ -821,6 +859,7 @@ class BookingLine extends Model {
         $result = [];
         $lines = $om->read(self::getType(), $ids, [
             'booking_line_group_id.date_from',
+            'booking_line_group_id.rate_class_id',
             'booking_id.center_id.price_list_category_id',
         ]);
 
@@ -841,8 +880,24 @@ class BookingLine extends Model {
 
             if($price_lists_ids > 0 && count($price_lists_ids)) {
                 foreach($price_lists_ids as $price_list_id) {
-                    $prices_ids = $om->search(\sale\price\Price::getType(), [ ['price_list_id', '=', $price_list_id], ['product_id', '=', $product_id] ]);
-                    if($prices_ids > 0 && count($prices_ids)) {
+                    $prices_ids = $om->search(\sale\price\Price::getType(), [
+                        ['price_list_id', '=', $price_list_id],
+                        ['product_id', '=', $product_id],
+                        [ 'has_rate_class' , '=', true],
+                        ['rate_class_id', '=', $line['booking_line_group_id.rate_class_id']],
+                    ]);
+
+                    if (!empty($prices_ids)) {
+                        $result[$line_id] = reset($prices_ids);
+                        break;
+                    }
+
+                    $prices_ids = $om->search(\sale\price\Price::getType(), [
+                        ['price_list_id', '=', $price_list_id],
+                        ['product_id', '=', $product_id],
+                    ]);
+
+                    if (!empty($prices_ids)) {
                         $result[$line_id] = reset($prices_ids);
                         break;
                     }
@@ -1196,6 +1251,61 @@ class BookingLine extends Model {
                 $result[$oid] = $odata['product_id.product_model_id.qty_accounting_method'];
             }
         }
+        return $result;
+    }
+
+    public static function calcServiceDate($self): array {
+        $result = [];
+        $self->read([
+            'booking_line_group_id' => ['date_from', 'date_to'],
+            'product_model_id'      => ['type', 'service_type', 'is_repeatable', 'schedule_offset']
+        ]);
+        foreach($self as $id => $booking_line) {
+            $product_model = $booking_line['product_model_id'];
+            if(
+                $product_model['type'] === 'service'
+                && $product_model['service_type'] === 'schedulable'
+                && !$product_model['is_repeatable']
+            ) {
+                $offset_seconds = $product_model['schedule_offset'] * 86400;
+                $service_date = $booking_line['booking_line_group_id']['date_from'] + $offset_seconds;
+                if($service_date > $booking_line['booking_line_group_id']['date_to']) {
+                    $service_date = $booking_line['booking_line_group_id']['date_to'];
+                }
+
+                $result[$id] = $service_date;
+            }
+        }
+
+        return $result;
+    }
+
+    public static function calcTimeSlotId($self): array {
+        $result = [];
+        $self->read(['product_model_id' => ['type', 'service_type', 'time_slots_ids', 'is_meal']]);
+        foreach($self as $id => $booking_line) {
+            $product_model = $booking_line['product_model_id'];
+            if($product_model['type'] !== 'service' || $product_model['service_type'] !== 'schedulable') {
+                continue;
+            }
+
+            if(!empty($product_model['time_slots_ids'])) {
+                $result[$id] = $product_model['time_slots_ids'][0];
+            }
+            elseif($product_model['is_meal']) {
+                $breakfast = TimeSlot::search(['code', '=', 'B'])->read(['id'])->first();
+                if(isset($breakfast)) {
+                    $result[$id] = $breakfast['id'];
+                }
+            }
+            else {
+                $morning = TimeSlot::search(['code', '=', 'AM'])->read(['id'])->first();
+                if(isset($morning['id'])) {
+                    $result[$id] = $morning['id'];
+                }
+            }
+        }
+
         return $result;
     }
 

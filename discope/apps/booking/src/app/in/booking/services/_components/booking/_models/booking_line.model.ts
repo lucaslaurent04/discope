@@ -24,6 +24,8 @@ export class BookingLine {
         public is_rental_unit: boolean = false,
         public is_accomodation: boolean = false,
         public is_meal: boolean = false,
+        public service_date: Date = new Date(),
+        public time_slot_id: number = 0,
         public qty_accounting_method: string = '',
         public qty_vars: string = '',
         public product_id: any = {},

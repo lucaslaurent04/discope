@@ -247,6 +247,11 @@
                                                 "type": "field",
                                                 "value": "logo_document_id",
                                                 "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "accounting_account",
+                                                "width": "100%"
                                             }
                                         ]
                                     },

@@ -39,6 +39,14 @@ interface vmModel {
         formControl: FormControl,
         change: () => void
     },
+    service_date: {
+        formControl: FormControl,
+        change: () => void
+    },
+    time_slot_id: {
+        formControl: FormControl,
+        change: () => void
+    },
     qty_vars: {
         values: any,
         change: (index: number, event: any) => void,
@@ -59,6 +67,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
     @Input() set model(values: any) { this.update(values) }
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
+    @Input() time_slots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
 
@@ -96,6 +105,14 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
             description: {
                 formControl:    new FormControl(),
                 change:         () => this.descriptionChange()
+            },
+            service_date: {
+                formControl:    new FormControl(),
+                change:         () => this.serviceDateChange()
+            },
+            time_slot_id: {
+                formControl:    new FormControl(),
+                change:         () => this.timeSlotIdChange()
             },
             qty_vars: {
                 values:         {},
@@ -167,6 +184,10 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         this.vm.qty.formControl.setValue(this.instance.qty);
         // description
         this.vm.description.formControl.setValue(this.instance.description);
+        // service_date
+        this.vm.service_date.formControl.setValue(this.instance.service_date.toISOString().split('T')[0]);
+        // time_slot_id
+        this.vm.time_slot_id.formControl.setValue(this.instance.time_slot_id);
         // qty_vars
         if(this.instance.qty_vars && this.instance.qty_vars.length) {
             this.vm.qty_vars.values = JSON.parse(this.instance.qty_vars);
@@ -277,6 +298,39 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         }
     }
 
+    private async serviceDateChange() {
+        if(this.instance.service_date == this.vm.service_date.formControl.value) {
+            return;
+        }
+
+        // notify back-end about the change
+        try {
+            const service_date = new Date(this.vm.service_date.formControl.value);
+            await this.api.update(this.instance.entity, [this.instance.id], {service_date: service_date.getTime() / 1000});
+            // relay change to parent component
+            this.updated.emit();
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+    }
+
+    private async timeSlotIdChange() {
+        if(this.instance.time_slot_id == this.vm.time_slot_id.formControl.value) {
+            return;
+        }
+
+        // notify back-end about the change
+        try {
+            await this.api.update(this.instance.entity, [this.instance.id], {time_slot_id: this.vm.time_slot_id.formControl.value});
+            // relay change to parent component
+            this.updated.emit();
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+    }
+
     private async qtyChange() {
         if(this.instance.qty != this.vm.qty.formControl.value) {
             // notify back-end about the change
@@ -310,8 +364,15 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
     }
 
     private async qtyVarsReset() {
-        this.vm.qty_vars.values = new Array(this.group.nb_nights);
+        let qty_vars_qty = this.group.nb_nights;
+        const product_model = this.instance.product_id.product_model_id;
+        if(product_model.type === 'service' && product_model.service_type === 'schedulable' && !product_model.is_repeatable) {
+            qty_vars_qty = product_model.has_duration ? product_model.duration : 1;
+        }
+
+        this.vm.qty_vars.values = new Array(qty_vars_qty);
         this.vm.qty_vars.values.fill(0);
+
         let qty_vars = JSON.stringify(Object.values(this.vm.qty_vars.values));
         // notify back-end about the change
         try {
@@ -381,7 +442,6 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         catch(response) {
             this.api.errorFeedback(response);
         }
-
     }
 
     public async onupdateDiscount(discount_id:any) {
@@ -392,6 +452,60 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         let date = new Date(this.group.date_from.getTime());
         date.setDate(date.getDate() + offset);
         return date;
+    }
+
+    public getPossibleServiceDates(): string[] {
+        const nights_indexes = Array.from(Array(this.group.nb_nights + 1).keys());
+        if(this.instance.product_id.product_model_id.has_duration && this.instance.product_id.product_model_id.duration > 1) {
+            nights_indexes.splice(-1 * this.instance.product_id.product_model_id.duration + 1);
+        }
+
+        const dates: string[] = [];
+        nights_indexes.forEach((night_index) => {
+            const date = new Date(this.group.date_from.getTime() + night_index * 86400 * 1000);
+            dates.push(date.toISOString().split('T')[0]);
+        });
+
+        return dates;
+    }
+
+    public getDateAfterServiceDate(index: number): string {
+        const date = new Date(this.instance.service_date.getTime() + index * 86400 * 1000);
+        return date.toISOString().split('T')[0];
+    }
+
+    public getTimeSlotName(): string {
+        let time_slot_name = '';
+        for(let time_slot of this.getPossibleTimeSlots()) {
+            if(this.instance.time_slot_id === time_slot.id) {
+                time_slot_name = time_slot.name;
+                break;
+            }
+        }
+
+        return time_slot_name;
+    }
+
+    public getPossibleTimeSlots(): { id: number, name: string }[] {
+        if(this.instance.product_id.product_model_id.time_slots_ids && this.instance.product_id.product_model_id.time_slots_ids.length > 0) {
+            return this.instance.product_id.product_model_id.time_slots_ids;
+        }
+
+        let time_slot_codes: ('B'|'AM'|'L'|'PM'|'D'|'EV')[] = [];
+        if(this.instance.product_id.product_model_id.is_meal) {
+            // If is meal allow Breakfast, Lunch and Diner
+            time_slot_codes = ['B', 'L', 'D'];
+        }
+        else if(this.instance.product_id.product_model_id.is_snack) {
+            // If is snack allow Morning and Afternoon
+            time_slot_codes = ['AM', 'PM'];
+        }
+        else {
+            // Else allow Morning, Afternoon and Evening
+            time_slot_codes = ['AM', 'PM', 'EV'];
+        }
+
+        return this.time_slots.filter((time_slot) => time_slot_codes.includes(time_slot.code));
     }
 
     public openPriceEdition() {

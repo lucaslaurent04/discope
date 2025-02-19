@@ -1,0 +1,51 @@
+{
+    "name": "Recherche avancé de Unité locative",
+    "description": "Contrôleur proposant une recherche avancée des Unités locatives.",
+    "model": {
+        "type": {
+            "label": "Type",
+            "description": "Type de l'unité locative, déterminant sa capacité .",
+            "selection": {
+                "all" : "Tous",
+                "building": "Bâtiment",
+                "bedroom": "Chambre",
+                "bed": "Lit",
+                "meetingroom": "Salle de réunion",
+                "diningroom": "Réfectoire",
+                "room": "Salle",
+                "FFE": "Mobilier, accessoires et équipement"
+            },
+            "help": ""
+        },
+        "is_accomodation": {
+            "label": "Logement",
+            "description": "L'unité locative est un logement.",
+            "help": ""
+        },
+        "parent_id": {
+            "label": "Unité parente",
+            "description": "Unité de location à laquelle appartient l'unité actuelle.",
+            "help": ""
+        },
+        "center_id": {
+            "label": "Centre",
+            "description": "Centre auquel est rattachée l'unité locative",
+            "help": ""
+        },
+        "has_pmr_access": {
+            "label": "PMR: Personnes à Mobilité Réduite",
+            "description": "L'unité est accessible aux personnes à mobilité réduite (PMR).",
+            "help": ""
+        },
+        "has_pdv_features": {
+            "label": "PDV: Personnes à Déficience Visuelles",
+            "description": "L'unité est adaptée aux personnes malvoyantes (PDV).",
+            "help": ""
+        },
+        "has_pda_support": {
+            "label": "PDA: Personnes à Déficience Auditives",
+            "description": "L'unité est équipée pour les personnes malentendantes (PDA).",
+            "help": ""
+        }
+    }
+}
