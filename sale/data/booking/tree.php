@@ -159,6 +159,13 @@ $tree = [
                 'value',
                 'discount_id' => ['name']
             ]
+        ],
+        'booking_activities_ids' => [
+            'activity_booking_line_id',
+            'booking_line_group_id',
+            'supplies_booking_lines_ids',
+            'transports_booking_lines_ids',
+            'counter'
         ]
     ]
 ];

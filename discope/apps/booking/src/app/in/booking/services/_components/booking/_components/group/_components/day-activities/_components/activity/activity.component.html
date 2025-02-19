@@ -1,0 +1,50 @@
+<!-- template vars -->
+<div #vProduct="var" [var]="{identification: {folded: true}}">
+</div>
+
+<div class="part" [class.hidden]="!ready">
+    <div class="part-toggle">
+        <button mat-icon-button *ngIf="!vProduct.identification.folded"
+                (click)="vProduct.identification.folded = !vProduct.identification.folded">
+            <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
+        </button>
+        <button mat-icon-button *ngIf="vProduct.identification.folded"
+                (click)="vProduct.identification.folded = !vProduct.identification.folded">
+            <mat-icon style="font-size: 15px;">keyboard_arrow_right</mat-icon>
+        </button>
+    </div>
+
+    <div class="part-container">
+        <div class="row row-first">
+            <div class="cell">
+                <mat-form-field *ngIf="activityBookingLine == null || (activityBookingLine.product_id | json) == '{}' || activityBookingLine.product_id?.id == 0">
+                    <mat-label>Activité</mat-label>
+                    <input *ngIf="!group.is_locked"
+                           matInput
+                           type="text"
+                           [matAutocomplete]="productAutocomplete"
+                           [value]="vm.product.name"
+                           (keyup)="vm.product.inputChange($event)"
+                           (focus)="vm.product.focus()"
+                           (blur)="vm.product.restore()"
+                           placeholder="Commencez à taper le nom" />
+                    <input *ngIf="group.is_locked" matInput disabled type="text" [value]="vm.product.name" />
+                    <mat-autocomplete #productAutocomplete="matAutocomplete"
+                                      [displayWith]="vm.product.display"
+                                      (optionSelected)="onchangeProduct($event)">
+                        <div *ngIf="vm.product.filteredList | async; let products_list">
+                            <mat-option *ngFor="let product of products_list" [value]="product">
+                                <span title="{{product.sku}}">{{product.name}}</span>
+                            </mat-option>
+                            <mat-option *ngIf="products_list.length == 0"><i>pas de résultat</i></mat-option>
+                        </div>
+                    </mat-autocomplete>
+                </mat-form-field>
+                <mat-form-field *ngIf="activityBookingLine != null && activityBookingLine.product_id?.id > 0">
+                    <mat-label>Activité</mat-label>
+                    <input matInput [disabled]="group.is_locked" type="text" [value]="vm.product.name" readonly="readonly" />
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</div>

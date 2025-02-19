@@ -77,7 +77,8 @@
                     max-height: 80px;
                 }
 
-                .row-products-title {
+                .row-products-title,
+                .row-activities-title {
                     flex: 1;
                     height: 40px;
                     line-height: 40px;
@@ -187,6 +188,22 @@
 
     }
 
+    .activities-header {
+        padding: 0 12px 0 0;
+        width: 100%;
+        margin-bottom: 1px;
+    }
+
+    .activities-list {
+        position: relative;
+        padding: 0 12px 0 0;
+        width: 100%;
+
+        .activity-item {
+            position: relative;
+            background-color: white;
+        }
+    }
 }
 
 .cdk-drag-preview {

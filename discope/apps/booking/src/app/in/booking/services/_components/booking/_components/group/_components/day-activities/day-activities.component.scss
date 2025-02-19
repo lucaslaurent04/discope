@@ -1,0 +1,40 @@
+:host {
+    width: 100%;
+
+    .days-list {
+        display: flex;
+
+        .day-name-col {
+            width: 90px;
+            padding-left: 10px;
+            padding-top: 25px;
+            font-size: 0.9rem;
+        }
+
+        .date-col {
+            width: 100px;
+            padding-top: 25px;
+            font-size: 0.9rem;
+        }
+
+        .activities-container-col {
+            width: 100%;
+
+            .activity-row {
+                display: flex;
+                height: 70px;
+                align-items: center;
+
+                .moment-col {
+                    width: 80px;
+                    font-size: 1rem;
+                    text-align: right;
+                }
+
+                .activity-col {
+                    flex: 1;
+                }
+            }
+        }
+    }
+}

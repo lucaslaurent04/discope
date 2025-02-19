@@ -325,6 +325,13 @@ class BookingLineGroup extends Model {
                 'ondetach'          => 'ondetachAgeRange'
             ],
 
+            'booking_activities_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\BookingActivity',
+                'foreign_field'     => 'booking_line_group_id',
+                'description'       => "The booking activities that refer to the booking line group."
+            ]
+
         ];
     }
 

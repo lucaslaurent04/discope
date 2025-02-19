@@ -286,6 +286,34 @@ class BookingLine extends Model {
                 'default'           => false
             ],
 
+            'is_activity' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => 'Does the line relate to an activity product?',
+                'store'             => true,
+                'function'          => 'calcIsActivity'
+            ],
+
+            'is_transport' => [
+                'type'              => 'boolean',
+                'description'       => 'Does the line relate to a transport product?',
+                'default'           => false
+            ],
+
+            'is_supply' => [
+                'type'              => 'boolean',
+                'description'       => 'Does the line relate to a supply product?',
+                'default'           => false
+            ],
+
+            'booking_activity_id' => [
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\booking\BookingActivity',
+                'description'       => 'Booking Activity this line relates to.',
+                'help'              => 'If the line refers to a transport/supply, it means that the transport/supply is needed for a specific activity.',
+                'ondelete'          => 'cascade'
+            ],
+
             'service_date' => [
                 'type'              => 'computed',
                 'result_type'       => 'date',
@@ -420,6 +448,7 @@ class BookingLine extends Model {
             'product_id.product_model_id.has_duration',
             'product_id.product_model_id.duration',
             'product_id.product_model_id.is_repeatable',
+            'product_id.product_model_id.is_activity',
             'product_id.has_age_range',
             'product_id.age_range_id',
             'booking_id',
@@ -511,6 +540,9 @@ class BookingLine extends Model {
             }
             if($qty != $line['qty'] || $line['is_rental_unit']) {
                 $om->update(self::getType(), $lid, ['qty' => $qty]);
+            }
+            if($line['product_id.product_model_id.is_activity']) {
+                BookingActivity::create(['activity_booking_line_id' => $lid]);
             }
         }
 
@@ -980,6 +1012,15 @@ class BookingLine extends Model {
      * @return void
      */
     public static function ondelete($om, $oids) {
+        $lines = $om->read(self::getType(), $oids, ['product_id.product_model_id.is_activity']);
+        if($lines > 0) {
+            foreach($lines as $oid => $odata) {
+                if($odata['product_id.product_model_id.is_activity']) {
+                    BookingActivity::search(['activity_booking_line_id', '=', $oid])->delete();
+                }
+            }
+        }
+
         $om->callonce(self::getType(), 'updateSPM', $oids, ['deleted' => $oids]);
     }
 
@@ -1199,6 +1240,18 @@ class BookingLine extends Model {
                 $result[$oid] = $odata['product_id.product_model_id.is_meal'];
             }
         }
+        return $result;
+    }
+
+    public static function calcIsActivity($self): array {
+        $result = [];
+        $self->read(['product_id' => ['product_model_id' => ['is_activity']]]);
+        foreach($self as $id => $booking_line) {
+            if(isset($booking_line['product_id']['product_model_id']['is_activity'])) {
+                $result[$id] = $booking_line['product_id']['product_model_id']['is_activity'];
+            }
+        }
+
         return $result;
     }
 

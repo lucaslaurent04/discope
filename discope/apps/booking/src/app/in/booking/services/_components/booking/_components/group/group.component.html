@@ -1,5 +1,5 @@
 <!-- template vars -->
-<div #vGroup="var" [var]="{identification: {folded: true}, products: {folded: true}, accomodations: {folded: false}, meals: {folded: true}}"></div>
+<div #vGroup="var" [var]="{identification: {folded: true}, products: {folded: true}, activities: {folded: true}, accomodations: {folded: false}, meals: {folded: true}}"></div>
 
 <div [class.hidden]="!ready">
 
@@ -552,6 +552,42 @@
 
         </div>
 
+        <!-- activities -->
+        <div class="part">
+            <div class="part-toggle">
+                <button mat-icon-button *ngIf="!vGroup.activities.folded" (click)="vGroup.activities.folded = true">
+                    <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
+                </button>
+                <button mat-icon-button *ngIf="vGroup.activities.folded" (click)="vGroup.activities.folded = false">
+                    <mat-icon style="font-size: 15px;">keyboard_arrow_right</mat-icon>
+                </button>
+            </div>
+
+            <div class="part-container">
+                <div class="row">
+                    <div class="row-activities-title">
+                        <span>Activités ({{instance.booking_activities_ids.length}})</span>
+                    </div>
+                </div>
+                <div class="row" [class.hidden]="vGroup.activities.folded">
+                    <div style="width: 100%;">
+                        <div class="activities-header"></div>
+                        <div class="activities-list">
+                            <!-- activities -->
+                            <div class="activity-item" *ngFor="let bookingActivityDay of bookingActivitiesDays">
+                                <booking-services-booking-group-day-activities
+                                    [bookingActivityDay]="bookingActivityDay"
+                                    [booking]="booking"
+                                    [group]="instance"
+                                    [timeSlots]="time_slots"
+                                    (updated)="onupdateActivity()"
+                                ></booking-services-booking-group-day-activities>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- accommodations -->
         <div class="part">
