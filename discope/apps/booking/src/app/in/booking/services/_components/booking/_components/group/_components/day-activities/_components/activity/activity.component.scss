@@ -51,7 +51,7 @@
                 }
 
                 .cell:first-child {
-                    flex: 0 0 calc((100% + 10px) * 0.40 - 10px);
+                    flex: 0 0 calc((100% + 5px) * 0.40 - 5px);
                 }
 
                 .cell:not(:first-child) {
