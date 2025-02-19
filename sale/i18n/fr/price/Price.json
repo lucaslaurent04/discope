@@ -65,7 +65,7 @@
         "rate_class_id": {
             "label": "Catégorie tarifaire",
             "description": "La catégorie tarifaire qui s'applique au prix, définissant les variations en fonction du public cible.",
-            "help": ""
+            "help": "La catégorie tarifaire qui s'applique au prix, définissant les variations en fonction du public cible."
         }
     },
     "view": {
