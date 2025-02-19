@@ -47,7 +47,16 @@
                 </mat-form-field>
             </div>
             <div class="cell cell-right">
-                1
+                <span *ngIf="group.is_locked">
+                    {{activityBookingLine.qty}}
+                </span>
+                <mat-form-field *ngIf="!group.is_locked">
+                    <mat-label>Quantité</mat-label>
+                    <input type="number" matInput (blur)="vm.qty.change()" [formControl]="vm.qty.formControl">
+                    <mat-error *ngIf="vm.qty.formControl.hasError('required')">
+                        Ne peut être vide.
+                    </mat-error>
+                </mat-form-field>
             </div>
             <div class="cell cell-right">
                 2
