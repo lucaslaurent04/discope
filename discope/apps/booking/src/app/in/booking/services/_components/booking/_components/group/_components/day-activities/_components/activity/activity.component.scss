@@ -1,28 +1,33 @@
 :host {
     .part {
         display: flex;
-        width: 100%;
-        align-items: center;
 
         .part-toggle {
             flex: 0 1;
-            display: inline-block;
-            vertical-align: top;
-            padding: 5px 0px 0px 20px;
+            display: flex;
+            align-items: start;
+            justify-content: right;
+            min-width: 140px;
+            max-width: 140px;
+            margin-right: 15px;
+
+            span {
+                padding-top: 10px;
+            }
         }
 
         .part-container {
+            display: flex;
+            flex-direction: column;
             flex: 1;
-            display: inline-block;
             width: 100%;
             min-height: 45px;
 
             .row {
-                width: 100%;
                 display: flex;
+                width: 100%;
                 padding: 5px 0;
                 flex: 1;
-
 
                 .cell {
                     position: relative;
@@ -31,7 +36,6 @@
                     white-space: nowrap;
                     text-overflow: ellipsis;
                     overflow: hidden;
-
                 }
 
                 .cell.cell-text {
@@ -47,11 +51,11 @@
                 }
 
                 .cell:first-child {
-                    flex: 0 0 calc((100% + 60px)*0.40 - 60px);
+                    flex: 0 0 calc((100% + 10px) * 0.40 - 10px);
                 }
 
                 .cell:not(:first-child) {
-                    flex: 1 0 calc((100% + 60px)*0.08);
+                    flex: 1 0 calc((100% + 10px) * 0.08);
                 }
             }
 
@@ -71,6 +75,25 @@
             .row.row-thin {
                 padding: 0;
             }
+        }
+    }
+
+    mat-form-field {
+        width: 100%;
+        padding: 0;
+    }
+
+    mat-form-field.header {
+        margin-top: -5px;
+
+        input {
+            font-size: 22px;
+        }
+    }
+
+    mat-form-field.invisible {
+        ::ng-deep.mat-form-field-underline {
+            display: none !important;
         }
     }
 }

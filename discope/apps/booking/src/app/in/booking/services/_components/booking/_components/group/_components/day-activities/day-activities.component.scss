@@ -1,40 +1,33 @@
 :host {
+    display: flex;
     width: 100%;
 
-    .days-list {
+    .day-date-cells-wrapper {
         display: flex;
+        min-width: 210px;
+        max-width: 210px;
 
-        .day-name-col {
-            width: 90px;
-            padding-left: 10px;
-            padding-top: 25px;
+        .cell {
+            margin-right: 15px;
+            padding: 15px 10px 0 10px;
+        }
+
+        .day-name-cell {
+            min-width: 80px;
+            max-width: 80px;
+            text-align: right;
             font-size: 0.9rem;
         }
 
-        .date-col {
-            width: 100px;
-            padding-top: 25px;
+        .date-cell {
+            min-width: 100px;
+            max-width: 100px;
+            text-align: center;
             font-size: 0.9rem;
         }
+    }
 
-        .activities-container-col {
-            width: 100%;
-
-            .activity-row {
-                display: flex;
-                height: 70px;
-                align-items: center;
-
-                .moment-col {
-                    width: 80px;
-                    font-size: 1rem;
-                    text-align: right;
-                }
-
-                .activity-col {
-                    flex: 1;
-                }
-            }
-        }
+    .activities-container {
+        width: 100%;
     }
 }

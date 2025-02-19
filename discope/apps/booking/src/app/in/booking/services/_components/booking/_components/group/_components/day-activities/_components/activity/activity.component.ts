@@ -11,8 +11,8 @@ interface vmModel {
     product: {
         name: string,
         formControl: FormControl,
-        inputClue: ReplaySubject < any > ,
-        filteredList: Observable < any > ,
+        inputClue: ReplaySubject <any> ,
+        filteredList: Observable <any> ,
         inputChange: (event: any) => void,
         focus: () => void,
         restore: () => void,
@@ -30,7 +30,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
 
     @Input() activityBookingLine: BookingLine | null;
     @Input() date: Date;
-    @Input() timeSlotId: number;
+    @Input() timeSlot: any;
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
 
@@ -39,6 +39,12 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
     public ready: boolean = false;
 
     public vm: vmModel;
+
+    public mapTimeSlotCodeName: any = {
+        'AM': 'Matin',
+        'PM': 'Après-Midi',
+        'EV': 'Soir',
+    };
 
     constructor(
         private api: ApiService
@@ -134,7 +140,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                     booking_id: this.booking.id,
                     booking_line_group_id: this.group.id,
                     service_date: this.date.getTime() / 1000,
-                    time_slot_id: this.timeSlotId
+                    time_slot_id: this.timeSlot.id
                 });
                 await this.api.call('?do=sale_booking_update-bookingline-product', {
                     id: new_line.id,
