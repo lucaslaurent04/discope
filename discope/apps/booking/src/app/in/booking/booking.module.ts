@@ -15,6 +15,8 @@ import { BookingServicesBookingGroupComponent } from './services/_components/boo
 import { BookingServicesBookingGroupLineComponent } from './services/_components/booking/_components/group/_components/line/line.component';
 import { BookingServicesBookingGroupAccomodationComponent } from './services/_components/booking/_components/group/_components/accomodation/accomodation.component';
 import { BookingServicesBookingGroupAccomodationAssignmentComponent } from './services/_components/booking/_components/group/_components/accomodation/_components/assignment.component';
+import { BookingServicesBookingGroupDayActivitiesComponent } from './services/_components/booking/_components/group/_components/day-activities/day-activities.component';
+import { BookingServicesBookingGroupDayActivitiesActivityComponent } from './services/_components/booking/_components/group/_components/day-activities/_components/activity/activity.component';
 import { BookingServicesBookingGroupAccomodationAssignmentsEditorComponent } from './services/_components/booking/_components/group/_components/accomodation/_components/assignmentseditor/assignmentseditor.component';
 import { BookingServicesBookingGroupAccomodationAssignmentsEditorAssignmentComponent } from './services/_components/booking/_components/group/_components/accomodation/_components/assignmentseditor/_components/assignment.component';
 import { BookingServicesBookingGroupMealPrefComponent } from './services/_components/booking/_components/group/_components/mealpref/mealpref.component';
@@ -41,6 +43,7 @@ import { BookingOptionComponent } from './option/option.component';
     BookingServicesBookingComponent, BookingServicesBookingGroupComponent,
     BookingServicesBookingGroupLineComponent, BookingServicesBookingGroupAccomodationComponent,
     BookingServicesBookingGroupAccomodationAssignmentComponent,
+    BookingServicesBookingGroupDayActivitiesComponent, BookingServicesBookingGroupDayActivitiesActivityComponent,
     BookingServicesBookingGroupAccomodationAssignmentsEditorComponent,
     BookingServicesBookingGroupAccomodationAssignmentsEditorAssignmentComponent,
     BookingServicesBookingGroupMealPrefComponent, BookingServicesBookingGroupAgeRangeComponent,

@@ -1,6 +1,5 @@
 import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ChangeDetectorRef, ViewChildren, QueryList, ViewChild } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService, AuthService, ContextService, TreeComponent, SbDialogConfirmDialog } from 'sb-shared-lib';
 import { BookingLineGroup } from '../../_models/booking_line_group.model';
 import { BookingLine } from '../../_models/booking_line.model';
@@ -27,8 +26,14 @@ interface BookingLineGroupComponentsMap {
     meal_preferences_ids: QueryList<BookingServicesBookingGroupMealPrefComponent>,
     age_range_assignments_ids: QueryList<BookingServicesBookingGroupAgeRangeComponent>,
     sojourn_product_models_ids: QueryList<BookingServicesBookingGroupAccomodationComponent>
-};
+}
 
+export interface BookingActivityDay {
+    date: Date,
+    am_activity: BookingLine|null,
+    pm_activity: BookingLine|null,
+    ev_activity: BookingLine|null,
+}
 
 interface vmModel {
     price: {
@@ -110,6 +115,8 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     public groupTypeOpen:boolean = false;
     public groupNbPersOpen: boolean = false;
     public groupDatesOpen: boolean = false;
+
+    public bookingActivitiesDays: BookingActivityDay[] = [];
 
     public action_in_progress: boolean = false;
 
@@ -194,7 +201,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         };
     }
 
-
     public ngAfterViewInit() {
         // init local componentsMap
         let map:BookingLineGroupComponentsMap = {
@@ -205,7 +211,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         };
         this.componentsMap = map;
     }
-
 
     public ngOnInit() {
         if(this.booking.status == 'quote' || (this.instance.is_extra && !this.instance.has_consumptions)) {
@@ -232,7 +237,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
             this.vm.name.value = value;
         });
 
-
         this.vm.timerange.checkin.formControl.valueChanges.subscribe( () => {
             this.onchangeTimeFrom();
         });
@@ -240,6 +244,8 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         this.vm.timerange.checkout.formControl.valueChanges.subscribe( () => {
             this.onchangeTimeTo();
         });
+
+        this.initBookingActivitiesDays();
 
         this.ready = true;
     }
@@ -269,6 +275,9 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
                 spm.refreshAvailableRentalUnits();
             }
         }
+
+        // Update activities
+        this.initBookingActivitiesDays();
     }
 
     public calcRateClass() {
@@ -349,7 +358,12 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         });
     }
 
-    public async onupdateLine() {
+    public onupdateLine() {
+        // relay to parent
+        this.updated.emit();
+    }
+
+    public onupdateActivity() {
         // relay to parent
         this.updated.emit();
     }
@@ -631,7 +645,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         });
     }
 
-
     public async onchangeSojournType(event:any) {
         this.vm.sojourn_type.value = event.value;
         // update model
@@ -846,4 +859,57 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         return days_of_week[ date.getDay() ];
     }
 
+    public initBookingActivitiesDays() {
+        const group_activity_booking_lines = [];
+        for(let booking_activity of this.instance.booking_activities_ids) {
+            for(let booking_line of this.instance.booking_lines_ids) {
+                if(booking_activity.activity_booking_line_id === booking_line.id) {
+                    group_activity_booking_lines.push(booking_line);
+                }
+            }
+        }
+
+        const bookingActivitiesDays = [];
+        let date = new Date(this.instance.date_from);
+        while(date <= this.instance.date_to) {
+            const bookingActivityDay: BookingActivityDay = {
+                date: new Date(date),
+                am_activity: null,
+                pm_activity: null,
+                ev_activity: null
+            };
+
+            for(let booking_line of group_activity_booking_lines) {
+                if(!booking_line.service_date) {
+                    continue;
+                }
+
+                let serviceDate = new Date(booking_line.service_date).toISOString().split('T')[0]
+
+                if(serviceDate === date.toISOString().split('T')[0]) {
+                    const time_slot = this.time_slots.find((time_slot: any) => time_slot.id === booking_line.time_slot_id);
+                    if(time_slot) {
+                        switch (time_slot.code) {
+                            case "AM":
+                                bookingActivityDay.am_activity = booking_line;
+                                break;
+                            case "PM":
+                                bookingActivityDay.pm_activity = booking_line;
+                                break;
+                            case "EV":
+                                bookingActivityDay.ev_activity = booking_line;
+                                break;
+                        }
+                    }
+                }
+            }
+
+            bookingActivitiesDays.push(bookingActivityDay);
+
+            date.setDate(date.getDate() + 1);
+        }
+
+        this.bookingActivitiesDays = bookingActivitiesDays;
+        console.log('bookingActivitiesDays', this.bookingActivitiesDays);
+    }
 }

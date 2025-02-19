@@ -1,0 +1,52 @@
+<div class="days-list">
+    <div class="col day-name-col">
+        {{bookingActivityDay.date | date: 'EEEE' | titlecase}}
+    </div>
+    <div class="col date-col">
+        {{bookingActivityDay.date | date: 'dd/MM/YYYY'}}
+    </div>
+    <div class="col activities-container-col">
+        <div class="activity-row am-row">
+            <div class="moment-col">
+                Matin
+            </div>
+            <div class="activity-col">
+                <booking-services-booking-group-day-activities-activity [activityBookingLine]="bookingActivityDay.am_activity"
+                                                                        [date]="bookingActivityDay.date"
+                                                                        [timeSlotId]="mapTimeSlotsCodeId['AM']"
+                                                                        [group]="group"
+                                                                        [booking]="booking"
+                                                                        (updated)="onupdateActivity()"
+                ></booking-services-booking-group-day-activities-activity>
+            </div>
+        </div>
+        <div class="activity-row pm-row">
+            <div class="moment-col">
+                Après-Midi
+            </div>
+            <div class="activity-col">
+                <booking-services-booking-group-day-activities-activity [activityBookingLine]="bookingActivityDay.pm_activity"
+                                                                        [date]="bookingActivityDay.date"
+                                                                        [timeSlotId]="mapTimeSlotsCodeId['PM']"
+                                                                        [group]="group"
+                                                                        [booking]="booking"
+                                                                        (updated)="onupdateActivity()"
+                ></booking-services-booking-group-day-activities-activity>
+            </div>
+        </div>
+        <div class="activity-row ev-row">
+            <div class="moment-col">
+                Soir
+            </div>
+            <div class="activity-col">
+                <booking-services-booking-group-day-activities-activity [activityBookingLine]="bookingActivityDay.ev_activity"
+                                                                        [date]="bookingActivityDay.date"
+                                                                        [timeSlotId]="mapTimeSlotsCodeId['EV']"
+                                                                        [group]="group"
+                                                                        [booking]="booking"
+                                                                        (updated)="onupdateActivity()"
+                ></booking-services-booking-group-day-activities-activity>
+            </div>
+        </div>
+    </div>
+</div>
