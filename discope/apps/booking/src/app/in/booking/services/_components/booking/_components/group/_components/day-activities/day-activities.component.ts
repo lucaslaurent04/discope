@@ -19,20 +19,20 @@ export class BookingServicesBookingGroupDayActivitiesComponent implements OnInit
 
     public ready: boolean = false;
 
-    public mapTimeSlotsCodeId : any = {
-        'B': 0,
-        'AM': 0,
-        'L': 0,
-        'PM': 0,
-        'D': 0,
-        'EV': 0
+    public mapTimeSlotsCode : any = {
+        'B': null,
+        'AM': null,
+        'L': null,
+        'PM': null,
+        'D': null,
+        'EV': null
     };
 
     public ngOnInit() {
         this.ready = true;
 
         for(let timeSlot of this.timeSlots) {
-            this.mapTimeSlotsCodeId[timeSlot.code] = timeSlot.id;
+            this.mapTimeSlotsCode[timeSlot.code] = timeSlot;
         }
     }
 

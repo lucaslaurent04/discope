@@ -1,15 +1,16 @@
 <!-- template vars -->
-<div #vProduct="var" [var]="{identification: {folded: true}}">
-</div>
+<div #vActivity="var" [var]="{details: {folded: true}}"></div>
 
 <div class="part" [class.hidden]="!ready">
     <div class="part-toggle">
-        <button mat-icon-button *ngIf="!vProduct.identification.folded"
-                (click)="vProduct.identification.folded = !vProduct.identification.folded">
+        <span>{{mapTimeSlotCodeName[timeSlot.code]}}</span>
+
+        <button mat-icon-button *ngIf="!vActivity.details.folded"
+                (click)="vActivity.details.folded = !vActivity.details.folded">
             <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
         </button>
-        <button mat-icon-button *ngIf="vProduct.identification.folded"
-                (click)="vProduct.identification.folded = !vProduct.identification.folded">
+        <button mat-icon-button *ngIf="vActivity.details.folded"
+                (click)="vActivity.details.folded = !vActivity.details.folded">
             <mat-icon style="font-size: 15px;">keyboard_arrow_right</mat-icon>
         </button>
     </div>
@@ -45,6 +46,25 @@
                     <input matInput [disabled]="group.is_locked" type="text" [value]="vm.product.name" readonly="readonly" />
                 </mat-form-field>
             </div>
+            <div class="cell cell-right">
+                1
+            </div>
+            <div class="cell cell-right">
+                2
+            </div>
+            <div class="cell cell-right">
+                2
+            </div>
+            <div class="cell cell-right">
+                3
+            </div>
+            <div class="cell cell-actions">
+                Del
+            </div>
+        </div>
+
+        <div class="row" *ngIf="!vActivity.details.folded">
+            Details
         </div>
     </div>
 </div>
