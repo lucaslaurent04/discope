@@ -37,7 +37,7 @@
                                                 "type": "field",
                                                 "value": "price_vat",
                                                 "width": "33%"
-                                            }                                            
+                                            }
                                         ]
                                     },
                                     {
@@ -59,6 +59,16 @@
                                                 "type": "field",
                                                 "label": "Type",
                                                 "value": "type",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_rate_class",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "rate_class_id",
                                                 "width": "100%"
                                             }
                                         ]
