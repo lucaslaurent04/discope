@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import { ApiService } from 'sb-shared-lib';
 import { BookingLineGroup } from '../../../../../../_models/booking_line_group.model';
-import { FormControl } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Observable, ReplaySubject } from 'rxjs';
 import { debounceTime, map, mergeMap } from 'rxjs/operators';
 import { Booking } from '../../../../../../_models/booking.model';
@@ -18,7 +18,11 @@ interface vmModel {
         restore: () => void,
         reset: () => void,
         display: (type: any) => string
-    }
+    },
+    qty: {
+        formControl: FormControl,
+        change: () => void
+    },
 }
 
 @Component({
@@ -60,7 +64,11 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                 restore:        () => this.productRestore(),
                 reset:          () => this.productReset(),
                 display:        (type:any) => this.productDisplay(type)
-            }
+            },
+            qty: {
+                formControl:    new FormControl('', Validators.required),
+                change:         () => this.qtyChange()
+            },
         };
     }
 
@@ -75,6 +83,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
         );
 
         this.vm.product.name = this.activityBookingLine?.product_id ? this.activityBookingLine.product_id.name : '';
+        this.vm.qty.formControl.setValue(this.activityBookingLine?.qty ? this.activityBookingLine.qty : 0);
     }
 
     private async filterProducts(name: string): Promise<any> {
@@ -153,6 +162,20 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
             }
             catch(response) {
                 this.vm.product.formControl.setErrors({ 'missing_price': 'Pas de liste de prix pour ce produit.' });
+                this.api.errorFeedback(response);
+            }
+        }
+    }
+
+    public async qtyChange() {
+        if(this.activityBookingLine.qty != this.vm.qty.formControl.value) {
+            // notify back-end about the change
+            try {
+                await this.api.update('sale\\booking\\BookingLine', [this.activityBookingLine.id], {qty: this.vm.qty.formControl.value});
+                // relay change to parent component
+                this.updated.emit();
+            }
+            catch(response) {
                 this.api.errorFeedback(response);
             }
         }
