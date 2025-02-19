@@ -47,9 +47,6 @@
                 </mat-form-field>
             </div>
             <div class="cell cell-right">
-                <span *ngIf="group.is_locked">
-                    {{activityBookingLine.qty}}
-                </span>
                 <mat-form-field *ngIf="!group.is_locked">
                     <mat-label>Quantité</mat-label>
                     <input type="number" matInput (blur)="vm.qty.change()" [formControl]="vm.qty.formControl">
@@ -58,14 +55,14 @@
                     </mat-error>
                 </mat-form-field>
             </div>
-            <div class="cell cell-right">
-                2
+            <div class="cell cell-right" style="cursor: pointer; padding-top: 11px">
+                <span>{{(activityBookingLine?.unit_price ? activityBookingLine.unit_price : 0) | number: '1.2-2'}} €</span>
             </div>
-            <div class="cell cell-right">
-                2
+            <div class="cell cell-right" style="cursor: pointer; padding-top: 11px">
+                <span>{{(activityBookingLine?.vat_rate ? activityBookingLine.vat_rate : 0) | percent: '1.2-2'}}</span>
             </div>
-            <div class="cell cell-right">
-                3
+            <div class="cell cell-text cell-right">
+                <span>{{(activityBookingLine?.price ? activityBookingLine.price : 0) | number: '1.2-2'}} €</span>
             </div>
             <!-- actions (empty: set in parent component) -->
             <div class="cell cell-actions"></div>
