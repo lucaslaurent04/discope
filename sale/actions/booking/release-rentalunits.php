@@ -49,7 +49,7 @@ if($booking['status'] != 'quote') {
     throw new Exception("invalid_status", QN_ERROR_INVALID_PARAM);
 }
 
-$channelmanager_enabled = Setting::get_value('sale', 'channelmanager', 'enabled', false);
+$channelmanager_enabled = Setting::get_value('sale', 'booking', 'channelmanager.enabled', false);
 if($channelmanager_enabled) {
     // rental units were released: check if consistency must be maintained with channel manager (if booking impacts a rental unit that is linked to a channelmanager room type)
     $map_rental_units_ids = [];
