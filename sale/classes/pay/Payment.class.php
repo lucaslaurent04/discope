@@ -240,10 +240,13 @@ class Payment extends Model {
      * @return array                       Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be deleted.
      */
     public static function candelete($om, $ids) {
-        $payments = $om->read(self::getType(), $ids, [ 'status' ]);
+        $payments = $om->read(self::getType(), $ids, [ 'status', 'is_exported' ]);
 
         if($payments > 0) {
             foreach($payments as $id => $payment) {
+                if($payment['is_exported']) {
+                    return ['is_exported' => ['non_removable' => 'Paid payment cannot be removed.']];
+                }
                 if($payment['status'] == 'paid') {
                     return ['status' => ['non_removable' => 'Paid payment cannot be removed.']];
                 }

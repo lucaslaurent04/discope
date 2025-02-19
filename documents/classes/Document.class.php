@@ -123,8 +123,10 @@ class Document extends Model {
         $res = $om->read(__CLASS__, $oids, ['hash']);
 
         $result = [];
-        foreach($res as $oid => $odata) {
-            $result[$oid] = '/document/'.$odata['hash'];
+        foreach($res as $id => $odata) {
+            if(strlen($odata['hash'])) {
+                $result[$id] = '/document/'.$odata['hash'];
+            }
         }
 
         return $result;
@@ -160,7 +162,7 @@ class Document extends Model {
      * @param $content_type string  The content_type found for for the file.
      * @param $name string  (optional) The name of the file, if any.
      *
-     * @return string | bool    In case of success, the extesnion is return. If no extension matches the content type, it returns false.
+     * @return string | bool    In case of success, the extension is return. If no extension matches the content type, it returns false.
      */
     public static function _getExtensionFromType($content_type, $name = '') {
 

@@ -6,6 +6,8 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace identity;
+
+use documents\Document;
 use equal\data\DataGenerator;
 use equal\orm\Model;
 use sale\booking\Booking;
@@ -536,7 +538,7 @@ class Identity extends Model {
             // Companies can also have an official website.
             'website' => [
                 'type'              => 'string',
-                'usage'             => 'url',
+                'usage'             => 'uri/url',
                 'description'       => 'Organisation main official website URL, if any.',
                 'visible'           => ['type', '<>', 'I']
             ],
@@ -594,7 +596,8 @@ class Identity extends Model {
                 'type'              => 'string',
                 'selection'         => ['M' => 'Male', 'F' => 'Female', 'X' => 'Non-binary'],
                 'description'       => 'Reference contact gender.',
-                'visible'           => ['type', '=', 'I']
+                'visible'           => ['type', '=', 'I'],
+                'default'           => 'M'
             ],
 
             'title' => [
@@ -631,6 +634,13 @@ class Identity extends Model {
                 'foreign_field'     => 'partner_identity_id',
                 'description'       => 'Partnerships that relate to the identity.',
                 'domain'            => ['owner_identity_id', '<>', 'object.id']
+            ],
+
+            'customer_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\customer\Customer',
+                'foreign_field'     => 'partner_identity_id',
+                'description'       => 'Customer associated to this identity, if any.'
             ],
 
             'flag_latepayer' => [
@@ -703,20 +713,26 @@ class Identity extends Model {
                 'description'       => 'List of invoices relating to the identity (as customer).'
             ],
 
-            // ota
             'is_ota' => [
                 'type'              => 'boolean',
                 'description'       => 'Is the identity from OTA origin.',
                 'default'           => false
             ],
 
-            // readonly
             'is_readonly' => [
                 'type'              => 'boolean',
                 'description'       => 'Is the identity readonly, used for static identities that should not be updated trivially.',
                 'default'           => false,
                 'readonly'          => true
-            ]
+            ],
+
+            'logo_document_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'documents\Document',
+                'description'       => 'The document containing the logo associated with the identity.',
+                'visible'           => ['type' ,'<>' , 'I']
+            ],
+
 
         ];
     }
