@@ -870,7 +870,7 @@ class BookingLine extends Model {
                 [
                     [
                         ['price_list_category_id', '=', $line['booking_id.center_id.price_list_category_id']],
-                        ['date_from', '>=', $line['booking_line_group_id.date_from']],
+                        ['date_from', '<=', $line['booking_line_group_id.date_from']],
                         ['date_to', '>=', $line['booking_line_group_id.date_from']],
                         ['status', '=', 'pending']
                     ]
