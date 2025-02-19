@@ -16,6 +16,7 @@ export class BookingServicesBookingGroupDayActivitiesComponent implements OnInit
     @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
 
     @Output() updated = new EventEmitter();
+    @Output() deleteLine = new EventEmitter();
 
     public ready: boolean = false;
 
@@ -39,5 +40,9 @@ export class BookingServicesBookingGroupDayActivitiesComponent implements OnInit
     public onupdateActivity() {
         // relay to parent
         this.updated.emit();
+    }
+
+    public ondeleteActivity(lineId: number) {
+        this.deleteLine.emit(lineId);
     }
 }
