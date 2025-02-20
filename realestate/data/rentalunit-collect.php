@@ -106,12 +106,12 @@ else {
 }
 
 
-if(isset($params['parent_id'])) {
+if(isset($params['parent_id']) && $params['parent_id'] > 0) {
     $domain[] = ['parent_id', '=', $params['parent_id']];
 }
 
 if(isset($params['type']) && strlen($params['type']) > 0 && $params['type'] != 'all') {
-    $domain = ['type', '=', $params['type']];
+    $domain[] = ['type', '=', $params['type']];
 }
 
 
