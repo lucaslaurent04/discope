@@ -47,6 +47,11 @@ list($params, $providers) = eQual::announce([
             'type'              => 'date',
             'description'       => 'Date interval Upper limit.'
         ],
+        'all_states' => [
+            'type'              => 'boolean',
+            'description'       => 'Include lines from archived invoices.',
+            'default'           => true
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -77,22 +82,40 @@ if(isset($params['organisation_id']) && $params['organisation_id'] > 0) {
     }
 }
 
+$invoice_states = ['instance'];
+
+if($params['all_states']) {
+    $invoice_states[] = 'archive';
+}
+
 if(isset($params['center_office_id']) && $params['center_office_id'] > 0) {
-    $invoices_ids = Invoice::search(['center_office_id', 'in', $params['center_office_id']])->ids();
+    $invoices_ids = Invoice::search([
+            ['center_office_id', 'in', $params['center_office_id']],
+            ['state', 'in', $invoice_states],
+        ])
+        ->ids();
     if(count($invoices_ids)) {
         $domain = Domain::conditionAdd($domain, ['invoice_id', 'in', $invoices_ids]);
     }
 }
 
 if(isset($params['customer_identity_id']) && $params['customer_identity_id'] > 0) {
-    $invoices_ids = Invoice::search(['customer_identity_id', 'in', $params['customer_identity_id']])->ids();
+    $invoices_ids = Invoice::search([
+            ['customer_identity_id', 'in', $params['customer_identity_id']],
+            ['state', 'in', $invoice_states]
+        ])
+        ->ids();
     if(count($invoices_ids)) {
         $domain = Domain::conditionAdd($domain, ['invoice_id', 'in', $invoices_ids]);
     }
 }
 
 if(isset($params['date_from']) && $params['date_from'] > 0) {
-    $invoices_ids = Invoice::search(['date', '>=', $params['date_from']])->ids();
+    $invoices_ids = Invoice::search([
+            ['date', '>=', $params['date_from']],
+            ['state', 'in', $invoice_states]
+        ])
+        ->ids();
     if(count($invoices_ids)) {
         $domain = Domain::conditionAdd($domain, ['invoice_id', 'in', $invoices_ids]);
     }
@@ -100,7 +123,11 @@ if(isset($params['date_from']) && $params['date_from'] > 0) {
 
 if(isset($params['date_to']) && $params['date_to'] > 0) {
     $date_to = strtotime(date('Y-m-d 00:00:00', strtotime('+1 day', $params['date_to'])));
-    $invoices_ids = Invoice::search(['date', '<=', $date_to])->ids();
+    $invoices_ids = Invoice::search([
+            ['date', '<=', $date_to],
+            ['state', 'in', $invoice_states]
+        ])
+        ->ids();
     if(count($invoices_ids)) {
         $domain = Domain::conditionAdd($domain, ['invoice_id', 'in', $invoices_ids]);
     }

@@ -55,6 +55,11 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "all_states",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "product_id",
                                                 "width": "75%"
                                             }
