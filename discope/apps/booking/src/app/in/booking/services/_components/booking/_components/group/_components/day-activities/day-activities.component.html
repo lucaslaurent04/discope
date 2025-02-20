@@ -10,54 +10,66 @@
     <div class="activity-container">
         <div class="activity-remove">
             <button mat-icon-button
-                    [disabled]="!bookingActivityDay.am_activity"
-                    (click)="ondeleteActivity(bookingActivityDay.am_activity?.id);"
+                    [disabled]="!bookingActivityDay.AM?.activity_booking_line_id"
+                    (click)="ondeleteActivity(bookingActivityDay.AM?.activity_booking_line_id?.id);"
             >
                 <mat-icon>delete</mat-icon>
             </button>
         </div>
-        <booking-services-booking-group-day-activities-activity [activityBookingLine]="bookingActivityDay.am_activity"
+        <booking-services-booking-group-day-activities-activity [activity]="bookingActivityDay.AM"
                                                                 [date]="bookingActivityDay.date"
                                                                 [timeSlot]="mapTimeSlotsCode['AM']"
                                                                 [group]="group"
                                                                 [booking]="booking"
-                                                                (updated)="onupdateActivity()"
+                                                                [opened]="bookingActivityDay.AM?.activity_booking_line_id && openedActivityIds.includes(bookingActivityDay.AM.activity_booking_line_id.id)"
+                                                                (close)="closeActivity.emit(bookingActivityDay.AM.activity_booking_line_id.id)"
+                                                                (open)="openActivity.emit(bookingActivityDay.AM.activity_booking_line_id.id)"
+                                                                (updated)="updated.emit()"
+                                                                (deleteLine)="deleteLine.emit($event)"
         ></booking-services-booking-group-day-activities-activity>
     </div>
 
     <div class="activity-container">
         <div class="activity-remove">
             <button mat-icon-button
-                    [disabled]="!bookingActivityDay.pm_activity"
-                    (click)="ondeleteActivity(bookingActivityDay.pm_activity?.id);"
+                    [disabled]="!bookingActivityDay.PM?.activity_booking_line_id"
+                    (click)="ondeleteActivity(bookingActivityDay.PM?.activity_booking_line_id?.id);"
             >
                 <mat-icon>delete</mat-icon>
             </button>
         </div>
-        <booking-services-booking-group-day-activities-activity [activityBookingLine]="bookingActivityDay.pm_activity"
+        <booking-services-booking-group-day-activities-activity [activity]="bookingActivityDay.PM"
                                                                 [date]="bookingActivityDay.date"
                                                                 [timeSlot]="mapTimeSlotsCode['PM']"
                                                                 [group]="group"
                                                                 [booking]="booking"
-                                                                (updated)="onupdateActivity()"
+                                                                [opened]="bookingActivityDay.PM?.activity_booking_line_id && openedActivityIds.includes(bookingActivityDay.PM.activity_booking_line_id.id)"
+                                                                (close)="closeActivity.emit(bookingActivityDay.PM.activity_booking_line_id.id)"
+                                                                (open)="openActivity.emit(bookingActivityDay.PM.activity_booking_line_id.id)"
+                                                                (updated)="updated.emit()"
+                                                                (deleteLine)="deleteLine.emit($event)"
         ></booking-services-booking-group-day-activities-activity>
     </div>
 
     <div class="activity-container">
         <div class="activity-remove">
             <button mat-icon-button
-                    [disabled]="!bookingActivityDay.ev_activity"
-                    (click)="ondeleteActivity(bookingActivityDay.ev_activity?.id);"
+                    [disabled]="!bookingActivityDay.EV?.activity_booking_line_id"
+                    (click)="ondeleteActivity(bookingActivityDay.EV?.activity_booking_line_id?.id);"
             >
                 <mat-icon>delete</mat-icon>
             </button>
         </div>
-        <booking-services-booking-group-day-activities-activity [activityBookingLine]="bookingActivityDay.ev_activity"
+        <booking-services-booking-group-day-activities-activity [activity]="bookingActivityDay.EV"
                                                                 [date]="bookingActivityDay.date"
                                                                 [timeSlot]="mapTimeSlotsCode['EV']"
                                                                 [group]="group"
                                                                 [booking]="booking"
-                                                                (updated)="onupdateActivity()"
+                                                                [opened]="bookingActivityDay.EV?.activity_booking_line_id && openedActivityIds.includes(bookingActivityDay.EV.activity_booking_line_id.id)"
+                                                                (close)="closeActivity.emit(bookingActivityDay.EV.activity_booking_line_id.id)"
+                                                                (open)="openActivity.emit(bookingActivityDay.EV.activity_booking_line_id.id)"
+                                                                (updated)="updated.emit()"
+                                                                (deleteLine)="deleteLine.emit($event)"
         ></booking-services-booking-group-day-activities-activity>
     </div>
 </div>

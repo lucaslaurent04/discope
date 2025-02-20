@@ -1,11 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ApiService } from 'sb-shared-lib';
-import { BookingLineGroup } from '../../../../../../_models/booking_line_group.model';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { Observable, ReplaySubject } from 'rxjs';
+import { BookingLineGroup } from '../../../../../../../../_models/booking_line_group.model';
+import { Booking } from '../../../../../../../../_models/booking.model';
+import { ApiService } from 'sb-shared-lib';
+import { BookingLine } from '../../../../../../../../_models/booking_line.model';
 import { debounceTime, map, mergeMap } from 'rxjs/operators';
-import { Booking } from '../../../../../../_models/booking.model';
-import { BookingActivity } from '../../../../../../_models/booking_activity.model';
 
 interface vmModel {
     product: {
@@ -26,33 +26,21 @@ interface vmModel {
 }
 
 @Component({
-    selector: 'booking-services-booking-group-day-activities-activity',
-    templateUrl: 'activity.component.html',
-    styleUrls: ['activity.component.scss']
+    selector: 'booking-services-booking-group-day-activities-activity-line',
+    templateUrl: 'line.component.html',
+    styleUrls: ['line.component.scss']
 })
-export class BookingServicesBookingGroupDayActivitiesActivityComponent {
+export class BookingServicesBookingGroupDayActivitiesActivityLineComponent implements OnInit {
 
-    @Input() activity: Partial<BookingActivity> | null;
-    @Input() date: Date;
-    @Input() timeSlot: any;
+    @Input() line: BookingLine | null;
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
-    @Input() opened: boolean = false;
 
     @Output() updated = new EventEmitter();
-    @Output() deleteLine = new EventEmitter();
-    @Output() open = new EventEmitter();
-    @Output() close = new EventEmitter();
 
-    public ready: boolean = false;
+    public ready = false;
 
     public vm: vmModel;
-
-    public mapTimeSlotCodeName: any = {
-        'AM': 'Matin',
-        'PM': 'Après-Midi',
-        'EV': 'Soir',
-    };
 
     constructor(
         private api: ApiService
@@ -86,12 +74,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
             mergeMap(async (name:string) => this.filterProducts(name))
         );
 
-        this.vm.product.name = this.activity?.activity_booking_line_id?.product_id ? this.activity.activity_booking_line_id.product_id.name : '';
-        this.vm.qty.formControl.setValue(this.activity?.activity_booking_line_id?.qty ? this.activity.activity_booking_line_id.qty : 0);
-    }
-
-    public toggleOpen() {
-        this.opened ? this.close.emit() : this.open.emit();
+        this.vm.product.name = this.line?.product_id ? this.line.product_id.name : '';
+        this.vm.qty.formControl.setValue(this.line?.qty ? this.line.qty : 0);
     }
 
     private async filterProducts(name: string): Promise<any> {
@@ -105,13 +89,21 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                 domain.push(['name', 'ilike', `%${name}%`]);
             }
 
-            filtered = await this.api.fetch('?get=sale_catalog_product_collect', {
+            const params: {[key: string]: any} = {
                 center_id: this.booking.center_id.id,
                 domain: JSON.stringify(domain),
                 date_from: this.booking.date_from.toISOString(),
-                date_to: this.booking.date_to.toISOString(),
-                is_activity: true
-            });
+                date_to: this.booking.date_to.toISOString()
+            };
+
+            if(this.line.is_transport) {
+                params.is_transport = true;
+            }
+            else {
+                params.is_supply = true;
+            }
+
+            filtered = await this.api.fetch('?get=sale_catalog_product_collect', params);
         }
         catch(response) {
             console.log(response);
@@ -139,11 +131,11 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
 
     private productRestore() {
         this.vm.product.formControl.setErrors(null);
-        this.vm.product.name = this.activity?.activity_booking_line_id?.product_id ? this.activity.activity_booking_line_id.product_id.name : '';
+        this.vm.product.name = this.line?.product_id ? this.line.product_id.name : '';
     }
 
     public async onchangeProduct(event: any) {
-        console.log('BookingServicesBookingGroupDayActivitiesActivityComponent::productChange', event)
+        console.log('BookingServicesBookingGroupDayActivitiesActivityLineComponent::productChange', event)
 
         // from mat-autocomplete
         if(event && event.option && event.option.value) {
@@ -158,15 +150,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
 
             // notify back-end about the change
             try {
-                const new_line: any = await this.api.create('sale\\booking\\BookingLine', {
-                    order: this.group.booking_lines_ids.length + 1,
-                    booking_id: this.booking.id,
-                    booking_line_group_id: this.group.id,
-                    service_date: this.date.getTime() / 1000,
-                    time_slot_id: this.timeSlot.id
-                });
                 await this.api.call('?do=sale_booking_update-bookingline-product', {
-                    id: new_line.id,
+                    id: this.line.id,
                     product_id: product.id
                 });
                 this.vm.product.formControl.setErrors(null);
@@ -182,64 +167,18 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
     }
 
     public async qtyChange() {
-        if(!this.activity?.activity_booking_line_id || this.activity.activity_booking_line_id.qty == this.vm.qty.formControl.value) {
+        if(!this.line || this.line.qty == this.vm.qty.formControl.value) {
             return;
         }
 
         // notify back-end about the change
         try {
-            await this.api.update('sale\\booking\\BookingLine', [this.activity.activity_booking_line_id.id], {qty: this.vm.qty.formControl.value});
+            await this.api.update('sale\\booking\\BookingLine', [this.line.id], {qty: this.vm.qty.formControl.value});
             // relay change to parent component
             this.updated.emit();
         }
         catch(response) {
             this.api.errorFeedback(response);
         }
-    }
-
-    public async oncreateTransport() {
-        try {
-            console.log(this.activity.activity_booking_line_id)
-
-            await this.api.create('sale\\booking\\BookingLine', {
-                order: this.group.booking_lines_ids.length + 1,
-                booking_id: this.booking.id,
-                booking_line_group_id: this.group.id,
-                service_date: this.date.getTime() / 1000,
-                time_slot_id: this.timeSlot.id,
-                booking_activity_id: this.activity.activity_booking_line_id.booking_activity_id,
-                is_transport: true
-            });
-
-            // relay change to parent component
-            this.updated.emit();
-        }
-        catch(response) {
-            this.api.errorFeedback(response);
-        }
-    }
-
-    public async oncreateSupply() {
-        try {
-            await this.api.create('sale\\booking\\BookingLine', {
-                order: this.group.booking_lines_ids.length + 1,
-                booking_id: this.booking.id,
-                booking_line_group_id: this.group.id,
-                service_date: this.date.getTime() / 1000,
-                time_slot_id: this.timeSlot.id,
-                booking_activity_id: this.activity.activity_booking_line_id.booking_activity_id,
-                is_supply: true
-            });
-
-            // relay change to parent component
-            this.updated.emit();
-        }
-        catch(response) {
-            this.api.errorFeedback(response);
-        }
-    }
-
-    public ondeleteActivityLine(lineId: number) {
-        this.deleteLine.emit(lineId);
     }
 }

@@ -46,6 +46,14 @@ list($params, $providers) = announce([
         'is_activity' => [
             'type'              => 'boolean',
             'description'       => "Must the product be linked to an activity product model."
+        ],
+        'is_transport' => [
+            'type'              => 'boolean',
+            'description'       => "Must the product be linked to an activity transport product model."
+        ],
+        'is_supply' => [
+            'type'              => 'boolean',
+            'description'       => "Must the product be linked to an activity supply product model."
         ]
     ],
     'response'      => [
@@ -143,6 +151,12 @@ $product_models_ids = null;
 if(isset($params['is_activity'])) {
     $product_models_ids = ProductModel::search(['is_activity', '=', $params['is_activity']])->ids();
 }
+elseif(isset($params['is_transport'])) {
+    $product_models_ids = ProductModel::search(['is_transport', '=', $params['is_transport']])->ids();
+}
+elseif(isset($params['is_supply'])) {
+    $product_models_ids = ProductModel::search(['is_supply', '=', $params['is_supply']])->ids();
+}
 
 // if center office has set some favorites, add related products to the result
 $favorites = [];
@@ -159,7 +173,7 @@ if(isset($center['center_office_id']['product_favorites_ids'])) {
     // remove favorites from found products
     $products_ids = array_diff($products_ids, array_keys($map_favorites_ids));
 
-    // Handle is_activity
+    // handle is_activity, is_transport or is_supply
     $dom = [['id', 'in', array_keys($map_favorites_ids)]];
     if(!is_null($product_models_ids)) {
         $dom[] = ['product_model_id', 'in', $product_models_ids];
@@ -173,7 +187,7 @@ if(isset($center['center_office_id']['product_favorites_ids'])) {
         ->get(true);
 }
 
-// Handle is_activity
+// handle is_activity, is_transport or is_supply
 $dom = [['id', 'in', $products_ids]];
 if(!is_null($product_models_ids)) {
     $dom[] = ['product_model_id', 'in', $product_models_ids];
