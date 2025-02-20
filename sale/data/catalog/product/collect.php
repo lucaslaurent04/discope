@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
@@ -10,6 +10,7 @@ use equal\orm\Domain;
 use equal\orm\DomainCondition;
 use identity\Center;
 use sale\catalog\Product;
+use sale\catalog\ProductModel;
 use sale\price\PriceList;
 
 list($params, $providers) = announce([
@@ -22,9 +23,9 @@ list($params, $providers) = announce([
             'default'           => 'sale\catalog\Product'
         ],
         'domain' => [
-            'description'   => 'Criterias that results have to match (serie of conjunctions)',
-            'type'          => 'array',
-            'default'       => []
+            'description'       => 'Criterias that results have to match (serie of conjunctions)',
+            'type'              => 'array',
+            'default'           => []
         ],
         'center_id' => [
             'type'              => 'many2one',
@@ -41,6 +42,10 @@ list($params, $providers) = announce([
             'type'              => 'date',
             'description'       => "End date of the queried date range.",
             'required'          => true
+        ],
+        'is_activity' => [
+            'type'              => 'boolean',
+            'description'       => "Must the product be linked to an activity product model."
         ]
     ],
     'response'      => [
@@ -134,6 +139,11 @@ else {
     $products_ids = array_intersect(array_keys($map_groups_products_ids), array_keys($map_pricelists_products_ids));
 }
 
+$product_models_ids = null;
+if(isset($params['is_activity'])) {
+    $product_models_ids = ProductModel::search(['is_activity', '=', $params['is_activity']])->ids();
+}
+
 // if center office has set some favorites, add related products to the result
 $favorites = [];
 
@@ -149,16 +159,28 @@ if(isset($center['center_office_id']['product_favorites_ids'])) {
     // remove favorites from found products
     $products_ids = array_diff($products_ids, array_keys($map_favorites_ids));
 
+    // Handle is_activity
+    $dom = [['id', 'in', array_keys($map_favorites_ids)]];
+    if(!is_null($product_models_ids)) {
+        $dom[] = ['product_model_id', 'in', $product_models_ids];
+    }
+
     // read favorites
     // #memo - ProductFavorite schema specifies the field `order` for sorting
-    $favorites = Product::ids(array_keys($map_favorites_ids))
+    $favorites = Product::search($dom)
         ->read($fields)
         ->adapt('json')
         ->get(true);
 }
 
+// Handle is_activity
+$dom = [['id', 'in', $products_ids]];
+if(!is_null($product_models_ids)) {
+    $dom[] = ['product_model_id', 'in', $product_models_ids];
+}
+
 // read products (without favorites)
-$products = Product::ids($products_ids)
+$products = Product::search($dom)
     ->read($fields)
     ->adapt('json')
     ->get(true);
