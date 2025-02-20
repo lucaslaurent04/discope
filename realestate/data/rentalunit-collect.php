@@ -115,21 +115,21 @@ if(isset($params['type']) && strlen($params['type']) > 0 && $params['type'] != '
 }
 
 
-if(!is_null($params['is_accomodation'])) {
+if($params['is_accomodation'] ?? false) {
     $domain[] = ['is_accomodation', '=', $params['is_accomodation']];
 }
 
 
-if(!is_null($params['has_prm_access'])) {
+if($params['has_prm_access'] ?? false) {
     $domain[] = ['has_prm_access', '=', $params['has_prm_access']];
 }
 
-if(!is_null($params['has_pvi_features'])) {
+if($params['has_pvi_features'] ?? false) {
     $domain[] = ['has_pvi_features', '=', $params['has_pvi_features']];
 }
 
 
-if(!is_null($params['has_phi_support'])) {
+if($params['has_phi_support'] ?? false) {
     $domain[] = ['has_phi_support', '=', $params['has_phi_support']];
 }
 
