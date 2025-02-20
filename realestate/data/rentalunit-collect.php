@@ -43,6 +43,7 @@ list($params, $providers) = eQual::announce([
                 'room',
                 'FFE'
             ],
+            'default'           => 'all',
             'description'       => 'Type of the rental unit, which determines its capacity and usage.'
         ],
 
@@ -109,7 +110,7 @@ if(isset($params['parent_id'])) {
     $domain[] = ['parent_id', '=', $params['parent_id']];
 }
 
-if(isset($params['type']) && strlen($params['type']) > 0 && $params['type']!= 'all') {
+if(isset($params['type']) && strlen($params['type']) > 0 && $params['type'] != 'all') {
     $domain = ['type', '=', $params['type']];
 }
 
