@@ -52,21 +52,21 @@ list($params, $providers) = eQual::announce([
             'default'           => null
         ],
 
-        'has_pmr_access' => [
+        'has_prm_access' => [
             'type'              => 'boolean',
             'description'       => 'Indicates if the unit is accessible for persons with reduced mobility (PMR)',
             'default'           => null,
             'visible'           => ['is_accomodation', '=', true]
         ],
 
-        'has_pdv_features' => [
+        'has_pvi_features' => [
             'type'              => 'boolean',
             'description'       => 'Indicates if the unit is adapted for persons with visual impairments (PDV).',
             'default'           => null,
             'visible'           => ['is_accomodation', '=', true]
         ],
 
-        'has_pda_support' => [
+        'has_phi_support' => [
             'type'              => 'boolean',
             'description'       => 'Indicates if the unit includes features for persons with hearing impairments (PDA).',
             'default'           => null,
@@ -119,17 +119,17 @@ if(!is_null($params['is_accomodation'])) {
 }
 
 
-if(!is_null($params['has_pmr_access'])) {
-    $domain[] = ['has_pmr_access', '=', $params['has_pmr_access']];
+if(!is_null($params['has_prm_access'])) {
+    $domain[] = ['has_prm_access', '=', $params['has_prm_access']];
 }
 
-if(!is_null($params['has_pdv_features'])) {
-    $domain[] = ['has_pdv_features', '=', $params['has_pdv_features']];
+if(!is_null($params['has_pvi_features'])) {
+    $domain[] = ['has_pvi_features', '=', $params['has_pvi_features']];
 }
 
 
-if(!is_null($params['has_pda_support'])) {
-    $domain[] = ['has_pda_support', '=', $params['has_pda_support']];
+if(!is_null($params['has_phi_support'])) {
+    $domain[] = ['has_phi_support', '=', $params['has_phi_support']];
 }
 
 
