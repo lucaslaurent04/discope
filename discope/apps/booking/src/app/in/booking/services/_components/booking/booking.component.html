@@ -23,6 +23,7 @@
                             [model]="group"
                             [booking]="instance"
                             [timeSlots]="time_slots"
+                            [bookingActivitiesDays]="mapGroupsIdsBookingActivitiesDays[group.id]"
                             (updated)="onupdateGroup()"
                             (deleted)="ondeleteGroup(group.id)"
                             (toggle)="ontoggleGroup(group.id, $event)"

@@ -18,7 +18,7 @@ import { BookingMealPref } from '../../_models/booking_mealpref.model';
 import { BookingAgeRangeAssignment } from '../../_models/booking_agerange_assignment.model';
 import { MatAutocomplete } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
-import { BookingActivity } from '../../_models/booking_activity.model';
+import { BookingActivityDay } from './_components/day-activities/day-activities.component';
 
 
 // declaration of the interface for the map associating relational Model fields with their components
@@ -27,13 +27,6 @@ interface BookingLineGroupComponentsMap {
     meal_preferences_ids: QueryList<BookingServicesBookingGroupMealPrefComponent>,
     age_range_assignments_ids: QueryList<BookingServicesBookingGroupAgeRangeComponent>,
     sojourn_product_models_ids: QueryList<BookingServicesBookingGroupAccomodationComponent>
-}
-
-export interface BookingActivityDay {
-    date: Date,
-    AM: Partial<BookingActivity>|null,
-    PM: Partial<BookingActivity>|null,
-    EV: Partial<BookingActivity>|null
 }
 
 interface vmModel {
@@ -103,6 +96,8 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     @Input() set model(values: any) { this.update(values) }
     @Input() booking: Booking;
     @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
+    @Input() bookingActivitiesDays: BookingActivityDay[];
+
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
     @Output() toggle  = new EventEmitter();
@@ -116,8 +111,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     public groupTypeOpen:boolean = false;
     public groupNbPersOpen: boolean = false;
     public groupDatesOpen: boolean = false;
-
-    public bookingActivitiesDays: BookingActivityDay[] = [];
     public openedActivityIds: number[] = [];
 
     public action_in_progress: boolean = false;
@@ -247,8 +240,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
             this.onchangeTimeTo();
         });
 
-        this.initBookingActivitiesDays();
-
         this.ready = true;
     }
 
@@ -276,11 +267,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
             for(let spm of this.bookingServicesBookingGroupAccomodationComponents) {
                 spm.refreshAvailableRentalUnits();
             }
-        }
-
-        // Update activities
-        if(this.timeSlots) {
-            this.initBookingActivitiesDays();
         }
     }
 
@@ -861,55 +847,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     public getDayOfWeek(date:Date) {
         const days_of_week = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
         return days_of_week[ date.getDay() ];
-    }
-
-    public initBookingActivitiesDays() {
-        const bookingActivitiesDays = [];
-        let date = new Date(this.instance.date_from);
-        while(date <= this.instance.date_to) {
-            const bookingActivityDay: BookingActivityDay = {
-                date: new Date(date),
-                AM: null,
-                PM: null,
-                EV: null
-            };
-
-            for(let bookingActivity of this.instance.booking_activities_ids as BookingActivity[]) {
-                let activityBookingLine: BookingLine | undefined = this.instance.booking_lines_ids.find(
-                    (bookingLine: BookingLine) => bookingLine.id === bookingActivity.activity_booking_line_id
-                );
-
-                if(activityBookingLine === undefined || !activityBookingLine.service_date) {
-                    continue;
-                }
-
-                let serviceDate = new Date(activityBookingLine.service_date).toISOString().split('T')[0];
-                if(serviceDate !== date.toISOString().split('T')[0]) {
-                    continue;
-                }
-
-                const timeSlot = this.timeSlots.find((timeSlot: any) => timeSlot.id === activityBookingLine.time_slot_id);
-                if(!timeSlot || !['AM', 'PM', 'EV'].includes(timeSlot.code)) {
-                    continue;
-                }
-
-                bookingActivityDay[timeSlot.code as 'AM'|'PM'|'EV'] = {
-                    activity_booking_line_id: activityBookingLine,
-                    transports_booking_lines_ids: this.instance.booking_lines_ids.filter(
-                        (bookingLine: BookingLine) => bookingActivity.transports_booking_lines_ids.map(Number).includes(bookingLine.id)
-                    ),
-                    supplies_booking_lines_ids: this.instance.booking_lines_ids.filter(
-                        (bookingLine: BookingLine) => bookingActivity.supplies_booking_lines_ids.map(Number).includes(bookingLine.id)
-                    )
-                };
-            }
-
-            bookingActivitiesDays.push(bookingActivityDay);
-
-            date.setDate(date.getDate() + 1);
-        }
-
-        this.bookingActivitiesDays = bookingActivitiesDays;
     }
 
     public onCloseActivity(activityId: number) {

@@ -1,21 +1,22 @@
-import { Component, Inject, OnInit, OnChanges, NgZone, Output, Input, ViewChildren, QueryList, AfterViewInit, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, ViewChildren, QueryList, AfterViewInit, SimpleChanges } from '@angular/core';
 
 import { ApiService, ContextService, TreeComponent, RootTreeComponent, SbDialogConfirmDialog } from 'sb-shared-lib';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatDialog } from '@angular/material/dialog';
-import { Observable, ReplaySubject, BehaviorSubject, async } from 'rxjs';
 
-import { trigger, state, style, animate, transition } from '@angular/animations';
+import { trigger, style, animate, transition } from '@angular/animations';
 
 import { BookingServicesBookingGroupComponent } from './_components/group/group.component'
 import { Booking } from './_models/booking.model';
 import { BookingLineGroup } from './_models/booking_line_group.model';
+import { BookingActivity } from './_models/booking_activity.model';
+import { BookingLine } from './_models/booking_line.model';
+import { BookingActivityDay } from './_components/group/_components/day-activities/day-activities.component';
 
 // declaration of the interface for the map associating relational Model fields with their components
 interface BookingComponentsMap {
     booking_lines_groups_ids: QueryList<BookingServicesBookingGroupComponent>
-};
-
+}
 
 @Component({
   selector: 'booking-services-booking',
@@ -53,6 +54,7 @@ export class BookingServicesBookingComponent
     public loading: boolean = true;
     public maximized_group_id: number = 0;
     public time_slots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[] = [];
+    public mapGroupsIdsBookingActivitiesDays: {[key: number]: BookingActivityDay[]} = {};
 
     constructor(
         private dialog: MatDialog,
@@ -99,6 +101,7 @@ export class BookingServicesBookingComponent
                 if(result) {
                     console.debug('received updated booking', result);
                     this.update(result);
+                    this.initMapGroupsIdsBookingActivitiesDays(result);
                     this.loading = false;
                 }
 
@@ -211,5 +214,66 @@ export class BookingServicesBookingComponent
 
     public onLoadEndGroup() {
         this.loading = false;
+    }
+
+    public initMapGroupsIdsBookingActivitiesDays(booking: Booking) {
+        this.mapGroupsIdsBookingActivitiesDays = {};
+        for(let group of booking.booking_lines_groups_ids) {
+            this.mapGroupsIdsBookingActivitiesDays[group.id] = this.createGroupBookingActivitiesDays(group);
+        }
+    }
+
+    private createGroupBookingActivitiesDays(group: BookingLineGroup) {
+        const bookingActivitiesDays = [];
+        let date = new Date(group.date_from);
+        const dateTo = new Date(group.date_to);
+        while(date <= dateTo) {
+            const bookingActivityDay: BookingActivityDay = {
+                date: new Date(date),
+                AM: null,
+                PM: null,
+                EV: null
+            };
+
+            for(let bookingActivity of group.booking_activities_ids as BookingActivity[]) {
+                let activityBookingLine: BookingLine | undefined = group.booking_lines_ids.find(
+                    (bookingLine: BookingLine) => bookingLine.id === bookingActivity.activity_booking_line_id
+                );
+
+                if(activityBookingLine === undefined || !activityBookingLine.service_date) {
+                    continue;
+                }
+
+                let serviceDate = new Date(activityBookingLine.service_date).toISOString().split('T')[0];
+                if(serviceDate !== date.toISOString().split('T')[0]) {
+                    continue;
+                }
+
+                const timeSlot = this.time_slots.find((timeSlot: any) => timeSlot.id === activityBookingLine.time_slot_id);
+                if(!timeSlot || !['AM', 'PM', 'EV'].includes(timeSlot.code)) {
+                    continue;
+                }
+
+                bookingActivityDay[timeSlot.code as 'AM'|'PM'|'EV'] = {
+                    activity_booking_line_id: activityBookingLine,
+                    transports_booking_lines_ids: group.booking_lines_ids.filter(
+                        (bookingLine: BookingLine) => bookingActivity.transports_booking_lines_ids.map(Number).includes(bookingLine.id)
+                    ),
+                    supplies_booking_lines_ids: group.booking_lines_ids.filter(
+                        (bookingLine: BookingLine) => bookingActivity.supplies_booking_lines_ids.map(Number).includes(bookingLine.id)
+                    )
+                };
+            }
+
+            bookingActivitiesDays.push(bookingActivityDay);
+
+            date.setDate(date.getDate() + 1);
+        }
+
+        if(group.id === 7) {
+            console.log(bookingActivitiesDays);
+        }
+
+        return bookingActivitiesDays;
     }
 }
