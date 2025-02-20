@@ -67,18 +67,18 @@ $context = $providers['context'];
 
 $result = [];
 if(isset($params['center_office_id']) || isset($params['organisation_id'])) {
-    $date_to = date('Y-m-d', $params['date_to']);
+    $date_to = strtotime(date('Y-m-d 00:00:00', strtotime('+1 day', $params['date_to'])));
 
     $invoices = Invoice::search(array_merge(
-        [
-            ['state', 'in', ['instance', 'archive']],
-            ['date', '>=', $params['date_from']],
-            ['date', '<=', strtotime($date_to.' 23:59:59')],
-            ['status', '=', 'invoice']
-        ],
-        isset($params['center_office_id']) ? [['center_office_id', '=', $params['center_office_id']]] : [],
-        isset($params['organisation_id']) ? [['organisation_id', '=', $params['organisation_id']]] : []
-    ))
+            [
+                ['state', 'in', ['instance', 'archive']],
+                ['date', '>=', $params['date_from']],
+                ['date', '<=', $date_to],
+                ['status', '=', 'invoice']
+            ],
+            isset($params['center_office_id']) ? [['center_office_id', '=', $params['center_office_id']]] : [],
+            isset($params['organisation_id']) ? [['organisation_id', '=', $params['organisation_id']]] : []
+        ))
         ->read([
             'center_office_id' => ['id', 'name'],
             'organisation_id' => ['id', 'name'],
@@ -89,24 +89,24 @@ if(isset($params['center_office_id']) || isset($params['organisation_id'])) {
 
     $organisation_map = [];
     foreach($invoices as $invoice) {
-        list($org_id, $cen_id) = [$invoice['organisation_id']['id'], $invoice['center_office_id']['id']];
+        list($org_id, $office_id) = [$invoice['organisation_id']['id'], $invoice['center_office_id']['id']];
 
         if(!isset($organisation_map[$org_id])) {
             $organisation_map[$org_id] = [];
         }
 
-        if(!isset($organisation_map[$org_id][$cen_id])) {
-            $organisation_map[$org_id][$cen_id] = [];
+        if(!isset($organisation_map[$org_id][$office_id])) {
+            $organisation_map[$org_id][$office_id] = [];
         }
 
         foreach($invoice['invoice_lines_ids'] as $invoice_line) {
-            $pro_id = $invoice_line['product_id'];
-            if(isset($params['product_id']) && $pro_id !== $params['product_id']) {
+            $product_id = $invoice_line['product_id'];
+            if(isset($params['product_id']) && $product_id !== $params['product_id']) {
                 continue;
             }
 
-            if(!isset($organisation_map[$org_id][$cen_id][$pro_id])) {
-                $organisation_map[$org_id][$cen_id][$pro_id] = [
+            if(!isset($organisation_map[$org_id][$office_id][$product_id])) {
+                $organisation_map[$org_id][$office_id][$product_id] = [
                     'organisation_id'  => $invoice['organisation_id'],
                     'center_office_id' => $invoice['center_office_id'],
                     'name'             => $invoice_line['name'],
@@ -115,14 +115,14 @@ if(isset($params['center_office_id']) || isset($params['organisation_id'])) {
                 ];
             }
 
-            $organisation_map[$org_id][$cen_id][$pro_id]['qty'] += $invoice_line['qty'];
-            $organisation_map[$org_id][$cen_id][$pro_id]['total'] += $invoice_line['total'];
+            $organisation_map[$org_id][$office_id][$product_id]['qty'] += $invoice_line['qty'];
+            $organisation_map[$org_id][$office_id][$product_id]['total'] += $invoice_line['total'];
         }
     }
 
     foreach($organisation_map as $org_id => $org_centers) {
-        foreach($org_centers as $cen_id => $center_prod_stats) {
-            foreach($center_prod_stats as $pro_id => $product_stat) {
+        foreach($org_centers as $office_id => $center_prod_stats) {
+            foreach($center_prod_stats as $product_id => $product_stat) {
                 $result[] = [
                     'organisation_id'  => $product_stat['organisation_id'],
                     'center_office_id' => $product_stat['center_office_id'],
