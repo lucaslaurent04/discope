@@ -101,7 +101,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                 center_id: this.booking.center_id.id,
                 domain: JSON.stringify(domain),
                 date_from: this.booking.date_from.toISOString(),
-                date_to: this.booking.date_to.toISOString()
+                date_to: this.booking.date_to.toISOString(),
+                is_activity: true
             });
         }
         catch(response) {
