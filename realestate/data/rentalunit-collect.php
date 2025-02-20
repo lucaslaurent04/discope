@@ -97,8 +97,8 @@ if(isset($params['center_id']) && $params['center_id'] > 0) {
 }
 else {
     $user = User::id($auth->userId())->read(['centers_ids'])->first(true);
-    if(count($user['centers_ids']) == 1) {
-        $domain[] = ['center_id', '=', reset($user['centers_ids'])];
+    if(count($user['centers_ids'])) {
+        $domain[] = ['center_id', 'in', $user['centers_ids']];
     }
     else {
         $domain[] = ['center_id', '=', 0];
