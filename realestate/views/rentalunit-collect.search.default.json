@@ -52,7 +52,7 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "has_pmr_access",
+                                                "value": "has_prm_access",
                                                 "width": "20%"
                                             }
                                         ]

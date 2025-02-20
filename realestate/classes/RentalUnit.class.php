@@ -233,21 +233,21 @@ class RentalUnit extends Model {
                 'help'              => 'If this field is set, it means that the rental unit can be rented on OTA via the channel manager. So, in case of a local booking it must trigger an update of the availabilities.'
             ],
 
-            'has_pmr_access' => [
+            'has_prm_access' => [
                 'type'        => 'boolean',
-                'description' => 'The rental unit is accessible for Persons with Reduced Mobility (PMR), including wheelchair adaptations, easy access, and adapted showers.',
+                'description' => 'The rental unit is accessible for Persons with Reduced Mobility (PRM), including wheelchair adaptations, easy access, and adapted showers.',
                 'default'     => false
             ],
 
-            'has_pdv_features' => [
+            'has_pvi_features' => [
                 'type'        => 'boolean',
-                'description' => 'The rental unit is adapted for Persons with Visual Impairment (PDV), featuring high visual contrast, tactile or Braille signage, and no hazardous obstacles.',
+                'description' => 'The rental unit is adapted for Persons with Visual Impairments (PVI), featuring high visual contrast, tactile or Braille signage, and no hazardous obstacles.',
                 'default'     => false
             ],
 
-            'has_pda_support' => [
+            'has_phi_support' => [
                 'type'        => 'boolean',
-                'description' => 'The rental unit is equipped for Persons with Hearing Impairment (PDA), including visual alarms, subtitles, or other suitable aids.',
+                'description' => 'The rental unit is equipped for Persons with Hearing Impairments (PHI), including visual alarms, subtitles, or other suitable aids.',
                 'default'     => false
             ]
 
