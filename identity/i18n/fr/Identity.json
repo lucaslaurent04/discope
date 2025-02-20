@@ -263,6 +263,10 @@
         "logo_document_id": {
             "label": "Document",
             "description": "Le document contenant le logo associé à l'organisation.",
+        },
+        "accounting_account": {
+            "label": "Compte Comptable",
+            "description": "Code unique identifiant le compte comptable associé.",
             "help": ""
         }
     },

@@ -104,9 +104,6 @@ $tree = [
         'meal_preferences_ids' => [
             'type', 'pref', 'qty'
         ],
-        'age_range_assignments_ids' => [
-            'age_range_id', 'qty'
-        ],
         'booking_lines_ids' => [
             'id',
             'name',
@@ -125,6 +122,8 @@ $tree = [
             'is_rental_unit',
             'is_accomodation',
             'is_meal',
+            'service_date',
+            'time_slot_id',
             'price_id',
             'product_id' => [
                 'name',
@@ -135,7 +134,14 @@ $tree = [
                     'schedule_offset',
                     'has_duration',
                     'duration',
-                    'capacity'
+                    'capacity',
+                    'type',
+                    'service_type',
+                    'is_repeatable',
+                    'is_meal',
+                    'is_snack',
+                    'is_fullday',
+                    'time_slots_ids' => ['name', 'code']
                 ]
             ],
             'auto_discounts_ids' => [
