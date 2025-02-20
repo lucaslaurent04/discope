@@ -27,12 +27,12 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "has_pdv_features",
+                                                "value": "has_pvi_features",
                                                 "width": "20%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "has_pda_support",
+                                                "value": "has_phi_support",
                                                 "width": "20%"
                                             }
                                         ]
