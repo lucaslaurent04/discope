@@ -126,6 +126,21 @@ hr {
     page-break-after: always;
     border: 0;
 }
+
+.signature-container {
+    max-width: 200px;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+    float: right;
+}
+
+.signature-container img {
+    max-width: 200px;
+    width: 100%;
+    height: auto;
+    display: block;
+}
 </style>
 
 </head>
@@ -277,7 +292,6 @@ hr {
         {% endif %}
     </p>
 </div>
-
 
 <div class="inner">
     <div class="intro">
@@ -534,6 +548,11 @@ hr {
     </table>
 </div>
 {% endif %}
+
+<br>
+<div class="signature-container">
+    {{ signature|raw }}
+</div>
 
 <div style="margin-top: 50px;">
     <table style="width: 100%; page-break-inside: avoid;">
