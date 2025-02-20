@@ -75,6 +75,18 @@
             .row.row-thin {
                 padding: 0;
             }
+
+            .activity-line-container {
+                position: relative;
+                width: 100%;
+
+                .activity-line-remove {
+                    position: absolute;
+                    right: 0;
+                    top: 5px;
+                    z-index: 2;
+                }
+            }
         }
     }
 

@@ -14,9 +14,12 @@ export class BookingServicesBookingGroupDayActivitiesComponent implements OnInit
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
     @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
+    @Input() openedActivityIds: number[];
 
     @Output() updated = new EventEmitter();
     @Output() deleteLine = new EventEmitter();
+    @Output() openActivity = new EventEmitter();
+    @Output() closeActivity = new EventEmitter();
 
     public ready: boolean = false;
 
@@ -35,11 +38,6 @@ export class BookingServicesBookingGroupDayActivitiesComponent implements OnInit
         for(let timeSlot of this.timeSlots) {
             this.mapTimeSlotsCode[timeSlot.code] = timeSlot;
         }
-    }
-
-    public onupdateActivity() {
-        // relay to parent
-        this.updated.emit();
     }
 
     public ondeleteActivity(lineId: number) {

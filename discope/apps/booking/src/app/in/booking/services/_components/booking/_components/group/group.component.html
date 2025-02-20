@@ -540,7 +540,7 @@
                                     [model]="line"
                                     [group]="instance"
                                     [booking]="booking"
-                                    [time_slots]="time_slots"
+                                    [time_slots]="timeSlots"
                                     (updated)="onupdateLine()"
                                 ></booking-services-booking-group-line>
                             </div>
@@ -596,9 +596,12 @@
                                     [bookingActivityDay]="bookingActivityDay"
                                     [booking]="booking"
                                     [group]="instance"
-                                    [timeSlots]="time_slots"
+                                    [timeSlots]="timeSlots"
+                                    [openedActivityIds]="openedActivityIds"
                                     (updated)="onupdateActivity()"
                                     (deleteLine)="ondeleteLine($event)"
+                                    (closeActivity)="onCloseActivity($event)"
+                                    (openActivity)="onOpenActivity($event)"
                                 ></booking-services-booking-group-day-activities>
                             </div>
                         </div>

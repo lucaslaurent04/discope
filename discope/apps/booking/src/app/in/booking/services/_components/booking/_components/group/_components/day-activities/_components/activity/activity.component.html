@@ -1,24 +1,19 @@
-<!-- template vars -->
-<div #vActivity="var" [var]="{details: {folded: true}}"></div>
-
 <div class="part" [class.hidden]="!ready">
     <div class="part-toggle">
         <span>{{mapTimeSlotCodeName[timeSlot.code]}}</span>
 
-        <button mat-icon-button *ngIf="!vActivity.details.folded"
-                (click)="vActivity.details.folded = !vActivity.details.folded">
-            <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
-        </button>
-        <button mat-icon-button *ngIf="vActivity.details.folded"
-                (click)="vActivity.details.folded = !vActivity.details.folded">
-            <mat-icon style="font-size: 15px;">keyboard_arrow_right</mat-icon>
+        <button mat-icon-button [disabled]="!activity" (click)="toggleOpen()">
+            <mat-icon style="font-size: 15px;">
+                <span *ngIf="opened">keyboard_arrow_up</span>
+                <span *ngIf="!opened">keyboard_arrow_right</span>
+            </mat-icon>
         </button>
     </div>
 
     <div class="part-container">
         <div class="row row-first">
             <div class="cell">
-                <mat-form-field *ngIf="activityBookingLine == null || (activityBookingLine.product_id | json) == '{}' || activityBookingLine.product_id?.id == 0">
+                <mat-form-field *ngIf="!activity?.activity_booking_line_id || (activity.activity_booking_line_id.product_id | json) == '{}' || activity.activity_booking_line_id.product_id.id == 0">
                     <mat-label>Activité</mat-label>
                     <input *ngIf="!group.is_locked"
                            matInput
@@ -41,7 +36,7 @@
                         </div>
                     </mat-autocomplete>
                 </mat-form-field>
-                <mat-form-field *ngIf="activityBookingLine != null && activityBookingLine.product_id?.id > 0">
+                <mat-form-field *ngIf="activity?.activity_booking_line_id?.product_id?.id > 0">
                     <mat-label>Activité</mat-label>
                     <input matInput [disabled]="group.is_locked" type="text" [value]="vm.product.name" readonly="readonly" />
                 </mat-form-field>
@@ -56,20 +51,58 @@
                 </mat-form-field>
             </div>
             <div class="cell cell-right" style="cursor: pointer; padding-top: 11px">
-                <span>{{(activityBookingLine?.unit_price ? activityBookingLine.unit_price : 0) | number: '1.2-2'}} €</span>
+                <span>{{(activity?.activity_booking_line_id?.unit_price ? activity.activity_booking_line_id.unit_price : 0) | number: '1.2-2'}} €</span>
             </div>
             <div class="cell cell-right" style="cursor: pointer; padding-top: 11px">
-                <span>{{(activityBookingLine?.vat_rate ? activityBookingLine.vat_rate : 0) | percent: '1.2-2'}}</span>
+                <span>{{(activity?.activity_booking_line_id?.vat_rate ? activity.activity_booking_line_id.vat_rate : 0) | percent: '1.2-2'}}</span>
             </div>
             <div class="cell cell-text cell-right">
-                <span>{{(activityBookingLine?.price ? activityBookingLine.price : 0) | number: '1.2-2'}} €</span>
+                <span>{{(activity?.activity_booking_line_id?.price ? activity.activity_booking_line_id.price : 0) | number: '1.2-2'}} €</span>
             </div>
             <!-- actions (empty: set in parent component) -->
             <div class="cell cell-actions"></div>
         </div>
 
-        <div class="row" *ngIf="!vActivity.details.folded">
-            Details
+        <div *ngIf="opened">
+            <div>
+                <span>Transports ({{activity.transports_booking_lines_ids.length}})</span>
+                <button mat-mini-fab color="primary" style="transform: scale(0.66)" (click)="oncreateTransport()">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+            <div class="activity-line-container" *ngFor="let transport_line of activity.transports_booking_lines_ids">
+                <div class="activity-line-remove">
+                    <button mat-icon-button (click)="ondeleteActivityLine(transport_line.id);">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+                <booking-services-booking-group-day-activities-activity-line [line]="transport_line"
+                                                                             [group]="group"
+                                                                             [booking]="booking"
+                                                                             (updated)="updated.emit()"
+                ></booking-services-booking-group-day-activities-activity-line>
+            </div>
+        </div>
+
+        <div *ngIf="opened">
+            <div>
+                <span>Matériels ({{activity.supplies_booking_lines_ids.length}})</span>
+                <button mat-mini-fab color="primary" style="transform: scale(0.66)" (click)="oncreateSupply()">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+            <div class="activity-line-container" *ngFor="let supply_line of activity.supplies_booking_lines_ids">
+                <div class="activity-line-remove">
+                    <button mat-icon-button (click)="ondeleteActivityLine(supply_line.id);">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+                <booking-services-booking-group-day-activities-activity-line [line]="supply_line"
+                                                                             [group]="group"
+                                                                             [booking]="booking"
+                                                                             (updated)="updated.emit()"
+                ></booking-services-booking-group-day-activities-activity-line>
+            </div>
         </div>
     </div>
 </div>

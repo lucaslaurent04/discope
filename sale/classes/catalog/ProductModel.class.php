@@ -242,28 +242,42 @@ class ProductModel extends Model {
                 'description'       => 'Is the product a rental_unit?',
                 'default'           => false,
                 'onupdate'          => 'onupdateIsRentalUnit',
-                'visible'           => [ ['type', '=', 'service'], ['is_meal', '=', false] , ['is_snack', '=', false]]
+                'visible'           => [ ['type', '=', 'service'], ['is_meal', '=', false] , ['is_snack', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ]
             ],
 
             'is_meal' => [
                 'type'              => 'boolean',
                 'description'       => 'Is the product a meal? (meals might be part of the board / included services of the stay).',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false] , ['is_snack', '=', false] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false] , ['is_snack', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ]
             ],
 
-            'is_transport' => [
+            'is_snack' => [
                 'type'              => 'boolean',
-                'description'       => 'Indicates whether the product is a transport service.',
+                'description'       => 'Is the product a snack?.',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ]
             ],
 
             'is_activity' => [
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the product is an activity or animation.',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_transport', '=', false], ['is_snack', '=', false], ['is_meal', '=', false] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ]
+            ],
+
+            'is_transport' => [
+                'type'              => 'boolean',
+                'description'       => 'Indicates whether the product is an activity transport service (transport to and back from an activity).',
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_supply', '=', false] ]
+            ],
+
+            'is_supply' => [
+                'type'              => 'boolean',
+                'description'       => 'Indicates whether the product is an activity supply service (supply to rent for an activity).',
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_transport', '=', false] ]
             ],
 
             'activity_scope' => [
@@ -384,13 +398,6 @@ class ProductModel extends Model {
                 'rel_local_key'     => 'product_model_id',
                 'description'       => "Defines the applicable age ranges for the product model, ensuring age-specific eligibility for activities or services.",
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] , ['has_age_range', '=', true]]
-            ],
-
-            'is_snack' => [
-                'type'              => 'boolean',
-                'description'       => 'Is the product a snack?.',
-                'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_meal', '=', false] ]
             ],
 
             'rental_unit_assignement' => [

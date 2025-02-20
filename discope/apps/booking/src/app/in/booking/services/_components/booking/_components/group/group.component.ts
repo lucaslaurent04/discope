@@ -18,6 +18,7 @@ import { BookingMealPref } from '../../_models/booking_mealpref.model';
 import { BookingAgeRangeAssignment } from '../../_models/booking_agerange_assignment.model';
 import { MatAutocomplete } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
+import { BookingActivity } from '../../_models/booking_activity.model';
 
 
 // declaration of the interface for the map associating relational Model fields with their components
@@ -30,9 +31,9 @@ interface BookingLineGroupComponentsMap {
 
 export interface BookingActivityDay {
     date: Date,
-    am_activity: BookingLine|null,
-    pm_activity: BookingLine|null,
-    ev_activity: BookingLine|null,
+    AM: Partial<BookingActivity>|null,
+    PM: Partial<BookingActivity>|null,
+    EV: Partial<BookingActivity>|null
 }
 
 interface vmModel {
@@ -101,7 +102,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     // server-model relayed by parent
     @Input() set model(values: any) { this.update(values) }
     @Input() booking: Booking;
-    @Input() time_slots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
+    @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
     @Output() toggle  = new EventEmitter();
@@ -117,6 +118,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     public groupDatesOpen: boolean = false;
 
     public bookingActivitiesDays: BookingActivityDay[] = [];
+    public openedActivityIds: number[] = [];
 
     public action_in_progress: boolean = false;
 
@@ -277,7 +279,9 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         }
 
         // Update activities
-        this.initBookingActivitiesDays();
+        if(this.timeSlots) {
+            this.initBookingActivitiesDays();
+        }
     }
 
     public calcRateClass() {
@@ -860,48 +864,44 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     }
 
     public initBookingActivitiesDays() {
-        const group_activity_booking_lines = [];
-        for(let booking_activity of this.instance.booking_activities_ids) {
-            for(let booking_line of this.instance.booking_lines_ids) {
-                if(booking_activity.activity_booking_line_id === booking_line.id) {
-                    group_activity_booking_lines.push(booking_line);
-                }
-            }
-        }
-
         const bookingActivitiesDays = [];
         let date = new Date(this.instance.date_from);
         while(date <= this.instance.date_to) {
             const bookingActivityDay: BookingActivityDay = {
                 date: new Date(date),
-                am_activity: null,
-                pm_activity: null,
-                ev_activity: null
+                AM: null,
+                PM: null,
+                EV: null
             };
 
-            for(let booking_line of group_activity_booking_lines) {
-                if(!booking_line.service_date) {
+            for(let bookingActivity of this.instance.booking_activities_ids as BookingActivity[]) {
+                let activityBookingLine: BookingLine | undefined = this.instance.booking_lines_ids.find(
+                    (bookingLine: BookingLine) => bookingLine.id === bookingActivity.activity_booking_line_id
+                );
+
+                if(activityBookingLine === undefined || !activityBookingLine.service_date) {
                     continue;
                 }
 
-                let serviceDate = new Date(booking_line.service_date).toISOString().split('T')[0]
-
-                if(serviceDate === date.toISOString().split('T')[0]) {
-                    const time_slot = this.time_slots.find((time_slot: any) => time_slot.id === booking_line.time_slot_id);
-                    if(time_slot) {
-                        switch (time_slot.code) {
-                            case "AM":
-                                bookingActivityDay.am_activity = booking_line;
-                                break;
-                            case "PM":
-                                bookingActivityDay.pm_activity = booking_line;
-                                break;
-                            case "EV":
-                                bookingActivityDay.ev_activity = booking_line;
-                                break;
-                        }
-                    }
+                let serviceDate = new Date(activityBookingLine.service_date).toISOString().split('T')[0];
+                if(serviceDate !== date.toISOString().split('T')[0]) {
+                    continue;
                 }
+
+                const timeSlot = this.timeSlots.find((timeSlot: any) => timeSlot.id === activityBookingLine.time_slot_id);
+                if(!timeSlot || !['AM', 'PM', 'EV'].includes(timeSlot.code)) {
+                    continue;
+                }
+
+                bookingActivityDay[timeSlot.code as 'AM'|'PM'|'EV'] = {
+                    activity_booking_line_id: activityBookingLine,
+                    transports_booking_lines_ids: this.instance.booking_lines_ids.filter(
+                        (bookingLine: BookingLine) => bookingActivity.transports_booking_lines_ids.map(Number).includes(bookingLine.id)
+                    ),
+                    supplies_booking_lines_ids: this.instance.booking_lines_ids.filter(
+                        (bookingLine: BookingLine) => bookingActivity.supplies_booking_lines_ids.map(Number).includes(bookingLine.id)
+                    )
+                };
             }
 
             bookingActivitiesDays.push(bookingActivityDay);
@@ -910,6 +910,16 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         }
 
         this.bookingActivitiesDays = bookingActivitiesDays;
-        console.log('bookingActivitiesDays', this.bookingActivitiesDays);
+    }
+
+    public onCloseActivity(activityId: number) {
+        const activityIdIndex = this.openedActivityIds.indexOf(activityId);
+        if(activityIdIndex !== undefined) {
+            this.openedActivityIds.splice(activityIdIndex, 1);
+        }
+    }
+
+    public onOpenActivity(activityId: number) {
+        this.openedActivityIds.push(activityId);
     }
 }

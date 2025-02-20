@@ -122,8 +122,12 @@ $tree = [
             'is_rental_unit',
             'is_accomodation',
             'is_meal',
+            'is_activity',
+            'is_transport',
+            'is_supply',
             'service_date',
             'time_slot_id',
+            'booking_activity_id',
             'price_id',
             'product_id' => [
                 'name',
