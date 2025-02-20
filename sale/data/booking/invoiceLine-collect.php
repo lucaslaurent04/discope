@@ -99,7 +99,8 @@ if(isset($params['date_from']) && $params['date_from'] > 0) {
 }
 
 if(isset($params['date_to']) && $params['date_to'] > 0) {
-    $invoices_ids = Invoice::search(['date', '<=', $params['date_to']])->ids();
+    $date_to = strtotime(date('Y-m-d 00:00:00', strtotime('+1 day', $params['date_to'])));
+    $invoices_ids = Invoice::search(['date', '<=', $date_to])->ids();
     if(count($invoices_ids)) {
         $domain = Domain::conditionAdd($domain, ['invoice_id', 'in', $invoices_ids]);
     }
