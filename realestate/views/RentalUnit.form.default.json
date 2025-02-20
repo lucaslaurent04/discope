@@ -68,6 +68,21 @@
                                                 "label": "Sojourn Type",
                                                 "value": "sojourn_type_id",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_pmr_access",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_pdv_features",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_pda_support",
+                                                "width": "100%"
                                             }
                                         ]
                                     },

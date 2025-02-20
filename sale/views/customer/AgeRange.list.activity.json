@@ -1,0 +1,19 @@
+{
+    "name": "Age Range List",
+    "description": "Currently defined age ranges.",
+    "access": {
+        "groups": [
+            "sale.default.user",
+            "booking.default.user"
+        ]
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "15%"
+            }
+        ]
+    }
+}

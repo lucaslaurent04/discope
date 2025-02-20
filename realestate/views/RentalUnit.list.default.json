@@ -4,6 +4,7 @@
     "access": {
         "groups": ["booking.default.user"]
     },
+    "controller": "realestate_rentalunit-collect",
     "order": "center_id,order",
     "sort": "asc",
     "layout": {
@@ -23,7 +24,7 @@
             {
                 "type": "field",
                 "value": "code",
-                "width": "15%",
+                "width": "5%",
                 "sortable": true
             },
             {
@@ -35,7 +36,7 @@
             {
                 "type": "field",
                 "value": "action_required",
-                "width": "10%",
+                "width": "15%",
                 "sortable": true
             },
             {
@@ -52,8 +53,20 @@
             },
             {
                 "type": "field",
-                "value": "sojourn_type_id",
-                "width": "15%",
+                "value": "has_pmr_access",
+                "width": "10%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "has_pdv_features",
+                "width": "10%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "has_pda_support",
+                "width": "10%",
                 "sortable": true
             },
             {

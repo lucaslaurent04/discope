@@ -254,6 +254,54 @@
                 "type": "string",
                 "form_control": "input",
                 "is_multilang": 0
+            },
+            {
+                "id": 148,
+                "name": "identity.locale.account.prefix",
+                "code": "account.prefix",
+                "package": "identity",
+                "section": "locale",
+                "section_id": 1,
+                "title": null,
+                "description": null,
+                "help": null,
+                "is_sequence": false,
+                "type": "string",
+                "object_class": null,
+                "is_multilang": false,
+                "form_control": "input"
+            },
+            {
+                "id": 149,
+                "name": "identity.locale.account.sequence",
+                "code": "account.sequence",
+                "package": "identity",
+                "section": "locale",
+                "section_id": 1,
+                "title": "Séquence de compte comptable pour l'identité",
+                "description": null,
+                "help": null,
+                "is_sequence": false,
+                "type": "integer",
+                "object_class": null,
+                "is_multilang": false,
+                "form_control": "input"
+            },
+            {
+                "id": 150,
+                "name": "identity.locale.account.sequence_format",
+                "code": "account.sequence_format",
+                "package": "identity",
+                "section": "locale",
+                "section_id": 1,
+                "title": "Format de la séquence des comptes comptables pour l'identité",
+                "description": null,
+                "help": null,
+                "is_sequence": false,
+                "type": "string",
+                "object_class": null,
+                "is_multilang": false,
+                "form_control": "input"
             }
         ]
     }
