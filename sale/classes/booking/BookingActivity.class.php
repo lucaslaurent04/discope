@@ -120,10 +120,16 @@ class BookingActivity extends Model {
     }
 
     public static function ondelete($self): void {
-        $self->read(['booking_lines_ids']);
+        $self->read(['booking_line_group_id', 'booking_lines_ids']);
         foreach($self as $booking_activity) {
             if(!empty($booking_activity['booking_lines_ids'])) {
-                BookingLine::search(['id', 'in', $booking_activity['booking_lines_ids']])->delete();
+                $booking_lines_ids_remove = array_map(
+                    function ($id) { return -$id; },
+                    $booking_activity['booking_lines_ids']
+                );
+
+                BookingLineGroup::id($booking_activity['booking_line_group_id'])
+                    ->update(['booking_lines_ids' => $booking_lines_ids_remove]);
             }
         }
     }
