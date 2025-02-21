@@ -25,6 +25,11 @@
     <mat-form-field *ngIf="line?.product_id?.id > 0">
         <mat-label>Produit</mat-label>
         <input matInput [disabled]="group.is_locked" type="text" [value]="vm.product.name" readonly="readonly" />
+        <mat-hint [align]="'end'">
+            <span *ngIf="line.qty_accounting_method == 'accomodation'">au logement</span>
+            <span *ngIf="line.qty_accounting_method == 'person'">à la personne</span>
+            <span *ngIf="line.qty_accounting_method == 'unit'">à l'unité</span>
+        </mat-hint>
     </mat-form-field>
 </div>
 
