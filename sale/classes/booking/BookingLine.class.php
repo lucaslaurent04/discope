@@ -1658,8 +1658,12 @@ class BookingLine extends Model {
     }
 
     public static function onupdateServiceDate($self) {
-        $self->read(['service_date', 'booking_activity_id' => ['supplies_booking_lines_ids', 'transports_booking_lines_ids']]);
+        $self->read(['is_activity', 'service_date', 'booking_activity_id' => ['supplies_booking_lines_ids', 'transports_booking_lines_ids']]);
         foreach($self as $booking_line) {
+            if(!$booking_line['is_activity']) {
+                continue;
+            }
+
             $sub_booking_lines_ids = array_merge(
                 $booking_line['booking_activity_id']['supplies_booking_lines_ids'] ?? [],
                 $booking_line['booking_activity_id']['transports_booking_lines_ids'] ?? []
@@ -1672,8 +1676,12 @@ class BookingLine extends Model {
     }
 
     public static function onupdateTimeSlotId($self) {
-        $self->read(['time_slot_id', 'booking_activity_id' => ['supplies_booking_lines_ids', 'transports_booking_lines_ids']]);
+        $self->read(['is_activity', 'time_slot_id', 'booking_activity_id' => ['supplies_booking_lines_ids', 'transports_booking_lines_ids']]);
         foreach($self as $booking_line) {
+            if(!$booking_line['is_activity']) {
+                continue;
+            }
+
             $sub_booking_lines_ids = array_merge(
                 $booking_line['booking_activity_id']['supplies_booking_lines_ids'] ?? [],
                 $booking_line['booking_activity_id']['transports_booking_lines_ids'] ?? []
