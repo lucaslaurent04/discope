@@ -38,11 +38,11 @@
     </mat-form-field>
 </div>
 
-<div class="cell cell-right" style="cursor: pointer; padding-top: 11px">
+<div class="cell cell-right" style="cursor: pointer; padding-top: 11px" (click)="openPriceEdition()">
     <span>{{(line?.unit_price ? line.unit_price : 0) | number: '1.2-2'}} €</span>
 </div>
 
-<div class="cell cell-right" style="cursor: pointer; padding-top: 11px">
+<div class="cell cell-right" style="cursor: pointer; padding-top: 11px" (click)="openPriceEdition()">
     <span>{{(line?.vat_rate ? line.vat_rate : 0) | percent: '1.2-2'}}</span>
 </div>
 

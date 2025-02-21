@@ -6,6 +6,8 @@ import { Booking } from '../../../../../../../../_models/booking.model';
 import { ApiService } from 'sb-shared-lib';
 import { BookingLine } from '../../../../../../../../_models/booking_line.model';
 import { debounceTime, map, mergeMap } from 'rxjs/operators';
+import { MatDialog } from '@angular/material/dialog';
+import { BookingServicesBookingGroupLinePriceDialogComponent } from '../../../../../line/_components/price.dialog/price.component';
 
 interface vmModel {
     product: {
@@ -43,7 +45,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityLineComponent imple
     public vm: vmModel;
 
     constructor(
-        private api: ApiService
+        private api: ApiService,
+        public dialog: MatDialog
     ) {
         this.vm = {
             product: {
@@ -180,5 +183,36 @@ export class BookingServicesBookingGroupDayActivitiesActivityLineComponent imple
         catch(response) {
             this.api.errorFeedback(response);
         }
+    }
+
+    public openPriceEdition() {
+        if(this.group.is_locked) {
+            return;
+        }
+
+        if(!this.line) {
+            return;
+        }
+
+        const dialogRef = this.dialog.open(BookingServicesBookingGroupLinePriceDialogComponent, {
+            width: '500px',
+            height: '500px',
+            data: { line: this.line }
+        });
+
+        dialogRef.afterClosed().subscribe(async (result) => {
+            if(result) {
+                if(this.line.unit_price != result.unit_price || this.line.vat != result.vat_rate) {
+                    try {
+                        await this.api.update('sale\\booking\\BookingLine', [this.line.id], {unit_price: result.unit_price, vat_rate: result.vat_rate});
+                        // relay change to parent component
+                        this.updated.emit();
+                    }
+                    catch(response) {
+                        this.api.errorFeedback(response);
+                    }
+                }
+            }
+        });
     }
 }
