@@ -82,6 +82,23 @@ class BookingActivity extends Model {
                 'type'              => 'integer',
                 'description'       => "The place of the activity in the booking sojourn, is it the first or second or ... activity of the same type in the sojourn.",
                 'default'           => 1
+            ],
+
+            'total' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:4',
+                'description'       => 'Total tax-excluded price for all lines (computed).',
+                'function'          => 'calcTotal',
+                'store'             => true
+            ],
+
+            'price' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'description'       => 'Final tax-included price for all lines (computed).',
+                'function'          => 'calcPrice',
+                'store'             => true
             ]
 
         ];
@@ -119,6 +136,34 @@ class BookingActivity extends Model {
         return $result;
     }
 
+    public static function calcTotal($self): array {
+        $result = [];
+        $self->read(['booking_lines_ids' => ['total']]);
+        foreach($self as $id => $booking_activity) {
+            $total = 0;
+            foreach($booking_activity['booking_lines_ids'] as $line) {
+                $total += $line['total'];
+            }
+            $result[$id] = $total;
+        }
+
+        return $result;
+    }
+
+    public static function calcPrice($self): array {
+        $result = [];
+        $self->read(['booking_lines_ids' => ['price']]);
+        foreach($self as $id => $booking_activity) {
+            $price = 0;
+            foreach($booking_activity['booking_lines_ids'] as $line) {
+                $price += $line['price'];
+            }
+            $result[$id] = $price;
+        }
+
+        return $result;
+    }
+
     public static function ondelete($self): void {
         $self->read(['booking_line_group_id', 'booking_lines_ids']);
         foreach($self as $booking_activity) {
@@ -132,5 +177,10 @@ class BookingActivity extends Model {
                     ->update(['booking_lines_ids' => $booking_lines_ids_remove]);
             }
         }
+    }
+
+    public static function _resetPrices($self) {
+        // reset computed fields related to price
+        $self->update(['total' => null, 'price' => null]);
     }
 }

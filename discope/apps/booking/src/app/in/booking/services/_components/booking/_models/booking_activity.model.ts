@@ -11,6 +11,8 @@ export class BookingActivity {
         public booking_line_group_id: any = {},
         public supplies_booking_lines_ids: any[] = [],
         public transports_booking_lines_ids: any[] = [],
-        public counter: number = 1
+        public counter: number = 1,
+        public total: number = 0,
+        public price: number = 0
     ) {}
 }

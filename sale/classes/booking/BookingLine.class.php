@@ -837,7 +837,7 @@ class BookingLine extends Model {
     public static function _resetPrices($om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLine:_resetPrices", QN_REPORT_DEBUG);
 
-        $lines = $om->read(self::getType(), $oids, ['price_id', 'has_manual_unit_price', 'has_manual_vat_rate', 'booking_line_group_id'], $lang);
+        $lines = $om->read(self::getType(), $oids, ['price_id', 'has_manual_unit_price', 'has_manual_vat_rate', 'booking_line_group_id', 'booking_activity_id'], $lang);
 
         if($lines > 0) {
             $new_values = ['vat_rate' => null, 'unit_price' => null, 'total' => null, 'price' => null, 'fare_benefit' => null, 'discount' => null, 'free_qty' => null];
@@ -868,6 +868,9 @@ class BookingLine extends Model {
             // update parent objects
             $booking_line_groups_ids = array_map(function ($a) { return $a['booking_line_group_id']; }, array_values($lines));
             $om->callonce(\sale\booking\BookingLineGroup::getType(), '_resetPrices', $booking_line_groups_ids, [], $lang);
+
+            $booking_activities_ids = array_map(function ($a) { return $a['booking_activity_id']; }, array_values($lines));
+            $om->callonce(\sale\booking\BookingActivity::getType(), '_resetPrices', $booking_activities_ids, [], $lang);
         }
     }
 

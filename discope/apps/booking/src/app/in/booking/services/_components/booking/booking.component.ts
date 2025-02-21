@@ -255,6 +255,7 @@ export class BookingServicesBookingComponent
                 }
 
                 bookingActivityDay[timeSlot.code as 'AM'|'PM'|'EV'] = {
+                    ...bookingActivity,
                     activity_booking_line_id: activityBookingLine,
                     transports_booking_lines_ids: group.booking_lines_ids.filter(
                         (bookingLine: BookingLine) => bookingActivity.transports_booking_lines_ids.map(Number).includes(bookingLine.id)
@@ -268,10 +269,6 @@ export class BookingServicesBookingComponent
             bookingActivitiesDays.push(bookingActivityDay);
 
             date.setDate(date.getDate() + 1);
-        }
-
-        if(group.id === 7) {
-            console.log(bookingActivitiesDays);
         }
 
         return bookingActivitiesDays;
