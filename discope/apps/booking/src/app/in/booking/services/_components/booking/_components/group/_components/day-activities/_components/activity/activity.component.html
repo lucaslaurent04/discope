@@ -104,5 +104,11 @@
                 ></booking-services-booking-group-day-activities-activity-line>
             </div>
         </div>
+
+        <div *ngIf="activity?.activity_booking_line_id"
+             style="display: flex; width: 100%; justify-content: end; margin-bottom: 30px; padding-right: 65px;"
+        >
+            TOTAL TTC &nbsp;:&nbsp; {{ activity.price ?? 0 | currency : 'EUR' : 'symbol' : '1.2-2' : 'fr'}}
+        </div>
     </div>
 </div>

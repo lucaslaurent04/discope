@@ -169,7 +169,9 @@ $tree = [
             'booking_line_group_id',
             'supplies_booking_lines_ids',
             'transports_booking_lines_ids',
-            'counter'
+            'counter',
+            'total',
+            'price'
         ]
     ]
 ];
