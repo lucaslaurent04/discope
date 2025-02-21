@@ -384,7 +384,8 @@
                                                             "ACTION.ADD": true,
                                                             "ACTION.DELETE" :true
                                                         }
-                                                    }
+                                                    },
+                                                    "domain": ["is_supply", "=", true]
                                                 }
                                             }
                                         ]
