@@ -163,15 +163,18 @@ else {
     $products_ids = array_intersect(array_keys($map_groups_products_ids), array_keys($map_pricelists_products_ids));
 }
 
-$product_models_ids = null;
+$activity_dom = [];
 if(isset($params['is_activity'])) {
-    $product_models_ids = ProductModel::search(['is_activity', '=', $params['is_activity']])->ids();
+    $activity_dom[] = ['is_activity', '=', $params['is_activity']];
 }
-elseif(isset($params['is_transport'])) {
-    $product_models_ids = ProductModel::search(['is_transport', '=', $params['is_transport']])->ids();
+if(isset($params['is_transport'])) {
+    $activity_dom[] = ['is_transport', '=', $params['is_transport']];
 }
-elseif(isset($params['is_supply'])) {
-    $product_models_ids = ProductModel::search(['is_supply', '=', $params['is_supply']])->ids();
+if(isset($params['is_supply'])) {
+    $activity_dom[] = ['is_supply', '=', $params['is_supply']];
+}
+if(!empty($activity_dom)) {
+    $product_models_ids = ProductModel::search($activity_dom)->ids();
 }
 
 // if center office has set some favorites, add related products to the result
