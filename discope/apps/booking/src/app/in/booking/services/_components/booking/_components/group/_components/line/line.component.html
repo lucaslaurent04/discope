@@ -145,12 +145,18 @@
                         Date:
                     </div>
                     <mat-form-field style="max-width: 100px">
-                        <mat-select [formControl]="vm.service_date.formControl" (selectionChange)="vm.service_date.change()">
+                        <mat-select [formControl]="vm.service_date.formControl"
+                                    [disabled]="!instance.is_activity"
+                                    (selectionChange)="vm.service_date.change()"
+                        >
                             <mat-option *ngFor="let date of getPossibleServiceDates()" [value]="date">{{ date | date:'dd/MM/YY' }}</mat-option>
                         </mat-select>
                     </mat-form-field>
                     <mat-form-field *ngIf="!instance.product_id.product_model_id.is_fullday" style="margin-left: 20px; max-width: 100px">
-                        <mat-select [formControl]="vm.time_slot_id.formControl" (selectionChange)="vm.time_slot_id.change()">
+                        <mat-select [formControl]="vm.time_slot_id.formControl"
+                                    [disabled]="!instance.is_activity"
+                                    (selectionChange)="vm.time_slot_id.change()"
+                        >
                             <mat-option *ngFor="let time_slot of getPossibleTimeSlots()" [value]="time_slot.id">
                                 {{ time_slot.name}}
                             </mat-option>
