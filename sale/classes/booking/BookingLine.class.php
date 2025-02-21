@@ -295,15 +295,19 @@ class BookingLine extends Model {
             ],
 
             'is_transport' => [
-                'type'              => 'boolean',
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
                 'description'       => 'Does the line relate to a transport product?',
-                'default'           => false
+                'store'             => true,
+                'function'          => 'calcIsTransport'
             ],
 
             'is_supply' => [
-                'type'              => 'boolean',
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
                 'description'       => 'Does the line relate to a supply product?',
-                'default'           => false
+                'store'             => true,
+                'function'          => 'calcIsSupply'
             ],
 
             'booking_activity_id' => [
@@ -448,9 +452,16 @@ class BookingLine extends Model {
             'product_id.product_model_id.duration',
             'product_id.product_model_id.is_repeatable',
             'product_id.product_model_id.is_activity',
+            'product_id.product_model_id.has_transport_required',
+            'product_id.product_model_id.transport_product_model_id',
+            'product_id.product_model_id.has_supply',
+            'product_id.product_model_id.supplies_ids',
             'product_id.has_age_range',
             'product_id.age_range_id',
             'booking_id',
+            'booking_id.center_id',
+            'booking_id.date_from',
+            'booking_id.date_to',
             'booking_line_group_id',
             'booking_line_group_id.is_sojourn',
             'booking_line_group_id.is_event',
@@ -459,12 +470,15 @@ class BookingLine extends Model {
             'booking_line_group_id.has_pack',
             'booking_line_group_id.pack_id.has_age_range',
             'booking_line_group_id.age_range_assignments_ids',
+            'order',
             'qty',
             'has_own_qty',
             'is_rental_unit',
             'is_accomodation',
             'is_meal',
-            'qty_accounting_method'
+            'qty_accounting_method',
+            'service_date',
+            'time_slot_id'
         ], $lang);
 
         foreach($lines as $lid => $line) {
@@ -501,6 +515,68 @@ class BookingLine extends Model {
                     ->first(true);
 
                 $om->update(self::getType(), $lid, ['booking_activity_id' => $booking_activity['id']]);
+
+                $line_order = $line['order'];
+
+                if($line['product_id.product_model_id.has_transport_required'] && $line['product_id.product_model_id.transport_product_model_id']) {
+                    $res = \eQual::run('get', 'sale_catalog_product_collect', [
+                        'center_id' => $line['booking_id.center_id'],
+                        'domain'    => ['product_model_id', '=', $line['product_id.product_model_id.transport_product_model_id']],
+                        'date_from' => $line['booking_id.date_from'],
+                        'date_to'   => $line['booking_id.date_to']
+                    ]);
+
+                    if(empty($res)) {
+                        continue;
+                    }
+
+                    $booking_line = self::create([
+                        'order'                 => ++$line_order,
+                        'booking_id'            => $line['booking_id'],
+                        'booking_line_group_id' => $line['booking_line_group_id'],
+                        'service_date'          => $line['service_date'],
+                        'time_slot_id'          => $line['time_slot_id'],
+                        'booking_activity_id'   => $booking_activity['id']
+                    ])
+                        ->read(['id'])
+                        ->first();
+
+                    \eQual::run('do', 'sale_booking_update-bookingline-product', [
+                        'id'            => $booking_line['id'],
+                        'product_id'    => $res[0]['id']
+                    ]);
+                }
+
+                if($line['product_id.product_model_id.has_supply']) {
+                    foreach($line['product_id.product_model_id.supplies_ids'] as $supply_product_model_id) {
+                        $res = \eQual::run('get', 'sale_catalog_product_collect', [
+                            'center_id' => $line['booking_id.center_id'],
+                            'domain'    => ['product_model_id', '=', $supply_product_model_id],
+                            'date_from' => $line['booking_id.date_from'],
+                            'date_to'   => $line['booking_id.date_to']
+                        ]);
+
+                        if(empty($res)) {
+                            continue;
+                        }
+
+                        $booking_line = self::create([
+                            'order'                 => ++$line_order,
+                            'booking_id'            => $line['booking_id'],
+                            'booking_line_group_id' => $line['booking_line_group_id'],
+                            'service_date'          => $line['service_date'],
+                            'time_slot_id'          => $line['time_slot_id'],
+                            'booking_activity_id'   => $booking_activity['id']
+                        ])
+                            ->read(['id'])
+                            ->first();
+
+                        \eQual::run('do', 'sale_booking_update-bookingline-product', [
+                            'id'            => $booking_line['id'],
+                            'product_id'    => $res[0]['id']
+                        ]);
+                    }
+                }
             }
         }
 
@@ -1254,6 +1330,30 @@ class BookingLine extends Model {
         foreach($self as $id => $booking_line) {
             if(isset($booking_line['product_id']['product_model_id']['is_activity'])) {
                 $result[$id] = $booking_line['product_id']['product_model_id']['is_activity'];
+            }
+        }
+
+        return $result;
+    }
+
+    public static function calcIsTransport($self): array {
+        $result = [];
+        $self->read(['product_id' => ['product_model_id' => ['is_transport']]]);
+        foreach($self as $id => $booking_line) {
+            if(isset($booking_line['product_id']['product_model_id']['is_transport'])) {
+                $result[$id] = $booking_line['product_id']['product_model_id']['is_transport'];
+            }
+        }
+
+        return $result;
+    }
+
+    public static function calcIsSupply($self): array {
+        $result = [];
+        $self->read(['product_id' => ['product_model_id' => ['is_supply']]]);
+        foreach($self as $id => $booking_line) {
+            if(isset($booking_line['product_id']['product_model_id']['is_supply'])) {
+                $result[$id] = $booking_line['product_id']['product_model_id']['is_supply'];
             }
         }
 

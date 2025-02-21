@@ -77,6 +77,22 @@ $result = [];
 
 $fields = ['id', 'name', 'is_pack', 'sku', 'can_sell'];
 
+// handle filter by product_model_id
+if(!empty($params['domain'])) {
+    foreach($params['domain'] as $dom) {
+        if(is_array($dom)) {
+            if(($dom[0] ?? false) === 'product_model_id') {
+                $fields[] = 'product_model_id';
+                break;
+            }
+        }
+        elseif($dom === 'product_model_id') {
+            $fields[] = 'product_model_id';
+            break;
+        }
+    }
+}
+
 /*
     Keep only products that can be sold by the given Center.
     We perform a double check: by category attached to the center, and by price list defined for the center.

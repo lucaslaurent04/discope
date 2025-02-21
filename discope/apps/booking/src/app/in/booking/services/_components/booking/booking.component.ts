@@ -64,7 +64,7 @@ export class BookingServicesBookingComponent
         super( new Booking() );
     }
 
-    ngOnChanges(changes: SimpleChanges) {
+    public ngOnChanges(changes: SimpleChanges) {
         if(changes.booking_id && this.booking_id > 0) {
             try {
                 this.load(this.booking_id);
