@@ -323,7 +323,8 @@ class BookingLine extends Model {
                 'description'       => 'Specific date on which the service is delivered.',
                 'help'              => 'Only needed when the ProductModel is schedulable and not repeatable.',
                 'store'             => true,
-                'function'          => 'calcServiceDate'
+                'function'          => 'calcServiceDate',
+                'onupdate'          => 'onupdateServiceDate'
             ],
 
             'time_slot_id' => [
@@ -332,7 +333,8 @@ class BookingLine extends Model {
                 'foreign_object'    => 'sale\booking\TimeSlot',
                 'description'       => 'Specific day time slot on which the service is delivered.',
                 'store'             => true,
-                'function'          => 'calcTimeSlotId'
+                'function'          => 'calcTimeSlotId',
+                'onupdate'          => 'onupdateTimeSlotId'
             ]
 
         ];
@@ -1653,5 +1655,33 @@ class BookingLine extends Model {
             }
         }
 
+    }
+
+    public static function onupdateServiceDate($self) {
+        $self->read(['service_date', 'booking_activity_id' => ['supplies_booking_lines_ids', 'transports_booking_lines_ids']]);
+        foreach($self as $booking_line) {
+            $sub_booking_lines_ids = array_merge(
+                $booking_line['booking_activity_id']['supplies_booking_lines_ids'] ?? [],
+                $booking_line['booking_activity_id']['transports_booking_lines_ids'] ?? []
+            );
+
+            if(!empty($sub_booking_lines_ids)) {
+                BookingLine::ids($sub_booking_lines_ids)->update(['service_date' => $booking_line['service_date']]);
+            }
+        }
+    }
+
+    public static function onupdateTimeSlotId($self) {
+        $self->read(['time_slot_id', 'booking_activity_id' => ['supplies_booking_lines_ids', 'transports_booking_lines_ids']]);
+        foreach($self as $booking_line) {
+            $sub_booking_lines_ids = array_merge(
+                $booking_line['booking_activity_id']['supplies_booking_lines_ids'] ?? [],
+                $booking_line['booking_activity_id']['transports_booking_lines_ids'] ?? []
+            );
+
+            if(!empty($sub_booking_lines_ids)) {
+                BookingLine::ids($sub_booking_lines_ids)->update(['time_slot_id' => $booking_line['time_slot_id']]);
+            }
+        }
     }
 }
