@@ -6,6 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace sale\booking;
+use equal\orm\Collection;
 use equal\orm\Model;
 
 class BookingLine extends Model {
@@ -376,13 +377,12 @@ class BookingLine extends Model {
      * Check whether an object can be updated, and perform some additional operations if necessary.
      * This method can be overridden to define a more precise set of tests.
      *
-     * @param  object   $om         ObjectManager instance.
-     * @param  array    $oids       List of objects identifiers.
-     * @param  array    $values     Associative array holding the new values to be assigned.
-     * @param  string   $lang       Language in which multilang fields are being updated.
-     * @return array    Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be updated.
+     * @param  Collection       $self       Collection instance.
+     * @param  array            $values     Associative array holding the new values to be assigned.
+     * @param  string           $lang       Language in which multilang fields are being updated.
+     * @return array            Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be updated.
      */
-    public static function canupdate($om, $oids, $values, $lang='en') {
+    public static function canupdate($self, $values, $lang = 'en') {
 
         // handle exceptions for fields that can always be updated
         $allowed = ['is_contractual', 'is_invoiced'];
@@ -395,20 +395,64 @@ class BookingLine extends Model {
         }
 
         if($count_non_allowed > 0) {
-            $lines = $om->read(self::getType(), $oids, ['booking_id.status', 'booking_line_group_id.is_extra', 'booking_line_group_id.has_schedulable_services', 'booking_line_group_id.has_consumptions'], $lang);
-            if($lines > 0) {
-                foreach($lines as $line) {
-                    if($line['booking_id.status'] != 'quote' && !$line['booking_line_group_id.is_extra']) {
-                        return ['booking_id' => ['non_editable' => 'Services cannot be updated for non-quote bookings.']];
+            $self->read([
+                'booking_id'            => ['status'],
+                'booking_line_group_id' => ['is_extra', 'has_schedulable_services', 'has_consumptions'],
+            ]);
+
+            foreach($self as $line) {
+                if($line['booking_id']['status'] != 'quote' && !$line['booking_line_group_id']['is_extra']) {
+                    return ['booking_id' => ['non_editable' => 'Services cannot be updated for non-quote bookings.']];
+                }
+                if($line['booking_line_group_id']['is_extra'] && $line['booking_line_group_id']['has_schedulable_services'] && $line['booking_line_group_id']['has_consumptions']) {
+                    return ['booking_id' => ['non_editable' => 'Lines from extra services cannot be changed once consumptions have been created.']];
+                }
+            }
+        }
+
+        // Check if moment does not conflict with another activity of the booking line group
+        if(in_array('service_date', array_keys($values)) || in_array('time_slot_id', array_keys($values))) {
+            $self->read([
+                'is_activity',
+                'service_date',
+                'time_slot_id',
+                'booking_line_group_id' => [
+                    'booking_activities_ids' => [
+                        'activity_booking_line_id' => [
+                            'id',
+                            'service_date',
+                            'time_slot_id'
+                        ]
+                    ]
+                ]
+            ]);
+
+            foreach($self as $line) {
+                if(!$line['is_activity']) {
+                    continue;
+                }
+
+                $new_activity_values = [
+                    'service_date' => $values['service_date'] ?? $line['service_date'],
+                    'time_slot_id' => $values['time_slot_id'] ?? $line['time_slot_id']
+                ];
+
+                foreach($line['booking_line_group_id']['booking_activities_ids'] as $activity) {
+                    if($activity['activity_booking_line_id']['id'] === $line['id']) {
+                        continue;
                     }
-                    if($line['booking_line_group_id.is_extra'] && $line['booking_line_group_id.has_schedulable_services'] && $line['booking_line_group_id.has_consumptions']) {
-                        return ['booking_id' => ['non_editable' => 'Lines from extra services cannot be changed once consumptions have been created.']];
+
+                    if(
+                        $new_activity_values['service_date'] === $activity['activity_booking_line_id']['service_date']
+                        && $new_activity_values['time_slot_id'] === $activity['activity_booking_line_id']['time_slot_id']
+                    ) {
+                        return ['service_date' => ['already_used' => 'Moment conflict with another activity of the group.']];
                     }
                 }
             }
         }
 
-        return parent::canupdate($om, $oids, $values, $lang);
+        return parent::canupdate($self, $values, $lang);
     }
 
     /**
