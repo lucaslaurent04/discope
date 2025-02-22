@@ -40,8 +40,7 @@ class Funding extends \sale\pay\Funding {
                 'usage'             => 'amount/money:2',
                 'description'       => 'Amount expected for the funding (computed based on VAT incl. price).',
                 'required'          => true,
-                'onupdate'          => 'onupdateDueAmount',
-                // 'dependencies'      => ['name', 'amount_share']
+                'onupdate'          => 'onupdateDueAmount'
             ],
 
             // override to reference booking.paid_amount
@@ -52,7 +51,6 @@ class Funding extends \sale\pay\Funding {
                 'function'          => 'calcIsPaid',
                 'store'             => true,
                 'onupdate'          => 'onupdateIsPaid',
-                // 'dependencies'      => ['booking_id.paid_amount', 'invoice_id.is_paid']
             ],
 
             // override to reference booking.paid_amount
@@ -64,7 +62,6 @@ class Funding extends \sale\pay\Funding {
                 'function'          => 'calcPaidAmount',
                 'store'             => true,
                 'instant'           => true
-                // 'dependencies'      => ['booking_id.paid_amount', 'invoice_id.is_paid']
             ],
 
             'amount_share' => [
