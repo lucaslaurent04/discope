@@ -53,7 +53,7 @@ class Provider extends \identity\Partner {
                 'description'       => 'The targeted identity (the partner).',
                 'onupdate'          => 'onupdatePartnerIdentityId',
                 'required'          => true,
-                'dependencies'      => ['address', 'vat_number', 'registration_number']
+                'dependents'        => ['address', 'vat_number', 'registration_number']
             ],
 
             'product_models_ids' => [
