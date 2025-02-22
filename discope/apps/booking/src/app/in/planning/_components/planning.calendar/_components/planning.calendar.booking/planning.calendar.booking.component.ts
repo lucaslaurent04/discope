@@ -32,7 +32,7 @@ export class PlanningCalendarBookingComponent implements OnInit, OnChanges  {
     }
 
     /**
-     * Convert a string-formated time to a unix timestamp-like value (i.e the number of seconds elapsed since midnight).
+     * Convert a string-formatted time to a unix timestamp-like value (i.e the number of seconds elapsed since midnight).
      *
      */
     private getTime(time:string) : number {
@@ -59,7 +59,7 @@ export class PlanningCalendarBookingComponent implements OnInit, OnChanges  {
         return parseInt(moment.toISOString().substring(0, 10).replace(/-/g, ''), 10);
     }
 
-    private isSameDate(date1:Date, date2:Date) : boolean {
+    private isSameDate(date1: Date, date2: Date) : boolean {
         try {
             return (this.calcDateInt(date1) == this.calcDateInt(date2));
         }
@@ -81,7 +81,7 @@ export class PlanningCalendarBookingComponent implements OnInit, OnChanges  {
             return;
         }
 
-        // #todo - we shoud have info about last visible date
+        // #todo - we should have info about last visible date
 
         let date_from = new Date(this.consumption.date_from);
         let date_to = new Date(this.consumption.date_to);
