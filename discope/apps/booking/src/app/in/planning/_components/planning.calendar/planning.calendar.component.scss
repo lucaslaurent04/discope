@@ -78,7 +78,7 @@
                 }
 
                 .head-days, .head-months {
-                    height: 46px;
+                    height: 36px;
                     font-size: 16px;
                 }
 
@@ -148,7 +148,7 @@
                 }
 
                 th.head-days {
-                    top: 45px;
+                    top: 35px;
                 }
 
                 th, td {
@@ -189,6 +189,7 @@
     tr.rows td.cell-days {
         position: relative;
         background-color: transparent;
+        overflow: hidden;
 
         .cell-overlay {
             position: absolute;
