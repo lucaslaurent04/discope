@@ -8,8 +8,8 @@
         <!-- header -->
         <thead>
             <tr class="head">
-                <th #calTableRefColumn class="ref-column cell-room" rowspan="2">ref.</th>
-                <th class="stat-column cell-room" rowspan="2">stat.</th>
+                <th #calTableRefColumn class="ref-column cell-room" rowspan="2"><span class="material-icons">holiday_village</span></th>
+                <th class="stat-column cell-room" rowspan="2"><span class="material-icons">task_alt</span></th>
                 <th class="head-months" *ngFor="let month of headers.months" [attr.colspan]="month.days.length">
                     {{ month.date | date : 'MMMM y' }}
                 </th>
