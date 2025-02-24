@@ -127,6 +127,21 @@ hr {
     page-break-after: always;
     border: 0;
 }
+
+.signature-container {
+    max-width: 200px;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+    float: right;
+}
+
+.signature-container img {
+    max-width: 200px;
+    width: 100%;
+    height: auto;
+    display: block;
+}
 </style>
 
 </head>
@@ -231,7 +246,7 @@ hr {
 
 <div class="inner">
     <div class="intro">
-        {{ quote_header_html | raw }}
+        {{ header_html | raw }}
     </div>
     <div class="wrapper">
         <table width="100%" cellpadding="4" cellspacing="0">
@@ -478,6 +493,38 @@ hr {
     </div>
     {% endif %}
 {% endif %}
+
+{% if has_footer %}
+    <div>
+        {{ footer_html|raw }}
+    </div>
+
+    <div class="signature-container">
+        {{ signature|raw }}
+    </div>
+
+{% endif %}
+
+{% if is_agreement_html %}
+    <table style="border: solid 1px black;border-collapse: collapse;  width: 100%; clear: both;">
+        <tr>
+            <td class="title" style="background-color: rgb(204, 204, 204); text-align: center; text-transform: uppercase;  border: 1px solid black; padding: 5px;">
+                <strong>{{i18n['title_agreement']}}</strong>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 5px;">{{i18n['date_and_signature']}}:  </td>
+        </tr>
+        <tr>
+            <td style="height:75px;"></td>
+        </tr>
+        <tr>
+            <td style="font-style: italic; padding:5px; vertical-align: sub;">{{ agreement_html | raw }}</td>
+        </tr>
+    </table>
+{% endif %}
+
+
 
 </body>
 </html>
