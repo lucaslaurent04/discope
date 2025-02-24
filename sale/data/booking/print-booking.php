@@ -90,6 +90,7 @@ $fields = [
     'status',
     'date_from',
     'date_to',
+    'nb_pers',
     'total',
     'price',
     'is_price_tbc',
@@ -219,68 +220,59 @@ if($logo_document_data) {
 $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
 $values = [
-    'header_img_url'        => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
-    'quote_header_html'     => '',
-    'quote_notice_html'     => '',
-    'status'                => $booking['status'],
-
-    'is_price_tbc'          => $booking['is_price_tbc'],
-    'customer_name'         => substr($booking['customer_id']['partner_identity_id']['display_name'], 0, 66),
-
-    // by default, there is no ATTN - if required, it is set below
-    'attn_name'             => '',
-    'attn_address1'         => '',
-    'attn_address2'         => '',
-
-    'contact_name'          => '',
-    'contact_phone'         => (strlen($booking['customer_id']['partner_identity_id']['phone']))?$booking['customer_id']['partner_identity_id']['phone']:$booking['customer_id']['partner_identity_id']['mobile'],
-    'contact_email'         => $booking['customer_id']['partner_identity_id']['email'],
-    'customer_address1'     => $booking['customer_id']['partner_identity_id']['address_street'],
-    'customer_address2'     => $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'].(($booking['customer_id']['partner_identity_id']['address_country'] != 'BE')?(' - '.$booking['customer_id']['partner_identity_id']['address_country']):''),
-    'customer_country'      => $booking['customer_id']['partner_identity_id']['address_country'],
-    'customer_has_vat'      => (int) $booking['customer_id']['partner_identity_id']['has_vat'],
-    'customer_vat'          => $booking['customer_id']['partner_identity_id']['vat_number'],
-
-    'member'                => lodging_booking_print_booking_formatMember($booking),
-    'date'                  => date('d/m/Y', $booking['modified']),
-    'code'                  => sprintf("%03d.%03d", intval($booking['name']) / 1000, intval($booking['name']) % 1000),
-    'center'                => $booking['center_id']['name'],
-    'center_address'        => $booking['center_id']['address_street'].' - '.$booking['center_id']['address_zip'].' '.$booking['center_id']['address_city'],
-    'postal_address'        => sprintf("%s - %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
-    'center_contact1'       => (isset($booking['center_id']['manager_id']['name']))?$booking['center_id']['manager_id']['name']:'',
-    'center_contact2'       => DataFormatter::format($booking['center_id']['phone'], 'phone').' - '.$booking['center_id']['email'],
-
-    // by default, we use center contact details (overridden in case Center has a management Office, see below)
-    'center_phone'          => DataFormatter::format($booking['center_id']['phone'], 'phone'),
-    'center_email'          => $booking['center_id']['email'],
-    'center_signature'      => $booking['center_id']['organisation_id']['signature'],
-    'center_office'         => $center_office_code,
-    'period'                => 'Du '.date('d/m/Y', $booking['date_from']).' au '.date('d/m/Y', $booking['date_to']),
-    'price'                 => $booking['price'],
-    'total'                 => $booking['total'],
-
-    'company_name'          => $booking['center_id']['organisation_id']['legal_name'],
-    'company_address'       => sprintf("%s %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
-    'company_email'         => $booking['center_id']['organisation_id']['email'],
-    'company_phone'         => DataFormatter::format($booking['center_id']['organisation_id']['phone'], 'phone'),
-    'company_fax'           => DataFormatter::format($booking['center_id']['organisation_id']['fax'], 'phone'),
-    'company_website'       => $booking['center_id']['organisation_id']['website'],
-    'company_reg_number'    => $booking['center_id']['organisation_id']['registration_number'],
-    'company_has_vat'       => $booking['center_id']['organisation_id']['has_vat'],
-    'company_vat_number'    => $booking['center_id']['organisation_id']['vat_number'],
-
-
-    // by default, we use organisation payment details (overridden in case Center has a management Office, see below)
-    'company_iban'          => DataFormatter::format($booking['center_id']['organisation_id']['bank_account_iban'], 'iban'),
-    'company_bic'           => DataFormatter::format($booking['center_id']['organisation_id']['bank_account_bic'], 'bic'),
-
-    'lines'                 => [],
-    'tax_lines'             => [],
-    'benefit_lines'         => [],
-
-    'consumptions_tye'           => isset($booking['type_id']['booking_schedule_layout'])?$booking['type_id']['booking_schedule_layout']:'simple',
-    'consumptions_map_simple'    => [],
+    'attn_address1'              => '',
+    'attn_address2'              => '',
+    'attn_name'                  => '',
+    'benefit_lines'              => [],
+    'center'                     => $booking['center_id']['name'],
+    'center_address'             => $booking['center_id']['address_street'].' - '.$booking['center_id']['address_zip'].' '.$booking['center_id']['address_city'],
+    'center_contact1'            => (isset($booking['center_id']['manager_id']['name']))?$booking['center_id']['manager_id']['name']:'',
+    'center_contact2'            => DataFormatter::format($booking['center_id']['phone'], 'phone').' - '.$booking['center_id']['email'],
+    'center_email'               => $booking['center_id']['email'],
+    'center_office'              => $center_office_code,
+    'center_phone'               => DataFormatter::format($booking['center_id']['phone'], 'phone'),
+    'center_signature'           => $booking['center_id']['center_office_id']['signature'],
+    'code'                       => sprintf("%03d.%03d", intval($booking['name']) / 1000, intval($booking['name']) % 1000),
+    'company_address'            => sprintf("%s %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
+    'company_bic'                => DataFormatter::format($booking['center_id']['organisation_id']['bank_account_bic'], 'bic'),
+    'company_email'              => $booking['center_id']['organisation_id']['email'],
+    'company_fax'                => DataFormatter::format($booking['center_id']['organisation_id']['fax'], 'phone'),
+    'company_has_vat'            => $booking['center_id']['organisation_id']['has_vat'],
+    'company_iban'               => DataFormatter::format($booking['center_id']['organisation_id']['bank_account_iban'], 'iban'),
+    'company_name'               => $booking['center_id']['organisation_id']['legal_name'],
+    'company_phone'              => DataFormatter::format($booking['center_id']['organisation_id']['phone'], 'phone'),
+    'company_reg_number'         => $booking['center_id']['organisation_id']['registration_number'],
+    'company_vat_number'         => $booking['center_id']['organisation_id']['vat_number'],
+    'company_website'            => $booking['center_id']['organisation_id']['website'],
     'consumptions_map_detailed'  => [],
+    'consumptions_map_simple'    => [],
+    'consumptions_tye'           => isset($booking['type_id']['booking_schedule_layout'])?$booking['type_id']['booking_schedule_layout']:'simple',
+    'contact_email'              => $booking['customer_id']['partner_identity_id']['email'],
+    'contact_name'               => '',
+    'contact_phone'              => (strlen($booking['customer_id']['partner_identity_id']['phone']))?$booking['customer_id']['partner_identity_id']['phone']:$booking['customer_id']['partner_identity_id']['mobile'],
+    'customer_address1'          => $booking['customer_id']['partner_identity_id']['address_street'],
+    'customer_address2'          => $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'].(($booking['customer_id']['partner_identity_id']['address_country'] != 'BE')?(' - '.$booking['customer_id']['partner_identity_id']['address_country']):''),
+    'customer_country'           => $booking['customer_id']['partner_identity_id']['address_country'],
+    'customer_has_vat'           => (int) $booking['customer_id']['partner_identity_id']['has_vat'],
+    'customer_name'              => substr($booking['customer_id']['partner_identity_id']['display_name'], 0, 66),
+    'customer_vat'               => $booking['customer_id']['partner_identity_id']['vat_number'],
+    'date'                       => date('d/m/Y', $booking['modified']),
+    'has_footer'                 => 0,
+    'header_img_url'             => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
+    'is_price_tbc'               => $booking['is_price_tbc'],
+    'is_agreement_html'    => '',
+    'lines'                      => [],
+    'member'                     => lodging_booking_print_booking_formatMember($booking),
+    'period'                     => 'Du '.date('d/m/Y', $booking['date_from']).' au '.date('d/m/Y', $booking['date_to']),
+    'postal_address'             => sprintf("%s - %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
+    'price'                      => $booking['price'],
+    'agreement_html'             => '',
+    'footer_html'                => '',
+    'header_html'                => '',
+    'signature'                  => $booking['center_id']['organisation_id']['signature'] ?? '',
+    'status'                     => $booking['status'],
+    'tax_lines'                  => [],
+    'total'                      => $booking['total'],
 ];
 
 
@@ -288,42 +280,42 @@ $values = [
     retrieve terms translations
 */
 $values['i18n'] = [
-    'invoice'           => Setting::get_value('sale', 'locale', 'terms.invoice', null, [], $params['lang']),
-    'quote'             => Setting::get_value('sale', 'locale', 'terms.quote', null, [], $params['lang']),
-    'option'            => Setting::get_value('sale', 'locale', 'terms.option', null, [], $params['lang']),
-    'contract'          => Setting::get_value('sale', 'locale', 'terms.contract', null, [], $params['lang']),
-    'booking_invoice'   => Setting::get_value('lodging', 'locale', 'i18n.booking_invoice', null, [], $params['lang']),
-    'booking_quote'     => Setting::get_value('lodging', 'locale', 'i18n.booking_quote', null, [], $params['lang']),
-    'booking_contract'  => Setting::get_value('lodging', 'locale', 'i18n.booking_contract', null, [], $params['lang']),
-    'credit_note'       => Setting::get_value('lodging', 'locale', 'i18n.credit_note', null, [], $params['lang']),
-    'company_registry'  => Setting::get_value('lodging', 'locale', 'i18n.company_registry', null, [], $params['lang']),
-    'vat_number'        => Setting::get_value('lodging', 'locale', 'i18n.vat_number', null, [], $params['lang']),
-    'vat'               => Setting::get_value('lodging', 'locale', 'i18n.vat', null, [], $params['lang']),
-    'your_stay_at'      => Setting::get_value('lodging', 'locale', 'i18n.your_stay_at', null, [], $params['lang']),
-    'contact'           => Setting::get_value('lodging', 'locale', 'i18n.contact', null, [], $params['lang']),
-    'period'            => Setting::get_value('lodging', 'locale', 'i18n.period', null, [], $params['lang']),
-    'member'            => Setting::get_value('lodging', 'locale', 'i18n.member', null, [], $params['lang']),
-    'phone'             => Setting::get_value('lodging', 'locale', 'i18n.phone', null, [], $params['lang']),
-    'email'             => Setting::get_value('lodging', 'locale', 'i18n.email', null, [], $params['lang']),
-    'booking_ref'       => Setting::get_value('lodging', 'locale', 'i18n.booking_ref', null, [], $params['lang']),
-    'your_reference'    => Setting::get_value('lodging', 'locale', 'i18n.your_reference', null, [], $params['lang']),
-    'number_short'      => Setting::get_value('lodging', 'locale', 'i18n.number_short', null, [], $params['lang']),
-    'date'              => Setting::get_value('lodging', 'locale', 'i18n.date', null, [], $params['lang']),
-    'status'            => Setting::get_value('lodging', 'locale', 'i18n.status', null, [], $params['lang']),
-    'paid'              => Setting::get_value('lodging', 'locale', 'i18n.paid', null, [], $params['lang']),
-    'to_pay'            => Setting::get_value('lodging', 'locale', 'i18n.to_pay', null, [], $params['lang']),
-    'to_refund'         => Setting::get_value('lodging', 'locale', 'i18n.to_refund', null, [], $params['lang']),
-    'product_label'     => Setting::get_value('lodging', 'locale', 'i18n.product_label', null, [], $params['lang']),
-    'quantity_short'    => Setting::get_value('lodging', 'locale', 'i18n.quantity_short', null, [], $params['lang']),
-    'freebies_short'    => Setting::get_value('lodging', 'locale', 'i18n.freebies_short', null, [], $params['lang']),
-    'unit_price'        => Setting::get_value('lodging', 'locale', 'i18n.unit_price', null, [], $params['lang']),
-    'discount_short'    => Setting::get_value('lodging', 'locale', 'i18n.discount_short', null, [], $params['lang']),
-    'taxes'             => Setting::get_value('lodging', 'locale', 'i18n.taxes', null, [], $params['lang']),
-    'price'             => Setting::get_value('lodging', 'locale', 'i18n.price', null, [], $params['lang']),
-    'total'             => Setting::get_value('lodging', 'locale', 'i18n.total', null, [], $params['lang']),
-    'price_tax_excl'    => Setting::get_value('lodging', 'locale', 'i18n.price_tax_excl', null, [], $params['lang']),
-    'total_tax_excl'    => Setting::get_value('lodging', 'locale', 'i18n.total_tax_excl', null, [], $params['lang']),
-    'total_tax_incl'    => Setting::get_value('lodging', 'locale', 'i18n.total_tax_incl', null, [], $params['lang']),
+    'invoice'               => Setting::get_value('sale', 'locale', 'terms.invoice', null, [], $params['lang']),
+    'quote'                 => Setting::get_value('sale', 'locale', 'terms.quote', null, [], $params['lang']),
+    'option'                => Setting::get_value('sale', 'locale', 'terms.option', null, [], $params['lang']),
+    'contract'              => Setting::get_value('sale', 'locale', 'terms.contract', null, [], $params['lang']),
+    'booking_invoice'       => Setting::get_value('lodging', 'locale', 'i18n.booking_invoice', null, [], $params['lang']),
+    'booking_quote'         => Setting::get_value('lodging', 'locale', 'i18n.booking_quote', null, [], $params['lang']),
+    'booking_contract'      => Setting::get_value('lodging', 'locale', 'i18n.booking_contract', null, [], $params['lang']),
+    'credit_note'           => Setting::get_value('lodging', 'locale', 'i18n.credit_note', null, [], $params['lang']),
+    'company_registry'      => Setting::get_value('lodging', 'locale', 'i18n.company_registry', null, [], $params['lang']),
+    'vat_number'            => Setting::get_value('lodging', 'locale', 'i18n.vat_number', null, [], $params['lang']),
+    'vat'                   => Setting::get_value('lodging', 'locale', 'i18n.vat', null, [], $params['lang']),
+    'your_stay_at'          => Setting::get_value('lodging', 'locale', 'i18n.your_stay_at', null, [], $params['lang']),
+    'contact'               => Setting::get_value('lodging', 'locale', 'i18n.contact', null, [], $params['lang']),
+    'period'                => Setting::get_value('lodging', 'locale', 'i18n.period', null, [], $params['lang']),
+    'member'                => Setting::get_value('lodging', 'locale', 'i18n.member', null, [], $params['lang']),
+    'phone'                 => Setting::get_value('lodging', 'locale', 'i18n.phone', null, [], $params['lang']),
+    'email'                 => Setting::get_value('lodging', 'locale', 'i18n.email', null, [], $params['lang']),
+    'booking_ref'           => Setting::get_value('lodging', 'locale', 'i18n.booking_ref', null, [], $params['lang']),
+    'your_reference'        => Setting::get_value('lodging', 'locale', 'i18n.your_reference', null, [], $params['lang']),
+    'number_short'          => Setting::get_value('lodging', 'locale', 'i18n.number_short', null, [], $params['lang']),
+    'date'                  => Setting::get_value('lodging', 'locale', 'i18n.date', null, [], $params['lang']),
+    'status'                => Setting::get_value('lodging', 'locale', 'i18n.status', null, [], $params['lang']),
+    'paid'                  => Setting::get_value('lodging', 'locale', 'i18n.paid', null, [], $params['lang']),
+    'to_pay'                => Setting::get_value('lodging', 'locale', 'i18n.to_pay', null, [], $params['lang']),
+    'to_refund'             => Setting::get_value('lodging', 'locale', 'i18n.to_refund', null, [], $params['lang']),
+    'product_label'         => Setting::get_value('lodging', 'locale', 'i18n.product_label', null, [], $params['lang']),
+    'quantity_short'        => Setting::get_value('lodging', 'locale', 'i18n.quantity_short', null, [], $params['lang']),
+    'freebies_short'        => Setting::get_value('lodging', 'locale', 'i18n.freebies_short', null, [], $params['lang']),
+    'unit_price'            => Setting::get_value('lodging', 'locale', 'i18n.unit_price', null, [], $params['lang']),
+    'discount_short'        => Setting::get_value('lodging', 'locale', 'i18n.discount_short', null, [], $params['lang']),
+    'taxes'                 => Setting::get_value('lodging', 'locale', 'i18n.taxes', null, [], $params['lang']),
+    'price'                 => Setting::get_value('lodging', 'locale', 'i18n.price', null, [], $params['lang']),
+    'total'                 => Setting::get_value('lodging', 'locale', 'i18n.total', null, [], $params['lang']),
+    'price_tax_excl'        => Setting::get_value('lodging', 'locale', 'i18n.price_tax_excl', null, [], $params['lang']),
+    'total_tax_excl'        => Setting::get_value('lodging', 'locale', 'i18n.total_tax_excl', null, [], $params['lang']),
+    'total_tax_incl'        => Setting::get_value('lodging', 'locale', 'i18n.total_tax_incl', null, [], $params['lang']),
     'stay_total_tax_incl'   => Setting::get_value('lodging', 'locale', 'i18n.stay_total_tax_incl', null, [], $params['lang']),
     'balance_of'            => Setting::get_value('lodging', 'locale', 'i18n.balance_of', null, [], $params['lang']),
     'to_be_paid_before'     => Setting::get_value('lodging', 'locale', 'i18n.to_be_paid_before', null, [], $params['lang']),
@@ -350,6 +342,7 @@ $values['i18n'] = [
     'time_slot'             => Setting::get_value('lodging', 'locale', 'i18n.time_slot', null, [], $params['lang']),
     'snack'                 => Setting::get_value('lodging', 'locale', 'i18n.snack', null, [], $params['lang']),
     'meals'                 => Setting::get_value('lodging', 'locale', 'i18n.meals', null, [], $params['lang']),
+    'title_agreement'       => Setting::get_value('lodging', 'locale', 'i18n.title_agreement', null, [], $params['lang']),
 ];
 
 
@@ -393,17 +386,28 @@ if($booking['center_id']['template_category_id']) {
 
     foreach($template['parts_ids'] as $part_id => $part) {
         if($part['name'] == 'header') {
-            $value = $part['value'].$values['center_signature'];
+            $value = $part['value'];
             $value = str_replace('{center}', $booking['center_id']['name'], $value);
+            $value = str_replace('{nb_pers}', $booking['nb_pers'] ,$value);
             $value = str_replace('{date_from}', date('d/m/Y', $booking['date_from']), $value);
             $value = str_replace('{date_to}', date('d/m/Y', $booking['date_to']), $value);
-            $values['quote_header_html'] = $value;
+            $values['header_html'] = $value;
         }
-        elseif($part['name'] == 'notice') {
-            $values['invoice_notice_html'] = $part['value'];
+        elseif($part['name'] == 'agreement') {
+            $values['is_agreement_html'] = 1;
+            $values['agreement_html'] = $part['value'];
+        }
+        elseif($part['name'] == 'footer') {
+            $values['has_footer'] = 1;
+            $values['footer_html'] = $part['value'] . $values['center_signature'];
+            $hasFooter = true;
         }
     }
 
+}
+
+if (!$hasFooter) {
+    $values['header_html'] .= $values['center_signature'];
 }
 
 $template_part = TemplatePart::search(['name', '=', 'advantage_notice'])
