@@ -10,7 +10,7 @@
     <div class="activity-container">
         <div class="activity-remove">
             <button mat-icon-button
-                    [disabled]="!bookingActivityDay.AM?.activity_booking_line_id"
+                    [disabled]="!bookingActivityDay.AM?.activity_booking_line_id || bookingActivityDay.AM?.is_fullday_virtual"
                     (click)="ondeleteActivity(bookingActivityDay.AM?.activity_booking_line_id?.id);"
             >
                 <mat-icon>delete</mat-icon>
@@ -21,9 +21,9 @@
                                                                 [timeSlot]="mapTimeSlotsCode['AM']"
                                                                 [group]="group"
                                                                 [booking]="booking"
-                                                                [opened]="bookingActivityDay.AM?.activity_booking_line_id && openedActivityIds.includes(bookingActivityDay.AM.activity_booking_line_id.id)"
-                                                                (close)="closeActivity.emit(bookingActivityDay.AM.activity_booking_line_id.id)"
-                                                                (open)="openActivity.emit(bookingActivityDay.AM.activity_booking_line_id.id)"
+                                                                [opened]="bookingActivityDay.AM?.id && openedActivityIds.includes(bookingActivityDay.AM.id)"
+                                                                (close)="closeActivity.emit(bookingActivityDay.AM.id)"
+                                                                (open)="openActivity.emit(bookingActivityDay.AM.id)"
                                                                 (updated)="updated.emit()"
                                                                 (deleteLine)="deleteLine.emit($event)"
         ></booking-services-booking-group-day-activities-activity>
@@ -32,7 +32,7 @@
     <div class="activity-container">
         <div class="activity-remove">
             <button mat-icon-button
-                    [disabled]="!bookingActivityDay.PM?.activity_booking_line_id"
+                    [disabled]="!bookingActivityDay.PM?.activity_booking_line_id || bookingActivityDay.PM?.is_fullday_virtual"
                     (click)="ondeleteActivity(bookingActivityDay.PM?.activity_booking_line_id?.id);"
             >
                 <mat-icon>delete</mat-icon>
@@ -43,9 +43,9 @@
                                                                 [timeSlot]="mapTimeSlotsCode['PM']"
                                                                 [group]="group"
                                                                 [booking]="booking"
-                                                                [opened]="bookingActivityDay.PM?.activity_booking_line_id && openedActivityIds.includes(bookingActivityDay.PM.activity_booking_line_id.id)"
-                                                                (close)="closeActivity.emit(bookingActivityDay.PM.activity_booking_line_id.id)"
-                                                                (open)="openActivity.emit(bookingActivityDay.PM.activity_booking_line_id.id)"
+                                                                [opened]="bookingActivityDay.PM?.id && openedActivityIds.includes(bookingActivityDay.PM.id)"
+                                                                (close)="closeActivity.emit(bookingActivityDay.PM.id)"
+                                                                (open)="openActivity.emit(bookingActivityDay.PM.id)"
                                                                 (updated)="updated.emit()"
                                                                 (deleteLine)="deleteLine.emit($event)"
         ></booking-services-booking-group-day-activities-activity>
@@ -65,9 +65,10 @@
                                                                 [timeSlot]="mapTimeSlotsCode['EV']"
                                                                 [group]="group"
                                                                 [booking]="booking"
-                                                                [opened]="bookingActivityDay.EV?.activity_booking_line_id && openedActivityIds.includes(bookingActivityDay.EV.activity_booking_line_id.id)"
-                                                                (close)="closeActivity.emit(bookingActivityDay.EV.activity_booking_line_id.id)"
-                                                                (open)="openActivity.emit(bookingActivityDay.EV.activity_booking_line_id.id)"
+                                                                [allow_fullday_selection]="false"
+                                                                [opened]="bookingActivityDay.EV?.id && openedActivityIds.includes(bookingActivityDay.EV.id)"
+                                                                (close)="closeActivity.emit(bookingActivityDay.EV.id)"
+                                                                (open)="openActivity.emit(bookingActivityDay.EV.id)"
                                                                 (updated)="updated.emit()"
                                                                 (deleteLine)="deleteLine.emit($event)"
         ></booking-services-booking-group-day-activities-activity>

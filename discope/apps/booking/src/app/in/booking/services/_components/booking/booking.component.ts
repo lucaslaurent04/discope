@@ -249,13 +249,14 @@ export class BookingServicesBookingComponent
                     continue;
                 }
 
-                const timeSlot = this.time_slots.find((timeSlot: any) => timeSlot.id === activityBookingLine.time_slot_id);
+                const timeSlot = this.time_slots.find((timeSlot: any) => timeSlot.id === bookingActivity.time_slot_id);
                 if(!timeSlot || !['AM', 'PM', 'EV'].includes(timeSlot.code)) {
                     continue;
                 }
 
                 bookingActivityDay[timeSlot.code as 'AM'|'PM'|'EV'] = {
                     ...bookingActivity,
+                    entity: 'sale\\booking\\BookingActivity',
                     activity_booking_line_id: activityBookingLine,
                     transports_booking_lines_ids: group.booking_lines_ids.filter(
                         (bookingLine: BookingLine) => bookingActivity.transports_booking_lines_ids.map(Number).includes(bookingLine.id)

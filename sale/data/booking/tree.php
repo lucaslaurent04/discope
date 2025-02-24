@@ -125,6 +125,7 @@ $tree = [
             'is_activity',
             'is_transport',
             'is_supply',
+            'is_fullday',
             'service_date',
             'time_slot_id',
             'booking_activity_id',
@@ -171,7 +172,9 @@ $tree = [
             'transports_booking_lines_ids',
             'counter',
             'total',
-            'price'
+            'price',
+            'is_fullday_virtual',
+            'time_slot_id'
         ]
     ]
 ];
