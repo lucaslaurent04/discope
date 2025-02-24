@@ -46,12 +46,6 @@ class Employee extends \identity\Partner {
                 'help'              => 'Date at which the contract ends (known in advance for fixed-term or unknown for permanent).'
             ],
 
-            'is_active' => [
-                'type'              => 'boolean',
-                'description'       => 'Marks the employee as currently active within the organisation.',
-                'default'           => true
-            ],
-
             'absences_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'hr\absence\Absence',
