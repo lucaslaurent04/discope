@@ -17,6 +17,7 @@ use equal\data\DataFormatter;
 use sale\booking\Consumption;
 use sale\booking\Contract;
 use sale\booking\TimeSlot;
+use sale\customer\Customer;
 use SepaQr\Data;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
@@ -90,7 +91,7 @@ if(!file_exists($file)) {
 $fields = [
     'created',
     'booking_id' => [
-        'id', 'name', 'modified', 'date_from', 'date_to', 'time_from', 'time_to', 'price',
+        'id', 'name', 'modified', 'date_from', 'date_to','nb_pers', 'time_from', 'time_to', 'price',
         'type_id' => [
             'id',
             'booking_schedule_layout'
@@ -238,75 +239,66 @@ $member_name = lodging_booking_print_contract_formatMember($booking);
 
 $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
+$postal_address = sprintf("%s - %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']);
+$customer_name = substr($booking['customer_id']['partner_identity_id']['display_name'], 0,  66);
+$customer_address = $booking['customer_id']['partner_identity_id']['address_street'] .' '. $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'];
+
 $values = [
-    'header_img_url'        => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
-    'contract_header_html'  => '',
-    'contract_notice_html'  => '',
-
-
-    // by default, there is no ATTN - if required, it is set below
-    'attn_name'             => '',
-    'attn_address1'         => '',
-    'attn_address2'         => '',
-
-    'contact_name'          => '',
-    'contact_phone'         => (strlen($booking['customer_id']['partner_identity_id']['phone']))?$booking['customer_id']['partner_identity_id']['phone']:$booking['customer_id']['partner_identity_id']['mobile'],
-    'contact_email'         => $booking['customer_id']['partner_identity_id']['email'],
-
-    'customer_name'         => substr($booking['customer_id']['partner_identity_id']['display_name'], 0,  66),
-    'customer_address1'     => $booking['customer_id']['partner_identity_id']['address_street'],
-    'customer_address_dispatch'     => $booking['customer_id']['partner_identity_id']['address_dispatch'],
-    'customer_address2'     => $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'].(($booking['customer_id']['partner_identity_id']['address_country'] != 'BE')?(' - '.$booking['customer_id']['partner_identity_id']['address_country']):''),
-    'customer_country'      => $booking['customer_id']['partner_identity_id']['address_country'],
-    'customer_has_vat'      => (int) $booking['customer_id']['partner_identity_id']['has_vat'],
-    'customer_vat'          => $booking['customer_id']['partner_identity_id']['vat_number'],
-
-    'member'                => substr($member_name, 0, 33) . ((strlen($member_name) > 33) ? '...' : ''),
-    'date'                  => date('d/m/Y', $contract['created']),
-    'code'                  => sprintf("%03d.%03d", intval($booking['name']) / 1000, intval($booking['name']) % 1000),
-    'center'                => $booking['center_id']['name'],
-    'center_address'        => $booking['center_id']['address_street'].' - '.$booking['center_id']['address_zip'].' '.$booking['center_id']['address_city'],
-    'postal_address'        => sprintf("%s - %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
-    'center_contact1'       => (isset($booking['center_id']['manager_id']['name']))?$booking['center_id']['manager_id']['name']:'',
-    'center_contact2'       => DataFormatter::format($booking['center_id']['phone'], 'phone').' - '.$booking['center_id']['email'],
-
-    // by default, we use center contact details (overridden in case Center has a management Office, see below)
-    'center_phone'          => DataFormatter::format($booking['center_id']['phone'], 'phone'),
-    'center_email'          => $booking['center_id']['email'],
-    'center_signature'      => $booking['center_id']['organisation_id']['signature'],
-    'center_office'         => $center_office_code,
-    'period'                => date('d/m/Y', $booking['date_from']).' '.date('H:i', $booking['time_from']).' - '.date('d/m/Y', $booking['date_to']).' '.date('H:i', $booking['time_to']),
-
-    'price'                 => $contract['price'],
-    'total'                 => $contract['total'],
-
-    'company_name'          => $booking['center_id']['organisation_id']['legal_name'],
-    'company_address'       => sprintf("%s %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
-    'company_email'         => $booking['center_id']['organisation_id']['email'],
-    'company_phone'         => DataFormatter::format($booking['center_id']['organisation_id']['phone'], 'phone'),
-    'company_fax'           => DataFormatter::format($booking['center_id']['organisation_id']['fax'], 'phone'),
-    'company_website'       => $booking['center_id']['organisation_id']['website'],
-    'company_reg_number'    => $booking['center_id']['organisation_id']['registration_number'],
-    'company_has_vat'       => $booking['center_id']['organisation_id']['has_vat'],
-    'company_vat_number'    => $booking['center_id']['organisation_id']['vat_number'],
-
-
-    // by default, we use organisation payment details (overridden in case Center has a management Office, see below)
-    'company_iban'          => DataFormatter::format($booking['center_id']['organisation_id']['bank_account_iban'], 'iban'),
-    'company_bic'           => DataFormatter::format($booking['center_id']['organisation_id']['bank_account_bic'], 'bic'),
-
-    'installment_date'      => '',
-    'installment_amount'    => 0,
-    'installment_reference' => '',
-    // default to transparent pixel
-    'installment_qr_url'    => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
-    'fundings'                   => [],
-    'lines'                      => [],
-    'tax_lines'                  => [],
-    'consumptions_tye'           => isset($booking['type_id']['booking_schedule_layout'])?$booking['type_id']['booking_schedule_layout']:'simple',
-    'consumptions_map_simple'    => [],
-    'consumptions_map_detailed'  => [],
-    'benefit_lines'              => []
+    'attn_address1'               => '',
+    'attn_address2'               => '',
+    'attn_name'                   => '',
+    'benefit_lines'               => [],
+    'center'                      => $booking['center_id']['name'],
+    'center_address'              => $booking['center_id']['address_street'].' - '.$booking['center_id']['address_zip'].' '.$booking['center_id']['address_city'],
+    'center_contact1'             => (isset($booking['center_id']['manager_id']['name']))?$booking['center_id']['manager_id']['name']:'',
+    'center_contact2'             => DataFormatter::format($booking['center_id']['phone'], 'phone').' - '.$booking['center_id']['email'],
+    'center_email'                => $booking['center_id']['email'],
+    'center_office'               => $center_office_code,
+    'center_phone'                => DataFormatter::format($booking['center_id']['phone'], 'phone'),
+    'center_signature'            => $booking['center_id']['organisation_id']['signature'],
+    'code'                        => sprintf("%03d.%03d", intval($booking['name']) / 1000, intval($booking['name']) % 1000),
+    'company_address'             => sprintf("%s %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
+    'company_bic'                 => DataFormatter::format($booking['center_id']['organisation_id']['bank_account_bic'], 'bic'),
+    'company_email'               => $booking['center_id']['organisation_id']['email'],
+    'company_fax'                 => DataFormatter::format($booking['center_id']['organisation_id']['fax'], 'phone'),
+    'company_has_vat'             => $booking['center_id']['organisation_id']['has_vat'],
+    'company_iban'                => DataFormatter::format($booking['center_id']['organisation_id']['bank_account_iban'], 'iban'),
+    'company_name'                => $booking['center_id']['organisation_id']['legal_name'],
+    'company_phone'               => DataFormatter::format($booking['center_id']['organisation_id']['phone'], 'phone'),
+    'company_reg_number'          => $booking['center_id']['organisation_id']['registration_number'],
+    'company_vat_number'          => $booking['center_id']['organisation_id']['vat_number'],
+    'company_website'             => $booking['center_id']['organisation_id']['website'],
+    'contact_email'               => $booking['customer_id']['partner_identity_id']['email'],
+    'contact_name'                => '',
+    'contact_phone'               => (strlen($booking['customer_id']['partner_identity_id']['phone']))?$booking['customer_id']['partner_identity_id']['phone']:$booking['customer_id']['partner_identity_id']['mobile'],
+    'consumptions_map_detailed'   => [],
+    'consumptions_map_simple'     => [],
+    'consumptions_tye'            => isset($booking['type_id']['booking_schedule_layout'])?$booking['type_id']['booking_schedule_layout']:'simple',
+    'contract_authorization_html' => '',
+    'contract_header_html'        => '',
+    'contract_notice_html'        => '',
+    'customer_address1'           => $booking['customer_id']['partner_identity_id']['address_street'],
+    'customer_address2'           => $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'].(($booking['customer_id']['partner_identity_id']['address_country'] != 'BE')?(' - '.$booking['customer_id']['partner_identity_id']['address_country']):''),
+    'customer_address_dispatch'   => $booking['customer_id']['partner_identity_id']['address_dispatch'],
+    'customer_country'            => $booking['customer_id']['partner_identity_id']['address_country'],
+    'customer_has_vat'            => (int) $booking['customer_id']['partner_identity_id']['has_vat'],
+    'customer_name'               => $customer_name,
+    'customer_vat'                => $booking['customer_id']['partner_identity_id']['vat_number'],
+    'date'                        => date('d/m/Y', $contract['created']),
+    'fundings'                    => [],
+    'has_contract_approved'       => 0,
+    'header_img_url'              => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
+    'installment_amount'          => 0,
+    'installment_date'            => '',
+    'installment_qr_url'          => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
+    'installment_reference'       => '',
+    'lines'                       => [],
+    'member'                      => substr($member_name, 0, 33) . ((strlen($member_name) > 33) ? '...' : ''),
+    'period'                      => date('d/m/Y', $booking['date_from']).' '.date('H:i', $booking['time_from']).' - '.date('d/m/Y', $booking['date_to']).' '.date('H:i', $booking['time_to']),
+    'postal_address'              => $postal_address,
+    'price'                       => $contract['price'],
+    'tax_lines'                   => [],
+    'total'                       => $contract['total'],
 ];
 
 /*
@@ -389,6 +381,20 @@ if($booking['customer_id']['partner_identity_id']['id'] != $booking['customer_id
 }
 
 /*
+    retrieve contact for booking
+*/
+foreach($booking['contacts_ids'] as $contact) {
+    if(strlen($values['contact_name']) == 0 || $contact['type'] == 'booking') {
+        // overwrite data of customer with contact info
+
+        $contact_name = str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title']) . ' ' . $contact['partner_identity_id']['display_name'];
+        $values['contact_name'] =  $contact_name;
+        $values['contact_phone'] = (strlen($contact['partner_identity_id']['phone']))?$contact['partner_identity_id']['phone']:$contact['partner_identity_id']['mobile'];
+        $values['contact_email'] = $contact['partner_identity_id']['email'];
+    }
+}
+
+/*
     override contact and payment details with center's office, if set
 */
 if($booking['center_id']['use_office_details']) {
@@ -401,7 +407,7 @@ if($booking['center_id']['use_office_details']) {
     $values['postal_address'] = $office['address_street'].' - '.$office['address_zip'].' '.$office['address_city'];
 }
 
-
+$hasFooter = false;
 
 /*
     retrieve templates
@@ -418,13 +424,41 @@ if($booking['center_id']['template_category_id']) {
 
     foreach($template['parts_ids'] as $part_id => $part) {
         if($part['name'] == 'header') {
-            $values['contract_header_html'] = $part['value'].$values['center_signature'];
+            $value = $part['value'];
+            $value = str_replace('{center}', $booking['center_id']['name'], $value);
+            $value = str_replace('{address}', $postal_address, $value);
+            $value = str_replace('{customer}', $customer_name, $value);
+            $value = str_replace('{customer_address}', $customer_address, $value);
+            $value = str_replace('{contact}', $contact_name, $value);
+            $value = str_replace('{nb_pers}', $booking['nb_pers'] ,$value);
+            $value = str_replace('{date_from}', date('d/m/Y', $booking['date_from']), $value);
+            $value = str_replace('{date_to}', date('d/m/Y', $booking['date_to']), $value);
+            $values['contract_header_html'] = $value;
         }
         elseif($part['name'] == 'notice') {
-            $values['contract_notice_html'] = $part['value'];
+            $value = $part['value'];
+            $value = str_replace('{center}', $booking['center_id']['name'], $value);
+            $value = str_replace('{price}', $booking['price'] ,$value);
+            $values['contract_notice_html'] = $value;
+        }elseif($part['name'] == 'contract_approved') {
+            $value = $part['value'];
+            $values['has_contract_approved'] = 1;
+            $values['contract_approved_html'] = $part['value'] . $values['center_signature'];
+            $has_contract_approved = true;
+        }
+        elseif($part['name'] == 'contract_authorization') {
+            $value = $part['value'];
+            $value = str_replace('{center}', $booking['center_id']['name'], $value);
+            $value = str_replace('{customer}', $customer_name, $value);
+            $value = str_replace('{contact}', $contact_name, $value);
+            $values['contract_authorization_html'] = $value;
         }
     }
 
+}
+
+if (!$has_contract_approved) {
+    $values['contract_header_html'] .= $values['center_signature'];
 }
 
 // fetch template parts that are common to all offices
@@ -642,17 +676,6 @@ foreach($lines as $line) {
 }
 
 
-/*
-    retrieve contact for booking
-*/
-foreach($booking['contacts_ids'] as $contact) {
-    if(strlen($values['contact_name']) == 0 || $contact['type'] == 'booking') {
-        // overwrite data of customer with contact info
-        $values['contact_name'] = str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title']) . ' ' . $contact['partner_identity_id']['display_name'];
-        $values['contact_phone'] = (strlen($contact['partner_identity_id']['phone']))?$contact['partner_identity_id']['phone']:$contact['partner_identity_id']['mobile'];
-        $values['contact_email'] = $contact['partner_identity_id']['email'];
-    }
-}
 
 /*
     inject expected fundings and find the first installment
