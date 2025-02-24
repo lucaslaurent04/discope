@@ -195,6 +195,9 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         if(!this.instance.price_id) {
             this.vm.product.formControl.setErrors({'missing_price': 'Pas de liste de prix pour ce produit.'});
         }
+        else {
+            this.vm.product.formControl.setErrors(null);
+        }
     }
 
     /**
