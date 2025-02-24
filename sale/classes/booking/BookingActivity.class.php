@@ -110,13 +110,23 @@ class BookingActivity extends Model {
                 'default'           => false
             ],
 
+            'activity_date' => [
+                'type'              => 'computed',
+                'result_type'       => 'date',
+                'description'       => 'Specific day time slot on which the service is delivered.',
+                'store'             => true,
+                'relation'          => ['activity_booking_line_id' => ['service_date']],
+                'onupdate'          => 'onupdateActivityDate'
+            ],
+
             'time_slot_id' => [
                 'type'              => 'computed',
                 'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\booking\TimeSlot',
                 'description'       => "Specific day time slot on which the service is delivered.",
                 'store'             => true,
-                'relation'          => ['activity_booking_line_id' => ['time_slot_id']]
+                'relation'          => ['activity_booking_line_id' => ['time_slot_id']],
+                'onupdate'          => 'onupdateTimeSlotId'
             ]
 
         ];
@@ -180,6 +190,55 @@ class BookingActivity extends Model {
         }
 
         return $result;
+    }
+
+    public static function onupdateActivityDate($self) {
+        $self->do('update-counters');
+    }
+
+    public static function onupdateTimeSlotId($self) {
+        $self->do('update-counters');
+    }
+
+    public static function getActions(): array {
+        return [
+            'update-counters' => [
+                'description'   => "Re-calculate the activities counters by group.",
+                'policies'      => [],
+                'function'      => 'doUpdateCounters'
+            ]
+        ];
+    }
+
+    public static function doUpdateCounters($self) {
+        $self->read(['booking_line_group_id']);
+
+        $mapBookingLineGroupIds = [];
+        foreach($self as $booking_activity) {
+            $mapBookingLineGroupIds[$booking_activity['booking_line_group_id']] = true;
+        }
+        $bookingLineGroupIds = array_keys($mapBookingLineGroupIds);
+
+        foreach($bookingLineGroupIds as $group_id) {
+            $group_activities = BookingActivity::search(
+                ['booking_line_group_id', '=', $group_id],
+                ['sort' => ['activity_date' => 'asc']]
+            )
+                ->read(['activity_date', 'time_slot_id' => ['order']])
+                ->get(true);
+
+            usort($group_activities, function($a, $b) {
+                $date_comp = $a['activity_date'] <=> $b['activity_date'];
+
+                return $date_comp !== 0 ? $date_comp : $a['time_slot_id']['order'] <=> $b['time_slot_id']['order'];
+            });
+
+            $counter = 1;
+            foreach($group_activities as $booking_activity) {
+                BookingActivity::id($booking_activity['id'])
+                    ->update(['counter' => $counter++]);
+            }
+        }
     }
 
     public static function ondelete($self): void {
