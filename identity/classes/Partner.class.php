@@ -140,7 +140,9 @@ class Partner extends Model {
     public static function onupdatePartnerIdentityId($self) {
         $self->read([ 'partner_identity_id' => 'lang_id' ]);
         foreach($self as $id => $partner) {
-            self::id($id)->update([ 'lang_id' => $partner['partner_identity_id']['lang_id'] ]);
+            if( ($partner['partner_identity_id']['lang_id'] ?? false) ) {
+                self::id($id)->update([ 'lang_id' => $partner['partner_identity_id']['lang_id'] ]);
+            }
         }
     }
 
