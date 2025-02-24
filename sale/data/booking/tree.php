@@ -174,6 +174,7 @@ $tree = [
             'total',
             'price',
             'is_fullday_virtual',
+            'activity_date',
             'time_slot_id'
         ]
     ]
