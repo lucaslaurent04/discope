@@ -34,12 +34,13 @@ interface vmModel {
 })
 export class BookingServicesBookingGroupDayActivitiesActivityComponent {
 
-    @Input() activity: Partial<BookingActivity> | null;
+    @Input() activity: BookingActivity | null;
     @Input() date: Date;
     @Input() timeSlot: any;
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
     @Input() opened: boolean = false;
+    @Input() allow_fullday_selection: boolean = true;
 
     @Output() updated = new EventEmitter();
     @Output() deleteLine = new EventEmitter();
@@ -108,13 +109,19 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                 domain.push(['name', 'ilike', `%${name}%`]);
             }
 
-            filtered = await this.api.fetch('?get=sale_catalog_product_collect', {
+            const productCollectParams: any = {
                 center_id: this.booking.center_id.id,
                 domain: JSON.stringify(domain),
                 date_from: this.booking.date_from.toISOString(),
                 date_to: this.booking.date_to.toISOString(),
                 is_activity: true
-            });
+            };
+
+            if(!this.allow_fullday_selection) {
+                productCollectParams.is_fullday = false;
+            }
+
+            filtered = await this.api.fetch('?get=sale_catalog_product_collect', productCollectParams);
         }
         catch(response) {
             console.log(response);

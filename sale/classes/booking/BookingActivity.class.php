@@ -31,7 +31,9 @@ class BookingActivity extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingLine',
                 'description'       => "Booking Line of the activity.",
-                'help'              => "Stays empty if the booking_line_id is the main activity."
+                'help'              => "Stays empty if the booking_line_id is the main activity.",
+                'readonly'          => true,
+                'required'          => true
             ],
 
             'booking_lines_ids' => [
@@ -88,7 +90,7 @@ class BookingActivity extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:4',
-                'description'       => 'Total tax-excluded price for all lines (computed).',
+                'description'       => "Total tax-excluded price for all lines (computed).",
                 'function'          => 'calcTotal',
                 'store'             => true
             ],
@@ -96,9 +98,25 @@ class BookingActivity extends Model {
             'price' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
-                'description'       => 'Final tax-included price for all lines (computed).',
+                'description'       => "Final tax-included price for all lines (computed).",
                 'function'          => 'calcPrice',
                 'store'             => true
+            ],
+
+            'is_fullday_virtual' => [
+                'type'              => 'boolean',
+                'description'       => "Is the activity related to another for a fullday activity.",
+                'help'              => "If true the activity is 'virtual' and no booking_line has a direct link to it. This activity will be mainly used for the planning.",
+                'default'           => false
+            ],
+
+            'time_slot_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\booking\TimeSlot',
+                'description'       => "Specific day time slot on which the service is delivered.",
+                'store'             => true,
+                'relation'          => ['activity_booking_line_id' => ['time_slot_id']]
             ]
 
         ];

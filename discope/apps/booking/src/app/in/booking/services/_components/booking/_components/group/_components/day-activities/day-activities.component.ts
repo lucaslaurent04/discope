@@ -1,13 +1,13 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { BookingLineGroup } from '../../../../_models/booking_line_group.model';
 import { Booking } from '../../../../_models/booking.model';
-import {BookingActivity} from "../../../../_models/booking_activity.model";
+import { BookingActivity } from '../../../../_models/booking_activity.model';
 
 export interface BookingActivityDay {
     date: Date,
-    AM: Partial<BookingActivity>|null,
-    PM: Partial<BookingActivity>|null,
-    EV: Partial<BookingActivity>|null
+    AM: BookingActivity | null,
+    PM: BookingActivity | null,
+    EV: BookingActivity | null
 }
 
 @Component({

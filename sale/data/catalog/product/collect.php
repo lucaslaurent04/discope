@@ -54,6 +54,10 @@ list($params, $providers) = announce([
         'is_supply' => [
             'type'              => 'boolean',
             'description'       => "Must the product be linked to an activity supply product model."
+        ],
+        'is_fullday' => [
+            'type'              => 'boolean',
+            'description'       => "Must the product be linked to a fullday activity product model."
         ]
     ],
     'response'      => [
@@ -163,15 +167,13 @@ else {
     $products_ids = array_intersect(array_keys($map_groups_products_ids), array_keys($map_pricelists_products_ids));
 }
 
+// filter on product model information
+$product_model_filter_keys = ['is_activity', 'is_transport', 'is_supply', 'is_fullday'];
 $activity_dom = [];
-if(isset($params['is_activity'])) {
-    $activity_dom[] = ['is_activity', '=', $params['is_activity']];
-}
-if(isset($params['is_transport'])) {
-    $activity_dom[] = ['is_transport', '=', $params['is_transport']];
-}
-if(isset($params['is_supply'])) {
-    $activity_dom[] = ['is_supply', '=', $params['is_supply']];
+foreach($product_model_filter_keys as $key) {
+    if(isset($params[$key])) {
+        $activity_dom[] = [$key, '=', $params[$key]];
+    }
 }
 if(!empty($activity_dom)) {
     $product_models_ids = ProductModel::search($activity_dom)->ids();

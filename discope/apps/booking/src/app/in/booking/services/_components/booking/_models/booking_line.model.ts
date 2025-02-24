@@ -27,6 +27,7 @@ export class BookingLine {
         public is_activity: boolean = false,
         public is_transport: boolean = false,
         public is_supply: boolean = false,
+        public is_fullday: boolean = false,
         public service_date: Date = new Date(),
         public time_slot_id: number = 0,
         public qty_accounting_method: string = '',
