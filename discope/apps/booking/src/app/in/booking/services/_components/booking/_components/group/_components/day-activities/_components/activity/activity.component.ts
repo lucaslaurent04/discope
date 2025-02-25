@@ -40,7 +40,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
     @Input() opened: boolean = false;
-    @Input() allow_fullday_selection: boolean = true;
+    @Input() allowFulldaySelection: boolean = true;
 
     @Output() updated = new EventEmitter();
     @Output() deleteLine = new EventEmitter();
@@ -117,7 +117,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                 is_activity: true
             };
 
-            if(!this.allow_fullday_selection) {
+            if(!this.allowFulldaySelection) {
                 productCollectParams.is_fullday = false;
             }
 
