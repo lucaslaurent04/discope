@@ -39,29 +39,11 @@ list($params, $providers) = eQual::announce([
 
 list($context, $orm, $dap) = [$providers['context'], $providers['orm'], $providers['adapt']];
 
-// #memo - this is a workaround to handle the change of logic between 'adapt' as DataAdapter (equal1.0) or DataAdapterProvider (equal2.0)
-if(is_a($dap, 'equal\data\DataAdapter')) {
-    $adapter = $dap;
-}
-else {
-    /** @var \equal\data\adapt\DataAdapter */
-    $adapter = $dap->get('json');
-}
-$adaptIn = function($value, $type) use (&$adapter) {
-    if(is_a($adapter, 'equal\data\DataAdapter')) {
-        return $adapter->adapt($value, $type);
-    }
-    return $adapter->adaptIn($value, $type);
-};
-$adaptOut = function($value, $type) use (&$adapter) {
-    if(is_a($adapter, 'equal\data\DataAdapter')) {
-        return $adapter->adapt($value, $type, 'txt', 'php');
-    }
-    return $adapter->adaptOut($value, $type);
-};
+/** @var \equal\data\adapt\DataAdapter */
+$adapter = $dap->get('json');
 
 if(isset($params['params']['all_months'])) {
-    $all_months = $adaptIn($params['params']['all_months'], 'bool');
+    $all_months = $adapter->adaptIn($params['params']['all_months'], 'number/boolean');
     if($all_months) {
         throw new Exception('missing_month', EQ_ERROR_INVALID_PARAM);
     }
@@ -71,7 +53,7 @@ if(!isset($params['params']['center_id'])) {
     throw new Exception('missing_center', EQ_ERROR_INVALID_PARAM);
 }
 
-$center_id = $adaptIn($params['params']['center_id'], 'int');
+$center_id = $adapter->adaptIn($params['params']['center_id'], 'number/integer');
 if($center_id <= 0) {
     throw new Exception('missing_center', EQ_ERROR_INVALID_PARAM);
 }
@@ -92,7 +74,7 @@ if(!isset($params['params']['date'])) {
     throw new Exception('missing_month', EQ_ERROR_INVALID_PARAM);
 }
 
-$date = $adaptIn($params['params']['date'], 'date');
+$date = $adapter->adaptIn($params['params']['date'], 'date/plain');
 if(is_null($date) || $date <= 0) {
     throw new Exception('missing_month', EQ_ERROR_INVALID_PARAM);
 }
