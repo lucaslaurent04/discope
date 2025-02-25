@@ -14,7 +14,8 @@ export class BookingActivity {
         public counter: number = 1,
         public total: number = 0,
         public price: number = 0,
-        public is_fullday_virtual: false,
+        public is_virtual: false,
+        public activity_date: Date = new Date(),
         public time_slot_id: number = 0
     ) {}
 }

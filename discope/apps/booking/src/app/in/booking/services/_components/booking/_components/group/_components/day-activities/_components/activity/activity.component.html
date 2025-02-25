@@ -2,7 +2,7 @@
     <div class="part-toggle">
         <span>{{mapTimeSlotCodeName[timeSlot.code]}}</span>
 
-        <button mat-icon-button [disabled]="!activity || activity?.is_fullday_virtual" (click)="toggleOpen()">
+        <button mat-icon-button [disabled]="!activity || activity?.is_virtual" (click)="toggleOpen()">
             <mat-icon style="font-size: 15px;">
                 <span *ngIf="opened">keyboard_arrow_up</span>
                 <span *ngIf="!opened">keyboard_arrow_right</span>
@@ -47,7 +47,7 @@
                 </mat-form-field>
             </div>
             <div class="cell cell-right">
-                <mat-form-field *ngIf="!group.is_locked && !activity?.is_fullday_virtual">
+                <mat-form-field *ngIf="!group.is_locked && !activity?.is_virtual">
                     <mat-label>Quantité</mat-label>
                     <input type="number" matInput (blur)="vm.qty.change()" [formControl]="vm.qty.formControl">
                     <mat-error *ngIf="vm.qty.formControl.hasError('required')">
@@ -56,17 +56,17 @@
                 </mat-form-field>
             </div>
             <div class="cell cell-right" style="cursor: pointer; padding-top: 11px" (click)="openPriceEdition()">
-                <span *ngIf="!activity?.is_fullday_virtual">
+                <span *ngIf="!activity?.is_virtual">
                     {{(activity?.activity_booking_line_id?.unit_price ? activity.activity_booking_line_id.unit_price : 0) | number: '1.2-2'}} €
                 </span>
             </div>
             <div class="cell cell-right" style="cursor: pointer; padding-top: 11px" (click)="openPriceEdition()">
-                <span *ngIf="!activity?.is_fullday_virtual">
+                <span *ngIf="!activity?.is_virtual">
                     {{(activity?.activity_booking_line_id?.vat_rate ? activity.activity_booking_line_id.vat_rate : 0) | percent: '1.2-2'}}
                 </span>
             </div>
             <div class="cell cell-text cell-right">
-                <span *ngIf="!activity?.is_fullday_virtual">
+                <span *ngIf="!activity?.is_virtual">
                     {{(activity?.activity_booking_line_id?.price ? activity.activity_booking_line_id.price : 0) | number: '1.2-2'}} €
                 </span>
             </div>
@@ -116,7 +116,7 @@
             </div>
         </div>
 
-        <div *ngIf="activity?.activity_booking_line_id && !activity?.is_fullday_virtual"
+        <div *ngIf="activity?.activity_booking_line_id && !activity?.is_virtual"
              style="display: flex; width: 100%; justify-content: end; margin-bottom: 30px; padding-right: 65px;"
         >
             TOTAL TTC &nbsp;:&nbsp; {{ activity.price ?? 0 | currency : 'EUR' : 'symbol' : '1.2-2' : 'fr'}}

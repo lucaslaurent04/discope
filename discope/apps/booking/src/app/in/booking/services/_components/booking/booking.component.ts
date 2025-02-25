@@ -236,16 +236,16 @@ export class BookingServicesBookingComponent
             };
 
             for(let bookingActivity of group.booking_activities_ids as BookingActivity[]) {
+                let activityDate = new Date(bookingActivity.activity_date).toISOString().split('T')[0];
+                if(activityDate !== date.toISOString().split('T')[0]) {
+                    continue;
+                }
+
                 let activityBookingLine: BookingLine | undefined = group.booking_lines_ids.find(
                     (bookingLine: BookingLine) => bookingLine.id === bookingActivity.activity_booking_line_id
                 );
 
                 if(activityBookingLine === undefined || !activityBookingLine.service_date) {
-                    continue;
-                }
-
-                let serviceDate = new Date(activityBookingLine.service_date).toISOString().split('T')[0];
-                if(serviceDate !== date.toISOString().split('T')[0]) {
                     continue;
                 }
 
