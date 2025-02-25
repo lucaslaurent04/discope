@@ -103,9 +103,9 @@ class BookingActivity extends Model {
                 'store'             => true
             ],
 
-            'is_fullday_virtual' => [
+            'is_virtual' => [
                 'type'              => 'boolean',
-                'description'       => "Is the activity related to another for a fullday activity.",
+                'description'       => "Is the activity related to another for a fullday activity or an activity with a duration.",
                 'help'              => "If true the activity is 'virtual' and no booking_line has a direct link to it. This activity will be mainly used for the planning.",
                 'default'           => false
             ],
@@ -129,12 +129,6 @@ class BookingActivity extends Model {
                 'onupdate'          => 'onupdateTimeSlotId'
             ]
 
-        ];
-    }
-
-    public function getUnique(): array {
-        return [
-            ['booking_line_group_id', 'activity_date', 'time_slot_id']
         ];
     }
 

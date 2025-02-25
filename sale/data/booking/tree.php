@@ -173,7 +173,7 @@ $tree = [
             'counter',
             'total',
             'price',
-            'is_fullday_virtual',
+            'is_virtual',
             'activity_date',
             'time_slot_id'
         ]
