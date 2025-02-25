@@ -658,12 +658,12 @@ class BookingLine extends Model {
 
                 $om->update(self::getType(), $lid, ['booking_activity_id' => $booking_activity['id']]);
 
+                $map_codes_time_slot_ids = [];
                 if($line['product_id.product_model_id.is_fullday']) {
                     $time_slots = TimeSlot::search(['code', 'in', ['AM', 'PM']])
                         ->read(['id', 'code'])
                         ->get();
 
-                    $map_codes_time_slot_ids = [];
                     foreach($time_slots as $slot) {
                         $map_codes_time_slot_ids[$slot['code']] = $slot['id'];
                     }
@@ -689,6 +689,15 @@ class BookingLine extends Model {
                             'activity_date'             => $line['service_date'] + $i * 86400,
                             'time_slot_id'              => $time_slot_id
                         ]);
+
+                        if($line['product_id.product_model_id.is_fullday']) {
+                            BookingActivity::create([
+                                'activity_booking_line_id'  => $lid,
+                                'is_virtual'                => true,
+                                'activity_date'             => $line['service_date'] + $i * 86400,
+                                'time_slot_id'              => $map_codes_time_slot_ids['AM'] === $time_slot_id ? $map_codes_time_slot_ids['PM'] : $map_codes_time_slot_ids['AM']
+                            ]);
+                        }
                     }
                 }
 
