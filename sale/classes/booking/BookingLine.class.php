@@ -443,16 +443,7 @@ class BookingLine extends Model {
                 ->first();
 
             if($product['product_model_id']['is_activity'] && $product['product_model_id']['is_fullday']) {
-                $time_slots = TimeSlot::search(['code', 'in', ['AM', 'PM']])
-                    ->read(['id', 'code'])
-                    ->get(true);
-
-                $AM_PM_time_slot_ids = array_map(
-                    function($time_slot) {
-                        return $time_slot['id'];
-                    },
-                    $time_slots
-                );
+                $AM_PM_time_slot_ids = TimeSlot::search(['code', 'in', ['AM', 'PM']])->ids();
 
                 $self->read(['time_slot_id']);
                 foreach($self as $line) {
@@ -476,16 +467,7 @@ class BookingLine extends Model {
                 ]
             ]);
 
-            $time_slots = TimeSlot::search(['code', 'in', ['AM', 'PM']])
-                ->read(['id', 'code'])
-                ->get(true);
-
-            $AM_PM_time_slot_ids = array_map(
-                function($time_slot) {
-                    return $time_slot['id'];
-                },
-                $time_slots
-            );
+            $AM_PM_time_slot_ids = TimeSlot::search(['code', 'in', ['AM', 'PM']])->ids();
 
             foreach($self as $line) {
                 if(!$line['is_activity']) {
