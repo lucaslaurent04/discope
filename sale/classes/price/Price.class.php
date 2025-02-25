@@ -90,7 +90,20 @@ class Price extends Model {
                 'description'       => 'VAT rate applied on the price (from accounting rule).',
                 'store'             => true,
                 'readonly'          => true
-            ]
+            ],
+
+            'has_rate_class' => [
+                'type'        => 'boolean',
+                'description' => 'Indicates whether the price depends on a rate class.',
+                'default'     => false
+            ],
+
+            'rate_class_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\customer\RateClass',
+                'description'       => 'The rate class that applies to the price, defining variations based on the target audience.',
+                'visible'           => ['has_rate_class', '=', true]
+            ],
 
         ];
     }

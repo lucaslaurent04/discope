@@ -121,7 +121,7 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
                 if($booking['customer_identity_id']['type'] == 'I') {
                     $item['firstname'] = $booking['customer_identity_id']['firstname'];
                     $item['lastname'] = $booking['customer_identity_id']['lastname'];
-                    $item['gender'] = $booking['customer_identity_id']['gender'];
+                    $item['gender'] = $item['gender'] = !empty($booking['customer_identity_id']['gender']) ? $booking['customer_identity_id']['gender'] : 'M';
                     $item['date_of_birth'] = $booking['customer_identity_id']['date_of_birth'];
                     $item['email'] = $booking['customer_identity_id']['email'];
                     $item['phone'] = $booking['customer_identity_id']['phone'];
