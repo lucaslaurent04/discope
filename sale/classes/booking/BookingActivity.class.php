@@ -21,10 +21,10 @@ class BookingActivity extends Model {
 
             'name' => [
                 'type'              => 'computed',
-                'function'          => 'calcName',
                 'result_type'       => 'string',
                 'store'             => true,
-                'description'       => "The name of the booking activity."
+                'description'       => "The name of the booking activity.",
+                'relation'          => ['activity_booking_line_id' => ['name']]
             ],
 
             'activity_booking_line_id' => [
@@ -50,7 +50,7 @@ class BookingActivity extends Model {
                 'description'       => "Booking the activity relates to.",
                 'store'             => true,
                 'instant'           => true,
-                'function'          => 'calcBookingId'
+                'relation'          => ['activity_booking_line_id' => ['booking_id']]
             ],
 
             'booking_line_group_id' => [
@@ -60,7 +60,7 @@ class BookingActivity extends Model {
                 'description'       => "Booking line group the activity relates to.",
                 'store'             => true,
                 'instant'           => true,
-                'function'          => 'calcBookingLineGroup'
+                'relation'          => ['activity_booking_line_id' => ['booking_line_group_id']]
             ],
 
             'supplies_booking_lines_ids' => [
@@ -132,36 +132,25 @@ class BookingActivity extends Model {
         ];
     }
 
-    public static function calcName($self): array {
-        $result = [];
-        $self->read(['activity_booking_line_id' => ['name']]);
-        foreach($self as $id => $booking_activity) {
-            if(isset($booking_activity['activity_booking_line_id']['name'])) {
-                $result[$id] = $booking_activity['activity_booking_line_id']['name'];
-            }
-        }
-
-        return $result;
+    public function getUnique(): array {
+        return [
+            ['booking_line_group_id', 'activity_date', 'time_slot_id']
+        ];
     }
 
-    public static function calcBookingId($self): array {
-        $result = [];
-        $self->read(['activity_booking_line_id' => ['booking_id']]);
-        foreach($self as $id => $booking_activity) {
-            $result[$id] = $booking_activity['activity_booking_line_id']['booking_id'];
-        }
-
-        return $result;
-    }
-
-    public static function calcBookingLineGroup($self): array {
-        $result = [];
-        $self->read(['activity_booking_line_id' => ['booking_line_group_id']]);
-        foreach($self as $id => $booking_activity) {
-            $result[$id] = $booking_activity['activity_booking_line_id']['booking_line_group_id'];
-        }
-
-        return $result;
+    public static function getActions(): array {
+        return [
+            'reset-prices' => [
+                'description'   => "Reset the prices fields values so they can be re-calculated.",
+                'policies'      => [],
+                'function'      => 'doResetPrices'
+            ],
+            'update-counters' => [
+                'description'   => "Re-calculate the activities counters by group.",
+                'policies'      => [],
+                'function'      => 'doUpdateCounters'
+            ]
+        ];
     }
 
     public static function calcTotal($self): array {
@@ -200,14 +189,9 @@ class BookingActivity extends Model {
         $self->do('update-counters');
     }
 
-    public static function getActions(): array {
-        return [
-            'update-counters' => [
-                'description'   => "Re-calculate the activities counters by group.",
-                'policies'      => [],
-                'function'      => 'doUpdateCounters'
-            ]
-        ];
+    public static function doResetPrices($self) {
+        // reset computed fields related to price
+        $self->update(['total' => null, 'price' => null]);
     }
 
     public static function doUpdateCounters($self) {
@@ -254,10 +238,5 @@ class BookingActivity extends Model {
                     ->update(['booking_lines_ids' => $booking_lines_ids_remove]);
             }
         }
-    }
-
-    public static function _resetPrices($self) {
-        // reset computed fields related to price
-        $self->update(['total' => null, 'price' => null]);
     }
 }

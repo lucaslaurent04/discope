@@ -1005,7 +1005,7 @@ class BookingLine extends Model {
             $om->callonce(\sale\booking\BookingLineGroup::getType(), '_resetPrices', $booking_line_groups_ids, [], $lang);
 
             $booking_activities_ids = array_map(function ($a) { return $a['booking_activity_id']; }, array_values($lines));
-            $om->callonce(\sale\booking\BookingActivity::getType(), '_resetPrices', $booking_activities_ids, [], $lang);
+            BookingActivity::ids($booking_activities_ids)->do('reset-prices');
         }
     }
 
