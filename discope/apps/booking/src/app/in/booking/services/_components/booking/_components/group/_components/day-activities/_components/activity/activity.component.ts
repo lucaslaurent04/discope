@@ -166,9 +166,11 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                 this.vm.product.name = product.name;
             }
 
+            let newLine: any = null;
+
             // notify back-end about the change
             try {
-                const new_line: any = await this.api.create('sale\\booking\\BookingLine', {
+                newLine = await this.api.create('sale\\booking\\BookingLine', {
                     order: this.group.booking_lines_ids.length + 1,
                     booking_id: this.booking.id,
                     booking_line_group_id: this.group.id,
@@ -176,7 +178,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                     time_slot_id: this.timeSlot.id
                 });
                 await this.api.call('?do=sale_booking_update-bookingline-product', {
-                    id: new_line.id,
+                    id: newLine.id,
                     product_id: product.id
                 });
                 this.vm.product.formControl.setErrors(null);
@@ -184,8 +186,11 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                 // relay change to parent component
                 this.updated.emit();
             }
-            catch(response) {
-                this.vm.product.formControl.setErrors({ 'missing_price': 'Pas de liste de prix pour ce produit.' });
+            catch(response: any) {
+                if(newLine) {
+                    this.deleteLine.emit(newLine.id);
+                }
+
                 this.api.errorFeedback(response);
             }
         }

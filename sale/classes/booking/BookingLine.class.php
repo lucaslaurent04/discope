@@ -445,12 +445,26 @@ class BookingLine extends Model {
             if($product['product_model_id']['is_activity'] && $product['product_model_id']['is_fullday']) {
                 $AM_PM_time_slot_ids = TimeSlot::search(['code', 'in', ['AM', 'PM']])->ids();
 
-                $self->read(['time_slot_id']);
+                $self->read(['booking_line_group_id', 'service_date', 'time_slot_id']);
                 foreach($self as $line) {
                     $time_slot_id = $values['time_slot_id'] ?? $line['time_slot_id'];
 
                     if(!in_array($time_slot_id, $AM_PM_time_slot_ids)) {
                         return ['time_slot_id' => ['not_allowed' => 'A full day activity can only happen on AM or PM time slots.']];
+                    }
+
+                    $other_time_slot_id = $AM_PM_time_slot_ids[0] === $time_slot_id ? $AM_PM_time_slot_ids[1] : $AM_PM_time_slot_ids[0];
+
+                    $booking_activity = BookingActivity::search([
+                        ['booking_line_group_id', '=', $values['booking_line_group_id'] ?? $line['booking_line_group_id']],
+                        ['activity_date', '=', $values['service_date'] ?? $line['service_date']],
+                        ['time_slot_id', '=', $other_time_slot_id]
+                    ])
+                        ->read(['id'])
+                        ->first();
+
+                    if(!is_null($booking_activity)) {
+                        return ['service_date' => ['already_used' => 'Moment conflict with another activity of the group.']];
                     }
                 }
             }
@@ -649,6 +663,8 @@ class BookingLine extends Model {
                         'time_slot_id'              => $map_codes_time_slot_ids['AM'] === $time_slot_id ? $map_codes_time_slot_ids['PM'] : $map_codes_time_slot_ids['AM']
                     ]);
                 }
+
+                // TODO: Handle as duration (create activity for other days)
 
                 BookingActivity::id($booking_activity['id'])->do('update-counters');
 
