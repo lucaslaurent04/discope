@@ -550,9 +550,13 @@ hr {
 {% endif %}
 
 <br>
+
+{% if status != 'proforma' %}
 <div class="signature-container">
     {{ signature|raw }}
 </div>
+{% endif %}
+
 
 <div style="margin-top: 50px;">
     <table style="width: 100%; page-break-inside: avoid;">
