@@ -381,6 +381,21 @@ class BookingLine extends Model {
             }
         }
 
+        // checks conflict with another activity
+        if(isset($values['booking_line_group_id'], $values['service_date'], $values['time_slot_id'])) {
+            $booking_activity = BookingActivity::search([
+                ['booking_line_group_id', '=', $values['booking_line_group_id']],
+                ['activity_date', '=', $values['service_date']],
+                ['time_slot_id', '=', $values['time_slot_id']]
+            ])
+                ->read(['id'])
+                ->first();
+
+            if(!is_null($booking_activity)) {
+                return ['service_date' => ['already_used' => 'Moment conflict with another activity of the group.']];
+            }
+        }
+
         return parent::cancreate($om, $values, $lang);
     }
 
@@ -421,8 +436,8 @@ class BookingLine extends Model {
             }
         }
 
-        // check that a fullday activity can only be on AM or PM time slots
-        if(in_array('product_id', array_keys($values))) {
+        // checks that a fullday activity can only be on AM or PM time slots
+        if(isset($values['product_id'])) {
             $product = Product::id($values['product_id'])
                 ->read(['product_model_id' => ['is_activity', 'is_fullday']])
                 ->first();
@@ -450,8 +465,8 @@ class BookingLine extends Model {
             }
         }
 
-        // check if moment does not conflict with another activity of the booking line group
-        if(in_array('service_date', array_keys($values)) || in_array('time_slot_id', array_keys($values))) {
+        // checks if moment does not conflict with another activity of the booking line group
+        if(isset($values['service_date']) || isset($values['time_slot_id'])) {
             $self->read([
                 'is_activity', 'service_date', 'time_slot_id', 'is_fullday',
                 'booking_line_group_id' => [
