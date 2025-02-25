@@ -1046,6 +1046,7 @@ class BookingLine extends Model {
         $result = [];
         $lines = $om->read(self::getType(), $ids, [
             'booking_line_group_id.date_from',
+            'booking_line_group_id.rate_class_id',
             'booking_id.center_id.price_list_category_id',
         ]);
 
@@ -1066,8 +1067,27 @@ class BookingLine extends Model {
 
             if($price_lists_ids > 0 && count($price_lists_ids)) {
                 foreach($price_lists_ids as $price_list_id) {
-                    $prices_ids = $om->search(\sale\price\Price::getType(), [ ['price_list_id', '=', $price_list_id], ['product_id', '=', $product_id] ]);
-                    if($prices_ids > 0 && count($prices_ids)) {
+
+                    $prices_ids = $om->search(\sale\price\Price::getType(), [
+                        ['price_list_id', '=', $price_list_id],
+                        ['product_id', '=', $product_id],
+                        [ 'has_rate_class' , '=', true],
+                        ['rate_class_id', '=', $line['booking_line_group_id.rate_class_id']],
+                    ]);
+
+                    if (!empty($prices_ids)) {
+                        $result[$line_id] = reset($prices_ids);
+                        file_put_contents('/var/www/html/log/error.log', " searchPriceId In the if  rate_class_id" . PHP_EOL, FILE_APPEND);
+                        break;
+                    }
+
+                    $prices_ids = $om->search(\sale\price\Price::getType(), [
+                        ['price_list_id', '=', $price_list_id],
+                        ['product_id', '=', $product_id],
+                    ]);
+
+                    if (!empty($prices_ids)) {
+                        file_put_contents('/var/www/html/log/error.log', " searchPriceId Not  rate_class_id" . PHP_EOL, FILE_APPEND);
                         $result[$line_id] = reset($prices_ids);
                         break;
                     }
@@ -1089,6 +1109,7 @@ class BookingLine extends Model {
         $result = [];
         $lines = $om->read(self::getType(), $ids, [
             'booking_line_group_id.date_from',
+            'booking_line_group_id.rate_class_id',
             'booking_id.center_id.price_list_category_id',
         ]);
 
@@ -1109,8 +1130,24 @@ class BookingLine extends Model {
 
             if($price_lists_ids > 0 && count($price_lists_ids)) {
                 foreach($price_lists_ids as $price_list_id) {
-                    $prices_ids = $om->search(\sale\price\Price::getType(), [ ['price_list_id', '=', $price_list_id], ['product_id', '=', $product_id] ]);
-                    if($prices_ids > 0 && count($prices_ids)) {
+                    $prices_ids = $om->search(\sale\price\Price::getType(), [
+                        ['price_list_id', '=', $price_list_id],
+                        ['product_id', '=', $product_id],
+                        [ 'has_rate_class' , '=', true],
+                        ['rate_class_id', '=', $line['booking_line_group_id.rate_class_id']],
+                    ]);
+
+                    if (!empty($prices_ids)) {
+                        $result[$line_id] = reset($prices_ids);
+                        break;
+                    }
+
+                    $prices_ids = $om->search(\sale\price\Price::getType(), [
+                        ['price_list_id', '=', $price_list_id],
+                        ['product_id', '=', $product_id],
+                    ]);
+
+                    if (!empty($prices_ids)) {
                         $result[$line_id] = reset($prices_ids);
                         break;
                     }

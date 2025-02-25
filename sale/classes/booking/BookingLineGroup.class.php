@@ -710,7 +710,7 @@ class BookingLineGroup extends Model {
             $booking_lines_ids = [];
             foreach($groups as $group) {
                 if($group['is_sojourn'] && count($group['age_range_assignments_ids']) == 1) {
-                    $age_range_assignment_id = reset($group['age_range_assignments_ids']);
+                    $age_range_assignment_id = current($group['age_range_assignments_ids']);
                     $om->update(BookingLineGroupAgeRangeAssignment::getType(), $age_range_assignment_id, ['qty' => $group['nb_pers']]);
                 }
                 $booking_lines_ids = array_merge($group['booking_lines_ids']);

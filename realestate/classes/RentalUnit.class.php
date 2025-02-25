@@ -231,6 +231,24 @@ class RentalUnit extends Model {
                 'rel_local_key'     => 'rental_unit_id',
                 'description'       => 'Room Type (from channel manager) the rental unit refers to.',
                 'help'              => 'If this field is set, it means that the rental unit can be rented on OTA via the channel manager. So, in case of a local booking it must trigger an update of the availabilities.'
+            ],
+
+            'has_pmr_access' => [
+                'type'        => 'boolean',
+                'description' => 'The rental unit is accessible for Persons with Reduced Mobility (PMR), including wheelchair adaptations, easy access, and adapted showers.',
+                'default'     => false
+            ],
+
+            'has_pdv_features' => [
+                'type'        => 'boolean',
+                'description' => 'The rental unit is adapted for Persons with Visual Impairment (PDV), featuring high visual contrast, tactile or Braille signage, and no hazardous obstacles.',
+                'default'     => false
+            ],
+
+            'has_pda_support' => [
+                'type'        => 'boolean',
+                'description' => 'The rental unit is equipped for Persons with Hearing Impairment (PDA), including visual alarms, subtitles, or other suitable aids.',
+                'default'     => false
             ]
 
         ];

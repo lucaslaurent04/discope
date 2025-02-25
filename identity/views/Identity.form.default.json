@@ -245,6 +245,11 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "logo_document_id",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "accounting_account",
                                                 "width": "100%"
                                             }
@@ -304,7 +309,7 @@
                             {
                                 "columns": [
                                     {
-                                        "width": "33%",
+                                        "width": "25%",
                                         "align": "left",
                                         "items": [
                                             {
@@ -325,7 +330,18 @@
                                         ]
                                     },
                                     {
-                                        "width": "66%",
+                                        "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "signature",
+                                                "width": "100%",
+                                                "visible": ["type", "<>", "I"]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "50%",
                                         "align": "left",
                                         "items": [
                                             {

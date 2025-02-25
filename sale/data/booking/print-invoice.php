@@ -117,7 +117,8 @@ $fields = [
         'vat_number',
         'signature',
         'bank_account_iban',
-        'bank_account_bic'
+        'bank_account_bic',
+        'logo_document_id' => ['id', 'type', 'data']
     ],
     'center_office_id' => [
         'code',
@@ -255,29 +256,15 @@ if($downpayment_sku) {
 $booking = $invoice['booking_id'];
 
 
-// set header image based on the organisation of the center
-$img_path = 'public/assets/img/brand/Kaleo.png';
-$img_url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=';
-
-if($invoice['organisation_id']['id'] == 2) {
-    $img_path = 'public/assets/img/brand/Villers.png';
+$logo_document_data = $invoice['organisation_id']['logo_document_id']['data'] ?? null;
+if($logo_document_data) {
+    $content_type = $booking['center_id']['organisation_id']['logo_document_id']['type'] ?? 'image/png';
+    $img_url = "data:{$content_type};base64, ".base64_encode($logo_document_data);
 }
-elseif($invoice['organisation_id']['id'] == 3) {
-    $img_path = 'public/assets/img/brand/Mozaik.png';
-}
-elseif($invoice['organisation_id']['id'] == 100) {
-    $img_path = 'public/assets/img/brand/Fer_a_cheval.png';
-}
-
-
-if(file_exists($img_path)) {
-    $img = file_get_contents($img_path);
-    $img_url = "data:image/png;base64, ".base64_encode($img);
-}
-
 
 $values = [
-    'header_img_url'        => $img_url,
+    'header_img_url'       => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
+    'signature'            => $invoice['organisation_id']['signature'] ?? '',
     'invoice_header_html'  => '',
     'invoice_notice_html'  => '',
 
