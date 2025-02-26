@@ -77,7 +77,7 @@ $tree = [
             'description'
         ],
         'age_range_assignments_ids' => [
-            'age_range_id', 'qty'
+            'age_range_id', 'qty', 'age_from', 'age_to'
         ],
         'sojourn_product_models_ids' => [
             'id',
