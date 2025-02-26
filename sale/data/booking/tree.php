@@ -122,8 +122,13 @@ $tree = [
             'is_rental_unit',
             'is_accomodation',
             'is_meal',
+            'is_activity',
+            'is_transport',
+            'is_supply',
+            'is_fullday',
             'service_date',
             'time_slot_id',
+            'booking_activity_id',
             'price_id',
             'product_id' => [
                 'name',
@@ -159,6 +164,18 @@ $tree = [
                 'value',
                 'discount_id' => ['name']
             ]
+        ],
+        'booking_activities_ids' => [
+            'activity_booking_line_id',
+            'booking_line_group_id',
+            'supplies_booking_lines_ids',
+            'transports_booking_lines_ids',
+            'counter',
+            'total',
+            'price',
+            'is_virtual',
+            'activity_date',
+            'time_slot_id'
         ]
     ]
 ];

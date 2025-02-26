@@ -22,7 +22,8 @@
                         <booking-services-booking-group
                             [model]="group"
                             [booking]="instance"
-                            [time_slots]="time_slots"
+                            [timeSlots]="time_slots"
+                            [bookingActivitiesDays]="mapGroupsIdsBookingActivitiesDays[group.id]"
                             (updated)="onupdateGroup()"
                             (deleted)="ondeleteGroup(group.id)"
                             (toggle)="ontoggleGroup(group.id, $event)"
