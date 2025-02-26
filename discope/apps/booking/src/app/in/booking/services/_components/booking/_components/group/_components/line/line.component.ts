@@ -150,15 +150,15 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
                 for(let val of values) {
                     this.vm.qty_vars.values.push(val);
                 }
+            }
 
-                if(!this.instance.is_activity) {
-                    this.vm.service_date.formControl.disable();
-                    this.vm.time_slot_id.formControl.disable();
-                }
-                else {
-                    this.vm.service_date.formControl.enable();
-                    this.vm.time_slot_id.formControl.enable();
-                }
+            if(!this.instance.is_activity) {
+                this.vm.service_date.formControl.disable();
+                this.vm.time_slot_id.formControl.disable();
+            }
+            else {
+                this.vm.service_date.formControl.enable();
+                this.vm.time_slot_id.formControl.enable();
             }
         }
     }
