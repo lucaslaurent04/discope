@@ -323,6 +323,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
             this.updated.emit();
         }
         catch(response) {
+            this.vm.service_date.formControl.setValue(this.instance.service_date.toISOString().split('T')[0]);
             this.api.errorFeedback(response);
         }
     }
@@ -339,6 +340,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
             this.updated.emit();
         }
         catch(response) {
+            this.vm.time_slot_id.formControl.setValue(this.instance.time_slot_id);
             this.api.errorFeedback(response);
         }
     }
