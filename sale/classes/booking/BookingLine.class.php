@@ -349,7 +349,7 @@ class BookingLine extends Model {
      * @param  string   $lang       Language in which multilang fields are being updated.
      * @return array    Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be updated.
      */
-    public static function canupdate($om, $oids, $values, $lang='en') {
+    public static function canupdate($self, $values, $lang='en') {
 
         // handle exceptions for fields that can always be updated
         $allowed = ['is_contractual', 'is_invoiced'];
@@ -362,20 +362,27 @@ class BookingLine extends Model {
         }
 
         if($count_non_allowed > 0) {
-            $lines = $om->read(self::getType(), $oids, ['booking_id.status', 'booking_line_group_id.is_extra', 'booking_line_group_id.has_schedulable_services', 'booking_line_group_id.has_consumptions'], $lang);
-            if($lines > 0) {
-                foreach($lines as $line) {
-                    if($line['booking_id.status'] != 'quote' && !$line['booking_line_group_id.is_extra']) {
-                        return ['booking_id' => ['non_editable' => 'Services cannot be updated for non-quote bookings.']];
-                    }
-                    if($line['booking_line_group_id.is_extra'] && $line['booking_line_group_id.has_schedulable_services'] && $line['booking_line_group_id.has_consumptions']) {
-                        return ['booking_id' => ['non_editable' => 'Lines from extra services cannot be changed once consumptions have been created.']];
-                    }
+            $self->read([
+                    'booking_id' => ['status'],
+                    'booking_line_group_id' => [
+                        'is_extra',
+                        'has_schedulable_services',
+                        'has_consumptions'
+                    ]
+                ]);
+
+            foreach($self as $line) {
+                if($line['booking_id']['status'] != 'quote' && !$line['booking_line_group_id']['is_extra']) {
+                    return ['booking_id' => ['non_editable' => 'Services cannot be updated for non-quote bookings.']];
+                }
+                if($line['booking_line_group_id']['is_extra'] && $line['booking_line_group_id']['has_schedulable_services'] && $line['booking_line_group_id']['has_consumptions']) {
+                    return ['booking_id' => ['non_editable' => 'Lines from extra services cannot be changed once consumptions have been created.']];
                 }
             }
+
         }
 
-        return parent::canupdate($om, $oids, $values, $lang);
+        return parent::canupdate($self, $values, $lang);
     }
 
     /**
