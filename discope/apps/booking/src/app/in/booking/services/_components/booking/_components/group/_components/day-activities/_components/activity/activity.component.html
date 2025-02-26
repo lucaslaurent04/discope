@@ -47,6 +47,9 @@
                 </mat-form-field>
             </div>
             <div class="cell cell-right">
+                <span *ngIf="group.is_locked && !activity?.is_virtual">
+                    {{(activity?.activity_booking_line_id?.qty ? activity.activity_booking_line_id.qty : 0)}}
+                </span>
                 <mat-form-field *ngIf="!group.is_locked && !activity?.is_virtual">
                     <mat-label>Quantité</mat-label>
                     <input type="number" matInput (blur)="vm.qty.change()" [formControl]="vm.qty.formControl">

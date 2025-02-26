@@ -35,6 +35,7 @@
 
 <div class="cell cell-right">
     <mat-form-field *ngIf="!group.is_locked">
+        <span *ngIf="group.is_locked">{{line?.qty ? line.qty : 0}}</span>
         <mat-label>Quantité</mat-label>
         <input type="number" matInput (blur)="vm.qty.change()" [formControl]="vm.qty.formControl">
         <mat-error *ngIf="vm.qty.formControl.hasError('required')">
