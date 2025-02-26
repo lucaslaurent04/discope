@@ -34,8 +34,8 @@
 </div>
 
 <div class="cell cell-right">
+    <span *ngIf="group.is_locked">{{line?.qty ? line.qty : 0}}</span>
     <mat-form-field *ngIf="!group.is_locked">
-        <span *ngIf="group.is_locked">{{line?.qty ? line.qty : 0}}</span>
         <mat-label>Quantité</mat-label>
         <input type="number" matInput (blur)="vm.qty.change()" [formControl]="vm.qty.formControl">
         <mat-error *ngIf="vm.qty.formControl.hasError('required')">
@@ -45,15 +45,15 @@
 </div>
 
 <div class="cell cell-right" style="cursor: pointer; padding-top: 11px" (click)="openPriceEdition()">
-    <span>{{(line?.unit_price ? line.unit_price : 0) | number: '1.2-2'}} €</span>
+    <span *ngIf="!group.is_locked">{{(line?.unit_price ? line.unit_price : 0) | number: '1.2-2'}} €</span>
 </div>
 
 <div class="cell cell-right" style="cursor: pointer; padding-top: 11px" (click)="openPriceEdition()">
-    <span>{{(line?.vat_rate ? line.vat_rate : 0) | percent: '1.2-2'}}</span>
+    <span *ngIf="!group.is_locked">{{(line?.vat_rate ? line.vat_rate : 0) | percent: '1.2-2'}}</span>
 </div>
 
 <div class="cell cell-text cell-right">
-    <span>{{(line?.price ? line.price : 0) | number: '1.2-2'}} €</span>
+    <span *ngIf="!group.is_locked">{{(line?.price ? line.price : 0) | number: '1.2-2'}} €</span>
 </div>
 
 <!-- actions (empty: set in parent component) -->
