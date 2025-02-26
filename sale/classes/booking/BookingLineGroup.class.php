@@ -1101,6 +1101,27 @@ class BookingLineGroup extends Model {
             }
         }
 
+        if(isset($values['date_from']) || isset($values['date_to'])) {
+            $groups = $om->read(self::getType(), $oids, ['date_from', 'date_to'], $lang);
+
+            if($groups > 0) {
+                foreach($groups as $group) {
+                    $date_from = $values['date_from'] ?? $group['date_from'];
+                    $date_to = $values['date_to'] ?? $group['date_to'];
+
+                    $outside_date_activities_ids = BookingActivity::search([
+                        [['activity_date', '<', $date_from]],
+                        [['activity_date', '>', $date_to]]
+                    ])
+                        ->ids();
+
+                    if(!empty($outside_date_activities_ids)) {
+                        return ['date_from' => ['invalid_daterange' => 'An scheduled activity is outside of the date range.']];
+                    }
+                }
+            }
+        }
+
         return parent::canupdate($om, $oids, $values, $lang);
     }
 
