@@ -167,12 +167,16 @@
                                             {
                                                 "type": "field",
                                                 "value": "is_snack",
-                                                "width": "50%",
-                                                "sortable": true
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "is_accomodation",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_activity",
                                                 "width": "50%"
                                             },
                                             {
@@ -182,7 +186,7 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "is_activity",
+                                                "value": "is_supply",
                                                 "width": "50%"
                                             }
                                         ]
