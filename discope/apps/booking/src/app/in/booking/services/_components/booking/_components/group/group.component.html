@@ -1,5 +1,5 @@
 <!-- template vars -->
-<div #vGroup="var" [var]="{identification: {folded: true}, products: {folded: true}, accomodations: {folded: false}, meals: {folded: true}}"></div>
+<div #vGroup="var" [var]="{identification: {folded: true}, products: {folded: true}, activities: {folded: true}, accomodations: {folded: false}, meals: {folded: true}}"></div>
 
 <div [class.hidden]="!ready">
 
@@ -540,7 +540,7 @@
                                     [model]="line"
                                     [group]="instance"
                                     [booking]="booking"
-                                    [time_slots]="time_slots"
+                                    [time_slots]="timeSlots"
                                     (updated)="onupdateLine()"
                                 ></booking-services-booking-group-line>
                             </div>
@@ -552,6 +552,63 @@
 
         </div>
 
+        <!-- activities -->
+        <div class="part">
+            <div class="part-toggle">
+                <button mat-icon-button *ngIf="!vGroup.activities.folded" (click)="vGroup.activities.folded = true">
+                    <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
+                </button>
+                <button mat-icon-button *ngIf="vGroup.activities.folded" (click)="vGroup.activities.folded = false">
+                    <mat-icon style="font-size: 15px;">keyboard_arrow_right</mat-icon>
+                </button>
+            </div>
+
+            <div class="part-container">
+                <div class="row">
+                    <div class="row-activities-title">
+                        <span>Activités ({{instance.booking_activities_ids.length}})</span>
+                    </div>
+                </div>
+                <div class="row" [class.hidden]="vGroup.activities.folded">
+                    <div style="width: 100%;">
+                        <div class="activities-header">
+                            <div style="display: flex; width: 100%; margin-bottom: 6px; padding-left: 1px;">
+                                <div class="day-date-cells-wrapper">
+                                    <div class="activity-cell">Jour</div>
+                                    <div class="activity-cell">Date</div>
+                                </div>
+                                <div class="activity-cell moment-cell">Moment</div>
+                                <div class="activity-wrapper">
+                                    <div class="activity-cell">SKU</div>
+                                    <div class="activity-cell">QTÉ</div>
+                                    <div class="activity-cell">P.U.</div>
+                                    <div class="activity-cell">TVA</div>
+                                    <div class="activity-cell">PRIX</div>
+                                    <!-- actions -->
+                                    <div class="activity-cell"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="activities-list">
+                            <!-- activities -->
+                            <div class="activity-item" *ngFor="let bookingActivityDay of bookingActivitiesDays">
+                                <booking-services-booking-group-day-activities
+                                    [bookingActivityDay]="bookingActivityDay"
+                                    [booking]="booking"
+                                    [group]="instance"
+                                    [timeSlots]="timeSlots"
+                                    [openedActivityIds]="openedActivityIds"
+                                    (updated)="onupdateActivity()"
+                                    (deleteLine)="ondeleteLine($event)"
+                                    (closeActivity)="onCloseActivity($event)"
+                                    (openActivity)="onOpenActivity($event)"
+                                ></booking-services-booking-group-day-activities>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- accommodations -->
         <div class="part">

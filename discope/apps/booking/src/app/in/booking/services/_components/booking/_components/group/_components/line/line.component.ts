@@ -151,6 +151,15 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
                     this.vm.qty_vars.values.push(val);
                 }
             }
+
+            if(!this.instance.is_activity) {
+                this.vm.service_date.formControl.disable();
+                this.vm.time_slot_id.formControl.disable();
+            }
+            else {
+                this.vm.service_date.formControl.enable();
+                this.vm.time_slot_id.formControl.enable();
+            }
         }
     }
 
@@ -194,6 +203,9 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         }
         if(!this.instance.price_id) {
             this.vm.product.formControl.setErrors({'missing_price': 'Pas de liste de prix pour ce produit.'});
+        }
+        else {
+            this.vm.product.formControl.setErrors(null);
         }
     }
 
@@ -311,6 +323,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
             this.updated.emit();
         }
         catch(response) {
+            this.vm.service_date.formControl.setValue(this.instance.service_date.toISOString().split('T')[0]);
             this.api.errorFeedback(response);
         }
     }
@@ -327,6 +340,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
             this.updated.emit();
         }
         catch(response) {
+            this.vm.time_slot_id.formControl.setValue(this.instance.time_slot_id);
             this.api.errorFeedback(response);
         }
     }
@@ -403,7 +417,8 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
                 center_id: this.booking.center_id.id,
                 domain: JSON.stringify(domain),
                 date_from: this.booking.date_from.toISOString(),
-                date_to: this.booking.date_to.toISOString()
+                date_to: this.booking.date_to.toISOString(),
+                is_activity: false
             });
             filtered = data;
         }

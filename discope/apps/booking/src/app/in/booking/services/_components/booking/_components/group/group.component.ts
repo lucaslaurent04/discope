@@ -1,6 +1,5 @@
 import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ChangeDetectorRef, ViewChildren, QueryList, ViewChild } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService, AuthService, ContextService, TreeComponent, SbDialogConfirmDialog } from 'sb-shared-lib';
 import { BookingLineGroup } from '../../_models/booking_line_group.model';
 import { BookingLine } from '../../_models/booking_line.model';
@@ -19,6 +18,7 @@ import { BookingMealPref } from '../../_models/booking_mealpref.model';
 import { BookingAgeRangeAssignment } from '../../_models/booking_agerange_assignment.model';
 import { MatAutocomplete } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
+import { BookingActivityDay } from './_components/day-activities/day-activities.component';
 
 
 // declaration of the interface for the map associating relational Model fields with their components
@@ -27,8 +27,7 @@ interface BookingLineGroupComponentsMap {
     meal_preferences_ids: QueryList<BookingServicesBookingGroupMealPrefComponent>,
     age_range_assignments_ids: QueryList<BookingServicesBookingGroupAgeRangeComponent>,
     sojourn_product_models_ids: QueryList<BookingServicesBookingGroupAccomodationComponent>
-};
-
+}
 
 interface vmModel {
     price: {
@@ -96,7 +95,9 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     // server-model relayed by parent
     @Input() set model(values: any) { this.update(values) }
     @Input() booking: Booking;
-    @Input() time_slots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
+    @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
+    @Input() bookingActivitiesDays: BookingActivityDay[];
+
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
     @Output() toggle  = new EventEmitter();
@@ -110,6 +111,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     public groupTypeOpen:boolean = false;
     public groupNbPersOpen: boolean = false;
     public groupDatesOpen: boolean = false;
+    public openedActivityIds: number[] = [];
 
     public action_in_progress: boolean = false;
 
@@ -194,7 +196,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         };
     }
 
-
     public ngAfterViewInit() {
         // init local componentsMap
         let map:BookingLineGroupComponentsMap = {
@@ -205,7 +206,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         };
         this.componentsMap = map;
     }
-
 
     public ngOnInit() {
         if(this.booking.status == 'quote' || (this.instance.is_extra && !this.instance.has_consumptions)) {
@@ -231,7 +231,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         this.vm.name.formControl.valueChanges.subscribe( (value:string)  => {
             this.vm.name.value = value;
         });
-
 
         this.vm.timerange.checkin.formControl.valueChanges.subscribe( () => {
             this.onchangeTimeFrom();
@@ -349,7 +348,12 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         });
     }
 
-    public async onupdateLine() {
+    public onupdateLine() {
+        // relay to parent
+        this.updated.emit();
+    }
+
+    public onupdateActivity() {
         // relay to parent
         this.updated.emit();
     }
@@ -631,7 +635,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         });
     }
 
-
     public async onchangeSojournType(event:any) {
         this.vm.sojourn_type.value = event.value;
         // update model
@@ -846,4 +849,14 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         return days_of_week[ date.getDay() ];
     }
 
+    public onCloseActivity(activityId: number) {
+        const activityIdIndex = this.openedActivityIds.indexOf(activityId);
+        if(activityIdIndex !== undefined) {
+            this.openedActivityIds.splice(activityIdIndex, 1);
+        }
+    }
+
+    public onOpenActivity(activityId: number) {
+        this.openedActivityIds.push(activityId);
+    }
 }

@@ -128,7 +128,7 @@ class BookingLine extends \sale\booking\BookingLine {
         }
 
         return [];
-        // ignore parent
+        // ignore parent (!!!! be careful if parent is called again, the signature may have been changed to ($self, $values, $lang)
         return parent::canupdate($om, $ids, $values, $lang);
     }
 
