@@ -646,6 +646,8 @@ class BookingLine extends Model {
                     }
                 }
 
+                BookingLine::id($lid)->update(['booking_activity_id' => $main_activity_id]);
+
                 BookingActivity::id($main_activity_id)->do('update-counters');
 
                 $line_order = $line['order'];
@@ -1897,7 +1899,7 @@ class BookingLine extends Model {
     }
 
     public static function onupdateServiceDate($self) {
-        $self->read(['is_activity', 'service_date', 'booking_activity_id' => ['id', 'supplies_booking_lines_ids', 'transports_booking_lines_ids']]);
+        $self->read(['is_activity', 'service_date', 'booking_activity_id' => ['supplies_booking_lines_ids', 'transports_booking_lines_ids']]);
         foreach($self as $booking_line) {
             if(!$booking_line['is_activity']) {
                 continue;
