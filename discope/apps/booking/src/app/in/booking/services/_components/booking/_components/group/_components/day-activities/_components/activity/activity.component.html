@@ -47,7 +47,7 @@
                 </mat-form-field>
             </div>
             <div class="cell cell-right">
-                <span *ngIf="group.is_locked && !activity?.is_virtual">
+                <span *ngIf="group.is_locked && !activity?.is_virtual" style="line-height: 45px;">
                     {{(activity?.activity_booking_line_id?.qty ? activity.activity_booking_line_id.qty : 0)}}
                 </span>
                 <mat-form-field *ngIf="!group.is_locked && !activity?.is_virtual">
@@ -59,17 +59,17 @@
                 </mat-form-field>
             </div>
             <div class="cell cell-right" style="cursor: pointer; padding-top: 11px" (click)="openPriceEdition()">
-                <span *ngIf="!activity?.is_virtual">
+                <span *ngIf="!group.is_locked && !activity?.is_virtual">
                     {{(activity?.activity_booking_line_id?.unit_price ? activity.activity_booking_line_id.unit_price : 0) | number: '1.2-2'}} €
                 </span>
             </div>
             <div class="cell cell-right" style="cursor: pointer; padding-top: 11px" (click)="openPriceEdition()">
-                <span *ngIf="!activity?.is_virtual">
+                <span *ngIf="!group.is_locked && !activity?.is_virtual">
                     {{(activity?.activity_booking_line_id?.vat_rate ? activity.activity_booking_line_id.vat_rate : 0) | percent: '1.2-2'}}
                 </span>
             </div>
             <div class="cell cell-text cell-right">
-                <span *ngIf="!activity?.is_virtual">
+                <span *ngIf="!group.is_locked && !activity?.is_virtual">
                     {{(activity?.activity_booking_line_id?.price ? activity.activity_booking_line_id.price : 0) | number: '1.2-2'}} €
                 </span>
             </div>
@@ -119,7 +119,7 @@
             </div>
         </div>
 
-        <div *ngIf="activity?.activity_booking_line_id && !activity?.is_virtual"
+        <div *ngIf="!group.is_locked && activity?.activity_booking_line_id && !activity?.is_virtual"
              style="display: flex; width: 100%; margin-bottom: 30px;"
         >
             <div style="flex-grow: 1; text-align: right;">
