@@ -47,7 +47,7 @@ class NutritionalCoefficientTable extends Model {
         $nutritional_coefficient = 1.0;
 
         $entries = NutritionalCoefficientEntry::search(['table_id', '=', $table_id], ['sort' => ['age_from' => 'asc']])
-            ->read(['age_from', 'age_to', 'is_sporty'])
+            ->read(['age_from', 'age_to', 'is_sporty', 'nutritional_coefficient'])
             ->get();
 
         foreach($entries as $entry) {
