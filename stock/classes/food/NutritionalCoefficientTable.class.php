@@ -46,7 +46,10 @@ class NutritionalCoefficientTable extends Model {
     public static function getNutritionalCoefficient(int $table_id, int $max_age, bool $is_sporty): float {
         $nutritional_coefficient = 1.0;
 
-        $entries = NutritionalCoefficientEntry::search(['table_id', '=', $table_id], ['sort' => ['age_from' => 'asc']])
+        // Sort by age_from asc to get the best match on "Max age"
+        $sort = ['age_from' => 'asc'];
+
+        $entries = NutritionalCoefficientEntry::search(['table_id', '=', $table_id], ['sort' => $sort])
             ->read(['age_from', 'age_to', 'is_sporty', 'nutritional_coefficient'])
             ->get();
 
