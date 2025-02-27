@@ -42,4 +42,27 @@ class NutritionalCoefficientTable extends Model {
 
         ];
     }
+
+    public static function getNutritionalCoefficient($table_id, $max_age, $is_sporty): float {
+        $nutritional_coefficient = 1.0;
+
+        $entries = NutritionalCoefficientEntry::search(['table_id', '=', $table_id], ['sort' => ['age_from' => 'asc']])
+            ->read(['age_from', 'age_to', 'is_sporty'])
+            ->get();
+
+        foreach($entries as $entry) {
+            if($max_age >= $entry['age_from'] && $max_age < $entry['age_to']) {
+                $nutritional_coefficient = $entry['nutritional_coefficient'];
+                if($is_sporty && $entry['is_sporty']) {
+                    // Age range and Is sporty complete match
+                    break;
+                }
+            }
+            elseif($is_sporty && $entry['is_sporty']) {
+                $nutritional_coefficient = $entry['nutritional_coefficient'];
+            }
+        }
+
+        return $nutritional_coefficient;
+    }
 }
