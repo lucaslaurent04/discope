@@ -47,6 +47,10 @@ interface vmModel {
         formControl: FormControl,
         change: () => void
     },
+    meal_location: {
+        formControl: FormControl,
+        change: () => void
+    },
     qty_vars: {
         values: any,
         change: (index: number, event: any) => void,
@@ -114,6 +118,10 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
                 formControl:    new FormControl(),
                 change:         () => this.timeSlotIdChange()
             },
+            meal_location: {
+                formControl:    new FormControl(),
+                change:         () => this.mealLocationIdChange()
+            },
             qty_vars: {
                 values:         {},
                 change:         (index:number, event:any) => this.qtyVarsChange(index, event),
@@ -152,7 +160,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
                 }
             }
 
-            if(!this.instance.is_activity) {
+            if(!this.instance.is_activity && !this.instance.is_meal) {
                 this.vm.service_date.formControl.disable();
                 this.vm.time_slot_id.formControl.disable();
             }
@@ -197,6 +205,8 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         this.vm.service_date.formControl.setValue(this.instance.service_date.toISOString().split('T')[0]);
         // time_slot_id
         this.vm.time_slot_id.formControl.setValue(this.instance.time_slot_id);
+        // meal_location
+        this.vm.meal_location.formControl.setValue(this.instance.meal_location);
         // qty_vars
         if(this.instance.qty_vars && this.instance.qty_vars.length) {
             this.vm.qty_vars.values = JSON.parse(this.instance.qty_vars);
@@ -341,6 +351,23 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         }
         catch(response) {
             this.vm.time_slot_id.formControl.setValue(this.instance.time_slot_id);
+            this.api.errorFeedback(response);
+        }
+    }
+
+    public async mealLocationIdChange() {
+        if(this.instance.meal_location == this.vm.meal_location.formControl.value) {
+            return;
+        }
+
+        // notify back-end about the change
+        try {
+            await this.api.update(this.instance.entity, [this.instance.id], {meal_location: this.vm.meal_location.formControl.value});
+            // relay change to parent component
+            this.updated.emit();
+        }
+        catch(response) {
+            this.vm.meal_location.formControl.setValue(this.instance.meal_location);
             this.api.errorFeedback(response);
         }
     }
