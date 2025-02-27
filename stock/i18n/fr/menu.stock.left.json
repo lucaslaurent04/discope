@@ -1,0 +1,17 @@
+{
+    "description": "",
+    "view": {
+        "item.nutritional-coefficients": {
+            "label": "Coef. Nutritionnel",
+            "help": ""
+        },
+        "item.nutritional-coefficients.tables": {
+            "label": "Configurations",
+            "help": ""
+        },
+        "item.nutritional-coefficients.entries": {
+            "label": "Entrées",
+            "help": ""
+        }
+    }
+}
