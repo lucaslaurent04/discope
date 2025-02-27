@@ -1,0 +1,29 @@
+{
+    "name": "Configuration Coefficient Nutritionnel",
+    "plural": "Configurations Coefficient Nutritionnel",
+    "description": "Configurations des coefficients nutritionnels des repas pour un centre spécifique. Il est composé de plusieurs entrées pouvant être configurées par tranche d'âge.",
+    "model": {
+        "center_id": {
+            "label": "Centre",
+            "description": "Centre auquel le coefficient appartient.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Configuration Coefficient Nutritionnel",
+            "description": "Vue pour voir et éditer une configuration de cofficients nutritionnel.",
+            "layout": {
+                "section.entries": {
+                    "label": "Entrées"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Configurations Coefficient Nutritionnel",
+            "description": "Vue listant les configurations des coefficients nutritionnel.",
+            "layout": {}
+        }
+    },
+    "error": {}
+}
