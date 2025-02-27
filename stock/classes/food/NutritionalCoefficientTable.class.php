@@ -43,7 +43,7 @@ class NutritionalCoefficientTable extends Model {
         ];
     }
 
-    public static function getNutritionalCoefficient($table_id, $max_age, $is_sporty): float {
+    public static function getNutritionalCoefficient(int $table_id, int $max_age, bool $is_sporty): float {
         $nutritional_coefficient = 1.0;
 
         $entries = NutritionalCoefficientEntry::search(['table_id', '=', $table_id], ['sort' => ['age_from' => 'asc']])
@@ -52,13 +52,16 @@ class NutritionalCoefficientTable extends Model {
 
         foreach($entries as $entry) {
             if($max_age >= $entry['age_from'] && $max_age < $entry['age_to']) {
+                // Match on "Age range"
                 $nutritional_coefficient = $entry['nutritional_coefficient'];
+
                 if($is_sporty && $entry['is_sporty']) {
-                    // Age range and Is sporty complete match
+                    // Break because complete Match on "Age range" and "Is sporty"
                     break;
                 }
             }
             elseif($is_sporty && $entry['is_sporty']) {
+                // Match on "Is sporty"
                 $nutritional_coefficient = $entry['nutritional_coefficient'];
             }
         }
