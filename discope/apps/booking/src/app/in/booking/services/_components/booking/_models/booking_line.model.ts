@@ -34,6 +34,7 @@ export class BookingLine {
         public qty_vars: string = '',
         public product_id: any = {},
         public auto_discounts_ids: any[] = [],
-        public manual_discounts_ids: any[] = []
+        public manual_discounts_ids: any[] = [],
+        public meal_location: string = 'inside'
     ) {}
 }

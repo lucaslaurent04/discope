@@ -171,6 +171,24 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "",
+                                                "width": "50%",
+                                                "visible": [
+                                                    ["is_meal", "=", true],
+                                                    ["is_repeatable", "=", false]
+                                                ]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "meal_location",
+                                                "width": "50%",
+                                                "visible": [
+                                                    ["is_meal", "=", true],
+                                                    ["is_repeatable", "=", false]
+                                                ]
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "is_snack",
                                                 "width": "50%"
                                             },
