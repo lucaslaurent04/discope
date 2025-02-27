@@ -1,0 +1,41 @@
+{
+    "name": "Sale menu",
+    "access": {
+        "groups": ["sale.default.user"]
+    },
+    "layout": {
+        "items": [
+            {
+                "id": "item.nutritional-coefficients",
+                "label": "Nutritional Coef.",
+                "description": "",
+                "icon": "list_alt",
+                "type": "parent",
+                "children": [
+                    {
+                        "id": "item.nutritional-coefficients.tables",
+                        "type": "entry",
+                        "label": "Configurations",
+                        "description": "Listing of all nutritional coefficient configuration",
+                        "route": "/",
+                        "context": {
+                            "entity": "stock\\food\\NutritionalCoefficientTable",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "item.nutritional-coefficients.entries",
+                        "type": "entry",
+                        "label": "Entries",
+                        "description": "",
+                        "route": "/",
+                        "context": {
+                            "entity": "stock\\food\\NutritionalCoefficientEntry",
+                            "view": "list.default"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

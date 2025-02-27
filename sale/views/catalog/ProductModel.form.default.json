@@ -166,6 +166,11 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "nutritional_coefficient",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "is_snack",
                                                 "width": "50%"
                                             },

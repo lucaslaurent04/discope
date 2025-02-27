@@ -400,6 +400,13 @@ class ProductModel extends Model {
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] , ['has_age_range', '=', true]]
             ],
 
+            'nutritional_coefficient' => [
+                'type'              => 'integer',
+                'description'       => "The nutritional coefficient of the meal.",
+                'default'           => 1,
+                'visible'           => ['is_meal', '=', true]
+            ],
+
             'rental_unit_assignement' => [
                 'type'              => 'string',
                 'description'       => 'The way the product is assigned to a rental unit (a specific unit, a specific category, or based on capacity match).',
