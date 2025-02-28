@@ -347,6 +347,19 @@ class BookingLine extends Model {
                 'store'             => true,
                 'function'          => 'calcTimeSlotId',
                 'onupdate'          => 'onupdateTimeSlotId'
+            ],
+
+            'meal_location' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'selection'         => [
+                    'inside',
+                    'outside',
+                    'takeaway'
+                ],
+                'store'             => true,
+                'relation'          => ['product_id' => ['product_model_id' => ['meal_location']]],
+                'visible'           => ['is_meal', '=', true]
             ]
 
         ];

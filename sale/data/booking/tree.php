@@ -122,6 +122,7 @@ $tree = [
             'is_rental_unit',
             'is_accomodation',
             'is_meal',
+            'meal_location',
             'is_activity',
             'is_transport',
             'is_supply',
