@@ -461,6 +461,20 @@ class ProductModel extends Model {
                 'default'           => true,
                 'visible'           => ['is_pack', '=', true],
                 'onupdate'          => 'onupdateAllowPriceAdaptation'
+            ],
+
+            'meal_location' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'inside',
+                    'outside',
+                    'takeaway'
+                ],
+                'default'           => 'inside',
+                'visible'           => [
+                    ['is_meal', '=', true],
+                    ['is_repeatable', '=', false]
+                ]
             ]
 
         ];

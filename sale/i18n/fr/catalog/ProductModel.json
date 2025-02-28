@@ -195,6 +195,16 @@
             "description": "Le coefficient nutritionnel du repas.",
             "help": ""
         },
+        "meal_location": {
+            "label": "Emplacement du repas",
+            "description": "Spécification de l'emplacement du repas.",
+            "help": "",
+            "selection": {
+                "inside": "Intérieur",
+                "outside": "Extérieur",
+                "takeaway": "À emporter"
+            }
+        },
         "is_snack": {
             "label": "Est une collation",
             "description": "Le produit est-il une collation ?",
@@ -229,6 +239,11 @@
             "label": "Est un transport",
             "description": "Le produit est-il un service de transport ?",
             "help": "Le produit est-il un service de transport ? (ceci inclut les transferts entre lieux, les navettes, etc.)"
+        },
+        "is_supply": {
+            "label": "Est un matériel",
+            "description": "Le produit est-il un service de location de matériel ?",
+            "help": ""
         },
         "is_activity": {
             "label": "Est une activité",
