@@ -146,12 +146,18 @@ class ProductModel extends Model {
                 'rel_foreign_key'   => 'time_slot_id',
                 'rel_local_key'     => 'product_model_id',
                 'description'       => "The time slots to classify when the service can take place.",
-                'visible'           => [
+                'visible'           => [ [
                                          ['type', '=', 'service'],
                                          ['service_type', '=', 'schedulable'] ,
                                          ['is_activity', '=', true],
                                          ['is_fullday', '=', false]
+                                        ],
+                                        [
+                                            ['type', '=', 'service'],
+                                            ['service_type', '=', 'schedulable'] ,
+                                            ['is_meal', '=', true]
                                         ]
+                                        ],
             ],
 
             'tracking_type' => [

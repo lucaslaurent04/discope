@@ -335,21 +335,6 @@
                                                 "type": "field",
                                                 "value": "is_fullday",
                                                 "width": "100%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "time_slots_ids",
-                                                "width": "100%",
-                                                "widget": {
-                                                    "view": "list.activity",
-                                                    "header": {
-                                                        "actions": {
-                                                            "ACTION.CREATE": false,
-                                                            "ACTION.ADD": true,
-                                                            "ACTION.DELETE" :true
-                                                        }
-                                                    }
-                                                }
                                             }
                                         ]
                                     },
@@ -398,6 +383,37 @@
                                                 }
                                             }
                                         ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "TimeSlots",
+                        "id": "section.time-slots",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "time_slots_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.activity",
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.ADD": true,
+                                                            "ACTION.DELETE" :true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+
                                     }
                                 ]
                             }
