@@ -13,6 +13,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
 use equal\data\DataFormatter;
 use sale\booking\Booking;
+use sale\booking\BookingActivity;
 use sale\booking\Consumption;
 use sale\booking\TimeSlot;
 use Twig\Environment as TwigEnvironment;
@@ -219,6 +220,7 @@ if($logo_document_data) {
 
 $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
+$has_activity = Setting::get_value('sale', 'booking', 'has_activity', 0);
 $values = [
     'attn_address1'              => '',
     'attn_address2'              => '',
@@ -273,6 +275,8 @@ $values = [
     'status'                     => $booking['status'],
     'tax_lines'                  => [],
     'total'                      => $booking['total'],
+    'has_activity'               => $has_activity,
+    'activities_map'             => ''
 ];
 
 
@@ -343,6 +347,8 @@ $values['i18n'] = [
     'snack'                 => Setting::get_value('lodging', 'locale', 'i18n.snack', null, [], $params['lang']),
     'meals'                 => Setting::get_value('lodging', 'locale', 'i18n.meals', null, [], $params['lang']),
     'title_agreement'       => Setting::get_value('lodging', 'locale', 'i18n.title_agreement', null, [], $params['lang']),
+    'activities_details'    => Setting::get_value('lodging', 'locale', 'i18n.activities_details', null, [], $params['lang']),
+    'activity'              => Setting::get_value('lodging', 'locale', 'i18n.activity', null, [], $params['lang'])
 ];
 
 
@@ -833,6 +839,66 @@ foreach($consumptions_detailed as $cid => $consumption) {
 $values['consumptions_map_detailed'] = $consumptions_map_detailed;
 
 
+if($has_activity){
+    $activities_map = [];
+
+    $booking_activities = BookingActivity::search(['booking_id', '=', $booking['id'] ])
+        ->read([
+            'id',
+            'name',
+            'activity_date',
+            'activity_booking_line_id' => ['product_id' => ['id','name']],
+            'booking_line_group_id' => ['id', 'name'],
+            'time_slot_id' => ['id', 'code','name'],
+        ])
+        ->get();
+
+    $time_slots_activities_ids = TimeSlot::search(["is_meal", "=", false])->read(['id', 'name','code', 'order'], $params['lang'])->get();
+
+    usort($time_slots_activities_ids, function ($a, $b) {
+        return $a['order'] <=> $b['order'];
+    });
+
+    usort($booking_activities, function ($a, $b) {
+        return $a['booking_line_group_id']['id'] <=> $b['booking_line_group_id']['id']
+            ?: $a['activity_date'] <=> $b['activity_date'];
+    });
+
+    foreach ($booking_activities as $activity) {
+        $group = $activity['booking_line_group_id']['name'];
+
+        if (!isset($activities_map[$group])) {
+            $activities_map[$group] = [];
+        }
+
+        $date = date('d/m/Y', $activity['activity_date']) . ' (' . $days_names[date('w', $activity['activity_date'])] . ')';
+        if (!isset($activities_map[$group][$date])) {
+            $activities_map[$group][$date] = [
+                'time_slots' => [],
+            ];
+
+            foreach ($time_slots_activities_ids as $time_slot) {
+                $activities_map[$group][$date]['time_slots'][$time_slot['name']] = [];
+            }
+        }
+
+        $time_slot_name = $activity['time_slot_id']['name'];
+        if (isset($activities_map[$group][$date]['time_slots'][$time_slot_name])) {
+            $activities_map[$group][$date]['time_slots'][$time_slot_name][] = $activity['name'];
+        }
+    }
+
+    foreach ($activities_map as &$dates) {
+        foreach ($dates as &$time_slots) {
+            array_walk($time_slots['time_slots'], fn(&$activities) =>
+                $activities = $activities ? (count($activities) === 1 ? $activities[0] : implode(', ', $activities)) : null
+            );
+        }
+    }
+    unset($dates, $time_slots);
+
+    $values['activities_map'] = $activities_map;
+}
 /*
     Inject all values into the template
 */
