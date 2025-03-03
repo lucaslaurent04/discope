@@ -13,11 +13,6 @@
             },
             {
                 "type": "field",
-                "value": "entity",
-                "width": "20%"
-            },
-            {
-                "type": "field",
                 "value": "event_type",
                 "width": "20%"
             },

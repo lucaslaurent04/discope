@@ -21,7 +21,6 @@ class TaskEvent extends DiscopeTaskEvent {
             'entity' => [
                 'type'              => 'string',
                 'description'       => "Namespace of the concerned entity.",
-                'required'          => true,
                 'default'           => 'sale\booking\Booking'
             ],
 
@@ -47,6 +46,21 @@ class TaskEvent extends DiscopeTaskEvent {
                 'foreign_object'    => 'sale\booking\followup\TaskModel',
                 'foreign_field'     => 'deadline_event_id',
                 'description'       => 'List of task models that uses the event as a deadline.'
+            ]
+
+        ];
+    }
+
+    public static function getConstraints(): array {
+        return [
+
+            'entity' =>  [
+                'not_allowed' => [
+                    'message'       => 'Entity must be "sale\booking\Booking".',
+                    'function'      => function ($entity, $values) {
+                        return $entity === 'sale\booking\Booking';
+                    }
+                ]
             ]
 
         ];
