@@ -10,8 +10,8 @@ use sale\booking\followup\Task;
 use sale\booking\followup\TaskModel;
 
 [$params, $providers] = eQual::announce([
-    'description'	=>	"Generate task models' tasks when a booking change status.",
-    'params' 		=>	[
+    'description'	=> "Generate task models' tasks when a booking change status.",
+    'params' 		=> [
 
         'booking_id' => [
             'type'              => 'many2one',
@@ -105,7 +105,7 @@ foreach($task_models as $task_model) {
             'deadline_date' => $deadline_date,
             'task_model_id' => $task_model['id'],
             'entity'        => 'sale\booking\Booking',
-            'entity_id'     => $booking['id'],
+            'booking_id'    => $booking['id'],
             'notes'         => $notes
         ]);
     }
