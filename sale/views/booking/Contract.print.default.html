@@ -134,7 +134,7 @@ hr {
 
 <div class="header">
     <div style="position: absolute; height: 150px; width: 350px; z-index: -1;">
-        <img src="{{ header_img_url }}" width="350" height="100" border="0" />
+        <img src="{{ header_img_url }}" style="max-width: 350px; width: 100%; height: auto;" border="0" alt="Header Image" />
         <div style="margin-left: 8px;">
             <h3>{{ company_name}}</h3>
             <!-- {{ company_address }} -->
@@ -449,9 +449,9 @@ hr {
             <tr>
                 <td><b>TOTAL</b></td>
                 {% if center_office == 'GA' %}
-                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_simple['total'][1] | default("0") }}</td>
-                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_simple['total'][2] | default("0") }}</td>
-                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_simple['total'][4] | default("0")}}</td>
+                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_simple['total']['B'] | default("0") }}</td>
+                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_simple['total']['L'] | default("0") }}</td>
+                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_simple['total']['D'] | default("0")}}</td>
                 {% endif %}
                 <td style="text-align: center; font-weight: bold;">{{ consumptions_map_simple['total']['night'] | default("0")}}</td>
             </tr>
@@ -537,6 +537,11 @@ hr {
 </div>
 {% endif %}
 
+
+<div>
+    {{ contract_authorization_html|raw }}
+</div>
+
 <div style="margin-top: 50px;">
     <table style="width: 100%; page-break-inside: avoid;">
         <tr>
@@ -558,6 +563,16 @@ hr {
     </table>
 </div>
 
+
+{% if has_contract_approved %}
+    <div>
+        {{ contract_approved_html|raw }}
+    </div>
+
+    <div class="signature-container">
+        {{ signature|raw }}
+    </div>
+{% endif %}
 
 </body>
 </html>

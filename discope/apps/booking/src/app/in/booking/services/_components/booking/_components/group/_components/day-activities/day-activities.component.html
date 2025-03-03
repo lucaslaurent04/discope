@@ -1,0 +1,76 @@
+<div class="day-date-cells-wrapper">
+    <div class="cell day-name-cell">
+        {{bookingActivityDay.date | date: 'EEEE' | titlecase}}
+    </div>
+    <div class="cell date-cell">
+        {{bookingActivityDay.date | date: 'dd/MM/YYYY'}}
+    </div>
+</div>
+<div class="activities-container">
+    <div class="activity-container">
+        <div *ngIf="!group.is_locked" class="activity-remove">
+            <button mat-icon-button
+                    [disabled]="!bookingActivityDay.AM?.activity_booking_line_id || bookingActivityDay.AM?.is_virtual"
+                    (click)="ondeleteActivity(bookingActivityDay.AM?.activity_booking_line_id?.id);"
+            >
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+        <booking-services-booking-group-day-activities-activity [activity]="bookingActivityDay.AM"
+                                                                [date]="bookingActivityDay.date"
+                                                                [timeSlot]="mapTimeSlotsCode['AM']"
+                                                                [group]="group"
+                                                                [booking]="booking"
+                                                                [opened]="bookingActivityDay.AM?.id && openedActivityIds.includes(bookingActivityDay.AM.id)"
+                                                                (close)="closeActivity.emit(bookingActivityDay.AM.id)"
+                                                                (open)="openActivity.emit(bookingActivityDay.AM.id)"
+                                                                (updated)="updated.emit()"
+                                                                (deleteLine)="deleteLine.emit($event)"
+        ></booking-services-booking-group-day-activities-activity>
+    </div>
+
+    <div class="activity-container">
+        <div *ngIf="!group.is_locked" class="activity-remove">
+            <button mat-icon-button
+                    [disabled]="!bookingActivityDay.PM?.activity_booking_line_id || bookingActivityDay.PM?.is_virtual"
+                    (click)="ondeleteActivity(bookingActivityDay.PM?.activity_booking_line_id?.id);"
+            >
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+        <booking-services-booking-group-day-activities-activity [activity]="bookingActivityDay.PM"
+                                                                [date]="bookingActivityDay.date"
+                                                                [timeSlot]="mapTimeSlotsCode['PM']"
+                                                                [group]="group"
+                                                                [booking]="booking"
+                                                                [opened]="bookingActivityDay.PM?.id && openedActivityIds.includes(bookingActivityDay.PM.id)"
+                                                                (close)="closeActivity.emit(bookingActivityDay.PM.id)"
+                                                                (open)="openActivity.emit(bookingActivityDay.PM.id)"
+                                                                (updated)="updated.emit()"
+                                                                (deleteLine)="deleteLine.emit($event)"
+        ></booking-services-booking-group-day-activities-activity>
+    </div>
+
+    <div class="activity-container">
+        <div *ngIf="!group.is_locked" class="activity-remove">
+            <button mat-icon-button
+                    [disabled]="!bookingActivityDay.EV?.activity_booking_line_id || bookingActivityDay.EV?.is_virtual"
+                    (click)="ondeleteActivity(bookingActivityDay.EV?.activity_booking_line_id?.id);"
+            >
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+        <booking-services-booking-group-day-activities-activity [activity]="bookingActivityDay.EV"
+                                                                [date]="bookingActivityDay.date"
+                                                                [timeSlot]="mapTimeSlotsCode['EV']"
+                                                                [group]="group"
+                                                                [booking]="booking"
+                                                                [allowFulldaySelection]="false"
+                                                                [opened]="bookingActivityDay.EV?.id && openedActivityIds.includes(bookingActivityDay.EV.id)"
+                                                                (close)="closeActivity.emit(bookingActivityDay.EV.id)"
+                                                                (open)="openActivity.emit(bookingActivityDay.EV.id)"
+                                                                (updated)="updated.emit()"
+                                                                (deleteLine)="deleteLine.emit($event)"
+        ></booking-services-booking-group-day-activities-activity>
+    </div>
+</div>

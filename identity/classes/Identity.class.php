@@ -6,10 +6,13 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace identity;
+
+use documents\Document;
 use equal\data\DataGenerator;
 use equal\orm\Model;
 use sale\booking\Booking;
 use sale\booking\Invoice;
+use core\setting\Setting;
 
 /**
  * This class is meant to be used as an interface for other entities (organisation and partner).
@@ -89,7 +92,7 @@ class Identity extends Model {
 
             'signature' => [
                 'type'              => 'string',
-                'usage'             => 'text/html',
+                'usage'             => 'text/html:2000000',
                 'description'       => 'Identity signature to append to communications.',
                 'multilang'         => true
             ],
@@ -204,6 +207,14 @@ class Identity extends Model {
                 'foreign_field'     => 'owner_identity_id',
                 'domain'            => [ ['partner_identity_id', '<>', 'object.id'] ],
                 'description'       => 'List of contacts related to the organisation (not necessarily employees), if any.'
+            ],
+
+            'accounting_account' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Unique code identifying the associated accounting account.",
+                'function'          => 'calcAccount',
+                'store'             => true
             ],
 
             /*
@@ -527,7 +538,7 @@ class Identity extends Model {
             // Companies can also have an official website.
             'website' => [
                 'type'              => 'string',
-                'usage'             => 'url',
+                'usage'             => 'uri/url',
                 'description'       => 'Organisation main official website URL, if any.',
                 'visible'           => ['type', '<>', 'I']
             ],
@@ -585,7 +596,8 @@ class Identity extends Model {
                 'type'              => 'string',
                 'selection'         => ['M' => 'Male', 'F' => 'Female', 'X' => 'Non-binary'],
                 'description'       => 'Reference contact gender.',
-                'visible'           => ['type', '=', 'I']
+                'visible'           => ['type', '=', 'I'],
+                'default'           => 'M'
             ],
 
             'title' => [
@@ -622,6 +634,13 @@ class Identity extends Model {
                 'foreign_field'     => 'partner_identity_id',
                 'description'       => 'Partnerships that relate to the identity.',
                 'domain'            => ['owner_identity_id', '<>', 'object.id']
+            ],
+
+            'customer_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\customer\Customer',
+                'foreign_field'     => 'partner_identity_id',
+                'description'       => 'Customer associated to this identity, if any.'
             ],
 
             'flag_latepayer' => [
@@ -694,22 +713,62 @@ class Identity extends Model {
                 'description'       => 'List of invoices relating to the identity (as customer).'
             ],
 
-            // ota
             'is_ota' => [
                 'type'              => 'boolean',
                 'description'       => 'Is the identity from OTA origin.',
                 'default'           => false
             ],
 
-            // readonly
             'is_readonly' => [
                 'type'              => 'boolean',
                 'description'       => 'Is the identity readonly, used for static identities that should not be updated trivially.',
                 'default'           => false,
                 'readonly'          => true
-            ]
+            ],
+
+            'logo_document_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'documents\Document',
+                'description'       => 'The document containing the logo associated with the identity.',
+                'visible'           => ['type' ,'<>' , 'I']
+            ],
+
 
         ];
+    }
+
+    public static function calcAccount($self) {
+        $result = [];
+        $self->read(['id','name']);
+        foreach($self as $id => $identity) {
+
+            $prefix_account = Setting::get_value('identity', 'locale', 'account.prefix');
+            $sequence_account = Setting::get_value('identity', 'locale', 'account.sequence');
+            $format = Setting::get_value('identity', 'locale', 'account.sequence_format', '%3d{prefix}%5d{sequence}');
+
+            if(isset($prefix_account) && isset($sequence_account) && $format) {
+                Setting::set_value('identity', 'locale', 'account.sequence', $sequence_account + 1);
+
+                $acounting_value = Setting::parse_format($format, [
+                    'prefix'    => $prefix_account,
+                    'sequence'  => $sequence_account
+                ]);
+
+                $identity_found = Identity::search([
+                                ['id', '<>' , $identity['id']],
+                                ['accounting_account' ,  '=',  $acounting_value]
+                            ])
+                            ->read('id')
+                            ->first(true);
+
+                if(!$identity_found){
+                    $result[$id] = $acounting_value;
+                }
+
+            }
+
+        }
+        return $result;
     }
 
     /**
@@ -939,7 +998,7 @@ class Identity extends Model {
     /**
      * Returns a region name based on a zip code and a country.
      */
-    public static function _getRegionByZip($zip, $country) {
+    public static function getRegionByZip($zip, $country) {
         $zip = intval($zip);
 
         if ($country == 'BE') {

@@ -1,0 +1,45 @@
+:host {
+    display: flex;
+    width: 100%;
+
+    .day-date-cells-wrapper {
+        display: flex;
+        min-width: 210px;
+        max-width: 210px;
+
+        .cell {
+            margin-right: 15px;
+            padding: 15px 10px 0 10px;
+        }
+
+        .day-name-cell {
+            min-width: 80px;
+            max-width: 80px;
+            text-align: right;
+            font-size: 0.9rem;
+        }
+
+        .date-cell {
+            min-width: 100px;
+            max-width: 100px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+    }
+
+    .activities-container {
+        width: 100%;
+
+        .activity-container {
+            position: relative;
+            width: 100%;
+
+            .activity-remove {
+                position: absolute;
+                right: 0;
+                top: 5px;
+                z-index: 2;
+            }
+        }
+    }
+}

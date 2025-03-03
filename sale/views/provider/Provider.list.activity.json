@@ -1,0 +1,17 @@
+{
+    "name": "Providers",
+    "description": "This view is intended for displaying basic listing of existing Providers.",
+    "domain": ["relationship", "=", "provider"],
+    "access": {
+        "groups": ["sale.default.user", "booking.default.user"]
+     },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "100%"
+            }
+        ]
+    }
+}

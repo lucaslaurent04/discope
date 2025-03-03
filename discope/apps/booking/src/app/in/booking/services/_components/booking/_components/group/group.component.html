@@ -1,5 +1,5 @@
 <!-- template vars -->
-<div #vGroup="var" [var]="{identification: {folded: true}, products: {folded: true}, accomodations: {folded: false}, meals: {folded: true}}"></div>
+<div #vGroup="var" [var]="{identification: {folded: displaySettings.identification_folded}, products: {folded: displaySettings.products_folded}, activities: {folded: displaySettings.activities_folded}, accomodations: {folded: displaySettings.accomodations_folded}, meals: {folded: displaySettings.meals_folded}}"></div>
 
 <div [class.hidden]="!ready">
 
@@ -118,11 +118,11 @@
 
             <div class="part-toggle">
                 <button mat-icon-button *ngIf="!vGroup.identification.folded"
-                    (click)="vGroup.identification.folded = !vGroup.identification.folded">
+                    (click)="vGroup.identification.folded = !vGroup.identification.folded; sectionFold('identification')">
                     <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
                 </button>
                 <button mat-icon-button *ngIf="vGroup.identification.folded"
-                    (click)="vGroup.identification.folded = !vGroup.identification.folded">
+                    (click)="vGroup.identification.folded = !vGroup.identification.folded; sectionUnfold('identification')">
                     <mat-icon style="font-size: 15px;">keyboard_arrow_right</mat-icon>
                 </button>
             </div>
@@ -404,10 +404,10 @@
         <!-- products -->
         <div class="part">
             <div class="part-toggle">
-                <button mat-icon-button *ngIf="!vGroup.products.folded" (click)="vGroup.products.folded = true">
+                <button mat-icon-button *ngIf="!vGroup.products.folded" (click)="vGroup.products.folded = true; sectionFold('products')">
                     <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
                 </button>
-                <button mat-icon-button *ngIf="vGroup.products.folded" (click)="vGroup.products.folded = false">
+                <button mat-icon-button *ngIf="vGroup.products.folded" (click)="vGroup.products.folded = false; sectionUnfold('products')">
                     <mat-icon style="font-size: 15px;">keyboard_arrow_right</mat-icon>
                 </button>
             </div>
@@ -540,6 +540,7 @@
                                     [model]="line"
                                     [group]="instance"
                                     [booking]="booking"
+                                    [time_slots]="timeSlots"
                                     (updated)="onupdateLine()"
                                 ></booking-services-booking-group-line>
                             </div>
@@ -551,15 +552,72 @@
 
         </div>
 
+        <!-- activities -->
+        <div class="part">
+            <div class="part-toggle">
+                <button mat-icon-button *ngIf="!vGroup.activities.folded" (click)="vGroup.activities.folded = true; sectionFold('activities')">
+                    <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
+                </button>
+                <button mat-icon-button *ngIf="vGroup.activities.folded" (click)="vGroup.activities.folded = false; sectionUnfold('activities')">
+                    <mat-icon style="font-size: 15px;">keyboard_arrow_right</mat-icon>
+                </button>
+            </div>
+
+            <div class="part-container">
+                <div class="row">
+                    <div class="row-activities-title">
+                        <span>Activités ({{instance.booking_activities_ids.length}})</span>
+                    </div>
+                </div>
+                <div class="row" [class.hidden]="vGroup.activities.folded">
+                    <div style="width: 100%;">
+                        <div class="activities-header">
+                            <div style="display: flex; width: 100%; margin-bottom: 6px; padding-left: 1px;">
+                                <div class="day-date-cells-wrapper">
+                                    <div class="activity-cell">Jour</div>
+                                    <div class="activity-cell">Date</div>
+                                </div>
+                                <div class="activity-cell moment-cell">Moment</div>
+                                <div class="activity-wrapper">
+                                    <div class="activity-cell">SKU</div>
+                                    <div class="activity-cell">QTÉ</div>
+                                    <div class="activity-cell">P.U.</div>
+                                    <div class="activity-cell">TVA</div>
+                                    <div class="activity-cell">PRIX</div>
+                                    <!-- actions -->
+                                    <div class="activity-cell"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="activities-list">
+                            <!-- activities -->
+                            <div class="activity-item" *ngFor="let bookingActivityDay of bookingActivitiesDays">
+                                <booking-services-booking-group-day-activities
+                                    [bookingActivityDay]="bookingActivityDay"
+                                    [booking]="booking"
+                                    [group]="instance"
+                                    [timeSlots]="timeSlots"
+                                    [openedActivityIds]="openedActivityIds"
+                                    (updated)="onupdateActivity()"
+                                    (deleteLine)="ondeleteLine($event)"
+                                    (closeActivity)="onCloseActivity($event)"
+                                    (openActivity)="onOpenActivity($event)"
+                                ></booking-services-booking-group-day-activities>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- accommodations -->
         <div class="part">
 
             <div class="part-toggle" style="padding-top: 20px;">
-                <button mat-icon-button *ngIf="!vGroup.accomodations.folded" (click)="vGroup.accomodations.folded = !vGroup.accomodations.folded">
+                <button mat-icon-button *ngIf="!vGroup.accomodations.folded" (click)="vGroup.accomodations.folded = !vGroup.accomodations.folded; sectionFold('accomodations')">
                     <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
                 </button>
-                <button mat-icon-button *ngIf="vGroup.accomodations.folded" (click)="vGroup.accomodations.folded = !vGroup.accomodations.folded">
+                <button mat-icon-button *ngIf="vGroup.accomodations.folded" (click)="vGroup.accomodations.folded = !vGroup.accomodations.folded; sectionUnfold('accomodations')">
                     <mat-icon style="font-size: 15px;">keyboard_arrow_right</mat-icon>
                 </button>
             </div>
@@ -603,10 +661,10 @@
         <div class="part" *ngIf="(instance?.is_sojourn && instance?.sojourn_type_id == 1) || instance.group_type == 'event'">
 
             <div class="part-toggle" style="padding-top: 12px;">
-                <button mat-icon-button *ngIf="!vGroup.meals.folded" (click)="vGroup.meals.folded = true">
+                <button mat-icon-button *ngIf="!vGroup.meals.folded" (click)="vGroup.meals.folded = true; sectionFold('meals')">
                     <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
                 </button>
-                <button mat-icon-button *ngIf="vGroup.meals.folded" (click)="vGroup.meals.folded = false">
+                <button mat-icon-button *ngIf="vGroup.meals.folded" (click)="vGroup.meals.folded = false; sectionUnfold('meals')">
                     <mat-icon style="font-size: 15px;">keyboard_arrow_right</mat-icon>
                 </button>
             </div>

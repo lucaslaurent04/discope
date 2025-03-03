@@ -42,6 +42,7 @@
 
             .inner-wrapper {
                 border: solid 1px lightgrey;
+                border-radius: 10px;
                 margin-bottom: 12px;
 
                 .groups-list {
@@ -52,11 +53,12 @@
                         margin: 6px 12px;
                         padding-bottom: 6px;
                         background-color: rgba(0, 0, 0, 0.04);
+                        border-radius: 10px;
                         max-height: 46px;
                         overflow: hidden;
 
                         &.group-selected {
-                            max-height: 2000px;
+                            max-height: 4000px;
                             transition: max-height .5s ease-in;
                         }
 

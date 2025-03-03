@@ -125,7 +125,7 @@ if($params['free_rental_units']) {
     // remove consumptions if requested (link & part)
     Consumption::search(['booking_id', '=', $params['id']])->delete(true);
 
-    $channelmanager_enabled = Setting::get_value('sale', 'channelmanager', 'enabled', false);
+    $channelmanager_enabled = Setting::get_value('sale', 'booking', 'channelmanager.enabled', false);
     if($channelmanager_enabled) {
         $booking = Booking::id($params['id'])
             ->read(['date_from', 'date_to', 'consumptions_ids' => ['is_accomodation', 'rental_unit_id']])

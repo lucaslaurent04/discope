@@ -16,7 +16,7 @@ class Consumption extends Model {
     }
 
     public static function getDescription() {
-        return "A Consumption is a service delivery that can be scheduled, relates to a booking, and is independant from the fare rate and the invoicing.";
+        return "A Consumption is a service delivery that can be scheduled, relates to a booking, and is independent from the fare rate and the invoicing.";
     }
 
     public static function getColumns() {
@@ -57,6 +57,7 @@ class Consumption extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'many2one',
                 'relation'          => ['booking_id' => ['customer_id']],
+                'store'             => true,
                 'foreign_object'    => 'sale\customer\Customer',
                 'description'       => "The customer whom the consumption relates to (computed).",
             ],
@@ -89,7 +90,7 @@ class Consumption extends Model {
             'time_slot_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\TimeSlot',
-                'description'       => 'Indicator of the moment of the day when the consumption occurs (from schedule).',
+                'description'       => 'Indicator of the moment of the day when the consumption occurs (from schedule).'
             ],
 
             'date' => [
@@ -157,7 +158,7 @@ class Consumption extends Model {
 
             'disclaimed' => [
                 'type'              => 'boolean',
-                'description'       => 'Delivery is planed by the customer has explicitely renounced to it.',
+                'description'       => 'Delivery is planed by the customer has explicitly renounced to it.',
                 'default'           => false
             ],
 
@@ -201,6 +202,34 @@ class Consumption extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\AgeRange',
                 'description'       => 'Customers age range the product is intended for.'
+            ],
+
+            'is_activity' => [
+                'type'              => 'boolean',
+                'description'       => 'Does the consumption relate to an activity?',
+                'help'              => 'Need to be linked to an activity provider.',
+                'default'           => false
+            ],
+
+            'has_provider' => [
+                'type'              => 'boolean',
+                'description'       => "Indicates whether the consumption requires a specific provider.",
+                'default'           => false,
+                'visible'           => ['is_activity', '=', true]
+            ],
+
+            'activity_provider_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\provider\Provider',
+                'description'       => "The activity provider the consumption is assigned to.",
+                'visible'           => [ ['is_activity', '=', true], ['has_provider', '=', true] ]
+            ],
+
+            'has_staff_required' => [
+                'type'              => 'boolean',
+                'description'       => "Indicates whether the activity requires dedicated staff to be assigned.",
+                'default'           => false,
+                'visible'           => ['is_activity', '=', true]
             ]
 
         ];
@@ -306,7 +335,7 @@ class Consumption extends Model {
                 }
             }
         }
-        $om->callonce(self::getType(), '_updateTimeSlotId', $oids, $values, $lang);
+        $om->callonce(self::getType(), 'updateTimeSlotId', $oids, $values, $lang);
     }
 
     /**
@@ -335,15 +364,22 @@ class Consumption extends Model {
                 }
             }
         }
-        $om->callonce(self::getType(), '_updateTimeSlotId', $oids, $values, $lang);
+        $om->callonce(self::getType(), 'updateTimeSlotId', $oids, $values, $lang);
     }
 
-    public static function _updateTimeSlotId($om, $oids, $values, $lang) {
-        $consumptions = $om->read(self::getType(), $oids, ['schedule_from', 'schedule_to', 'is_meal']);
+    /**
+     * #todo - make this method private (cannot while called through callonce)
+     */
+    public static function updateTimeSlotId($om, $oids, $values, $lang) {
+        $consumptions = $om->read(self::getType(), $oids, ['schedule_from', 'schedule_to', 'is_meal', 'time_slot_id']);
         if($consumptions > 0) {
             $moments_ids = $om->search('sale\booking\TimeSlot', [], ['order' => 'asc']);
             $moments = $om->read('sale\booking\TimeSlot', $moments_ids, ['schedule_from', 'schedule_to', 'is_meal']);
             foreach($consumptions as $cid => $consumption) {
+                if(isset($consumption['time_slot_id'])) {
+                    // Ignore update of schedule_from and schedule_to if already set, because it could've been already set from origin booking_line_group.
+                    continue;
+                }
                 // retrieve timeslot according to schedule_from
                 $moment_id = 1;
                 foreach($moments as $mid => $moment) {
@@ -357,6 +393,31 @@ class Consumption extends Model {
                 $om->update(self::getType(), $cid, ['time_slot_id' => $moment_id]);
             }
         }
+    }
+
+
+    /**
+     * #memo - this method is not used, but left as example
+     */
+    public static function calcTimeSlotId($self) {
+        $result = [];
+        $self->read(['schedule_from', 'schedule_to', 'is_meal']);
+
+        $moments = TimeSlot::search([], ['order' => 'asc'])->read(['schedule_from', 'schedule_to', 'is_meal'])->get();
+
+        foreach($self as $id => $consumption) {
+            $result[$id] = 1;
+            foreach($moments as $mid => $moment) {
+                if($consumption['schedule_from'] >= $moment['schedule_from'] && $consumption['schedule_to'] <= $moment['schedule_to']) {
+                    $result[$id] = $mid;
+                    if($moment['is_meal'] && $consumption['is_meal']) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**

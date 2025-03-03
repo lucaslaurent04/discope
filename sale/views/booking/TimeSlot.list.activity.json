@@ -1,0 +1,28 @@
+{
+    "name": "Time slots",
+    "description": "List of time slots.",
+    "access": {
+        "groups": ["booking.default.user"]
+     },
+    "order": "order",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "is_meal",
+                "width": "25%"
+            },
+            {
+                "type": "field",
+                "value": "order",
+                "width": "0%",
+                "visible": false
+            }
+        ]
+    }
+}

@@ -257,8 +257,8 @@ $tests = [
 
 
             return (
-                $booking['price'] == round($total_price_blg,2) &&
-                $booking['price'] == round($total_price_bl,2)
+                $booking['price'] == round($total_price_blg, 2) &&
+                $booking['price'] == round($total_price_bl, 2)
             );
         },
         'rollback'          =>  function () {
@@ -271,8 +271,9 @@ $tests = [
         'description'       =>  'Create a booking for the pack, including an overnight stay of type logement.',
         'help'              =>  "
             Creates a booking with configuration below and test the consistency between booking price, sum of groups prices and sum of the lines. \n \n
+            A total of 6 nights x 52 pers is accounted for city tax. \n \n
             Dates from: 02-08-2023
-            Dates to: 08-08-2023 (3 nights)
+            Dates to: 08-08-2023 (6 nights)
             Persons: 52",
         'arrange'           =>  function () {
 
@@ -337,7 +338,7 @@ $tests = [
             $orm->enableEvents();
 
             $booking = Booking::id($booking['id'])
-                ->read(['id', 'price',
+                ->read(['id', 'price', 'product_id',
                     'booking_lines_ids' => ['id', 'price'],
                     'booking_lines_groups_ids' => ['id', 'price']
                 ])->first(true);
@@ -347,17 +348,16 @@ $tests = [
         'assert'            =>  function ($booking) {
 
             $total_price_bl = array_reduce($booking['booking_lines_ids'], function($sum, $line) {
-                return $sum + $line['price'];
+                return round($sum + $line['price'], 2);
             }, 0);
 
 
             $total_price_blg = array_reduce($booking['booking_lines_groups_ids'], function($sum, $group) {
-                return $sum + $group['price'];
+                return round($sum + $group['price'], 2);
             }, 0);
 
-
             return (
-                $booking['price'] == 1054.1  &&
+                $booking['price'] == 1412.9  &&
                 $booking['price'] == $total_price_blg &&
                 $booking['price'] == $total_price_bl
             );
