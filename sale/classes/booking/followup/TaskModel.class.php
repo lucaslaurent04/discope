@@ -21,7 +21,6 @@ class TaskModel extends DiscopeTaskModel {
             'entity' => [
                 'type'              => 'string',
                 'description'       => "Namespace of the concerned entity.",
-                'required'          => true,
                 'default'           => 'sale\booking\Booking'
             ],
 
@@ -53,6 +52,21 @@ class TaskModel extends DiscopeTaskModel {
                 'rel_local_key'     => 'task_models_id',
                 'description'       => "Center offices associated with the task model.",
                 'help'              => "When a booking is created for a center office, follow up tasks are generated depending on its associated models."
+            ]
+
+        ];
+    }
+
+    public static function getConstraints(): array {
+        return [
+
+            'entity' =>  [
+                'not_allowed' => [
+                    'message'       => 'Entity must be "sale\booking\Booking".',
+                    'function'      => function ($entity, $values) {
+                        return $entity === 'sale\booking\Booking';
+                    }
+                ]
             ]
 
         ];

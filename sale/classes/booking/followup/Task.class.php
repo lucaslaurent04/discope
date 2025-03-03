@@ -27,7 +27,6 @@ class Task extends DiscopeTask {
             'entity' => [
                 'type'              => 'string',
                 'description'       => "Namespace of the concerned entity.",
-                'required'          => true,
                 'default'           => 'sale\booking\followup\Task'
             ],
 
@@ -59,5 +58,20 @@ class Task extends DiscopeTask {
         }
 
         return $result;
+    }
+
+    public static function getConstraints(): array {
+        return [
+
+            'entity' =>  [
+                'not_allowed' => [
+                    'message'       => 'Entity must be "sale\booking\Booking".',
+                    'function'      => function ($entity, $values) {
+                        return $entity === 'sale\booking\Booking';
+                    }
+                ]
+            ]
+
+        ];
     }
 }
