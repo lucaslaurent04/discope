@@ -31,30 +31,32 @@ class Task extends DiscopeTask {
             ],
 
             'entity_id' => [
-                'type'              => 'integer',
+                'type'              => 'computed',
+                'result_type'       => 'integer',
                 'description'       => "Id of the associated entity. In this case it is the booking id.",
-                'required'          => true,
-                'dependencies'      => ['booking_id']
+                'store'             => true,
+                'instant'           => true,
+                'function'          => 'calcEntityId',
+                'readonly'          => true
             ],
 
             'booking_id' => [
-                'type'              => 'computed',
-                'result_type'       => 'many2one',
+                'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
                 'description'       => "Booking the task relates to.",
-                'store'             => true,
-                'instant'           => true,
-                'function'          => 'calcBookingId'
+                'readonly'          => true
             ]
 
         ];
     }
 
-    public static function calcBookingId($self): array {
+    public static function calcEntityId($self): array {
         $result = [];
-        $self->read(['entity_id']);
+        $self->read(['booking_id']);
         foreach($self as $id => $task) {
-            $result[$id] = $task['entity_id'];
+            if(isset($task['booking_id'])) {
+                $result[$id] = $task['booking_id'];
+            }
         }
 
         return $result;
