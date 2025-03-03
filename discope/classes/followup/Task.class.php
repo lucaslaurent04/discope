@@ -51,7 +51,7 @@ class Task extends Model {
             'visible_date' => [
                 'type'              => 'date',
                 'description'       => "Date on which the task must be visible.",
-                'help'              => "Always visible if the date is not set."
+                'default'           => function() { return strtotime('Today'); }
             ],
 
             'deadline_date' => [
