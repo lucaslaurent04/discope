@@ -19,7 +19,7 @@ import { BookingAgeRangeAssignment } from '../../_models/booking_agerange_assign
 import { MatAutocomplete } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
 import { BookingActivityDay } from './_components/day-activities/day-activities.component';
-import { BookedServicesDisplaySettings, BookedServicesDisplaySettingsKey } from '../../../../services.component';
+import { BookedServicesDisplaySettings } from '../../../../services.component';
 
 
 // declaration of the interface for the map associating relational Model fields with their components
@@ -397,7 +397,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
             map_bookings_booked_services_settings[this.booking.id] = JSON.parse(JSON.stringify(this.displaySettings));
         }
 
-        map_bookings_booked_services_settings[this.booking.id][(`${key}_folded`) as BookedServicesDisplaySettingsKey] = folded;
+        map_bookings_booked_services_settings[this.booking.id][`${key}_folded` as keyof BookedServicesDisplaySettings] = folded;
 
         localStorage.setItem('map_bookings_booked_services_settings', JSON.stringify(map_bookings_booked_services_settings));
     }
