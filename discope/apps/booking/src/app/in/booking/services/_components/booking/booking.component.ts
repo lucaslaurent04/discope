@@ -12,6 +12,7 @@ import { BookingLineGroup } from './_models/booking_line_group.model';
 import { BookingActivity } from './_models/booking_activity.model';
 import { BookingLine } from './_models/booking_line.model';
 import { BookingActivityDay } from './_components/group/_components/day-activities/day-activities.component';
+import { BookedServicesDisplaySettings } from '../../services.component';
 
 // declaration of the interface for the map associating relational Model fields with their components
 interface BookingComponentsMap {
@@ -49,6 +50,7 @@ export class BookingServicesBookingComponent
 
     @ViewChildren(BookingServicesBookingGroupComponent) bookingServicesBookingGroups: QueryList<BookingServicesBookingGroupComponent>;
     @Input() booking_id: number;
+    @Input() display_settings: BookedServicesDisplaySettings;
 
     public ready: boolean = false;
     public loading: boolean = true;
