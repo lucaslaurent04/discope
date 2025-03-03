@@ -15,7 +15,7 @@ class Booking {
     ) {}
 }
 
-export type BookedServicesDisplaySettingsKey = 'identification_folded'|'products_folded'|'activities_folded'|'accomodations_folded'|'meals_folded';
+export type BookedServicesDisplaySettingsKey = 'store_folded_settings'|'identification_folded'|'products_folded'|'activities_folded'|'accomodations_folded'|'meals_folded';
 
 export interface BookedServicesDisplaySettings {
     store_folded_settings: boolean;
