@@ -1,9 +1,7 @@
-import { Component, OnInit, AfterViewInit, Inject, ElementRef, QueryList, ViewChild, ViewChildren, NgZone, Renderer2  } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, Renderer2  } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { BookingApiService } from 'src/app/in/booking/_services/booking.api.service';
-import { AuthService, ContextService, EqualUIService } from 'sb-shared-lib';
-import { MatSnackBar } from '@angular/material/snack-bar';
-
+import { ContextService, EqualUIService } from 'sb-shared-lib';
 
 class Booking {
     constructor(
@@ -15,8 +13,6 @@ class Booking {
     ) {}
 }
 
-export type BookedServicesDisplaySettingsKey = 'store_folded_settings'|'identification_folded'|'products_folded'|'activities_folded'|'accomodations_folded'|'meals_folded';
-
 export interface BookedServicesDisplaySettings {
     store_folded_settings: boolean;
     identification_folded: boolean;
@@ -25,7 +21,6 @@ export interface BookedServicesDisplaySettings {
     accomodations_folded: boolean;
     meals_folded: boolean;
 }
-
 
 @Component({
     selector: 'booking-services',
@@ -64,18 +59,12 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
     }
 
     constructor(
-        private auth: AuthService,
         private api: BookingApiService,
-        private router: Router,
         private route: ActivatedRoute,
-        private snack: MatSnackBar,
-        private zone: NgZone,
         private context:ContextService,
         private eq:EqualUIService,
         private renderer: Renderer2
     ) {}
-
-
 
     /**
      * Set up callbacks when component DOM is ready.
@@ -190,8 +179,8 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
         }
 
         const booked_services_settings = map_bookings_booked_services_settings[this.booking_id];
-        for(let key of Object.keys(this.display_settings) as BookedServicesDisplaySettingsKey[]) {
-            this.display_settings[key] = booked_services_settings[key];
+        for(let key of Object.keys(this.display_settings)) {
+            this.display_settings[key as keyof BookedServicesDisplaySettings] = booked_services_settings[key as keyof BookedServicesDisplaySettings];
         }
     }
 }
