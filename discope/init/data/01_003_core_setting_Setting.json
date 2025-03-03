@@ -302,23 +302,6 @@
                 "object_class": null,
                 "is_multilang": false,
                 "form_control": "input"
-            },
-            {
-                "id": 152,
-                "state": "instance",
-                "name": "lodging.locale.i18n.activity",
-                "code": "i18n.activity",
-                "package": "lodging",
-                "section_id": 1,
-                "title": "activity",
-                "description": null,
-                "help": null,
-                "type": "string",
-                "form_control": "input",
-                "section": "locale",
-                "is_multilang": 1,
-                "is_sequence": 0,
-                "object_class": null
             }
         ]
     }
