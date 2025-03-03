@@ -5,8 +5,12 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\booking;
+
+use equal\orm\Collection;
 use equal\orm\Model;
+use sale\catalog\Product;
 
 class BookingLine extends Model {
 
@@ -69,7 +73,7 @@ class BookingLine extends Model {
 
             'price_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \sale\price\Price::getType(),
+                'foreign_object'    => 'sale\price\Price',
                 'description'       => 'The price the line relates to (retrieved by price list).',
                 'onupdate'          => 'onupdatePriceId'
             ],
@@ -140,6 +144,7 @@ class BookingLine extends Model {
                 'default'           => 1
             ],
 
+            // #todo #deprecate - it seems this is no longer used
             'payment_mode' => [
                 'type'              => 'string',
                 'selection'         => [
@@ -285,6 +290,78 @@ class BookingLine extends Model {
                 'default'           => false
             ],
 
+            'is_activity' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => 'Does the line relate to an activity product?',
+                'store'             => true,
+                'function'          => 'calcIsActivity'
+            ],
+
+            'is_transport' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => 'Does the line relate to a transport product?',
+                'store'             => true,
+                'function'          => 'calcIsTransport'
+            ],
+
+            'is_supply' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => 'Does the line relate to a supply product?',
+                'store'             => true,
+                'function'          => 'calcIsSupply'
+            ],
+
+            'is_fullday' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => 'Does the line relate to a fullday activity product?',
+                'store'             => true,
+                'function'          => 'calcIsFullday'
+            ],
+
+            'booking_activity_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\booking\BookingActivity',
+                'description'       => 'Booking Activity this line relates to.',
+                'help'              => 'If the line refers to a transport/supply, it means that the transport/supply is needed for a specific activity.'
+            ],
+
+            'service_date' => [
+                'type'              => 'computed',
+                'result_type'       => 'date',
+                'description'       => 'Specific date on which the service is delivered.',
+                'help'              => 'Only needed when the ProductModel is schedulable and not repeatable.',
+                'store'             => true,
+                'function'          => 'calcServiceDate',
+                'onupdate'          => 'onupdateServiceDate'
+            ],
+
+            'time_slot_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\booking\TimeSlot',
+                'description'       => 'Specific day time slot on which the service is delivered.',
+                'store'             => true,
+                'function'          => 'calcTimeSlotId',
+                'onupdate'          => 'onupdateTimeSlotId'
+            ],
+
+            'meal_location' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'selection'         => [
+                    'inside',
+                    'outside',
+                    'takeaway'
+                ],
+                'store'             => true,
+                'relation'          => ['product_id' => ['product_model_id' => ['meal_location']]],
+                'visible'           => ['is_meal', '=', true]
+            ]
+
         ];
     }
 
@@ -324,13 +401,12 @@ class BookingLine extends Model {
      * Check whether an object can be updated, and perform some additional operations if necessary.
      * This method can be overridden to define a more precise set of tests.
      *
-     * @param  object   $om         ObjectManager instance.
-     * @param  array    $oids       List of objects identifiers.
-     * @param  array    $values     Associative array holding the new values to be assigned.
-     * @param  string   $lang       Language in which multilang fields are being updated.
-     * @return array    Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be updated.
+     * @param  Collection       $self       Collection instance.
+     * @param  array            $values     Associative array holding the new values to be assigned.
+     * @param  string           $lang       Language in which multilang fields are being updated.
+     * @return array            Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be updated.
      */
-    public static function canupdate($om, $oids, $values, $lang='en') {
+    public static function canupdate($self, $values, $lang = 'en') {
 
         // handle exceptions for fields that can always be updated
         $allowed = ['is_contractual', 'is_invoiced'];
@@ -343,20 +419,122 @@ class BookingLine extends Model {
         }
 
         if($count_non_allowed > 0) {
-            $lines = $om->read(self::getType(), $oids, ['booking_id.status', 'booking_line_group_id.is_extra', 'booking_line_group_id.has_schedulable_services', 'booking_line_group_id.has_consumptions'], $lang);
-            if($lines > 0) {
-                foreach($lines as $line) {
-                    if($line['booking_id.status'] != 'quote' && !$line['booking_line_group_id.is_extra']) {
-                        return ['booking_id' => ['non_editable' => 'Services cannot be updated for non-quote bookings.']];
+            $self->read([
+                'booking_id'            => ['status'],
+                'booking_line_group_id' => ['is_extra', 'has_schedulable_services', 'has_consumptions'],
+            ]);
+
+            foreach($self as $line) {
+                if($line['booking_id']['status'] != 'quote' && !$line['booking_line_group_id']['is_extra']) {
+                    return ['booking_id' => ['non_editable' => 'Services cannot be updated for non-quote bookings.']];
+                }
+                if($line['booking_line_group_id']['is_extra'] && $line['booking_line_group_id']['has_schedulable_services'] && $line['booking_line_group_id']['has_consumptions']) {
+                    return ['booking_id' => ['non_editable' => 'Lines from extra services cannot be changed once consumptions have been created.']];
+                }
+            }
+        }
+
+        // checks that a fullday activity can only be on AM or PM time slots
+        if(isset($values['product_id'])) {
+            $product = Product::id($values['product_id'])
+                ->read(['product_model_id' => ['is_activity', 'is_fullday', 'has_duration', 'duration']])
+                ->first();
+
+            if($product['product_model_id']['is_activity']) {
+                $AM_PM_time_slot_ids = TimeSlot::search(['code', 'in', ['AM', 'PM']])->ids();
+
+                $self->read([
+                    'service_date',
+                    'time_slot_id',
+                    'booking_line_group_id' => ['id', 'date_from', 'date_to']
+                ]);
+
+                if($product['product_model_id']['is_fullday']) {
+                    foreach($self as $line) {
+                        if(!in_array($line['time_slot_id'], $AM_PM_time_slot_ids)) {
+                            return ['time_slot_id' => ['not_allowed' => 'A full day activity can only happen on AM or PM time slots.']];
+                        }
                     }
-                    if($line['booking_line_group_id.is_extra'] && $line['booking_line_group_id.has_schedulable_services'] && $line['booking_line_group_id.has_consumptions']) {
-                        return ['booking_id' => ['non_editable' => 'Lines from extra services cannot be changed once consumptions have been created.']];
+                }
+
+                foreach($self as $line) {
+                    $activities_to_check = self::generateLineActivities(
+                        $line['service_date'],
+                        $line['time_slot_id'],
+                        $product['product_model_id']['is_fullday'],
+                        $product['product_model_id']['has_duration'],
+                        $product['product_model_id']['duration']
+                    );
+
+                    foreach($activities_to_check as $activity_to_check) {
+                        if(
+                            $activity_to_check['activity_date'] < $line['booking_line_group_id']['date_from']
+                            || $activity_to_check['activity_date'] > $line['booking_line_group_id']['date_to']
+                        ) {
+                            return ['service_date' => ['outside_of_group_dates' => 'The activity has to be planned inside the group period.']];
+                        }
+
+                        $activity = BookingActivity::search([
+                            ['booking_line_group_id', '=',  $line['booking_line_group_id']['id']],
+                            ['activity_date', '=', $activity_to_check['activity_date']],
+                            ['time_slot_id', '=', $activity_to_check['time_slot_id']]
+                        ])
+                            ->read(['id'])
+                            ->first();
+
+                        if(!is_null($activity)) {
+                            return ['service_date' => ['already_used' => 'Moment conflict with another activity of the group.']];
+                        }
                     }
                 }
             }
         }
 
-        return parent::canupdate($om, $oids, $values, $lang);
+        // checks if moment does not conflict with another activity of the booking line group
+        if(isset($values['service_date']) || isset($values['time_slot_id'])) {
+            $self->read([
+                'id',
+                'is_activity',
+                'service_date',
+                'time_slot_id',
+                'is_fullday',
+                'booking_line_group_id' => ['id', 'date_from', 'date_to']
+            ]);
+
+            foreach($self as $line) {
+                if(!$line['is_activity']) {
+                    continue;
+                }
+
+                $booking_activities = BookingActivity::search(['activity_booking_line_id', '=', $line['id']], ['sort' => ['activity_date' => 'asc']])
+                    ->read(['activity_date', 'time_slot_id'])
+                    ->get(true);
+
+                $shift_days = ($values['service_date'] ?? $line['service_date']) - $booking_activities[0]['activity_date'];
+
+                foreach($booking_activities as $booking_activity) {
+                    $activity_date = $booking_activity['activity_date'] + $shift_days;
+                    if($activity_date < $line['booking_line_group_id']['date_from'] || $activity_date > $line['booking_line_group_id']['date_to']) {
+                        return ['service_date' => ['already_used' => 'Moment conflict with another activity of the group.']];
+                    }
+
+                    $existing_activity = BookingActivity::search([
+                        ['booking_line_group_id', '=', $line['booking_line_group_id']['id']],
+                        ['activity_date', '=', $activity_date],
+                        ['time_slot_id', '=', ($values['time_slot_id'] ?? $booking_activity['time_slot_id'])],
+                        ['activity_booking_line_id', '<>', $line['id']]
+                    ])
+                        ->read(['id'])
+                        ->first();
+
+                    if(!is_null($existing_activity)) {
+                        return ['service_date' => ['already_used' => 'Moment conflict with another activity of the group.']];
+                    }
+                }
+            }
+        }
+
+        return parent::canupdate($self, $values, $lang);
     }
 
     /**
@@ -401,9 +579,20 @@ class BookingLine extends Model {
             'product_id.product_model_id.has_duration',
             'product_id.product_model_id.duration',
             'product_id.product_model_id.is_repeatable',
+            'product_id.product_model_id.is_activity',
+            'product_id.product_model_id.is_fullday',
+            'product_id.product_model_id.has_duration',
+            'product_id.product_model_id.duration',
+            'product_id.product_model_id.has_transport_required',
+            'product_id.product_model_id.transport_product_model_id',
+            'product_id.product_model_id.has_supply',
+            'product_id.product_model_id.supplies_ids',
             'product_id.has_age_range',
             'product_id.age_range_id',
             'booking_id',
+            'booking_id.center_id',
+            'booking_id.date_from',
+            'booking_id.date_to',
             'booking_line_group_id',
             'booking_line_group_id.is_sojourn',
             'booking_line_group_id.is_event',
@@ -412,12 +601,15 @@ class BookingLine extends Model {
             'booking_line_group_id.has_pack',
             'booking_line_group_id.pack_id.has_age_range',
             'booking_line_group_id.age_range_assignments_ids',
+            'order',
             'qty',
             'has_own_qty',
             'is_rental_unit',
             'is_accomodation',
             'is_meal',
-            'qty_accounting_method'
+            'qty_accounting_method',
+            'service_date',
+            'time_slot_id'
         ], $lang);
 
         foreach($lines as $lid => $line) {
@@ -443,6 +635,93 @@ class BookingLine extends Model {
                             // update the parent group schedule
                             $om->update(BookingLineGroup::getType(), $line['booking_line_group_id'], ['time_from' => $schedule_from, 'time_to' => $schedule_to], $lang);
                         }
+                    }
+                }
+            }
+
+            if($line['product_id.product_model_id.is_activity']) {
+                $booking_activities = self::generateLineActivities(
+                    $line['service_date'],
+                    $line['time_slot_id'],
+                    $line['product_id.product_model_id.is_fullday'],
+                    $line['product_id.product_model_id.has_duration'],
+                    $line['product_id.product_model_id.duration']
+                );
+
+                $main_activity_id = null;
+                foreach($booking_activities as $index => $activity) {
+                    $activity = BookingActivity::create(array_merge($activity, ['activity_booking_line_id' => $lid]))
+                        ->read(['id'])
+                        ->first();
+
+                    if($index === 0) {
+                        $main_activity_id = $activity['id'];
+                    }
+                }
+
+                BookingLine::id($lid)->update(['booking_activity_id' => $main_activity_id]);
+
+                BookingActivity::id($main_activity_id)->do('update-counters');
+
+                $line_order = $line['order'];
+
+                // create transport related lines
+                if($line['product_id.product_model_id.has_transport_required'] && $line['product_id.product_model_id.transport_product_model_id']) {
+                    $res = \eQual::run('get', 'sale_catalog_product_collect', [
+                        'center_id' => $line['booking_id.center_id'],
+                        'domain'    => ['product_model_id', '=', $line['product_id.product_model_id.transport_product_model_id']],
+                        'date_from' => $line['booking_id.date_from'],
+                        'date_to'   => $line['booking_id.date_to']
+                    ]);
+
+                    if(!empty($res)) {
+                        $booking_line = self::create([
+                            'order'                 => ++$line_order,
+                            'booking_id'            => $line['booking_id'],
+                            'booking_line_group_id' => $line['booking_line_group_id'],
+                            'service_date'          => $line['service_date'],
+                            'time_slot_id'          => $line['time_slot_id'],
+                            'booking_activity_id'   => $main_activity_id
+                        ])
+                            ->read(['id'])
+                            ->first();
+
+                        \eQual::run('do', 'sale_booking_update-bookingline-product', [
+                            'id'            => $booking_line['id'],
+                            'product_id'    => $res[0]['id']
+                        ]);
+                    }
+                }
+
+                // create supplies related lines
+                if($line['product_id.product_model_id.has_supply']) {
+                    foreach($line['product_id.product_model_id.supplies_ids'] as $supply_product_model_id) {
+                        $res = \eQual::run('get', 'sale_catalog_product_collect', [
+                            'center_id' => $line['booking_id.center_id'],
+                            'domain'    => ['product_model_id', '=', $supply_product_model_id],
+                            'date_from' => $line['booking_id.date_from'],
+                            'date_to'   => $line['booking_id.date_to']
+                        ]);
+
+                        if(empty($res)) {
+                            continue;
+                        }
+
+                        $booking_line = self::create([
+                            'order'                 => ++$line_order,
+                            'booking_id'            => $line['booking_id'],
+                            'booking_line_group_id' => $line['booking_line_group_id'],
+                            'service_date'          => $line['service_date'],
+                            'time_slot_id'          => $line['time_slot_id'],
+                            'booking_activity_id'   => $main_activity_id
+                        ])
+                            ->read(['id'])
+                            ->first();
+
+                        \eQual::run('do', 'sale_booking_update-bookingline-product', [
+                            'id'            => $booking_line['id'],
+                            'product_id'    => $res[0]['id']
+                        ]);
                     }
                 }
             }
@@ -481,7 +760,7 @@ class BookingLine extends Model {
                     }
                 }
                 // retrieve quantity to consider
-                $qty = self::_computeLineQty(
+                $qty = self::computeLineQty(
                     $line['qty_accounting_method'],
                     $nb_repeat,
                     $nb_pers,
@@ -568,6 +847,55 @@ class BookingLine extends Model {
 
     }
 
+    private static function generateLineActivities(int $service_date, int $time_slot_id, bool $is_fullday, bool $has_duration, int $duration): array {
+        $booking_activities = [
+            [
+                'activity_date' => $service_date,
+                'time_slot_id'  => $time_slot_id,
+                'is_virtual'    => false
+            ]
+        ];
+
+        $map_codes_time_slot_ids = [];
+        if($is_fullday) {
+            $time_slots = TimeSlot::search(['code', 'in', ['AM', 'PM']])
+                ->read(['id', 'code'])
+                ->get();
+
+            foreach($time_slots as $slot) {
+                $map_codes_time_slot_ids[$slot['code']] = $slot['id'];
+            }
+
+            $booking_activities[] = [
+                'activity_date' => $service_date,
+                'time_slot_id'  => $map_codes_time_slot_ids['AM'] === $time_slot_id ? $map_codes_time_slot_ids['PM'] : $map_codes_time_slot_ids['AM'],
+                'is_virtual'    => true
+            ];
+        }
+
+        if($has_duration) {
+            $remaining_days_qty = $duration - 1;
+
+            for($i = 1; $i <= $remaining_days_qty; $i++) {
+                $booking_activities[] = [
+                    'activity_date' => $service_date + $i * 86400,
+                    'time_slot_id'  => $time_slot_id,
+                    'is_virtual'    => true
+                ];
+
+                if($is_fullday) {
+                    $booking_activities[] = [
+                        'activity_date' => $service_date + $i * 86400,
+                        'time_slot_id'  => $map_codes_time_slot_ids['AM'] === $time_slot_id ? $map_codes_time_slot_ids['PM'] : $map_codes_time_slot_ids['AM'],
+                        'is_virtual'    => true
+                    ];
+                }
+            }
+        }
+
+        return $booking_activities;
+    }
+
     /**
      * Update the quantity of products.
      *
@@ -643,7 +971,7 @@ class BookingLine extends Model {
                         }
                     }
                     // retrieve quantity to consider
-                    $qty = self::_computeLineQty(
+                    $qty = self::computeLineQty(
                         $line['qty_accounting_method'],
                         $nb_repeat,
                         $nb_pers,
@@ -703,7 +1031,7 @@ class BookingLine extends Model {
     public static function _resetPrices($om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLine:_resetPrices", QN_REPORT_DEBUG);
 
-        $lines = $om->read(self::getType(), $oids, ['price_id', 'has_manual_unit_price', 'has_manual_vat_rate', 'booking_line_group_id'], $lang);
+        $lines = $om->read(self::getType(), $oids, ['price_id', 'has_manual_unit_price', 'has_manual_vat_rate', 'booking_line_group_id', 'booking_activity_id'], $lang);
 
         if($lines > 0) {
             $new_values = ['vat_rate' => null, 'unit_price' => null, 'total' => null, 'price' => null, 'fare_benefit' => null, 'discount' => null, 'free_qty' => null];
@@ -734,6 +1062,9 @@ class BookingLine extends Model {
             // update parent objects
             $booking_line_groups_ids = array_map(function ($a) { return $a['booking_line_group_id']; }, array_values($lines));
             $om->callonce(\sale\booking\BookingLineGroup::getType(), '_resetPrices', $booking_line_groups_ids, [], $lang);
+
+            $booking_activities_ids = array_map(function ($a) { return $a['booking_activity_id']; }, array_values($lines));
+            BookingActivity::ids($booking_activities_ids)->do('reset-prices');
         }
     }
 
@@ -777,6 +1108,7 @@ class BookingLine extends Model {
         $result = [];
         $lines = $om->read(self::getType(), $ids, [
             'booking_line_group_id.date_from',
+            'booking_line_group_id.rate_class_id',
             'booking_id.center_id.price_list_category_id',
         ]);
 
@@ -797,8 +1129,27 @@ class BookingLine extends Model {
 
             if($price_lists_ids > 0 && count($price_lists_ids)) {
                 foreach($price_lists_ids as $price_list_id) {
-                    $prices_ids = $om->search(\sale\price\Price::getType(), [ ['price_list_id', '=', $price_list_id], ['product_id', '=', $product_id] ]);
-                    if($prices_ids > 0 && count($prices_ids)) {
+
+                    $prices_ids = $om->search(\sale\price\Price::getType(), [
+                        ['price_list_id', '=', $price_list_id],
+                        ['product_id', '=', $product_id],
+                        [ 'has_rate_class' , '=', true],
+                        ['rate_class_id', '=', $line['booking_line_group_id.rate_class_id']],
+                    ]);
+
+                    if (!empty($prices_ids)) {
+                        $result[$line_id] = reset($prices_ids);
+                        file_put_contents('/var/www/html/log/error.log', " searchPriceId In the if  rate_class_id" . PHP_EOL, FILE_APPEND);
+                        break;
+                    }
+
+                    $prices_ids = $om->search(\sale\price\Price::getType(), [
+                        ['price_list_id', '=', $price_list_id],
+                        ['product_id', '=', $product_id],
+                    ]);
+
+                    if (!empty($prices_ids)) {
+                        file_put_contents('/var/www/html/log/error.log', " searchPriceId Not  rate_class_id" . PHP_EOL, FILE_APPEND);
                         $result[$line_id] = reset($prices_ids);
                         break;
                     }
@@ -820,6 +1171,7 @@ class BookingLine extends Model {
         $result = [];
         $lines = $om->read(self::getType(), $ids, [
             'booking_line_group_id.date_from',
+            'booking_line_group_id.rate_class_id',
             'booking_id.center_id.price_list_category_id',
         ]);
 
@@ -840,8 +1192,24 @@ class BookingLine extends Model {
 
             if($price_lists_ids > 0 && count($price_lists_ids)) {
                 foreach($price_lists_ids as $price_list_id) {
-                    $prices_ids = $om->search(\sale\price\Price::getType(), [ ['price_list_id', '=', $price_list_id], ['product_id', '=', $product_id] ]);
-                    if($prices_ids > 0 && count($prices_ids)) {
+                    $prices_ids = $om->search(\sale\price\Price::getType(), [
+                        ['price_list_id', '=', $price_list_id],
+                        ['product_id', '=', $product_id],
+                        [ 'has_rate_class' , '=', true],
+                        ['rate_class_id', '=', $line['booking_line_group_id.rate_class_id']],
+                    ]);
+
+                    if (!empty($prices_ids)) {
+                        $result[$line_id] = reset($prices_ids);
+                        break;
+                    }
+
+                    $prices_ids = $om->search(\sale\price\Price::getType(), [
+                        ['price_list_id', '=', $price_list_id],
+                        ['product_id', '=', $product_id],
+                    ]);
+
+                    if (!empty($prices_ids)) {
                         $result[$line_id] = reset($prices_ids);
                         break;
                     }
@@ -861,7 +1229,7 @@ class BookingLine extends Model {
      * @param boolean   $is_accommodation   Flag marking the line as an accommodation.
      * @param boolean   $capacity           Capacity of the product model the line refers to.
      */
-    public static function _computeLineQty($method, $nb_repeat, $nb_pers, $is_repeatable, $is_accommodation, $capacity) {
+    private static function computeLineQty($method, $nb_repeat, $nb_pers, $is_repeatable, $is_accommodation, $capacity) {
         // default quantity (duration of the group or own quantity or method = 'unit')
         $qty = $nb_repeat;
         // service is accounted by accommodation
@@ -961,6 +1329,23 @@ class BookingLine extends Model {
      * @return void
      */
     public static function ondelete($om, $oids) {
+        $lines = $om->read(self::getType(), $oids, ['booking_line_group_id', 'product_id.product_model_id.is_activity']);
+        if($lines > 0) {
+            foreach($lines as $oid => $odata) {
+                if($odata['product_id.product_model_id.is_activity']) {
+                    BookingActivity::search(['activity_booking_line_id', '=', $oid])->delete(true);
+
+                    $booking_activity = BookingActivity::search(['booking_line_group_id', '=', $odata['booking_line_group_id']])
+                        ->read(['id'])
+                        ->first();
+
+                    if(!is_null($booking_activity)) {
+                        BookingActivity::id($booking_activity['id'])->do('update-counters');
+                    }
+                }
+            }
+        }
+
         $om->callonce(self::getType(), 'updateSPM', $oids, ['deleted' => $oids]);
     }
 
@@ -1183,6 +1568,54 @@ class BookingLine extends Model {
         return $result;
     }
 
+    public static function calcIsActivity($self): array {
+        $result = [];
+        $self->read(['product_id' => ['product_model_id' => ['is_activity']]]);
+        foreach($self as $id => $booking_line) {
+            if(isset($booking_line['product_id']['product_model_id']['is_activity'])) {
+                $result[$id] = $booking_line['product_id']['product_model_id']['is_activity'];
+            }
+        }
+
+        return $result;
+    }
+
+    public static function calcIsTransport($self): array {
+        $result = [];
+        $self->read(['product_id' => ['product_model_id' => ['is_transport']]]);
+        foreach($self as $id => $booking_line) {
+            if(isset($booking_line['product_id']['product_model_id']['is_transport'])) {
+                $result[$id] = $booking_line['product_id']['product_model_id']['is_transport'];
+            }
+        }
+
+        return $result;
+    }
+
+    public static function calcIsSupply($self): array {
+        $result = [];
+        $self->read(['product_id' => ['product_model_id' => ['is_supply']]]);
+        foreach($self as $id => $booking_line) {
+            if(isset($booking_line['product_id']['product_model_id']['is_supply'])) {
+                $result[$id] = $booking_line['product_id']['product_model_id']['is_supply'];
+            }
+        }
+
+        return $result;
+    }
+
+    public static function calcIsFullday($self): array {
+        $result = [];
+        $self->read(['product_id' => ['product_model_id' => ['is_fullday']]]);
+        foreach($self as $id => $booking_line) {
+            if(isset($booking_line['product_id']['product_model_id']['is_fullday'])) {
+                $result[$id] = $booking_line['product_id']['product_model_id']['is_fullday'];
+            }
+        }
+
+        return $result;
+    }
+
     public static function calcQtyAccountingMethod($om, $oids, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLine:calcQtyAccountingMethod", QN_REPORT_DEBUG);
 
@@ -1195,6 +1628,61 @@ class BookingLine extends Model {
                 $result[$oid] = $odata['product_id.product_model_id.qty_accounting_method'];
             }
         }
+        return $result;
+    }
+
+    public static function calcServiceDate($self): array {
+        $result = [];
+        $self->read([
+            'booking_line_group_id' => ['date_from', 'date_to'],
+            'product_model_id'      => ['type', 'service_type', 'is_repeatable', 'schedule_offset']
+        ]);
+        foreach($self as $id => $booking_line) {
+            $product_model = $booking_line['product_model_id'];
+            if(
+                $product_model['type'] === 'service'
+                && $product_model['service_type'] === 'schedulable'
+                && !$product_model['is_repeatable']
+            ) {
+                $offset_seconds = $product_model['schedule_offset'] * 86400;
+                $service_date = $booking_line['booking_line_group_id']['date_from'] + $offset_seconds;
+                if($service_date > $booking_line['booking_line_group_id']['date_to']) {
+                    $service_date = $booking_line['booking_line_group_id']['date_to'];
+                }
+
+                $result[$id] = $service_date;
+            }
+        }
+
+        return $result;
+    }
+
+    public static function calcTimeSlotId($self): array {
+        $result = [];
+        $self->read(['product_model_id' => ['type', 'service_type', 'time_slots_ids', 'is_meal']]);
+        foreach($self as $id => $booking_line) {
+            $product_model = $booking_line['product_model_id'];
+            if($product_model['type'] !== 'service' || $product_model['service_type'] !== 'schedulable') {
+                continue;
+            }
+
+            if(!empty($product_model['time_slots_ids'])) {
+                $result[$id] = $product_model['time_slots_ids'][0];
+            }
+            elseif($product_model['is_meal']) {
+                $breakfast = TimeSlot::search(['code', '=', 'B'])->read(['id'])->first();
+                if(isset($breakfast)) {
+                    $result[$id] = $breakfast['id'];
+                }
+            }
+            else {
+                $morning = TimeSlot::search(['code', '=', 'AM'])->read(['id'])->first();
+                if(isset($morning['id'])) {
+                    $result[$id] = $morning['id'];
+                }
+            }
+        }
+
         return $result;
     }
 
@@ -1302,7 +1790,7 @@ class BookingLine extends Model {
             }
         }
         // retrieve quantity to consider
-        $qty = self::_computeLineQty(
+        $qty = self::computeLineQty(
                 $line['qty_accounting_method'],
                 $nb_repeat,
                 $nb_pers,
@@ -1421,5 +1909,57 @@ class BookingLine extends Model {
             }
         }
 
+    }
+
+    public static function onupdateServiceDate($self) {
+        $self->read(['is_activity', 'service_date', 'booking_activity_id' => ['supplies_booking_lines_ids', 'transports_booking_lines_ids']]);
+        foreach($self as $booking_line) {
+            if(!$booking_line['is_activity']) {
+                continue;
+            }
+
+            $sub_booking_lines_ids = array_merge(
+                $booking_line['booking_activity_id']['supplies_booking_lines_ids'] ?? [],
+                $booking_line['booking_activity_id']['transports_booking_lines_ids'] ?? []
+            );
+
+            if(!empty($sub_booking_lines_ids)) {
+                BookingLine::ids($sub_booking_lines_ids)
+                    ->update(['service_date' => $booking_line['service_date']]);
+            }
+
+            $booking_activities = BookingActivity::search(['activity_booking_line_id', '=', $booking_line['id']], ['sort' => ['activity_date' => 'asc']])
+                ->read(['id', 'activity_date'])
+                ->get(true);
+
+            if(!empty($booking_activities)) {
+                $shift_days = $booking_line['service_date'] - $booking_activities[0]['activity_date'];
+
+                foreach($booking_activities as $activity) {
+                    BookingActivity::id($activity['id'])->update(['activity_date' => $activity['activity_date'] + $shift_days]);
+                }
+            }
+        }
+    }
+
+    public static function onupdateTimeSlotId($self) {
+        $self->read(['is_activity', 'time_slot_id', 'booking_activity_id' => ['supplies_booking_lines_ids', 'transports_booking_lines_ids']]);
+        foreach($self as $booking_line) {
+            if(!$booking_line['is_activity']) {
+                continue;
+            }
+
+            $sub_booking_lines_ids = array_merge(
+                $booking_line['booking_activity_id']['supplies_booking_lines_ids'] ?? [],
+                $booking_line['booking_activity_id']['transports_booking_lines_ids'] ?? []
+            );
+
+            if(!empty($sub_booking_lines_ids)) {
+                BookingLine::ids($sub_booking_lines_ids)->update(['time_slot_id' => $booking_line['time_slot_id']]);
+            }
+
+            BookingActivity::id($booking_line['booking_activity_id']['id'])
+                ->update(['time_slot_id' => $booking_line['time_slot_id']]);
+        }
     }
 }

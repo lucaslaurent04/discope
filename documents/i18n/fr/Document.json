@@ -57,7 +57,7 @@
             "label": "Pièces jointes",
             "description": "Pièces jointes utilisant le document.",
             "help": ""
-        }        
+        }
     },
     "view": {
         "form.default": {

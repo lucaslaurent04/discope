@@ -58,6 +58,18 @@
             },
             {
                 "type": "field",
+                "value": "has_rate_class",
+                "width": "10%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "rate_class_id",
+                "width": "10%",
+                "sortable": true
+            },
+            {
+                "type": "field",
                 "value": "accounting_rule_id",
                 "width": "10%",
                 "sortable": true

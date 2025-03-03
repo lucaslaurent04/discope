@@ -241,6 +241,25 @@
                         ]
                     },
                     {
+                        "id": "sales.providers",
+                        "label": "Providers",
+                        "description": "",
+                        "icon": "business",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "sales.providers.all",
+                                "type": "entry",
+                                "label": "All providers",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\provider\\Provider",
+                                    "view": "list.default"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "id": "sales.customers",
                         "label": "Customers",
                         "description": "",

@@ -80,11 +80,11 @@ list($params, $providers) = eQual::announce([
         ],
         'nb_pers_nights' => [
             'type'              => 'integer',
-            'description'       => 'Number of nights/accommodations.'
+            'description'       => 'Number of guests nights.'
         ],
         'nb_room_nights' => [
             'type'              => 'integer',
-            'description'       => 'Number of nights/accommodations.'
+            'description'       => 'Number of room nights.'
         ],
         'nb_rental_units' => [
             'type'              => 'integer',
@@ -243,6 +243,7 @@ foreach($bookings as $booking) {
             ->get(true);
 
         $sojourn_nb_pers_nights = 0;
+
         foreach($lines as $line) {
             if($line['price'] < 0 || $line['qty'] < 0) {
                 continue;
@@ -280,6 +281,7 @@ foreach($bookings as $booking) {
         $count_nb_pers_nights += $sojourn_nb_pers_nights;
         $count_nb_room_nights += $sojourn_nb_nights * $sojourn_nb_accommodations;
     }
+
     // #memo - one entry by booking
     $result[] = [
         'center'            => $booking['center_id']['name'],

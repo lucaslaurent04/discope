@@ -39,7 +39,7 @@ list($params, $providers) = eQual::announce([
         /* parameters used as properties of virtual entity */
         'params' => [
             'type'              => 'array',
-            'description'       => 'Name of the center.'
+            'description'       => 'Additional params to use for retrieving data.'
         ]
     ],
     'response'      => [

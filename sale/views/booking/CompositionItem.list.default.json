@@ -1,11 +1,11 @@
 {
     "name": "Composition Items",
-    "description": "This view is intended for displaying the list of compostion items.",
+    "description": "This view is intended for displaying the list of composition items.",
     "access": {
         "groups": ["booking.default.user"]
     },
     "group_by": ["rental_unit_id"],
-    "limit": "100",
+    "limit": "500",
     "exports": [
         {
             "id": "export.print.form",

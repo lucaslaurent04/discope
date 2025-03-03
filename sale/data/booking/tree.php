@@ -77,7 +77,7 @@ $tree = [
             'description'
         ],
         'age_range_assignments_ids' => [
-            'age_range_id', 'qty'
+            'age_range_id', 'qty', 'age_from', 'age_to'
         ],
         'sojourn_product_models_ids' => [
             'id',
@@ -104,9 +104,6 @@ $tree = [
         'meal_preferences_ids' => [
             'type', 'pref', 'qty'
         ],
-        'age_range_assignments_ids' => [
-            'age_range_id', 'qty'
-        ],
         'booking_lines_ids' => [
             'id',
             'name',
@@ -125,6 +122,14 @@ $tree = [
             'is_rental_unit',
             'is_accomodation',
             'is_meal',
+            'meal_location',
+            'is_activity',
+            'is_transport',
+            'is_supply',
+            'is_fullday',
+            'service_date',
+            'time_slot_id',
+            'booking_activity_id',
             'price_id',
             'product_id' => [
                 'name',
@@ -135,7 +140,14 @@ $tree = [
                     'schedule_offset',
                     'has_duration',
                     'duration',
-                    'capacity'
+                    'capacity',
+                    'type',
+                    'service_type',
+                    'is_repeatable',
+                    'is_meal',
+                    'is_snack',
+                    'is_fullday',
+                    'time_slots_ids' => ['name', 'code']
                 ]
             ],
             'auto_discounts_ids' => [
@@ -153,6 +165,18 @@ $tree = [
                 'value',
                 'discount_id' => ['name']
             ]
+        ],
+        'booking_activities_ids' => [
+            'activity_booking_line_id',
+            'booking_line_group_id',
+            'supplies_booking_lines_ids',
+            'transports_booking_lines_ids',
+            'counter',
+            'total',
+            'price',
+            'is_virtual',
+            'activity_date',
+            'time_slot_id'
         ]
     ]
 ];

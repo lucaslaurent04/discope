@@ -1,0 +1,19 @@
+{
+    "name": "Supply List",
+    "description": "This view is intended for displaying the list of suplies.",
+    "access": {
+        "groups": [
+            "pos.default.user",
+            "sale.default.user"
+        ]
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "100%"
+            }
+        ]
+    }
+}

@@ -104,7 +104,7 @@ class BookingLine extends \sale\booking\BookingLine {
      * @param  string   $lang       Language in which multilang fields are being updated.
      * @return array    Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be updated.
      */
-    public static function canupdate($om, $ids, $values, $lang='en') {
+    public static function canupdate($self, $values, $lang='en') {
 
         // handle exceptions for fields that can always be updated
         $allowed = ['is_contractual', 'is_invoiced'];
@@ -117,19 +117,18 @@ class BookingLine extends \sale\booking\BookingLine {
         }
 
         if($count_non_allowed > 0) {
-            $lines = $om->read(self::getType(), $ids, ['booking_id.status'], $lang);
-            if($lines > 0) {
-                foreach($lines as $line) {
-                    if($line['booking_id.status'] != 'quote') {
-                        return ['booking_id' => ['non_editable' => 'Services cannot be updated for non-quote bookings.']];
-                    }
+            $self->read(['booking_id' => ['status']]);
+
+            foreach($self as $line) {
+                if($line['booking_id']['status'] != 'quote') {
+                    return ['booking_id' => ['non_editable' => 'Services cannot be updated for non-quote bookings.']];
                 }
             }
+
         }
 
+        // #memo - ignore parent (!!!! be careful if parent is called again, the signature may have been changed to ($self, $values, $lang)
         return [];
-        // ignore parent
-        return parent::canupdate($om, $ids, $values, $lang);
     }
 
     /**

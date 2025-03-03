@@ -8,7 +8,7 @@
 
 use equal\orm\Domain;
 
-list($params, $providers) = announce([
+list($params, $providers) = eQual::announce([
     'description'   => 'Advanced search for Order: returns a collection of Order according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
@@ -30,8 +30,7 @@ list($params, $providers) = announce([
         'date'      => [
             'type'              => 'date',
             'description'       => "Date of the creation.",
-            'usage'             => 'date/month',
-            'default'           => strtotime('Today')
+            'default'           => function() { return strtotime('Today'); }
         ]
     ],
     'response'      => [

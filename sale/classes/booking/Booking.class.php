@@ -484,6 +484,13 @@ class Booking extends Model {
                 'description'       => "The consumptions meter readings  relates to Booking.."
             ],
 
+            'booking_activities_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\BookingActivity',
+                'foreign_field'     => 'booking_id',
+                'description'       => "The booking activities that refer to the booking."
+            ],
+
             'tasks_ids' => [
                 'type'              => 'one2many',
                 'foreign_field'     => 'booking_id',
