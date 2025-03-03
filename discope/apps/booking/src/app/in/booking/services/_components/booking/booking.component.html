@@ -24,6 +24,7 @@
                             [booking]="instance"
                             [timeSlots]="time_slots"
                             [bookingActivitiesDays]="mapGroupsIdsBookingActivitiesDays[group.id]"
+                            [displaySettings]="display_settings"
                             (updated)="onupdateGroup()"
                             (deleted)="ondeleteGroup(group.id)"
                             (toggle)="ontoggleGroup(group.id, $event)"
