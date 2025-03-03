@@ -72,21 +72,6 @@
                 "name": "identity.locale.account.sequence_format",
                 "setting_id": 150,
                 "value": "%3d{prefix}%5d{sequence}"
-            },
-            {
-                "name": "lodging.locale.i18n.activity",
-                "setting_id": 152,
-                "value": "Activité"
-            },
-            {
-                "name": "lodging.locale.i18n.activities_details",
-                "setting_id": 153,
-                "value": "Détail des activitie"
-            },
-            {
-                "name": "sale.booking.has_activity",
-                "setting_id": 154,
-                "value": "1"
             }
         ]
     }
