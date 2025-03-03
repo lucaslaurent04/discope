@@ -8,6 +8,7 @@
 namespace discope\followup;
 
 use equal\orm\Model;
+use identity\User;
 
 class Task extends Model {
 
@@ -84,6 +85,36 @@ class Task extends Model {
             ]
 
         ];
+    }
+
+    public static function onchange($event, $values): array {
+        $result = [];
+        if(isset($event['is_done'])) {
+            if($event['is_done']) {
+                $result['done_date'] = $values['done_date'] ?? strtotime('Today');
+
+                /** @var \equal\auth\AuthenticationManager $auth */
+                ['auth' => $auth] = \eQual::inject(['auth']);
+                $user_id = $auth->userId();
+
+                if($user_id) {
+                    $user = User::id($user_id)
+                        ->read(['id', 'name'])
+                        ->first(true);
+
+                    $result['done_by'] = $user ?? null;
+                }
+                else {
+                    $result['done_by'] = null;
+                }
+            }
+            else {
+                $result['done_date'] = null;
+                $result['done_by'] = null;
+            }
+        }
+
+        return $result;
     }
 
     public static function calcDoneDate($self): array {

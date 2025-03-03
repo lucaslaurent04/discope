@@ -24,6 +24,24 @@ class TaskEvent extends DiscopeTaskEvent {
                 'default'           => 'sale\booking\Booking'
             ],
 
+            'entity_status' => [
+                'type'              => 'string',
+                'description'       => "Status of the booking the task event is associated with.",
+                'selection'         => [
+                    'quote',
+                    'option',
+                    'confirmed',
+                    'validated',
+                    'checkedin',
+                    'checkedout',
+                    'invoiced',
+                    'debit_balance',
+                    'credit_balance',
+                    'balanced'
+                ],
+                'visible'           => ['event_type', '=', 'status_change']
+            ],
+
             'entity_date_field' => [
                 'type'              => 'string',
                 'description'       => "Date field of the entity the task event is associated with.",
