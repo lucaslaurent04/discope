@@ -15,6 +15,17 @@ class Booking {
     ) {}
 }
 
+export type BookedServicesDisplaySettingsKey = 'identification_folded'|'products_folded'|'activities_folded'|'accomodations_folded'|'meals_folded';
+
+export interface BookedServicesDisplaySettings {
+    store_folded_settings: boolean;
+    identification_folded: boolean;
+    products_folded: boolean;
+    activities_folded: boolean;
+    accomodations_folded: boolean;
+    meals_folded: boolean;
+}
+
 
 @Component({
     selector: 'booking-services',
@@ -25,6 +36,15 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
 
     public booking: any = new Booking();
     public booking_id: number = 0;
+
+    public display_settings: BookedServicesDisplaySettings = {
+        store_folded_settings: false,
+        identification_folded: true,
+        products_folded: true,
+        activities_folded: true,
+        accomodations_folded: true,
+        meals_folded: true
+    };
 
     public ready: boolean = false;
 
@@ -110,6 +130,8 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
                 }
             }
         });
+
+        this.loadDisplaySettings();
     }
 
     private async refreshActionButton() {
@@ -141,6 +163,35 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
         }
         catch(response) {
             console.log('unexpected error');
+        }
+    }
+
+    private async loadDisplaySettings() {
+        try {
+            this.display_settings = await this.api.fetch('?get=sale_booking_booked-services-settings');
+            if(this.display_settings.store_folded_settings) {
+                this.setDisplaySettingsFromLocalStorage();
+            }
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+    }
+
+    private setDisplaySettingsFromLocalStorage() {
+        const stored_map_bookings_booked_services_settings: string | null = localStorage.getItem('map_bookings_booked_services_settings');
+        if(stored_map_bookings_booked_services_settings === null) {
+            return;
+        }
+
+        const map_bookings_booked_services_settings: {[key: number]: BookedServicesDisplaySettings} = JSON.parse(stored_map_bookings_booked_services_settings);
+        if(!map_bookings_booked_services_settings[this.booking_id]) {
+            return;
+        }
+
+        const booked_services_settings = map_bookings_booked_services_settings[this.booking_id];
+        for(let key of Object.keys(this.display_settings) as BookedServicesDisplaySettingsKey[]) {
+            this.display_settings[key] = booked_services_settings[key];
         }
     }
 }

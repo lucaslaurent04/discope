@@ -19,6 +19,7 @@ import { BookingAgeRangeAssignment } from '../../_models/booking_agerange_assign
 import { MatAutocomplete } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
 import { BookingActivityDay } from './_components/day-activities/day-activities.component';
+import { BookedServicesDisplaySettings, BookedServicesDisplaySettingsKey } from '../../../../services.component';
 
 
 // declaration of the interface for the map associating relational Model fields with their components
@@ -97,6 +98,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     @Input() booking: Booking;
     @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
     @Input() bookingActivitiesDays: BookingActivityDay[];
+    @Input() displaySettings: BookedServicesDisplaySettings;
 
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
@@ -366,6 +368,38 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
 
     public fold() {
         this.folded = true;
+    }
+
+    public sectionUnfold(key: string) {
+        if(!this.displaySettings.store_folded_settings) {
+            return;
+        }
+
+        this.storeFolded(key, false);
+    }
+
+    public sectionFold(key: string) {
+        if(!this.displaySettings.store_folded_settings) {
+            return;
+        }
+
+        this.storeFolded(key, true);
+    }
+
+    private storeFolded(key: string, folded: boolean) {
+        let stored_map_bookings_booked_services_settings: string | null = localStorage.getItem('map_bookings_booked_services_settings');
+        if(stored_map_bookings_booked_services_settings === null) {
+            stored_map_bookings_booked_services_settings = '{}';
+        }
+
+        const map_bookings_booked_services_settings: {[key: number]: BookedServicesDisplaySettings} = JSON.parse(stored_map_bookings_booked_services_settings);
+        if(!map_bookings_booked_services_settings[this.booking.id]) {
+            map_bookings_booked_services_settings[this.booking.id] = JSON.parse(JSON.stringify(this.displaySettings));
+        }
+
+        map_bookings_booked_services_settings[this.booking.id][(`${key}_folded`) as BookedServicesDisplaySettingsKey] = folded;
+
+        localStorage.setItem('map_bookings_booked_services_settings', JSON.stringify(map_bookings_booked_services_settings));
     }
 
     public toggleFold() {
