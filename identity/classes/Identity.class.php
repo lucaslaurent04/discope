@@ -517,21 +517,24 @@ class Identity extends Model {
 
             'phone' => [
                 'type'              => 'string',
-                'usage'             => 'phone',
+                // #memo - too many users input variations for generic validation
+                // 'usage'             => 'phone',
                 'onupdate'          => 'onupdatePhone',
                 'description'       => "Identity main phone number (mobile or landline)."
             ],
 
             'mobile' => [
                 'type'              => 'string',
-                'usage'             => 'phone',
+                // #memo - too many users input variations for generic validation
+                // 'usage'             => 'phone',
                 'onupdate'          => 'onupdateMobile',
                 'description'       => "Identity mobile phone number."
             ],
 
             'fax' => [
                 'type'              => 'string',
-                'usage'             => 'phone',
+                // #memo - too many users input variations for generic validation
+                // 'usage'             => 'phone',
                 'description'       => "Identity main fax number."
             ],
 
@@ -857,7 +860,6 @@ class Identity extends Model {
             $om->read(self::getType(), $oids, ['display_name'], $lang);
             // force re-computing of related partners names
             $om->update('identity\Partner', $partners_ids, [ 'name' => null ], $lang);
-            $om->read('identity\Partner', $partners_ids, ['name'], $lang);
         }
     }
 
