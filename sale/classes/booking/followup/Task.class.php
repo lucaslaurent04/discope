@@ -27,7 +27,7 @@ class Task extends DiscopeTask {
             'entity' => [
                 'type'              => 'string',
                 'description'       => "Namespace of the concerned entity.",
-                'default'           => 'sale\booking\followup\Task'
+                'default'           => 'sale\booking\Booking'
             ],
 
             'entity_id' => [
