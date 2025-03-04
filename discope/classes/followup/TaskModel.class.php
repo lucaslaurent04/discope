@@ -36,9 +36,9 @@ class TaskModel extends Model {
                 'required'          => true
             ],
 
-            'task_group' => [
+            'tasks_group_name' => [
                 'type'              => 'string',
-                'description'       => "Name of the task group.",
+                'description'       => "Name of the tasks group.",
                 'help'              => "Allows to group the tasks."
             ],
 

@@ -13,7 +13,7 @@
             },
             {
                 "type": "field",
-                "value": "task_group",
+                "value": "tasks_group_name",
                 "width": "40%"
             },
             {
