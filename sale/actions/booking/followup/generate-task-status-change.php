@@ -56,7 +56,6 @@ $task_models = TaskModel::search(['entity', '=', 'sale\booking\Booking'])
         ],
         'deadline_event_id' => [
             'event_type',
-            'entity_status',
             'entity_date_field',
             'offset'
         ]
