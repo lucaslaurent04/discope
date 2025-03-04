@@ -400,7 +400,7 @@
                 "object_class": null
             },
             {
-                "id": 152,
+                "id": 157,
                 "state": "instance",
                 "name": "lodging.locale.i18n.activity",
                 "code": "i18n.activity",
@@ -417,7 +417,7 @@
                 "object_class": null
             },
             {
-                "id": 153,
+                "id": 158,
                 "name": "lodging.locale.i18n.activities_details",
                 "code": "i18n.activities_details",
                 "package": "lodging",
@@ -433,7 +433,7 @@
                 "object_class": null
             },
             {
-                "id": 154,
+                "id": 159,
                 "name": "sale.booking.has_activity",
                 "code": "has_activity",
                 "package": "sale",
