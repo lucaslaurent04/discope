@@ -102,7 +102,23 @@
                 "name": "sale.booking.display.meals.folded",
                 "setting_id": 156,
                 "value": "0"
+            },
+            {
+                "name": "lodging.locale.i18n.activity",
+                "setting_id": 157,
+                "value": "Activité"
+            },
+            {
+                "name": "lodging.locale.i18n.activities_details",
+                "setting_id": 158,
+                "value": "Détail des activitie"
+            },
+            {
+                "name": "sale.booking.has_activity",
+                "setting_id": 159,
+                "value": "1"
             }
+
         ]
     }
 ]
