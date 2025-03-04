@@ -10,7 +10,7 @@ use sale\booking\followup\Task;
 use sale\booking\followup\TaskModel;
 
 [$params, $providers] = eQual::announce([
-    'description'	=> "Generate task models' tasks when a booking change status.",
+    'description'	=> "Generate task models' tasks when a booking status changes.",
     'params' 		=> [
 
         'booking_id' => [
