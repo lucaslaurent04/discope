@@ -7,16 +7,20 @@
 
 namespace sale\booking\followup;
 
-use discope\followup\Task as DiscopeTask;
-
-class Task extends DiscopeTask {
+class Task extends \core\followup\Task {
 
     public static function getDescription(): string {
-        return "Booking task that must be realized.";
+        return "Booking task that has been or must be completed.";
     }
 
     public static function getColumns(): array {
         return [
+
+            'done_by' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\User',
+                'description'       => "The user who completed the task."
+            ],
 
             'task_model_id' => [
                 'type'              => 'many2one',
@@ -67,8 +71,8 @@ class Task extends DiscopeTask {
 
             'entity' =>  [
                 'not_allowed' => [
-                    'message'       => 'Entity must be "sale\booking\Booking".',
-                    'function'      => function ($entity, $values) {
+                    'message'   => 'Entity must be "sale\booking\Booking".',
+                    'function'  => function ($entity, $values) {
                         return $entity === 'sale\booking\Booking';
                     }
                 ]

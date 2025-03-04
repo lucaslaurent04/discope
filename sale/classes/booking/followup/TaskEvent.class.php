@@ -7,9 +7,7 @@
 
 namespace sale\booking\followup;
 
-use discope\followup\TaskEvent as DiscopeTaskEvent;
-
-class TaskEvent extends DiscopeTaskEvent {
+class TaskEvent extends \core\followup\TaskEvent {
 
     public static function getDescription(): string {
         return "A task event associated with a booking status change or an booking date field value.";
@@ -56,14 +54,14 @@ class TaskEvent extends DiscopeTaskEvent {
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\followup\TaskModel',
                 'foreign_field'     => 'trigger_event_id',
-                'description'       => 'List of task models that uses the event as a trigger.'
+                'description'       => "List of task models that uses the event as a trigger."
             ],
 
             'deadline_event_task_models_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\followup\TaskModel',
                 'foreign_field'     => 'deadline_event_id',
-                'description'       => 'List of task models that uses the event as a deadline.'
+                'description'       => "List of task models that uses the event as a deadline."
             ]
 
         ];
@@ -72,10 +70,10 @@ class TaskEvent extends DiscopeTaskEvent {
     public static function getConstraints(): array {
         return [
 
-            'entity' =>  [
+            'entity' => [
                 'not_allowed' => [
-                    'message'       => 'Entity must be "sale\booking\Booking".',
-                    'function'      => function ($entity, $values) {
+                    'message'   => 'Entity must be "sale\booking\Booking".',
+                    'function'  => function ($entity, $values) {
                         return $entity === 'sale\booking\Booking';
                     }
                 ]

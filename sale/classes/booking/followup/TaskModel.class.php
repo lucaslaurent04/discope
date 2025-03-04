@@ -7,9 +7,7 @@
 
 namespace sale\booking\followup;
 
-use discope\followup\TaskModel as DiscopeTaskModel;
-
-class TaskModel extends DiscopeTaskModel {
+class TaskModel extends \core\followup\TaskModel {
 
     public static function getDescription(): string {
         return "A task is generated from a task model when a booking is created or change status.";
@@ -60,10 +58,10 @@ class TaskModel extends DiscopeTaskModel {
     public static function getConstraints(): array {
         return [
 
-            'entity' =>  [
+            'entity' => [
                 'not_allowed' => [
-                    'message'       => 'Entity must be "sale\booking\Booking".',
-                    'function'      => function ($entity, $values) {
+                    'message'   => 'Entity must be "sale\booking\Booking".',
+                    'function'  => function ($entity, $values) {
                         return $entity === 'sale\booking\Booking';
                     }
                 ]
