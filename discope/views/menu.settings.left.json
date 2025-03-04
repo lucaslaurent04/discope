@@ -1176,7 +1176,7 @@
                         "description": "",
                         "icon": "event",
                         "context": {
-                            "entity": "discope\\followup\\TaskEvent",
+                            "entity": "core\\followup\\TaskEvent",
                             "view": "list.default"
                         }
                     },
@@ -1187,7 +1187,7 @@
                         "description": "",
                         "icon": "description",
                         "context": {
-                            "entity": "discope\\followup\\TaskModel",
+                            "entity": "core\\followup\\TaskModel",
                             "view": "list.default"
                         }
                     },
@@ -1198,7 +1198,7 @@
                         "description": "",
                         "icon": "task",
                         "context": {
-                            "entity": "discope\\followup\\Task",
+                            "entity": "core\\followup\\Task",
                             "view": "list.default"
                         }
                     },
