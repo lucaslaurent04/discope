@@ -29,24 +29,18 @@ class Task extends Model {
                 'type'              => 'boolean',
                 'description'       => "Whether the task is done.",
                 'default'           => false,
-                'onupdate'          => 'onupdateDone'
+                'onupdate'          => 'onupdateIsDone'
             ],
 
             'done_by' => [
-                'type'              => 'computed',
-                'result_type'       => 'many2one',
+                'type'              => 'many2one',
                 'foreign_object'    => 'core\User',
-                'description'       => "The user who completed the task.",
-                'function'          => 'calcDoneBy',
-                'store'             => true
+                'description'       => "The user who completed the task."
             ],
 
             'done_date' => [
-                'type'              => 'computed',
-                'result_type'       => 'date',
-                'description'       => "Date on which the task was completed.",
-                'function'          => 'calcDoneDate',
-                'store'             => true
+                'type'              => 'date',
+                'description'       => "Date on which the task was completed."
             ],
 
             'visible_date' => [
@@ -105,6 +99,7 @@ class Task extends Model {
                     $result['done_by'] = $user ?? null;
                 }
                 else {
+                    $result['done_date'] = null;
                     $result['done_by'] = null;
                 }
             }
@@ -117,27 +112,34 @@ class Task extends Model {
         return $result;
     }
 
-    public static function calcDoneDate($self): array {
-        $result = [];
-        $self->read(['is_done']);
-        foreach($self as $id => $task) {
-            $result[$id] = $task['is_done'] ? time() : null;
-        }
-
-        return $result;
-    }
-
-    public static function calcDoneBy($self): array {
+    public static function onupdateIsDone($self) {
         /** @var \equal\auth\AuthenticationManager $auth */
         ['auth' => $auth] = \eQual::inject(['auth']);
         $user_id = $auth->userId();
 
-        $result = [];
-        $self->read(['is_done']);
+        $self->read(['is_done', 'done_by', 'done_date']);
         foreach($self as $id => $task) {
-            $result[$id] = $task['is_done'] ? $user_id : null;
-        }
+            $done_data = [];
+            if($task['is_done']) {
+                if(is_null($task['done_by'])) {
+                    $done_data['done_by'] = $user_id;
+                }
+                if(is_null($task['done_date'])) {
+                    $done_data['done_date'] = strtotime('Today');
+                }
+            }
+            else {
+                if(!is_null($task['done_by'])) {
+                    $done_data['done_by'] = null;
+                }
+                if(!is_null($task['done_date'])) {
+                    $done_data['done_date'] = null;
+                }
+            }
 
-        return $result;
+            if(!empty($done_data)) {
+                self::id($id)->update($done_data);
+            }
+        }
     }
 }
