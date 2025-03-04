@@ -25,13 +25,15 @@ class TaskModel extends \core\followup\TaskModel {
             'trigger_event_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\followup\TaskEvent',
-                'description'       => "The trigger event associated with the task model."
+                'description'       => "The trigger event associated with the task model.",
+                'domain'            => ['event_type', '=', 'status_change']
             ],
 
             'deadline_event_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\followup\TaskEvent',
-                'description'       => "The deadline event associated with the task model."
+                'description'       => "The deadline event associated with the task model.",
+                'domain'            => ['event_type', '=', 'date_field']
             ],
 
             'tasks_ids' => [
