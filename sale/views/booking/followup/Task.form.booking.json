@@ -22,12 +22,14 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "label": "Booking",
                                                 "value": "booking_id",
                                                 "width": "25%",
                                                 "visible": false
                                             },
                                             {
                                                 "type": "field",
+                                                "label": "Task Model",
                                                 "value": "task_model_id",
                                                 "width": "50%",
                                                 "visible": ["task_model_id", "<>", null]
@@ -84,7 +86,7 @@
                             {
                                 "columns": [
                                     {
-                                        "width": "100%",
+                                        "width": "50%",
                                         "items": [
                                             {
                                                 "type": "field",

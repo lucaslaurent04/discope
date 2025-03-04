@@ -22,7 +22,14 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "label": "Booking",
                                                 "value": "booking_id",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Task Model",
+                                                "value": "task_model_id",
                                                 "width": "50%"
                                             }
                                         ]
@@ -30,6 +37,21 @@
                                     {
                                         "width": "50%",
                                         "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "visible_date",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "deadline_date",
+                                                "width": "33%"
+                                            },
                                             {
                                                 "type": "field",
                                                 "value": "is_done",
@@ -43,21 +65,6 @@
                                             {
                                                 "type": "field",
                                                 "value": "done_date",
-                                                "width": "33%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "task_model_id",
-                                                "width": "33%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "visible_date",
-                                                "width": "33%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "deadline_date",
                                                 "width": "33%"
                                             }
                                         ]
