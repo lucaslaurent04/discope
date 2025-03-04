@@ -488,12 +488,12 @@
                                             {
                                                 "type": "field",
                                                 "value": "description",
-                                                "width": "50%"
+                                                "width": "33%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "tasks_ids",
-                                                "width": "50%",
+                                                "width": "66%",
                                                 "widget": {
                                                     "view": "list.booking",
                                                     "domain": ["visible_date", "<=", "date.this.day.first"]
