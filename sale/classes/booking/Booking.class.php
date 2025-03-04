@@ -928,9 +928,7 @@ class Booking extends Model {
                     $om->update(self::getType(), $id, ['has_contract' => true], $lang);
                 }
 
-                \eQual::run('do', 'sale_booking_followup_generate-task', [
-                    'booking_id' => $id,
-                ]);
+                \eQual::run('do', 'sale_booking_followup_generate-task-status-change', ['booking_id' => $id]);
             }
         }
     }
