@@ -398,6 +398,55 @@
                 "is_multilang": false,
                 "is_sequence": false,
                 "object_class": null
+            },
+            {
+                "id": 152,
+                "state": "instance",
+                "name": "lodging.locale.i18n.activity",
+                "code": "i18n.activity",
+                "package": "lodging",
+                "section_id": 1,
+                "title": "activity",
+                "description": null,
+                "help": null,
+                "type": "string",
+                "form_control": "input",
+                "section": "locale",
+                "is_multilang": 1,
+                "is_sequence": 0,
+                "object_class": null
+            },
+            {
+                "id": 153,
+                "name": "lodging.locale.i18n.activities_details",
+                "code": "i18n.activities_details",
+                "package": "lodging",
+                "section_id": 1,
+                "title": "Activity details",
+                "description": null,
+                "help": null,
+                "type": "string",
+                "form_control": "input",
+                "section": "locale",
+                "is_multilang": 1,
+                "is_sequence": 0,
+                "object_class": null
+            },
+            {
+                "id": 154,
+                "name": "sale.booking.has_activity",
+                "code": "has_activity",
+                "package": "sale",
+                "section_id": 6,
+                "title": "L'organisation a des activités",
+                "description": "L'organisation a des activités dans ses services",
+                "help": null,
+                "type": "boolean",
+                "form_control": "toggle",
+                "section": "booking",
+                "is_multilang": 0,
+                "is_sequence": 0,
+                "object_class": null
             }
         ]
     }
