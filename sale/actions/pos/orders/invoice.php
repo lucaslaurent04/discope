@@ -92,7 +92,7 @@ $orders = Order::search([
         ['center_id', '=', $center_id],
         // #memo - we do not use start date to make sure that any passed order not yet invoiced is included
         ['created', '<', $last_date],
-        ['created', '>=', strtotime('2024-04-01 00:00:00')]
+        ['created', '>=', $first_date]
     ])
     ->read([
         'id', 'name', 'status', 'created',
