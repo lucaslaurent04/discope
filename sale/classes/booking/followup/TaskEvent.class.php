@@ -37,7 +37,8 @@ class TaskEvent extends \core\followup\TaskEvent {
                     'credit_balance',
                     'balanced'
                 ],
-                'visible'           => ['event_type', '=', 'status_change']
+                'visible'           => ['event_type', '=', 'status_change'],
+                'default'           => 'quote'
             ],
 
             'entity_date_field' => [
@@ -47,7 +48,8 @@ class TaskEvent extends \core\followup\TaskEvent {
                 'selection'         => [
                     'date_from',
                     'date_to'
-                ]
+                ],
+                'default'           => 'date_from'
             ],
 
             'trigger_event_task_models_ids' => [
@@ -67,6 +69,20 @@ class TaskEvent extends \core\followup\TaskEvent {
         ];
     }
 
+    public static function onchange($event, $values) {
+        $result = [];
+        if(isset($event['event_type'])) {
+            if($event['event_type'] === 'status_change') {
+                $result['entity_status'] = 'quote';
+            }
+            elseif($event['event_type'] === 'date_field') {
+                $result['entity_date_field'] = 'date_from';
+            }
+        }
+
+        return $result;
+    }
+
     public static function getConstraints(): array {
         return [
 
@@ -75,6 +91,27 @@ class TaskEvent extends \core\followup\TaskEvent {
                     'message'   => 'Entity must be "sale\booking\Booking".',
                     'function'  => function ($entity, $values) {
                         return $entity === 'sale\booking\Booking';
+                    }
+                ]
+            ],
+
+            'entity_status' => [
+                'invalid' => [
+                    'message'   => 'Invalid Booking status.',
+                    'function'  => function ($entity_status, $values) {
+                        return in_array($entity_status, [
+                            'quote', 'option', 'confirmed', 'validated', 'checkedin', 'checkedout',
+                            'invoiced', 'debit_balance', 'credit_balance', 'balanced'
+                        ]);
+                    }
+                ]
+            ],
+
+            'entity_date_field' => [
+                'invalid' => [
+                    'message'   => 'Invalid Booking status.',
+                    'function'  => function ($entity_date_field, $values) {
+                        return in_array($entity_date_field, ['date_from', 'date_to']);
                     }
                 ]
             ]
