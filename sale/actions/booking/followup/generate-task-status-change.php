@@ -37,14 +37,6 @@ use sale\booking\followup\TaskModel;
  */
 ['context' => $context] = $providers;
 
-$booking = Booking::id($params['booking_id'])
-    ->read(['status', 'center_office_id'])
-    ->first(true);
-
-if(is_null($booking)) {
-    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
-}
-
 $task_models = TaskModel::search(['entity', '=', 'sale\booking\Booking'])
     ->read([
         'name',
@@ -62,30 +54,54 @@ $task_models = TaskModel::search(['entity', '=', 'sale\booking\Booking'])
     ])
     ->get(true);
 
-foreach($task_models as $task_model) {
-    if(
-        $task_model['trigger_event_id']['event_type'] === 'status_change'
-        && $task_model['trigger_event_id']['entity_status'] === $booking['status']
-        && in_array($booking['center_office_id'], $task_model['center_offices_ids'])
-    ) {
+$task_models = array_filter(
+    $task_models,
+    function($task_model) {
+        return $task_model['trigger_event_id']['event_type'] === 'status_change';
+    }
+);
+
+if(!empty($task_models)) {
+    $map_date_fields = [];
+    foreach($task_models as $task_model) {
+        if(isset($task_model['deadline_event_id']['entity_date_field'])) {
+            $map_date_fields[$task_model['deadline_event_id']['entity_date_field']] = true;
+        }
+    }
+
+    $date_fields = array_keys($map_date_fields);
+
+    $booking = Booking::id($params['booking_id'])
+        ->read(array_merge($date_fields, ['center_office_id', 'status']))
+        ->first();
+
+    if(is_null($booking)) {
+        throw new Exception("unknown_entity", EQ_ERROR_UNKNOWN_OBJECT);
+    }
+
+    foreach($task_models as $task_model) {
+        if(
+            $task_model['trigger_event_id']['entity_status'] !== $booking['status']
+            || !in_array($booking['center_office_id'], $task_model['center_offices_ids'])
+        ) {
+            continue;
+        }
+
         $visible_date = time() + (86400 * $task_model['trigger_event_id']['offset']);
 
         $deadline_date = null;
-        if($task_model['deadline_event_id']['event_type'] === 'date_field') {
-            $book = Booking::id($booking['id'])
-                ->read([$task_model['deadline_event_id']['entity_date_field']])
-                ->first(true);
-
-            $deadline_date = $book[$task_model['deadline_event_id']['entity_date_field']] + (86400 * $task_model['deadline_event_id']['offset']);
-        }
-        else {
-            $deadline_date = time() + (86400 * $task_model['deadline_event_id']['offset']);
+        if(isset($task_model['deadline_event_id'])) {
+            if(isset($book[$task_model['deadline_event_id']['entity_date_field']])) {
+                $deadline_date = $book[$task_model['deadline_event_id']['entity_date_field']] + (86400 * $task_model['deadline_event_id']['offset']);
+            }
+            else {
+                // TODO: report problem date not set
+            }
         }
 
         $task = Task::search([
             ['task_model_id', '=', $task_model['id']],
-            ['entity', '=', 'sale\booking\Booking'],
-            ['entity_id', '=', $booking['id']]
+            ['booking_id', '=', $booking['id']]
         ])
             ->read(['notes'])
             ->first(true);
@@ -103,7 +119,6 @@ foreach($task_models as $task_model) {
             'visible_date'  => $visible_date,
             'deadline_date' => $deadline_date,
             'task_model_id' => $task_model['id'],
-            'entity'        => 'sale\booking\Booking',
             'booking_id'    => $booking['id'],
             'notes'         => $notes
         ]);
