@@ -104,7 +104,7 @@ if(!empty($task_models)) {
             ['booking_id', '=', $booking['id']]
         ])
             ->read(['notes'])
-            ->first(true);
+            ->first();
 
         $notes = null;
         if(!is_null($task)) {
