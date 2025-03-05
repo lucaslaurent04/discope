@@ -112,7 +112,8 @@ if(!empty($task_models)) {
                 'visible_date'  => $visible_date,
                 'deadline_date' => $deadline_date,
                 'task_model_id' => $task_model['id'],
-                'booking_id'    => $booking['id']
+                'booking_id'    => $booking['id'],
+                'notes'         => $notes
             ]);
         }
     }
