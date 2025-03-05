@@ -1163,6 +1163,93 @@
                 ]
             },
             {
+                "id": "tasks",
+                "label": "Tasks",
+                "description": "",
+                "icon": "task",
+                "type": "parent",
+                "children": [
+                    {
+                        "id": "tasks.events",
+                        "type": "entry",
+                        "label": "Events",
+                        "description": "",
+                        "icon": "event",
+                        "context": {
+                            "entity": "core\\followup\\TaskEvent",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "tasks.models",
+                        "type": "entry",
+                        "label": "Models",
+                        "description": "",
+                        "icon": "description",
+                        "context": {
+                            "entity": "core\\followup\\TaskModel",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "tasks.tasks",
+                        "type": "entry",
+                        "label": "Tasks",
+                        "description": "",
+                        "icon": "task",
+                        "context": {
+                            "entity": "core\\followup\\Task",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "tasks.booking-tasks",
+                        "label": "Booking tasks",
+                        "description": "",
+                        "icon": "task",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "tasks.booking-tasks.events",
+                                "type": "entry",
+                                "label": "Events",
+                                "description": "",
+                                "icon": "event",
+                                "context": {
+                                    "entity": "sale\\booking\\followup\\TaskEvent",
+                                    "view": "list.default",
+                                    "domain": ["entity", "=", "sale\\booking\\Booking"]
+                                }
+                            },
+                            {
+                                "id": "tasks.booking-tasks.models",
+                                "type": "entry",
+                                "label": "Models",
+                                "description": "",
+                                "icon": "description",
+                                "context": {
+                                    "entity": "sale\\booking\\followup\\TaskModel",
+                                    "view": "list.default",
+                                    "domain": ["entity", "=", "sale\\booking\\Booking"]
+                                }
+                            },
+                            {
+                                "id": "tasks.booking-tasks.tasks",
+                                "type": "entry",
+                                "label": "Tasks",
+                                "description": "",
+                                "icon": "task",
+                                "context": {
+                                    "entity": "sale\\booking\\followup\\Task",
+                                    "view": "list.default",
+                                    "domain": ["entity", "=", "sale\\booking\\Booking"]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "id": "settings",
                 "label": "Configuration",
                 "description": "",

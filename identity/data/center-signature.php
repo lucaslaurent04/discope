@@ -10,8 +10,8 @@ use identity\Center;
 
 // announce script and fetch parameters values
 list($params, $providers) = announce([
-    'description' =>  "Generate the HTML email signature for a Center, in a given language.",
-    'params'      =>  [
+    'description' => "Generate the HTML email signature for a Center, in a given language.",
+    'params'      => [
         'center_id' => [
             'description'   => 'Identifier of the center for which the signature is requested.',
             'type'          => 'integer',
@@ -34,7 +34,7 @@ list($params, $providers) = announce([
         'charset'           => 'utf-8',
         'accept-origin'     => '*'
     ],
-    'providers'  => ['context']
+    'providers'   => ['context']
 ]);
 
 list($context) = [ $providers['context'] ];

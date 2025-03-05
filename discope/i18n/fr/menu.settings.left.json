@@ -537,6 +537,38 @@
         "guest.items.settings": {
             "label": "Hôtes",
             "help": ""
+        },
+        "tasks": {
+            "label": "Suivi de tâches",
+            "help": ""
+        },
+        "tasks.events": {
+            "label": "Evénements",
+            "help": ""
+        },
+        "tasks.models": {
+            "label": "Modèles",
+            "help": ""
+        },
+        "tasks.tasks": {
+            "label": "Tâches",
+            "help": ""
+        },
+        "tasks.booking-tasks": {
+            "label": "Tâches réservation",
+            "help": ""
+        },
+        "tasks.booking-tasks.events": {
+            "label": "Evénements",
+            "help": ""
+        },
+        "tasks.booking-tasks.models": {
+            "label": "Modèles",
+            "help": ""
+        },
+        "tasks.booking-tasks.tasks": {
+            "label": "Tâches",
+            "help": ""
         }
     }
 }

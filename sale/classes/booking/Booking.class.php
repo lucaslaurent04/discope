@@ -489,6 +489,13 @@ class Booking extends Model {
                 'foreign_object'    => 'sale\booking\BookingActivity',
                 'foreign_field'     => 'booking_id',
                 'description'       => "The booking activities that refer to the booking."
+            ],
+
+            'tasks_ids' => [
+                'type'              => 'one2many',
+                'foreign_field'     => 'booking_id',
+                'foreign_object'    => 'sale\booking\followup\Task',
+                'description'       => "Follow up tasks that are associated with the booking."
             ]
 
         ];
@@ -920,6 +927,8 @@ class Booking extends Model {
                 if($booking['status'] == 'confirmed') {
                     $om->update(self::getType(), $id, ['has_contract' => true], $lang);
                 }
+
+                \eQual::run('do', 'sale_booking_followup_generate-task-status-change', ['booking_id' => $id]);
             }
         }
     }
