@@ -117,8 +117,22 @@
                 "name": "sale.booking.has_activity",
                 "setting_id": 159,
                 "value": "1"
+            },
+            {
+                "name": "lodging.locale.i18n.activity_schedule",
+                "setting_id": 160,
+                "value": "Planning prévisionnel des activités"
+            },
+            {
+                "name": "lodging.locale.i18n.children",
+                "setting_id": 161,
+                "value": "enfant(s)"
+            },
+            {
+                "name": "lodging.locale.i18n.people",
+                "setting_id": 162,
+                "value": "personne(s)"
             }
-
         ]
     }
 ]
