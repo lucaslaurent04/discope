@@ -86,7 +86,7 @@ $generateZip = function($files) {
 };
 
 /**
- * Data controller
+ * Action
  */
 
 $office = CenterOffice::id($params['center_office_id'])
@@ -97,20 +97,28 @@ if(is_null($office)) {
     throw new Exception("unknown_center_office", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-$journal = $journal = AccountingJournal::search([['center_office_id', '=', $params['center_office_id']], ['type', '=', 'sales']])
+$journal = AccountingJournal::search([['center_office_id', '=', $params['center_office_id']], ['type', '=', 'sales']])
     ->read(['id', 'code'])
     ->first();
 
-if(!$journal) {
+if(is_null($journal)) {
     throw new Exception("unknown_accounting_journal", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $invoices = Invoice::search(
     [
-        ['is_exported', '=', false],
-        ['center_office_id', '=', $params['center_office_id']],
-        ['booking_id', '>', 0],
-        ['status', '<>', 'proforma'],
+        [
+            ['is_exported', '=', false],
+            ['center_office_id', '=', $params['center_office_id']],
+            ['booking_id', '>', 0],
+            ['status', '<>', 'proforma'],
+        ],
+        [
+            ['is_exported', '=', false],
+            ['center_office_id', '=', $params['center_office_id']],
+            ['has_orders', '=', true],
+            ['status', '<>', 'proforma'],
+        ]
     ],
     ['sort'  => ['number' => 'asc']]
 )
