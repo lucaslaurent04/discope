@@ -393,7 +393,7 @@ hr {
                 </td>
             </tr>
         </table>
-        {% if status != 'proforma' and type != 'credit_note' %}
+        {% if status != 'proforma' and type != 'credit_note' and ( not has_orders)%}
         <table width="100%" style="border-right: 1px solid white; border: 0px; margin-top: 20px;" cellpadding="4" cellspacing="0">
             {% if (total_remaining < 0.0) %}
             <tr valign="top">
