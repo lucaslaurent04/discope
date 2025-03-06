@@ -9,7 +9,7 @@
 use sale\booking\Invoice;
 
 list($params, $providers) = eQual::announce([
-    'description'   => 'Provides the quantities and prices of all invoiced products for a given period.',
+    'description'   => 'Provides the quantity and prices for a given product and period.',
     'params'        => [
         'organisation_id' => [
             'type'              => 'many2one',
@@ -66,7 +66,7 @@ list($params, $providers) = eQual::announce([
 $context = $providers['context'];
 
 $result = [];
-if(isset($params['center_office_id']) || isset($params['organisation_id'])) {
+if( (isset($params['center_office_id']) || isset($params['organisation_id'])) && isset($params['product_id']) ) {
     $date_to = strtotime(date('Y-m-d 00:00:00', strtotime('+1 day', $params['date_to'])));
 
     $invoices = Invoice::search(array_merge(
@@ -107,8 +107,8 @@ if(isset($params['center_office_id']) || isset($params['organisation_id'])) {
 
             if(!isset($organisation_map[$org_id][$office_id][$product_id])) {
                 $organisation_map[$org_id][$office_id][$product_id] = [
-                    'organisation_id'  => $invoice['organisation_id'],
-                    'center_office_id' => $invoice['center_office_id'],
+                    'organisation_id'  => $invoice['organisation_id']['id'],
+                    'center_office_id' => $invoice['center_office_id']['id'],
                     'name'             => $invoice_line['name'],
                     'qty'              => 0,
                     'total'            => 0
