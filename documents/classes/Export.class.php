@@ -1,21 +1,22 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-namespace documents;
 
+namespace documents;
 
 class Export extends Document {
 
-    public function getTable() {
+    public function getTable(): string {
         return 'lodging_documents_export';
     }
 
-    public static function getColumns() {
+    public static function getColumns(): array {
         return [
+
             'name' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
@@ -48,15 +49,18 @@ class Export extends Document {
         ];
     }
 
-    public static function calcName($om, $ids, $lang) {
+    public static function calcName($self): array {
         $result = [];
-        $exports = $om->read(self::getType(), $ids, ['created', 'export_type', 'center_office_id.name'], $lang);
-        if($exports) {
-            foreach($exports as $oid => $export) {
-                $result[$oid] = date('Ymd', $export['created']).' - '.$export['export_type'].' - '.$export['center_office_id.name'];
-            }
+        $self->read(['created', 'export_type', 'center_office_id' => ['name']]);
+        foreach($self as $id => $export) {
+            $result[$id] = sprintf(
+                '%s - %s - %s',
+                date('Ymd', $export['created']),
+                $export['export_type'],
+                $export['center_office_id']['name']
+            );
         }
+
         return $result;
     }
-
 }
