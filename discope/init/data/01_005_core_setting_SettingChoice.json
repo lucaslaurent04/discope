@@ -164,6 +164,18 @@
                 "name": "mètre carré",
                 "setting_id": 17,
                 "value": "m2"
+            },
+            {
+                "id": 150,
+                "name": "BOB",
+                "setting_id": 163,
+                "value": "bob"
+            },
+            {
+                "id": 151,
+                "name": "EBP",
+                "setting_id": 163,
+                "value": "ebp"
             }
         ]
     }
