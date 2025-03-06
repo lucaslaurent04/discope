@@ -47,9 +47,17 @@ list($params, $providers) = eQual::announce([
             'type'              => 'integer',
             'description'       => 'Quantity of product invoiced.'
         ],
+        'center_office' => [
+            'type'              => 'string',
+            'description'       => 'Center office name'
+        ],
         'total' => [
             'type'              => 'float',
-            'description'       => 'Total price invoiced.'
+            'description'       => 'Total invoiced tax excl.'
+        ],
+        'price' => [
+            'type'              => 'float',
+            'description'       => 'Total invoiced tax incl.'
         ]
     ],
     'response'      => [
@@ -83,7 +91,7 @@ if( (isset($params['center_office_id']) || isset($params['organisation_id'])) &&
             'center_office_id' => ['id', 'name'],
             'organisation_id' => ['id', 'name'],
             'invoice_lines_ids' => [
-                'id', 'product_id', 'qty', 'unit_price', 'total', 'name',
+                'id', 'name', 'product_id', 'qty', 'unit_price', 'total', 'price',
             ]
         ]);
 
@@ -109,14 +117,17 @@ if( (isset($params['center_office_id']) || isset($params['organisation_id'])) &&
                 $organisation_map[$org_id][$office_id][$product_id] = [
                     'organisation_id'  => $invoice['organisation_id']['id'],
                     'center_office_id' => $invoice['center_office_id']['id'],
+                    'center_office'    => $invoice['center_office_id']['name'],
                     'name'             => $invoice_line['name'],
                     'qty'              => 0,
-                    'total'            => 0
+                    'total'            => 0,
+                    'price'            => 0
                 ];
             }
 
             $organisation_map[$org_id][$office_id][$product_id]['qty'] += $invoice_line['qty'];
             $organisation_map[$org_id][$office_id][$product_id]['total'] += $invoice_line['total'];
+            $organisation_map[$org_id][$office_id][$product_id]['price'] += $invoice_line['price'];
         }
     }
 
@@ -126,9 +137,11 @@ if( (isset($params['center_office_id']) || isset($params['organisation_id'])) &&
                 $result[] = [
                     'organisation_id'  => $product_stat['organisation_id'],
                     'center_office_id' => $product_stat['center_office_id'],
+                    'center_office'    => $product_stat['center_office'],
                     'name'             => $product_stat['name'],
                     'qty'              => $product_stat['qty'],
-                    'total'            => $product_stat['total']
+                    'total'            => $product_stat['total'],
+                    'price'            => $product_stat['price']
                 ];
 
             }
