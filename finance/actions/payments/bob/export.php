@@ -5,6 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use identity\CenterOffice;
 use identity\User;
 
 list($params, $providers) = eQual::announce([
@@ -27,11 +28,22 @@ list($params, $providers) = eQual::announce([
  */
 ['context' => $context, 'auth' => $auth] = $providers;
 
-$auth_user = User::id($auth->userId())
-    ->read(['center_offices_ids'])
-    ->first();
+$center_office_ids = [];
 
-foreach($auth_user['center_offices_ids'] as $center_office_id) {
+$auth_user_id = $auth->userId();
+if($auth_user_id === 1) {
+    // All center offices if root
+    $center_office_ids = CenterOffice::search()->ids();
+}
+else {
+    $auth_user = User::id($auth->userId())
+        ->read(['center_offices_ids'])
+        ->first();
+
+    $center_office_ids = $auth_user['center_offices_ids'];
+}
+
+foreach($center_office_ids as $center_office_id) {
     try {
         eQual::run('do', 'finance_payments_bob_export-invoices', compact('center_office_id'));
         eQual::run('do', 'finance_payments_bob_export-payments', compact('center_office_id'));
