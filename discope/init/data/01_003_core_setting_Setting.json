@@ -503,7 +503,7 @@
                 "package": "finance",
                 "section_id": 5,
                 "title": "Type export",
-                "description": "Type d'exportation requis, soit BOB ou EBP.",
+                "description": "Type de fichier d'export requis, soit BOB ou EBP.",
                 "help": "Dépend du logiciel de comptabilité utilisé.",
                 "type": "string",
                 "form_control": "select",
