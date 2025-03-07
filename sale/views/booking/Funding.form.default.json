@@ -153,6 +153,14 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "status",
+                                                "width": "33%",
+                                                "widget": {
+                                                    "readonly": true
+                                                }
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "is_paid",
                                                 "width": "33%",
                                                 "widget": {
@@ -249,6 +257,26 @@
                                                         "selection": false
                                                     }
                                                 }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Bank Checks",
+                        "id": "section.backchecks",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "bank_check_ids",
+                                                "width": "100%"
                                             }
                                         ]
                                     }

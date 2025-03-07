@@ -1,0 +1,24 @@
+{
+    "name": "Enregistrer un chèque bancaire",
+    "description": "Associer un chèque bancaire à un financement, marquer le financement comme payé et mettre à jour son statut en cours.",
+    "model": {
+        "id": {
+            "label": "Identifiant",
+            "description": "Identifiant du financement.",
+            "help": ""
+        },
+        "bank_check_id": {
+            "label": "Chèque bancaire",
+            "description": "Identifiant du chèque bancaire.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "unknown_funding": "Financement inconnu.",
+            "unknown_bankCheck": "Chèque bancaire inconnu.",
+            "nothing_to_pay": "Le financement est déjà payé en totalité.",
+            "funding_already_associated": "Le chèque bancaire est déjà associé à un financement."
+        }
+    }
+}

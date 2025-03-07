@@ -77,7 +77,8 @@ class Payment extends \sale\pay\Payment {
                     'cash',                 // cash money
                     'bank_card',            // electronic payment with bank (or credit) card
                     'booking',              // payment through addition to the final (balance) invoice of a specific booking
-                    'voucher'               // gift, coupon, or tour-operator voucher                    
+                    'voucher',               // gift, coupon, or tour-operator voucher
+                    'bank_check'
                 ],
                 'description'       => "The method used for payment at the cashdesk.",
                 'visible'           => [ ['payment_origin', '=', 'cashdesk'] ],
@@ -115,7 +116,14 @@ class Payment extends \sale\pay\Payment {
             'psp_ref' => [
                 'type'              => 'string',
                 'description'       => 'Reference allowing to retrieve the payment details from PSP.'
-            ]
+            ],
+
+            'bank_check_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\booking\BankCheck',
+                'description'       => 'The BankCheck associated with the payment.'
+            ],
+
 
         ];
     }
