@@ -1,0 +1,53 @@
+{
+    "name": "Bank Check",
+    "description": "This view is intended for displaying the list of Bank Check.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "bankCheck_number",
+                "width": "20%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "emission_date",
+                "width": "20%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "amount",
+                "width": "20%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "status",
+                "width": "20%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "funding_id",
+                "width": "20%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "booking_id",
+                "width": "20%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "payment_id",
+                "width": "20%",
+                "sortable": true
+            }
+        ]
+    }
+}
