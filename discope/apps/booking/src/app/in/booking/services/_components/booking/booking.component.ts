@@ -154,6 +154,18 @@ export class BookingServicesBookingComponent
         }
     }
 
+    public async oncloneGroup(group_id: number) {
+        try {
+            await this.api.fetch('?do=sale_booking_clone-group', {id: group_id});
+
+            // reload booking tree
+            this.load(this.instance.id);
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+    }
+
     public async ondeleteGroup(group_id:number) {
 
         const dialog = this.dialog.open(SbDialogConfirmDialog, {
