@@ -57,6 +57,7 @@ export class BookingServicesBookingComponent
     public maximized_group_id: number = 0;
     public time_slots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[] = [];
     public mapGroupsIdsBookingActivitiesDays: {[key: number]: BookingActivityDay[]} = {};
+    public mapGroupsIdsHasActivity: {[key: number]: boolean};
 
     constructor(
         private dialog: MatDialog,
@@ -104,6 +105,7 @@ export class BookingServicesBookingComponent
                     console.debug('received updated booking', result);
                     this.update(result);
                     this.initMapGroupsIdsBookingActivitiesDays(result);
+                    this.initMapGroupsIdsHasActivity(result);
                     this.loading = false;
                 }
 
@@ -232,7 +234,7 @@ export class BookingServicesBookingComponent
         this.loading = false;
     }
 
-    public initMapGroupsIdsBookingActivitiesDays(booking: Booking) {
+    private initMapGroupsIdsBookingActivitiesDays(booking: Booking) {
         this.mapGroupsIdsBookingActivitiesDays = {};
         for(let group of booking.booking_lines_groups_ids) {
             this.mapGroupsIdsBookingActivitiesDays[group.id] = this.createGroupBookingActivitiesDays(group);
@@ -289,5 +291,19 @@ export class BookingServicesBookingComponent
         }
 
         return bookingActivitiesDays;
+    }
+
+    private initMapGroupsIdsHasActivity(booking: Booking) {
+        this.mapGroupsIdsHasActivity = {};
+        for(let group of booking.booking_lines_groups_ids as BookingLineGroup[]) {
+            let hasActivity = false;
+            for(let line of group.booking_lines_ids as BookingLine[]) {
+                if(line.is_activity) {
+                    hasActivity = true;
+                }
+            }
+
+            this.mapGroupsIdsHasActivity[group.id] = hasActivity;
+        }
     }
 }
