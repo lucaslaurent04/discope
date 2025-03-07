@@ -76,6 +76,12 @@
                             transform: translateX(4px) translateY(14px);
                         }
 
+                        .group-clone {
+                            position: absolute;
+                            right: 100px;
+                            transform: translateY(3px);
+                        }
+
                         .group-remove {
                             position: absolute;
                             right: 50px;

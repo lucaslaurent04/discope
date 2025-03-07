@@ -31,7 +31,16 @@
                             (loadStart)="onLoadStartGroup()"
                             (loadEnd)="onLoadEndGroup()"
                         ></booking-services-booking-group>
-                        <div class="group-remove" *ngIf="maximized_group_id == 0"><button mat-icon-button (click)="ondeleteGroup(group.id)"> <mat-icon>delete</mat-icon></button></div>
+                        <div class="group-clone" *ngIf="maximized_group_id == 0">
+                            <button mat-icon-button [disabled]="!this.mapGroupsIdsHasActivity[group.id]" (click)="oncloneGroup(group.id)">
+                                <mat-icon>content_copy</mat-icon>
+                            </button>
+                        </div>
+                        <div class="group-remove" *ngIf="maximized_group_id == 0">
+                            <button mat-icon-button (click)="ondeleteGroup(group.id)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </div>
                     </div>
                 </ng-container>
             </div>
