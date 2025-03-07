@@ -1,0 +1,46 @@
+{
+    "name": "Chèque bancaire",
+    "plural": "Chèques bancaires",
+    "description": "",
+    "model": {
+        "booking_id": {
+            "label": "Réservation",
+            "description": "La réservation associée au chèque bancaire, si applicable .",
+            "help": ""
+        },
+        "payment_id": {
+            "label": "Paiement",
+            "description": "Le paiement associé au chèque bancaire, si applicable.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Chèque bancaire",
+            "description": "Formulaire de modification par défaut  de un cheque bancaire.",
+            "actions": {
+                "action.transition.register": {
+                    "label": "Enregistrer",
+                    "help": "Soumettez le chèque bancaire pour son traitement."
+                },
+                "action.transition.in_process": {
+                    "label": "En Cours",
+                    "help": "Le chèque bancaire est en cours de transfert vers la banque et attend validation."
+                },
+                "action.transition.reject": {
+                    "label": "Rejeter",
+                    "help": "Marquez le chèque bancaire comme rejeté par la banque."
+                },
+                "action.transition.pay": {
+                    "label": "Payer",
+                    "help": "Confirmez que le chèque bancaire a été payé et que le virement a été effectué."
+                },
+                "action.transition.add.payment": {
+                    "label": "Effectuer un paiement",
+                    "help": "L'enregistrement d'un paiement sera effectué et associé au financement."
+                }
+            }
+        }
+    },
+    "error": {}
+}
