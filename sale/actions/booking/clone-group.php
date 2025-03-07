@@ -135,6 +135,9 @@ $cloneBookingLines = function($clone_group_id, $lines) {
                     if($line['unit_price'] !== $l['unit_price']) {
                         BookingLine::id($l['id'])->update(['unit_price' => $line['unit_price']]);
                     }
+                    if($line['vat_rate'] !== $l['vat_rate']) {
+                        BookingLine::id($l['id'])->update(['vat_rate' => $line['vat_rate']]);
+                    }
                     break;
                 }
 
@@ -163,7 +166,7 @@ $cloneBookingLines = function($clone_group_id, $lines) {
         ]);
 
         $clone_line = BookingLine::id($clone_line['id'])
-            ->read(['qty', 'unit_price'])
+            ->read(['qty', 'unit_price', 'vat_rate'])
             ->first();
 
         // Handle link between BookingLine and BookingActivity
@@ -186,6 +189,9 @@ $cloneBookingLines = function($clone_group_id, $lines) {
         }
         if($line['unit_price'] !== $clone_line['unit_price']) {
             BookingLine::id($clone_line['id'])->update(['unit_price' => $line['unit_price']]);
+        }
+        if($line['vat_rate'] !== $clone_line['vat_rate']) {
+            BookingLine::id($clone_line['id'])->update(['vat_rate' => $line['vat_rate']]);
         }
     }
 };
@@ -222,6 +228,7 @@ $group = BookingLineGroup::id($params['id'])
             'order',
             'qty',
             'unit_price',
+            'vat_rate',
             'description',
             'product_id',
             'service_date',
