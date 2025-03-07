@@ -155,6 +155,7 @@ export class BookingServicesBookingComponent
     }
 
     public async oncloneGroup(group_id: number) {
+        this.loading = true;
         try {
             await this.api.fetch('?do=sale_booking_clone-group', {id: group_id});
 
@@ -163,6 +164,7 @@ export class BookingServicesBookingComponent
         }
         catch(response) {
             this.api.errorFeedback(response);
+            this.loading = false;
         }
     }
 
