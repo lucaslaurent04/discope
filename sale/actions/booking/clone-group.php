@@ -138,8 +138,6 @@ $cloneBookingLines = function($clone_group_id, $lines) {
 
         // Handle link between BookingLine and BookingActivity
         if($line['is_activity']) {
-            $activity_id = null;
-
             $bl = BookingLine::id($clone_line['id'])
                 ->read(['booking_activity_id'])
                 ->first();
