@@ -22,7 +22,17 @@
 			"label": "Payé",
 			"description": "Montant versé pour ce financement.",
 			"help": ""
-		}
+		},
+        "status": {
+            "label": "Statut",
+            "description": "Le statut actuel du traitement du financement.",
+            "selection": {
+                "pending": "En attente",
+                "in_process": "En cours",
+                "paid": "Payé"
+            },
+            "help": ""
+        }
 	},
 	"view": {
 		"form.default": {
@@ -61,6 +71,9 @@
 				},
 				"section.payments": {
 					"label": "Paiements"
+				},
+                "section.backchecks": {
+					"label": "Chèques bancaires"
 				}
 			}
 		},
@@ -92,6 +105,10 @@
 				"action.delete": {
 					"label": "Supprimer",
 					"description": "Permet de supprimer financement de remboursement un obsolète."
+				},
+                "action.add_bank_check": {
+					"label": "Enregistrer chèque bancaire",
+					"description": "Enregistrer un chèque bancaire à un financement, marquer le financement comme payé et mettre à jour son statut en cours."
 				}
 			},
 			"layout": {
@@ -100,6 +117,9 @@
 				},
 				"section.payments": {
 					"label": "Paiements"
+				},
+                "section.backchecks": {
+					"label": "Chèques bancaires"
 				}
 			}
 		},
@@ -131,6 +151,9 @@
 				},
 				"section.payments": {
 					"label": "Paiements"
+				},
+                "section.backchecks": {
+					"label": "Chèques bancaires"
 				}
 			}
 		},
@@ -162,6 +185,9 @@
 				},
 				"section.payments": {
 					"label": "Paiements"
+				},
+                "section.backchecks": {
+					"label": "Chèques bancaires"
 				}
 			}
 		},
