@@ -100,6 +100,14 @@
         "item.contracts.all": {
             "label": "Tous les contrats",
             "help": ""
+        },
+        "item.bankchecks": {
+            "label": "Chèques bancaires",
+            "help": ""
+        },
+        "item.bankchecks.all": {
+            "label": "Tous les chèques bancaires",
+            "help": ""
         }
     }
 }
