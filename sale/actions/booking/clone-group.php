@@ -118,7 +118,7 @@ $cloneBookingLines = function($clone_group_id, $lines) {
                 $line['product_id'] === $product_model['transport_product_model_id']
                 || in_array($line['product_id'], $product_model['supplies_ids'])
             ) {
-                // Skip because is transport or supply of an activity and will be automatically added
+                // Find automatically added transport or supply line, then update its qty and unit_price if needed.
                 $new_activity_id = $map_old_activity_line_id_new_activity_id[$line['booking_activity_id']['activity_booking_line_id']['id']];
                 $activity = BookingActivity::id($new_activity_id)
                     ->read(['booking_lines_ids' => ['product_model_id', 'qty', 'unit_price']])
