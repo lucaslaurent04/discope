@@ -95,12 +95,20 @@ $group = BookingLineGroup::id($params['id'])
             ]
         ],
         'booking_lines_ids' => [
+            'booking_id',
+            'order',
             'description',
             'product_id',
             'service_date',
             'time_slot_id',
+            'is_activity',
             'booking_activity_id' => [
-                'activity_booking_line_id'
+                'activity_booking_line_id' => [
+                    'product_model_id' => [
+                        'transport_product_model_id',
+                        'supplies_ids'
+                    ]
+                ]
             ]
         ]
     ])
@@ -133,17 +141,25 @@ $clone = BookingLineGroup::create([
     ->read(['id'])
     ->first(true);
 
-$order = 1;
+$map_old_activity_line_id_new_activity_id = [];
 foreach($group['booking_lines_ids'] as $line) {
+    $activity_line_id = null;
     if(isset($line['booking_activity_id']['activity_booking_line_id']) && $line['booking_activity_id']['activity_booking_line_id'] !== $line['id']) {
-        // Skip because is transport or supply of an activity and will be automatically added
-        continue;
+        $product_model = $line['booking_activity_id']['activity_booking_line_id']['product_model_id'];
+        if($line['product_id'] === $product_model['transport_product_model_id'] || in_array($line['product_id'], $product_model['supplies_ids'])) {
+            // Skip because is transport or supply of an activity and will be automatically added
+            continue;
+        }
+        else {
+            // Save activity line id to link new line to the new activity
+            $activity_line_id = $line['booking_activity_id']['activity_booking_line_id']['id'];
+        }
     }
 
     $clone_line = BookingLine::create([
-        'order'                 => $order++,
-        'booking_id'            => $group['booking_id']['id'],
         'booking_line_group_id' => $clone['id'],
+        'booking_id'            => $line['booking_id'],
+        'order'                 => $line['order'],
         'service_date'          => $line['service_date'],
         'time_slot_id'          => $line['time_slot_id']
     ])
@@ -154,6 +170,25 @@ foreach($group['booking_lines_ids'] as $line) {
         'id'            => $clone_line['id'],
         'product_id'    => $line['product_id']
     ]);
+
+    // Handle link between BookingLine and BookingActivity
+    if($line['is_activity']) {
+        $activity_id = null;
+
+        $bl = BookingLine::id($clone_line['id'])
+            ->read(['booking_activity_id'])
+            ->first();
+
+        if(!is_null($bl)) {
+            $map_old_activity_line_id_new_activity_id[$line['id']] = $bl['booking_activity_id'];
+        }
+    }
+    elseif(!is_null($activity_line_id) && isset($map_old_activity_line_id_new_activity_id[$activity_line_id])) {
+        BookingLine::id($clone_line['id'])
+            ->update(['booking_activity_id' => $map_old_activity_line_id_new_activity_id[$activity_line_id]]);
+    }
+
+    // TODO: handle qty
 
     // BookingLine::id($clone_line['id'])->update(['qty' => '']);
 }
