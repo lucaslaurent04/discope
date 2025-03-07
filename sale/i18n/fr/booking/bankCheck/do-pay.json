@@ -1,0 +1,25 @@
+{
+    "name": "Paiement",
+    "description": "Cette action traite un paiement manuel par chèque bancaire, l'associe au financement correspondant et le marque comme payé.",
+    "model": {
+        "id": {
+            "label": "Identifiant",
+            "description": "Identifiant de  cheque bancaire.",
+            "help": ""
+        },
+        "confirm": {
+            "label": "Confirmer",
+            "description": "Confirmation manuelle.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "missing_confirmation": "La confirmation de cette action est requise.",
+            "unknown_funding": "Réservation de financement.",
+            "unknown_bankCheck": "Chèque bancaire inconnu.",
+            "payment_already_associated": "Impossible d'enregistrer le paiement : il y a déjà un paiement associé.",
+            "nothing_to_pay": "Le financement est déjà payé en totalité."
+        }
+    }
+}
