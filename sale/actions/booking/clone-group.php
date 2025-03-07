@@ -21,6 +21,10 @@ list($params, $providers) = announce([
         ]
 
     ],
+    'access'        => [
+        'visibility'        => 'protected',
+        'groups'            => ['booking.default.user']
+    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
