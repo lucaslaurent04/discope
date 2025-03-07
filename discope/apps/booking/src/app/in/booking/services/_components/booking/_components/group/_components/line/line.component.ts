@@ -207,7 +207,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         this.vm.time_slot_id.formControl.setValue(this.instance.time_slot_id);
         // meal_location
         this.vm.meal_location.formControl.setValue(this.instance.meal_location);
-        if(this.instance.meal_location || this.instance.is_activity) {
+        if(this.instance.is_meal || this.instance.is_activity) {
             this.vm.service_date.formControl.enable();
             this.vm.time_slot_id.formControl.enable();
         }
