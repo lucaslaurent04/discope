@@ -72,9 +72,10 @@ $orm->disableEvents();
 
 
 // remove existing booking_lines
-BookingLine::ids($group['booking_lines_ids'])->delete(true);
 
-SojournProductModel::ids($group['sojourn_product_models_ids'])->delete(true);
+// #memo - removing service may impact activities and should only be done manually or at pack selection
+// BookingLine::ids($group['booking_lines_ids'])->delete(true);
+// SojournProductModel::ids($group['sojourn_product_models_ids'])->delete(true);
 
 // reset attributes related to pack
 BookingLineGroup::id($group['id'])->update(['is_locked' => false, 'has_pack' => false, 'pack_id' => null ]);
