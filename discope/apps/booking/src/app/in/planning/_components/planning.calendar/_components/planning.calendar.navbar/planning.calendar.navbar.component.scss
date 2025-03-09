@@ -32,11 +32,14 @@
 
         .centers-selector {
             width: 80%;
+            display: flex;
+            align-items: center;
+            margin-top: -23px;
+            flex-direction: row;
+            gap: 12px;
 
             mat-form-field {
                 width: 100%;
-
-    
             }
 
         }
@@ -79,10 +82,12 @@
                 width: 100%;
             }
         }
-        
     }
 
     .panelNavigation {
+        display: flex;
+        align-items: center;
+        margin-top: -23px;
         line-height: 65px;
         flex: 1 0 33%;
         text-align: right;
