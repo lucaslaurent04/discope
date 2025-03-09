@@ -5,13 +5,13 @@ import { Subscription } from 'rxjs';
 import { BookingDayClass } from 'src/app/model/booking.class';
 import { ChangeReservationArg } from 'src/app/model/changereservationarg';
 import { ApiService, AuthService, ContextService } from 'sb-shared-lib';
-import { CalendarParamService } from './_services/calendar.param.service';
-import { PlanningCalendarComponent } from './_components/planning.calendar/planning.calendar.component';
+import { PlanningEmployeesCalendarParamService } from './_services/employees.calendar.param.service';
+import { PlanningEmployeesCalendarComponent } from './_components/employees.calendar/employees.calendar.component';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 import * as screenfull from 'screenfull';
-import { PlanningLegendDialogComponent } from './_components/legend.dialog/legend.component';
-import { PlanningPreferencesDialogComponent } from './_components/preferences.dialog/preferences.component';
+// import { PlanningLegendDialogComponent } from './_components/legend.dialog/legend.component';
+// import { PlanningPreferencesDialogComponent } from './_components/preferences.dialog/preferences.component';
 
 interface DateRange {
   from: Date,
@@ -19,13 +19,13 @@ interface DateRange {
 }
 
 @Component({
-    selector: 'planning',
-    templateUrl: './planning.component.html',
-    styleUrls: ['./planning.component.scss']
+    selector: 'planning-employees',
+    templateUrl: './employees.component.html',
+    styleUrls: ['./employees.component.scss']
 })
-export class PlanningComponent implements OnInit, AfterViewInit, OnDestroy {
+export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('planningBody') planningBody: ElementRef;
-    @ViewChild('planningCalendar') planningCalendar: PlanningCalendarComponent;
+    @ViewChild('planningCalendar') planningCalendar: PlanningEmployeesCalendarComponent;
 
     public centers_ids: number[];
     public rowsHeight: number = 30;
@@ -42,7 +42,7 @@ export class PlanningComponent implements OnInit, AfterViewInit, OnDestroy {
         private api: ApiService,
         private auth:AuthService,
         private context: ContextService,
-        private params: CalendarParamService,
+        private params: PlanningEmployeesCalendarParamService,
         private cd: ChangeDetectorRef,
         public dialog: MatDialog
     ) {
@@ -64,6 +64,7 @@ export class PlanningComponent implements OnInit, AfterViewInit, OnDestroy {
         }
 
         // #memo - we need to put this on global window to support fullscreen
+
         window.addEventListener('wheel', (event:any) => {
             if(event.shiftKey) {
                 if(event.deltaY > 0) {
@@ -177,10 +178,11 @@ export class PlanningComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     public onOpenLegendDialog(){
-        const dialogRef = this.dialog.open(PlanningLegendDialogComponent, {});
+        // const dialogRef = this.dialog.open(PlanningLegendDialogComponent, {});
     }
 
     public onOpenPrefDialog() {
+        /*
         const dialogRef = this.dialog.open(PlanningPreferencesDialogComponent, {
                 width: '500px',
                 height: '500px'
@@ -195,6 +197,7 @@ export class PlanningComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.applySettings();
             }
         });
+        */
     }
 
     public onShowBooking(consumption: any) {
@@ -249,7 +252,7 @@ export class PlanningComponent implements OnInit, AfterViewInit, OnDestroy {
         this.context.change(descriptor);
     }
 
-    public onShowRentalUnit(rental_unit: any) {
+    public onShowEmployee(rental_unit: any) {
         let descriptor:any = {
             context_silent: true, // do not update sidebar
             context: {
