@@ -63,6 +63,16 @@ class BookingActivity extends Model {
                 'relation'          => ['activity_booking_line_id' => ['booking_line_group_id']]
             ],
 
+            'providers_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\provider\Provider',
+                'foreign_field'     => 'booking_activities_ids',
+                'rel_table'         => 'sale_booking_bookingactivity_rel_sale_provider_providers',
+                'rel_foreign_key'   => 'provider_id',
+                'rel_local_key'     => 'booking_activity_id',
+                'description'       => 'The assigned providers for the activity, if required by product model.'
+            ],
+
             'supplies_booking_lines_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\BookingLine',
