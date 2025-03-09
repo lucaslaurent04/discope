@@ -102,24 +102,23 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
         let filtered: any[] = [];
         try {
             let domain = [
-                ['is_pack', '=', false]
+                ['is_activity', '=', true]
             ];
+
+            if(!this.allowFulldaySelection) {
+                domain.push(['is_fullday', '=', false]);
+            }
 
             if(name && name.length) {
                 domain.push(['name', 'ilike', `%${name}%`]);
             }
 
             const productCollectParams: any = {
-                center_id: this.booking.center_id.id,
-                domain: JSON.stringify(domain),
-                date_from: this.booking.date_from.toISOString(),
-                date_to: this.booking.date_to.toISOString(),
-                is_activity: true
-            };
-
-            if(!this.allowFulldaySelection) {
-                productCollectParams.is_fullday = false;
-            }
+                    center_id: this.booking.center_id.id,
+                    domain: JSON.stringify(domain),
+                    date_from: this.booking.date_from.toISOString(),
+                    date_to: this.booking.date_to.toISOString()
+                };
 
             filtered = await this.api.fetch('?get=sale_catalog_product_collect', productCollectParams);
         }
