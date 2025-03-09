@@ -83,11 +83,16 @@
                                             {
                                                 "type": "field",
                                                 "value": "schedule_type",
-                                                "width": "50%"
+                                                "width": "25%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "schedule_default_value",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "time_slot_id",
                                                 "width": "50%"
                                             },
                                             {
@@ -278,25 +283,31 @@
                     {
                         "label": "Activity",
                         "id": "section.activity",
+                        "visible": ["is_activity", "=", true],
                         "rows": [
                             {
                                 "columns": [
                                     {
-                                        "width": "33%",
+                                        "width": "25%",
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "is_billable",
-                                                "width": "50%"
+                                                "value": "activity_scope",
+                                                "width": "100%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "activity_scope",
-                                                "width": "50%"
+                                                "value": "is_billable",
+                                                "width": "100%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "has_staff_required",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_fullday",
                                                 "width": "100%"
                                             },
                                             {
@@ -312,17 +323,17 @@
                                             {
                                                 "type": "field",
                                                 "value": "has_transport_required",
-                                                "width": "100%"
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "transport_product_model_id",
-                                                "width": "100%"
+                                                "width": "50%"
                                             }
                                         ]
                                     },
                                     {
-                                        "width": "33%",
+                                        "width": "25%",
                                         "items": [
                                             {
                                                 "type": "field",
@@ -343,21 +354,41 @@
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": false,
-                                                            "ACTION.ADD": true,
-                                                            "ACTION.DELETE" :true
+                                                            "ACTION.ADD": true
                                                         }
                                                     }
                                                 }
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "is_fullday",
-                                                "width": "100%"
                                             }
                                         ]
                                     },
                                     {
-                                        "width": "33%",
+                                        "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "has_supply",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "supplies_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.activity",
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.ADD": true
+                                                        }
+                                                    },
+                                                    "domain": ["is_supply", "=", true]
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "visible": ["has_staff_required", "=", false],
+                                        "width": "25%",
                                         "items": [
                                             {
                                                 "type": "field",
@@ -373,31 +404,9 @@
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": false,
-                                                            "ACTION.ADD": true,
-                                                            "ACTION.DELETE" :true
+                                                            "ACTION.ADD": true
                                                         }
                                                     }
-                                                }
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "has_supply",
-                                                "width": "100%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "supplies_ids",
-                                                "width": "100%",
-                                                "widget": {
-                                                    "view": "list.activity",
-                                                    "header": {
-                                                        "actions": {
-                                                            "ACTION.CREATE": false,
-                                                            "ACTION.ADD": true,
-                                                            "ACTION.DELETE" :true
-                                                        }
-                                                    },
-                                                    "domain": ["is_supply", "=", true]
                                                 }
                                             }
                                         ]
@@ -409,6 +418,7 @@
                     {
                         "label": "TimeSlots",
                         "id": "section.time-slots",
+                        "visible": [ ["type", "=", "service"], ["service_type", "=", "schedulable"] ],
                         "rows": [
                             {
                                 "columns": [
@@ -424,8 +434,7 @@
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": false,
-                                                            "ACTION.ADD": true,
-                                                            "ACTION.DELETE" :true
+                                                            "ACTION.ADD": true
                                                         }
                                                     }
                                                 }
