@@ -19,6 +19,7 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
+/*
     'constants'     => [
         'BOOKING_BOOKED_SERVICES_STORE_FOLDED_SETTINGS',
         'BOOKING_BOOKED_SERVICES_IDENTIFICATION_FOLDED',
@@ -27,6 +28,7 @@ list($params, $providers) = eQual::announce([
         'BOOKING_BOOKED_SERVICES_ACCOMODATIONS_FOLDED',
         'BOOKING_BOOKED_SERVICES_MEALS_FOLDED'
     ],
+*/
     'providers'     => ['context', 'auth']
 ]);
 
