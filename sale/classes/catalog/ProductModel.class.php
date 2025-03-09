@@ -138,6 +138,14 @@ class ProductModel extends Model {
                 'visible'           => [ ['type', '=', 'service'], ['service_type', '=', 'schedulable'] ]
             ],
 
+            'time_slot_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\booking\TimeSlot',
+                'description'       => "The specific time slot at which the service can take place.",
+                'help'              => "This value is used when creating the consumptions relating to scheduled products (mostly meals).",
+                'visible'           => [ ['type', '=', 'service'], ['service_type', '=', 'schedulable'] ]
+            ],
+
             'time_slots_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\booking\TimeSlot',
@@ -145,18 +153,13 @@ class ProductModel extends Model {
                 'rel_table'         => 'sale_catalog_product_model_rel_sale_booking_timeslot',
                 'rel_foreign_key'   => 'time_slot_id',
                 'rel_local_key'     => 'product_model_id',
-                'description'       => "The time slots to classify when the service can take place.",
-                'visible'           => [ [
-                                         ['type', '=', 'service'],
-                                         ['service_type', '=', 'schedulable'] ,
-                                         ['is_activity', '=', true],
-                                         ['is_fullday', '=', false]
-                                        ],
-                                        [
+                'description'       => "The specific time slots at which the service can take place.",
+                'help'              => "This field applies only to activities that can be scheduled on specific time slots. Most of the time a product is linked to a single time slot.",
+                'visible'           => [
                                             ['type', '=', 'service'],
                                             ['service_type', '=', 'schedulable'] ,
-                                            ['is_meal', '=', true]
-                                        ]
+                                            ['is_activity', '=', true],
+                                            ['is_fullday', '=', false]
                                         ],
             ],
 
@@ -347,7 +350,7 @@ class ProductModel extends Model {
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the product requires specific provider.',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_staff_required', '=', false] ]
             ],
 
             'providers_ids' => [
@@ -358,7 +361,7 @@ class ProductModel extends Model {
                 'rel_foreign_key'   => 'provider_id',
                 'rel_local_key'     => 'product_model_id',
                 'description'       => 'References the providers required for the activity.',
-                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_provider', '=', true] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_provider', '=', true], ['has_staff_required', '=', false] ]
             ],
 
             'is_fullday' => [
