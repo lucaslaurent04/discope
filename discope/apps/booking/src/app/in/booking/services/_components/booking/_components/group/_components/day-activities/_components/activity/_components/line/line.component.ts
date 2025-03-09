@@ -88,23 +88,23 @@ export class BookingServicesBookingGroupDayActivitiesActivityLineComponent imple
                 ['is_pack', '=', false]
             ];
 
+            if(this.line.is_transport) {
+                domain.push(['is_transport', '=', true]);
+            }
+            else {
+                domain.push(['is_supply', '=', true]);
+            }
+
             if(name && name.length) {
                 domain.push(['name', 'ilike', `%${name}%`]);
             }
 
             const params: {[key: string]: any} = {
-                center_id: this.booking.center_id.id,
-                domain: JSON.stringify(domain),
-                date_from: this.booking.date_from.toISOString(),
-                date_to: this.booking.date_to.toISOString()
-            };
-
-            if(this.line.is_transport) {
-                params.is_transport = true;
-            }
-            else {
-                params.is_supply = true;
-            }
+                    center_id: this.booking.center_id.id,
+                    domain: JSON.stringify(domain),
+                    date_from: this.booking.date_from.toISOString(),
+                    date_to: this.booking.date_to.toISOString()
+                };
 
             filtered = await this.api.fetch('?get=sale_catalog_product_collect', params);
         }
