@@ -85,7 +85,7 @@
             "help": ""
         },
         "schedule_default_value": {
-            "label": "Planification par défaut",
+            "label": "Planification",
             "description": "Valeur par défaut du planning selon son type.",
             "help": "Valeur par défaut du planning selon son type (heure, plage horaire)."
         },
@@ -94,9 +94,14 @@
             "description": "Décalage, en jours, à partir de la date de début de séjour.",
             "help": ""
         },
+        "time_slot_id": {
+            "label": "Tranche horaire",
+            "description": "Les créneaux horaires durant lequel le service peut avoir lieu.",
+            "help": ""
+        },
         "time_slots_ids": {
             "label": "Tranches horaires",
-            "description": "Les créneaux horaires pour classer quand le service peut avoir lieu.",
+            "description": "Les créneaux horaires durant lesquels l'activité peut avoir lieu.",
             "help": ""
         },
         "tracking_type": {
