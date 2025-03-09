@@ -13,6 +13,9 @@
         }
 
         .day-name-cell {
+            text-transform: uppercase;
+            text-align: left !important;
+            font-weight: bold;
             min-width: 80px;
             max-width: 80px;
             text-align: right;
@@ -28,6 +31,7 @@
     }
 
     .activities-container {
+        margin-top: 4px;
         width: 100%;
 
         .activity-container {

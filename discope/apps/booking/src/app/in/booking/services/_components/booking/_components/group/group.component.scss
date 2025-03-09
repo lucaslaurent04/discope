@@ -50,6 +50,10 @@
     }
 
     .part {
+        .part-toggle.highlight, .part-container.highlight {
+            background: #eaeaea;
+        }
+
         display: flex;
 
         .part-toggle {
@@ -169,6 +173,8 @@
         .product-item {
             position: relative;
             background-color: white;
+            border-radius: 12px;
+            margin-bottom: 8px;
 
             .product-handle {
                 position: absolute;
@@ -258,6 +264,8 @@
         .activity-item {
             position: relative;
             background-color: white;
+            margin: 10px 0;
+            border-radius: 10px;
         }
     }
 }

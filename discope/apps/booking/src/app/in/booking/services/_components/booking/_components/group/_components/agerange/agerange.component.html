@@ -1,18 +1,18 @@
 <div class="cell" style="width: 330px;">
-    <sb-m2o-select [entity]="'sale\\customer\\AgeRange'"
-                   [id]="instance.age_range_id"
-                   [placeholder]="'Commencez à taper le nom'"
-                   [noResult]="'rien trouvé'"
-                   [required]="true"
-                   [disabled]="instance?.age_range_id > 0"
-                   (itemSelected)="onupdateAgeRange($event)"
-    >
+    <sb-m2o-select
+            [entity]="'sale\\customer\\AgeRange'"
+            [id]="instance.age_range_id"
+            [placeholder]="'Commencez à taper le nom'"
+            [noResult]="'rien trouvé'"
+            [required]="true"
+            [disabled]="instance?.age_range_id > 0"
+            (itemSelected)="onupdateAgeRange($event)">
         Tranche d'âge
     </sb-m2o-select>
 </div>
 
 <div class="cell">
-    <mat-form-field style="max-width: 60px;">
+    <mat-form-field style="max-width: 60px;" [class.hidden]="this.instance.age_from >= 18">
         <mat-label>De</mat-label>
         <input type="number" min="0" max="99" matInput (blur)="onupdateAgeFrom()" [formControl]="ageFromFormControl">
         <mat-error *ngIf="ageFromFormControl.hasError('min')">Min 0.</mat-error>
@@ -22,7 +22,7 @@
 </div>
 
 <div class="cell">
-    <mat-form-field style="max-width: 60px;">
+    <mat-form-field style="max-width: 60px;" [class.hidden]="this.instance.age_from >= 18">
         <mat-label>À</mat-label>
         <input type="number" min="0" max="99" matInput (blur)="onupdateAgeTo()" [formControl]="ageToFormControl">
         <mat-error *ngIf="ageToFormControl.hasError('min')">Min 0.</mat-error>
