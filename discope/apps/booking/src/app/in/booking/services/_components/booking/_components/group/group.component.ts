@@ -739,19 +739,19 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         let filtered:any[] = [];
         try {
             let domain = [
-                ["is_pack", "=", true]
+                ['is_pack', '=', true]
             ];
 
             if(name && name.length) {
-                domain.push(["name", "ilike", '%'+name+'%']);
+                domain.push(['name', 'ilike', '%'+name+'%']);
             }
 
             const data:any[] = await this.api.fetch('?get=sale_catalog_product_collect', {
-                center_id: this.booking.center_id.id,
-                domain: JSON.stringify(domain),
-                date_from: this.booking.date_from.toISOString(),
-                date_to: this.booking.date_to.toISOString()
-            });
+                    center_id: this.booking.center_id.id,
+                    domain: JSON.stringify(domain),
+                    date_from: this.booking.date_from.toISOString(),
+                    date_to: this.booking.date_to.toISOString()
+                });
             filtered = data;
         }
         catch(response) {
