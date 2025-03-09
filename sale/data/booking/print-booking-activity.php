@@ -21,7 +21,7 @@ use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Render a booking quote as a PDF document, given its id.",
     'params'        => [
         'id' => [
@@ -32,7 +32,7 @@ list($params, $providers) = announce([
         'view_id' =>  [
             'description'   => 'The identifier of the view <type.name>.',
             'type'          => 'string',
-            'default'       => 'print.default'
+            'default'       => 'print.activity'
         ],
         'mode' =>  [
             'description'   => 'Mode in which document has to be rendered: simple or detailed.',
@@ -65,7 +65,7 @@ list($params, $providers) = announce([
 ]);
 
 
-list($context, $orm) = [$providers['context'], $providers['orm']];
+['context' => $context, 'orm' => $orm] = $providers;
 
 /*
     Retrieve the requested template
@@ -186,7 +186,7 @@ $values['i18n'] = [
     'activity_schedule'    => Setting::get_value('lodging', 'locale', 'i18n.activity_schedule', null, [], $params['lang']),
     'booking_ref'          => Setting::get_value('lodging', 'locale', 'i18n.booking_ref', null, [], $params['lang']),
     'children'             => Setting::get_value('lodging', 'locale', 'i18n.children', null, [], $params['lang']),
-    'company_registry'      => Setting::get_value('lodging', 'locale', 'i18n.company_registry', null, [], $params['lang']),
+    'company_registry'     => Setting::get_value('lodging', 'locale', 'i18n.company_registry', null, [], $params['lang']),
     'date'                 => Setting::get_value('lodging', 'locale', 'i18n.date', null, [], $params['lang']),
     'day'                  => Setting::get_value('lodging', 'locale', 'i18n.day', null, [], $params['lang']),
     'people'               => Setting::get_value('lodging', 'locale', 'i18n.people', null, [], $params['lang']),
