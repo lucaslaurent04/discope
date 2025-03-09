@@ -282,7 +282,7 @@
         </div>
 
         <!-- 4) manual discounts -->
-        <div class="row row-first" *ngIf="!vProduct.identification.folded && !group.is_locked">
+        <div class="row row-first" *ngIf="!vProduct.identification.folded && !instance.is_activity && !group.is_locked">
             <div class="part cell" style="flex: none; min-width: 38%;" [class.hidden]="!ready">
                 <div class="part-toggle">
                     <button mat-icon-button *ngIf="!vProduct.discounts.folded"

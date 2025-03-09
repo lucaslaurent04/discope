@@ -79,7 +79,7 @@
 
         <div *ngIf="opened">
             <div>
-                <span>Transports ({{activity.transports_booking_lines_ids.length}})</span>
+                <span style="display: inline-block; width: 120px;">Transports ({{activity.transports_booking_lines_ids.length}})</span>
                 <button mat-mini-fab color="primary" style="transform: scale(0.66)" (click)="oncreateTransport()">
                     <mat-icon>add</mat-icon>
                 </button>
@@ -90,17 +90,18 @@
                         <mat-icon>delete</mat-icon>
                     </button>
                 </div>
-                <booking-services-booking-group-day-activities-activity-line [line]="transport_line"
-                                                                             [group]="group"
-                                                                             [booking]="booking"
-                                                                             (updated)="updated.emit()"
+                <booking-services-booking-group-day-activities-activity-line
+                    [line]="transport_line"
+                    [group]="group"
+                    [booking]="booking"
+                    (updated)="updated.emit()"
                 ></booking-services-booking-group-day-activities-activity-line>
             </div>
         </div>
 
         <div *ngIf="opened">
             <div>
-                <span>Matériels ({{activity.supplies_booking_lines_ids.length}})</span>
+                <span style="display: inline-block; width: 120px;">Fournitures ({{activity.supplies_booking_lines_ids.length}})</span>
                 <button mat-mini-fab color="primary" style="transform: scale(0.66)" (click)="oncreateSupply()">
                     <mat-icon>add</mat-icon>
                 </button>
@@ -111,19 +112,20 @@
                         <mat-icon>delete</mat-icon>
                     </button>
                 </div>
-                <booking-services-booking-group-day-activities-activity-line [line]="supply_line"
-                                                                             [group]="group"
-                                                                             [booking]="booking"
-                                                                             (updated)="updated.emit()"
+                <booking-services-booking-group-day-activities-activity-line
+                    [line]="supply_line"
+                    [group]="group"
+                    [booking]="booking"
+                    (updated)="updated.emit()"
                 ></booking-services-booking-group-day-activities-activity-line>
             </div>
         </div>
 
-        <div *ngIf="!group.is_locked && activity?.activity_booking_line_id && !activity?.is_virtual"
-             style="display: flex; width: 100%; margin-bottom: 30px;"
-        >
+        <div    style="display: flex; width: 100%; margin-bottom: 10px; border-bottom: solid 1px #dfdfdf;"
+                *ngIf="!group.is_locked && activity?.activity_booking_line_id && !activity?.is_virtual
+                        && (activity.transports_booking_lines_ids?.length || activity.supplies_booking_lines_ids?.length)">
             <div style="flex-grow: 1; text-align: right;">
-                TOTAL TTC &nbsp;:&nbsp; {{ activity.price ?? 0 | currency : 'EUR' : 'symbol' : '1.2-2' : 'fr'}}
+                <small>TOTAL TTC &nbsp;:&nbsp; {{ activity.price ?? 0 | currency : 'EUR' : 'symbol' : '1.2-2' : 'fr'}}</small>
             </div>
             <div style="width: 75px"></div>
         </div>
