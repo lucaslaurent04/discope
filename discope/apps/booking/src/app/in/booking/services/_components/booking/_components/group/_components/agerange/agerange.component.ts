@@ -126,20 +126,20 @@ export class BookingServicesBookingGroupAgeRangeComponent extends TreeComponent<
             return;
         }
 
-        this.updating.emit(true);
+        // this.updating.emit(true);
 
         // notify back-end about the change
         try {
             await this.api.update('sale\\booking\\BookingLineGroupAgeRangeAssignment', [this.instance.id], {age_from: this.ageFromFormControl.value});
 
             // relay change to parent component
-            this.updated.emit();
+            // this.updated.emit();
         }
         catch(response) {
             this.api.errorFeedback(response);
         }
 
-        this.updating.emit(false);
+        // this.updating.emit(false);
     }
 
     public async onupdateAgeTo() {
@@ -147,19 +147,19 @@ export class BookingServicesBookingGroupAgeRangeComponent extends TreeComponent<
             return;
         }
 
-        this.updating.emit(true);
+        // this.updating.emit(true);
 
         // notify back-end about the change
         try {
             await this.api.update('sale\\booking\\BookingLineGroupAgeRangeAssignment', [this.instance.id], {age_to: this.ageToFormControl.value});
 
             // relay change to parent component
-            this.updated.emit();
+            // this.updated.emit();
         }
         catch(response) {
             this.api.errorFeedback(response);
         }
 
-        this.updating.emit(false);
+        // this.updating.emit(false);
     }
 }
