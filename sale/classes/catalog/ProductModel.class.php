@@ -156,10 +156,22 @@ class ProductModel extends Model {
                 'description'       => "The specific time slots at which the service can take place.",
                 'help'              => "This field applies only to activities that can be scheduled on specific time slots. Most of the time a product is linked to a single time slot.",
                 'visible'           => [
-                                            ['type', '=', 'service'],
-                                            ['service_type', '=', 'schedulable'] ,
-                                            ['is_activity', '=', true],
-                                            ['is_fullday', '=', false]
+                                            [
+                                                ['type', '=', 'service'],
+                                                ['service_type', '=', 'schedulable'] ,
+                                                ['is_activity', '=', true],
+                                                ['is_fullday', '=', false]
+                                            ],
+                                            [
+                                                ['type', '=', 'service'],
+                                                ['service_type', '=', 'schedulable'] ,
+                                                ['is_meal', '=', true]
+                                            ],
+                                            [
+                                                ['type', '=', 'service'],
+                                                ['service_type', '=', 'schedulable'] ,
+                                                ['is_snack', '=', true]
+                                            ]
                                         ],
             ],
 
