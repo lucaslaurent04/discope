@@ -91,20 +91,9 @@ $payments_ids = Payment::search([
             ['has_psp', '=', true],
             ['psp_type', '=', 'stripe']
         ],
-/*
-// #todo - #memo - waiting to be confirmed (the teams to be ready for the accounting)
         [
             ['is_exported', '=', false],
             ['center_office_id', '=', $params['center_office_id']],
-            ['order_payment_id', '>', 0],
-            ['payment_origin', '=', 'cashdesk'],
-            ['payment_method', 'in', ['bank_card', 'cash']]
-        ]
-*/
-        [
-            ['is_exported', '=', false],
-            ['center_office_id', '=', $params['center_office_id']],
-            ['center_office_id', '=', 5],
             ['order_payment_id', '>', 0],
             ['payment_origin', '=', 'cashdesk'],
             ['payment_method', 'in', ['bank_card', 'cash']]
