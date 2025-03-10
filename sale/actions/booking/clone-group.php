@@ -183,7 +183,7 @@ foreach($group['age_range_assignments_ids'] as $assignment) {
 
 // Create lines
 $map_old_booking_line_id_to_new = [];
-$map_old_booking_activity_new_line_id = [];
+$map_old_booking_activity_new_lines_ids = [];
 foreach($group['booking_lines_ids'] as $line) {
     $cloned_line = BookingLine::create([
         'booking_line_group_id' => $cloned_group['id'],
@@ -209,10 +209,10 @@ foreach($group['booking_lines_ids'] as $line) {
 
     $map_old_booking_line_id_to_new[$line['id']] = $cloned_line['id'];
 
-    if(!isset($map_old_booking_activity_new_line_id[$line['booking_activity_id']])) {
-        $map_old_booking_activity_new_line_id[$line['booking_activity_id']] = [];
+    if(!isset($map_old_booking_activity_new_lines_ids[$line['booking_activity_id']])) {
+        $map_old_booking_activity_new_lines_ids[$line['booking_activity_id']] = [];
     }
-    $map_old_booking_activity_new_line_id[$line['booking_activity_id']][] = $cloned_line['id'];
+    $map_old_booking_activity_new_lines_ids[$line['booking_activity_id']][] = $cloned_line['id'];
 }
 
 // Create activities
@@ -233,7 +233,7 @@ foreach($group['booking_activities_ids'] as $activity) {
         ->first();
 
     // Link booking lines to newly created activity
-    BookingLine::ids($map_old_booking_activity_new_line_id[$activity['id']])
+    BookingLine::ids($map_old_booking_activity_new_lines_ids[$activity['id']])
         ->update(['booking_activity_id' => $cloned_activity['id']]);
 }
 
