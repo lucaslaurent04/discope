@@ -326,7 +326,8 @@ class BookingLine extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingActivity',
                 'description'       => 'Booking Activity this line relates to.',
-                'help'              => 'If the line refers to a transport/supply, it means that the transport/supply is needed for a specific activity.'
+                'help'              => 'If the line refers to a transport/supply, it means that the transport/supply is needed for a specific activity.',
+                'onupdate'          => 'onupdateBookingActivityId'
             ],
 
             'service_date' => [
@@ -1909,6 +1910,29 @@ class BookingLine extends Model {
             }
         }
 
+    }
+
+    public static function onupdateBookingActivityId($self) {
+        $self->read([
+            'is_transport',
+            'service_date',
+            'time_slot_id'          => ['name'],
+            'booking_activity_id'   => ['name']
+        ]);
+
+        foreach($self as $id => $line) {
+            if(!isset($line['is_transport'], $line['service_date'], $line['time_slot_id']['name'], $line['booking_activity_id']['name']) || !$line['is_transport']) {
+                continue;
+            }
+
+            $description = sprintf('Transport (%s - %s) : %s',
+                date('d/m/Y', $line['service_date']),
+                $line['time_slot_id']['name'],
+                $line['booking_activity_id']['name']
+            );
+
+            self::id($id)->update(['description' => $description]);
+        }
     }
 
     public static function onupdateServiceDate($self) {
