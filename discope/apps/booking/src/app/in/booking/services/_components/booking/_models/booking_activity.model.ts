@@ -16,6 +16,7 @@ export class BookingActivity {
         public price: number = 0,
         public is_virtual: false,
         public activity_date: Date = new Date(),
-        public time_slot_id: number = 0
+        public time_slot_id: number = 0,
+        public providers_ids: any[] = []
     ) {}
 }
