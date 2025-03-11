@@ -326,7 +326,8 @@ class BookingLine extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingActivity',
                 'description'       => 'Booking Activity this line relates to.',
-                'help'              => 'If the line refers to a transport/supply, it means that the transport/supply is needed for a specific activity.'
+                'help'              => 'If the line refers to a transport/supply, it means that the transport/supply is needed for a specific activity.',
+                'onupdate'          => 'onupdateBookingActivityId'
             ],
 
             'service_date' => [
@@ -587,6 +588,8 @@ class BookingLine extends Model {
             'product_id.product_model_id.transport_product_model_id',
             'product_id.product_model_id.has_supply',
             'product_id.product_model_id.supplies_ids',
+            'product_id.product_model_id.has_provider',
+            'product_id.product_model_id.providers_ids',
             'product_id.has_age_range',
             'product_id.age_range_id',
             'booking_id',
@@ -723,6 +726,11 @@ class BookingLine extends Model {
                             'product_id'    => $res[0]['id']
                         ]);
                     }
+                }
+
+                // link to providers
+                if($line['product_id.product_model_id.has_provider'] && count($line['product_id.product_model_id.providers_ids']) === 1) {
+                    BookingActivity::id($main_activity_id)->update(['providers_ids' => $line['product_id.product_model_id.providers_ids']]);
                 }
             }
         }
@@ -904,6 +912,25 @@ class BookingLine extends Model {
      */
     public static function onupdateQty($om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLine:onupdateQty", QN_REPORT_DEBUG);
+
+        $lines = $om->read(self::getType(), $oids, [
+            'qty',
+            'product_id.product_model_id.has_provider',
+            'booking_activity_id',
+            'booking_activity_id.providers_ids'
+        ]);
+        if($lines > 0) {
+            foreach($lines as $line) {
+                if($line['product_id.product_model_id.has_provider'] && count($line['booking_activity_id.providers_ids']) > $line['qty']) {
+                    $providers_ids_to_remove = [];
+                    for($i = count($line['booking_activity_id.providers_ids']) - 1; $i >= $line['qty']; $i--) {
+                        $providers_ids_to_remove[] = -$line['booking_activity_id.providers_ids'][$i];
+                    }
+
+                    BookingActivity::id($line['booking_activity_id'])->update(['providers_ids' => $providers_ids_to_remove]);
+                }
+            }
+        }
 
         // Reset computed fields related to price (because they depend on qty)
         $om->callonce(self::getType(), '_resetPrices', $oids, [], $lang);
@@ -1909,6 +1936,29 @@ class BookingLine extends Model {
             }
         }
 
+    }
+
+    public static function onupdateBookingActivityId($self) {
+        $self->read([
+            'is_transport',
+            'service_date',
+            'time_slot_id'          => ['name'],
+            'booking_activity_id'   => ['name']
+        ]);
+
+        foreach($self as $id => $line) {
+            if(!isset($line['is_transport'], $line['service_date'], $line['time_slot_id']['name'], $line['booking_activity_id']['name']) || !$line['is_transport']) {
+                continue;
+            }
+
+            $description = sprintf('Transport (%s - %s) : %s',
+                date('d/m/Y', $line['service_date']),
+                $line['time_slot_id']['name'],
+                $line['booking_activity_id']['name']
+            );
+
+            self::id($id)->update(['description' => $description]);
+        }
     }
 
     public static function onupdateServiceDate($self) {

@@ -24,6 +24,10 @@ interface vmModel {
     qty: {
         formControl: FormControl,
         change: () => void
+    },
+    providers: {
+        formControls: FormControl[],
+        change: () => void
     }
 }
 
@@ -57,6 +61,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
         'EV': 'Soir',
     };
 
+    public providersQty: number = 1;
+
     constructor(
         private api: ApiService,
         public dialog: MatDialog
@@ -76,6 +82,10 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
             qty: {
                 formControl: new FormControl('', Validators.required),
                 change: () => this.qtyChange()
+            },
+            providers: {
+                formControls: [],
+                change: () => this.providerChange()
             }
         };
     }
@@ -92,6 +102,18 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
 
         this.vm.product.name = this.activity?.activity_booking_line_id?.product_id ? this.activity.activity_booking_line_id.product_id.name : '';
         this.vm.qty.formControl.setValue(this.activity?.activity_booking_line_id?.qty ? this.activity.activity_booking_line_id.qty : 0);
+
+        if(this.activity?.activity_booking_line_id?.qty_accounting_method === 'unit') {
+            this.providersQty = this.activity.activity_booking_line_id.qty;
+        }
+        for(let i = 0; i < this.providersQty; i++) {
+            let providerId: number | null = null;
+            if(this.activity?.providers_ids[i]) {
+                providerId = parseInt(this.activity?.providers_ids[i]);
+            }
+
+            this.vm.providers.formControls.push(new FormControl(providerId));
+        }
     }
 
     public toggleOpen() {
@@ -211,10 +233,30 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
         }
     }
 
+    public async providerChange() {
+        let providersIds: number[] = [];
+        for(let providerId of this.activity.providers_ids) {
+            providersIds.push(-providerId)
+        }
+        for(let formControl of this.vm.providers.formControls) {
+            if(formControl.value !== null) {
+                providersIds.push(formControl.value);
+            }
+        }
+
+        // notify back-end about the change
+        try {
+            await this.api.update('sale\\booking\\BookingActivity', [this.activity.id], {providers_ids: providersIds});
+            // relay change to parent component
+            this.updated.emit();
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+    }
+
     public async oncreateTransport() {
         try {
-            console.log(this.activity.activity_booking_line_id)
-
             await this.api.create('sale\\booking\\BookingLine', {
                 order: this.group.booking_lines_ids.length + 1,
                 booking_id: this.booking.id,
