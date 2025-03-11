@@ -77,6 +77,21 @@
             <div class="cell cell-actions"></div>
         </div>
 
+        <div *ngIf="opened && activity?.activity_booking_line_id?.product_id.product_model_id.has_provider"
+             style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 20px; padding: 10px;"
+        >
+            <div *ngFor="let formControl of vm.providers.formControls">
+                <mat-form-field>
+                    <mat-label>Prestataire</mat-label>
+                    <mat-select [formControl]="formControl" (selectionChange)="vm.providers.change()">
+                        <mat-option *ngFor="let provider of activity?.activity_booking_line_id?.product_id.product_model_id.providers_ids" [value]="provider.id">
+                            {{ provider.name }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+
         <div *ngIf="opened">
             <div>
                 <span style="display: inline-block; width: 120px;">Transports ({{activity.transports_booking_lines_ids.length}})</span>
