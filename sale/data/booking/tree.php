@@ -147,6 +147,8 @@ $tree = [
                     'is_meal',
                     'is_snack',
                     'is_fullday',
+                    'has_provider',
+                    'providers_ids' => ['name'],
                     'time_slots_ids' => ['name', 'code']
                 ]
             ],
@@ -176,7 +178,8 @@ $tree = [
             'price',
             'is_virtual',
             'activity_date',
-            'time_slot_id'
+            'time_slot_id',
+            'providers_ids'
         ]
     ]
 ];
