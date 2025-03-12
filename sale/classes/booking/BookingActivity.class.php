@@ -24,7 +24,7 @@ class BookingActivity extends Model {
                 'result_type'       => 'string',
                 'store'             => true,
                 'description'       => "The name of the booking activity.",
-                'relation'          => ['activity_booking_line_id' => ['name']]
+                'relation'          => ['activity_booking_line_id' => 'name']
             ],
 
             'activity_booking_line_id' => [
@@ -50,7 +50,7 @@ class BookingActivity extends Model {
                 'description'       => "Booking the activity relates to.",
                 'store'             => true,
                 'instant'           => true,
-                'relation'          => ['activity_booking_line_id' => ['booking_id']]
+                'relation'          => ['activity_booking_line_id' => 'booking_id']
             ],
 
             'booking_line_group_id' => [
@@ -60,7 +60,7 @@ class BookingActivity extends Model {
                 'description'       => "Booking line group the activity relates to.",
                 'store'             => true,
                 'instant'           => true,
-                'relation'          => ['activity_booking_line_id' => ['booking_line_group_id']]
+                'relation'          => ['activity_booking_line_id' => 'booking_line_group_id']
             ],
 
             'providers_ids' => [
@@ -125,7 +125,7 @@ class BookingActivity extends Model {
                 'result_type'       => 'date',
                 'description'       => 'Specific day time slot on which the service is delivered.',
                 'store'             => true,
-                'relation'          => ['activity_booking_line_id' => ['service_date']],
+                'relation'          => ['activity_booking_line_id' => 'service_date'],
                 'onupdate'          => 'onupdateActivityDate'
             ],
 
@@ -135,8 +135,15 @@ class BookingActivity extends Model {
                 'foreign_object'    => 'sale\booking\TimeSlot',
                 'description'       => "Specific day time slot on which the service is delivered.",
                 'store'             => true,
-                'relation'          => ['activity_booking_line_id' => ['time_slot_id']],
+                'relation'          => ['activity_booking_line_id' => 'time_slot_id'],
                 'onupdate'          => 'onupdateTimeSlotId'
+            ],
+
+            'rental_unit_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'realestate\RentalUnit',
+                'description'       => "The rental unit needed for the activity to take place.",
+                'onupdate'          => 'onupdateRentalUnitId'
             ]
 
         ];
@@ -191,6 +198,14 @@ class BookingActivity extends Model {
 
     public static function onupdateTimeSlotId($self) {
         $self->do('update-counters');
+    }
+
+    public static function onupdateRentalUnitId($self) {
+        $self->read(['activity_booking_line_id', 'rental_unit_id']);
+        foreach($self as $booking_activity) {
+            BookingLine::id($booking_activity['activity_booking_line_id'])
+                ->update(['activity_rental_unit_id' => $booking_activity['rental_unit_id']]);
+        }
     }
 
     public static function doResetPrices($self) {

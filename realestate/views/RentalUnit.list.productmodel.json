@@ -1,0 +1,17 @@
+{
+    "name": "Rental Unit",
+    "description": "This view is intended for displaying the list rental units.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "75%",
+                "sortable": true
+            }
+        ]
+    }
+}
