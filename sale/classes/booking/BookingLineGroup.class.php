@@ -3790,7 +3790,8 @@ class BookingLineGroup extends Model {
                     'product_id.product_model_id.duration',
                     'product_id.age_range_id',
                     'is_meal',
-                    'is_accomodation'
+                    'is_accomodation',
+                    'is_snack'
                 ]);
 
                 foreach($lines as $line_id => $line) {
@@ -3811,12 +3812,12 @@ class BookingLineGroup extends Model {
                             $group['sojourn_type_id'] == 2 /*'GG'*/ && $line['is_accomodation']
                         )
                         ||
-                        // for GA: apply discounts on meals and accommodations
+                        // for GA: apply discounts on meals, accommodations and snacks
                         (
                             $group['sojourn_type_id'] == 1 /*'GA'*/
                             &&
                             (
-                                $line['is_accomodation'] || $line['is_meal']
+                                $line['is_accomodation'] || $line['is_meal'] || $line['is_snack']
                             )
                         )
                     ) {

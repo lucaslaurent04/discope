@@ -269,6 +269,14 @@ class BookingLine extends Model {
                 'store'             => true
             ],
 
+            'is_snack' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => 'Line relates to a snack (from product_model).',
+                'function'          => 'calcIsSnack',
+                'store'             => true
+            ],
+
             'qty_accounting_method' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
@@ -1590,6 +1598,21 @@ class BookingLine extends Model {
         if($lines > 0 && count($lines)) {
             foreach($lines as $oid => $odata) {
                 $result[$oid] = $odata['product_id.product_model_id.is_meal'];
+            }
+        }
+        return $result;
+    }
+
+    public static function calcIsSnack($om, $oids, $lang) {
+        trigger_error("ORM::calling sale\booking\BookingLine:calcIsSnack", QN_REPORT_DEBUG);
+
+        $result = [];
+        $lines = $om->read(self::getType(), $oids, [
+            'product_id.product_model_id.is_snack'
+        ]);
+        if($lines > 0 && count($lines)) {
+            foreach($lines as $oid => $odata) {
+                $result[$oid] = $odata['product_id.product_model_id.is_snack'];
             }
         }
         return $result;
