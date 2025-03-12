@@ -2160,6 +2160,7 @@ class BookingLineGroup extends Model {
                     'product_id.description',
                     'time_slot_id.schedule_from',
                     'time_slot_id.schedule_to',
+                    'activity_rental_unit_id'
                 ],
                     $lang);
 
@@ -2340,7 +2341,18 @@ class BookingLineGroup extends Model {
                                 $consumption['description'] = $description;
                             }
                             elseif($is_activity) {
-                                $consumption['description'] = $line['product_id.description'];
+                                if($line['activity_rental_unit_id']) {
+                                    $consumptions[] = array_merge(
+                                        $consumption,
+                                        [
+                                            'is_activity'       => false,
+                                            'is_rental_unit'    => true,
+                                            'rental_unit_id'    => $line['activity_rental_unit_id']
+                                        ]
+                                    );
+                                }
+
+                                $consumption['description'] = $line['description'];
                             }
                             $consumptions[] = $consumption;
                         }
