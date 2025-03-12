@@ -361,6 +361,15 @@ class BookingLine extends Model {
                 'store'             => true,
                 'relation'          => ['product_id' => ['product_model_id' => ['meal_location']]],
                 'visible'           => ['is_meal', '=', true]
+            ],
+
+            'activity_rental_unit_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'realestate\RentalUnit',
+                'description'       => "The rental unit needed for the activity to take place.",
+                'relation'          => ['booking_activity_id' => 'rental_unit_id'],
+                'store'             => true
             ]
 
         ];
@@ -590,6 +599,8 @@ class BookingLine extends Model {
             'product_id.product_model_id.supplies_ids',
             'product_id.product_model_id.has_provider',
             'product_id.product_model_id.providers_ids',
+            'product_id.product_model_id.has_rental_unit',
+            'product_id.product_model_id.activity_rental_units_ids',
             'product_id.has_age_range',
             'product_id.age_range_id',
             'booking_id',
@@ -728,9 +739,15 @@ class BookingLine extends Model {
                     }
                 }
 
-                // link to providers
+                $booking_activity_data = [];
                 if($line['product_id.product_model_id.has_provider'] && count($line['product_id.product_model_id.providers_ids']) === 1) {
-                    BookingActivity::id($main_activity_id)->update(['providers_ids' => $line['product_id.product_model_id.providers_ids']]);
+                    $booking_activity_data['providers_ids'] = $line['product_id.product_model_id.providers_ids'];
+                }
+                if($line['product_id.product_model_id.has_rental_unit'] && count($line['product_id.product_model_id.activity_rental_units_ids']) === 1) {
+                    $booking_activity_data['rental_unit_id'] = $line['product_id.product_model_id.activity_rental_units_ids'][0];
+                }
+                if(!empty($booking_activity_data)) {
+                    BookingActivity::id($main_activity_id)->update($booking_activity_data);
                 }
             }
         }
