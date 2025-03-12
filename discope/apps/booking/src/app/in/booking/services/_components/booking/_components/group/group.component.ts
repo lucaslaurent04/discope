@@ -101,11 +101,11 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     @Input() bookingActivitiesDays: BookingActivityDay[];
     @Input() displaySettings: BookedServicesDisplaySettings;
 
+    @Output() loadStart = new EventEmitter();
+    @Output() loadEnd   = new EventEmitter();
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
     @Output() toggle  = new EventEmitter();
-    @Output() loadStart = new EventEmitter();
-    @Output() loadEnd   = new EventEmitter();
 
     public user: UserClass = null;
 

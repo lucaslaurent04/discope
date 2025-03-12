@@ -122,6 +122,8 @@
                     [line]="transport_line"
                     [group]="group"
                     [booking]="booking"
+                    (loadStart)="loadStart.emit()"
+                    (loadEnd)="loadEnd.emit()"
                     (updated)="updated.emit()"
                 ></booking-services-booking-group-day-activities-activity-line>
             </div>

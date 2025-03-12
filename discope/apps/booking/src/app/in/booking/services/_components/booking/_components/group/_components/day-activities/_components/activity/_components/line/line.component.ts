@@ -38,6 +38,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityLineComponent imple
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
 
+    @Output() loadStart = new EventEmitter();
+    @Output() loadEnd   = new EventEmitter();
     @Output() updated = new EventEmitter();
 
     public ready = false;
@@ -153,17 +155,22 @@ export class BookingServicesBookingGroupDayActivitiesActivityLineComponent imple
 
             // notify back-end about the change
             try {
+                this.loadStart.emit();
+
                 await this.api.call('?do=sale_booking_update-bookingline-product', {
                     id: this.line.id,
                     product_id: product.id
                 });
                 this.vm.product.formControl.setErrors(null);
 
+                this.loadEnd.emit();
+
                 // relay change to parent component
                 this.updated.emit();
             }
             catch(response) {
                 this.vm.product.formControl.setErrors({ 'missing_price': 'Pas de liste de prix pour ce produit.' });
+                this.loadEnd.emit();
                 this.api.errorFeedback(response);
             }
         }

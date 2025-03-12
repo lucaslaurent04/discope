@@ -50,6 +50,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
     @Input() opened: boolean = false;
     @Input() allowFulldaySelection: boolean = true;
 
+    @Output() loadStart = new EventEmitter();
+    @Output() loadEnd   = new EventEmitter();
     @Output() updated = new EventEmitter();
     @Output() deleteLine = new EventEmitter();
     @Output() open = new EventEmitter();
@@ -203,6 +205,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                 this.vm.product.name = product.name;
             }
 
+            this.loadStart.emit();
+
             let newLine: any = null;
 
             // notify back-end about the change
@@ -220,6 +224,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                 });
                 this.vm.product.formControl.setErrors(null);
 
+                this.loadEnd.emit();
+
                 // relay change to parent component
                 this.updated.emit();
             }
@@ -227,6 +233,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                 if(newLine) {
                     this.deleteLine.emit(newLine.id);
                 }
+
+                this.loadEnd.emit();
 
                 this.api.errorFeedback(response);
             }
