@@ -615,6 +615,7 @@ class BookingLine extends Model {
             'booking_line_group_id.has_pack',
             'booking_line_group_id.pack_id.has_age_range',
             'booking_line_group_id.age_range_assignments_ids',
+            'name',
             'order',
             'qty',
             'has_own_qty',
@@ -623,7 +624,8 @@ class BookingLine extends Model {
             'is_meal',
             'qty_accounting_method',
             'service_date',
-            'time_slot_id'
+            'time_slot_id',
+            'time_slot_id.name'
         ], $lang);
 
         foreach($lines as $lid => $line) {
@@ -689,13 +691,20 @@ class BookingLine extends Model {
                     ]);
 
                     if(!empty($res)) {
+                        $description = sprintf('Transport (%s - %s) : %s',
+                            date('d/m/Y', $line['service_date']),
+                            $line['time_slot_id.name'],
+                            $line['name']
+                        );
+
                         $booking_line = self::create([
                             'order'                 => ++$line_order,
                             'booking_id'            => $line['booking_id'],
                             'booking_line_group_id' => $line['booking_line_group_id'],
                             'service_date'          => $line['service_date'],
                             'time_slot_id'          => $line['time_slot_id'],
-                            'booking_activity_id'   => $main_activity_id
+                            'booking_activity_id'   => $main_activity_id,
+                            'description'           => $description
                         ])
                             ->read(['id'])
                             ->first();
