@@ -24,7 +24,7 @@ export class BookingServicesBookingGroupDayActivitiesComponent implements OnInit
     @Input() openedActivityIds: number[];
 
     @Output() loadStart = new EventEmitter();
-    @Output() loadEnd   = new EventEmitter();
+    @Output() loadEnd = new EventEmitter();
     @Output() updated = new EventEmitter();
     @Output() deleteLine = new EventEmitter();
     @Output() openActivity = new EventEmitter();
