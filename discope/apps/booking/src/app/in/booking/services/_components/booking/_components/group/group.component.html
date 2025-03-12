@@ -600,6 +600,8 @@
                                     [group]="instance"
                                     [timeSlots]="timeSlots"
                                     [openedActivityIds]="openedActivityIds"
+                                    (loadStart)="loadStart.emit()"
+                                    (loadEnd)="loadEnd.emit()"
                                     (updated)="onupdateActivity()"
                                     (deleteLine)="ondeleteLine($event)"
                                     (closeActivity)="onCloseActivity($event)"

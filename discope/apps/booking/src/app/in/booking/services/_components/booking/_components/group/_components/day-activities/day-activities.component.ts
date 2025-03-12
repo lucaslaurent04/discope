@@ -23,6 +23,8 @@ export class BookingServicesBookingGroupDayActivitiesComponent implements OnInit
     @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
     @Input() openedActivityIds: number[];
 
+    @Output() loadStart = new EventEmitter();
+    @Output() loadEnd   = new EventEmitter();
     @Output() updated = new EventEmitter();
     @Output() deleteLine = new EventEmitter();
     @Output() openActivity = new EventEmitter();
