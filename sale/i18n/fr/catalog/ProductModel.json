@@ -318,6 +318,16 @@
             "label": "Âge minimum",
             "description": "Spécifie l'âge minimum requis pour participer à l'activité.",
             "help": ""
+        },
+        "has_rental_unit" : {
+            "label": "Nécessite une unité locative",
+            "description": "Indique si l'activité prend place dans une unité locative spécifique.",
+            "help": ""
+        },
+        "activity_rental_units_ids": {
+            "label": "Unités locatives",
+            "description": "Les unités locatives possibles pour accueillir l'activité.",
+            "help": ""
         }
     },
     "view": {
