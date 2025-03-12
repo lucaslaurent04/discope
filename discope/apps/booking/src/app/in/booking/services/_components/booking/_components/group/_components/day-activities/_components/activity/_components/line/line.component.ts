@@ -39,7 +39,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityLineComponent imple
     @Input() booking: Booking;
 
     @Output() loadStart = new EventEmitter();
-    @Output() loadEnd   = new EventEmitter();
+    @Output() loadEnd = new EventEmitter();
     @Output() updated = new EventEmitter();
 
     public ready = false;

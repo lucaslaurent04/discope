@@ -51,7 +51,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
     @Input() allowFulldaySelection: boolean = true;
 
     @Output() loadStart = new EventEmitter();
-    @Output() loadEnd   = new EventEmitter();
+    @Output() loadEnd = new EventEmitter();
     @Output() updated = new EventEmitter();
     @Output() deleteLine = new EventEmitter();
     @Output() open = new EventEmitter();
