@@ -333,9 +333,16 @@ class BookingLine extends Model {
             'booking_activity_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingActivity',
-                'description'       => 'Booking Activity this line relates to.',
+                'description'       => 'Main Booking Activity this line relates to (non virtual activity).',
                 'help'              => 'If the line refers to a transport/supply, it means that the transport/supply is needed for a specific activity.',
                 'onupdate'          => 'onupdateBookingActivityId'
+            ],
+
+            'booking_activities_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\BookingActivity',
+                'foreign_field'     => 'activity_booking_line_id',
+                'description'       => 'All Booking Activities this line relates to (non virtual activity and virtual activities).'
             ],
 
             'service_date' => [
