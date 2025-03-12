@@ -28,6 +28,10 @@ interface vmModel {
     providers: {
         formControls: FormControl[],
         change: () => void
+    },
+    rentalUnit: {
+        formControl: FormControl,
+        change: () => void
     }
 }
 
@@ -46,6 +50,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
     @Input() opened: boolean = false;
     @Input() allowFulldaySelection: boolean = true;
 
+    @Output() loadStart = new EventEmitter();
+    @Output() loadEnd = new EventEmitter();
     @Output() updated = new EventEmitter();
     @Output() deleteLine = new EventEmitter();
     @Output() open = new EventEmitter();
@@ -86,6 +92,10 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
             providers: {
                 formControls: [],
                 change: () => this.providerChange()
+            },
+            rentalUnit: {
+                formControl: new FormControl(null),
+                change: () => this.rentalUnitChange()
             }
         };
     }
@@ -93,26 +103,34 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
     public ngOnInit() {
         this.ready = true;
 
-        // listen to the changes on FormControl objects
-        this.vm.product.filteredList = this.vm.product.inputClue.pipe(
-            debounceTime(300),
-            map((value:any) => (typeof value === 'string' ? value : ((value == null) ? '' : value.name))),
-            mergeMap(async (name:string) => this.filterProducts(name))
-        );
+        if(!this.activity) {
+            // listen to the changes on FormControl objects
+            this.vm.product.filteredList = this.vm.product.inputClue.pipe(
+                debounceTime(300),
+                map((value:any) => (typeof value === 'string' ? value : ((value == null) ? '' : value.name))),
+                mergeMap(async (name:string) => this.filterProducts(name))
+            );
 
-        this.vm.product.name = this.activity?.activity_booking_line_id?.product_id ? this.activity.activity_booking_line_id.product_id.name : '';
-        this.vm.qty.formControl.setValue(this.activity?.activity_booking_line_id?.qty ? this.activity.activity_booking_line_id.qty : 0);
+            this.vm.product.name = '';
+            this.vm.qty.formControl.setValue(0);
 
-        if(this.activity?.activity_booking_line_id?.qty_accounting_method === 'unit') {
-            this.providersQty = this.activity.activity_booking_line_id.qty;
+            return;
         }
+
+        this.vm.product.name = this.activity.activity_booking_line_id.product_id.name;
+        this.vm.qty.formControl.setValue(this.activity.activity_booking_line_id.qty);
+
+        this.providersQty = this.activity.activity_booking_line_id.qty_accounting_method === 'unit' ? this.activity.activity_booking_line_id.qty : 1;
         for(let i = 0; i < this.providersQty; i++) {
             let providerId: number | null = null;
-            if(this.activity?.providers_ids[i]) {
+            if(this.activity.providers_ids[i]) {
                 providerId = parseInt(this.activity?.providers_ids[i]);
             }
-
             this.vm.providers.formControls.push(new FormControl(providerId));
+        }
+
+        if(this.activity.rental_unit_id) {
+            this.vm.rentalUnit.formControl.setValue(this.activity.rental_unit_id);
         }
     }
 
@@ -187,6 +205,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                 this.vm.product.name = product.name;
             }
 
+            this.loadStart.emit();
+
             let newLine: any = null;
 
             // notify back-end about the change
@@ -204,6 +224,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                 });
                 this.vm.product.formControl.setErrors(null);
 
+                this.loadEnd.emit();
+
                 // relay change to parent component
                 this.updated.emit();
             }
@@ -211,6 +233,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                 if(newLine) {
                     this.deleteLine.emit(newLine.id);
                 }
+
+                this.loadEnd.emit();
 
                 this.api.errorFeedback(response);
             }
@@ -247,6 +271,18 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
         // notify back-end about the change
         try {
             await this.api.update('sale\\booking\\BookingActivity', [this.activity.id], {providers_ids: providersIds});
+            // relay change to parent component
+            this.updated.emit();
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+    }
+
+    public async rentalUnitChange() {
+        // notify back-end about the change
+        try {
+            await this.api.update('sale\\booking\\BookingActivity', [this.activity.id], {rental_unit_id: this.vm.rentalUnit.formControl.value});
             // relay change to parent component
             this.updated.emit();
         }

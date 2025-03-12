@@ -249,7 +249,17 @@ class RentalUnit extends Model {
                 'type'        => 'boolean',
                 'description' => 'The rental unit is equipped for Persons with Hearing Impairment (PDA), including visual alarms, subtitles, or other suitable aids.',
                 'default'     => false
-            ]
+            ],
+
+            'product_models_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\catalog\ProductModel',
+                'foreign_field'     => 'activity_rental_units_ids',
+                'rel_table'         => 'sale_catalog_product_model_rel_realestate_rentalunit',
+                'rel_foreign_key'   => 'product_model_id',
+                'rel_local_key'     => 'rental_unit_id',
+                'description'       => 'Product model related to this Rental Unit.'
+            ],
 
         ];
     }
