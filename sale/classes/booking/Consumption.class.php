@@ -207,29 +207,7 @@ class Consumption extends Model {
             'is_activity' => [
                 'type'              => 'boolean',
                 'description'       => 'Does the consumption relate to an activity?',
-                'help'              => 'Need to be linked to an activity provider.',
                 'default'           => false
-            ],
-
-            'has_provider' => [
-                'type'              => 'boolean',
-                'description'       => "Indicates whether the consumption requires a specific provider.",
-                'default'           => false,
-                'visible'           => ['is_activity', '=', true]
-            ],
-
-            'activity_provider_id' => [
-                'type'              => 'many2one',
-                'foreign_object'    => 'sale\provider\Provider',
-                'description'       => "The activity provider the consumption is assigned to.",
-                'visible'           => [ ['is_activity', '=', true], ['has_provider', '=', true] ]
-            ],
-
-            'has_staff_required' => [
-                'type'              => 'boolean',
-                'description'       => "Indicates whether the activity requires dedicated staff to be assigned.",
-                'default'           => false,
-                'visible'           => ['is_activity', '=', true]
             ]
 
         ];
@@ -443,7 +421,8 @@ class Consumption extends Model {
             'booking_line_group_id',
             'repairing_id',
             'schedule_from',
-            'schedule_to'
+            'schedule_to',
+            'is_activity'
         ]);
 
         /*
@@ -539,11 +518,17 @@ class Consumption extends Model {
                         $processed_consumptions[$cid] = true;
                     }
 
-                    $consumption['date_from'] = $booking_line_groups[$booking_line_group_id]['date_from'];
-                    // #todo - date_to should be the latest date from all consumptions relating to the group (the sojourn might be shorter than initially set, in case of partial cancellation)
-                    $consumption['date_to'] = $booking_line_groups[$booking_line_group_id]['date_to'];
-                    $consumption['schedule_from'] = $booking_line_groups[$booking_line_group_id]['time_from'];
-                    $consumption['schedule_to'] = $booking_line_groups[$booking_line_group_id]['time_to'];
+                    if($consumption['is_activity']) {
+                        $consumption['date_from'] = $consumption['date'];
+                        $consumption['date_to'] = $consumption['date'];
+                    }
+                    else {
+                        $consumption['date_from'] = $booking_line_groups[$booking_line_group_id]['date_from'];
+                        // #todo - date_to should be the latest date from all consumptions relating to the group (the sojourn might be shorter than initially set, in case of partial cancellation)
+                        $consumption['date_to'] = $booking_line_groups[$booking_line_group_id]['date_to'];
+                        $consumption['schedule_from'] = $booking_line_groups[$booking_line_group_id]['time_from'];
+                        $consumption['schedule_to'] = $booking_line_groups[$booking_line_group_id]['time_to'];
+                    }
                 }
                 // handle consumptions from repairings
                 elseif(isset($consumption['repairing_id'])) {
