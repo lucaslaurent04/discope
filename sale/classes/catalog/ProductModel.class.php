@@ -397,6 +397,26 @@ class ProductModel extends Model {
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
             ],
 
+            'has_rental_unit' => [
+                'type'              => 'boolean',
+                'description'       => "Indicates whether the activity requires the assignation of a rental unit.",
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ],
+                'onupdate'          => 'onupdateHasRentalUnit'
+            ],
+
+            'activity_rental_units_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'realestate\RentalUnit',
+                'foreign_field'     => 'product_models_ids',
+                'rel_table'         => 'sale_catalog_product_model_rel_realestate_rentalunit',
+                'rel_foreign_key'   => 'rental_unit_id',
+                'rel_local_key'     => 'product_model_id',
+                'description'       => 'Rental Units this Activity relate.',
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_rental_unit', '=', true] ],
+                'onupdate'          => 'onupdateActivityRentalUnitIds'
+            ],
+
             'has_age_range' => [
                 'type'              => 'boolean',
                 'description'       => "Indicates whether the product model has age-based participation restrictions.",
@@ -559,6 +579,37 @@ class ProductModel extends Model {
                 $groups_ids = array_map(function($a) {return "-$a";}, (array) $product['groups_ids']);
                 $groups_ids = array_merge($groups_ids, $model['groups_ids']);
                 $om->write('sale\catalog\Product', $pid, ['groups_ids' => $groups_ids]);
+            }
+        }
+    }
+
+    /**
+     * Keep activity_rental_units_ids synced with has_rental_unit
+     */
+    public static function onupdateHasRentalUnit($self) {
+        $self->read(['has_rental_unit', 'activity_rental_units_ids']);
+        foreach($self as $id => $product_model) {
+            if(!$product_model['has_rental_unit'] && !empty($product_model['activity_rental_units_ids'])) {
+                $ids_to_remove = [];
+                foreach($product_model['activity_rental_units_ids'] as $rental_unit_id) {
+                    $ids_to_remove[] = -$rental_unit_id;
+                }
+                self::id($id)->update(['activity_rental_units_ids' => $ids_to_remove]);
+            }
+        }
+    }
+
+    /**
+     * Keep has_rental_unit synced with activity_rental_units_ids
+     */
+    public static function onupdateActivityRentalUnitIds($self) {
+        $self->read(['has_rental_unit', 'activity_rental_units_ids']);
+        foreach($self as $id => $product_model) {
+            if(!empty($product_model['activity_rental_units_ids']) && !$product_model['has_rental_unit']) {
+                self::id($id)->update(['has_rental_unit' => true]);
+            }
+            elseif(empty($product_model['activity_rental_units_ids']) && $product_model['has_rental_unit']) {
+                self::id($id)->update(['has_rental_unit' => false]);
             }
         }
     }

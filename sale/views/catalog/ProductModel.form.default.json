@@ -313,12 +313,12 @@
                                             {
                                                 "type": "field",
                                                 "value": "has_activity_duration",
-                                                "width": "50%"
+                                                "width": "66%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "activity_duration",
-                                                "width": "50%"
+                                                "width": "33%"
                                             },
                                             {
                                                 "type": "field",
@@ -329,6 +329,24 @@
                                                 "type": "field",
                                                 "value": "transport_product_model_id",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_rental_unit",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "activity_rental_units_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.productmodel",
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     },

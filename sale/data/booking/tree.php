@@ -148,8 +148,10 @@ $tree = [
                     'is_snack',
                     'is_fullday',
                     'has_provider',
-                    'providers_ids' => ['name'],
-                    'time_slots_ids' => ['name', 'code']
+                    'has_rental_unit',
+                    'providers_ids'             => ['name'],
+                    'activity_rental_units_ids' => ['name'],
+                    'time_slots_ids'            => ['name', 'code']
                 ]
             ],
             'auto_discounts_ids' => [
@@ -179,7 +181,8 @@ $tree = [
             'is_virtual',
             'activity_date',
             'time_slot_id',
-            'providers_ids'
+            'providers_ids',
+            'rental_unit_id'
         ]
     ]
 ];

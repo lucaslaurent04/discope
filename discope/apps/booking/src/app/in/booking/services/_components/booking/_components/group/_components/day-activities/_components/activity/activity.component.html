@@ -92,6 +92,19 @@
             </div>
         </div>
 
+        <div *ngIf="opened && activity?.activity_booking_line_id?.product_id.product_model_id.has_rental_unit"
+             style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 20px; padding: 10px;"
+        >
+            <mat-form-field style="max-width: 220px;">
+                <mat-label>Unité locative</mat-label>
+                <mat-select [formControl]="vm.rentalUnit.formControl" (selectionChange)="vm.rentalUnit.change()">
+                    <mat-option *ngFor="let rentalUnit of activity?.activity_booking_line_id?.product_id.product_model_id.activity_rental_units_ids" [value]="rentalUnit.id">
+                        {{ rentalUnit.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
         <div *ngIf="opened">
             <div>
                 <span style="display: inline-block; width: 120px;">Transports ({{activity.transports_booking_lines_ids.length}})</span>
