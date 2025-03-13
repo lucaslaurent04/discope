@@ -1409,7 +1409,7 @@ class BookingLine extends Model {
 
     public static function calcFreeQty($om, $oids, $lang) {
         $result = [];
-        $lines = $om->read(get_called_class(), $oids, ['auto_discounts_ids','manual_discounts_ids']);
+        $lines = $om->read(get_called_class(), $oids, ['qty', 'auto_discounts_ids','manual_discounts_ids']);
 
         foreach($lines as $oid => $odata) {
             $free_qty = 0;
@@ -1427,7 +1427,7 @@ class BookingLine extends Model {
                     $free_qty += $adata['value'];
                 }
             }
-            $result[$oid] = $free_qty;
+            $result[$oid] = min($free_qty, $odata['qty']);
         }
         return $result;
     }
