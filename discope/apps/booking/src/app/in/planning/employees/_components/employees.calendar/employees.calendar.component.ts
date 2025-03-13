@@ -271,20 +271,13 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             console.warn('unable to fetch rental units', response);
         }
 
-
-/*
-        if(this.params.employees_ids.length <= 0) {
-            this.loading = false;
-            return;
-        }
-*/
         try {
             this.activities = await this.api.fetch('?get=sale_booking_activity_map', {
                 // #memo - all dates are considered UTC
                 date_from: this.calcDateIndex(this.params.date_from),
                 date_to: this.calcDateIndex(this.params.date_to),
-                // centers_ids: JSON.stringify(this.params.centers_ids)
-                employees_ids: JSON.stringify([15, 16, 17, 18, 19])
+                // #todo - #memo - we need to allow filtering employees based on various criterias
+                // employees_ids: JSON.stringify([15, 16, 17, 18, 19])
             });
 
         }
@@ -460,7 +453,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             let valid = true;
             let diff = (<Date>this.selection.cell_to.date).getTime() - (<Date>this.selection.cell_from.date).getTime();
             let days = Math.abs(Math.floor(diff / (60*60*24*1000)))+1;
-            // do not check last day : overlapse is allowed if checkout is before checkin
+            // do not check last day : overlaps is allowed if checkout is before checkin
             for (let i = 0; i < days-1; i++) {
                 let currdate = new Date(from.date.getTime());
                 currdate.setDate(currdate.getDate() + i);
@@ -618,6 +611,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         if(date_index === activity_date_index && time_slot == activity.time_slot) {
             result = true;
         }
+        // #todo - il faut vérifier si l'animateur dispose des compétences pour cette activité
+        // #todo - ajouter un test pour vérifier que l'employé n'a pas déjà une activité "animation" assignée
         return result;
     }
 
@@ -632,21 +627,70 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         }, 500);
     }
 
-
-    public onDrop(event: Event | CdkDragDrop<any, any>, index: number, employee: Employee, date_index: string, time_slot: string) {
-        console.log('ondrop');
+    public async onDropUnassign(event: Event | CdkDragDrop<any, any>) {
         if(this.currentDraggedActivity) {
-            if(this.isDroppable(this.currentDraggedActivity, employee, date_index, time_slot)) {
+            const dropEvent = event as CdkDragDrop<any, any>;
+            const element = dropEvent.container.element.nativeElement as HTMLElement;
+            console.log('dropped', this.currentDraggedActivity);
+
+            let time_slot = this.currentDraggedActivity.time_slot;
+            let date_index = this.calcDateIndex(new Date(this.currentDraggedActivity.activity_date));
+
+
+            // #todo - (?) tenir compte du type (event_type)
+            let old_employee_id = this.currentDraggedActivity.employee_id ? this.currentDraggedActivity.employee_id.id : this.currentDraggedActivity.employee_id;
+
+console.log(time_slot, date_index, old_employee_id);
+            // remove from this.activities[0][date_index][time_slot]
+            this.activities[old_employee_id][date_index][time_slot] = this.activities[old_employee_id][date_index][time_slot].filter( (activity: any) => activity.id !== this.currentDraggedActivity.id);
+
+            // add to unassigned activities
+            if(!(this.activities[0] ?? false)) {
+                this.activities[0] = {};
+            }
+            if(!(this.activities[0][date_index] ?? false)) {
+                this.activities[0][date_index] = {};
+            }
+            if(!(this.activities[0][date_index][time_slot] ?? false)) {
+                this.activities[0][date_index][time_slot] = [];
+            }
+
+            this.currentDraggedActivity.employee_id = this.emptyEmployee;
+            this.activities[0][date_index][time_slot].push(this.currentDraggedActivity);
+
+            // update back-end
+            try {
+                await this.api.call('?do=model_update', {
+                    entity: 'sale\\booking\\BookingActivity',
+                    id: this.currentDraggedActivity.id,
+                    fields: {
+                        employee_id: null
+                    }
+                });
+
+                this.onRefresh(false);
+            }
+            catch(response) {
+                this.api.errorFeedback(response);
+            }
+
+            this.currentDraggedActivity = null;
+        }
+    }
+
+    public async onDrop(event: Event | CdkDragDrop<any, any>, index: number, employee: Employee, date_index: string, time_slot: string) {
+        if(this.currentDraggedActivity) {
+            if(!this.isDroppable(this.currentDraggedActivity, employee, date_index, time_slot)) {
+                this.snack.open('Cette activité ne peut pas être assignée à cet animateur ou à cette plage horaire.', 'ERREUR');
+            }
+            else {
                 const dropEvent = event as CdkDragDrop<any, any>;
 
                 const element = dropEvent.container.element.nativeElement as HTMLElement;
                 element.style.setProperty('background-color', '');
 
-                // #todo - ajouter un test pour vérifier que l'employé n'a pas déjà une activité "animation" assignée
-                // #todo - tenir compte du type (event_type)
+                // #todo - (?) tenir compte du type (event_type)
                 let old_employee_id = this.currentDraggedActivity.employee_id ? this.currentDraggedActivity.employee_id.id : this.currentDraggedActivity.employee_id;
-                
-                this.currentDraggedActivity.employee_id = employee;
 
                 // remove from this.activities[0][date_index][time_slot]
                 this.activities[old_employee_id][date_index][time_slot] = this.activities[old_employee_id][date_index][time_slot].filter( (activity: any) => activity.id !== this.currentDraggedActivity.id);
@@ -662,13 +706,26 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                     this.activities[employee.id][date_index][time_slot] = [];
                 }
 
+                this.currentDraggedActivity.employee_id = employee;
                 this.activities[employee.id][date_index][time_slot].push(this.currentDraggedActivity);
-                console.log(this.activities);
+
                 // this.headers.days = this.headers.days.slice();
-                this.onRefresh(false);
-            }
-            else {
-                this.snack.open('Cette activité ne peut pas être assignée à cette plage horaire.', 'ERREUR');
+
+                // update back-end
+                try {
+                    await this.api.call('?do=model_update', {
+                        entity: 'sale\\booking\\BookingActivity',
+                        id: this.currentDraggedActivity.id,
+                        fields: {
+                            employee_id: employee.id
+                        }
+                    });
+
+                    this.onRefresh(false);
+                }
+                catch(response) {
+                    this.api.errorFeedback(response);
+                }
             }
             this.currentDraggedActivity = null;
         }
