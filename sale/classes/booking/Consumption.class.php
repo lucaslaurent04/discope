@@ -512,17 +512,17 @@ class Consumption extends Model {
 
                 // handle consumptions from bookings
                 if(isset($consumption['booking_line_group_id'])) {
-                    $booking_line_group_id = $consumption['booking_line_group_id'];
-
-                    foreach($bookings_map[$rental_unit_id][$booking_line_group_id] as $cid) {
-                        $processed_consumptions[$cid] = true;
-                    }
-
                     if($consumption['is_activity']) {
                         $consumption['date_from'] = $consumption['date'];
                         $consumption['date_to'] = $consumption['date'];
                     }
                     else {
+                        $booking_line_group_id = $consumption['booking_line_group_id'];
+
+                        foreach($bookings_map[$rental_unit_id][$booking_line_group_id] as $cid) {
+                            $processed_consumptions[$cid] = true;
+                        }
+
                         $consumption['date_from'] = $booking_line_groups[$booking_line_group_id]['date_from'];
                         // #todo - date_to should be the latest date from all consumptions relating to the group (the sojourn might be shorter than initially set, in case of partial cancellation)
                         $consumption['date_to'] = $booking_line_groups[$booking_line_group_id]['date_to'];
