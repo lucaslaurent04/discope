@@ -36,6 +36,8 @@ if(is_null($user)) {
     throw new Exception('unexpected_error', EQ_ERROR_INVALID_USER);
 }
 
+$result = [];
+
 $result['store_folded_settings'] = Setting::get_value('sale', 'booking', 'display.store.folded.settings', false);
 $result['identification_folded'] = Setting::get_value('sale', 'booking', 'display.identification.folded', true);
 $result['products_folded'] = Setting::get_value('sale', 'booking', 'display.products.folded', true);
@@ -51,6 +53,8 @@ if(isset($user['organisation_id'])) {
     $result['accomodations_folded'] = Setting::get_value('sale', 'booking', "display.accomodations.folded.{$user['organisation_id']}", $result['accomodations_folded']);
     $result['meals_folded'] = Setting::get_value('sale', 'booking', "display.meals.folded.{$user['organisation_id']}", $result['meals_folded']);
 }
+
+file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', json_encode($result).PHP_EOL, FILE_APPEND | LOCK_EX);
 
 $context->httpResponse()
         ->body($result)
