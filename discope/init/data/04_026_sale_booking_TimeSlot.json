@@ -4,6 +4,16 @@
         "lang": "fr",
         "data": [
             {
+                "id": 5,
+                "name": "Petit-déjeuner",
+                "description": "Tranche horaire pour le repas du matin (Breakfast).",
+                "order": 1,
+                "code": "B",
+                "is_meal": true,
+                "schedule_from": "07:00:00",
+                "schedule_to": "08:00:00"
+            },
+            {
                 "id": 1,
                 "name": "Matin",
                 "description": "Services planifiés pendant la matinée.",
@@ -16,7 +26,7 @@
             {
                 "id": 2,
                 "name": "Déjeuner",
-                "description": "Services planifiés pendant la pause déjeuner.",
+                "description": "Tranche horaire pour le repas du midi (Lunch).",
                 "order": 3,
                 "code": "L",
                 "is_meal": true,
@@ -36,22 +46,12 @@
             {
                 "id": 4,
                 "name": "Dîner",
-                "description": "Services planifiés en début de soirée.",
+                "description": "Tranche horaire pour le repas du soir (Diner).",
                 "order": 5,
                 "code": "D",
                 "is_meal": true,
                 "schedule_from": "19:00:00",
                 "schedule_to": "20:00:00"
-            },
-            {
-                "id": 5,
-                "name": "Petit-déjeuner",
-                "description": "Services planifiés tôt le matin.",
-                "order": 1,
-                "code": "B",
-                "is_meal": true,
-                "schedule_from": "07:00:00",
-                "schedule_to": "08:00:00"
             },
             {
                 "id": 6,

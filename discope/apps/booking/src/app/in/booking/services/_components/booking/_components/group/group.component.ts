@@ -97,14 +97,15 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     @Input() set model(values: any) { this.update(values) }
     @Input() booking: Booking;
     @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
+    @Input() sojournTypes: { id: number, name: 'GA'|'GG' }[] = [];
     @Input() bookingActivitiesDays: BookingActivityDay[];
     @Input() displaySettings: BookedServicesDisplaySettings;
 
+    @Output() loadStart = new EventEmitter();
+    @Output() loadEnd   = new EventEmitter();
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
     @Output() toggle  = new EventEmitter();
-    @Output() loadStart = new EventEmitter();
-    @Output() loadEnd   = new EventEmitter();
 
     public user: UserClass = null;
 

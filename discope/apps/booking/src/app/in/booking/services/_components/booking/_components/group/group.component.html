@@ -351,13 +351,15 @@
                     </div>
 
                     <!-- sojourn type -->
-                    <div *ngIf="instance.is_sojourn" class="cell" style="flex: 0.5 1 0; max-width: 120px; min-width: 60px;">
+                    <div *ngIf="instance.is_sojourn && sojournTypes.length > 1" class="cell" style="flex: 0.5 1 0; max-width: 120px; min-width: 60px;">
                         <mat-form-field>
                             <mat-label>Type de séjour</mat-label>
                             <mat-select [ngModel]="vm.sojourn_type.value"
-                                (selectionChange)="onchangeSojournType($event)">
-                                <mat-option value="GG">GG</mat-option>
-                                <mat-option value="GA">GA</mat-option>
+                                        (selectionChange)="onchangeSojournType($event)"
+                            >
+                                <mat-option *ngFor="let sojournType of sojournTypes " [value]="sojournType.name">
+                                    {{sojournType.name}}
+                                </mat-option>
                             </mat-select>
                         </mat-form-field>
                     </div>
@@ -598,6 +600,8 @@
                                     [group]="instance"
                                     [timeSlots]="timeSlots"
                                     [openedActivityIds]="openedActivityIds"
+                                    (loadStart)="loadStart.emit()"
+                                    (loadEnd)="loadEnd.emit()"
                                     (updated)="onupdateActivity()"
                                     (deleteLine)="ondeleteLine($event)"
                                     (closeActivity)="onCloseActivity($event)"

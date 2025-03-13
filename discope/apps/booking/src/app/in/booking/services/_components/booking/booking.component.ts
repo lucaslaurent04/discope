@@ -56,6 +56,7 @@ export class BookingServicesBookingComponent
     public loading: boolean = true;
     public maximized_group_id: number = 0;
     public time_slots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[] = [];
+    public sojourn_types: { id: number, name: 'GA'|'GG' }[] = [];
     public mapGroupsIdsBookingActivitiesDays: {[key: number]: BookingActivityDay[]} = {};
     public mapGroupsIdsHasActivity: {[key: number]: boolean};
 
@@ -89,6 +90,7 @@ export class BookingServicesBookingComponent
 
     public async ngOnInit() {
         this.time_slots = await this.api.collect('sale\\booking\\TimeSlot', [], ['id', 'name', 'code']);
+        this.sojourn_types = await this.api.collect('sale\\booking\\SojournType', [], ['id', 'name']);
     }
 
     /**

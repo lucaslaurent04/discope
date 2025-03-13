@@ -12,14 +12,15 @@
 </div>
 <div *ngIf="!lower_screen_resolution" class="container">
     <div class="app-header">
-        <app-header [section]="'Réservations'"
-                    [i18n]="translationsMenuTop"
-                    [items]="topMenuItems"
-                    [action]="'Nouvelle réservation'"
-                    (toggleMenu)="toggleSideMenu()"
-                    (toggleBar)="toggleSideBar()"
-                    (select)="onSelectItem($event)"
-                    (onAction)="onAction()">
+        <app-header
+            [section]="'Réservations'"
+            [i18n]="translationsMenuTop"
+            [items]="topMenuItems"
+            [action]="'Nouvelle réservation'"
+            (toggleMenu)="toggleSideMenu()"
+            (toggleBar)="toggleSideBar()"
+            (select)="onSelectItem($event)"
+            (onAction)="onAction()">
         </app-header>
     </div>
     <div *ngIf="notifications.length && show_notifications" class="app-notif" [class.visible]="notifications.length && show_notifications">
@@ -37,6 +38,18 @@
         <div class="app-sidebar"  [class.show]="show_side_bar">
             <!-- app-sidebar -->
             <div class="side-inner">
+                <!--
+                <div *ngIf="show_search_side_menu" class="search-menu">
+                    <input
+                        matInput
+                        placeholder="Search in menu"
+                        autocomplete="off"
+                        [(ngModel)]="filter"
+                        (keyup)="onchangeFilter()">
+                    <button mat-icon-button *ngIf="filter?.length" style="position: absolute; right: 5px"  (click)="filter=''; onchangeFilter()"><mat-icon>close</mat-icon></button>
+                    <mat-icon *ngIf="!filter?.length" style="position: absolute; right: 5px">search</mat-icon>
+               </div>
+               -->
                 <mat-nav-list>
                     <app-menu-list-item *ngFor="let item of navMenuItems"
                         [i18n]="translationsMenuLeft"

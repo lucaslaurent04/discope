@@ -43,6 +43,7 @@ list($params, $providers) = eQual::announce([
                 'room',
                 'FFE'
             ],
+            'default'           => 'all',
             'description'       => 'Type of the rental unit, which determines its capacity and usage.'
         ],
 
@@ -52,21 +53,21 @@ list($params, $providers) = eQual::announce([
             'default'           => null
         ],
 
-        'has_pmr_access' => [
+        'has_prm_access' => [
             'type'              => 'boolean',
             'description'       => 'Indicates if the unit is accessible for persons with reduced mobility (PMR)',
             'default'           => null,
             'visible'           => ['is_accomodation', '=', true]
         ],
 
-        'has_pdv_features' => [
+        'has_pvi_features' => [
             'type'              => 'boolean',
             'description'       => 'Indicates if the unit is adapted for persons with visual impairments (PDV).',
             'default'           => null,
             'visible'           => ['is_accomodation', '=', true]
         ],
 
-        'has_pda_support' => [
+        'has_phi_support' => [
             'type'              => 'boolean',
             'description'       => 'Indicates if the unit includes features for persons with hearing impairments (PDA).',
             'default'           => null,
@@ -96,8 +97,8 @@ if(isset($params['center_id']) && $params['center_id'] > 0) {
 }
 else {
     $user = User::id($auth->userId())->read(['centers_ids'])->first(true);
-    if(count($user['centers_ids']) == 1) {
-        $domain[] = ['center_id', '=', reset($user['centers_ids'])];
+    if(count($user['centers_ids'])) {
+        $domain[] = ['center_id', 'in', $user['centers_ids']];
     }
     else {
         $domain[] = ['center_id', '=', 0];
@@ -105,31 +106,31 @@ else {
 }
 
 
-if(isset($params['parent_id'])) {
+if(isset($params['parent_id']) && $params['parent_id'] > 0) {
     $domain[] = ['parent_id', '=', $params['parent_id']];
 }
 
-if(isset($params['type']) && strlen($params['type']) > 0 && $params['type']!= 'all') {
-    $domain = ['type', '=', $params['type']];
+if(isset($params['type']) && strlen($params['type']) > 0 && $params['type'] != 'all') {
+    $domain[] = ['type', '=', $params['type']];
 }
 
 
-if(!is_null($params['is_accomodation'])) {
+if($params['is_accomodation'] ?? false) {
     $domain[] = ['is_accomodation', '=', $params['is_accomodation']];
 }
 
 
-if(!is_null($params['has_pmr_access'])) {
-    $domain[] = ['has_pmr_access', '=', $params['has_pmr_access']];
+if($params['has_prm_access'] ?? false) {
+    $domain[] = ['has_prm_access', '=', $params['has_prm_access']];
 }
 
-if(!is_null($params['has_pdv_features'])) {
-    $domain[] = ['has_pdv_features', '=', $params['has_pdv_features']];
+if($params['has_pvi_features'] ?? false) {
+    $domain[] = ['has_pvi_features', '=', $params['has_pvi_features']];
 }
 
 
-if(!is_null($params['has_pda_support'])) {
-    $domain[] = ['has_pda_support', '=', $params['has_pda_support']];
+if($params['has_phi_support'] ?? false) {
+    $domain[] = ['has_phi_support', '=', $params['has_phi_support']];
 }
 
 

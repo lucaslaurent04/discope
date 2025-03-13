@@ -23,21 +23,22 @@ list($params, $providers) = announce([
 
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
  */
-['context' => $context] = $providers;
+['context' => $context, 'orm' => $orm] = $providers;
 
 /**
  * Methods
@@ -72,146 +73,6 @@ $createGroupUniqName = function($group_name, $groups) {
     return $name;
 };
 
-$cloneAgeRangeAssignments = function($clone_group_id, $clone_age_range_assignments_ids, $age_range_assignments) {
-    foreach($age_range_assignments as $index => $age_range_assignment) {
-        $assignment_id = null;
-        if($index === 0 && isset($clone_age_range_assignments_ids[0])) {
-            $assignment_id = $clone_age_range_assignments_ids[0];
-        }
-        else {
-            $clone_age_range_assignment = eQual::run('do', 'sale_booking_update-sojourn-agerange-add', [
-                'id' => $clone_group_id
-            ]);
-
-            $assignment_id = $clone_age_range_assignment['id'];
-        }
-
-        eQual::run('do', 'sale_booking_update-sojourn-agerange-set', [
-            'id'                        => $clone_group_id,
-            'age_range_assignment_id'   => $assignment_id,
-            'age_range_id'              => $age_range_assignment['age_range_id'],
-            'qty'                       => $age_range_assignment['qty']
-        ]);
-
-        BookingLineGroupAgeRangeAssignment::id($assignment_id)
-            ->update([
-                'age_from'  => $age_range_assignment['age_from'],
-                'age_to'    => $age_range_assignment['age_to']
-            ]);
-    }
-};
-
-$cloneBookingLines = function($clone_group_id, $lines) {
-    usort($lines, function($a, $b) {
-        return $a['id'] <=> $b['id'];
-    });
-
-    $map_old_activity_line_id_new_activity_id = [];
-    $lines_orders = [];
-    foreach($lines as $line) {
-        $activity_line_id = null;
-        if(
-            isset($line['booking_activity_id']['activity_booking_line_id']['id'])
-            && $line['booking_activity_id']['activity_booking_line_id']['id'] !== $line['id']
-        ) {
-            $product_model = $line['booking_activity_id']['activity_booking_line_id']['product_model_id'];
-            if(
-                $line['product_id'] === $product_model['transport_product_model_id']
-                || in_array($line['product_id'], $product_model['supplies_ids'])
-            ) {
-                // Find automatically added transport or supply line, then update its qty and unit_price if needed.
-                $new_activity_id = $map_old_activity_line_id_new_activity_id[$line['booking_activity_id']['activity_booking_line_id']['id']];
-                $activity = BookingActivity::id($new_activity_id)
-                    ->read(['booking_lines_ids' => ['product_model_id', 'qty', 'unit_price']])
-                    ->first();
-
-                $clone_line = null;
-                foreach($activity['booking_lines_ids'] as $l) {
-                    if($line['product_model_id'] === $l['product_model_id']) {
-                        $clone_line = $l;
-                        break;
-                    }
-                }
-
-                if(!is_null($clone_line)) {
-                    if($line['qty'] !== $clone_line['qty']) {
-                        BookingLine::id($clone_line['id'])->update(['qty' => $line['qty']]);
-                    }
-                    if($line['unit_price'] !== $clone_line['unit_price']) {
-                        BookingLine::id($clone_line['id'])->update(['unit_price' => $line['unit_price']]);
-                    }
-                    if($line['vat_rate'] !== $clone_line['vat_rate']) {
-                        BookingLine::id($clone_line['id'])->update(['vat_rate' => $line['vat_rate']]);
-                    }
-                    if(!empty($line['description'])) {
-                        BookingLine::id($clone_line['id'])->update(['description' => $line['description']]);
-                    }
-
-                    $lines_orders[] = ['order' => $line['order'], 'new_line_id' => $clone_line['id']];
-                }
-
-                continue;
-            }
-            else {
-                // Save activity line id to link new line to the new activity
-                $activity_line_id = $line['booking_activity_id']['activity_booking_line_id']['id'];
-            }
-        }
-
-        $clone_line = BookingLine::create([
-            'booking_line_group_id' => $clone_group_id,
-            'booking_id'            => $line['booking_id'],
-            'order'                 => $line['order'],
-            'service_date'          => $line['service_date'],
-            'time_slot_id'          => $line['time_slot_id'],
-            'description'           => $line['description']
-        ])
-            ->read(['id'])
-            ->first();
-
-        \eQual::run('do', 'sale_booking_update-bookingline-product', [
-            'id'            => $clone_line['id'],
-            'product_id'    => $line['product_id']
-        ]);
-
-        $clone_line = BookingLine::id($clone_line['id'])
-            ->read(['qty', 'unit_price', 'vat_rate'])
-            ->first();
-
-        $lines_orders[] = ['order' => $line['order'], 'new_line_id' => $clone_line['id']];
-
-        // Handle link between BookingLine and BookingActivity
-        if($line['is_activity']) {
-            $bl = BookingLine::id($clone_line['id'])
-                ->read(['booking_activity_id'])
-                ->first();
-
-            if(!is_null($bl)) {
-                $map_old_activity_line_id_new_activity_id[$line['id']] = $bl['booking_activity_id'];
-            }
-        }
-        elseif(!is_null($activity_line_id) && isset($map_old_activity_line_id_new_activity_id[$activity_line_id])) {
-            BookingLine::id($clone_line['id'])
-                ->update(['booking_activity_id' => $map_old_activity_line_id_new_activity_id[$activity_line_id]]);
-        }
-
-        if($line['qty'] !== $clone_line['qty']) {
-            BookingLine::id($clone_line['id'])->update(['qty' => $line['qty']]);
-        }
-        if($line['unit_price'] !== $clone_line['unit_price']) {
-            BookingLine::id($clone_line['id'])->update(['unit_price' => $line['unit_price']]);
-        }
-        if($line['vat_rate'] !== $clone_line['vat_rate']) {
-            BookingLine::id($clone_line['id'])->update(['vat_rate' => $line['vat_rate']]);
-        }
-    }
-
-    usort($lines_orders, function($a, $b) { return $a <=> $b; });
-    foreach($lines_orders as $line_order) {
-        BookingLine::id($line_order['new_line_id'])->update(['order' => $line_order['order']]);
-    }
-};
-
 /**
  * Action
  */
@@ -235,36 +96,45 @@ $group = BookingLineGroup::id($params['id'])
             'id',
             'status',
             'booking_lines_groups_ids' => [
-                'name',
-                'order'
-            ]
-        ],
-        'booking_lines_ids' => [
-            'booking_id',
-            'order',
-            'qty',
-            'unit_price',
-            'vat_rate',
-            'description',
-            'product_id',
-            'service_date',
-            'time_slot_id',
-            'is_activity',
-            'product_model_id',
-            'booking_activity_id' => [
-                'activity_booking_line_id' => [
-                    'product_model_id' => [
-                        'transport_product_model_id',
-                        'supplies_ids'
-                    ]
-                ]
+                'name'
             ]
         ],
         'age_range_assignments_ids' => [
+            'booking_id',
             'qty',
             'age_range_id',
             'age_from',
             'age_to'
+        ],
+        'booking_lines_ids' => [
+            'booking_id',
+            'booking_activity_id',
+            'order',
+            'qty',
+            'unit_price',
+            'vat_rate',
+            'qty_vars',
+            'description',
+            'product_id',
+            'product_model_id',
+            'service_date',
+            'time_slot_id',
+            'is_activity',
+            'price_id',
+            'total',
+            'price',
+            'meal_location'
+        ],
+        'booking_activities_ids' => [
+            'booking_id',
+            'activity_booking_line_id',
+            'providers_ids',
+            'counter',
+            'total',
+            'price',
+            'is_virtual',
+            'activity_date',
+            'time_slot_id'
         ]
     ])
     ->first(true);
@@ -277,28 +147,97 @@ if($group['booking_id']['status'] !== 'quote') {
     throw new Exception("only_group_of_quote_booking_can_be_cloned", EQ_ERROR_NOT_ALLOWED);
 }
 
-$clone = BookingLineGroup::create([
+$orm->disableEvents();
+
+// Create group
+$cloned_group = BookingLineGroup::create([
     'name'              => $createGroupUniqName($group['name'], $group['booking_id']['booking_lines_groups_ids']),
     'order'             => max(array_column($group['booking_id']['booking_lines_groups_ids'], 'order')) + 1,
+    'booking_id'        => $group['booking_id']['id'],
+    'group_type'        => $group['group_type'],
     'date_from'         => $group['date_from'],
     'date_to'           => $group['date_to'],
     'time_from'         => $group['time_from'],
     'time_to'           => $group['time_to'],
-    'group_type'        => $group['group_type'],
     'sojourn_type_id'   => $group['sojourn_type_id'],
     'is_sojourn'        => $group['is_sojourn'],
     'is_event'          => $group['is_event'],
     'is_extra'          => $group['is_extra'],
     'is_autosale'       => $group['is_autosale'],
-    'booking_id'        => $group['booking_id']['id'],
     'nb_pers'           => $group['nb_pers']
 ])
-    ->read(['id', 'age_range_assignments_ids'])
-    ->first(true);
+    ->read(['id'])
+    ->first();
 
-$cloneAgeRangeAssignments($clone['id'], $clone['age_range_assignments_ids'], $group['age_range_assignments_ids']);
+// Create age range assignments
+foreach($group['age_range_assignments_ids'] as $assignment) {
+    BookingLineGroupAgeRangeAssignment::create([
+        'booking_line_group_id' => $cloned_group['id'],
+        'booking_id'            => $assignment['booking_id'],
+        'qty'                   => $assignment['qty'],
+        'age_range_id'          => $assignment['age_range_id'],
+        'age_from'              => $assignment['age_from'],
+        'age_to'                => $assignment['age_to']
+    ]);
+}
 
-$cloneBookingLines($clone['id'], $group['booking_lines_ids']);
+// Create lines
+$map_old_booking_line_id_to_new = [];
+$map_old_booking_activity_new_lines_ids = [];
+foreach($group['booking_lines_ids'] as $line) {
+    $cloned_line = BookingLine::create([
+        'booking_line_group_id' => $cloned_group['id'],
+        'booking_id'            => $line['booking_id'],
+        'order'                 => $line['order'],
+        'qty'                   => $line['qty'],
+        'unit_price'            => $line['unit_price'],
+        'vat_rate'              => $line['vat_rate'],
+        'qty_vars'              => $line['qty_vars'],
+        'description'           => $line['description'],
+        'product_id'            => $line['product_id'],
+        'product_model_id'      => $line['product_model_id'],
+        'service_date'          => $line['service_date'],
+        'time_slot_id'          => $line['time_slot_id'],
+        'is_activity'           => $line['is_activity'],
+        'price_id'              => $line['price_id'],
+        'total'                 => $line['total'],
+        'price'                 => $line['price'],
+        'meal_location'         => $line['meal_location']
+    ])
+        ->read(['id'])
+        ->first();
+
+    $map_old_booking_line_id_to_new[$line['id']] = $cloned_line['id'];
+
+    if(!isset($map_old_booking_activity_new_lines_ids[$line['booking_activity_id']])) {
+        $map_old_booking_activity_new_lines_ids[$line['booking_activity_id']] = [];
+    }
+    $map_old_booking_activity_new_lines_ids[$line['booking_activity_id']][] = $cloned_line['id'];
+}
+
+// Create activities
+foreach($group['booking_activities_ids'] as $activity) {
+    $cloned_activity = BookingActivity::create([
+        'booking_line_group_id'     => $cloned_group['id'],
+        'booking_id'                => $activity['booking_id'],
+        'activity_booking_line_id'  => $map_old_booking_line_id_to_new[$activity['activity_booking_line_id']],
+        'providers_ids'             => $activity['providers_ids'],
+        'counter'                   => $activity['counter'],
+        'total'                     => $activity['total'],
+        'price'                     => $activity['price'],
+        'is_virtual'                => $activity['is_virtual'],
+        'activity_date'             => $activity['activity_date'],
+        'time_slot_id'              => $activity['time_slot_id']
+    ])
+        ->read(['id'])
+        ->first();
+
+    // Link booking lines to newly created activity
+    BookingLine::ids($map_old_booking_activity_new_lines_ids[$activity['id']])
+        ->update(['booking_activity_id' => $cloned_activity['id']]);
+}
+
+$orm->enableEvents();
 
 $context->httpResponse()
         ->status(201)

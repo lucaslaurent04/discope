@@ -157,12 +157,16 @@ foreach($booking['bookings_inspections_ids'] as $index => $booking_inspection) {
                     $price = $reading_checkedin['price_id'];
 
                     $qty = $reading_checkout['index_value'] - $reading_checkedin['index_value'];
-                    if ($meter['coefficient'] != 1){
+
+                    if($meter['coefficient'] != 1){
                         $qty *= $meter['coefficient'];
                     }
 
-                    $resulting_total = round($qty * $reading_checkout['unit_price'],   2);
-                    $resulting_price = round($resulting_total/(1+$price['vat_rate']), 2);
+                    // index_value is an integer representation of the index
+                    $qty = round($qty / 1000, 2);
+
+                    $resulting_total = round($qty * $reading_checkout['unit_price'], 2);
+                    $resulting_price = round($resulting_total / (1 + $price['vat_rate']), 2);
 
                     $booking_line = BookingLine::create([
                             'booking_id'            => $booking['id'],
