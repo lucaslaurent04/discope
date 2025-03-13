@@ -6,7 +6,8 @@ export class RentalUnitClass {
         public name: string = '',
         public capacity: number = 0,
         public order: number = 0,
-        public is_accomodation: boolean = false
+        public is_accomodation: boolean = false,
+        public parent_id: number = 0
     ) {}
 
 }
