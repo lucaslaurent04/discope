@@ -113,7 +113,7 @@
                             <mat-slide-toggle [checked]="showOnlyChildren" (change)="leftShowOnlyChildren($event.checked)" style="transform: scale(0.8);">Enfants</mat-slide-toggle>
                         </div>
                     </div>
-                    <div class="list" cdkDropList cdkDropListSortingDisabled style="border: solid 1px darkgrey;" >
+                    <div class="list" cdkDropList cdkDropListSortingDisabled style="flex-grow: 1; border: solid 1px darkgrey;" >
                         <div *ngFor="let unit of filteredRentalUnits"
                              class="rentalunit-line line-choice"
                              [class.selected]="selectedRentalUnits.indexOf(unit.id) > -1"
