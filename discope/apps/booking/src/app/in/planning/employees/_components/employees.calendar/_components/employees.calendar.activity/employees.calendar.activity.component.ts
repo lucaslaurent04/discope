@@ -28,7 +28,7 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
             this.datasourceChanged();
         }
         if(changes.height) {
-            this.elementRef.nativeElement.style.setProperty('--height', this.height+'px');
+            this.elementRef.nativeElement.style.setProperty('--height', (this.height-1)+'px');
         }
     }
 
@@ -78,7 +78,7 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
         }
 
         this.elementRef.nativeElement.style.setProperty('--width', '100%');
-        this.elementRef.nativeElement.style.setProperty('--height', this.height+'px');
+        this.elementRef.nativeElement.style.setProperty('--height', (this.height-1)+'px');
 
     }
 
