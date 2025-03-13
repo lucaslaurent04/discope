@@ -54,8 +54,6 @@ if(isset($user['organisation_id'])) {
     $result['meals_folded'] = Setting::get_value('sale', 'booking', "display.meals.folded.{$user['organisation_id']}", $result['meals_folded']);
 }
 
-file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', json_encode($result).PHP_EOL, FILE_APPEND | LOCK_EX);
-
 $context->httpResponse()
         ->body($result)
         ->send();
