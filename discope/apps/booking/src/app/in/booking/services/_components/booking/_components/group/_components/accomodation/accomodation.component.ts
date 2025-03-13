@@ -6,6 +6,7 @@ import { BookingAccomodation } from '../../../../_models/booking_accomodation.mo
 import { Booking } from '../../../../_models/booking.model';
 import { RentalUnitClass } from 'src/app/model/rental.unit.class';
 import { BehaviorSubject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { BookingServicesBookingGroupAccomodationAssignmentComponent } from './_components/assignment.component';
 import { BookingServicesBookingGroupAccomodationAssignmentsEditorComponent } from './_components/assignmentseditor/assignmentseditor.component';
 
@@ -47,6 +48,8 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
     public showOnlyParents: boolean = false;
     public showOnlyChildren$ = new BehaviorSubject<boolean>(false);
     public showOnlyChildren: boolean = false;
+    public filterBy$ = new BehaviorSubject<string>('');
+    public filterBy = '';
 
     constructor(
         private api: ApiService,
@@ -75,21 +78,17 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
         this.rentalUnits$.subscribe((rentalUnits) => {
             this.rentalUnits = rentalUnits;
 
-            if(this.showOnlyParents) {
-                this.filteredRentalUnits = rentalUnits.filter(ru => !ru.parent_id);
-            }
-            else if(this.showOnlyChildren) {
-                this.filteredRentalUnits = rentalUnits.filter(ru => ru.parent_id);
-            }
-            else {
-                this.filteredRentalUnits = rentalUnits;
-            }
+            this.refreshFilteredRentalUnits();
         });
 
         this.filteredRentalUnits$.subscribe((filteredRentalUnits) => {
             this.filteredRentalUnits = filteredRentalUnits;
 
             this.allRentalUnitsSelected = filteredRentalUnits.length === this.selectedRentalUnits.length && filteredRentalUnits.length > 0;
+
+            this.selectedRentalUnits$.next(
+                this.selectedRentalUnits.filter((sru) => filteredRentalUnits.map(fru => fru.id).includes(sru))
+            );
         });
 
         this.showOnlyParents$.subscribe((showOnlyParents) => {
@@ -97,16 +96,9 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
 
             if(showOnlyParents) {
                 this.showOnlyChildren$.next(false);
-
-                this.filteredRentalUnits$.next(this.rentalUnits.filter(ru => !ru.parent_id));
-
-                this.selectedRentalUnits$.next(
-                    this.selectedRentalUnits.filter((sru) => this.filteredRentalUnits.map(fru => fru.id).includes(sru))
-                );
             }
-            else {
-                this.filteredRentalUnits$.next(this.rentalUnits);
-            }
+
+            this.refreshFilteredRentalUnits();
         });
 
         this.showOnlyChildren$.subscribe((showOnlyChildren) => {
@@ -114,17 +106,35 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
 
             if(showOnlyChildren) {
                 this.showOnlyParents$.next(false);
-
-                this.filteredRentalUnits$.next(this.rentalUnits.filter(ru => ru.parent_id));
-
-                this.selectedRentalUnits$.next(
-                    this.selectedRentalUnits.filter((sru) => this.filteredRentalUnits.map(fru => fru.id).includes(sru))
-                );
             }
-            else {
-                this.filteredRentalUnits$.next(this.rentalUnits);
-            }
+
+            this.refreshFilteredRentalUnits();
         });
+
+        this.filterBy$
+            .pipe(debounceTime(300))
+            .subscribe((filterBy) => {
+                this.filterBy = filterBy;
+                this.refreshFilteredRentalUnits();
+            });
+    }
+
+    private refreshFilteredRentalUnits() {
+        let rentalUnits = this.rentalUnits;
+
+        if(this.filterBy.length > 0) {
+            rentalUnits = rentalUnits.filter((rentalUnit) => {
+                return rentalUnit.name.toLowerCase().includes(this.filterBy.toLowerCase());
+            });
+        }
+
+        if(this.showOnlyParents) {
+            rentalUnits = rentalUnits.filter((rentalUnit) => !rentalUnit.parent_id);
+        } else if(this.showOnlyChildren) {
+            rentalUnits = rentalUnits.filter((rentalUnit) => rentalUnit.parent_id);
+        }
+
+        this.filteredRentalUnits$.next(rentalUnits);
     }
 
     public async refreshAvailableRentalUnits() {
@@ -183,6 +193,10 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
 
     public async onupdateAssignment(assignment_id:any) {
         this.updated.emit();
+    }
+
+    public leftFilterBy(event: any) {
+        this.filterBy$.next(event.target.value);
     }
 
     public leftSelectAllRentalUnits() {
@@ -269,10 +283,8 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
     }
 
     public addAll() {
-        // unselect selected items
-        this.selectedRentalUnits$.next([]);
-        // select all
-        this.selectedRentalUnits$.next(this.rentalUnits.map(ru => ru.id));
+        // select all displayed rental units
+        this.selectedRentalUnits$.next(this.filteredRentalUnits.map(ru => ru.id));
         this.addSelection();
     }
 
