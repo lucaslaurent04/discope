@@ -19,18 +19,22 @@
             "total": {
                 "usage": "amount/money",
                 "operation": "SUM"
+            },
+            "price": {
+                "usage": "amount/money",
+                "operation": "SUM"
             }
         }
     },
     "group_by": [
-        { "field": "center_office_id" }
+        { "field": "center_office" }
     ],
     "limit": 500,
     "layout": {
         "items": [
             {
                 "type": "field",
-                "value": "center_office_id",
+                "value": "center_office",
                 "width": "20%"
             },
             {
@@ -46,6 +50,14 @@
             {
                 "type": "field",
                 "value": "total",
+                "width": "10%",
+                "widget": {
+                    "usage": "amount/money:2"
+                }
+            },
+            {
+                "type": "field",
+                "value": "price",
                 "width": "10%",
                 "widget": {
                     "usage": "amount/money:2"

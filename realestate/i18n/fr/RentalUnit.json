@@ -114,17 +114,17 @@
             "description": "Type de séjour par défaut auquel se rapporte le logement.",
             "help": ""
         },
-        "has_pmr_access": {
+        "has_prm_access": {
             "label": "PMR",
             "description": "Adaptée aux personnes à mobilité réduite, avec des aménagements pour fauteuils roulants, un accès facilité, des douches accessibles, etc.",
             "help": ""
         },
-        "has_pdv_features": {
+        "has_pvi_features": {
             "label": "PDV",
             "description": "Adaptée aux personnes déficientes visuelles, avec contraste visuel, signalisation tactile ou braille, et absence d'obstacles.",
             "help": ""
         },
-        "has_pda_support": {
+        "has_phi_support": {
             "label": "PDA",
             "description": "L'unité locative est équipée pour les personnes à déficience auditive, avec la présence d'alarmes visuelles, de sous-titrage ou d'autres aides adaptées.",
             "help": ""

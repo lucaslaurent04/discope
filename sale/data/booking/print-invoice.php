@@ -226,7 +226,8 @@ $fields = [
     'price',
     'accounting_total',
     'accounting_price',
-    'payment_reference'
+    'payment_reference',
+    'has_orders'
 ];
 
 
@@ -276,7 +277,7 @@ $values = [
     'contact_name'          => '',
     'contact_phone'         => (strlen($invoice['partner_id']['partner_identity_id']['phone']))?$invoice['partner_id']['partner_identity_id']['phone']:$invoice['partner_id']['partner_identity_id']['mobile'],
     'contact_email'         => $invoice['partner_id']['partner_identity_id']['email'],
-
+    'has_orders'            => (int) $invoice['has_orders'],
     'customer_id'           => $invoice['partner_id']['partner_identity_id']['id'],
     'customer_name'         => substr($invoice['partner_id']['partner_identity_id']['display_name'], 0, 66),
     'customer_address1'     => '',

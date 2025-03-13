@@ -71,6 +71,8 @@ export class BookingServicesBookingGroupAgeRangeComponent extends TreeComponent<
 
     public async onupdateAgeRange(age_range: any) {
         this.age_range_id = age_range.id;
+        this.instance.age_from = age_range.age_from;
+        this.instance.age_to = age_range.age_to;
         /*
         if(this.qtyFormControl.value <= 0) {
             return;

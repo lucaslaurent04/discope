@@ -445,9 +445,13 @@ class BookingLine extends Model {
 
         if($count_non_allowed > 0) {
             $self->read([
-                'booking_id'            => ['status'],
-                'booking_line_group_id' => ['is_extra', 'has_schedulable_services', 'has_consumptions'],
-            ]);
+                    'booking_id' => ['status'],
+                    'booking_line_group_id' => [
+                        'is_extra',
+                        'has_schedulable_services',
+                        'has_consumptions'
+                    ]
+                ]);
 
             foreach($self as $line) {
                 if($line['booking_id']['status'] != 'quote' && !$line['booking_line_group_id']['is_extra']) {
@@ -557,6 +561,7 @@ class BookingLine extends Model {
                     }
                 }
             }
+
         }
 
         return parent::canupdate($self, $values, $lang);
@@ -1477,7 +1482,7 @@ class BookingLine extends Model {
 
     public static function calcFreeQty($om, $oids, $lang) {
         $result = [];
-        $lines = $om->read(get_called_class(), $oids, ['auto_discounts_ids','manual_discounts_ids']);
+        $lines = $om->read(get_called_class(), $oids, ['qty', 'auto_discounts_ids','manual_discounts_ids']);
 
         foreach($lines as $oid => $odata) {
             $free_qty = 0;
@@ -1495,7 +1500,7 @@ class BookingLine extends Model {
                     $free_qty += $adata['value'];
                 }
             }
-            $result[$oid] = $free_qty;
+            $result[$oid] = min($free_qty, $odata['qty']);
         }
         return $result;
     }

@@ -1,0 +1,266 @@
+<div>
+    <planning-employees-calendar-navbar
+        [employee]="hovered_employee"
+        [activity]="hovered_activity"
+        [holidays]="hovered_holidays"
+        (refresh)="onRefresh()"
+        (openLegendDialog)="onOpenLegendDialog()"
+        (openPrefDialog)="onOpenPrefDialog()"
+        (fullScreen)="onFullScreen()">
+    </planning-employees-calendar-navbar>
+</div>
+<div class="container" cdkDropListGroup>
+    <div class="container-body">
+        <mat-progress-bar [class.hidden]="!loading" mode="indeterminate"></mat-progress-bar>
+        <table #calTable class="cal-table">
+            <!-- header -->
+            <thead>
+                <tr class="head">
+                    <th #calTableRefColumn class="cell-room employee ref-column" rowspan="2"><span class="material-icons">people</span></th>
+                    <!--
+                    <th class="head-months" *ngFor="let month of headers.months" [attr.colspan]="month.days.length">
+                        {{ month.date | date : 'MMMM y' }}
+                    </th>
+                    -->
+                    <ng-container *ngFor="let day of headers.days" >
+                        <th colspan="3">
+                            <div class="month-day">{{ day | date: 'EEE'}} {{ day | date: 'd'}}/{{ day | date: 'MM'}}</div>
+                        </th>
+                    </ng-container>
+                </tr>
+                <tr class="head">
+                    <ng-container *ngFor="let day of headers.days" >
+                        <th #calTableHeadCells class="head-slots">
+                            <div>Mat.</div>
+                        </th>
+                        <th class="head-slots">
+                            <div>Apr.</div>
+                        </th>
+                        <th class="head-slots">
+                            <div>Soir</div>
+                        </th>
+                    </ng-container>
+                </tr>
+            </thead>
+            <tbody  (mouseleave)="onmouseleaveTable()" >
+                <!-- body -->
+                <tr     *ngFor="let employee of employees; let index = index;"
+                        class="rows days cdk-drag-disabled"
+                        (dragstart)="preventDrag($event)">
+
+                    <td class="cell-room employee"
+                        (mouseenter)="onhoverEmployee(employee); hover_row_index = index"
+                        (mouseleave)="onhoverEmployee(null); hover_row_index = -1"
+                        [style.background]="employee?.color"
+                        (click)="onSelectedEmployee(employee)"><span class="employee-name">{{ employee.name }} </span>
+                        <span *ngIf="employee == hovered_employee" class="cell-hint"><span>{{ employee.name }} ({{ employee.is_active }})</span></span>
+                    </td>
+
+                    <!-- #debug - for debugging, add [attr.data-date]="day" -->
+                    <ng-container *ngFor="let day of headers.days; let i = index">
+                        <td     class="cell-AM cell-days cdk-drag-disabled"
+                                [class.is-weekend]="isWeekEnd(day)"
+                                (dragstart)="preventDrag($event)"
+                                (mousedown)="onmousedown($event, employee, day)"
+                                (mouseup)="onmouseup()"
+                                (mouseover)="onmouseover($event, day)"
+                                (mouseenter)="onmouseenterTableCell($event, index, employee, headers.days_indexes[i], 'AM')"
+                                (mouseleave)="onmouseleaveTableCell($event)"
+                                cdkDropList
+                                (cdkDropListDropped)="onDrop($event, index, employee, headers.days_indexes[i], 'AM')">
+
+                            <!-- activity cell -->
+                            <ng-container *ngIf="hasActivity(employee, headers.days_indexes[i], 'AM')">
+                                <div class="cell-activities">
+                                    <ng-container *ngFor="let activity of getActivities(employee, day, 'AM')">
+
+                                        <planning-employees-calendar-activity
+                                            [height]="rowsHeight"
+                                            [width]="cellsWidth"
+                                            [tableRect]="tableRect"
+                                            [day]="day"
+                                            [activity]="activity"
+                                            (hover)="onhoverActivity($event); onhoverDay(employee, day)"
+                                            (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
+                                            (selected)="onSelectedBooking($event)"
+                                            cdkDrag
+                                            (cdkDragStarted)="onDragStart(activity)">
+                                        </planning-employees-calendar-activity>
+
+                                        <span *ngIf="hovered_activity == activity" class="cell-hint" #vDescription="var" [var]="{value: getDescription(activity)}">
+                                            <span *ngIf="vDescription?.value?.length" style="margin: 0 !important;" [innerHTML]="vDescription.value"></span>
+                                        </span>
+                                    </ng-container>
+                                </div>
+                            </ng-container>
+                        </td>
+
+                        <td     class="cell-PM cell-days cdk-drag-disabled"
+                                [class.is-weekend]="isWeekEnd(day)"
+                                (dragstart)="preventDrag($event)"
+                                (mousedown)="onmousedown($event, employee, day)"
+                                (mouseup)="onmouseup()"
+                                (mouseover)="onmouseover($event, day)"
+                                (mouseenter)="onmouseenterTableCell($event, index, employee, headers.days_indexes[i], 'PM')"
+                                (mouseleave)="onmouseleaveTableCell($event)"
+                                cdkDropList
+                                (cdkDropListDropped)="onDrop($event, index, employee, headers.days_indexes[i], 'PM')">
+
+                            <!-- activity cell -->
+                            <ng-container *ngIf="hasActivity(employee, headers.days_indexes[i], 'PM')">
+                                <div class="cell-activities">
+                                    <ng-container *ngFor="let activity of getActivities(employee, day, 'PM')">
+
+                                        <planning-employees-calendar-activity
+                                            [height]="rowsHeight"
+                                            [width]="cellsWidth"
+                                            [tableRect]="tableRect"
+                                            [day]="day"
+                                            [activity]="activity"
+                                            (hover)="onhoverActivity($event); onhoverDay(employee, day)"
+                                            (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
+                                            (selected)="onSelectedBooking($event)"
+                                            cdkDrag
+                                            (cdkDragStarted)="onDragStart(activity)">
+                                        </planning-employees-calendar-activity>
+
+                                        <span *ngIf="hovered_activity == activity" class="cell-hint" #vDescription="var" [var]="{value: getDescription(activity)}">
+                                            <span *ngIf="vDescription?.value?.length" style="margin: 0 !important;" [innerHTML]="vDescription.value"></span>
+                                        </span>
+                                    </ng-container>
+                                </div>
+                            </ng-container>
+                        </td>
+
+                        <td     class="cell-EV cell-days cdk-drag-disabled"
+                                [class.is-weekend]="isWeekEnd(day)"
+                                (dragstart)="preventDrag($event)"
+                                (mousedown)="onmousedown($event, employee, day)"
+                                (mouseup)="onmouseup()"
+                                (mouseover)="onmouseover($event, day)"
+                                (mouseenter)="onmouseenterTableCell($event, index, employee, headers.days_indexes[i], 'EV')"
+                                (mouseleave)="onmouseleaveTableCell($event)"
+                                cdkDropList
+                                (cdkDropListDropped)="onDrop($event, index, employee, headers.days_indexes[i], 'EV')">
+
+                            <!-- activity cell -->
+                            <ng-container *ngIf="hasActivity(employee, headers.days_indexes[i], 'EV')">
+                                <div class="cell-activities">
+                                    <ng-container *ngFor="let activity of getActivities(employee, day, 'EV')">
+
+                                        <planning-employees-calendar-activity
+                                            [height]="rowsHeight"
+                                            [width]="cellsWidth"
+                                            [tableRect]="tableRect"
+                                            [day]="day"
+                                            [activity]="activity"
+                                            (hover)="onhoverActivity($event); onhoverDay(employee, day)"
+                                            (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
+                                            (selected)="onSelectedBooking($event)"
+                                            cdkDrag
+                                            (cdkDragStarted)="onDragStart(activity)">
+                                        </planning-employees-calendar-activity>
+
+                                        <span *ngIf="hovered_activity == activity" class="cell-hint" #vDescription="var" [var]="{value: getDescription(activity)}">
+                                            <span *ngIf="vDescription?.value?.length" style="margin: 0 !important;" [innerHTML]="vDescription.value"></span>
+                                        </span>
+                                    </ng-container>
+                                </div>
+                            </ng-container>
+                        </td>
+
+                    </ng-container>
+
+                </tr>
+            </tbody>
+
+        </table>
+
+        <div #selector style="position: absolute; background-color: #ff4081; z-index: 0;"
+            [style.left.px]="selection.left"
+            [style.top.px]="selection.top"
+            [style.width.px]="selection.width"
+            [style.height.px]="selection.height"></div>
+    </div>
+
+    <div class="container-footer">
+
+        <table  #actTable
+                cdkDropList
+                [cdkDropListSortingDisabled]="true"
+                [cdkDropListEnterPredicate]="preventDrag"
+                class="act-table">
+            <tr>
+                <td class="cell-room employee"></td>
+                <ng-container *ngFor="let day of headers.days; let i = index">
+                    <td     class="cell-AM cell-days cell-activities"
+                            [class.is-weekend]="isWeekEnd(day)">
+                        <!-- activity cell -->
+                        <ng-container *ngIf="hasActivity(emptyEmployee, headers.days_indexes[i], 'AM')">
+                            <div class="list-activities">
+                                <ng-container *ngFor="let activity of getActivities(emptyEmployee, day, 'AM')">
+                                    <planning-employees-calendar-activity
+                                        cdkDrag
+                                        (cdkDragStarted)="onDragStart(activity)"
+                                        (cdkDragEnded)="onDragEnd()"
+                                        [height]="rowsHeight"
+                                        [width]="cellsWidth"
+                                        [tableRect]="tableRect"
+                                        [day]="day"
+                                        [activity]="activity">
+                                    </planning-employees-calendar-activity>
+                                </ng-container>
+                            </div>
+                        </ng-container>
+                    </td>
+
+                    <td     class="cell-PM cell-days cell-activities"
+                            [class.is-weekend]="isWeekEnd(day)">
+                        <!-- activity cell -->
+                        <ng-container *ngIf="hasActivity(emptyEmployee, headers.days_indexes[i], 'PM')">
+                            <div class="list-activities">
+                                <ng-container *ngFor="let activity of getActivities(emptyEmployee, day, 'PM')">
+                                    <planning-employees-calendar-activity
+                                        cdkDrag
+                                        (cdkDragStarted)="onDragStart(activity)"
+                                        (cdkDragEnded)="onDragEnd()"
+                                        [height]="rowsHeight"
+                                        [width]="cellsWidth"
+                                        [tableRect]="tableRect"
+                                        [day]="day"
+                                        [activity]="activity">
+                                    </planning-employees-calendar-activity>
+                                </ng-container>
+                            </div>
+                        </ng-container>
+                    </td>
+
+                    <td     class="cell-EV cell-days cell-activities"
+                            [class.is-weekend]="isWeekEnd(day)">
+                        <!-- activity cell -->
+                        <ng-container *ngIf="hasActivity(emptyEmployee, headers.days_indexes[i], 'EV')">
+                            <div class="list-activities">
+                                <ng-container *ngFor="let activity of getActivities(emptyEmployee, day, 'EV')">
+                                    <planning-employees-calendar-activity
+                                        cdkDrag
+                                        (cdkDragStarted)="onDragStart(activity)"
+                                        (cdkDragEnded)="onDragEnd()"
+                                        [height]="rowsHeight"
+                                        [width]="cellsWidth"
+                                        [tableRect]="tableRect"
+                                        [day]="day"
+                                        [activity]="activity">
+                                    </planning-employees-calendar-activity>
+                                </ng-container>
+                            </div>
+                        </ng-container>
+                    </td>
+
+                </ng-container>
+            </tr>
+        </table>
+
+    </div>
+
+
+</div>

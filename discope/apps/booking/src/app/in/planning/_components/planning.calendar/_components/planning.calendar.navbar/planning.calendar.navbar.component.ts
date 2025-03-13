@@ -24,6 +24,10 @@ export class PlanningCalendarNavbarComponent implements OnInit, AfterViewInit, A
     @Output() refresh = new EventEmitter<Boolean>();
     @ViewChild('centerSelector') centerSelector: MatSelect;
 
+    @Output() openLegendDialog = new EventEmitter();
+    @Output() openPrefDialog = new EventEmitter();
+    @Output() fullScreen = new EventEmitter();
+
     dateFrom: Date;
     dateTo: Date;
     duration: number;
@@ -106,6 +110,17 @@ export class PlanningCalendarNavbarComponent implements OnInit, AfterViewInit, A
             });
     }
 
+    public onOpenLegendDialog() {
+        this.openLegendDialog.emit();
+    }
+
+    public onOpenPrefDialog() {
+        this.openPrefDialog.emit();
+    }
+
+    public onFullScreen() {
+        this.fullScreen.emit();
+    }
 
     public async onchangeDateRange() {
         let start = this.vm.date_range.get("date_from").value;
