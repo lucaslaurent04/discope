@@ -23,26 +23,42 @@
                     </th>
                     -->
                     <ng-container *ngFor="let day of headers.days" >
-                        <th colspan="3">
-                            <div class="month-day">{{ day | date: 'EEE'}} {{ day | date: 'd'}}/{{ day | date: 'MM'}}</div>
+                        <th colspan="3" class="head-days" [class.is-weekend]="isWeekEnd(day)">
+                            <div *ngIf="cellsWidth > 12" class="month-day">{{ day | date: 'EEE'}}<br *ngIf="cellsWidth < 30" />{{ day | date: 'd'}}/{{ day | date: 'MM'}}</div>
+                            <div *ngIf="cellsWidth <= 12" class="month-day"><span style="text-transform: uppercase;">{{ day | date: 'E' | slice:0:1 }}</span><br />{{ day | date: 'd'}}</div>
                         </th>
                     </ng-container>
                 </tr>
                 <tr class="head">
                     <ng-container *ngFor="let day of headers.days" >
-                        <th #calTableHeadCells class="head-slots">
-                            <div>Mat.</div>
+                        <th #calTableHeadCells
+                                [class.is-weekend]="isWeekEnd(day)"
+                                class="head-slots">
+                            <div *ngIf="cellsWidth > 26">Mat.</div>
+                            <div *ngIf="cellsWidth <= 26" [class.sm]="cellsWidth < 12" [class.xs]="cellsWidth < 6">
+                                <div>M</div>
+                            </div>
                         </th>
-                        <th class="head-slots">
-                            <div>Apr.</div>
+                        <th #calTableHeadCells
+                                [class.is-weekend]="isWeekEnd(day)"
+                                class="head-slots">
+                            <div *ngIf="cellsWidth > 26">Apr.</div>
+                            <div *ngIf="cellsWidth <= 26" [class.sm]="cellsWidth < 12" [class.xs]="cellsWidth < 6">
+                                <div>A</div>
+                            </div>
                         </th>
-                        <th class="head-slots">
-                            <div>Soir</div>
+                        <th #calTableHeadCells
+                                [class.is-weekend]="isWeekEnd(day)"
+                                class="head-slots">
+                            <div *ngIf="cellsWidth > 26">Soir</div>
+                            <div *ngIf="cellsWidth <= 26" [class.sm]="cellsWidth < 12" [class.xs]="cellsWidth < 6">
+                                <div>S</div>
+                            </div>
                         </th>
                     </ng-container>
                 </tr>
             </thead>
-            <tbody  (mouseleave)="onmouseleaveTable()" >
+            <tbody (mouseleave)="onmouseleaveTable()" >
                 <!-- body -->
                 <tr     *ngFor="let employee of employees; let index = index;"
                         class="rows days cdk-drag-disabled"
@@ -183,18 +199,20 @@
             [style.height.px]="selection.height"></div>
     </div>
 
+    <!-- non-assigned activities area -->
     <div class="container-footer">
 
         <table  #actTable
                 cdkDropList
                 [cdkDropListSortingDisabled]="true"
-                [cdkDropListEnterPredicate]="preventDrag"
+                (cdkDropListDropped)="onDropUnassign($event)"
                 class="act-table">
             <tr>
                 <td class="cell-room employee"></td>
                 <ng-container *ngFor="let day of headers.days; let i = index">
                     <td     class="cell-AM cell-days cell-activities"
                             [class.is-weekend]="isWeekEnd(day)">
+
                         <!-- activity cell -->
                         <ng-container *ngIf="hasActivity(emptyEmployee, headers.days_indexes[i], 'AM')">
                             <div class="list-activities">
