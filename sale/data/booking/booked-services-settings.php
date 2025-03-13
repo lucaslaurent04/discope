@@ -36,12 +36,14 @@ if(is_null($user)) {
     throw new Exception('unexpected_error', EQ_ERROR_INVALID_USER);
 }
 
-$result['store_folded_settings'] = Setting::get_value('sale', 'booking', 'display.store.folded.settings', false);
-$result['identification_folded'] = Setting::get_value('sale', 'booking', 'display.identification.folded', true);
-$result['products_folded'] = Setting::get_value('sale', 'booking', 'display.products.folded', true);
-$result['activities_folded'] = Setting::get_value('sale', 'booking', 'display.activities.folded', true);
-$result['accomodations_folded'] = Setting::get_value('sale', 'booking', 'display.accomodations.folded', true);
-$result['meals_folded'] = Setting::get_value('sale', 'booking', 'display.meals.folded', true);
+$result = [
+    'store_folded_settings' => Setting::get_value('sale', 'booking', 'display.store.folded.settings', false),
+    'identification_folded' => Setting::get_value('sale', 'booking', 'display.identification.folded', true),
+    'products_folded'       => Setting::get_value('sale', 'booking', 'display.products.folded', true),
+    'activities_folded'     => Setting::get_value('sale', 'booking', 'display.activities.folded', true),
+    'accomodations_folded'  => Setting::get_value('sale', 'booking', 'display.accomodations.folded', true),
+    'meals_folded'          => Setting::get_value('sale', 'booking', 'display.meals.folded', true)
+];
 
 if(isset($user['organisation_id'])) {
     $result['store_folded_settings'] = Setting::get_value('sale', 'booking', "display.store.folded.settings.{$user['organisation_id']}", $result['store_folded_settings']);
