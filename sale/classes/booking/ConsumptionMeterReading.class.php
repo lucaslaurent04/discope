@@ -57,6 +57,7 @@ class ConsumptionMeterReading extends \equal\orm\Model {
             'index_value' => [
                 'type'              => 'integer',
                 'description'       => 'The index value of the consumption meter reading.',
+                'help'              => 'To prevent rounding issued, indexes are stored as integer: the last 3 digits being the decimal part. Index values must therefore be divided by 1000 for further computations.',
                 'required'          => true
             ],
 

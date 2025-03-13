@@ -40,12 +40,17 @@
         },
         "qty": {
             "label": "Qté",
-            "description": "Quantité de produits facturées.",
+            "description": "Quantité de produits facturés.",
+            "help": ""
+        },
+        "total": {
+            "label": "Total HT",
+            "description": "Prix total facturé.",
             "help": ""
         },
         "price": {
-            "label": "Total",
-            "description": "Prix total du facturé.",
+            "label": "Total TTC",
+            "description": "Prix total facturé.",
             "help": ""
         }
     },

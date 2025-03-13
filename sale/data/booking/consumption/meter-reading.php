@@ -98,7 +98,7 @@ if(isset($params['booking_id'])) {
             'index_initial'          => $meter['index_initial'],
             'index_difference'       => $meter['index_final'] - $meter['index_initial'],
             'unit_price'             => $meter['unit_price'],
-            'total'                  => ($meter['index_final'] - $meter['index_initial']) * $meter['unit_price']
+            'total'                  => (($meter['index_final'] - $meter['index_initial']) / 1000) * $meter['unit_price']
         ];
     }
 }

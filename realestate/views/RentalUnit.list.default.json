@@ -53,19 +53,19 @@
             },
             {
                 "type": "field",
-                "value": "has_pmr_access",
+                "value": "has_prm_access",
                 "width": "10%",
                 "sortable": true
             },
             {
                 "type": "field",
-                "value": "has_pdv_features",
+                "value": "has_pvi_features",
                 "width": "10%",
                 "sortable": true
             },
             {
                 "type": "field",
-                "value": "has_pda_support",
+                "value": "has_phi_support",
                 "width": "10%",
                 "sortable": true
             },
