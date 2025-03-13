@@ -444,7 +444,8 @@ if(isset($envelope['children'][0])) {
                     if($global_info['name'] == 'Comments') {
                         foreach($global_info['children'] as $comment_info) {
                             if($comment_info['attributes']['GuestViewable'] == 'true') {
-                                $entry['comments'] = $comment_info['children']['Text']['value'];
+                                // remove utf8mb4 chars (emojis)
+                                $entry['comments'] = preg_replace('/(?:\xF0[\x90-\xBF][\x80-\xBF]{2} | [\xF1-\xF3][\x80-\xBF]{3} | \xF4[\x80-\x8F][\x80-\xBF]{2})/xs', '', $comment_info['children']['Text']['value']);
                                 break;
                             }
                         }

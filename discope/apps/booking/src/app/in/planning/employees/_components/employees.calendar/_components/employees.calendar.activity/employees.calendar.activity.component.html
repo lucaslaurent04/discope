@@ -1,0 +1,25 @@
+<div class="reservedBox">
+
+    <div class="booking-details"
+        [class.less-28]="height < 28"
+        [class.less-15]="height < 15"
+        [class.less-12]="height < 12"
+        [style.background-color]="getColor()"
+        (mouseenter)="onEnterActivity(activity)"
+        (mouseleave)="onLeaveActivity(activity)">
+
+        <div (click)="onShowBooking(activity)" >
+            <div class="activity-booking">
+                <!-- #memo - this part is discarded if available height is less than 28px -->
+                <div style="flex: 0 1 20%;">{{activity.name}}</div>
+                <div style="margin-left: auto">
+                    <span class="material-icons">{{getIcon()}}</span>
+                </div>
+            </div>
+            <div class="activity-customer">
+                <div class="activity-customer-details">{{activity.customer_id?.name}}</div>
+            </div>
+        </div>
+    </div>
+
+</div>

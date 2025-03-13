@@ -14,16 +14,19 @@
     -->
     <div class="centers-selector">
         <mat-form-field>
-            <mat-select #centerSelector multiple
-                        [(ngModel)]="selected_centers_ids"
-                        panelClass="centers-selector"
-                        [disableOptionCentering]="true"
-                        (closed)="onchangeSelectedCenters()"
-                        (selectionChange)="onchangeSelectedCenters()">
+            <mat-select
+                    #centerSelector multiple
+                    [(ngModel)]="selected_centers_ids"
+                    panelClass="centers-selector"
+                    [disableOptionCentering]="true"
+                    (closed)="onchangeSelectedCenters()"
+                    (selectionChange)="onchangeSelectedCenters()">
                 <mat-optgroup [label]="'Sélection'">&nbsp;<a style="cursor: pointer;" (click)="onclickSelectAllCenters()">Tous</a> &nbsp; <a style="cursor: pointer;" (click)="onclickUnselectAllCenters()">Aucun</a> &nbsp; <a style="cursor: pointer;" (click)="onclickSelectGA()">GA</a> &nbsp; <a style="cursor: pointer;" (click)="onclickSelectGG()">GG</a></mat-optgroup>
                 <mat-option *ngFor="let center of centers" [value]="center.id" >{{center.name}}</mat-option>
             </mat-select>
         </mat-form-field>
+        <button mat-icon-button (click)="onOpenLegendDialog()"><mat-icon>info</mat-icon></button>
+        <button mat-icon-button (click)="onOpenPrefDialog()"><mat-icon>settings</mat-icon></button>
     </div>
 
 </div>
@@ -86,6 +89,10 @@
     </button>
     <button mat-icon-button (click)="onNext(31)">
         <mat-icon>keyboard_double_arrow_right</mat-icon>
+    </button>
+
+    <button mat-icon-button (click)="onFullScreen()" style="margin-left: auto; transform: scale(0.8);">
+        <mat-icon>open_in_full</mat-icon>
     </button>
 
 </div>

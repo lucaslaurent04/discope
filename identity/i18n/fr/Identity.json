@@ -263,6 +263,7 @@
         "logo_document_id": {
             "label": "Document",
             "description": "Le document contenant le logo associé à l'organisation.",
+            "help": ""
         },
         "accounting_account": {
             "label": "Compte Comptable",

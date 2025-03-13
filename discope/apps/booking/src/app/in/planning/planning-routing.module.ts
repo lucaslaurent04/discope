@@ -2,25 +2,18 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { PlanningComponent } from './planning.component';
-// import { BookingEditComponent } from './edit/booking.edit.component';
+import { PlanningEmployeesComponent } from './employees/employees.component';
 
 
 const routes: Routes = [
     {
         path: '',
         component: PlanningComponent
-    }
-    /*
-    ,
-    {
-        path: 'edit/:id',
-        component: BookingEditComponent
     },
     {
-        path: 'edit',
-        component: BookingEditComponent
+        path: 'employees',
+        component: PlanningEmployeesComponent
     }
-    */
 ];
 
 @NgModule({
