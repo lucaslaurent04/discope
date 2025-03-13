@@ -112,12 +112,6 @@ else {
     /** @var \equal\data\adapt\DataAdapter */
     $adapter = $dap->get('json');
 }
-$adaptIn = function($value, $type) use (&$adapter) {
-    if(is_a($adapter, 'equal\data\DataAdapter')) {
-        return $adapter->adapt($value, $type);
-    }
-    return $adapter->adaptIn($value, $type);
-};
 $adaptOut = function($value, $type) use (&$adapter) {
     if(is_a($adapter, 'equal\data\DataAdapter')) {
         return $adapter->adapt($value, $type, 'txt', 'php');

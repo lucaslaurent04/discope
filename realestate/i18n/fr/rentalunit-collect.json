@@ -32,17 +32,17 @@
             "description": "Centre auquel est rattachée l'unité locative",
             "help": ""
         },
-        "has_pmr_access": {
+        "has_prm_access": {
             "label": "PMR: Personnes à Mobilité Réduite",
             "description": "L'unité est accessible aux personnes à mobilité réduite (PMR).",
             "help": ""
         },
-        "has_pdv_features": {
+        "has_pvi_features": {
             "label": "PDV: Personnes à Déficience Visuelles",
             "description": "L'unité est adaptée aux personnes malvoyantes (PDV).",
             "help": ""
         },
-        "has_pda_support": {
+        "has_phi_support": {
             "label": "PDA: Personnes à Déficience Auditives",
             "description": "L'unité est équipée pour les personnes malentendantes (PDA).",
             "help": ""
