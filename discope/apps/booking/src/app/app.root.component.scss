@@ -18,7 +18,7 @@ app-menu-list-item.hidden {
     padding: 0;
     margin: 0;
     background-color: #fff;
-    border-bottom: 1px solid #c8ced3;
+    /* border-bottom: 1px solid #c8ced3; */
     z-index: 1;
     width: 100%;
     flex: 0 0 55px;
@@ -61,6 +61,8 @@ app-menu-list-item.hidden {
     flex-direction: row;
     flex-grow: 1;
     overflow: hidden;
+    background-color: #0000000a;
+    height: calc(100vh - 55px);
 
     mat-nav-list {
         padding: 0px 1px 0 0;
@@ -78,11 +80,13 @@ app-menu-list-item.hidden {
     flex-flow: column nowrap;
     min-height: calc(100vh - 55px);
 
-/* 2 modes for this : either SB list view or any other type of view */
-/* this will prevent global scrollbar and add a specific scrollbar for table */
+    /* 2 modes for this : either SB list view or any other type of view */
+    /* this will prevent global scrollbar and add a specific scrollbar for table */
     height: calc(100vh - 55px);
-/* this will end-up in a global scrollbar only if the content is higher than the viewport */
-    height: 100%;
+    /* this will end-up in a global scrollbar only if the content is higher than the viewport */
+
+    /* #memo - not sure of this : as is, it is always applied */
+    /* height: 100%; */
 }
 
 .app-body .app-sidebar {
@@ -92,7 +96,7 @@ app-menu-list-item.hidden {
     flex-direction: column;
     padding: 0;
 
-    background-color: rgba(0,0,0,0.04);
+    /* background-color: rgba(0,0,0,0.04); */
     margin-left: -200px;
     width: 200px;
     flex: 0 0 200px;
@@ -106,11 +110,12 @@ app-menu-list-item.hidden {
 
 .app-body .app-asidemenu {
     display: flex;
-    margin-top: 55px;
+    margin-top: 65px;
+    border-top-left-radius: 10px;
     flex-direction: column;
     padding: 0;
 
-    background: rgba(0,0,0,0.04);
+    /*background: rgba(0,0,0,0.04);*/
 
     margin-right: -250px;
     width: 250px;
@@ -124,6 +129,27 @@ app-menu-list-item.hidden {
     position: fixed;
     padding: 0;
     width: 200px;
+    height: calc(100vh - 55px - 60px);
+
+    box-sizing: border-box;
+    /* border-right: solid 1px #d3d3d3; */
+    padding-top: 8px;
+
+    .search-menu {
+        display: flex;
+        height: 48px;
+        align-items: center;
+        position: relative;
+        background-color: white;
+        margin: 5px;
+        border-radius: 5px;
+        width: calc(100% - 10px);
+        overflow: hidden;
+
+        input {
+            border: 0; outline: 0; padding: 0 40px 0 10px; width: 100%; height: 100%; font-size: 16px;
+        }
+    }
 }
 
 

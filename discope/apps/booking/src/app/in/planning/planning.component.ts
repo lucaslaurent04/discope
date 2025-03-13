@@ -176,11 +176,11 @@ export class PlanningComponent implements OnInit, AfterViewInit, OnDestroy {
         }
     }
 
-    public onclickOpenLegendDialog(){
+    public onOpenLegendDialog(){
         const dialogRef = this.dialog.open(PlanningLegendDialogComponent, {});
     }
 
-    public onclickOpenPrefsDialog() {
+    public onOpenPrefDialog() {
         const dialogRef = this.dialog.open(PlanningPreferencesDialogComponent, {
                 width: '500px',
                 height: '500px'

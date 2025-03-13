@@ -1,5 +1,5 @@
 import { Component, Input, Output, ElementRef, EventEmitter, OnInit, OnChanges, SimpleChanges, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { es } from 'date-fns/locale';
+import { de, es } from 'date-fns/locale';
 
 const millisecondsPerDay:number = 24 * 60 * 60 * 1000;
 
@@ -12,7 +12,8 @@ export class PlanningCalendarBookingComponent implements OnInit, OnChanges  {
     @Input()  day: Date;
     @Input()  consumption: any;
     @Input()  width: number;
-    @Input()  height: number;
+    @Input()  height: number
+    @Input()  tableRect: DOMRect;
     @Output() hover = new EventEmitter<any>();
     @Output() selected = new EventEmitter<any>();
 
@@ -32,7 +33,7 @@ export class PlanningCalendarBookingComponent implements OnInit, OnChanges  {
     }
 
     /**
-     * Convert a string-formated time to a unix timestamp-like value (i.e the number of seconds elapsed since midnight).
+     * Convert a string-formatted time to a unix timestamp-like value (i.e the number of seconds elapsed since midnight).
      *
      */
     private getTime(time:string) : number {
@@ -59,7 +60,7 @@ export class PlanningCalendarBookingComponent implements OnInit, OnChanges  {
         return parseInt(moment.toISOString().substring(0, 10).replace(/-/g, ''), 10);
     }
 
-    private isSameDate(date1:Date, date2:Date) : boolean {
+    private isSameDate(date1: Date, date2: Date) : boolean {
         try {
             return (this.calcDateInt(date1) == this.calcDateInt(date2));
         }
@@ -74,14 +75,12 @@ export class PlanningCalendarBookingComponent implements OnInit, OnChanges  {
 
         // offset since the start of the current day
         let offset:number = 0;
-        let width:string = '100%';
+        let width: number | undefined;
 
         // ignore invalid consumptions
         if(!this.consumption || Object.keys(this.consumption).length == 0) {
             return;
         }
-
-        // #todo - we shoud have info about last visible date
 
         let date_from = new Date(this.consumption.date_from);
         let date_to = new Date(this.consumption.date_to);
@@ -91,19 +90,34 @@ export class PlanningCalendarBookingComponent implements OnInit, OnChanges  {
             // #memo - offset is left to 0
             let time_to = this.getTime(this.consumption.schedule_to);
             let days = this.calcDiff(date_to, date);
-            width = Math.abs(unit * ((24*3600*days) + (time_to))).toString() + 'px';
+            width = Math.abs(unit * ((24*3600*days) + (time_to)));
         }
         else {
             let time_to = this.getTime(this.consumption.schedule_to);
             let time_from = this.getTime(this.consumption.schedule_from);
             offset  = unit * time_from;
             let days = this.calcDiff(date_to, date_from) - 1;
-            width = Math.abs(unit * (((24*3600)-time_from) + (24*3600*days) + (time_to))).toString() + 'px';
+            width = Math.abs(unit * (((24*3600)-time_from) + (24*3600*days) + (time_to)));
+        }
+
+        if(this.tableRect) {
+            const elementRect = this.elementRef.nativeElement.getBoundingClientRect();
+
+            const delta = this.tableRect.right - elementRect.left - offset - width;
+            if(delta < 0) {
+                width += delta;
+            }
+        }
+
+        // #memo - width can be expressed in px or %
+        if(width === undefined) {
+            this.elementRef.nativeElement.style.setProperty('--width', '100%');
+        }
+        else {
+            this.elementRef.nativeElement.style.setProperty('--width', width.toString() + 'px');
         }
 
         this.elementRef.nativeElement.style.setProperty('--height', this.height+'px');
-        // #memo - width can be expressed in px or %
-        this.elementRef.nativeElement.style.setProperty('--width', width);
         this.elementRef.nativeElement.style.setProperty('--offset', offset+'px');
     }
 

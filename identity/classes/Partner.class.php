@@ -23,9 +23,10 @@ class Partner extends Model {
 
             'name' => [
                 'type'              => 'computed',
-                'function'          => 'calcName',
+                'relation'          => ['partner_identity_id' => 'name'],
                 'result_type'       => 'string',
                 'store'             => true,
+                'instant'           => true,
                 'description'       => 'The display name of the partner (related organisation name).'
             ],
 
@@ -41,7 +42,8 @@ class Partner extends Model {
                 'foreign_object'    => 'identity\Identity',
                 'description'       => 'The targeted identity (the partner).',
                 'onupdate'          => 'onupdatePartnerIdentityId',
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['name', 'title', 'email', 'phone', 'mobile']
             ],
 
             'relationship' => [
@@ -79,39 +81,39 @@ class Partner extends Model {
                 'visible'           => ['relationship', '=', 'customer']
             ],
 
-            // #memo - email remains related to identity
             'email' => [
                 'type'              => 'computed',
-                'function'          => 'calcEmail',
+                'relation'          => ['partner_identity_id' => 'email'],
                 'result_type'       => 'string',
                 'usage'             => 'email',
+                'store'             => true,
                 'description'       => 'Email of the contact (from Identity).'
             ],
 
-            // #memo - phone remains related to identity
             'phone' => [
                 'type'              => 'computed',
-                'function'          => 'calcPhone',
+                'relation'          => ['partner_identity_id' => 'phone'],
                 'result_type'       => 'string',
                 'usage'             => 'phone',
+                'store'             => true,
                 'description'       => 'Phone number of the contact (from Identity).'
             ],
 
-            // #memo - mobile remains related to identity
             'mobile' => [
                 'type'              => 'computed',
-                'function'          => 'calcMobile',
+                'relation'          => ['partner_identity_id' => 'mobile'],
                 'result_type'       => 'string',
                 'usage'             => 'phone',
+                'store'             => true,
                 'description'       => 'Mobile phone number of the contact (from Identity).'
             ],
 
             'title' => [
                 'type'              => 'computed',
-                'function'          => 'calcTitle',
+                'relation'          => ['partner_identity_id' => 'title'],
                 'result_type'       => 'string',
+                'store'             => true,
                 'description'       => 'Title of the contact (from Identity).'
-                // #memo - title origin remains the related identity
             ],
 
             'lang_id' => [
@@ -135,75 +137,13 @@ class Partner extends Model {
         ];
     }
 
-    public static function onupdatePartnerIdentityId($om, $oids, $values, $lang) {
-        $res = $om->read(get_called_class(), $oids, [ 'partner_identity_id.lang_id' ], $lang);
-        if($res > 0 && count($res) ) {
-            foreach($res as $oid => $odata) {
-                $om->write(get_called_class(), $oids, [ 'lang_id' => $odata['partner_identity_id.lang_id'] ], $lang);
+    public static function onupdatePartnerIdentityId($self) {
+        $self->read([ 'partner_identity_id' => 'lang_id' ]);
+        foreach($self as $id => $partner) {
+            if( ($partner['partner_identity_id']['lang_id'] ?? false) ) {
+                self::id($id)->update([ 'lang_id' => $partner['partner_identity_id']['lang_id'] ]);
             }
         }
-        $om->write(get_called_class(), $oids, [ 'name' => null, 'title' => null, 'phone' => null, 'email' => null ], $lang);
-        // force immediate re-computing of the name
-        $om->read(get_called_class(), $oids, [ 'name' ], $lang);
-    }
-
-    public static function calcName($om, $oids, $lang) {
-        $result = [];
-        $partners = $om->read(self::getType(), $oids, ['partner_identity_id.name'], $lang);
-        foreach($partners as $oid => $partner) {
-            if(isset($partner['partner_identity_id.name'])) {
-                $result[$oid] = $partner['partner_identity_id.name'];
-            }
-        }
-        return $result;
-    }
-
-    public static function calcEmail($om, $oids, $lang) {
-        $result = [];
-        $partners = $om->read(get_called_class(), $oids, ['partner_identity_id.email'], $lang);
-        foreach($partners as $oid => $partner) {
-            $result[$oid] = '';
-            if(isset($partner['partner_identity_id.email'])) {
-                $result[$oid] = $partner['partner_identity_id.email'];
-            }
-        }
-        return $result;
-    }
-
-    public static function calcPhone($om, $oids, $lang) {
-        $result = [];
-        $partners = $om->read(get_called_class(), $oids, ['partner_identity_id.phone'], $lang);
-        foreach($partners as $oid => $partner) {
-            $result[$oid] = '';
-            if(isset($partner['partner_identity_id.phone'])) {
-                $result[$oid] = $partner['partner_identity_id.phone'];
-            }
-        }
-        return $result;
-    }
-
-    public static function calcMobile($om, $oids, $lang) {
-        $result = [];
-        $partners = $om->read(get_called_class(), $oids, ['partner_identity_id.mobile'], $lang);
-        foreach($partners as $oid => $partner) {
-            $result[$oid] = '';
-            if(isset($partner['partner_identity_id.mobile'])) {
-                $result[$oid] = $partner['partner_identity_id.mobile'];
-            }
-        }
-        return $result;
-    }
-
-    public static function calcTitle($om, $oids, $lang) {
-        $result = [];
-        $partners = $om->read(get_called_class(), $oids, ['partner_identity_id.title'], $lang);
-        foreach($partners as $oid => $partner) {
-            $result[$oid] = '';
-            if(isset($partner['partner_identity_id.title'])) {
-                $result[$oid] = $partner['partner_identity_id.title'];
-            }
-        }
-        return $result;
     }
 
     /**

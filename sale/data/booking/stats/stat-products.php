@@ -9,7 +9,7 @@
 use sale\booking\Invoice;
 
 list($params, $providers) = eQual::announce([
-    'description'   => 'Provides the quantities and prices of all invoiced products for a given period.',
+    'description'   => 'Provides the quantity and prices for a given product and period.',
     'params'        => [
         'organisation_id' => [
             'type'              => 'many2one',
@@ -47,9 +47,17 @@ list($params, $providers) = eQual::announce([
             'type'              => 'integer',
             'description'       => 'Quantity of product invoiced.'
         ],
+        'center_office' => [
+            'type'              => 'string',
+            'description'       => 'Center office name'
+        ],
         'total' => [
             'type'              => 'float',
-            'description'       => 'Total price invoiced.'
+            'description'       => 'Total invoiced tax excl.'
+        ],
+        'price' => [
+            'type'              => 'float',
+            'description'       => 'Total invoiced tax incl.'
         ]
     ],
     'response'      => [
@@ -66,69 +74,74 @@ list($params, $providers) = eQual::announce([
 $context = $providers['context'];
 
 $result = [];
-if(isset($params['center_office_id']) || isset($params['organisation_id'])) {
-    $date_to = date('Y-m-d', $params['date_to']);
+if( (isset($params['center_office_id']) || isset($params['organisation_id'])) && isset($params['product_id']) ) {
+    $date_to = strtotime(date('Y-m-d 00:00:00', strtotime('+1 day', $params['date_to'])));
 
     $invoices = Invoice::search(array_merge(
-        [
-            ['state', 'in', ['instance', 'archive']],
-            ['date', '>=', $params['date_from']],
-            ['date', '<=', strtotime($date_to.' 23:59:59')],
-            ['status', '=', 'invoice']
-        ],
-        isset($params['center_office_id']) ? [['center_office_id', '=', $params['center_office_id']]] : [],
-        isset($params['organisation_id']) ? [['organisation_id', '=', $params['organisation_id']]] : []
-    ))
+            [
+                ['state', 'in', ['instance', 'archive']],
+                ['date', '>=', $params['date_from']],
+                ['date', '<=', $date_to],
+                ['status', '=', 'invoice']
+            ],
+            isset($params['center_office_id']) ? [['center_office_id', '=', $params['center_office_id']]] : [],
+            isset($params['organisation_id']) ? [['organisation_id', '=', $params['organisation_id']]] : []
+        ))
         ->read([
             'center_office_id' => ['id', 'name'],
             'organisation_id' => ['id', 'name'],
             'invoice_lines_ids' => [
-                'id', 'product_id', 'qty', 'unit_price', 'total', 'name',
+                'id', 'name', 'product_id', 'qty', 'unit_price', 'total', 'price',
             ]
         ]);
 
     $organisation_map = [];
     foreach($invoices as $invoice) {
-        list($org_id, $cen_id) = [$invoice['organisation_id']['id'], $invoice['center_office_id']['id']];
+        list($org_id, $office_id) = [$invoice['organisation_id']['id'], $invoice['center_office_id']['id']];
 
         if(!isset($organisation_map[$org_id])) {
             $organisation_map[$org_id] = [];
         }
 
-        if(!isset($organisation_map[$org_id][$cen_id])) {
-            $organisation_map[$org_id][$cen_id] = [];
+        if(!isset($organisation_map[$org_id][$office_id])) {
+            $organisation_map[$org_id][$office_id] = [];
         }
 
         foreach($invoice['invoice_lines_ids'] as $invoice_line) {
-            $pro_id = $invoice_line['product_id'];
-            if(isset($params['product_id']) && $pro_id !== $params['product_id']) {
+            $product_id = $invoice_line['product_id'];
+            if(isset($params['product_id']) && $product_id !== $params['product_id']) {
                 continue;
             }
 
-            if(!isset($organisation_map[$org_id][$cen_id][$pro_id])) {
-                $organisation_map[$org_id][$cen_id][$pro_id] = [
-                    'organisation_id'  => $invoice['organisation_id'],
-                    'center_office_id' => $invoice['center_office_id'],
+            if(!isset($organisation_map[$org_id][$office_id][$product_id])) {
+                $organisation_map[$org_id][$office_id][$product_id] = [
+                    'organisation_id'  => $invoice['organisation_id']['id'],
+                    'center_office_id' => $invoice['center_office_id']['id'],
+                    'center_office'    => $invoice['center_office_id']['name'],
                     'name'             => $invoice_line['name'],
                     'qty'              => 0,
-                    'total'            => 0
+                    'total'            => 0,
+                    'price'            => 0
                 ];
             }
 
-            $organisation_map[$org_id][$cen_id][$pro_id]['qty'] += $invoice_line['qty'];
-            $organisation_map[$org_id][$cen_id][$pro_id]['total'] += $invoice_line['total'];
+            $organisation_map[$org_id][$office_id][$product_id]['qty'] += $invoice_line['qty'];
+            $organisation_map[$org_id][$office_id][$product_id]['total'] += $invoice_line['total'];
+            $organisation_map[$org_id][$office_id][$product_id]['price'] += $invoice_line['price'];
         }
     }
 
     foreach($organisation_map as $org_id => $org_centers) {
-        foreach($org_centers as $cen_id => $center_prod_stats) {
-            foreach($center_prod_stats as $pro_id => $product_stat) {
+        foreach($org_centers as $office_id => $center_prod_stats) {
+            foreach($center_prod_stats as $product_id => $product_stat) {
                 $result[] = [
                     'organisation_id'  => $product_stat['organisation_id'],
                     'center_office_id' => $product_stat['center_office_id'],
+                    'center_office'    => $product_stat['center_office'],
                     'name'             => $product_stat['name'],
                     'qty'              => $product_stat['qty'],
-                    'total'            => $product_stat['total']
+                    'total'            => $product_stat['total'],
+                    'price'            => $product_stat['price']
                 ];
 
             }

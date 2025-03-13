@@ -41,6 +41,10 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
     @Output() showBooking = new EventEmitter();
     @Output() showRentalUnit = new EventEmitter();
 
+    @Output() openLegendDialog = new EventEmitter();
+    @Output() openPrefDialog = new EventEmitter();
+    @Output() fullScreen = new EventEmitter();
+
     // attach DOM element to compute the cells width
     @ViewChild('calTable') calTable: any;
     @ViewChild('calTableRefColumn') calTableRefColumn: any;
@@ -53,6 +57,7 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
 
     public headerdays: HeaderDays;
 
+    public tableRect: DOMRect;
     public cellsWidth: number;
 
     public consumptions: any = [];
@@ -127,7 +132,7 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
 
     ngOnChanges(changes: SimpleChanges): void {
         if(changes.rowsHeight)     {
-            this.elementRef.nativeElement.style.setProperty('--rows_height', this.rowsHeight+'px');
+            this.elementRef.nativeElement.style.setProperty('--rows_height', this.rowsHeight + 'px');
         }
      }
 
@@ -138,7 +143,7 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
             this.onRefresh();
         });
 
-        this.elementRef.nativeElement.style.setProperty('--rows_height', this.rowsHeight+'px');
+        this.elementRef.nativeElement.style.setProperty('--rows_height', this.rowsHeight + 'px');
     }
 
     async ngAfterViewInit() {
@@ -148,6 +153,8 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
      * After refreshing the view with new content, adapt header and relay new cell_width, if changed
      */
     async ngAfterViewChecked() {
+
+        this.tableRect = this.calTable.nativeElement.getBoundingClientRect();
 
         if(this.calTableHeadCells) {
             for(let cell of this.calTableHeadCells) {
@@ -477,7 +484,7 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
     private createHeaderDays() {
 
         if(this.previous_duration != this.params.duration) {
-            // temporarily reset cellsWidth to an arbitrary ow value
+            // temporarily reset cellsWidth to an arbitrary low value
             this.cellsWidth = 12;
         }
 
@@ -532,6 +539,21 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
             }
         }
         this.hovered_holidays = result;
+    }
+
+    public onOpenLegendDialog() {
+        this.openLegendDialog.emit();
+    }
+
+    public onOpenPrefDialog() {
+        this.openPrefDialog.emit();
+    }
+
+    public onFullScreen() {
+        this.fullScreen.emit();
+        setTimeout( () => {
+            this.tableRect = this.calTable.nativeElement.getBoundingClientRect();
+        }, 500);
     }
 
     public onSelectedBooking(event: any) {

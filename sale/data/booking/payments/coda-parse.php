@@ -6,6 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 use Codelicious\Coda\Parser;
+use equal\text\TextTransformer;
 use sale\booking\BankStatement;
 
 list($params, $providers) = eQual::announce([
@@ -47,8 +48,16 @@ $lines = explode("\n", $content);
 
 // #memo - parser expects ASCII-compatible chars
 // latin chars from non ASCII/UTF-8 charsets (e.g. ISO-8859-1) make the parser to return an empty set of statements)
+/*
 $lines = array_map( function($line) {
             return mb_convert_encoding($line, "UTF-8", "ISO-8859-1");
+        },
+        $lines
+    );
+*/
+
+$lines = array_map( function($line) {
+            return TextTransformer::toAscii($line);
         },
         $lines
     );

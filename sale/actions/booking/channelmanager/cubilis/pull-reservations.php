@@ -194,7 +194,7 @@ try {
                             if(!in_array($booking['status'], ['confirmed', 'validated'])){
                                 ++$result['warnings'];
                                 $result['logs'][] = "WARN- Incompatible reservation status [{$booking['id']} - {$booking['name']}] (Cubilis reservation {$reservation['reservation_id']})";
-                                $result['center_offices'][$property['center_office_id']['id']]['logs'][] = 'Reservation en cours : Le client a effectue une modification dans la reservation  de Channel Manager et la mise a jour a ete ignoree par Discope pour la <a href="https://discope.yb.run/booking/#/booking/'.$booking['id'].'"> reservation '.$booking['name'].'</a>. Veuillez verifier les modifications dans Cubilis et effectuer les ajustements manuellement dans Discope.';
+                                $result['center_offices'][$property['center_office_id']['id']]['logs'][] = 'Reservation en cours : Le client a effectue une modification dans la reservation  de Channel Manager et la mise a jour a ete ignoree par Discope pour la <a href="https://kaleo.discope.run/booking/#/booking/'.$booking['id'].'"> reservation '.$booking['name'].'</a>. Veuillez verifier les modifications dans Cubilis et effectuer les ajustements manuellement dans Discope.';
 
                                 $dispatch->cancel('lodging.booking.chanelmanager.update.ignored', 'sale\booking\Booking', $booking['id']);
                                 $dispatch->dispatch('lodging.booking.chanelmanager.update.ignored', 'sale\booking\Booking', $booking['id'], 'important', null, [], [], null, $property['center_office_id']['id']);
@@ -526,7 +526,8 @@ try {
                                 }
 
                                 // add a line for breakfast (always included)
-                                $line_product = Product::search([['sku', '=', 'GA-PtDej-A']])
+                                // #memo - changed from GA-PtDej-A to PTDEJ_OTA on 2024-02-27
+                                $line_product = Product::search([['sku', '=', 'PTDEJ_OTA']])
                                     ->read(['id', 'product_model_id'])
                                     ->first(true);
 
@@ -861,7 +862,7 @@ try {
                         if($has_overbooking) {
                             ++$result['warnings'];
                             $result['logs'][] = "WARN- Overbooking for booking [{$booking['id']} - {$booking['name']}] (Cubilis reservation {$reservation['reservation_id']})";
-                            $result['center_offices'][$property['center_office_id']['id']]['logs'][] = 'Surbooking : pas d\'unite locative disponible pour la <a href="https://discope.yb.run/booking/#/booking/'.$booking['id'].'/services">reservation '.$booking['name'].'</a> importee automatiquement depuis Cubilis : une assignation manuelle d\'une autre unite locative doit être faite le plus rapidement possible.';
+                            $result['center_offices'][$property['center_office_id']['id']]['logs'][] = 'Surbooking : pas d\'unite locative disponible pour la <a href="https://kaleo.discope.run/booking/#/booking/'.$booking['id'].'/services">reservation '.$booking['name'].'</a> importee automatiquement depuis Cubilis : une assignation manuelle d\'une autre unite locative doit être faite le plus rapidement possible.';
                             // remove alert if already present
                             // #memo - if do-confirm failed, we cannot be sure if alert has been created or not
                             $dispatch->cancel('lodging.booking.consistency', 'sale\booking\Booking', $booking['id']);

@@ -125,6 +125,7 @@ class BookingLine extends \sale\booking\BookingLine {
                 }
             }
 
+
         }
 
         // #memo - ignore parent (!!!! be careful if parent is called again, the signature may have been changed to ($self, $values, $lang)

@@ -445,9 +445,13 @@ class BookingLine extends Model {
 
         if($count_non_allowed > 0) {
             $self->read([
-                'booking_id'            => ['status'],
-                'booking_line_group_id' => ['is_extra', 'has_schedulable_services', 'has_consumptions'],
-            ]);
+                    'booking_id' => ['status'],
+                    'booking_line_group_id' => [
+                        'is_extra',
+                        'has_schedulable_services',
+                        'has_consumptions'
+                    ]
+                ]);
 
             foreach($self as $line) {
                 if($line['booking_id']['status'] != 'quote' && !$line['booking_line_group_id']['is_extra']) {
@@ -557,6 +561,7 @@ class BookingLine extends Model {
                     }
                 }
             }
+
         }
 
         return parent::canupdate($self, $values, $lang);

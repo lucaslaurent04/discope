@@ -16,6 +16,12 @@ import { PlanningCalendarNavbarComponent } from './_components/planning.calendar
 
 import { ConsumptionCreationDialog } from './_components/planning.calendar/_components/consumption.dialog/consumption.component';
 
+
+import { PlanningEmployeesComponent } from './employees/employees.component';
+import { PlanningEmployeesCalendarComponent } from './employees/_components/employees.calendar/employees.calendar.component';
+import { PlanningEmployeesCalendarNavbarComponent } from './employees/_components/employees.calendar/_components/employees.calendar.navbar/employees.calendar.navbar.component';
+import { PlanningEmployeesCalendarActivityComponent } from './employees/_components/employees.calendar/_components/employees.calendar.activity/employees.calendar.activity.component';
+
 import { LayoutModule } from '@angular/cdk/layout';
 import { OverlayModule } from '@angular/cdk/overlay';
 
@@ -33,7 +39,11 @@ import { OverlayModule } from '@angular/cdk/overlay';
     PlanningCalendarNavbarComponent,
     ConsumptionCreationDialog,
     PlanningLegendDialogComponent,
-    PlanningPreferencesDialogComponent
+    PlanningPreferencesDialogComponent,
+    PlanningEmployeesComponent,
+    PlanningEmployeesCalendarComponent,
+    PlanningEmployeesCalendarNavbarComponent,
+    PlanningEmployeesCalendarActivityComponent
   ],
   providers: [
     { provide: DateAdapter, useClass: CustomDateAdapter, deps: [MAT_DATE_LOCALE, Platform] }
