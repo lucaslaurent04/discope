@@ -18,7 +18,7 @@ use sale\catalog\ProductModel;
         'employees_ids' =>  [
             'description'   => 'Identifiers of the employees for which the activities are requested.',
             'type'          => 'array',
-            'required'      => true
+            'default'       => []
         ],
         'date_from' => [
             'description'   => 'Start of time-range for the lookup.',
@@ -54,17 +54,13 @@ $auth->su();
 
 
 $domain = [
-    [
-        ['employee_id', 'in', $params['employees_ids']],
         ['activity_date', '>=', $params['date_from']],
         ['activity_date', '<=', $params['date_to']]
-    ],
-    [
-        ['employee_id', 'is', null],
-        ['activity_date', '>=', $params['date_from']],
-        ['activity_date', '<=', $params['date_to']]
-    ]
 ];
+
+if(!empty($params['employees_ids'])) {
+    $domain[] = ['employee_id', 'in', $params['employees_ids']];
+}
 
 $activities_ids = $orm->search(BookingActivity::getType(), $domain);
 
