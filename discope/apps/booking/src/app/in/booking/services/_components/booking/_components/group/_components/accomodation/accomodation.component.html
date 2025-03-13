@@ -105,10 +105,13 @@
 
                 <!-- left pane : list of available rental units for current product model -->
                 <div style="display: flex; flex-direction: column; flex: 0 1 calc(50% - 10px);">
-                    <div style="display: flex; margin-bottom: 5px;">
-                        <mat-checkbox [checked]="allRentalUnitsSelected" (change)="leftSelectAllRentalUnits()" style="margin-left: 6px">Toutes</mat-checkbox>
-                        <mat-slide-toggle [checked]="showOnlyParents" (change)="leftShowOnlyParents($event.checked)" style="margin-left: 30px">Parents</mat-slide-toggle>
-                        <mat-slide-toggle [checked]="showOnlyChildren" (change)="leftShowOnlyChildren($event.checked)" style="margin-left: 10px">Enfants</mat-slide-toggle>
+                    <div style="margin-bottom: 5px;">
+                        <div style="display: flex; padding: 0 6px;">
+                            <mat-checkbox [checked]="allRentalUnitsSelected" (change)="leftSelectAllRentalUnits()">Toutes</mat-checkbox>
+                            <input [value]="filterBy" (keyup)="leftFilterBy($event)" type="text" placeholder="Filtrer" style="flex-grow: 1; margin-left: 40px; padding-left: 10px; border-radius: 20px; border-color: black;">
+                            <mat-slide-toggle [checked]="showOnlyParents" (change)="leftShowOnlyParents($event.checked)" style="margin-left: 40px; transform: scale(0.8);">Parents</mat-slide-toggle>
+                            <mat-slide-toggle [checked]="showOnlyChildren" (change)="leftShowOnlyChildren($event.checked)" style="transform: scale(0.8);">Enfants</mat-slide-toggle>
+                        </div>
                     </div>
                     <div class="list" cdkDropList cdkDropListSortingDisabled style="border: solid 1px darkgrey;" >
                         <div *ngFor="let unit of filteredRentalUnits"
