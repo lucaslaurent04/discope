@@ -1,27 +1,25 @@
-import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ChangeDetectorRef, ViewChildren, QueryList, Host, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ApiService, ContextService, TreeComponent, SbDialogConfirmDialog } from 'sb-shared-lib';
-import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ViewChildren, QueryList, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ApiService, TreeComponent, SbDialogConfirmDialog } from 'sb-shared-lib';
 import { BookingLineGroup } from '../../../../_models/booking_line_group.model';
 import { BookingAccomodation } from '../../../../_models/booking_accomodation.model';
 import { Booking } from '../../../../_models/booking.model';
 import { RentalUnitClass } from 'src/app/model/rental.unit.class';
-import { Observable, ReplaySubject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { BookingServicesBookingGroupAccomodationAssignmentComponent } from './_components/assignment.component';
 import { BookingServicesBookingGroupAccomodationAssignmentsEditorComponent } from './_components/assignmentseditor/assignmentseditor.component';
 
 // declaration of the interface for the map associating relational Model fields with their components
 interface BookingLineAccomodationComponentsMap {
     rental_unit_assignments_ids: QueryList<BookingServicesBookingGroupAccomodationAssignmentComponent>
-};
+}
 
 @Component({
     selector: 'booking-services-booking-group-rentalunitassignment',
     templateUrl: 'accomodation.component.html',
     styleUrls: ['accomodation.component.scss']
 })
-export class BookingServicesBookingGroupAccomodationComponent extends TreeComponent<BookingAccomodation, BookingLineAccomodationComponentsMap> implements OnInit, OnChanges, AfterViewInit  {
+export class BookingServicesBookingGroupAccomodationComponent extends TreeComponent<BookingAccomodation, BookingLineAccomodationComponentsMap> implements OnInit, AfterViewInit  {
     // server-model relayed by parent
     @Input() set model(values: any) { this.update(values) }
     @Input() group: BookingLineGroup;
@@ -36,25 +34,25 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
 
     public ready: boolean = false;
     public assignments_editor_enabled: boolean = false;
-    public rentalunits: RentalUnitClass[] = [];
+    public rentalUnits$ = new BehaviorSubject<RentalUnitClass[]>([]);
+    public rentalUnits: RentalUnitClass[] = [];
+    public filteredRentalUnits$ = new BehaviorSubject<RentalUnitClass[]>([]);
+    public filteredRentalUnits: RentalUnitClass[] = [];
 
+    public selectedRentalUnits$ = new BehaviorSubject<number[]>([]);
     public selectedRentalUnits: number[] = [];
+    public allRentalUnitsSelected: boolean = false;
     public action_in_progress: boolean = false;
+    public showOnlyParents$ = new BehaviorSubject<boolean>(false);
+    public showOnlyParents: boolean = false;
+    public showOnlyChildren$ = new BehaviorSubject<boolean>(false);
+    public showOnlyChildren: boolean = false;
 
     constructor(
-        private cd: ChangeDetectorRef,
         private api: ApiService,
-        private dialog: MatDialog,
-        private context: ContextService
+        private dialog: MatDialog
     ) {
         super( new BookingAccomodation() );
-    }
-
-    public ngOnChanges(changes: SimpleChanges) {
-        if(changes.model) {
-
-
-        }
     }
 
     public ngAfterViewInit() {
@@ -68,20 +66,76 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
 
     public async ngOnInit() {
         this.ready = true;
+
+        this.selectedRentalUnits$.subscribe((selectedRentalUnits) => {
+            this.selectedRentalUnits = selectedRentalUnits;
+            this.allRentalUnitsSelected = this.filteredRentalUnits.length === selectedRentalUnits.length && this.filteredRentalUnits.length > 0;
+        });
+
+        this.rentalUnits$.subscribe((rentalUnits) => {
+            this.rentalUnits = rentalUnits;
+
+            if(this.showOnlyParents) {
+                this.filteredRentalUnits = rentalUnits.filter(ru => !ru.parent_id);
+            }
+            else if(this.showOnlyChildren) {
+                this.filteredRentalUnits = rentalUnits.filter(ru => ru.parent_id);
+            }
+            else {
+                this.filteredRentalUnits = rentalUnits;
+            }
+        });
+
+        this.filteredRentalUnits$.subscribe((filteredRentalUnits) => {
+            this.filteredRentalUnits = filteredRentalUnits;
+
+            this.allRentalUnitsSelected = filteredRentalUnits.length === this.selectedRentalUnits.length && filteredRentalUnits.length > 0;
+        });
+
+        this.showOnlyParents$.subscribe((showOnlyParents) => {
+            this.showOnlyParents = showOnlyParents;
+
+            if(showOnlyParents) {
+                this.showOnlyChildren$.next(false);
+
+                this.filteredRentalUnits$.next(this.rentalUnits.filter(ru => !ru.parent_id));
+
+                this.selectedRentalUnits$.next(
+                    this.selectedRentalUnits.filter((sru) => this.filteredRentalUnits.map(fru => fru.id).includes(sru))
+                );
+            }
+            else {
+                this.filteredRentalUnits$.next(this.rentalUnits);
+            }
+        });
+
+        this.showOnlyChildren$.subscribe((showOnlyChildren) => {
+            this.showOnlyChildren = showOnlyChildren;
+
+            if(showOnlyChildren) {
+                this.showOnlyParents$.next(false);
+
+                this.filteredRentalUnits$.next(this.rentalUnits.filter(ru => ru.parent_id));
+
+                this.selectedRentalUnits$.next(
+                    this.selectedRentalUnits.filter((sru) => this.filteredRentalUnits.map(fru => fru.id).includes(sru))
+                );
+            }
+            else {
+                this.filteredRentalUnits$.next(this.rentalUnits);
+            }
+        });
     }
 
     public async refreshAvailableRentalUnits() {
         // reset rental units listing
-        this.rentalunits.splice(0);
         try {
             // retrieve rental units available for assignment
             const data = await this.api.fetch('?get=sale_booking_rentalunits', {
                 booking_line_group_id: this.instance.booking_line_group_id,
                 product_model_id: this.instance.product_model_id.id
             });
-            for(let item of data) {
-                this.rentalunits.push(<RentalUnitClass> item);
-            }
+            this.rentalUnits$.next(data);
         }
         catch(response) {
             this.api.errorFeedback(response);
@@ -92,9 +146,6 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
         console.log('accommodation update', values);
         super.update(values);
     }
-
-
-
 
     /**
      * Add a rental unit assignment
@@ -134,13 +185,35 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
         this.updated.emit();
     }
 
+    public leftSelectAllRentalUnits() {
+        if(this.allRentalUnitsSelected) {
+            this.selectedRentalUnits$.next([]);
+        }
+        else {
+            this.selectedRentalUnits$.next(this.filteredRentalUnits.map(ru => ru.id));
+        }
+    }
+
+    public leftShowOnlyParents(checked: boolean) {
+        this.showOnlyParents$.next(checked);
+    }
+
+    public leftShowOnlyChildren(checked: boolean) {
+        this.showOnlyChildren$.next(checked);
+    }
+
     public leftSelectRentalUnit(checked: boolean, rental_unit_id: number) {
         let index = this.selectedRentalUnits.indexOf(rental_unit_id);
         if(index == -1) {
-            this.selectedRentalUnits.push(rental_unit_id);
+            this.selectedRentalUnits$.next([
+                ...this.selectedRentalUnits$.value,
+                rental_unit_id
+            ]);
         }
         else if(!checked) {
-            this.selectedRentalUnits.splice(index, 1);
+            let selectedRentalUnits = [...this.selectedRentalUnits$.value];
+            selectedRentalUnits.splice(index, 1);
+            this.selectedRentalUnits$.next(selectedRentalUnits);
         }
     }
 
@@ -151,7 +224,7 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
         let remaining_assignments: number = this.group.nb_pers - this.instance.qty;
 
         for(let rental_unit_id of this.selectedRentalUnits) {
-            const rentalUnit = <RentalUnitClass> this.rentalunits.find( (item) => item.id == rental_unit_id );
+            const rentalUnit = <RentalUnitClass> this.rentalUnits.find( (item) => item.id == rental_unit_id );
             if(!rentalUnit) {
                 continue;
             }
@@ -192,16 +265,14 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
         .catch( (response) =>  {
             this.api.errorFeedback(response);
         });
-        this.selectedRentalUnits.splice(0);
+        this.selectedRentalUnits$.next([]);
     }
 
     public addAll() {
         // unselect selected items
-        this.selectedRentalUnits.splice(0);
+        this.selectedRentalUnits$.next([]);
         // select all
-        for(let rentalUnit of this.rentalunits) {
-            this.selectedRentalUnits.push(rentalUnit.id);
-        }
+        this.selectedRentalUnits$.next(this.rentalUnits.map(ru => ru.id));
         this.addSelection();
     }
 

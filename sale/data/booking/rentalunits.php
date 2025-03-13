@@ -220,7 +220,7 @@ if($sojourn) {
     // In order to resolve that situation, user has to manually release the rental units (through action release-rentalunits.php)
 
     $rental_units = RentalUnit::ids($rental_units_ids)
-        ->read(['id', 'name', 'capacity', 'order', 'is_accomodation', 'can_rent', 'rental_unit_category_id'])
+        ->read(['id', 'name', 'capacity', 'order', 'is_accomodation', 'can_rent', 'rental_unit_category_id', 'parent_id'])
         ->adapt('json')
         ->get(true);
 
