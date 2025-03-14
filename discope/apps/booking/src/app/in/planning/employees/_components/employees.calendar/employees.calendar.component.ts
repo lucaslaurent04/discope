@@ -4,14 +4,11 @@ import { ChangeReservationArg } from 'src/app/model/changereservationarg';
 import { HeaderDays } from 'src/app/model/headerdays';
 
 
-import { ApiService, AuthService } from 'sb-shared-lib';
+import { ApiService } from 'sb-shared-lib';
 import { PlanningEmployeesCalendarParamService } from '../../_services/employees.calendar.param.service';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-// import { ConsumptionCreationDialog } from './_components/consumption.dialog/consumption.component';
-
-import { CdkDragDrop, CdkDragEnter, CdkDragExit, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 
 class Employee {
@@ -19,6 +16,7 @@ class Employee {
         public id: number = 0,
         public name: string = '',
         public is_active: boolean = true,
+        public activity_product_models_ids: any[] = []
     ) {}
 }
 
@@ -28,7 +26,7 @@ class Employee {
     styleUrls: ['./employees.calendar.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, AfterViewInit, AfterViewChecked {
+export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, AfterViewChecked {
     @Input() rowsHeight: number;
     @Output() filters = new EventEmitter<ChangeReservationArg>();
     @Output() showBooking = new EventEmitter();
@@ -112,7 +110,6 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     constructor(
         private params: PlanningEmployeesCalendarParamService,
         private api: ApiService,
-        private dialog: MatDialog,
         private snack: MatSnackBar,
         private elementRef: ElementRef,
         private cd: ChangeDetectorRef) {
@@ -129,15 +126,13 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             this.today_index = this.calcDateIndex(this.today);
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
+    public ngOnChanges(changes: SimpleChanges): void {
         if(changes.rowsHeight)     {
             this.elementRef.nativeElement.style.setProperty('--rows_height', this.rowsHeight + 'px');
         }
      }
 
-    async ngOnInit() {
-
-
+    public async ngOnInit() {
         this.params.getObservable().subscribe( () => {
             console.log('PlanningEmployeesCalendarComponent cal params change', this.params);
             this.onRefresh();
@@ -146,13 +141,10 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         this.elementRef.nativeElement.style.setProperty('--rows_height', this.rowsHeight + 'px');
     }
 
-    async ngAfterViewInit() {
-    }
-
     /**
      * After refreshing the view with new content, adapt header and relay new cell_width, if changed
      */
-    async ngAfterViewChecked() {
+    public async ngAfterViewChecked() {
 
         this.tableRect = this.calTable?.nativeElement.getBoundingClientRect();
 
@@ -214,7 +206,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 */
     public hasActivity(employee: Employee, day_index: string, time_slot: string): boolean {
-        return !!(this.activities[employee.id]?.[day_index]?.[time_slot] ?? false);
+        return (this.activities[employee.id]?.[day_index]?.[time_slot] ?? []).length > 0;
     }
 
     public getActivities(employee:Employee, day: Date, time_slot: string): any {
@@ -268,7 +260,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             }
         }
         catch(response) {
-            console.warn('unable to fetch rental units', response);
+            console.warn('unable to fetch employees', response);
         }
 
         try {
@@ -279,10 +271,9 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 // #todo - #memo - we need to allow filtering employees based on various criterias
                 // employees_ids: JSON.stringify([15, 16, 17, 18, 19])
             });
-
         }
         catch(response: any ) {
-            console.warn('unable to fetch rental units', response);
+            console.warn('unable to fetch activities', response);
             // if a 403 response is received, we assume that the user is not identified: redirect to /auth
             if(response.status == 403) {
                 window.location.href = '/auth';
@@ -605,15 +596,16 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     private isDroppable(activity: any, employee: Employee, date_index: string, time_slot: string) {
-        let result: boolean = false;
-        const activity_date_index = this.calcDateIndex(new Date(activity.activity_date))
-        console.log(date_index, activity_date_index);
-        if(date_index === activity_date_index && time_slot == activity.time_slot) {
-            result = true;
-        }
-        // #todo - il faut vérifier si l'animateur dispose des compétences pour cette activité
-        // #todo - ajouter un test pour vérifier que l'employé n'a pas déjà une activité "animation" assignée
-        return result;
+        const activity_date_index = this.calcDateIndex(new Date(activity.activity_date));
+
+               // Check drop and activity moment match
+        return date_index === activity_date_index && time_slot == activity.time_slot
+
+               // Check employee can handle activity
+               && employee.activity_product_models_ids.map(id => +id).includes(activity.product_model_id.id)
+
+               // Check employee is free during moment
+               && !this.hasActivity(employee, date_index, time_slot);
     }
 
     public onDragStart(activity: any) {
@@ -641,8 +633,12 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             let old_employee_id = this.currentDraggedActivity.employee_id ? this.currentDraggedActivity.employee_id.id : this.currentDraggedActivity.employee_id;
 
 console.log(time_slot, date_index, old_employee_id);
+
+            console.log(JSON.stringify(this.activities[old_employee_id][date_index][time_slot]))
             // remove from this.activities[0][date_index][time_slot]
             this.activities[old_employee_id][date_index][time_slot] = this.activities[old_employee_id][date_index][time_slot].filter( (activity: any) => activity.id !== this.currentDraggedActivity.id);
+
+            console.log(JSON.stringify(this.activities[old_employee_id][date_index][time_slot]))
 
             // add to unassigned activities
             if(!(this.activities[0] ?? false)) {

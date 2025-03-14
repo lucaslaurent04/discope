@@ -51,6 +51,17 @@ class Employee extends \identity\Partner {
                 'foreign_object'    => 'hr\absence\Absence',
                 'foreign_field'     => 'employee_id',
                 'description'       => 'Absences relating to the employee.',
+            ],
+
+            'activity_product_models_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\catalog\ProductModel',
+                'foreign_field'     => 'activity_employees_ids',
+                'rel_table'         => 'sale_catalog_product_model_rel_hr_employee',
+                'rel_foreign_key'   => 'activity_id',
+                'rel_local_key'     => 'employee_id',
+                'description'       => "Activity product models that the employee can be assigned to.",
+                'domain'            => ['is_activity', '=', true]
             ]
 
         ];
