@@ -198,6 +198,10 @@
             "label": "Tranches horaires",
             "help": ""
         },
+        "sales.catalog.groupingCode": {
+            "label": "Regroupement",
+            "help": ""
+        },
         "sales.settings": {
             "label": "Paramètres",
             "help": ""
