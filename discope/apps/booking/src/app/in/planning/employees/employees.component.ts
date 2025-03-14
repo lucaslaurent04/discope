@@ -167,7 +167,7 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
     }
 
     public async onFullScreen() {
-        if (screenfull.isEnabled) {
+        if(screenfull.isEnabled) {
             this.cd.detach();
             await screenfull.request(this.planningBody.nativeElement);
             this.cd.reattach();
