@@ -160,15 +160,6 @@ class BookingActivity extends Model {
                 'description'       => 'The product model the activity relates to.',
                 'store'             => true,
                 'relation'          => ['activity_booking_line_id' => ['product_model_id']]
-            ],
-
-            'time_slot_id' => [
-                'type'              => 'computed',
-                'result_type'       => 'many2one',
-                'foreign_object'    => 'sale\booking\TimeSlot',
-                'description'       => 'Specific day time slot on which the service is delivered.',
-                'store'             => true,
-                'relation'          => ['activity_booking_line_id' => ['time_slot_id']]
             ]
 
         ];
