@@ -666,6 +666,17 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "id": "sales.catalog.groupingCode",
+                                "type": "entry",
+                                "icon": "group",
+                                "label": "Grouping Code",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\catalog\\GroupingCode",
+                                    "view": "list.default"
+                                }
                             }
                         ]
                     },

@@ -23,6 +23,7 @@ use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
+use sale\booking\BookingActivity;
 
 list($params, $providers) = announce([
     'description'   => "Render a contract given its ID as a PDF document.",
@@ -105,7 +106,6 @@ $fields = [
                 'email'
         ],
         'customer_id' => [
-            'rate_class_id' => ['id', 'name'],
             'partner_identity_id' => [
                 'id',
                 'display_name',
@@ -204,7 +204,14 @@ $fields = [
             'free_qty',
             'vat_rate',
             'total',
-            'price'
+            'price',
+            'product_id' => [
+                'id',
+                'label' ,
+                'age_range_id',
+                'grouping_code_id' => ['id', 'name' , 'has_age_range'],
+                'product_model_id' => ['id', 'name', 'grouping_code_id' => ['id', 'name', 'has_age_range']]
+            ],
         ]
     ],
     'price',
@@ -243,7 +250,7 @@ $center_office_code = (isset( $booking['center_id']['center_office_id']['code'])
 $postal_address = sprintf("%s - %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']);
 $customer_name = substr($booking['customer_id']['partner_identity_id']['display_name'], 0,  66);
 $customer_address = $booking['customer_id']['partner_identity_id']['address_street'] .' '. $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'];
-
+$has_activity = Setting::get_value('sale', 'booking', 'has_activity', 0);
 $values = [
     'attn_address1'               => '',
     'attn_address2'               => '',
@@ -277,9 +284,9 @@ $values = [
     'consumptions_tye'            => isset($booking['type_id']['booking_schedule_layout'])?$booking['type_id']['booking_schedule_layout']:'simple',
     'contract_authorization_html' => '',
     'contract_header_html'        => '',
-    'contract_notice_html'        => '',
     'contract_service_html'       => '',
     'contract_engage_html'        => '',
+    'contract_notice_html'        => '',
     'customer_address1'           => $booking['customer_id']['partner_identity_id']['address_street'],
     'customer_address2'           => $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'].(($booking['customer_id']['partner_identity_id']['address_country'] != 'BE')?(' - '.$booking['customer_id']['partner_identity_id']['address_country']):''),
     'customer_address_dispatch'   => $booking['customer_id']['partner_identity_id']['address_dispatch'],
@@ -302,6 +309,8 @@ $values = [
     'price'                       => $contract['price'],
     'tax_lines'                   => [],
     'total'                       => $contract['total'],
+    'has_activity'               => $has_activity,
+    'activities_map'             => ''
 ];
 
 /*
@@ -370,6 +379,8 @@ $values['i18n'] = [
     'time_slot'             => Setting::get_value('lodging', 'locale', 'i18n.time_slot', null, [], $params['lang']),
     'snack'                 => Setting::get_value('lodging', 'locale', 'i18n.snack', null, [], $params['lang']),
     'meals'                 => Setting::get_value('lodging', 'locale', 'i18n.meals', null, [], $params['lang']),
+    'activities_details'    => Setting::get_value('lodging', 'locale', 'i18n.activities_details', null, [], $params['lang']),
+    'activity'              => Setting::get_value('lodging', 'locale', 'i18n.activity', null, [], $params['lang'])
 ];
 
 /**
@@ -422,7 +433,7 @@ if($booking['center_id']['template_category_id']) {
             ['code', '=', 'contract'],
             ['type', '=', 'contract']
         ])
-        ->read(['parts_ids' => ['name', 'value']], $params['lang'])
+        ->read(['id','parts_ids' => ['name', 'value']], $params['lang'])
         ->first(true);
 
     foreach($template['parts_ids'] as $part_id => $part) {
@@ -433,6 +444,9 @@ if($booking['center_id']['template_category_id']) {
             $value = str_replace('{customer}', $customer_name, $value);
             $value = str_replace('{customer_address}', $customer_address, $value);
             $value = str_replace('{contact}', $contact_name, $value);
+            $value = str_replace('{nb_pers}', $booking['nb_pers'] ,$value);
+            $value = str_replace('{date_from}', date('d/m/Y', $booking['date_from']), $value);
+            $value = str_replace('{date_to}', date('d/m/Y', $booking['date_to']), $value);
             $values['contract_header_html'] = $value;
         }
         if($part['name'] == 'service') {
@@ -446,7 +460,7 @@ if($booking['center_id']['template_category_id']) {
             if ($booking['customer_id']['rate_class_id']) {
 
                 $part_name = 'service_'. $booking['customer_id']['rate_class_id']['name'];
-                $template_part = TemplatePart::search(['name', '=', $part_name])
+                $template_part = TemplatePart::search([['name', '=', $part_name], ['template_id', '=', $template['id']] ])
                         ->read(['value'], $params['lang'])
                         ->first(true);
                 if($template_part){
@@ -462,7 +476,7 @@ if($booking['center_id']['template_category_id']) {
             if ($booking['customer_id']['rate_class_id']) {
 
                 $part_name = 'engage_'. $booking['customer_id']['rate_class_id']['name'];
-                $template_part = TemplatePart::search(['name', '=', $part_name])
+                $template_part = TemplatePart::search([['name', '=', $part_name], ['template_id', '=', $template['id']] ])
                         ->read(['value'], $params['lang'])
                         ->first(true);
                 if($template_part){
@@ -490,7 +504,6 @@ if($booking['center_id']['template_category_id']) {
             $value = str_replace('{center}', $booking['center_id']['name'], $value);
             $value = str_replace('{customer}', $customer_name, $value);
             $value = str_replace('{contact}', $contact_name, $value);
-            $value = str_replace('{center}', $booking['center_id']['name'], $value);
             $values['contract_authorization_html'] = $value;
         }
     }
@@ -675,6 +688,86 @@ foreach($contract['contract_line_groups_ids'] as $contract_line_group) {
             }
         }
     }
+}
+
+
+$lines_map = [];
+
+if($params['mode'] == 'grouped') {
+    $lines = [];
+    foreach($contract['contract_line_groups_ids'] as $contract_line_group) {
+        foreach ($contract_line_group['contract_lines_ids'] as $contract_line) {
+            $contract_line_group_id = $contract_line_group['id'];
+            $product = $contract_line['product_id'];
+
+            $grouping_code = isset($product['grouping_code_id']['name'])
+                ? $product['grouping_code_id']['name']
+                : ($product['product_model_id']['grouping_code_id']['name']
+                ?? $contract_line['name']);
+
+            if (!isset($lines_map[$contract_line_group_id])) {
+                $lines_map[$contract_line_group_id] = [];
+            }
+            if (!isset($lines_map[$contract_line_group_id][$grouping_code])) {
+                $lines_map[$contract_line_group_id][$grouping_code] = [];
+            }
+
+            if (!isset($lines_map[$contract_line_group_id][$grouping_code][$product['id']])) {
+                $lines_map[$contract_line_group_id][$grouping_code][$product['id']] = [
+                    'name'          => $contract_line['name'],
+                    'price'         => $contract_line['price'],
+                    'total'         => $contract_line['total'],
+                    'unit_price'    => $contract_line['unit_price'],
+                    'vat_rate'      => null,
+                    'qty'           => $contract_line['qty'],
+                    'discount'      => null,
+                    'is_pack'       => $contract_line_group['is_pack'],
+                    'has_age_range' => isset($product['grouping_code_id']['has_age_range'])
+                                        ? $product['grouping_code_id']['has_age_range']
+                                        : ($product['product_model_id']['grouping_code_id']['has_age_range'] ?? true),
+                    'free_qty'      => $contract_line['free_qty'],
+                    'grouping'      => $grouping_code
+                ];
+            } else {
+                $lines_map[$contract_line_group_id][$grouping_code][$product['id']]['price'] += $contract_line['price'];
+                $lines_map[$contract_line_group_id][$grouping_code][$product['id']]['total'] += $contract_line['total'];
+                $lines_map[$contract_line_group_id][$grouping_code][$product['id']]['qty'] += $contract_line['qty'];
+            }
+        }
+    }
+
+
+    foreach ($lines_map as $contract_line_group_id => $groupings) {
+        foreach ($groupings as $grouping_code_id => $products) {
+            foreach ($products as $product_id => $product) {
+
+                if (!isset($lines[$grouping_code_id])) {
+                        $lines[$grouping_code_id] = [
+                            'name'          => $product['grouping'],
+                            'unit_price'    => 0,
+                            'vat_rate'      => 0,
+                            'free_qty'      => 0,
+                            'qty'           => 0,
+                            'price'         => 0,
+                            'total'         => 0,
+                            'is_group'      => false
+                        ];
+                }
+                $lines[$grouping_code_id]['price'] += $product['price'];
+                $lines[$grouping_code_id]['total'] += $product['total'];
+
+                if ($product['has_age_range']){
+                    $lines[$grouping_code_id]['qty'] = $product['qty'];
+                    $lines[$grouping_code_id]['free_qty'] = $product['free_qty'];
+                    $lines[$grouping_code_id]['unit_price'] += $product['unit_price'];
+
+                } else{
+                    $lines[$grouping_code_id]['qty'] += 1;
+                }
+            }
+        }
+    }
+
 }
 
 $values['lines'] = $lines;
@@ -959,6 +1052,67 @@ foreach($consumptions_detailed as $cid => $consumption) {
 }
 
 $values['consumptions_map_detailed'] = $consumptions_map_detailed;
+if($has_activity){
+    $activities_map = [];
+
+    $booking_activities = BookingActivity::search(['booking_id', '=', $booking['id'] ])
+        ->read([
+            'id',
+            'name',
+            'activity_date',
+            'activity_booking_line_id' => ['product_id' => ['id','name']],
+            'booking_line_group_id' => ['id', 'name'],
+            'time_slot_id' => ['id', 'code','name'],
+        ])
+        ->get();
+
+    $time_slots_activities_ids = TimeSlot::search(["is_meal", "=", false])->read(['id', 'name','code', 'order'], $params['lang'])->get();
+
+    usort($time_slots_activities_ids, function ($a, $b) {
+        return $a['order'] <=> $b['order'];
+    });
+
+    usort($booking_activities, function ($a, $b) {
+        return $a['booking_line_group_id']['id'] <=> $b['booking_line_group_id']['id']
+            ?: $a['activity_date'] <=> $b['activity_date'];
+    });
+
+    foreach ($booking_activities as $activity) {
+        $group = $activity['booking_line_group_id']['name'];
+
+        if (!isset($activities_map[$group])) {
+            $activities_map[$group] = [];
+        }
+
+        $date = date('d/m/Y', $activity['activity_date']) . ' (' . $days_names[date('w', $activity['activity_date'])] . ')';
+        if (!isset($activities_map[$group][$date])) {
+            $activities_map[$group][$date] = [
+                'time_slots' => [],
+            ];
+
+            foreach ($time_slots_activities_ids as $time_slot) {
+                $activities_map[$group][$date]['time_slots'][$time_slot['name']] = [];
+            }
+        }
+
+        $time_slot_name = $activity['time_slot_id']['name'];
+        if (isset($activities_map[$group][$date]['time_slots'][$time_slot_name])) {
+            $activities_map[$group][$date]['time_slots'][$time_slot_name][] = $activity['name'];
+        }
+    }
+
+    foreach ($activities_map as &$dates) {
+        foreach ($dates as &$time_slots) {
+            array_walk($time_slots['time_slots'], fn(&$activities) =>
+                $activities = $activities ? (count($activities) === 1 ? $activities[0] : implode(', ', $activities)) : null
+            );
+        }
+    }
+    unset($dates, $time_slots);
+
+    $values['activities_map'] = $activities_map;
+}
+
 
 /*
     Inject all values into the template
