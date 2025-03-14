@@ -328,6 +328,11 @@
             "label": "Unités locatives",
             "description": "Les unités locatives possibles pour accueillir l'activité.",
             "help": ""
+        },
+        "grouping_code_id": {
+            "label": "Regroupement",
+            "description": "Code de regroupement spécifique auquel ce modèle de produit est associé, le cas échéant.",
+            "help": ""
         }
     },
     "view": {

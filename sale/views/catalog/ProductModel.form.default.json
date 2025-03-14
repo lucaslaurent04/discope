@@ -121,6 +121,11 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "grouping_code_id",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "has_own_price",
                                                 "width": "50%"
                                             },
