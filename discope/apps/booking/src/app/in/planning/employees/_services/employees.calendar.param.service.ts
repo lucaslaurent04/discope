@@ -64,7 +64,7 @@ export class PlanningEmployeesCalendarParamService {
     public init() {
         this._duration = 7;
         // #todo - toujours commencer le lundi par défaut
-        this._date_from = new Date();
+        this._date_from = new Date('2025-06-01');
         this._date_to = new Date(this._date_from.getTime());
         this._date_to.setDate(this._date_from.getDate() + this._duration);
         this._centers_ids = [];

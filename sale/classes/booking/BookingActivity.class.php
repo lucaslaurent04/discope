@@ -157,9 +157,19 @@ class BookingActivity extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\catalog\ProductModel',
-                'description'       => 'The product model the activity relates to.',
+                'description'       => "The product model the activity relates to.",
                 'store'             => true,
                 'relation'          => ['activity_booking_line_id' => ['product_model_id']]
+            ],
+
+            'has_staff_required' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'foreign_object'    => 'sale\catalog\ProductModel',
+                'description'       => "Does the activity needs an employee to be assigned to it.",
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['product_model_id' => ['has_staff_required']]
             ]
 
         ];
@@ -306,5 +316,4 @@ class BookingActivity extends Model {
             }
         }
     }
-
 }
