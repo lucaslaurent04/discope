@@ -271,7 +271,7 @@
         },
         "activity_duration": {
             "label": "Durée de l'activité",
-            "description": "Précise la durée de l'activité (en heures).",
+            "description": "Durée, en heures, de l'activité.",
             "help": "Indiquer la durée de l'activité en heures pour planifier et allouer les ressources."
         },
         "has_transport_required": {
