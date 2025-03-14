@@ -102,18 +102,6 @@ foreach($activities as $id => $activity) {
     $date_index = date('Y-m-d', $activity['activity_date']);
     $time_slot = [1 => 'AM', 3 => 'PM', 6 => 'EV'][$activity['time_slot_id']];
 
-    if(!isset($result[$employee_id])) {
-        $result[$employee_id] = [];
-    }
-
-    if(!isset($result[$employee_id][$date_index])) {
-        $result[$employee_id][$date_index] = [];
-    }
-
-    if(!isset($result[$employee_id][$date_index][$time_slot])) {
-        $result[$employee_id][$date_index][$time_slot] = [];
-    }
-
     $result[$employee_id][$date_index][$time_slot][] = array_merge($activity->toArray(), [
             'booking_id'        => ($activity['booking_id']) ? $bookings[$activity['booking_id']]->toArray() : null,
             'employee_id'       => ($activity['employee_id']) ? $employees[$activity['employee_id']]->toArray() : 0,
