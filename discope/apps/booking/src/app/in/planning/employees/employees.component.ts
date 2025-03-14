@@ -10,7 +10,7 @@ import { PlanningEmployeesCalendarComponent } from './_components/employees.cale
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 import * as screenfull from 'screenfull';
-// import { PlanningLegendDialogComponent } from './_components/legend.dialog/legend.component';
+import { PlanningEmployeesLegendDialogComponent } from './_components/legend.dialog/legend.component';
 // import { PlanningPreferencesDialogComponent } from './_components/preferences.dialog/preferences.component';
 
 interface DateRange {
@@ -178,7 +178,7 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
     }
 
     public onOpenLegendDialog(){
-        // const dialogRef = this.dialog.open(PlanningLegendDialogComponent, {});
+        this.dialog.open(PlanningEmployeesLegendDialogComponent, {});
     }
 
     public onOpenPrefDialog() {
