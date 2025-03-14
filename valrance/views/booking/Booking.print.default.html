@@ -497,6 +497,39 @@ hr {
     {% endif %}
 {% endif %}
 
+{% if has_activity %}
+    {% if activities_map | length > 0 %}
+        <b>{{i18n['activities_details']}}:</b>
+        {% for group, dates in activities_map %}
+        <div style="position: relative; margin-top: 30px; margin-bottom: 30px; page-break-inside: avoid;">
+            <table style="border: solid 1px black; border-collapse: collapse; width: 100%;" border="1">
+                <tr>
+                    <th colspan="3" style="text-align: center;">{{ group }}</th>
+                </tr>
+                <tr>
+                    <td style="text-align: center; width: 25%;"><b>{{i18n['day']}}</b></td>
+                    <td style="text-align: center; width: 25%"><b>{{i18n['time_slot']}}</b></td>
+                    <td style="text-align: center; width: 50%"><b>{{i18n['activity']}}</b></td>
+                </tr>
+                {% for date, details in dates %}
+                    <tr>
+                        <td style="text-align: center;" rowspan="{{ details.time_slots | length }}">{{ date }}</td>
+                        {% set first = true %}
+                        {% for time_slot, activity in details.time_slots %}
+                            {% if not first %}<tr>{% endif %}
+                                <td style="text-align: center;">{{ time_slot }}</td>
+                                <td style="text-align: left;">{{ activity ?: '' }}</td>
+                            </tr>
+                            {% set first = false %}
+                        {% endfor %}
+                {% endfor %}
+            </table>
+        </div>
+        {% endfor %}
+    {% endif %}
+{% endif %}
+
+
 {% if has_footer %}
     <div>
         {{ footer_html|raw }}

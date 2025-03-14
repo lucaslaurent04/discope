@@ -516,7 +516,14 @@ class ProductModel extends Model {
                     ['is_meal', '=', true],
                     ['is_repeatable', '=', false]
                 ]
-            ]
+            ],
+
+            'grouping_code_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\catalog\GroupingCode',
+                'description'       => "Specific GroupingCode this Product Model related to, if any",
+                'onupdate'          => 'onupdateGroupingCode'
+            ],
 
         ];
     }
@@ -640,6 +647,13 @@ class ProductModel extends Model {
             if(!$model['is_rental_unit']) {
                 $om->update(self::gettype(), $id, ['is_accomodation' => false]);
             }
+        }
+    }
+
+    public static function onupdateGroupingCode($om, $ids, $values, $lang) {
+        $models = $om->read(self::getType(), $ids, ['products_ids','grouping_code_id'], $lang);
+        foreach($models as $id => $model) {
+            $om->update('sale\catalog\Product', $model['products_ids'], ['grouping_code_id' => $model['grouping_code_id']]);
         }
     }
 
