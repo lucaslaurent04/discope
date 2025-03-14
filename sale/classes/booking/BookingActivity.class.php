@@ -170,6 +170,13 @@ class BookingActivity extends Model {
                 'store'             => true,
                 'instant'           => true,
                 'relation'          => ['product_model_id' => ['has_staff_required']]
+            ],
+
+            'group_num' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'store'             => true,
+                'relation'          => ['booking_line_group_id' => ['activity_group_num']]
             ]
 
         ];

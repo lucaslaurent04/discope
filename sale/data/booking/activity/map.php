@@ -1,16 +1,16 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use equal\orm\Domain;
 use hr\employee\Employee;
 use sale\booking\Booking;
 use sale\booking\BookingActivity;
 use sale\catalog\ProductModel;
+use sale\customer\Customer;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Retrieve the consumptions assigned to specified employees and return an associative array mapping employees and ate indexes with related activities (this controller is used for the planning).",
@@ -39,7 +39,7 @@ use sale\catalog\ProductModel;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth', 'adapt']
+    'providers'     => ['context', 'orm', 'auth']
 ]);
 
 /**
@@ -47,7 +47,7 @@ use sale\catalog\ProductModel;
  * @var \equal\orm\ObjectManager             $orm
  * @var \equal\auth\AuthenticationManager    $auth
  */
-['context' => $context, 'orm' => $orm, 'auth' => $auth, 'adapt' => $dap] = $providers;
+['context' => $context, 'orm' => $orm, 'auth' => $auth] = $providers;
 
 // #memo - processing of this controller might be heavy, so we make sure AC does not check permissions for each single consumption
 $auth->su();
@@ -73,7 +73,8 @@ $activities = $orm->read(BookingActivity::getType(), $activities_ids, [
         'time_slot_id',
         'booking_id',
         'product_model_id',
-        'activity_booking_line_id'
+        'activity_booking_line_id',
+        'group_num'
     ]);
 
 // read additional fields for the view
@@ -90,8 +91,15 @@ foreach($activities as $id => $activity) {
 
 // load all foreign objects at once
 $product_models = $orm->read(ProductModel::getType(), array_keys($map_product_models), ['id', 'name', 'description']);
-$bookings = $orm->read(Booking::getType(), array_keys($map_bookings), ['id', 'name', 'description', 'status', 'payment_status']);
+$bookings = $orm->read(Booking::getType(), array_keys($map_bookings), ['id', 'name', 'description', 'status', 'payment_status', 'customer_id']);
 $employees = $orm->read(Employee::getType(), array_keys($map_employees), ['id', 'name']);
+
+$map_customers = [];
+foreach($bookings as $id => $booking) {
+    $map_customers[$booking['customer_id']] = true;
+}
+
+$customers = $orm->read(Customer::getType(), array_keys($map_customers), ['id', 'name']);
 
 $result = [];
 // build result: enrich and adapt consumptions
@@ -102,10 +110,16 @@ foreach($activities as $id => $activity) {
     $date_index = date('Y-m-d', $activity['activity_date']);
     $time_slot = [1 => 'AM', 3 => 'PM', 6 => 'EV'][$activity['time_slot_id']];
 
+    $booking = $activity['booking_id'] ? $bookings[$activity['booking_id']]->toArray() : null;
+    $employee = $activity['employee_id'] ? $employees[$activity['employee_id']]->toArray() : 0;
+    $product_model = $activity['product_model_id'] ? $product_models[$activity['product_model_id']]->toArray() : null;
+    $customer = isset($booking['customer_id'], $customers[$booking['customer_id']]) ? $customers[$booking['customer_id']]->toArray() : null;
+
     $result[$employee_id][$date_index][$time_slot][] = array_merge($activity->toArray(), [
-            'booking_id'        => ($activity['booking_id']) ? $bookings[$activity['booking_id']]->toArray() : null,
-            'employee_id'       => ($activity['employee_id']) ? $employees[$activity['employee_id']]->toArray() : 0,
-            'product_model_id'  => ($activity['product_model_id']) ? $product_models[$activity['product_model_id']]->toArray() : null,
+            'booking_id'        => $booking,
+            'employee_id'       => $employee,
+            'product_model_id'  => $product_model,
+            'customer_id'       => $customer,
             'activity_date'     => date('c', $activity['activity_date']),
             'time_slot'         => $time_slot
         ]);
