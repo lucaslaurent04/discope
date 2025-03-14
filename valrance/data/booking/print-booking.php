@@ -13,12 +13,14 @@ use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
 use equal\data\DataFormatter;
 use sale\booking\Booking;
+use sale\booking\BookingActivity;
 use sale\booking\Consumption;
 use sale\booking\TimeSlot;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
+use sale\booking\BookingLineGroupAgeRangeAssignment;
 
 list($params, $providers) = announce([
     'description'   => "Render a booking quote as a PDF document, given its id.",
@@ -173,6 +175,7 @@ $fields = [
         ]
     ],
     'booking_lines_groups_ids' => [
+        'id',
         'name',
         'has_pack',
         'is_locked',
@@ -187,10 +190,18 @@ $fields = [
         'date_from',
         'date_to',
         'nb_pers',
+        'age_range_assignments_ids'=> ['id', 'age_range_id','booking_line_group_id','qty'],
         'booking_lines_ids' => [
             'name',
-            'product_id' => ['label'],
+            'product_id' => [
+                'id',
+                'label' ,
+                'age_range_id',
+                'grouping_code_id' => ['id', 'name'],
+                'product_model_id' => ['id', 'name', 'grouping_code_id' => ['id', 'name']]
+            ],
             'description',
+            'is_accomodation',
             'qty',
             'unit_price',
             'free_qty',
@@ -199,6 +210,9 @@ $fields = [
             'price',
             'vat_rate',
             'qty_accounting_method',
+            'qty_vars',
+            'has_own_qty',
+            'own_duration',
             'price_adapters_ids' => ['type', 'value', 'is_manual_discount']
         ]
     ]
@@ -206,7 +220,9 @@ $fields = [
 ];
 
 
+
 $booking = Booking::id($params['id'])->read($fields, $params['lang'])->first(true);
+
 
 if(!$booking) {
     throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
@@ -220,6 +236,7 @@ if($logo_document_data) {
 
 $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
+$has_activity = Setting::get_value('sale', 'booking', 'has_activity', 0);
 $values = [
     'attn_address1'              => '',
     'attn_address2'              => '',
@@ -275,6 +292,8 @@ $values = [
     'status'                     => $booking['status'],
     'tax_lines'                  => [],
     'total'                      => $booking['total'],
+    'has_activity'               => $has_activity,
+    'activities_map'             => ''
 ];
 
 
@@ -345,6 +364,8 @@ $values['i18n'] = [
     'snack'                 => Setting::get_value('lodging', 'locale', 'i18n.snack', null, [], $params['lang']),
     'meals'                 => Setting::get_value('lodging', 'locale', 'i18n.meals', null, [], $params['lang']),
     'title_agreement'       => Setting::get_value('lodging', 'locale', 'i18n.title_agreement', null, [], $params['lang']),
+    'activities_details'    => Setting::get_value('lodging', 'locale', 'i18n.activities_details', null, [], $params['lang']),
+    'activity'              => Setting::get_value('lodging', 'locale', 'i18n.activity', null, [], $params['lang'])
 ];
 
 
@@ -376,7 +397,6 @@ if($booking['center_id']['use_office_details']) {
 /*
     retrieve templates
 */
-
 if($booking['center_id']['template_category_id']) {
 
     $template = Template::search([
@@ -384,7 +404,7 @@ if($booking['center_id']['template_category_id']) {
                             ['code', '=', $booking['status']],
                             ['type', '=', $booking['status']]
                         ])
-                        ->read(['parts_ids' => ['name', 'value']], $params['lang'])
+                        ->read( ['id','parts_ids' => ['name', 'value']], $params['lang'])
                         ->first(true);
 
     foreach($template['parts_ids'] as $part_id => $part) {
@@ -401,7 +421,7 @@ if($booking['center_id']['template_category_id']) {
             if ($booking['customer_id']['rate_class_id']) {
 
                 $part_name = 'service_'. $booking['customer_id']['rate_class_id']['name'];
-                $template_part = TemplatePart::search(['name', '=', $part_name])
+                $template_part = TemplatePart::search([['name', '=', $part_name], ['template_id', '=', $template['id']] ])
                         ->read(['value'], $params['lang'])
                         ->first(true);
                 if($template_part){
@@ -423,7 +443,6 @@ if($booking['center_id']['template_category_id']) {
     }
 
 }
-
 
 if (!$hasFooter) {
     $values['header_html'] .= $values['center_signature'];
@@ -615,6 +634,80 @@ foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
             }
         }
     }
+}
+
+$lines_map = [];
+
+if($params['mode'] == 'grouped') {
+    $lines = [];
+    foreach ($booking['booking_lines_groups_ids'] as $booking_line_group) {
+        foreach ($booking_line_group['booking_lines_ids'] as $booking_line) {
+            $booking_line_group_id = $booking_line_group['id'];
+            $product = $booking_line['product_id'];
+
+            $grouping_code = isset($product['grouping_code_id']['name'])
+                ? $product['grouping_code_id']['name']
+                : ($product['product_model_id']['grouping_code_id']['name']
+                ?? (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['name']);
+
+            if (!isset($lines_map[$booking_line_group_id])) {
+                $lines_map[$booking_line_group_id] = [];
+            }
+            if (!isset($lines_map[$booking_line_group_id][$grouping_code])) {
+                $lines_map[$booking_line_group_id][$grouping_code] = [];
+            }
+
+            if (!isset($lines_map[$booking_line_group_id][$grouping_code][$product['id']])) {
+                $lines_map[$booking_line_group_id][$grouping_code][$product['id']] = [
+                    'name'          => $booking_line['name'],
+                    'price'         => $booking_line['price'],
+                    'total'         => $booking_line['total'],
+                    'unit_price'    => $booking_line['unit_price'],
+                    'vat_rate'      => null,
+                    'qty'           => $booking_line['qty'],
+                    'discount'      => null,
+                    'has_pack'      => $booking_line_group['has_pack'],
+                    'free_qty'      => $booking_line['free_qty'],
+                    'grouping'      => $grouping_code
+                ];
+            } else {
+                $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] += $booking_line['price'];
+                $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] += $booking_line['total'];
+                $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['qty'] += $booking_line['qty'];
+            }
+        }
+    }
+    foreach ($lines_map as $booking_line_group_id => $groupings) {
+        foreach ($groupings as $grouping_code_id => $products) {
+            foreach ($products as $product_id => $product) {
+                if (!isset($lines[$grouping_code_id])) {
+                        $lines[$grouping_code_id] = [
+                            'name'          => $product['grouping'],
+                            'unit_price'    => 0,
+                            'vat_rate'      => 0,
+                            'free_qty'      => 0,
+                            'qty'           => 0,
+                            'price'         => 0,
+                            'total'         => 0,
+                            'is_group'      => false,
+                            'is_pack'       => false
+                        ];
+                }
+                $lines[$grouping_code_id]['price'] += $product['price'];
+                $lines[$grouping_code_id]['total'] += $product['total'];
+
+                if ($product['has_pack']){
+                    $lines[$grouping_code_id]['qty'] = $product['qty'];
+                    $lines[$grouping_code_id]['free_qty'] = $product['free_qty'];
+                    $lines[$grouping_code_id]['unit_price'] += $product['unit_price'];
+
+                } else{
+                    $lines[$grouping_code_id]['qty'] += 1;
+                }
+            }
+        }
+    }
+
 }
 
 $values['lines'] = $lines;
@@ -852,6 +945,66 @@ foreach($consumptions_detailed as $cid => $consumption) {
 $values['consumptions_map_detailed'] = $consumptions_map_detailed;
 
 
+if($has_activity){
+    $activities_map = [];
+
+    $booking_activities = BookingActivity::search(['booking_id', '=', $booking['id'] ])
+        ->read([
+            'id',
+            'name',
+            'activity_date',
+            'activity_booking_line_id' => ['product_id' => ['id','name']],
+            'booking_line_group_id' => ['id', 'name'],
+            'time_slot_id' => ['id', 'code','name'],
+        ])
+        ->get();
+
+    $time_slots_activities_ids = TimeSlot::search(["is_meal", "=", false])->read(['id', 'name','code', 'order'], $params['lang'])->get();
+
+    usort($time_slots_activities_ids, function ($a, $b) {
+        return $a['order'] <=> $b['order'];
+    });
+
+    usort($booking_activities, function ($a, $b) {
+        return $a['booking_line_group_id']['id'] <=> $b['booking_line_group_id']['id']
+            ?: $a['activity_date'] <=> $b['activity_date'];
+    });
+
+    foreach ($booking_activities as $activity) {
+        $group = $activity['booking_line_group_id']['name'];
+
+        if (!isset($activities_map[$group])) {
+            $activities_map[$group] = [];
+        }
+
+        $date = date('d/m/Y', $activity['activity_date']) . ' (' . $days_names[date('w', $activity['activity_date'])] . ')';
+        if (!isset($activities_map[$group][$date])) {
+            $activities_map[$group][$date] = [
+                'time_slots' => [],
+            ];
+
+            foreach ($time_slots_activities_ids as $time_slot) {
+                $activities_map[$group][$date]['time_slots'][$time_slot['name']] = [];
+            }
+        }
+
+        $time_slot_name = $activity['time_slot_id']['name'];
+        if (isset($activities_map[$group][$date]['time_slots'][$time_slot_name])) {
+            $activities_map[$group][$date]['time_slots'][$time_slot_name][] = $activity['name'];
+        }
+    }
+
+    foreach ($activities_map as &$dates) {
+        foreach ($dates as &$time_slots) {
+            array_walk($time_slots['time_slots'], fn(&$activities) =>
+                $activities = $activities ? (count($activities) === 1 ? $activities[0] : implode(', ', $activities)) : null
+            );
+        }
+    }
+    unset($dates, $time_slots);
+
+    $values['activities_map'] = $activities_map;
+}
 /*
     Inject all values into the template
 */
