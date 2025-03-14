@@ -18,6 +18,7 @@ import { ConsumptionCreationDialog } from './_components/planning.calendar/_comp
 
 
 import { PlanningEmployeesComponent } from './employees/employees.component';
+import { PlanningEmployeesLegendDialogComponent } from './employees/_components/legend.dialog/legend.component';
 import { PlanningEmployeesCalendarComponent } from './employees/_components/employees.calendar/employees.calendar.component';
 import { PlanningEmployeesCalendarNavbarComponent } from './employees/_components/employees.calendar/_components/employees.calendar.navbar/employees.calendar.navbar.component';
 import { PlanningEmployeesCalendarActivityComponent } from './employees/_components/employees.calendar/_components/employees.calendar.activity/employees.calendar.activity.component';
@@ -41,6 +42,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
     PlanningLegendDialogComponent,
     PlanningPreferencesDialogComponent,
     PlanningEmployeesComponent,
+    PlanningEmployeesLegendDialogComponent,
     PlanningEmployeesCalendarComponent,
     PlanningEmployeesCalendarNavbarComponent,
     PlanningEmployeesCalendarActivityComponent
