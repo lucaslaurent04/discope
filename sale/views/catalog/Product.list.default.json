@@ -51,6 +51,12 @@
             },
             {
                 "type": "field",
+                "value": "grouping_code_id",
+                "width": "10%",
+                "sortable": true
+            },
+            {
+                "type": "field",
                 "value": "family_id",
                 "width": "10%"
             }
