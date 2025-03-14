@@ -102,6 +102,11 @@
             "label": "Prix adaptables",
             "description": "Le pack est-il candidat aux adaptations de prix (catégories tarifaires).",
             "help": "Si cette proprété est désactivée, les adaptations de prix (avantages) liées aux catégories tarifaires ne sont pas appliquées sur les produits du pack."
+        },
+        "grouping_code_id": {
+            "label": "Code de regroupement",
+            "description": "Code de regroupement spécifique auquel ce modèle de produit est associé, le cas échéant.",
+            "help": ""
         }
     },
     "view": {
