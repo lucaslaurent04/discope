@@ -46,6 +46,13 @@ class Employee extends \identity\Partner {
                 'help'              => 'Date at which the contract ends (known in advance for fixed-term or unknown for permanent).'
             ],
 
+            'center_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\Center',
+                'description'       => 'The center to which belongs the employee.',
+                'default'           => 1
+            ],
+
             'absences_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'hr\absence\Absence',

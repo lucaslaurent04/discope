@@ -1,34 +1,28 @@
 <div class="panelFilters">
-
-    <!--
-    <div>
-        <mat-form-field>
-        <mat-select name="capacity" [ngModel]="capacity" (selectionChange)="onCapacityChange($event)">
-            <mat-option value="0">-- All room --</mat-option>
-            <mat-option value="1">Single</mat-option>
-            <mat-option value="2">Double</mat-option>
-            <mat-option value="3">Triple</mat-option>
-        </mat-select>
-        </mat-form-field>
-    </div>
-    -->
     <div class="centers-selector">
         <mat-form-field>
-            <mat-select
-                    #centerSelector multiple
-                    [(ngModel)]="selected_centers_ids"
-                    panelClass="centers-selector"
-                    [disableOptionCentering]="true"
-                    (closed)="onchangeSelectedCenters()"
-                    (selectionChange)="onchangeSelectedCenters()">
-                <mat-optgroup [label]="'Sélection'">&nbsp;<a style="cursor: pointer;" (click)="onclickSelectAllCenters()">Tous</a> &nbsp; <a style="cursor: pointer;" (click)="onclickUnselectAllCenters()">Aucun</a> &nbsp; <a style="cursor: pointer;" (click)="onclickSelectGA()">GA</a> &nbsp; <a style="cursor: pointer;" (click)="onclickSelectGG()">GG</a></mat-optgroup>
-                <mat-option *ngFor="let center of centers" [value]="center.id" >{{center.name}}</mat-option>
+            <mat-select #centerSelector
+                        multiple
+                        [(ngModel)]="selected_employees_ids"
+                        panelClass="centers-selector"
+                        [disableOptionCentering]="true"
+                        (closed)="onchangeSelectedEmployees()"
+                        (selectionChange)="onchangeSelectedEmployees()"
+            >
+                <mat-optgroup [label]="'Sélection'">
+                    &nbsp; <a style="cursor: pointer;" (click)="onclickSelectAllEmployees()">Tous</a>
+                    &nbsp; <a style="cursor: pointer;" (click)="onclickUnselectAllEmployees()">Aucun</a>
+                    &nbsp; <a style="cursor: pointer;" (click)="onclickSelectInternal()">Interne</a>
+                    &nbsp; <a style="cursor: pointer;" (click)="onclickSelectExternal()">Externe</a>
+                </mat-optgroup>
+                <mat-option *ngFor="let employee of employees" [value]="employee.id">
+                    {{employee.name}}
+                </mat-option>
             </mat-select>
         </mat-form-field>
         <button mat-icon-button (click)="onOpenLegendDialog()"><mat-icon>info</mat-icon></button>
         <button mat-icon-button (click)="onOpenPrefDialog()"><mat-icon>settings</mat-icon></button>
     </div>
-
 </div>
 
 <div class="panelStatus">

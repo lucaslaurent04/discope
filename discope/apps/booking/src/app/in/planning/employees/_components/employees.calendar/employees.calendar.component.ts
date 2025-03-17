@@ -253,24 +253,18 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         this.createHeaderDays();
 
         try {
-            const domain: any[] = ['relationship', '=', 'employee'];
-            /*
-            const domain: any[] = JSON.parse(JSON.stringify(this.params.rental_units_filter));
-            if(!domain.length) {
-                domain.push([['can_rent', '=', true], ["center_id", "in", this.params.centers_ids]]);
-            }
-            else {
-                for(let i = 0, n = domain.length; i < n; ++i) {
-                    domain[i].push(["center_id", "in",  this.params.centers_ids]);
-                }
-            }
-            */
+            const domain: any[] = [
+                ['relationship', '=', 'employee'],
+                ['id', 'in', this.params.employees_ids]
+            ];
+
             const employees = await this.api.collect(
-                "hr\\employee\\Employee",
+                'hr\\employee\\Employee',
                 domain,
                 Object.getOwnPropertyNames(new Employee()),
                 'name', 'asc', 0, 500
             );
+
             if(employees) {
                 this.employees = employees;
             }
@@ -284,8 +278,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 // #memo - all dates are considered UTC
                 date_from: this.calcDateIndex(this.params.date_from),
                 date_to: this.calcDateIndex(this.params.date_to),
-                // #todo - #memo - we need to allow filtering employees based on various criterias
-                // employees_ids: JSON.stringify([15, 16, 17, 18, 19])
+                employees_ids: JSON.stringify(this.params.employees_ids)
             });
         }
         catch(response: any ) {
@@ -295,10 +288,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 window.location.href = '/auth';
             }
         }
-
-
     }
-
 
     /**
      * Recompute content of the header.
