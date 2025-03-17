@@ -163,7 +163,12 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public onRefresh(full: boolean = true) {
-        console.log('onrefresh')
+        console.log('onrefresh');
+
+        if(this.currentDraggedActivity) {
+            console.log('skip refresh because moving activity');
+            return;
+        }
 
         this.cd.detectChanges();
 
