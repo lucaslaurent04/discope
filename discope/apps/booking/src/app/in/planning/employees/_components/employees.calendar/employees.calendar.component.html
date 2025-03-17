@@ -89,7 +89,6 @@
                             <ng-container *ngIf="hasActivity(employee, headers.days_indexes[i], 'AM')">
                                 <div class="cell-activities">
                                     <ng-container *ngFor="let activity of getActivities(employee, day, 'AM')">
-
                                         <planning-employees-calendar-activity
                                             [height]="rowsHeight"
                                             [width]="cellsWidth"
@@ -100,12 +99,12 @@
                                             (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
                                             (selected)="onSelectedBooking($event)"
                                             cdkDrag
-                                            (cdkDragStarted)="onDragStart(activity)">
-                                        </planning-employees-calendar-activity>
+                                            (cdkDragStarted)="onDragStart(activity)"
+                                        ></planning-employees-calendar-activity>
 
-                                        <span *ngIf="hovered_activity == activity" class="cell-hint" #vDescription="var" [var]="{value: getDescription(activity)}">
+                                        <div *ngIf="hovered_activity == activity" class="cell-hint" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
                                             <span *ngIf="vDescription?.value?.length" style="margin: 0 !important;" [innerHTML]="vDescription.value"></span>
-                                        </span>
+                                        </div>
                                     </ng-container>
                                 </div>
                             </ng-container>
@@ -140,7 +139,7 @@
                                             (cdkDragStarted)="onDragStart(activity)">
                                         </planning-employees-calendar-activity>
 
-                                        <span *ngIf="hovered_activity == activity" class="cell-hint" #vDescription="var" [var]="{value: getDescription(activity)}">
+                                        <span *ngIf="hovered_activity == activity" class="cell-hint" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
                                             <span *ngIf="vDescription?.value?.length" style="margin: 0 !important;" [innerHTML]="vDescription.value"></span>
                                         </span>
                                     </ng-container>
@@ -177,7 +176,7 @@
                                             (cdkDragStarted)="onDragStart(activity)">
                                         </planning-employees-calendar-activity>
 
-                                        <span *ngIf="hovered_activity == activity" class="cell-hint" #vDescription="var" [var]="{value: getDescription(activity)}">
+                                        <span *ngIf="hovered_activity == activity" class="cell-hint" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
                                             <span *ngIf="vDescription?.value?.length" style="margin: 0 !important;" [innerHTML]="vDescription.value"></span>
                                         </span>
                                     </ng-container>

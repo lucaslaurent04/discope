@@ -341,25 +341,21 @@
         .cell-hint {
             display: block;
             position: fixed;
-            z-index:100;
+            z-index: 100;
             transform: translateX(16px) translateY(calc(var(--rows_height) + 10px));
 
             span {
                 display: block;
-                border:1px;
-                background-color:white;
-                border-style:solid;
-                border-width:1px;
+                border: 1px solid grey;
+                background-color: white;
                 font-size: 15px;
-                border-color:grey;
                 box-shadow: 0 3px 5px 0 rgb(0 0 0 / 10%) !important;
                 padding: 3px 10px;
                 border-radius: 4px;
                 color:black;
                 width: 350px;
-                /* #memo - in case of overflow, user must open the booking to see the details */
                 overflow-x: hidden;
-                overflow-y: hidden;
+                overflow-y: auto;
                 height: 250px;
                 text-align: left;
             }

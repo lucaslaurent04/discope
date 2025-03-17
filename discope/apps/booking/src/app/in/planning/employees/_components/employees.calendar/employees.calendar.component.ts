@@ -59,6 +59,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     public count_rental_units: number = 0;
 
     public hovered_activity: any;
+    private hoveredActivityTimeout: any = null;
+
     public hovered_employee: any;
     public hovered_holidays: any;
 
@@ -217,20 +219,29 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return {};
     }
 
-    public getDescription(activity:any): string {
-        /*
-        if(activity.hasOwnProperty('booking_id')
-            && activity['booking_id']
-            && activity['booking_id'].hasOwnProperty('description')) {
-            return activity.booking_id.description;
+    public getDescription(activity: any): string {
+        let group_details = `<dt>Groupe ${activity.group_num}`;
+        if(activity.age_range_assignments_ids.length === 1) {
+            const assign = activity.age_range_assignments_ids[0];
+            group_details += `, ${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</dt>`;
         }
-        else if(activity.hasOwnProperty('repairing_id')
-            && activity['repairing_id']
-            && activity['repairing_id'].hasOwnProperty('description')) {
-            return activity.repairing_id.description;
+        else if(activity.age_range_assignments_ids.length > 1) {
+            group_details += ':</dt>';
+            for(let assign of activity.age_range_assignments_ids) {
+                group_details += `<dd>${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</dd>`;
+            }
         }
-        */
-        return '';
+
+        return '<dl>' +
+            `<dt>${activity.customer_id.name}</dt>` +
+            (activity.partner_identity_id?.address_city ? `<dt>${activity.partner_identity_id?.address_city}</dt>` : '') +
+            group_details +
+            `<dt>Handicap : <b>${activity.booking_line_group_id.has_person_with_disability ? 'oui' : 'non'}</b></dt>` + // TODO: handle disabled people (yes/no)
+            `<dt>Séjour du ${activity.booking_id.date_from} au ${activity.booking_id.date_to}</dt>` +
+            `<dt>${activity.booking_id.nb_pers} personnes</dt>` +
+            `<br />` +
+            `<dt>Activité ${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
+            '</dl>';
     }
 
     private async onFiltersChange() {
@@ -364,7 +375,16 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public onhoverActivity(activity: any) {
-        this.hovered_activity = activity;
+        if(this.hoveredActivityTimeout === null && activity) {
+            this.hovered_activity = activity;
+        }
+        else {
+            clearTimeout(this.hoveredActivityTimeout);
+            this.hoveredActivityTimeout = setTimeout(() => {
+                this.hovered_activity = activity;
+                this.hoveredActivityTimeout = null;
+            }, 300);
+        }
     }
 
     public onhoverDate(day: Date) {
