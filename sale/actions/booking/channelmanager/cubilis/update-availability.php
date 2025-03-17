@@ -6,10 +6,11 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use core\setting\Setting;
 use equal\http\HttpRequest;
 use sale\booking\channelmanager\Property;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Send an acknowledgment notification to Cubilis for a given reservation, using a `OTA_HotelAvailNotifRQ` request.",
     'params'        => [
         'property_id' => [
@@ -50,11 +51,18 @@ list($params, $providers) = eQual::announce([
  * @var \equal\php\Context                  $context
  * @var \equal\auth\AuthenticationManager   $auth
  */
-list($context, $auth) = [ $providers['context'], $providers['auth'] ];
+['context' => $context, 'auth' => $auth] = $providers;
 
-// #todo - @kaleo - this must be adapted according to new domain
-// #memo - temporary solution to prevent calls from non-production server
-if(constant('ROOT_APP_URL') != 'https://discope.yb.run') {
+$channelmanager_enabled = Setting::get_value('sale', 'booking', 'channelmanager.enabled', false);
+
+if(!$channelmanager_enabled) {
+    throw new Exception('disabled_feature', QN_ERROR_INVALID_CONFIG);
+}
+
+$client_domain = Setting::get_value('sale', 'booking', 'channelmanager.client_domain', 'https://discope.yb.run');
+
+// #memo - prevent calls from non-production server
+if(constant('ROOT_APP_URL') != $client_domain) {
     throw new Exception('wrong_host', QN_ERROR_INVALID_CONFIG);
 }
 
