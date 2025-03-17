@@ -337,6 +337,12 @@ class BookingLineGroup extends Model {
                 'type'              => 'integer',
                 'description'       => "Identifier of the activity group in the booking.",
                 'onupdate'          => 'onupdateActivityGroupNum'
+            ],
+
+            'has_person_with_disability' => [
+                'type'              => 'boolean',
+                'description'       => "At least one person from the group has a disability.",
+                'default'           => false
             ]
 
         ];

@@ -97,6 +97,12 @@ class BookingActivity extends Model {
                 'default'           => 1
             ],
 
+            'counter_total' => [
+                'type'              => 'integer',
+                'description'       => "The total of this type of activity in the booking sojourn for the group.",
+                'default'           => 1
+            ],
+
             'total' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
@@ -301,10 +307,11 @@ class BookingActivity extends Model {
                 return $date_comp !== 0 ? $date_comp : $a['time_slot_id']['order'] <=> $b['time_slot_id']['order'];
             });
 
+            $total_counter = count($group_activities);
             $counter = 1;
             foreach($group_activities as $booking_activity) {
                 BookingActivity::id($booking_activity['id'])
-                    ->update(['counter' => $counter++]);
+                    ->update(['counter' => $counter++, 'total_counter' => $total_counter]);
             }
         }
     }
