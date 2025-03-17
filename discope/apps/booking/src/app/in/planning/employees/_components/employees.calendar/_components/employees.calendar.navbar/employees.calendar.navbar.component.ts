@@ -1,10 +1,7 @@
-import { Component, Input, Output, EventEmitter, OnInit, NgZone, ChangeDetectorRef, AfterViewChecked, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-import { Observable }  from 'rxjs';
-import { find, map, mergeMap, startWith, debounceTime } from 'rxjs/operators';
+import { Component, Input, Output, EventEmitter, OnInit, ViewChild } from '@angular/core';
 
 import { PlanningEmployeesCalendarParamService } from '../../../../_services/employees.calendar.param.service';
 
-import { HeaderDays } from 'src/app/model/headerdays';
 import { ChangeReservationArg } from 'src/app/model/changereservationarg';
 import { ApiService, AuthService } from 'sb-shared-lib';
 import { FormControl, FormGroup } from '@angular/forms';
@@ -16,13 +13,13 @@ import { MatOption } from '@angular/material/core';
   templateUrl: './employees.calendar.navbar.component.html',
   styleUrls: ['./employees.calendar.navbar.component.scss']
 })
-export class PlanningEmployeesCalendarNavbarComponent implements OnInit, AfterViewInit, AfterViewChecked {
+export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
     @Input() activity: any;
     @Input() employee: any;
     @Input() holidays: any;
     @Output() changedays = new EventEmitter<ChangeReservationArg>();
     @Output() refresh = new EventEmitter<Boolean>();
-    @ViewChild('centerSelector') centerSelector: MatSelect;
+    @ViewChild('centerSelector') employeeSelector: MatSelect;
 
     @Output() openLegendDialog = new EventEmitter();
     @Output() openPrefDialog = new EventEmitter();
@@ -32,8 +29,8 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, AfterVi
     dateTo: Date;
     duration: number;
 
-    centers: any[] = [];
-    selected_centers_ids: any[] = [];
+    employees: any[] = [];
+    selected_employees_ids: any[] = [];
 
     vm: any = {
         duration:   '31',
@@ -46,21 +43,10 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, AfterVi
     constructor(
         private api: ApiService,
         private auth: AuthService,
-        private params: PlanningEmployeesCalendarParamService,
-        private cd: ChangeDetectorRef,
-        private zone: NgZone) {
-    }
+        private params: PlanningEmployeesCalendarParamService
+    ) {}
 
-
-    ngAfterViewInit() {
-    }
-
-
-    ngAfterViewChecked() {
-    }
-
-
-    ngOnInit() {
+    public ngOnInit() {
 
         /*
             Setup events listeners
@@ -79,28 +65,27 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, AfterVi
                 this.vm.date_range.get("date_to").setValue(this.dateTo);
             });
 
-
         // by default set the first center of current user
         this.auth.getObservable()
             .subscribe( async (user:any) => {
                 if(user.hasOwnProperty('centers_ids') && user.centers_ids.length) {
                     try {
-                        const centers = await this.api.collect('identity\\Center',
-                            ['id', 'in', user.centers_ids],
-                            ['id', 'name', 'code', 'sojourn_type_id'],
-                            'name','asc',0,50
+                        const employees = await this.api.collect('hr\\employee\\Employee',
+                            ['center_id', 'in', user.centers_ids],
+                            ['id', 'name'],
+                            'name', 'asc', 0, 50
                         );
-                        if(centers.length) {
+                        if(employees.length) {
                             // value stored in local storage prevails
-                            let stored = localStorage.getItem('centers_ids');
+                            let stored = localStorage.getItem('employees_ids');
                             if(stored) {
-                                this.selected_centers_ids = JSON.parse(stored);
+                                this.selected_employees_ids = JSON.parse(stored);
                             }
                             else {
-                                this.selected_centers_ids = centers.map( (e:any) => e.id );
+                                this.selected_employees_ids = employees.map( (e:any) => e.id );
                             }
-                            this.params.centers_ids = this.selected_centers_ids;
-                            this.centers = centers;
+                            this.params.employees_ids = this.selected_employees_ids;
+                            this.employees = employees;
                         }
                     }
                     catch(err) {
@@ -196,26 +181,24 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, AfterVi
         this.refresh.emit(true);
     }
 
-    public onchangeSelectedCenters() {
-        console.log('::onchangeSelectedCenters');
-        this.params.centers_ids = this.selected_centers_ids;
-        localStorage.setItem('centers_ids', JSON.stringify(this.selected_centers_ids));
+    public onchangeSelectedEmployees() {
+        console.log('::onchangeSelectedEmployees');
+        this.params.employees_ids = this.selected_employees_ids;
+        localStorage.setItem('centers_ids', JSON.stringify(this.selected_employees_ids));
     }
 
-    public onclickUnselectAllCenters() {
-        // this.centerSelector.close();
-        this.centerSelector.options.forEach((item: MatOption) => item.deselect());
+    public onclickUnselectAllEmployees() {
+        this.employeeSelector.options.forEach((item: MatOption) => item.deselect());
     }
 
-    public onclickSelectAllCenters() {
-        // this.centerSelector.close();
-        this.centerSelector.options.forEach((item: MatOption) => item.select());
+    public onclickSelectAllEmployees() {
+        this.employeeSelector.options.forEach((item: MatOption) => item.select());
     }
 
-    public onclickSelectGA() {
-        this.centerSelector.options.forEach((item: MatOption) => {
-            const center = this.centers.find(center => center.id == item.value);
-            if(center.sojourn_type_id == 1) {
+    public onclickSelectInternal() {
+        this.employeeSelector.options.forEach((item: MatOption) => {
+            const employee = this.employees.find(employee => employee.id == item.value);
+            if(employee.id > 0) {
                 item.select();
             }
             else {
@@ -224,10 +207,10 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, AfterVi
         });
     }
 
-    public onclickSelectGG() {
-        this.centerSelector.options.forEach((item: MatOption) => {
-            const center = this.centers.find(center => center.id == item.value);
-            if(center.sojourn_type_id == 2) {
+    public onclickSelectExternal() {
+        this.employeeSelector.options.forEach((item: MatOption) => {
+            const employee = this.employees.find(employee => employee.id == item.value);
+            if(employee.id < 0) {
                 item.select();
             }
             else {
@@ -239,5 +222,4 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, AfterVi
     public calcHolidays() {
         return this.holidays.map( (a:any) => a.name ).join(', ');
     }
-
 }

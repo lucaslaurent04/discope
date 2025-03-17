@@ -49,7 +49,6 @@ class Center extends \identity\Establishment {
                 'description'       => 'Manager of the center, if any.'
             ],
 
-
             'price_list_category_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\price\PriceListCategory',
@@ -110,6 +109,13 @@ class Center extends \identity\Establishment {
                 'description'       => 'List of rental units of the center.'
             ],
 
+            'employees_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'hr\employee\Employee',
+                'foreign_field'     => 'center_id',
+                'description'       => 'List of employees of the center.'
+            ],
+
             'product_families_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\catalog\Family',
@@ -167,8 +173,7 @@ class Center extends \identity\Establishment {
                 'foreign_object'    => 'sale\booking\ConsumptionMeter',
                 'foreign_field'     => 'center_id',
                 'description'       => 'List of consumptions meters of the center.'
-            ],
-
+            ]
 
         ];
     }

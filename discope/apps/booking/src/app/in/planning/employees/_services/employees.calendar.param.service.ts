@@ -16,8 +16,7 @@ export class PlanningEmployeesCalendarParamService {
     private _date_to: Date;
     // duration in days
     private _duration: number;
-    private _centers_ids: number[];
-    private _rental_units_filter: any[];
+    private _employees_ids: number[];
 
     // timeout handler for debounce
     private timeout: any;
@@ -31,8 +30,8 @@ export class PlanningEmployeesCalendarParamService {
     /**
      * Current state according to instant values of the instance.
      */
-    private getState():string {
-        return this._date_from.getTime() + this._date_to.getTime() + this._centers_ids.toString() + JSON.stringify(this._rental_units_filter);
+    private getState(): string {
+        return this._date_from.getTime() + this._date_to.getTime() + this._employees_ids.toString()
     }
 
     private treatAsUTC(date:Date): Date {
@@ -64,11 +63,10 @@ export class PlanningEmployeesCalendarParamService {
     public init() {
         this._duration = 7;
         // #todo - toujours commencer le lundi par défaut
-        this._date_from = new Date('2025-06-01');
+        this._date_from = new Date('2025-06-01'); // TODO: fix
         this._date_to = new Date(this._date_from.getTime());
         this._date_to.setDate(this._date_from.getDate() + this._duration);
-        this._centers_ids = [];
-        this._rental_units_filter = [];
+        this._employees_ids = [];
         this.state = this.getState();
     }
 
@@ -76,8 +74,8 @@ export class PlanningEmployeesCalendarParamService {
         return this.observable;
     }
 
-    public set centers_ids(centers_ids: number[]) {
-        this._centers_ids = [...centers_ids];
+    public set employees_ids(employees_ids: number[]) {
+        this._employees_ids = [...employees_ids];
         this.updateRange();
     }
 
@@ -91,13 +89,8 @@ export class PlanningEmployeesCalendarParamService {
         this.updateRange();
     }
 
-    public set rental_units_filter(filter: any[]) {
-        this._rental_units_filter = JSON.parse(JSON.stringify(filter));
-        this.updateRange();
-    }
-
-    public get centers_ids(): number[] {
-        return this._centers_ids;
+    public get employees_ids(): number[] {
+        return this._employees_ids;
     }
 
     public get date_from(): Date {
@@ -111,9 +104,4 @@ export class PlanningEmployeesCalendarParamService {
     public get duration(): number {
         return this._duration;
     }
-
-    public get rental_units_filter(): any[] {
-        return this._rental_units_filter;
-    }
-
 }
