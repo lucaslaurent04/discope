@@ -75,7 +75,7 @@ list($context, $orm) = [$providers['context'], $providers['orm']];
     Retrieve the requested template
 */
 
-$entity = 'sale\booking\Contract';
+$entity = 'valrance\booking\Contract';
 $parts = explode('\\', $entity);
 $package = array_shift($parts);
 $class_path = implode('/', $parts);
@@ -763,6 +763,7 @@ if($params['mode'] == 'grouped') {
 
                 } else{
                     $lines[$grouping_code_id]['qty'] += 1;
+                    $lines[$grouping_code_id]['unit_price'] = $lines[$grouping_code_id]['total'] / $lines[$grouping_code_id]['qty'];
                 }
             }
         }

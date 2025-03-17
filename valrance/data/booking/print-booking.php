@@ -72,7 +72,7 @@ list($context, $orm) = [$providers['context'], $providers['orm']];
     Retrieve the requested template
 */
 
-$entity = 'sale\booking\Booking';
+$entity = 'valrance\booking\Booking';
 $parts = explode('\\', $entity);
 $package = array_shift($parts);
 $class_path = implode('/', $parts);
@@ -695,6 +695,8 @@ if($params['mode'] == 'grouped') {
                 }
                 $lines[$grouping_code_id]['price'] += $product['price'];
                 $lines[$grouping_code_id]['total'] += $product['total'];
+                
+
 
                 if ($product['has_pack']){
                     $lines[$grouping_code_id]['qty'] = $product['qty'];
@@ -703,6 +705,7 @@ if($params['mode'] == 'grouped') {
 
                 } else{
                     $lines[$grouping_code_id]['qty'] += 1;
+                    $lines[$grouping_code_id]['unit_price'] = $lines[$grouping_code_id]['total'] / $lines[$grouping_code_id]['qty'];
                 }
             }
         }
