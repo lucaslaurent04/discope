@@ -370,7 +370,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             this.hoveredActivityTimeout = setTimeout(() => {
                 this.hovered_activity = activity;
                 this.hoveredActivityTimeout = null;
-            }, 300);
+                this.cd.detectChanges();
+            }, 100);
         }
     }
 
