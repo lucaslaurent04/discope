@@ -685,7 +685,12 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     public async onDrop(event: Event | CdkDragDrop<any, any>, index: number, employee: Employee, date_index: string, time_slot: string) {
         if(this.currentDraggedActivity) {
             if(!this.isDroppable(this.currentDraggedActivity, employee, date_index, time_slot)) {
-                this.snack.open('Cette activité ne peut pas être assignée à cet animateur ou à cette plage horaire.', 'ERREUR');
+                if(employee.relationship !== 'employee') {
+                    this.snack.open('Cette activité ne peut pas être assignée à un prestataire.', 'ERREUR');
+                }
+                else if(this.currentDraggedActivity.employee_id !== employee.id) {
+                    this.snack.open('Cette activité ne peut pas être assignée à cet animateur ou à cette plage horaire.', 'ERREUR');
+                }
             }
             else {
                 const dropEvent = event as CdkDragDrop<any, any>;
