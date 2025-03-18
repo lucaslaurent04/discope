@@ -15,11 +15,11 @@ import { MatOption } from '@angular/material/core';
 })
 export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
     @Input() activity: any;
-    @Input() employee: any;
+    @Input() partner: any;
     @Input() holidays: any;
     @Output() changedays = new EventEmitter<ChangeReservationArg>();
     @Output() refresh = new EventEmitter<Boolean>();
-    @ViewChild('centerSelector') employeeSelector: MatSelect;
+    @ViewChild('centerSelector') partnerSelector: MatSelect;
 
     @Output() openLegendDialog = new EventEmitter();
     @Output() openPrefDialog = new EventEmitter();
@@ -29,8 +29,8 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
     dateTo: Date;
     duration: number;
 
-    employees: any[] = [];
-    selected_employees_ids: any[] = [];
+    partners: any[] = [];
+    selected_partners_ids: any[] = [];
 
     vm: any = {
         duration:   '31',
@@ -68,29 +68,56 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
         // by default set the first center of current user
         this.auth.getObservable()
             .subscribe( async (user:any) => {
-                if(user.hasOwnProperty('centers_ids') && user.centers_ids.length) {
-                    try {
-                        const employees = await this.api.collect('hr\\employee\\Employee',
-                            ['center_id', 'in', user.centers_ids],
-                            ['id', 'name'],
-                            'name', 'asc', 0, 50
-                        );
-                        if(employees.length) {
-                            // value stored in local storage prevails
-                            let stored = localStorage.getItem('employees_ids');
-                            if(stored) {
-                                this.selected_employees_ids = JSON.parse(stored);
-                            }
-                            else {
-                                this.selected_employees_ids = employees.map( (e:any) => e.id );
-                            }
-                            this.params.employees_ids = this.selected_employees_ids;
-                            this.employees = employees;
+                if(!user.hasOwnProperty('centers_ids') || !user.centers_ids.length) {
+                    return;
+                }
+
+                try {
+                    const employees = await this.api.collect(
+                        'hr\\employee\\Employee',
+                        ['center_id', 'in', user.centers_ids],
+                        ['id'],
+                        'name', 'asc', 0, 500
+                    );
+
+                    if(employees.length === 0) {
+                        return;
+                    }
+
+                    const partners_domain = [
+                        [['id', 'in', employees.map((e: any) => e.id)]],
+                        [['relationship', '=', 'provider']]
+                    ];
+                    const partners = await this.api.collect(
+                        'identity\\Partner',
+                        partners_domain,
+                        ['id', 'name', 'relationship'],
+                        'name', 'asc', 0, 500
+                    );
+
+                    if(partners.length === 0) {
+                        return;
+                    }
+
+                    // value stored in local storage prevails
+                    let stored = localStorage.getItem('partners_ids');
+                    if(stored) {
+                        this.selected_partners_ids = JSON.parse(stored);
+                    }
+                    else {
+                        this.selected_partners_ids = partners.map( (e:any) => e.id );
+                    }
+
+                    this.params.partners_ids = this.selected_partners_ids;
+                    this.partners = partners.sort((a: any, b: any) => {
+                        if (a.relationship !== b.relationship) {
+                            return a.relationship < b.relationship ? -1 : 1;
                         }
-                    }
-                    catch(err) {
-                        console.warn(err) ;
-                    }
+                        return a.name.localeCompare(b.name);
+                    });
+                }
+                catch(err) {
+                    console.warn(err) ;
                 }
             });
     }
@@ -181,24 +208,24 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
         this.refresh.emit(true);
     }
 
-    public onchangeSelectedEmployees() {
+    public onchangeSelectedPartners() {
         console.log('::onchangeSelectedEmployees');
-        this.params.employees_ids = this.selected_employees_ids;
-        localStorage.setItem('centers_ids', JSON.stringify(this.selected_employees_ids));
+        this.params.partners_ids = this.selected_partners_ids;
+        localStorage.setItem('partners_ids', JSON.stringify(this.selected_partners_ids));
     }
 
-    public onclickUnselectAllEmployees() {
-        this.employeeSelector.options.forEach((item: MatOption) => item.deselect());
+    public onclickUnselectAllPartners() {
+        this.partnerSelector.options.forEach((item: MatOption) => item.deselect());
     }
 
-    public onclickSelectAllEmployees() {
-        this.employeeSelector.options.forEach((item: MatOption) => item.select());
+    public onclickSelectAllPartners() {
+        this.partnerSelector.options.forEach((item: MatOption) => item.select());
     }
 
     public onclickSelectInternal() {
-        this.employeeSelector.options.forEach((item: MatOption) => {
-            const employee = this.employees.find(employee => employee.id == item.value);
-            if(employee.id > 0) {
+        this.partnerSelector.options.forEach((item: MatOption) => {
+            const partner = this.partners.find(p => p.id == item.value);
+            if(partner.relationship === 'employee') {
                 item.select();
             }
             else {
@@ -208,9 +235,9 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
     }
 
     public onclickSelectExternal() {
-        this.employeeSelector.options.forEach((item: MatOption) => {
-            const employee = this.employees.find(employee => employee.id == item.value);
-            if(employee.id < 0) {
+        this.partnerSelector.options.forEach((item: MatOption) => {
+            const partner = this.partners.find(p => p.id == item.value);
+            if(partner.relationship === 'provider') {
                 item.select();
             }
             else {

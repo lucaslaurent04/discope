@@ -199,14 +199,14 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
         this.context.change(descriptor);
     }
 
-    public onShowEmployee(rental_unit: any) {
+    public onShowPartner(partner: any) {
         let descriptor:any = {
             context_silent: true, // do not update sidebar
             context: {
-                entity: 'realestate\\RentalUnit',
+                entity: partner.relationship === 'employee' ? 'hr\\employee\\Employee' : 'sale\\provider\\Provider',
                 type: 'form',
                 name: 'default',
-                domain: ['id', '=', rental_unit.id],
+                domain: ['id', '=', partner.id],
                 mode: 'view',
                 purpose: 'view',
                 display_mode: 'popup',
