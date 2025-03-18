@@ -294,11 +294,14 @@ class BookingActivity extends Model {
         $bookingLineGroupIds = array_keys($mapBookingLineGroupIds);
 
         foreach($bookingLineGroupIds as $group_id) {
+            $map_activity_product_counter_total = [];
+            $map_activity_counter = [];
+
             $group_activities = BookingActivity::search(
                 ['booking_line_group_id', '=', $group_id],
                 ['sort' => ['activity_date' => 'asc']]
             )
-                ->read(['activity_date', 'time_slot_id' => ['order']])
+                ->read(['product_model_id', 'activity_date', 'time_slot_id' => ['order']])
                 ->get(true);
 
             usort($group_activities, function($a, $b) {
@@ -307,11 +310,21 @@ class BookingActivity extends Model {
                 return $date_comp !== 0 ? $date_comp : $a['time_slot_id']['order'] <=> $b['time_slot_id']['order'];
             });
 
-            $total_counter = count($group_activities);
-            $counter = 1;
+            foreach($group_activities as $booking_activity) {
+                if(!isset($map_activity_product_counter_total[$booking_activity['product_model_id']])) {
+                    $map_activity_product_counter_total[$booking_activity['product_model_id']] = 0;
+                }
+
+                $map_activity_product_counter_total[$booking_activity['product_model_id']] += 1;
+                $map_activity_counter[$booking_activity['id']] = $map_activity_product_counter_total[$booking_activity['product_model_id']];
+            }
+
             foreach($group_activities as $booking_activity) {
                 BookingActivity::id($booking_activity['id'])
-                    ->update(['counter' => $counter++, 'total_counter' => $total_counter]);
+                    ->update([
+                        'counter'       => $map_activity_counter[$booking_activity['id']],
+                        'counter_total' => $map_activity_product_counter_total[$booking_activity['product_model_id']]
+                    ]);
             }
         }
     }
