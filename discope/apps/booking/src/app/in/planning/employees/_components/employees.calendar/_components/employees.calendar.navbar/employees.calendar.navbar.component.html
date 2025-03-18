@@ -15,9 +15,12 @@
                     &nbsp; <a style="cursor: pointer;" (click)="onclickSelectInternal()">Interne</a>
                     &nbsp; <a style="cursor: pointer;" (click)="onclickSelectExternal()">Externe</a>
                 </mat-optgroup>
-                <mat-option *ngFor="let partner of partners" [value]="partner.id">
-                    {{partner.name}}
-                </mat-option>
+                <ng-container *ngFor="let partner of partners; let i = index">
+                    <mat-divider *ngIf="i > 0 && partners[i-1].relationship !== partner.relationship"></mat-divider>
+                    <mat-option [value]="partner.id">
+                        {{partner.name}}
+                    </mat-option>
+                </ng-container>
             </mat-select>
         </mat-form-field>
         <button mat-icon-button (click)="onOpenLegendDialog()"><mat-icon>info</mat-icon></button>
