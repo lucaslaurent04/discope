@@ -190,15 +190,6 @@ class Funding extends Model {
                     'sale_booking_funding_check-payment',
                     [ 'id' => $fid ]
                 );
-                // #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
-                $cron->schedule(
-                // assign a reproducible unique name
-                    "booking.funding.overdue.{$fid}",
-                    // remind on day following due_date
-                    $values['due_date'] + 86400,
-                    'lodging_funding_check-payment',
-                    [ 'id' => $fid ]
-                );
             }
         }
         parent::onupdate($om, $ids, $values, $lang);
