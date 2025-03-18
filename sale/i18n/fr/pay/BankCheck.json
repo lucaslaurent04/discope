@@ -37,11 +37,9 @@
             "label": "Statut",
             "description": "Le statut actuel du traitement du chèque bancaire.",
             "selection": {
-                "registered": "Enregistré",
-                "in_process": "En cours",
+                "pending": "En attente",
                 "paid": "Payé",
-                "rejected": "Rejeté",
-                "expired": "Expiré"
+                "rejected": "Rejeté"
             },
             "help": ""
         },
@@ -53,6 +51,11 @@
         "bankCheck_description": {
             "label": "Description",
             "description": "Une description détaillée ou une note relative à ce chèque bancaire.",
+            "help": ""
+        },
+        "has_signature": {
+            "label": "Signature ?",
+            "description": "Indique si le chèque bancaire est signé.",
             "help": ""
         }
     },
