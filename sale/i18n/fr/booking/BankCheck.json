@@ -19,25 +19,21 @@
             "name": "Chèque bancaire",
             "description": "Formulaire de modification par défaut  de un cheque bancaire.",
             "actions": {
-                "action.transition.register": {
-                    "label": "Enregistrer",
-                    "help": "Soumettez le chèque bancaire pour son traitement."
+                "action.transition.add.payment": {
+                    "label": "Effectuer un paiement",
+                    "help": "Un paiement sera enregistré et associé au financement."
                 },
-                "action.transition.in_process": {
-                    "label": "En Cours",
-                    "help": "Le chèque bancaire est en cours de transfert vers la banque et attend validation."
+                "action.transition.remove.payment": {
+                    "label": "Supprimer le paiement",
+                    "help": "L'association avec le paiement sera supprimée."
+                },
+                "action.transition.delete": {
+                    "label": "Supprimer le chèque bancaire",
+                    "help": "Le chèque bancaire sera définitivement supprimé."
                 },
                 "action.transition.reject": {
                     "label": "Rejeter",
                     "help": "Marquez le chèque bancaire comme rejeté par la banque."
-                },
-                "action.transition.pay": {
-                    "label": "Payer",
-                    "help": "Confirmez que le chèque bancaire a été payé et que le virement a été effectué."
-                },
-                "action.transition.add.payment": {
-                    "label": "Effectuer un paiement",
-                    "help": "L'enregistrement d'un paiement sera effectué et associé au financement."
                 }
             }
         }

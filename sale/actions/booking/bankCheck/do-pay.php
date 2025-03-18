@@ -87,7 +87,7 @@ $payment = Payment::create([
     ->read(['id'])
     ->first(true);
 
-BankCheck::id($bankCheck['id'])->update(['payment_id' => $payment['id']]);
+BankCheck::id($bankCheck['id'])->update(['payment_id' => $payment['id'], 'status' => 'paid']);
 
 Funding::id($bankCheck['funding_id'])->update(['is_paid' => true]);
 

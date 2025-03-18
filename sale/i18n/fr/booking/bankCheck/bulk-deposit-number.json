@@ -1,0 +1,19 @@
+{
+    "name": "Attribution d’un numéro de remise aux chèques bancaires",
+    "description": "Cette action attribue un numéro de remise officiel à une liste de chèques bancaires. Elle parcourt les identifiants fournis et met à jour chaque chèque avec le numéro de remise spécifié.",
+    "model": {
+        "ids": {
+            "label": "Identifiants",
+            "description": "Liste des identifiants uniques des chèques bancaires concernés.",
+            "help": ""
+        },
+        "deposit_number": {
+            "label": "Numéro de remise",
+            "description": "Numéro officiel de remise fourni par la banque, permettant de suivre tous les chèques associés.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {}
+    }
+}

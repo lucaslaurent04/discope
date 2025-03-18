@@ -9,9 +9,9 @@ use sale\booking\BankCheck;
 use sale\booking\Funding;
 
 list($params, $providers) = eQual::announce([
-    'description'   => "Associates a bank check with a funding and marks the funding as paid.",
-    'help'          => "Allows you to associate a bank check with a funding and update its status.
-                        No payment will be created. The association can be undone as long as the booking is not invoiced",
+    'description'   => "Creates a bank check and associates it with a funding record, updating its payment status.",
+    'help'          => "This action generates a new bank check and links it to an existing funding record, updating its status accordingly.  
+                    No actual payment transaction is processed. The association can be reversed as long as the booking has not been invoiced.",
     'params'        => [
         'id' =>  [
             'description'       => 'Identifier of the targeted funding.',
@@ -20,11 +20,23 @@ list($params, $providers) = eQual::announce([
             'required'          => true
         ],
 
-        'bank_check_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'sale\booking\BankCheck',
-            'description'       => 'The bank check associated with the funding.',
-            'required'          => true
+        'has_signature' => [
+            'type'              => 'boolean',
+            'description'       => "Has the bank check  the signature?",
+            'required'           => true,
+        ],
+
+        'amount' => [
+            'type'              => 'float',
+            'usage'             => 'amount/money:2',
+            'description'       => 'The monetary value of the bank check.',
+            'default'           => function($id = 0){
+                $funding = Funding::id($id)->read(['due_amount', 'paid_amount'])->first(true);
+                $remaining_amount = abs($funding['due_amount']) - abs($funding['paid_amount']);
+                if(!$funding) {
+                    return 0;
+                }
+                return  $remaining_amount ;}
         ],
 
     ],
@@ -45,21 +57,21 @@ list($params, $providers) = eQual::announce([
  */
 list($context, $om) = [ $providers['context'], $providers['orm'] ];
 
+
+if(!$params['has_signature']) {
+    throw new Exception('missing_has_signature', EQ_ERROR_MISSING_PARAM);
+}
+
+if($params['amount'] < 0) {
+    throw new Exception("invalidated_amount", QN_ERROR_INVALID_PARAM);
+}
+
 $funding = Funding::id($params['id'])
             ->read(['paid_amount', 'due_amount'])
             ->first(true);
 
 if(!$funding) {
     throw new Exception("unknown_funding", QN_ERROR_UNKNOWN_OBJECT);
-}
-
-$bankCheck = BankCheck::id($params['bank_check_id'])->read(['id','funding_id'])->first(true);
-if(!$bankCheck) {
-    throw new Exception("unknown_bank_check", QN_ERROR_UNKNOWN_OBJECT);
-}
-
-if($bankCheck['funding_id']) {
-    throw new Exception("funding_already_associated", QN_ERROR_UNKNOWN_OBJECT);
 }
 
 $sign = ($funding['due_amount'] >= 0)? 1 : -1;
@@ -69,16 +81,13 @@ if($remaining_amount <= 0) {
     throw new Exception("nothing_to_pay", QN_ERROR_INVALID_PARAM);
 }
 
-Funding::id($funding['id'])
-    ->update([
-        'is_paid' => true
+BankCheck::create([
+        'funding_id'        => $funding['id'],
+        'has_signature'     => $params['has_signature'],
+        'amount'            => $params['amount']
     ])
-    ->update([
-        'status' => 'in_process'
-    ])
-    ->read(['bank_check_ids']);
-
-BankCheck::id($params['bank_check_id'])->update(['funding_id' => $funding['id']]);
+    ->read(['id'])
+    ->first(true);
 
 $context->httpResponse()
         ->status(205)
