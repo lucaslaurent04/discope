@@ -1,25 +1,25 @@
 {
-    "name": "Paiement",
-    "description": "Cette action traite un paiement manuel par chèque bancaire, l'associe au financement correspondant et le marque comme payé.",
+    "name": "Paiement manuel par chèque",
+    "description": "Cette action enregistre un paiement manuel via un chèque bancaire pour régler le solde restant d'un financement, l'associe au financement correspondant et le marque comme payé.",
     "model": {
         "id": {
             "label": "Identifiant",
-            "description": "Identifiant de  cheque bancaire.",
+            "description": "Identifiant unique du chèque bancaire concerné.",
             "help": ""
         },
         "confirm": {
             "label": "Confirmer",
-            "description": "Confirmation manuelle.",
+            "description": "Confirmation explicite requise pour valider le paiement.",
             "help": ""
         }
     },
     "error": {
         "errors": {
             "missing_confirmation": "La confirmation de cette action est requise.",
-            "unknown_funding": "Réservation de financement.",
+            "unknown_funding": "Financement inconnu.",
             "unknown_bankCheck": "Chèque bancaire inconnu.",
-            "payment_already_associated": "Impossible d'enregistrer le paiement : il y a déjà un paiement associé.",
-            "nothing_to_pay": "Le financement est déjà payé en totalité."
+            "payment_already_associated": "Impossible d'enregistrer le paiement : un paiement est déjà associé à ce chèque.",
+            "nothing_to_pay": "Le financement est déjà entièrement réglé."
         }
     }
 }
