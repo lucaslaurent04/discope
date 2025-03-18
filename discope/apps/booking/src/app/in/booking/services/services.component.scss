@@ -19,8 +19,17 @@
     }
 
     .container {
-        height: 100%;
-        width: 100%;
+        position: relative;
+        width: calc(100% - 20px);
+        height: calc(100% - 10px);
+        border-radius: 10px;
+        margin-top: 10px;
+        margin-left: 5px;
+        overflow: hidden;
+        flex: 1 1 100%;
+        box-sizing: border-box;
+        background-color: white;
+        z-index: 2;
 
         &.hidden {
             display: none;
@@ -31,7 +40,6 @@
             padding-left: 12px;
             height: 48px;
             line-height: 48px;
-            border-bottom: solid 1px lightgrey;
             font-size: 24px;
 
             a {
