@@ -6,18 +6,33 @@
     },
     "actions": [
         {
-            "id": "action.transition.register",
-            "label": "Submit",
-            "controller": "model_transition",
-            "params": {
-                "entity": "sale\\booking\\BankCheck",
-                "transition": "process",
-                "ids": []
+            "id": "action.transition.add.payment",
+            "label": "Add Payment",
+            "controller": "sale_booking_bankCheck_do-pay",
+            "access": {
+                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
             },
             "visible": [
-                ["state", "<>", "draft"],
-                ["status", "=", "registered"]
+                ["status", "=", "pending"]
             ]
+        },
+        {
+            "id": "action.transition.remove.payment",
+            "label": "Remove Payment",
+            "controller": "sale_booking_bankCheck_remove-pay",
+            "access": {
+                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
+            },
+            "visible": ["status", "=", "paid"]
+        },
+        {
+            "id": "action.transition.delete",
+            "label": "Delete Bank Check",
+            "controller": "sale_booking_bankCheck_remove-bankCheck",
+            "access": {
+                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
+            },
+            "visible": ["state", "<>", "draft"]
         },
         {
             "id": "action.transition.reject",
@@ -29,34 +44,7 @@
                 "ids": []
             },
             "visible": [
-                ["state", "<>", "draft"],
-                ["status", "=", "in_process"]
-            ]
-        },
-        {
-            "id": "action.transition.pay",
-            "label": "Reject",
-            "controller": "model_transition",
-            "params": {
-                "entity": "sale\\booking\\BankCheck",
-                "transition": "paid",
-                "ids": []
-            },
-            "visible": [
-                ["state", "<>", "draft"],
-                ["status", "=", "in_process"]
-            ]
-        },
-        {
-            "id": "action.transition.add.payment",
-            "label": "Add Payment",
-            "controller": "sale_booking_bankCheck_do-pay",
-            "access": {
-                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
-            },
-            "visible": [
-                ["state", "<>", "draft"],
-                ["payment_id", "=", null]
+                ["status", "<>", "rejected"]
             ]
         }
     ],
@@ -93,6 +81,11 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "deposit_number",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "has_signature",
                                                 "width": "50%"
                                             },
@@ -109,9 +102,7 @@
                                             {
                                                 "type": "field",
                                                 "value": "funding_id",
-                                                "width": "50%",
-                                                "readonly": true,
-                                                "visible": ["state", "<>", "draft"]
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
