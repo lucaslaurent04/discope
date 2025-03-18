@@ -128,20 +128,6 @@ if($channelmanager_enabled) {
             'rental_units_ids' => array_merge([$params['rental_unit_id']], $rental_unit['children_ids'])
         ]
     );
-
-    // #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
-    $cron->schedule(
-        "channelmanager.check-contingencies.{$repairing['id']}",
-        time(),
-        'lodging_booking_check-contingencies',
-        [
-            'date_from'        => date('c', $params['date_from']),
-            // repairings completely cover the last day of the date range
-            'date_to'          => date('c', strtotime('+1 day', $params['date_to'])),
-            'rental_units_ids' => array_merge([$params['rental_unit_id']], $rental_unit['children_ids'])
-        ]
-    );
-
 }
 
 $context->httpResponse()

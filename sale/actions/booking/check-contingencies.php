@@ -196,18 +196,6 @@ if($params['date_from'] <= $last_updatable_day) {
                             ]
                         );
 
-                    // #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
-                    $cron->schedule(
-                            "channelmanager.check-contingencies.retry.{$room_type['center_id']}",
-                            time()+(5*60),
-                            'lodging_booking_check-contingencies',
-                            [
-                                'date_from'         => date('c', $date_index),
-                                'date_to'           => date('c', strtotime($date_index.' +1day')),
-                                'rental_units_ids'  => $room_type['rental_units_ids']
-                            ]
-                        );
-
                 }
             }
         }
