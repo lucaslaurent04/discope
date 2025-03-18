@@ -260,7 +260,7 @@
             span {
                 font-size: 13px;
 
-                &.employee-name {
+                &.partner-name {
                     font-size: calc(8px + (var(--rows_height) / 5));
                 }
             }
@@ -376,12 +376,12 @@
             cursor: default;
             user-select: none;
 
-            &.employee {
+            &.partner {
                 position: relative;
                 cursor: pointer;
                 width: 200px;
 
-                span.employee-name {
+                span.partner-name {
                     position: absolute;
                     top: 50%;
                     transform: translateY(-50%);

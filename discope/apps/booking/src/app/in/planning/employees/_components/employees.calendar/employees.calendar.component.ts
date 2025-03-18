@@ -10,14 +10,34 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
+class Partner {
+    constructor(
+        public id: number = 0,
+        public name: string = '',
+        public relationship: 'employee'|'provider' = 'employee',
+        public is_active: boolean = true
+    ) {}
+}
 
-class Employee {
+class Employee extends Partner {
     constructor(
         public id: number = 0,
         public name: string = '',
         public is_active: boolean = true,
         public activity_product_models_ids: any[] = []
-    ) {}
+    ) {
+        super(id, name, 'employee', is_active);
+    }
+}
+
+class Provider extends Partner {
+    constructor(
+        public id: number = 0,
+        public name: string = '',
+        public is_active: boolean = true
+    ) {
+        super(id, name, 'provider');
+    }
 }
 
 @Component({
@@ -30,7 +50,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     @Input() rowsHeight: number;
     @Output() filters = new EventEmitter<ChangeReservationArg>();
     @Output() showBooking = new EventEmitter();
-    @Output() showEmployee = new EventEmitter();
+    @Output() showPartner = new EventEmitter();
 
     @Output() openLegendDialog = new EventEmitter();
     @Output() openPrefDialog = new EventEmitter();
@@ -53,7 +73,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     public cellsWidth: number;
 
     public activities: any = [];
-    public employees: any = [];
+    public partners: any = [];
     public holidays: any = [];
     // count of rental units taken under account (not necessarily equal to `rental_units.length`)
     public count_rental_units: number = 0;
@@ -61,7 +81,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     public hovered_activity: any;
     private hoveredActivityTimeout: any = null;
 
-    public hovered_employee: any;
+    public hovered_partner: any;
     public hovered_holidays: any;
 
     public hover_row_index = -1;
@@ -86,26 +106,10 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
     public currentDraggedActivity: any = null;
 
-    public mapStats: any = {
-        'occupied': {},
-        'capacity': {},
-        'blocked': {},
-        'occupancy': {},
-        'arrivals_expected': {},
-        'arrivals_confirmed': {},
-        'departures_expected': {},
-        'departures_confirmed': {}
-    };
-
     private mousedownTimeout: any;
 
     // duration history as hint for refreshing cell width
     private previous_duration: number;
-
-    private show_parents: boolean = false;
-    private show_children: boolean = false;
-    private today: Date;
-    private today_index: string;
 
     public emptyEmployee = new Employee();
 
@@ -116,16 +120,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         private elementRef: ElementRef,
         private cd: ChangeDetectorRef) {
             this.headers = {};
-            this.employees = [];
+            this.partners = [];
             this.previous_duration = 0;
-            this.show_parents = (localStorage.getItem('planning_show_parents') === 'true');
-            this.show_children = (localStorage.getItem('planning_show_children') === 'true');
-            if(!this.show_parents && !this.show_children) {
-                this.show_parents = true;
-                this.show_children = true;
-            }
-            this.today = new Date();
-            this.today_index = this.calcDateIndex(this.today);
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
@@ -175,12 +171,6 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         if(full) {
             this.loading = true;
 
-            this.show_parents = (localStorage.getItem('planning_show_parents') === 'true');
-            this.show_children = (localStorage.getItem('planning_show_children') === 'true');
-            if(!this.show_parents && !this.show_children) {
-                this.show_parents = true;
-                this.show_children = true;
-            }
             // refresh the view, then run onchange
             setTimeout( async () => {
                 await this.onFiltersChange();
@@ -204,22 +194,14 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return (day.getDay() == 0 || day.getDay() == 6);
     }
 
-    public isToday(day:Date) {
-        return (day.getDate() == this.today.getDate() && day.getMonth() == this.today.getMonth() && day.getFullYear() == this.today.getFullYear());
-    }
-/*
-    public isTodayIndex(day_index:string) {
-        return (this.today_index == day_index);
-    }
-*/
-    public hasActivity(employee: Employee, day_index: string, time_slot: string): boolean {
-        return (this.activities[employee.id]?.[day_index]?.[time_slot] ?? []).length > 0;
+    public hasActivity(partner: Partner, day_index: string, time_slot: string): boolean {
+        return (this.activities[partner.id]?.[day_index]?.[time_slot] ?? []).length > 0;
     }
 
-    public getActivities(employee:Employee, day: Date, time_slot: string): any {
-        if(this.activities[employee.id] ?? false) {
+    public getActivities(partner: Partner, day: Date, time_slot: string): any {
+        if(this.activities[partner.id] ?? false) {
             let date_index:string = this.calcDateIndex(day);
-            return this.activities[employee.id]?.[date_index]?.[time_slot] ?? {};
+            return this.activities[partner.id]?.[date_index]?.[time_slot] ?? {};
         }
         return {};
     }
@@ -253,24 +235,34 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         this.createHeaderDays();
 
         try {
-            const domain: any[] = [
+            const employees_domain = [
                 ['relationship', '=', 'employee'],
-                ['id', 'in', this.params.employees_ids]
+                ['id', 'in', this.params.partners_ids]
             ];
 
             const employees = await this.api.collect(
                 'hr\\employee\\Employee',
-                domain,
+                employees_domain,
                 Object.getOwnPropertyNames(new Employee()),
                 'name', 'asc', 0, 500
             );
 
-            if(employees) {
-                this.employees = employees;
-            }
+            const providers_domain = [
+                ['relationship', '=', 'provider'],
+                ['id', 'in', this.params.partners_ids]
+            ];
+
+            const providers = await this.api.collect(
+                'sale\\provider\\Provider',
+                providers_domain,
+                Object.getOwnPropertyNames(new Provider()),
+                'name', 'asc', 0, 500
+            );
+
+            this.partners = [...employees, ...providers];
         }
         catch(response) {
-            console.warn('unable to fetch employees', response);
+            console.warn('unable to fetch partners', response);
         }
 
         try {
@@ -278,7 +270,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 // #memo - all dates are considered UTC
                 date_from: this.calcDateIndex(this.params.date_from),
                 date_to: this.calcDateIndex(this.params.date_to),
-                employees_ids: JSON.stringify(this.params.employees_ids)
+                employees_ids: JSON.stringify(this.params.partners_ids)
             });
         }
         catch(response: any ) {
@@ -413,13 +405,13 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         this.showBooking.emit(event);
     }
 
-    public onSelectedEmployee(employee: any) {
+    public onSelectedPartner(partner: any) {
         clearTimeout(this.mousedownTimeout);
-        this.showEmployee.emit(employee);
+        this.showPartner.emit(partner);
     }
 
     public onhoverDay(employee: any, day:Date) {
-        this.hovered_employee = employee;
+        this.hovered_partner = employee;
 
         if(day) {
             let date_index:string = this.calcDateIndex(day);
@@ -432,8 +424,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         }
     }
 
-    public onhoverEmployee(employee: any) {
-        this.hovered_employee = employee;
+    public onhoverPartner(employee: any) {
+        this.hovered_partner = employee;
     }
 
     public onmouseleaveTable() {
@@ -611,6 +603,10 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     private isDroppable(activity: any, employee: Employee, date_index: string, time_slot: string) {
+        if(employee.relationship !== 'employee') {
+            return false;
+        }
+
         const activity_date_index = this.calcDateIndex(new Date(activity.activity_date));
 
                // Check drop and activity moment match
@@ -645,15 +641,10 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
 
             // #todo - (?) tenir compte du type (event_type)
-            let old_employee_id = this.currentDraggedActivity.employee_id ? this.currentDraggedActivity.employee_id.id : this.currentDraggedActivity.employee_id;
+            let old_employee_id = this.currentDraggedActivity.employee_id ?? 0;
 
-console.log(time_slot, date_index, old_employee_id);
-
-            console.log(JSON.stringify(this.activities[old_employee_id][date_index][time_slot]))
             // remove from this.activities[0][date_index][time_slot]
             this.activities[old_employee_id][date_index][time_slot] = this.activities[old_employee_id][date_index][time_slot].filter( (activity: any) => activity.id !== this.currentDraggedActivity.id);
-
-            console.log(JSON.stringify(this.activities[old_employee_id][date_index][time_slot]))
 
             // add to unassigned activities
             if(!(this.activities[0] ?? false)) {
@@ -666,7 +657,8 @@ console.log(time_slot, date_index, old_employee_id);
                 this.activities[0][date_index][time_slot] = [];
             }
 
-            this.currentDraggedActivity.employee_id = this.emptyEmployee;
+            this.currentDraggedActivity.partner_id = null;
+            this.currentDraggedActivity.employee_id = null;
             this.activities[0][date_index][time_slot].push(this.currentDraggedActivity);
 
             // update back-end
@@ -701,7 +693,7 @@ console.log(time_slot, date_index, old_employee_id);
                 element.style.setProperty('background-color', '');
 
                 // #todo - (?) tenir compte du type (event_type)
-                let old_employee_id = this.currentDraggedActivity.employee_id ? this.currentDraggedActivity.employee_id.id : this.currentDraggedActivity.employee_id;
+                let old_employee_id = this.currentDraggedActivity.employee_id ?? 0;
 
                 // remove from this.activities[0][date_index][time_slot]
                 this.activities[old_employee_id][date_index][time_slot] = this.activities[old_employee_id][date_index][time_slot].filter( (activity: any) => activity.id !== this.currentDraggedActivity.id);
@@ -717,7 +709,8 @@ console.log(time_slot, date_index, old_employee_id);
                     this.activities[employee.id][date_index][time_slot] = [];
                 }
 
-                this.currentDraggedActivity.employee_id = employee;
+                this.currentDraggedActivity.partner_id = employee;
+                this.currentDraggedActivity.employee_id = employee.id;
                 this.activities[employee.id][date_index][time_slot].push(this.currentDraggedActivity);
 
                 // this.headers.days = this.headers.days.slice();

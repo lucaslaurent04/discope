@@ -3,20 +3,20 @@
         <mat-form-field>
             <mat-select #centerSelector
                         multiple
-                        [(ngModel)]="selected_employees_ids"
+                        [(ngModel)]="selected_partners_ids"
                         panelClass="centers-selector"
                         [disableOptionCentering]="true"
-                        (closed)="onchangeSelectedEmployees()"
-                        (selectionChange)="onchangeSelectedEmployees()"
+                        (closed)="onchangeSelectedPartners()"
+                        (selectionChange)="onchangeSelectedPartners()"
             >
                 <mat-optgroup [label]="'Sélection'">
-                    &nbsp; <a style="cursor: pointer;" (click)="onclickSelectAllEmployees()">Tous</a>
-                    &nbsp; <a style="cursor: pointer;" (click)="onclickUnselectAllEmployees()">Aucun</a>
+                    &nbsp; <a style="cursor: pointer;" (click)="onclickSelectAllPartners()">Tous</a>
+                    &nbsp; <a style="cursor: pointer;" (click)="onclickUnselectAllPartners()">Aucun</a>
                     &nbsp; <a style="cursor: pointer;" (click)="onclickSelectInternal()">Interne</a>
                     &nbsp; <a style="cursor: pointer;" (click)="onclickSelectExternal()">Externe</a>
                 </mat-optgroup>
-                <mat-option *ngFor="let employee of employees" [value]="employee.id">
-                    {{employee.name}}
+                <mat-option *ngFor="let partner of partners" [value]="partner.id">
+                    {{partner.name}}
                 </mat-option>
             </mat-select>
         </mat-form-field>
@@ -90,7 +90,7 @@
 
 <div class="overlay">
     <div class="rental-unit-details">
-        <span *ngIf="employee">{{employee.name}} ({{employee.capacity}})</span>
+        <span *ngIf="partner">{{partner.name}} ({{partner.relationship === 'employee' ? 'Employé' : 'Prestataire'}})</span>
     </div>
     <div class="consumption-details">
         <span *ngIf="activity">

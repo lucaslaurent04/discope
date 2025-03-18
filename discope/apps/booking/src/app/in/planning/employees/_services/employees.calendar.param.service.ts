@@ -16,7 +16,7 @@ export class PlanningEmployeesCalendarParamService {
     private _date_to: Date;
     // duration in days
     private _duration: number;
-    private _employees_ids: number[];
+    private _partners_ids: number[];
 
     // timeout handler for debounce
     private timeout: any;
@@ -31,7 +31,7 @@ export class PlanningEmployeesCalendarParamService {
      * Current state according to instant values of the instance.
      */
     private getState(): string {
-        return this._date_from.getTime() + this._date_to.getTime() + this._employees_ids.toString()
+        return this._date_from.getTime() + this._date_to.getTime() + this._partners_ids.toString()
     }
 
     private treatAsUTC(date:Date): Date {
@@ -66,7 +66,7 @@ export class PlanningEmployeesCalendarParamService {
         this._date_from = new Date('2025-06-01'); // TODO: fix
         this._date_to = new Date(this._date_from.getTime());
         this._date_to.setDate(this._date_from.getDate() + this._duration);
-        this._employees_ids = [];
+        this._partners_ids = [];
         this.state = this.getState();
     }
 
@@ -74,8 +74,8 @@ export class PlanningEmployeesCalendarParamService {
         return this.observable;
     }
 
-    public set employees_ids(employees_ids: number[]) {
-        this._employees_ids = [...employees_ids];
+    public set partners_ids(partners_ids: number[]) {
+        this._partners_ids = [...partners_ids];
         this.updateRange();
     }
 
@@ -89,8 +89,8 @@ export class PlanningEmployeesCalendarParamService {
         this.updateRange();
     }
 
-    public get employees_ids(): number[] {
-        return this._employees_ids;
+    public get partners_ids(): number[] {
+        return this._partners_ids;
     }
 
     public get date_from(): Date {
