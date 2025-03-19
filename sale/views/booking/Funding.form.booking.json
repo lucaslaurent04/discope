@@ -53,8 +53,7 @@
             "confirm": true,
             "access": {
                 "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
-            },
-            "visible": ["is_paid", "=", false]
+            }
         },
         {
             "id": "action.unpay_instant",
@@ -289,9 +288,9 @@
                                                 "widget": {
                                                     "header": {
                                                         "actions": {
-                                                            "ACTION.CREATE" : false
+                                                            "ACTION.CREATE" : true
                                                         },
-                                                        "selection": false
+                                                        "selection": true
                                                     }
                                                 }
                                             }

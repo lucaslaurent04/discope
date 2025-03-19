@@ -21,8 +21,7 @@ class BankCheck extends Model {
 
             'bankCheck_number' => [
                 'type'              => 'string',
-                'description'       => 'The official unique number assigned to the bank check by the issuing bank.',
-                'required'          => true
+                'description'       => 'The official unique number assigned to the bank check by the issuing bank.'
             ],
 
             'amount' => [
@@ -39,20 +38,19 @@ class BankCheck extends Model {
 
             'has_signature' => [
                 'type'              => 'boolean',
-                'description'       => "The bank check has the signature validated",
+                'description'       => "The bank check has the signature",
                 'default'           => true,
             ],
 
             'status' => [
                 'type'              => 'string',
                 'selection'         => [
-                    'registered',
-                    'in_process',
+                    'pending',
                     'paid',
                     'rejected'
                 ],
                 'description'       => 'The current processing status of the bank check.',
-                'default'           => 'registered'
+                'default'           => 'pending'
             ],
 
             'funding_id' => [
@@ -65,42 +63,45 @@ class BankCheck extends Model {
                 'type'              => 'string',
                 'usage'             => 'text/plain',
                 'description'       => "'A detailed description or note related to this bank check."
+            ],
+
+            'deposit_number' => [
+                'type'        => 'string',
+                'description' => 'The official deposit number provided by the bank, used to track all associated checks.',
             ]
         ];
     }
 
     public static function getWorkflow() {
         return [
-            'registered' => [
-                'description' => 'The bank check has been enregistred and waiting to been tranfert to the bank.',
-                'icon' => 'edit',
-                'transitions' => [
-                    'process' => [
-                        'description' => 'Sets the bank check as ready for transfering.',
-                        'status' => 'in_process',
-                    ],
-                ],
-            ],
-            'in_process' => [
-                'description' => 'The bank check has been tranfering for the banck and it is waitong for the validation.',
-                'icon' => 'pending',
+            'pending' => [
+                'description' => 'The bank check has been registered and is waiting to be transferred to the bank.',
                 'transitions' => [
                     'reject' => [
-                        'description' => 'The back check has been rejeted for the bank.',
+                        'description' => 'The bank check has been rejected by the bank.',
                         'status' => 'rejected',
                     ],
                     'pay' => [
-                        'description' => 'The back check has been  paid for the banck and a transfer was been created in the banck stament line.',
+                        'description' => 'The bank check has been marked as paid, and a transfer has been created in the bank statement.',
                         'status' => 'paid',
                     ],
                 ],
             ],
-            'rejected' => [
-                'description' => 'The bank check as been paid for the rejected, it must to conect to the client.',
-                'transitions' => [],
-            ],
             'paid' => [
-                'description' => 'The bank check as been paid for the paid, it can be payment to the funding.',
+                'description' => 'The bank check has been marked as paid. It can now be linked to the funding.',
+                'transitions' => [
+                    'pending' => [
+                        'description' => 'The payment has been removed and funding has been updated.',
+                        'status' => 'pending',
+                    ],
+                    'reject' => [
+                        'description' => 'The bank check has been rejected by the bank.',
+                        'status' => 'rejected',
+                    ],
+                ],
+            ],
+            'rejected' => [
+                'description' => 'The bank check has been rejected. The client must be contacted.',
                 'transitions' => [],
             ],
         ];
@@ -114,14 +115,6 @@ class BankCheck extends Model {
     }
 
     public static function cancreate($om, $values, $lang) {
-        if (isset($values['funding_id'])) {
-            $funding = Funding::id($values['funding_id'])->read(['is_paid'])->first(true);
-
-            if ($funding['is_paid']) {
-                return ['funding_id' => ['non_editable' => 'Modifications are not allowed once the funding has been fully paid.']];
-            }
-        }
-
         return self::validateAmount($values, function() use ($om, $values, $lang) {
             return parent::cancreate($om, $values, $lang);
         });
