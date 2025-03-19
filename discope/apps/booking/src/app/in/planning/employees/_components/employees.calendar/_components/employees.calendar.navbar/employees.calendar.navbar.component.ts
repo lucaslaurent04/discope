@@ -218,17 +218,17 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
             this.selectedProductCategory = category;
 
             if(category.id > 0) {
-                this.filteredProductModels = this.aggregatedProductModels(
-                    this.productModels.filter((productModel) => {
-                        return productModel.categories_ids.map(p => +p).includes(categoryId);
-                    })
-                );
+                const productModels = this.productModels.filter((productModel) => {
+                    return productModel.categories_ids.map(p => +p).includes(categoryId);
+                });
+
+                this.filteredProductModels = this.aggregatedProductModels(productModels);
+                this.params.product_model_ids = productModels.map(p => p.id);
             }
             else {
                 this.filteredProductModels = this.aggregatedProductModels(this.productModels);
+                this.params.product_model_ids = [];
             }
-
-            this.params.product_model_ids = this.filteredProductModels.map(p => p.id);
         }
         else {
             let productModelId = +this.selectedCatOrProductModelCode.split('_')[1];
