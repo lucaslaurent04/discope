@@ -77,28 +77,25 @@ if(isset($params['date_to']) && $params['date_to'] > 0) {
     $domain = Domain::conditionAdd($domain, ['created', '<=', $params['date_to']]);
 }
 
-if(isset($params['center_id'])) {
+if(isset($params['center_id'])  && $params['center_id'] > 0) {
     $domain = Domain::conditionAdd($domain, ['center_id', '=', $params['center_id']]);
 }
 
-if(isset($params['user_id'])) {
+if(isset($params['user_id'])  && $params['center_id'] > 0) {
     $cashdeskSession_ids= CashdeskSession::search(['user_id', '=', $params['user_id']])->ids();
     if(count($cashdeskSession_ids)) {
         $domain = Domain::conditionAdd($domain, ['session_id', 'in', $cashdeskSession_ids]);
     }
 }
 
-if(isset($params['funding_id'])) {
+if(isset($params['funding_id'])  && $params['center_id'] > 0) {
     $domain = Domain::conditionAdd($domain, ['funding_id', '=', $params['funding_id']]);
 }
 
 $result = NULL;
 
-if ($domain != $params['domain'])
-{
-    $params['domain'] = $domain;
-    $result = eQual::run('get', 'model_collect', $params, true);
-}
+$params['domain'] = $domain;
+$result = eQual::run('get', 'model_collect', $params, true);
 
 $context->httpResponse()
         ->body($result)
