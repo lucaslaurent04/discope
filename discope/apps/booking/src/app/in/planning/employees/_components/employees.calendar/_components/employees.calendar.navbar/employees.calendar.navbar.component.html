@@ -1,10 +1,10 @@
 <div class="panelFilters">
-    <div class="centers-selector">
+    <div class="partners-selector">
         <mat-form-field>
-            <mat-select #centerSelector
+            <mat-select #partnerSelector
                         multiple
                         [(ngModel)]="selected_partners_ids"
-                        panelClass="centers-selector"
+                        panelClass="partners-selector"
                         [disableOptionCentering]="true"
                         (closed)="onchangeSelectedPartners()"
                         (selectionChange)="onchangeSelectedPartners()"
@@ -23,6 +23,28 @@
                 </ng-container>
             </mat-select>
         </mat-form-field>
+    </div>
+    <div class="product-model-selector">
+        <mat-form-field>
+            <mat-select #productModelSelector
+                        [(ngModel)]="selectedCatOrProductModelCode"
+                        panelClass="product-model-selector"
+                        (selectionChange)="onchangeCatOrProductModelCode()"
+            >
+                <mat-optgroup [label]="'Catégories'">
+                    <mat-option *ngFor="let category of productModelCategories" [value]="'cat_'+category.id">
+                        {{category.name}}
+                    </mat-option>
+                </mat-optgroup>
+                <mat-optgroup [label]="'Modèles de produit (' + selectedProductCategory.name + ')'">
+                    <mat-option *ngFor="let model of filteredProductModels" [value]="'mod_'+model.id">
+                        {{model.name}}
+                    </mat-option>
+                </mat-optgroup>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div class="info-settings">
         <button mat-icon-button (click)="onOpenLegendDialog()"><mat-icon>info</mat-icon></button>
         <button mat-icon-button (click)="onOpenPrefDialog()"><mat-icon>settings</mat-icon></button>
     </div>

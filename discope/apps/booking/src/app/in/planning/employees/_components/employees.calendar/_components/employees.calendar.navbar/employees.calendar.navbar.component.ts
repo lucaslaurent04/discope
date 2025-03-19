@@ -8,6 +8,24 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
 
+type ProductCategory = {
+    id: number,
+    name: string
+}
+
+type ProductModelType = {
+    id: number,
+    name: string,
+    categories_ids: number[]
+}
+
+type AggregatedProductModelType = {
+    id: number,
+    name: string,
+    categories_ids: number[],
+    product_models_ids: number[]
+}
+
 @Component({
   selector: 'planning-employees-calendar-navbar',
   templateUrl: './employees.calendar.navbar.component.html',
@@ -17,20 +35,29 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
     @Input() activity: any;
     @Input() partner: any;
     @Input() holidays: any;
+
     @Output() changedays = new EventEmitter<ChangeReservationArg>();
     @Output() refresh = new EventEmitter<Boolean>();
-    @ViewChild('centerSelector') partnerSelector: MatSelect;
-
     @Output() openLegendDialog = new EventEmitter();
     @Output() openPrefDialog = new EventEmitter();
     @Output() fullScreen = new EventEmitter();
 
-    dateFrom: Date;
-    dateTo: Date;
-    duration: number;
+    @ViewChild('productModelSelector') productModelSelector: MatSelect;
+    @ViewChild('partnerSelector') partnerSelector: MatSelect;
 
-    partners: any[] = [];
-    selected_partners_ids: any[] = [];
+    private dateFrom: Date;
+    private dateTo: Date;
+    public duration: number;
+
+    private allProductCategory: ProductCategory = { id: 0, name: 'TOUTES' };
+    public productModelCategories: ProductCategory[] = [];
+    public selectedProductCategory: ProductCategory = this.allProductCategory;
+    private productModels: ProductModelType[] = [];
+    public filteredProductModels: AggregatedProductModelType[] = [];
+    public selectedCatOrProductModelCode: string = 'cat_0';
+
+    public partners: any[] = [];
+    public selected_partners_ids: any[] = [];
 
     vm: any = {
         duration:   '31',
@@ -46,7 +73,7 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
         private params: PlanningEmployeesCalendarParamService
     ) {}
 
-    public ngOnInit() {
+    public async ngOnInit() {
 
         /*
             Setup events listeners
@@ -65,7 +92,7 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
                 this.vm.date_range.get("date_to").setValue(this.dateTo);
             });
 
-        // by default set the first center of current user
+        // use user centers_ids to filter displayed employees
         this.auth.getObservable()
             .subscribe( async (user:any) => {
                 if(!user.hasOwnProperty('centers_ids') || !user.centers_ids.length) {
@@ -120,6 +147,55 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
                     console.warn(err) ;
                 }
             });
+
+        this.productModelCategories = [
+            this.allProductCategory,
+            ...await this.api.collect(
+                'sale\\catalog\\Category',
+                [],
+                ['id', 'name'],
+                'name', 'asc', 0, 500
+            )
+        ];
+
+        this.productModels = await this.api.collect(
+            'sale\\catalog\\ProductModel',
+            [['can_sell', '=', true], ['is_activity', '=', true]],
+            ['id', 'name', 'categories_ids'],
+            'name', 'asc', 0, 500
+        );
+
+        this.filteredProductModels = this.aggregatedProductModels(this.productModels);
+    }
+
+    /**
+     * Aggregate product models to not repeat the same name
+     *
+     * @param productModels
+     * @private
+     */
+    private aggregatedProductModels(productModels: ProductModelType[]): AggregatedProductModelType[] {
+        const aggregateProductModels: AggregatedProductModelType[] = [];
+
+        for(let productModel of productModels) {
+            const index = aggregateProductModels.findIndex((pm) => pm.name === productModel.name);
+            if(index >= 0) {
+                aggregateProductModels[index].product_models_ids.push(productModel.id);
+                for(let categoryId of productModel.categories_ids) {
+                    if(!aggregateProductModels[index].categories_ids.includes(categoryId)) {
+                        aggregateProductModels[index].categories_ids.push(categoryId);
+                    }
+                }
+            }
+            else {
+                aggregateProductModels.push({
+                    ...productModel,
+                    product_models_ids: [productModel.id]
+                });
+            }
+        }
+
+        return aggregateProductModels;
     }
 
     public onOpenLegendDialog() {
@@ -134,9 +210,42 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
         this.fullScreen.emit();
     }
 
+    public async onchangeCatOrProductModelCode() {
+        if(this.selectedCatOrProductModelCode.startsWith('cat_')) {
+            let categoryId = +this.selectedCatOrProductModelCode.split('_')[1];
+            const category = this.productModelCategories.find((pc) => pc.id === categoryId);
+
+            this.selectedProductCategory = category;
+
+            if(category.id > 0) {
+                this.filteredProductModels = this.aggregatedProductModels(
+                    this.productModels.filter((productModel) => {
+                        return productModel.categories_ids.map(p => +p).includes(categoryId);
+                    })
+                );
+            }
+            else {
+                this.filteredProductModels = this.aggregatedProductModels(this.productModels);
+            }
+
+            this.params.product_model_ids = this.filteredProductModels.map(p => p.id);
+        }
+        else {
+            let productModelId = +this.selectedCatOrProductModelCode.split('_')[1];
+
+            const aggregatedProductModel = this.filteredProductModels.find((pm) => pm.id === productModelId);
+            if(aggregatedProductModel) {
+                this.params.product_model_ids = aggregatedProductModel.product_models_ids;
+            }
+            else {
+                this.params.product_model_ids = [productModelId];
+            }
+        }
+    }
+
     public async onchangeDateRange() {
-        let start = this.vm.date_range.get("date_from").value;
-        let end = this.vm.date_range.get("date_to").value;
+        let start = this.vm.date_range.get('date_from').value;
+        let end = this.vm.date_range.get('date_to').value;
 
         if(!start || !end) return;
 
@@ -149,12 +258,11 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
         }
 
         if(start <= end) {
-
             // relay change to parent component
             if((start.getTime() != this.dateFrom.getTime() || end.getTime() != this.dateTo.getTime())) {
                 //  update local members and relay to params service
-                this.dateFrom = this.vm.date_range.get("date_from").value;
-                this.dateTo = this.vm.date_range.get("date_to").value;
+                this.dateFrom = this.vm.date_range.get('date_from').value;
+                this.dateTo = this.vm.date_range.get('date_to').value;
                 this.params.date_from = this.dateFrom;
                 this.params.date_to = this.dateTo;
             }
