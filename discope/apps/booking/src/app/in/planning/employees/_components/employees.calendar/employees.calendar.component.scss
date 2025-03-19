@@ -114,6 +114,7 @@
                             .cell-activities {
                                 display: flex;
                                 flex-direction: column;
+                                gap: 1px;
                             }
                         }
                         .cdk-drag-placeholder {
