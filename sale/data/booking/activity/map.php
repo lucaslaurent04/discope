@@ -25,6 +25,11 @@ use sale\provider\Provider;
             'type'          => 'array',
             'default'       => []
         ],
+        'product_model_ids' =>  [
+            'description'   => 'Identifiers of the product models for which the activities are requested.',
+            'type'          => 'array',
+            'default'       => []
+        ],
         'date_from' => [
             'description'   => 'Start of time-range for the lookup.',
             'type'          => 'date',
@@ -57,10 +62,15 @@ use sale\provider\Provider;
 // #memo - processing of this controller might be heavy, so we make sure AC does not check permissions for each single consumption
 $auth->su();
 
-$activities_ids = $orm->search(BookingActivity::getType(), [
+$domain = [
     ['activity_date', '>=', $params['date_from']],
     ['activity_date', '<=', $params['date_to']]
-]);
+];
+if(!empty($params['product_model_ids'])) {
+    $domain[] = ['product_model_id', 'in', $params['product_model_ids']];
+}
+
+$activities_ids = $orm->search(BookingActivity::getType(), $domain);
 
 $domain = [];
 if(!empty($params['partners_ids'])) {
@@ -85,7 +95,7 @@ if(!empty($params['partners_ids'])) {
     if(!empty($employees_ids)) {
         $domain[] = [
             ['id', 'in', $activities_ids],
-            ['employee_id', 'in', $params['employees_ids']]
+            ['employee_id', 'in', $employees_ids]
         ];
     }
     if(!empty($providers_ids)) {

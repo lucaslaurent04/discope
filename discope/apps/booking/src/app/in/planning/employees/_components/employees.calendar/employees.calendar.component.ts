@@ -270,7 +270,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 // #memo - all dates are considered UTC
                 date_from: this.calcDateIndex(this.params.date_from),
                 date_to: this.calcDateIndex(this.params.date_to),
-                employees_ids: JSON.stringify(this.params.partners_ids)
+                partners_ids: JSON.stringify(this.params.partners_ids),
+                product_model_ids: JSON.stringify(this.params.product_model_ids)
             });
         }
         catch(response: any ) {

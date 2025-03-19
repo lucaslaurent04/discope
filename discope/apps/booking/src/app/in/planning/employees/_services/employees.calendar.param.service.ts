@@ -17,6 +17,7 @@ export class PlanningEmployeesCalendarParamService {
     // duration in days
     private _duration: number;
     private _partners_ids: number[];
+    private _product_model_ids: number[];
 
     // timeout handler for debounce
     private timeout: any;
@@ -31,7 +32,7 @@ export class PlanningEmployeesCalendarParamService {
      * Current state according to instant values of the instance.
      */
     private getState(): string {
-        return this._date_from.getTime() + this._date_to.getTime() + this._partners_ids.toString()
+        return this._date_from.getTime() + this._date_to.getTime() + this._partners_ids.toString() + this._product_model_ids.toString();
     }
 
     private treatAsUTC(date:Date): Date {
@@ -62,12 +63,25 @@ export class PlanningEmployeesCalendarParamService {
     */
     public init() {
         this._duration = 7;
-        // #todo - toujours commencer le lundi par défaut
-        this._date_from = new Date('2025-06-01'); // TODO: fix
+        this._date_from = this.getPreviousMonday();
         this._date_to = new Date(this._date_from.getTime());
         this._date_to.setDate(this._date_from.getDate() + this._duration);
         this._partners_ids = [];
+        this._product_model_ids = [];
         this.state = this.getState();
+    }
+
+    private getPreviousMonday() {
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+
+        if(dayOfWeek === 1) {
+            return today;
+        }
+
+        const daysToSubtract = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
+        today.setDate(today.getDate() - daysToSubtract);
+        return today;
     }
 
     public getObservable(): Subject<any> {
@@ -76,6 +90,11 @@ export class PlanningEmployeesCalendarParamService {
 
     public set partners_ids(partners_ids: number[]) {
         this._partners_ids = [...partners_ids];
+        this.updateRange();
+    }
+
+    public set product_model_ids(product_model_ids: number[]) {
+        this._product_model_ids = [...product_model_ids];
         this.updateRange();
     }
 
@@ -91,6 +110,10 @@ export class PlanningEmployeesCalendarParamService {
 
     public get partners_ids(): number[] {
         return this._partners_ids;
+    }
+
+    public get product_model_ids(): number[] {
+        return this._product_model_ids;
     }
 
     public get date_from(): Date {
