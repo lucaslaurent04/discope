@@ -97,6 +97,11 @@ if(!empty($params['partners_ids'])) {
             ['id', 'in', $activities_ids],
             ['employee_id', 'in', $employees_ids]
         ];
+
+        $domain[] = [
+            ['id', 'in', $activities_ids],
+            ['employee_id', '=', null]
+        ];
     }
     if(!empty($providers_ids)) {
         $activities = $orm->read(BookingActivity::getType(), $activities_ids, ['id', 'providers_ids']);
