@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Output, EventEmitter, ViewChild, OnInit, OnChanges, AfterViewInit, ViewChildren, QueryList, ElementRef, AfterViewChecked, Input, SimpleChanges, ViewRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Output, EventEmitter, ViewChild, OnInit, OnChanges, ViewChildren, QueryList, ElementRef, AfterViewChecked, Input, SimpleChanges } from '@angular/core';
 
 import { ChangeReservationArg } from 'src/app/model/changereservationarg';
 import { HeaderDays } from 'src/app/model/headerdays';
@@ -207,10 +207,14 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public getDescription(activity: any): string {
+        if(activity?.is_partner_activity) {
+            return activity.name;
+        }
+
         let group_details = `<dt>Groupe ${activity.group_num}`;
         if(activity.age_range_assignments_ids.length === 1) {
             const assign = activity.age_range_assignments_ids[0];
-            group_details += `, ${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</dt>`;
+            group_details += `, ${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</span></dt>`;
         }
         else if(activity.age_range_assignments_ids.length > 1) {
             group_details += ':</dt>';
@@ -223,7 +227,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             `<dt>${activity.customer_id.name}</dt>` +
             (activity.partner_identity_id?.address_city ? `<dt>${activity.partner_identity_id?.address_city}</dt>` : '') +
             group_details +
-            `<dt>Handicap : <b>${activity.booking_line_group_id.has_person_with_disability ? 'oui' : 'non'}</b></dt>` + // TODO: handle disabled people (yes/no)
+            `<dt>Handicap : <b>${activity.booking_line_group_id.has_person_with_disability ? 'oui' : 'non'}</b></dt>` +
             `<dt>Séjour du ${activity.booking_id.date_from} au ${activity.booking_id.date_to}</dt>` +
             `<dt>${activity.booking_id.nb_pers} personnes</dt>` +
             `<br />` +
@@ -376,17 +380,6 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         }
     }
 
-    public onhoverDate(day: Date) {
-        let result;
-        if(day) {
-            let date_index: string = this.calcDateIndex(day);
-            if(this.holidays.hasOwnProperty(date_index) && this.holidays[date_index].length) {
-                result = this.holidays[date_index];
-            }
-        }
-        this.hovered_holidays = result;
-    }
-
     public onOpenLegendDialog() {
         this.openLegendDialog.emit();
     }
@@ -404,7 +397,9 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
     public onSelectedBooking(event: any) {
         clearTimeout(this.mousedownTimeout);
-        this.showBooking.emit(event);
+        if(!event?.is_partner_activity) {
+            this.showBooking.emit(event);
+        }
     }
 
     public onSelectedPartner(partner: any) {
@@ -430,173 +425,6 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         this.hovered_partner = employee;
     }
 
-    public onmouseleaveTable() {
-        clearTimeout(this.mousedownTimeout);
-        this.selection.is_active = false;
-        this.selection.width = 0;
-    }
-
-    public onmouseup() {
-        clearTimeout(this.mousedownTimeout);
-
-        if(this.selection.is_active) {
-            console.log('is active');
-            // make from and to right
-            let rental_unit:any = this.selection.cell_from.employee;
-            let from:any = this.selection.cell_from;
-            let to:any = this.selection.cell_to;
-            if(this.selection.cell_to.date < this.selection.cell_from.date) {
-                from = this.selection.cell_to;
-                to = this.selection.cell_from;
-            }
-            // check selection for existing consumption
-            let valid = true;
-            let diff = (<Date>this.selection.cell_to.date).getTime() - (<Date>this.selection.cell_from.date).getTime();
-            let days = Math.abs(Math.floor(diff / (60*60*24*1000)))+1;
-            // do not check last day : overlaps is allowed if checkout is before checkin
-            for (let i = 0; i < days-1; i++) {
-                let currdate = new Date(from.date.getTime());
-                currdate.setDate(currdate.getDate() + i);
-                // #todo
-                if(this.hasActivity(rental_unit, this.calcDateIndex(currdate), 'AM')) {
-                    valid = false;
-                    break;
-                }
-            }
-            if(!valid || !from.employee) {
-                this.selection.is_active = false;
-                this.selection.width = 0;
-                return;
-            }
-            else {
-                // open dialog for requesting action dd
-/*
-                const dialogRef = this.dialog.open(ConsumptionCreationDialog, {
-                    width: '50vw',
-                    data: {
-                        employee: from.employee.name,
-                        employee_id: from.employee.id,
-                        date_from: from.date,
-                        date_to: to.date
-                    }
-                });
-
-                dialogRef.afterClosed().subscribe( async (values) => {
-                    if(values) {
-                        if(values.type && values.type == 'book') {
-                            try {
-                                // let date_from = new Date(values.date_from.getTime()-values.date_from.getTimezoneOffset()*60*1000);
-                                let date_from = (new Date(values.date_from.getTime()));
-                                let date_to = (new Date(values.date_to.getTime()));
-                                date_from.setHours(0,-values.date_from.getTimezoneOffset(),0,0);
-                                date_to.setHours(0,-values.date_to.getTimezoneOffset(),0,0);
-                                await this.api.call('?do=sale_booking_plan-option', {
-                                    date_from: date_from.toISOString(),
-                                    date_to: date_to.toISOString(),
-                                    rental_unit_id: values.rental_unit_id,
-                                    customer_identity_id: values.customer_identity_id,
-                                    no_expiry: values.no_expiry,
-                                    free_rental_units: values.free_rental_units
-                                });
-
-                                this.onRefresh();
-                            }
-                            catch(response) {
-                                this.api.errorFeedback(response);
-                            }
-                        }
-                        else if(values.type && values.type == 'ooo') {
-                            try {
-                                let date_from = (new Date(values.date_from.getTime()));
-                                let date_to = (new Date(values.date_to.getTime()));
-                                date_from.setHours(0,-values.date_from.getTimezoneOffset(),0,0);
-                                date_to.setHours(0,-values.date_to.getTimezoneOffset(),0,0);
-                                await this.api.call('?do=sale_booking_plan-repair', {
-                                    date_from: date_from.toISOString(),
-                                    date_to: date_to.toISOString(),
-                                    rental_unit_id: values.rental_unit_id,
-                                    description: (values.description.length)?values.description:'Blocage via planning'
-                                });
-
-                                this.onRefresh();
-                            }
-                            catch(response) {
-                                this.snack.open('Ce blocage est en conflit avec des consommations existantes.', 'ERREUR');
-                                // this.api.errorFeedback(response);
-                            }
-                        }
-
-                    }
-                });
-*/
-            }
-        }
-
-        this.selection.is_active = false;
-        this.selection.width = 0;
-
-    }
-
-    public onmousedown($event: any, employee: any, day: any) {
-        // start selection with a 100ms delay to avoid confusion with booking selection
-        this.mousedownTimeout = setTimeout( () => {
-            let table = this.calTable?.nativeElement.getBoundingClientRect();
-            let cell = $event.target;
-
-            while (cell && !cell.classList.contains('cell-AM')) {
-                cell = cell.previousElementSibling;
-            }
-
-            if(!cell) {
-                return;
-            }
-
-            let cellRect = cell.getBoundingClientRect();
-
-            this.selection.top = cellRect.top - table.top;
-            this.selection.left = cellRect.left - table.left + this.calTable.nativeElement.offsetLeft;
-
-            this.selection.width = this.cellsWidth * 3;
-            this.selection.height = cellRect.height;
-
-            this.selection.cell_from.left = this.selection.left;
-            this.selection.cell_from.width = this.cellsWidth;
-            this.selection.cell_from.date = day;
-            this.selection.cell_from.employee = employee;
-
-            this.selection.is_active = true;
-        }, 100);
-    }
-
-    public onmouseover($event: any, day: any) {
-        if(this.selection.is_active) {
-            if(day < this.selection.cell_from.date) {
-                return;
-            }
-            // selection between start and currently hovered cell
-            let table = this.calTable?.nativeElement.getBoundingClientRect();
-            let cell = $event.target;
-            while (cell && !cell.classList.contains('cell-EV')) {
-                cell = cell.nextElementSibling;
-            }
-
-            if(!cell) {
-                return;
-            }
-
-            let cellRect = cell.getBoundingClientRect();
-
-            this.selection.cell_to.date = day;
-
-            // diff between two dates
-            let diff = (<Date>this.selection.cell_to.date).getTime() - (<Date>this.selection.cell_from.date).getTime();
-            let nb_days = Math.abs(Math.floor(diff / (60*60*24*1000))) + 1;
-
-            this.selection.width = Math.ceil(this.cellsWidth * nb_days * 3) + nb_days;
-
-        }
-    }
-
     public preventDrag($event: any = null) {
         if($event && typeof $event.preventDefault === 'function') {
             $event.preventDefault();
@@ -615,10 +443,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return date_index === activity_date_index && time_slot == activity.time_slot
 
                // Check employee can handle activity
-               && employee.activity_product_models_ids.map(id => +id).includes(activity.product_model_id.id)
-
-               // Check employee is free during moment
-               && !this.hasActivity(employee, date_index, time_slot);
+               && employee.activity_product_models_ids.map(id => +id).includes(activity.product_model_id.id);
     }
 
     public onDragStart(activity: any) {
@@ -718,7 +543,12 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
                 this.currentDraggedActivity.partner_id = employee;
                 this.currentDraggedActivity.employee_id = employee.id;
-                this.activities[employee.id][date_index][time_slot].push(this.currentDraggedActivity);
+                if(this.currentDraggedActivity?.is_partner_activity) {
+                    this.activities[employee.id][date_index][time_slot].push(this.currentDraggedActivity);
+                }
+                else {
+                    this.activities[employee.id][date_index][time_slot].unshift(this.currentDraggedActivity);
+                }
 
                 // this.headers.days = this.headers.days.slice();
 

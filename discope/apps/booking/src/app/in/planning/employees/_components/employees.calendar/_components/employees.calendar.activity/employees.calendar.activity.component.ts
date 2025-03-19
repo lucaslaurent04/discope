@@ -104,10 +104,14 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
             violet: '#9575cd',
             red: '#c80651',
             grey: '#988a7d',
+            dark_grey: '#655c58',
             purple: '#7733aa'
         };
 
-        if(this.activity.type == 'ooo') {
+        if(this.activity?.is_partner_activity){
+            return colors['dark_grey'];
+        }
+        else if(this.activity.type == 'ooo') {
             return colors['red'];
         }
         else if(this.activity.booking_id?.status == 'quote') {
@@ -165,5 +169,4 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
         }
         return '';
     }
-
 }

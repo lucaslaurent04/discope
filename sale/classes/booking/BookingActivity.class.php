@@ -130,13 +130,13 @@ class BookingActivity extends Model {
             'employee_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'hr\employee\Employee',
-                'description'       => "Employee assigned to the supervision of the activity.",
+                'description'       => "Employee assigned to the supervision of the activity."
             ],
 
             'activity_date' => [
                 'type'              => 'computed',
                 'result_type'       => 'date',
-                'description'       => 'Specific day time slot on which the service is delivered.',
+                'description'       => "Specific date on which the service is delivered.",
                 'store'             => true,
                 'relation'          => ['activity_booking_line_id' => 'service_date'],
                 'onupdate'          => 'onupdateActivityDate'

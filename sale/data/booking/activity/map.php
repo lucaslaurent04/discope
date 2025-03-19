@@ -12,6 +12,7 @@ use identity\Partner;
 use sale\booking\Booking;
 use sale\booking\BookingActivity;
 use sale\booking\BookingLineGroupAgeRangeAssignment;
+use sale\booking\BookingPartnerActivity;
 use sale\booking\channelmanager\BookingLineGroup;
 use sale\catalog\ProductModel;
 use sale\customer\Customer;
@@ -184,6 +185,8 @@ foreach($booking_groups as $group) {
 }
 $age_range_assignments = $orm->read(BookingLineGroupAgeRangeAssignment::getType(), array_unique($age_range_assignments_ids), ['id', 'booking_line_group_id', 'age_from', 'age_to', 'qty']);
 
+$map_partners = [];
+
 $result = [];
 // build result: enrich and adapt consumptions
 foreach($activities as $id => $activity) {
@@ -211,6 +214,9 @@ foreach($activities as $id => $activity) {
     if($activity['has_staff_required']) {
         // #memo - we use employee_id 0 for unassigned activities
         $partner_id = intval($activity['employee_id']);
+        if($partner_id > 0) {
+            $map_partners[$partner_id] = true;
+        }
         $employee = isset($activity['employee_id'], $employees[$activity['employee_id']]) ? $employees[$activity['employee_id']]->toArray() : null;
 
         $result[$partner_id][$date_index][$time_slot][] = array_merge($activity->toArray(), [
@@ -222,12 +228,15 @@ foreach($activities as $id => $activity) {
             'customer_id'               => $customer,
             'partner_id'                => $employee,
             'partner_identity_id'       => $identity,
-            'age_range_assignments_ids' => $group_age_range_assignments,
+            'age_range_assignments_ids' => $group_age_range_assignments
         ]);
     }
     else {
         foreach($activity['providers_ids'] as $provider_id) {
             $provider = isset($providers[$provider_id]) ? $providers[$provider_id]->toArray() : null;
+            if(!is_null($provider)) {
+                $map_partners[$provider_id] = true;
+            }
 
             $result[$provider_id][$date_index][$time_slot][] = array_merge($activity->toArray(), [
                 'activity_date'             => date('c', $activity['activity_date']),
@@ -239,6 +248,34 @@ foreach($activities as $id => $activity) {
                 'partner_id'                => $provider,
                 'partner_identity_id'       => $identity,
                 'age_range_assignments_ids' => $group_age_range_assignments
+            ]);
+        }
+    }
+}
+
+if(!empty($map_partners)) {
+    $activity_partner_activities_ids = $orm->search(BookingPartnerActivity::getType(), [
+        ['partner_id', 'in', array_keys($map_partners)],
+        ['activity_date', '>=', $params['date_from']],
+        ['activity_date', '<=', $params['date_to']]
+    ]);
+
+    if(!empty($activity_partner_activities_ids)) {
+        $partner_activities = $orm->read(BookingPartnerActivity::getType(), $activity_partner_activities_ids, ['id', 'name', 'partner_id', 'activity_date', 'time_slot_id']);
+
+        foreach ($partner_activities as $partner_activity) {
+            $date_index = date('Y-m-d', $partner_activity['activity_date']);
+            $time_slot = [1 => 'AM', 3 => 'PM', 6 => 'EV'][$partner_activity['time_slot_id']];
+
+            $result[$partner_activity['partner_id']][$date_index][$time_slot][] = array_merge($partner_activity->toArray(), [
+                'is_partner_activity'       => true,
+                'booking_id'                => null,
+                'booking_line_group_id'     => null,
+                'product_model_id'          => null,
+                'customer_id'               => null,
+                'partner_id'                => null,
+                'partner_identity_id'       => null,
+                'age_range_assignments_ids' => []
             ]);
         }
     }
