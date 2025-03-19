@@ -188,7 +188,7 @@ foreach($bookings as $booking) {
                 'qty',
                 'price',
                 'is_accomodation',
-                'product_id' => ['has_age_range', 'age_range_id' => ['id', 'name']]
+                'product_id' => ['has_age_range', 'age_range_id' => ['id', 'name'], 'product_model_id' => ['qty_accounting_method']]
             ])
             ->get(true);
 
@@ -209,6 +209,11 @@ foreach($bookings as $booking) {
 
             $age_range_id = $group_age_range_id;
             $nb_pers = $line['qty'];
+
+            if($line['product_id']['product_model_id']['qty_accounting_method'] == 'person') {
+                $nb_pers /= $group['nb_nights'];
+            }
+
             if($line['product_id']['has_age_range']) {
                 $age_range_id = $line['product_id']['age_range_id']['id'];
                 // discard lines not matching given age_range
