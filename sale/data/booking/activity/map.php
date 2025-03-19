@@ -104,7 +104,7 @@ if(!empty($params['partners_ids'])) {
         $providers_activities_ids = [];
         foreach($activities as $activity) {
             if(count(array_intersect($activity['providers_ids'], $providers_ids)) > 0) {
-                $providers_activities_ids = $activity['id'];
+                $providers_activities_ids[] = $activity['id'];
             }
         }
 
