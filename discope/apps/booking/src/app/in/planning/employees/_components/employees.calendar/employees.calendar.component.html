@@ -58,7 +58,7 @@
                     </ng-container>
                 </tr>
             </thead>
-            <tbody (mouseleave)="onmouseleaveTable()" >
+            <tbody>
                 <!-- body -->
                 <tr     *ngFor="let partner of partners; let index = index;"
                         class="rows days cdk-drag-disabled"
@@ -77,9 +77,6 @@
                         <td     class="cell-AM cell-days cdk-drag-disabled"
                                 [class.is-weekend]="isWeekEnd(day)"
                                 (dragstart)="preventDrag($event)"
-                                (mousedown)="onmousedown($event, partner, day)"
-                                (mouseup)="onmouseup()"
-                                (mouseover)="onmouseover($event, day)"
                                 (mouseenter)="onmouseenterTableCell($event, index, partner, headers.days_indexes[i], 'AM')"
                                 (mouseleave)="onmouseleaveTableCell($event)"
                                 cdkDropList
@@ -99,12 +96,12 @@
                                             (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
                                             (selected)="onSelectedBooking($event)"
                                             cdkDrag
-                                            [cdkDragDisabled]="partner.relationship !== 'employee'"
+                                            [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_activity"
                                             (cdkDragStarted)="onDragStart(activity)"
                                         ></planning-employees-calendar-activity>
 
                                         <div *ngIf="hovered_activity == activity" class="cell-hint" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
-                                            <span *ngIf="vDescription?.value?.length" style="margin: 0 !important;" [innerHTML]="vDescription.value"></span>
+                                            <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
                                         </div>
                                     </ng-container>
                                 </div>
@@ -114,9 +111,6 @@
                         <td     class="cell-PM cell-days cdk-drag-disabled"
                                 [class.is-weekend]="isWeekEnd(day)"
                                 (dragstart)="preventDrag($event)"
-                                (mousedown)="onmousedown($event, partner, day)"
-                                (mouseup)="onmouseup()"
-                                (mouseover)="onmouseover($event, day)"
                                 (mouseenter)="onmouseenterTableCell($event, index, partner, headers.days_indexes[i], 'PM')"
                                 (mouseleave)="onmouseleaveTableCell($event)"
                                 cdkDropList
@@ -137,11 +131,12 @@
                                             (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
                                             (selected)="onSelectedBooking($event)"
                                             cdkDrag
+                                            [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_activity"
                                             (cdkDragStarted)="onDragStart(activity)">
                                         </planning-employees-calendar-activity>
 
                                         <span *ngIf="hovered_activity == activity" class="cell-hint" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
-                                            <span *ngIf="vDescription?.value?.length" style="margin: 0 !important;" [innerHTML]="vDescription.value"></span>
+                                            <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
                                         </span>
                                     </ng-container>
                                 </div>
@@ -151,9 +146,6 @@
                         <td     class="cell-EV cell-days cdk-drag-disabled"
                                 [class.is-weekend]="isWeekEnd(day)"
                                 (dragstart)="preventDrag($event)"
-                                (mousedown)="onmousedown($event, partner, day)"
-                                (mouseup)="onmouseup()"
-                                (mouseover)="onmouseover($event, day)"
                                 (mouseenter)="onmouseenterTableCell($event, index, partner, headers.days_indexes[i], 'EV')"
                                 (mouseleave)="onmouseleaveTableCell($event)"
                                 cdkDropList
@@ -174,11 +166,12 @@
                                             (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
                                             (selected)="onSelectedBooking($event)"
                                             cdkDrag
+                                            [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_activity"
                                             (cdkDragStarted)="onDragStart(activity)">
                                         </planning-employees-calendar-activity>
 
                                         <span *ngIf="hovered_activity == activity" class="cell-hint" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
-                                            <span *ngIf="vDescription?.value?.length" style="margin: 0 !important;" [innerHTML]="vDescription.value"></span>
+                                            <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
                                         </span>
                                     </ng-container>
                                 </div>
@@ -277,8 +270,5 @@
                 </ng-container>
             </tr>
         </table>
-
     </div>
-
-
 </div>
