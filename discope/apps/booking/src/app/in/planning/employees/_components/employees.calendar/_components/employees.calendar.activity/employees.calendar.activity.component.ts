@@ -108,7 +108,7 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
             purple: '#7733aa'
         };
 
-        if(this.activity?.is_partner_activity){
+        if(this.activity?.is_partner_event){
             return colors['dark_grey'];
         }
         else if(this.activity.type == 'ooo') {
