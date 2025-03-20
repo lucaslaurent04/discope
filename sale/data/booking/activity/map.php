@@ -262,7 +262,7 @@ if(!empty($params['partners_ids'])) {
 $activity_partner_activities_ids = $orm->search(PartnerEvent::getType(), $domain);
 
 if(!empty($activity_partner_activities_ids)) {
-    $partner_activities = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'partner_id', 'event_date', 'time_slot_id']);
+    $partner_activities = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'description', 'partner_id', 'event_date', 'time_slot_id']);
 
     foreach($partner_activities as $partner_activity) {
         $date_index = date('Y-m-d', $partner_activity['event_date']);

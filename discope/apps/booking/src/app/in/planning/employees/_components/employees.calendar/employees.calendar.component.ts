@@ -208,7 +208,9 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
     public getDescription(activity: any): string {
         if(activity?.is_partner_event) {
-            return activity.name;
+            return `<dt>${activity.name}</dt>` +
+                `<br />` +
+                (activity.description ? `<dt>${activity.description}</dt>` : '');
         }
 
         let group_details = `<dt>Groupe ${activity.group_num}`;
