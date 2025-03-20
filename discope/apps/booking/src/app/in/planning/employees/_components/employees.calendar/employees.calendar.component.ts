@@ -194,8 +194,18 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return (day.getDay() == 0 || day.getDay() == 6);
     }
 
-    public hasActivity(partner: Partner, day_index: string, time_slot: string): boolean {
-        return (this.activities[partner.id]?.[day_index]?.[time_slot] ?? []).length > 0;
+    public hasActivity(partner: Partner, day_index: string, time_slot: string, ignore_partner_events = false): boolean {
+        const activities = this.activities[partner.id]?.[day_index]?.[time_slot] ?? [];
+        if(!ignore_partner_events) {
+            return activities.length > 0;
+        }
+
+        for(let activity of activities) {
+            if(!activity?.is_partner_event) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public getActivities(partner: Partner, day: Date, time_slot: string): any {
@@ -445,7 +455,10 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return date_index === activity_date_index && time_slot == activity.time_slot
 
                // Check employee can handle activity
-               && employee.activity_product_models_ids.map(id => +id).includes(activity.product_model_id.id);
+               && employee.activity_product_models_ids.map(id => +id).includes(activity.product_model_id.id)
+
+               // Check that the employee hasn't been assigned an activity yet
+               && !this.hasActivity(employee, date_index, time_slot, true);
     }
 
     public onDragStart(activity: any) {
@@ -568,6 +581,9 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 }
                 catch(response) {
                     this.api.errorFeedback(response);
+
+                    this.activities[employee.id][date_index][time_slot] = this.activities[employee.id][date_index][time_slot].filter( (activity: any) => activity.id !== this.currentDraggedActivity.id);
+                    this.activities[old_employee_id][date_index][time_slot].unshift(this.currentDraggedActivity);
                 }
             }
             this.currentDraggedActivity = null;

@@ -9,6 +9,7 @@
 namespace sale\booking;
 
 use equal\orm\Model;
+use hr\employee\Employee;
 
 class BookingActivity extends Model {
 
@@ -327,6 +328,40 @@ class BookingActivity extends Model {
                     ]);
             }
         }
+    }
+
+    public static function canupdate($self, $values): array {
+        $self->read(['activity_date', 'time_slot_id', 'employee_id', 'product_model_id']);
+        foreach($self as $booking_activity) {
+            $employee_id = array_key_exists('employee_id', $values) ? $values['employee_id'] : $booking_activity['employee_id'];
+            if(is_null($employee_id)) {
+                continue;
+            }
+
+            $employee = Employee::id($employee_id)
+                ->read(['activity_product_models_ids'])
+                ->first();
+
+            if(!in_array($booking_activity['product_model_id'], $employee['activity_product_models_ids'])) {
+                return ['employee_id' => ['not_allowed' => "Employee not qualified for this type of activity."]];
+            }
+
+            $activity_date = $values['activity_date'] ?? $booking_activity['activity_date'];
+            $time_slot_id = $values['time_slot_id'] ?? $booking_activity['time_slot_id'];
+
+            $activities_ids = BookingActivity::search([
+                ['activity_date', '=', $activity_date],
+                ['time_slot_id', '=', $time_slot_id],
+                ['employee_id', '=', $employee_id]
+            ])
+                ->ids();
+
+            if(!empty($activities_ids)) {
+                return ['employee_id' => ['already_assigned' => "An activity is already assigned to this user for that moment."]];
+            }
+        }
+
+        return parent::canupdate($self, $values);
     }
 
     public static function ondelete($self): void {
