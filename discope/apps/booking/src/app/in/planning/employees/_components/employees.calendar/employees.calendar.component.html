@@ -85,7 +85,7 @@
                             <!-- activity cell -->
                             <ng-container *ngIf="hasActivity(partner, headers.days_indexes[i], 'AM')">
                                 <div class="cell-activities">
-                                    <ng-container *ngFor="let activity of getActivities(partner, day, 'AM')">
+                                    <ng-container *ngFor="let activity of getActivities(partner, day, 'AM'); let j = index">
                                         <planning-employees-calendar-activity
                                             [height]="rowsHeight"
                                             [width]="cellsWidth"
@@ -100,7 +100,7 @@
                                             (cdkDragStarted)="onDragStart(activity)"
                                         ></planning-employees-calendar-activity>
 
-                                        <div *ngIf="hovered_activity == activity" class="cell-hint" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                        <div *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(16px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
                                             <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
                                         </div>
                                     </ng-container>
@@ -119,7 +119,7 @@
                             <!-- activity cell -->
                             <ng-container *ngIf="hasActivity(partner, headers.days_indexes[i], 'PM')">
                                 <div class="cell-activities">
-                                    <ng-container *ngFor="let activity of getActivities(partner, day, 'PM')">
+                                    <ng-container *ngFor="let activity of getActivities(partner, day, 'PM'); let j = index">
 
                                         <planning-employees-calendar-activity
                                             [height]="rowsHeight"
@@ -135,7 +135,7 @@
                                             (cdkDragStarted)="onDragStart(activity)">
                                         </planning-employees-calendar-activity>
 
-                                        <span *ngIf="hovered_activity == activity" class="cell-hint" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                        <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(16px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
                                             <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
                                         </span>
                                     </ng-container>
@@ -154,7 +154,7 @@
                             <!-- activity cell -->
                             <ng-container *ngIf="hasActivity(partner, headers.days_indexes[i], 'EV')">
                                 <div class="cell-activities">
-                                    <ng-container *ngFor="let activity of getActivities(partner, day, 'EV')">
+                                    <ng-container *ngFor="let activity of getActivities(partner, day, 'EV'); let j = index">
 
                                         <planning-employees-calendar-activity
                                             [height]="rowsHeight"
@@ -170,7 +170,7 @@
                                             (cdkDragStarted)="onDragStart(activity)">
                                         </planning-employees-calendar-activity>
 
-                                        <span *ngIf="hovered_activity == activity" class="cell-hint" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                        <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(16px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
                                             <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
                                         </span>
                                     </ng-container>
