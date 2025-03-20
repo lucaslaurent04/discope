@@ -10,7 +10,7 @@ namespace sale\booking;
 
 use equal\orm\Model;
 
-class BookingPartnerActivity extends Model {
+class PartnerEventSet extends Model {
 
     public static function getDescription(): string {
         return "Custom planning activity to add notes on partners activities or partners availabilities.";
@@ -25,6 +25,11 @@ class BookingPartnerActivity extends Model {
                 'required'          => true
             ],
 
+            'description' => [
+                'type'              => 'string',
+                'description'       => "Complete description of the event."
+            ],
+
             'partner_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Partner',
@@ -32,17 +37,23 @@ class BookingPartnerActivity extends Model {
                 'required'          => true
             ],
 
-            'activity_date' => [
+            'date_from' => [
                 'type'              => 'date',
-                'description'       => "Specific date on which the service is delivered.",
+                'description'       => "Starting date of the set.",
                 'required'          => true
             ],
 
-            'time_slot_id' => [
-                'type'              => 'many2one',
-                'foreign_object'    => 'sale\booking\TimeSlot',
-                'description'       => "Specific day time slot on which the service is delivered.",
+            'date_to' => [
+                'type'              => 'date',
+                'description'       => "Ending date of the set.",
                 'required'          => true
+            ],
+
+            'partner_events_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\PartnerEvent',
+                'foreign_field'     => 'partner_event_set_id',
+                'description'       => 'Detailed consumptions of the booking.'
             ]
 
         ];

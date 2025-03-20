@@ -96,7 +96,7 @@
                                             (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
                                             (selected)="onSelectedBooking($event)"
                                             cdkDrag
-                                            [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_activity"
+                                            [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_event"
                                             (cdkDragStarted)="onDragStart(activity)"
                                         ></planning-employees-calendar-activity>
 
@@ -131,7 +131,7 @@
                                             (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
                                             (selected)="onSelectedBooking($event)"
                                             cdkDrag
-                                            [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_activity"
+                                            [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_event"
                                             (cdkDragStarted)="onDragStart(activity)">
                                         </planning-employees-calendar-activity>
 
@@ -166,7 +166,7 @@
                                             (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
                                             (selected)="onSelectedBooking($event)"
                                             cdkDrag
-                                            [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_activity"
+                                            [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_event"
                                             (cdkDragStarted)="onDragStart(activity)">
                                         </planning-employees-calendar-activity>
 

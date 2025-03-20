@@ -207,7 +207,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public getDescription(activity: any): string {
-        if(activity?.is_partner_activity) {
+        if(activity?.is_partner_event) {
             return activity.name;
         }
 
@@ -397,7 +397,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
     public onSelectedBooking(event: any) {
         clearTimeout(this.mousedownTimeout);
-        if(!event?.is_partner_activity) {
+        if(!event?.is_partner_event) {
             this.showBooking.emit(event);
         }
     }
@@ -543,7 +543,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
                 this.currentDraggedActivity.partner_id = employee;
                 this.currentDraggedActivity.employee_id = employee.id;
-                if(this.currentDraggedActivity?.is_partner_activity) {
+                if(this.currentDraggedActivity?.is_partner_event) {
                     this.activities[employee.id][date_index][time_slot].push(this.currentDraggedActivity);
                 }
                 else {
