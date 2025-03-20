@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 
 const millisecondsPerDay:number = 24 * 60 * 60 * 1000;
@@ -10,21 +8,30 @@ const millisecondsPerDay:number = 24 * 60 * 60 * 1000;
 })
 export class PlanningEmployeesCalendarParamService {
 
+    // current state of filters
     private observable: Subject<any>;
-
+    // date from
     private _date_from: Date;
+    // date to
     private _date_to: Date;
     // duration in days
     private _duration: number;
+    // selected partners (employees/providers)
     private _partners_ids: number[];
+    // if true display only product models with has_transport_required
+    private _show_only_transport: boolean;
+    // selected product category
+    private _product_category_id: number;
+    // selected product model
+    private _product_model_id: number|null;
+    // ids of the product models to display (all if empty)
     private _product_model_ids: number[];
-
     // timeout handler for debounce
     private timeout: any;
     // current state, for changes detection
     private state: string;
 
-    constructor(private translate:TranslateService, private snack: MatSnackBar) {
+    constructor() {
         this.observable = new Subject();
     }
 
@@ -45,6 +52,7 @@ export class PlanningEmployeesCalendarParamService {
         if(this.timeout) {
             clearTimeout(this.timeout);
         }
+
         // add a debounce in case range is updated several times in a row
         this.timeout = setTimeout( () => {
             console.log('update', this._date_from, this._date_to);
@@ -60,13 +68,16 @@ export class PlanningEmployeesCalendarParamService {
 
     /**
      * Allow init request from other components
-    */
+     */
     public init() {
         this._duration = 7;
         this._date_from = this.getPreviousMonday();
         this._date_to = new Date(this._date_from.getTime());
         this._date_to.setDate(this._date_from.getDate() + this._duration);
         this._partners_ids = [];
+        this._show_only_transport = false;
+        this._product_category_id = 0;
+        this._product_model_id = null;
         this._product_model_ids = [];
         this.state = this.getState();
     }
@@ -88,6 +99,11 @@ export class PlanningEmployeesCalendarParamService {
         return this.observable;
     }
 
+
+    /***********
+     * Setters *
+     ***********/
+
     public set partners_ids(partners_ids: number[]) {
         this._partners_ids = [...partners_ids];
         this.updateRange();
@@ -108,6 +124,26 @@ export class PlanningEmployeesCalendarParamService {
         this.updateRange();
     }
 
+    public set show_only_transport(show_only_transport: boolean) {
+        this._show_only_transport = show_only_transport;
+        this.updateRange();
+    }
+
+    public set product_category_id(product_category_id: number) {
+        this._product_category_id = product_category_id;
+        this.updateRange();
+    }
+
+    public set product_model_id(product_model_id: number) {
+        this._product_model_id = product_model_id;
+        this.updateRange();
+    }
+
+
+    /***********
+     * Getters *
+     ***********/
+
     public get partners_ids(): number[] {
         return this._partners_ids;
     }
@@ -126,5 +162,17 @@ export class PlanningEmployeesCalendarParamService {
 
     public get duration(): number {
         return this._duration;
+    }
+
+    public get show_only_transport() {
+        return this._show_only_transport;
+    }
+
+    public get product_category_id() {
+        return this._product_category_id;
+    }
+
+    public get product_model_id() {
+        return this._product_model_id;
     }
 }

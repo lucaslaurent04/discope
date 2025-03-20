@@ -16,7 +16,8 @@ type ProductCategory = {
 type ProductModelType = {
     id: number,
     name: string,
-    categories_ids: number[]
+    categories_ids: number[],
+    has_transport_required: boolean
 }
 
 type AggregatedProductModelType = {
@@ -54,7 +55,6 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
     public selectedProductCategory: ProductCategory = this.allProductCategory;
     private productModels: ProductModelType[] = [];
     public filteredProductModels: AggregatedProductModelType[] = [];
-    public selectedCatOrProductModelCode: string = 'cat_0';
 
     public partners: any[] = [];
     public selected_partners_ids: any[] = [];
@@ -64,7 +64,9 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
         date_range: new FormGroup({
             date_from: new FormControl(),
             date_to: new FormControl()
-        })
+        }),
+        product_model_code: new FormControl(),
+        show_only_transport: new FormControl()
     };
 
     constructor(
@@ -85,11 +87,20 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
                 // update local vars according to service new values
                 this.dateFrom = new Date(this.params.date_from.getTime())
                 this.dateTo = new Date(this.params.date_to.getTime())
-
                 this.duration = this.params.duration;
+
                 this.vm.duration = this.duration.toString();
-                this.vm.date_range.get("date_from").setValue(this.dateFrom);
-                this.vm.date_range.get("date_to").setValue(this.dateTo);
+                this.vm.date_range.get('date_from').setValue(this.dateFrom);
+                this.vm.date_range.get('date_to').setValue(this.dateTo);
+                if(this.params.product_model_id === null) {
+                    this.vm.product_model_code.setValue('cat_' + this.params.product_category_id);
+                }
+                else {
+                    this.vm.product_model_code.setValue('mod_' + this.params.product_model_id);
+                }
+                this.vm.show_only_transport.setValue(this.params.show_only_transport);
+
+                this.selectedProductCategory = this.productModelCategories.find((cat) => cat.id === this.params.product_category_id);
             });
 
         // use user centers_ids to filter displayed employees
@@ -161,11 +172,29 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
         this.productModels = await this.api.collect(
             'sale\\catalog\\ProductModel',
             [['can_sell', '=', true], ['is_activity', '=', true]],
-            ['id', 'name', 'categories_ids'],
+            ['id', 'name', 'categories_ids', 'has_transport_required'],
             'name', 'asc', 0, 500
         );
 
         this.filteredProductModels = this.aggregatedProductModels(this.productModels);
+
+        this.vm.product_model_code.valueChanges.subscribe((value: string) => {
+            if(value.startsWith('cat_')) {
+                this.params.product_category_id = +value.split('_')[1];
+                this.params.product_model_id = null;
+            }
+            else {
+                this.params.product_model_id = +value.split('_')[1];
+            }
+
+            this.filterProductModels();
+        });
+
+        this.vm.show_only_transport.valueChanges.subscribe((value: boolean) => {
+            this.params.show_only_transport = value;
+
+            this.filterProductModels();
+        });
     }
 
     /**
@@ -210,36 +239,33 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
         this.fullScreen.emit();
     }
 
-    public async onchangeCatOrProductModelCode() {
-        if(this.selectedCatOrProductModelCode.startsWith('cat_')) {
-            let categoryId = +this.selectedCatOrProductModelCode.split('_')[1];
-            const category = this.productModelCategories.find((pc) => pc.id === categoryId);
+    private filterProductModels() {
+        let productModels = this.productModels.filter((productModel) => {
+            return !this.params.show_only_transport || productModel.has_transport_required;
+        });
 
-            this.selectedProductCategory = category;
-
-            if(category.id > 0) {
-                const productModels = this.productModels.filter((productModel) => {
-                    return productModel.categories_ids.map(p => +p).includes(categoryId);
-                });
-
-                this.filteredProductModels = this.aggregatedProductModels(productModels);
-                this.params.product_model_ids = productModels.map(p => p.id);
-            }
-            else {
-                this.filteredProductModels = this.aggregatedProductModels(this.productModels);
-                this.params.product_model_ids = [];
-            }
+        if(this.params.product_category_id > 0) {
+            productModels = productModels.filter((productModel) => {
+                return productModel.categories_ids.map(p => +p).includes(this.params.product_category_id);
+            });
         }
-        else {
-            let productModelId = +this.selectedCatOrProductModelCode.split('_')[1];
 
-            const aggregatedProductModel = this.filteredProductModels.find((pm) => pm.id === productModelId);
-            if(aggregatedProductModel) {
+        this.filteredProductModels = this.aggregatedProductModels(productModels);
+
+        if(productModels.length > 0) {
+            if(this.params.product_model_id) {
+                const aggregatedProductModel = this.filteredProductModels.find((pm) => pm.id === this.params.product_model_id);
                 this.params.product_model_ids = aggregatedProductModel.product_models_ids;
             }
             else {
-                this.params.product_model_ids = [productModelId];
+                this.params.product_model_ids = productModels.map(p => p.id);
             }
+        }
+        else {
+            // No product models so show no activities
+            this.params.product_model_ids = [0];
+            // And unselect selected product model
+            this.params.product_model_id = null;
         }
     }
 
