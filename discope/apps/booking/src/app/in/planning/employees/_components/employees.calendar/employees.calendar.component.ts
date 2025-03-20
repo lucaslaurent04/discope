@@ -210,7 +210,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
     public getActivities(partner: Partner, day: Date, time_slot: string): any {
         if(this.activities[partner.id] ?? false) {
-            let date_index:string = this.calcDateIndex(day);
+            let date_index = this.calcDateIndex(day);
             return this.activities[partner.id]?.[date_index]?.[time_slot] ?? [];
         }
         return [];
