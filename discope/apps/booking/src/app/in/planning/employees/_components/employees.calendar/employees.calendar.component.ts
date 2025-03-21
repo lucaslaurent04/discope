@@ -40,6 +40,22 @@ class Provider extends Partner {
     }
 }
 
+export class ProductModelCategory {
+    constructor(
+        public id: number = 0,
+        public name: string = ''
+    ) {}
+}
+
+export class ProductModel {
+    constructor(
+        public id: number = 0,
+        public name: string = '',
+        public categories_ids: number[] = [],
+        public has_transport_required: boolean = false
+    ) {}
+}
+
 @Component({
     selector: 'planning-employees-calendar',
     templateUrl: './employees.calendar.component.html',
@@ -114,15 +130,19 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
     public emptyEmployee = new Employee();
 
+    public productModelCategories: ProductModelCategory[] = [];
+    public productModels: ProductModel[] = [];
+
     constructor(
         private params: PlanningEmployeesCalendarParamService,
         private api: ApiService,
         private snack: MatSnackBar,
         private elementRef: ElementRef,
-        private cd: ChangeDetectorRef) {
-            this.headers = {};
-            this.partners = [];
-            this.previous_duration = 0;
+        private cd: ChangeDetectorRef
+    ) {
+        this.headers = {};
+        this.partners = [];
+        this.previous_duration = 0;
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
@@ -138,6 +158,23 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         });
 
         this.elementRef.nativeElement.style.setProperty('--rows_height', this.rowsHeight + 'px');
+
+        this.productModelCategories = [
+            { id: 0, name: 'TOUTES' },
+            ...await this.api.collect(
+                'sale\\catalog\\Category',
+                [],
+                Object.getOwnPropertyNames(new ProductModelCategory()),
+                'name', 'asc', 0, 500
+            )
+        ];
+
+        this.productModels = await this.api.collect(
+            'sale\\catalog\\ProductModel',
+            [['can_sell', '=', true], ['is_activity', '=', true]],
+            Object.getOwnPropertyNames(new ProductModel()),
+            'name', 'asc', 0, 500
+        );
     }
 
     /**
@@ -597,5 +634,11 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
     public trackByActivity(index: number, activity: any): string {
         return activity.id; // Assurez-vous que chaque activité a un ID unique
+    }
+
+    public getProductModelName(productModelId: string) {
+        const productModel = this.productModels.find(p => p.id === +productModelId);
+
+        return productModel?.name ?? '';
     }
 }

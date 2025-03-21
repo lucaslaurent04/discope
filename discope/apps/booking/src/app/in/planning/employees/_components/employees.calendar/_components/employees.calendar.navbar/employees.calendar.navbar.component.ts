@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 
 import { PlanningEmployeesCalendarParamService } from '../../../../_services/employees.calendar.param.service';
 
@@ -7,18 +7,7 @@ import { ApiService, AuthService } from 'sb-shared-lib';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
-
-type ProductCategory = {
-    id: number,
-    name: string
-}
-
-type ProductModelType = {
-    id: number,
-    name: string,
-    categories_ids: number[],
-    has_transport_required: boolean
-}
+import { ProductModelCategory, ProductModel } from '../../employees.calendar.component';
 
 type AggregatedProductModelType = {
     id: number,
@@ -32,10 +21,12 @@ type AggregatedProductModelType = {
   templateUrl: './employees.calendar.navbar.component.html',
   styleUrls: ['./employees.calendar.navbar.component.scss']
 })
-export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
+export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChanges {
     @Input() activity: any;
     @Input() partner: any;
     @Input() holidays: any;
+    @Input() productModelCategories: ProductModelCategory[];
+    @Input() productModels: ProductModel[];
 
     @Output() changedays = new EventEmitter<ChangeReservationArg>();
     @Output() refresh = new EventEmitter<Boolean>();
@@ -50,10 +41,8 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
     private dateTo: Date;
     public duration: number;
 
-    private allProductCategory: ProductCategory = { id: 0, name: 'TOUTES' };
-    public productModelCategories: ProductCategory[] = [];
-    public selectedProductCategory: ProductCategory = this.allProductCategory;
-    private productModels: ProductModelType[] = [];
+    private allProductCategory: ProductModelCategory = { id: 0, name: 'TOUTES' };
+    public selectedProductCategory: ProductModelCategory = this.allProductCategory;
     public filteredProductModels: AggregatedProductModelType[] = [];
 
     public partners: any[] = [];
@@ -159,25 +148,6 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
                 }
             });
 
-        this.productModelCategories = [
-            this.allProductCategory,
-            ...await this.api.collect(
-                'sale\\catalog\\Category',
-                [],
-                ['id', 'name'],
-                'name', 'asc', 0, 500
-            )
-        ];
-
-        this.productModels = await this.api.collect(
-            'sale\\catalog\\ProductModel',
-            [['can_sell', '=', true], ['is_activity', '=', true]],
-            ['id', 'name', 'categories_ids', 'has_transport_required'],
-            'name', 'asc', 0, 500
-        );
-
-        this.filteredProductModels = this.aggregatedProductModels(this.productModels);
-
         this.vm.product_model_code.valueChanges.subscribe((value: string) => {
             if(value.startsWith('cat_')) {
                 this.params.product_category_id = +value.split('_')[1];
@@ -197,13 +167,19 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit {
         });
     }
 
+    public ngOnChanges(changes: SimpleChanges) {
+        if(changes.productModels) {
+            this.filteredProductModels = this.aggregatedProductModels(this.productModels);
+        }
+    }
+
     /**
      * Aggregate product models to not repeat the same name
      *
      * @param productModels
      * @private
      */
-    private aggregatedProductModels(productModels: ProductModelType[]): AggregatedProductModelType[] {
+    private aggregatedProductModels(productModels: ProductModel[]): AggregatedProductModelType[] {
         const aggregateProductModels: AggregatedProductModelType[] = [];
 
         for(let productModel of productModels) {
