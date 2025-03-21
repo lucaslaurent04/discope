@@ -902,6 +902,19 @@ class Booking extends Model {
                     else {
                         // everything has been paid : booking can be archived
                         $om->update(self::getType(), $id, ['status' => 'balanced']);
+                        $booking_point = BookingPoint::search(['booking_id', '=' , $id])->read('id')->first(true);
+                        if($booking_point){
+                            BookingPoint::id($booking_point['id'])
+                                ->update([
+                                    'nb_paying_pers' => null,
+                                    'nb_nights'      => null,
+                                    'points_value'   => null
+                                ]);
+                        }else {
+                            BookingPoint::create([
+                                'booking_id' =>  $id
+                            ]);
+                        }
                     }
                 }
             }
