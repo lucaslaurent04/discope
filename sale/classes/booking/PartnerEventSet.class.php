@@ -27,6 +27,7 @@ class PartnerEventSet extends Model {
 
             'description' => [
                 'type'              => 'string',
+                'usage'             => 'text/plain',
                 'description'       => "Complete description of the event."
             ],
 

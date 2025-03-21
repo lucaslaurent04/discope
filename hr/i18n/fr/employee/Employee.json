@@ -32,6 +32,9 @@
                 },
                 "section.partner-events": {
                     "label": "Evénements"
+                },
+                "section.partner-event-sets": {
+                    "label": "Séries d'événements"
                 }
             }
         },
