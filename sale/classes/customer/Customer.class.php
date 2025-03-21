@@ -27,8 +27,7 @@ class Customer extends \identity\Partner {
                 'foreign_object'    => 'sale\customer\RateClass',
                 'description'       => 'Rate class that applies to the customer.',
                 'visible'           => ['relationship', '=', 'customer'],
-                'default'           => 1,
-                'readonly'          => true
+                'default'           => 1
             ],
 
             'partner_identity_id' => [
@@ -111,7 +110,14 @@ class Customer extends \identity\Partner {
                 'usage'             => 'email',
                 'description'       => "Identity secondary email address.",
                 'function'          => 'calcEmailSecondary'
-            ]
+            ],
+
+            'bookings_points_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\BookingPoint',
+                'foreign_field'     => 'customer_id',
+                'description'       => "The bookings points of the customer."
+            ],
 
         ];
     }
