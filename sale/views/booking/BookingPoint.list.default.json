@@ -1,0 +1,46 @@
+{
+    "name": "Booking Points",
+    "description": "This view is intended for displaying the list of booking points.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "booking_id",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "customer_id",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "nb_paying_pers",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "nb_nights",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "points_value",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "booking_apply_id",
+                "width": "10%"
+            }
+        ]
+    }
+}
