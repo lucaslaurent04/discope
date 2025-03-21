@@ -173,7 +173,7 @@ class BookingActivity extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
                 'foreign_object'    => 'sale\catalog\ProductModel',
-                'description'       => "Does the activity needs an employee to be assigned to it.",
+                'description'       => "Does the activity need an employee to be assigned to it.",
                 'store'             => true,
                 'instant'           => true,
                 'relation'          => ['product_model_id' => ['has_staff_required']]
