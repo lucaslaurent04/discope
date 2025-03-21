@@ -1,25 +1,26 @@
 <div class="reservedBox">
-
     <div class="booking-details"
         [class.less-28]="height < 28"
         [class.less-15]="height < 15"
         [class.less-12]="height < 12"
         [style.background-color]="getColor()"
         (mouseenter)="onEnterActivity(activity)"
-        (mouseleave)="onLeaveActivity(activity)">
-
+        (mouseleave)="onLeaveActivity(activity)"
+    >
         <div (click)="onShowBooking(activity)" >
-            <div class="activity-booking">
+            <div class="activity-booking" *ngIf="!activity?.is_partner_event">
                 <!-- #memo - this part is discarded if available height is less than 28px -->
                 <div style="flex: 0 1 20%;">{{activity.group_num ? activity.group_num + ' - ' : ''}}{{activity.name}}</div>
                 <div style="margin-left: auto">
                     <span class="material-icons">{{getIcon()}}</span>
                 </div>
             </div>
-            <div class="activity-customer">
+            <div class="activity-customer" *ngIf="!activity?.is_partner_event">
                 <div class="activity-customer-details">{{activity.customer_id?.name}}</div>
+            </div>
+            <div class="activity-partner-event" *ngIf="activity?.is_partner_event">
+                {{activity.name}}
             </div>
         </div>
     </div>
-
 </div>
