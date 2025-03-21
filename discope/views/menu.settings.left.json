@@ -1160,7 +1160,7 @@
                                 }
                             },
                             {
-                                "id": "hr.absences.all",
+                                "id": "hr.absences.codes",
                                 "type": "entry",
                                 "label": "Absence codes",
                                 "description": "",

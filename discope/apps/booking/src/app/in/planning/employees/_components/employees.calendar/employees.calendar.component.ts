@@ -1,24 +1,58 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Output, EventEmitter, ViewChild, OnInit, OnChanges, AfterViewInit, ViewChildren, QueryList, ElementRef, AfterViewChecked, Input, SimpleChanges, ViewRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Output, EventEmitter, ViewChild, OnInit, OnChanges, ViewChildren, QueryList, ElementRef, AfterViewChecked, Input, SimpleChanges } from '@angular/core';
 
 import { ChangeReservationArg } from 'src/app/model/changereservationarg';
 import { HeaderDays } from 'src/app/model/headerdays';
 
 
-import { ApiService, AuthService } from 'sb-shared-lib';
+import { ApiService } from 'sb-shared-lib';
 import { PlanningEmployeesCalendarParamService } from '../../_services/employees.calendar.param.service';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-// import { ConsumptionCreationDialog } from './_components/consumption.dialog/consumption.component';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
-import { CdkDragDrop, CdkDragEnter, CdkDragExit, moveItemInArray } from '@angular/cdk/drag-drop';
+class Partner {
+    constructor(
+        public id: number = 0,
+        public name: string = '',
+        public relationship: 'employee'|'provider' = 'employee',
+        public is_active: boolean = true
+    ) {}
+}
 
-
-class Employee {
+class Employee extends Partner {
     constructor(
         public id: number = 0,
         public name: string = '',
         public is_active: boolean = true,
+        public activity_product_models_ids: any[] = []
+    ) {
+        super(id, name, 'employee', is_active);
+    }
+}
+
+class Provider extends Partner {
+    constructor(
+        public id: number = 0,
+        public name: string = '',
+        public is_active: boolean = true
+    ) {
+        super(id, name, 'provider');
+    }
+}
+
+export class ProductModelCategory {
+    constructor(
+        public id: number = 0,
+        public name: string = ''
+    ) {}
+}
+
+export class ProductModel {
+    constructor(
+        public id: number = 0,
+        public name: string = '',
+        public categories_ids: number[] = [],
+        public has_transport_required: boolean = false
     ) {}
 }
 
@@ -28,11 +62,12 @@ class Employee {
     styleUrls: ['./employees.calendar.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, AfterViewInit, AfterViewChecked {
+export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, AfterViewChecked {
     @Input() rowsHeight: number;
     @Output() filters = new EventEmitter<ChangeReservationArg>();
     @Output() showBooking = new EventEmitter();
-    @Output() showEmployee = new EventEmitter();
+    @Output() showPartner = new EventEmitter();
+    @Output() showPartnerEvent = new EventEmitter();
 
     @Output() openLegendDialog = new EventEmitter();
     @Output() openPrefDialog = new EventEmitter();
@@ -55,13 +90,15 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     public cellsWidth: number;
 
     public activities: any = [];
-    public employees: any = [];
+    public partners: any = [];
     public holidays: any = [];
     // count of rental units taken under account (not necessarily equal to `rental_units.length`)
     public count_rental_units: number = 0;
 
     public hovered_activity: any;
-    public hovered_employee: any;
+    private hoveredActivityTimeout: any = null;
+
+    public hovered_partner: any;
     public hovered_holidays: any;
 
     public hover_row_index = -1;
@@ -86,73 +123,64 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
     public currentDraggedActivity: any = null;
 
-    public mapStats: any = {
-        'occupied': {},
-        'capacity': {},
-        'blocked': {},
-        'occupancy': {},
-        'arrivals_expected': {},
-        'arrivals_confirmed': {},
-        'departures_expected': {},
-        'departures_confirmed': {}
-    };
-
     private mousedownTimeout: any;
 
     // duration history as hint for refreshing cell width
     private previous_duration: number;
 
-    private show_parents: boolean = false;
-    private show_children: boolean = false;
-    private today: Date;
-    private today_index: string;
-
     public emptyEmployee = new Employee();
+
+    public productModelCategories: ProductModelCategory[] = [];
+    public productModels: ProductModel[] = [];
 
     constructor(
         private params: PlanningEmployeesCalendarParamService,
         private api: ApiService,
-        private dialog: MatDialog,
         private snack: MatSnackBar,
         private elementRef: ElementRef,
-        private cd: ChangeDetectorRef) {
-            this.headers = {};
-            this.employees = [];
-            this.previous_duration = 0;
-            this.show_parents = (localStorage.getItem('planning_show_parents') === 'true');
-            this.show_children = (localStorage.getItem('planning_show_children') === 'true');
-            if(!this.show_parents && !this.show_children) {
-                this.show_parents = true;
-                this.show_children = true;
-            }
-            this.today = new Date();
-            this.today_index = this.calcDateIndex(this.today);
+        private cd: ChangeDetectorRef
+    ) {
+        this.headers = {};
+        this.partners = [];
+        this.previous_duration = 0;
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
+    public ngOnChanges(changes: SimpleChanges): void {
         if(changes.rowsHeight)     {
             this.elementRef.nativeElement.style.setProperty('--rows_height', this.rowsHeight + 'px');
         }
      }
 
-    async ngOnInit() {
-
-
+    public async ngOnInit() {
         this.params.getObservable().subscribe( () => {
             console.log('PlanningEmployeesCalendarComponent cal params change', this.params);
             this.onRefresh();
         });
 
         this.elementRef.nativeElement.style.setProperty('--rows_height', this.rowsHeight + 'px');
-    }
 
-    async ngAfterViewInit() {
+        this.productModelCategories = [
+            { id: 0, name: 'TOUTES' },
+            ...await this.api.collect(
+                'sale\\catalog\\Category',
+                [],
+                Object.getOwnPropertyNames(new ProductModelCategory()),
+                'name', 'asc', 0, 500
+            )
+        ];
+
+        this.productModels = await this.api.collect(
+            'sale\\catalog\\ProductModel',
+            [['can_sell', '=', true], ['is_activity', '=', true]],
+            Object.getOwnPropertyNames(new ProductModel()),
+            'name', 'asc', 0, 500
+        );
     }
 
     /**
      * After refreshing the view with new content, adapt header and relay new cell_width, if changed
      */
-    async ngAfterViewChecked() {
+    public async ngAfterViewChecked() {
 
         this.tableRect = this.calTable?.nativeElement.getBoundingClientRect();
 
@@ -169,19 +197,18 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public onRefresh(full: boolean = true) {
-        console.log('onrefresh')
+        console.log('onrefresh');
+
+        if(this.currentDraggedActivity) {
+            console.log('skip refresh because moving activity');
+            return;
+        }
 
         this.cd.detectChanges();
 
         if(full) {
             this.loading = true;
 
-            this.show_parents = (localStorage.getItem('planning_show_parents') === 'true');
-            this.show_children = (localStorage.getItem('planning_show_children') === 'true');
-            if(!this.show_parents && !this.show_children) {
-                this.show_parents = true;
-                this.show_children = true;
-            }
             // refresh the view, then run onchange
             setTimeout( async () => {
                 await this.onFiltersChange();
@@ -205,70 +232,91 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return (day.getDay() == 0 || day.getDay() == 6);
     }
 
-    public isToday(day:Date) {
-        return (day.getDate() == this.today.getDate() && day.getMonth() == this.today.getMonth() && day.getFullYear() == this.today.getFullYear());
-    }
-/*
-    public isTodayIndex(day_index:string) {
-        return (this.today_index == day_index);
-    }
-*/
-    public hasActivity(employee: Employee, day_index: string, time_slot: string): boolean {
-        return !!(this.activities[employee.id]?.[day_index]?.[time_slot] ?? false);
+    public hasActivity(partner: Partner, day_index: string, time_slot: string, ignore_partner_events = false): boolean {
+        const activities = this.activities[partner.id]?.[day_index]?.[time_slot] ?? [];
+        if(!ignore_partner_events) {
+            return activities.length > 0;
+        }
+
+        for(let activity of activities) {
+            if(!activity?.is_partner_event) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public getActivities(employee:Employee, day: Date, time_slot: string): any {
-        if(this.activities[employee.id] ?? false) {
-            let date_index:string = this.calcDateIndex(day);
-            return this.activities[employee.id]?.[date_index]?.[time_slot] ?? {};
+    public getActivities(partner: Partner, day: Date, time_slot: string): any {
+        if(this.activities[partner.id] ?? false) {
+            let date_index = this.calcDateIndex(day);
+            return this.activities[partner.id]?.[date_index]?.[time_slot] ?? [];
         }
-        return {};
+        return [];
     }
 
-    public getDescription(activity:any): string {
-        /*
-        if(activity.hasOwnProperty('booking_id')
-            && activity['booking_id']
-            && activity['booking_id'].hasOwnProperty('description')) {
-            return activity.booking_id.description;
+    public getDescription(activity: any): string {
+        if(activity?.is_partner_event) {
+            return `<dt>${activity.name}</dt>` +
+                `<br />` +
+                (activity.description ? `<dt>${activity.description}</dt>` : '');
         }
-        else if(activity.hasOwnProperty('repairing_id')
-            && activity['repairing_id']
-            && activity['repairing_id'].hasOwnProperty('description')) {
-            return activity.repairing_id.description;
+
+        let group_details = `<dt>Groupe ${activity.group_num}`;
+        if(activity.age_range_assignments_ids.length === 1) {
+            const assign = activity.age_range_assignments_ids[0];
+            group_details += `, ${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</span></dt>`;
         }
-        */
-        return '';
+        else if(activity.age_range_assignments_ids.length > 1) {
+            group_details += ':</dt>';
+            for(let assign of activity.age_range_assignments_ids) {
+                group_details += `<dd>${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</dd>`;
+            }
+        }
+
+        return '<dl>' +
+            `<dt>${activity.customer_id.name}</dt>` +
+            (activity.partner_identity_id?.address_city ? `<dt>${activity.partner_identity_id?.address_city}</dt>` : '') +
+            group_details +
+            `<dt>Handicap : <b>${activity.booking_line_group_id.has_person_with_disability ? 'oui' : 'non'}</b></dt>` +
+            `<dt>Séjour du ${activity.booking_id.date_from} au ${activity.booking_id.date_to}</dt>` +
+            `<dt>${activity.booking_id.nb_pers} personnes</dt>` +
+            `<br />` +
+            `<dt>Activité ${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
+            '</dl>';
     }
 
     private async onFiltersChange() {
         this.createHeaderDays();
 
         try {
-            const domain: any[] = ['relationship', '=', 'employee'];
-            /*
-            const domain: any[] = JSON.parse(JSON.stringify(this.params.rental_units_filter));
-            if(!domain.length) {
-                domain.push([['can_rent', '=', true], ["center_id", "in", this.params.centers_ids]]);
-            }
-            else {
-                for(let i = 0, n = domain.length; i < n; ++i) {
-                    domain[i].push(["center_id", "in",  this.params.centers_ids]);
-                }
-            }
-            */
+            const employees_domain = [
+                ['relationship', '=', 'employee'],
+                ['id', 'in', this.params.partners_ids]
+            ];
+
             const employees = await this.api.collect(
-                "hr\\employee\\Employee",
-                domain,
+                'hr\\employee\\Employee',
+                employees_domain,
                 Object.getOwnPropertyNames(new Employee()),
                 'name', 'asc', 0, 500
             );
-            if(employees) {
-                this.employees = employees;
-            }
+
+            const providers_domain = [
+                ['relationship', '=', 'provider'],
+                ['id', 'in', this.params.partners_ids]
+            ];
+
+            const providers = await this.api.collect(
+                'sale\\provider\\Provider',
+                providers_domain,
+                Object.getOwnPropertyNames(new Provider()),
+                'name', 'asc', 0, 500
+            );
+
+            this.partners = [...employees, ...providers];
         }
         catch(response) {
-            console.warn('unable to fetch rental units', response);
+            console.warn('unable to fetch partners', response);
         }
 
         try {
@@ -276,22 +324,18 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 // #memo - all dates are considered UTC
                 date_from: this.calcDateIndex(this.params.date_from),
                 date_to: this.calcDateIndex(this.params.date_to),
-                // #todo - #memo - we need to allow filtering employees based on various criterias
-                // employees_ids: JSON.stringify([15, 16, 17, 18, 19])
+                partners_ids: JSON.stringify(this.params.partners_ids),
+                product_model_ids: JSON.stringify(this.params.product_model_ids)
             });
-
         }
         catch(response: any ) {
-            console.warn('unable to fetch rental units', response);
+            console.warn('unable to fetch activities', response);
             // if a 403 response is received, we assume that the user is not identified: redirect to /auth
             if(response.status == 403) {
                 window.location.href = '/auth';
             }
         }
-
-
     }
-
 
     /**
      * Recompute content of the header.
@@ -373,18 +417,17 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public onhoverActivity(activity: any) {
-        this.hovered_activity = activity;
-    }
-
-    public onhoverDate(day: Date) {
-        let result;
-        if(day) {
-            let date_index: string = this.calcDateIndex(day);
-            if(this.holidays.hasOwnProperty(date_index) && this.holidays[date_index].length) {
-                result = this.holidays[date_index];
-            }
+        if(this.hoveredActivityTimeout === null && activity) {
+            this.hovered_activity = activity;
         }
-        this.hovered_holidays = result;
+        else {
+            clearTimeout(this.hoveredActivityTimeout);
+            this.hoveredActivityTimeout = setTimeout(() => {
+                this.hovered_activity = activity;
+                this.hoveredActivityTimeout = null;
+                this.cd.detectChanges();
+            }, 100);
+        }
     }
 
     public onOpenLegendDialog() {
@@ -404,16 +447,21 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
     public onSelectedBooking(event: any) {
         clearTimeout(this.mousedownTimeout);
-        this.showBooking.emit(event);
+        if(!event?.is_partner_event) {
+            this.showBooking.emit(event);
+        }
+        else {
+            this.showPartnerEvent.emit(event);
+        }
     }
 
-    public onSelectedEmployee(employee: any) {
+    public onSelectedPartner(partner: any) {
         clearTimeout(this.mousedownTimeout);
-        this.showEmployee.emit(employee);
+        this.showPartner.emit(partner);
     }
 
     public onhoverDay(employee: any, day:Date) {
-        this.hovered_employee = employee;
+        this.hovered_partner = employee;
 
         if(day) {
             let date_index:string = this.calcDateIndex(day);
@@ -426,175 +474,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         }
     }
 
-    public onhoverEmployee(employee: any) {
-        this.hovered_employee = employee;
-    }
-
-    public onmouseleaveTable() {
-        clearTimeout(this.mousedownTimeout);
-        this.selection.is_active = false;
-        this.selection.width = 0;
-    }
-
-    public onmouseup() {
-        clearTimeout(this.mousedownTimeout);
-
-        if(this.selection.is_active) {
-            console.log('is active');
-            // make from and to right
-            let rental_unit:any = this.selection.cell_from.employee;
-            let from:any = this.selection.cell_from;
-            let to:any = this.selection.cell_to;
-            if(this.selection.cell_to.date < this.selection.cell_from.date) {
-                from = this.selection.cell_to;
-                to = this.selection.cell_from;
-            }
-            // check selection for existing consumption
-            let valid = true;
-            let diff = (<Date>this.selection.cell_to.date).getTime() - (<Date>this.selection.cell_from.date).getTime();
-            let days = Math.abs(Math.floor(diff / (60*60*24*1000)))+1;
-            // do not check last day : overlaps is allowed if checkout is before checkin
-            for (let i = 0; i < days-1; i++) {
-                let currdate = new Date(from.date.getTime());
-                currdate.setDate(currdate.getDate() + i);
-                // #todo
-                if(this.hasActivity(rental_unit, this.calcDateIndex(currdate), 'AM')) {
-                    valid = false;
-                    break;
-                }
-            }
-            if(!valid || !from.employee) {
-                this.selection.is_active = false;
-                this.selection.width = 0;
-                return;
-            }
-            else {
-                // open dialog for requesting action dd
-/*
-                const dialogRef = this.dialog.open(ConsumptionCreationDialog, {
-                    width: '50vw',
-                    data: {
-                        employee: from.employee.name,
-                        employee_id: from.employee.id,
-                        date_from: from.date,
-                        date_to: to.date
-                    }
-                });
-
-                dialogRef.afterClosed().subscribe( async (values) => {
-                    if(values) {
-                        if(values.type && values.type == 'book') {
-                            try {
-                                // let date_from = new Date(values.date_from.getTime()-values.date_from.getTimezoneOffset()*60*1000);
-                                let date_from = (new Date(values.date_from.getTime()));
-                                let date_to = (new Date(values.date_to.getTime()));
-                                date_from.setHours(0,-values.date_from.getTimezoneOffset(),0,0);
-                                date_to.setHours(0,-values.date_to.getTimezoneOffset(),0,0);
-                                await this.api.call('?do=sale_booking_plan-option', {
-                                    date_from: date_from.toISOString(),
-                                    date_to: date_to.toISOString(),
-                                    rental_unit_id: values.rental_unit_id,
-                                    customer_identity_id: values.customer_identity_id,
-                                    no_expiry: values.no_expiry,
-                                    free_rental_units: values.free_rental_units
-                                });
-
-                                this.onRefresh();
-                            }
-                            catch(response) {
-                                this.api.errorFeedback(response);
-                            }
-                        }
-                        else if(values.type && values.type == 'ooo') {
-                            try {
-                                let date_from = (new Date(values.date_from.getTime()));
-                                let date_to = (new Date(values.date_to.getTime()));
-                                date_from.setHours(0,-values.date_from.getTimezoneOffset(),0,0);
-                                date_to.setHours(0,-values.date_to.getTimezoneOffset(),0,0);
-                                await this.api.call('?do=sale_booking_plan-repair', {
-                                    date_from: date_from.toISOString(),
-                                    date_to: date_to.toISOString(),
-                                    rental_unit_id: values.rental_unit_id,
-                                    description: (values.description.length)?values.description:'Blocage via planning'
-                                });
-
-                                this.onRefresh();
-                            }
-                            catch(response) {
-                                this.snack.open('Ce blocage est en conflit avec des consommations existantes.', 'ERREUR');
-                                // this.api.errorFeedback(response);
-                            }
-                        }
-
-                    }
-                });
-*/
-            }
-        }
-
-        this.selection.is_active = false;
-        this.selection.width = 0;
-
-    }
-
-    public onmousedown($event: any, employee: any, day: any) {
-        // start selection with a 100ms delay to avoid confusion with booking selection
-        this.mousedownTimeout = setTimeout( () => {
-            let table = this.calTable?.nativeElement.getBoundingClientRect();
-            let cell = $event.target;
-
-            while (cell && !cell.classList.contains('cell-AM')) {
-                cell = cell.previousElementSibling;
-            }
-
-            if(!cell) {
-                return;
-            }
-
-            let cellRect = cell.getBoundingClientRect();
-
-            this.selection.top = cellRect.top - table.top;
-            this.selection.left = cellRect.left - table.left + this.calTable.nativeElement.offsetLeft;
-
-            this.selection.width = this.cellsWidth * 3;
-            this.selection.height = cellRect.height;
-
-            this.selection.cell_from.left = this.selection.left;
-            this.selection.cell_from.width = this.cellsWidth;
-            this.selection.cell_from.date = day;
-            this.selection.cell_from.employee = employee;
-
-            this.selection.is_active = true;
-        }, 100);
-    }
-
-    public onmouseover($event: any, day: any) {
-        if(this.selection.is_active) {
-            if(day < this.selection.cell_from.date) {
-                return;
-            }
-            // selection between start and currently hovered cell
-            let table = this.calTable?.nativeElement.getBoundingClientRect();
-            let cell = $event.target;
-            while (cell && !cell.classList.contains('cell-EV')) {
-                cell = cell.nextElementSibling;
-            }
-
-            if(!cell) {
-                return;
-            }
-
-            let cellRect = cell.getBoundingClientRect();
-
-            this.selection.cell_to.date = day;
-
-            // diff between two dates
-            let diff = (<Date>this.selection.cell_to.date).getTime() - (<Date>this.selection.cell_from.date).getTime();
-            let nb_days = Math.abs(Math.floor(diff / (60*60*24*1000))) + 1;
-
-            this.selection.width = Math.ceil(this.cellsWidth * nb_days * 3) + nb_days;
-
-        }
+    public onhoverPartner(employee: any) {
+        this.hovered_partner = employee;
     }
 
     public preventDrag($event: any = null) {
@@ -605,15 +486,20 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     private isDroppable(activity: any, employee: Employee, date_index: string, time_slot: string) {
-        let result: boolean = false;
-        const activity_date_index = this.calcDateIndex(new Date(activity.activity_date))
-        console.log(date_index, activity_date_index);
-        if(date_index === activity_date_index && time_slot == activity.time_slot) {
-            result = true;
+        if(employee.relationship !== 'employee') {
+            return false;
         }
-        // #todo - il faut vérifier si l'animateur dispose des compétences pour cette activité
-        // #todo - ajouter un test pour vérifier que l'employé n'a pas déjà une activité "animation" assignée
-        return result;
+
+        const activity_date_index = this.calcDateIndex(new Date(activity.activity_date));
+
+               // Check drop and activity moment match
+        return date_index === activity_date_index && time_slot == activity.time_slot
+
+               // Check employee can handle activity
+               && employee.activity_product_models_ids.map(id => +id).includes(activity.product_model_id.id)
+
+               // Check that the employee hasn't been assigned an activity yet
+               && !this.hasActivity(employee, date_index, time_slot, true);
     }
 
     public onDragStart(activity: any) {
@@ -638,9 +524,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
 
             // #todo - (?) tenir compte du type (event_type)
-            let old_employee_id = this.currentDraggedActivity.employee_id ? this.currentDraggedActivity.employee_id.id : this.currentDraggedActivity.employee_id;
+            let old_employee_id = this.currentDraggedActivity.employee_id ?? 0;
 
-console.log(time_slot, date_index, old_employee_id);
             // remove from this.activities[0][date_index][time_slot]
             this.activities[old_employee_id][date_index][time_slot] = this.activities[old_employee_id][date_index][time_slot].filter( (activity: any) => activity.id !== this.currentDraggedActivity.id);
 
@@ -655,7 +540,8 @@ console.log(time_slot, date_index, old_employee_id);
                 this.activities[0][date_index][time_slot] = [];
             }
 
-            this.currentDraggedActivity.employee_id = this.emptyEmployee;
+            this.currentDraggedActivity.partner_id = null;
+            this.currentDraggedActivity.employee_id = null;
             this.activities[0][date_index][time_slot].push(this.currentDraggedActivity);
 
             // update back-end
@@ -681,7 +567,12 @@ console.log(time_slot, date_index, old_employee_id);
     public async onDrop(event: Event | CdkDragDrop<any, any>, index: number, employee: Employee, date_index: string, time_slot: string) {
         if(this.currentDraggedActivity) {
             if(!this.isDroppable(this.currentDraggedActivity, employee, date_index, time_slot)) {
-                this.snack.open('Cette activité ne peut pas être assignée à cet animateur ou à cette plage horaire.', 'ERREUR');
+                if(employee.relationship !== 'employee') {
+                    this.snack.open('Cette activité ne peut pas être assignée à un prestataire.', 'ERREUR');
+                }
+                else if(this.currentDraggedActivity.employee_id !== employee.id) {
+                    this.snack.open('Cette activité ne peut pas être assignée à cet animateur ou à cette plage horaire.', 'ERREUR');
+                }
             }
             else {
                 const dropEvent = event as CdkDragDrop<any, any>;
@@ -690,7 +581,7 @@ console.log(time_slot, date_index, old_employee_id);
                 element.style.setProperty('background-color', '');
 
                 // #todo - (?) tenir compte du type (event_type)
-                let old_employee_id = this.currentDraggedActivity.employee_id ? this.currentDraggedActivity.employee_id.id : this.currentDraggedActivity.employee_id;
+                let old_employee_id = this.currentDraggedActivity.employee_id ?? 0;
 
                 // remove from this.activities[0][date_index][time_slot]
                 this.activities[old_employee_id][date_index][time_slot] = this.activities[old_employee_id][date_index][time_slot].filter( (activity: any) => activity.id !== this.currentDraggedActivity.id);
@@ -706,8 +597,14 @@ console.log(time_slot, date_index, old_employee_id);
                     this.activities[employee.id][date_index][time_slot] = [];
                 }
 
-                this.currentDraggedActivity.employee_id = employee;
-                this.activities[employee.id][date_index][time_slot].push(this.currentDraggedActivity);
+                this.currentDraggedActivity.partner_id = employee;
+                this.currentDraggedActivity.employee_id = employee.id;
+                if(this.currentDraggedActivity?.is_partner_event) {
+                    this.activities[employee.id][date_index][time_slot].push(this.currentDraggedActivity);
+                }
+                else {
+                    this.activities[employee.id][date_index][time_slot].unshift(this.currentDraggedActivity);
+                }
 
                 // this.headers.days = this.headers.days.slice();
 
@@ -725,6 +622,9 @@ console.log(time_slot, date_index, old_employee_id);
                 }
                 catch(response) {
                     this.api.errorFeedback(response);
+
+                    this.activities[employee.id][date_index][time_slot] = this.activities[employee.id][date_index][time_slot].filter( (activity: any) => activity.id !== this.currentDraggedActivity.id);
+                    this.activities[old_employee_id][date_index][time_slot].unshift(this.currentDraggedActivity);
                 }
             }
             this.currentDraggedActivity = null;
@@ -734,5 +634,11 @@ console.log(time_slot, date_index, old_employee_id);
 
     public trackByActivity(index: number, activity: any): string {
         return activity.id; // Assurez-vous que chaque activité a un ID unique
+    }
+
+    public getProductModelName(productModelId: string) {
+        const productModel = this.productModels.find(p => p.id === +productModelId);
+
+        return productModel?.name ?? '';
     }
 }

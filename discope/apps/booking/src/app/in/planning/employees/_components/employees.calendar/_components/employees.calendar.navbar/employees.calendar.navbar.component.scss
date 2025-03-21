@@ -1,9 +1,11 @@
-::ng-deep.cdk-overlay-pane .centers-selector .mat-optgroup-label {
+::ng-deep.cdk-overlay-pane .partners-selector .mat-optgroup-label,
+::ng-deep.cdk-overlay-pane .product-model-selector .mat-optgroup-label {
     height: 38px !important;
     line-height: 38px !important;
 }
 
-::ng-deep.cdk-overlay-pane .mat-select-panel.centers-selector {
+::ng-deep.cdk-overlay-pane .mat-select-panel.partners-selector,
+::ng-deep.cdk-overlay-pane .mat-select-panel.product-model-selector {
     height: auto;
     max-height: calc(100vh - 150px) !important;
 }
@@ -18,37 +20,54 @@
 }
 
 :host {
-
     position: relative;
     user-select: none;
     display: flex;
     height: 95px;
     padding: 0 15px;
 
-
     .panelFilters {
-        flex: 0 1 33%;
+        flex: 0 1 40%;
         display: flex;
+        align-items: center;
+        gap: 12px;
 
-        .centers-selector {
-            width: 80%;
+        .product-model-selector {
             display: flex;
+            flex-grow: 1;
+            max-width: 225px;
             align-items: center;
             margin-top: -23px;
-            flex-direction: row;
-            gap: 12px;
 
             mat-form-field {
                 width: 100%;
             }
+        }
 
+        .partners-selector {
+            display: flex;
+            flex-grow: 1;
+            max-width: 225px;
+            align-items: center;
+            margin-top: -23px;
+
+            mat-form-field {
+                width: 100%;
+            }
+        }
+
+        .info-settings {
+            display: flex;
+            align-items: center;
+            margin-top: -23px;
+            margin-right: 50px;
         }
     }
 
     .panelStatus {
         display: flex;
         line-height: 65px;
-        flex: 1 0 33%;
+        flex: 1 0 30%;
         text-align: center;
 
         .date-display {
@@ -62,16 +81,16 @@
 
         .date-selector {
             min-width: 240px;
-            
+
             .mat-datepicker-popup {
                 position: relative;
                 top: 110px
-            }         
+            }
         }
 
         .date-counter {
-            line-height: 70px; 
-            font-size: 14px; 
+            line-height: 70px;
+            font-size: 14px;
             font-weight: 400;
         }
 
@@ -89,7 +108,7 @@
         align-items: center;
         margin-top: -23px;
         line-height: 65px;
-        flex: 1 0 33%;
+        flex: 1 0 30%;
         text-align: right;
     }
 
@@ -105,7 +124,7 @@
     .mat-datepicker-popup {
         position: relative;
         top: 110px
-    } 
+    }
 
     .containerStatusbar {
         height: 20px;
@@ -124,7 +143,7 @@
         height: 30px;
         left: 15px;
         bottom: 7px;
-        
+
         border-radius: 5px;
 
         .rental-unit-details {
@@ -150,7 +169,7 @@
             width: 100%;
             overflow: hidden;
             white-space: nowrap;
-            text-overflow: ellipsis;            
+            text-overflow: ellipsis;
 
             span {
                 display: flex;
@@ -161,7 +180,7 @@
                 text-align: center;
                 border-bottom: solid 1px var(--mdc-theme-secondary);
                 font-weight: 500;
-            }            
+            }
 
         }
 

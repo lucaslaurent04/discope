@@ -31,7 +31,8 @@ class BookingLineGroup extends Model {
             'order' => [
                 'type'              => 'integer',
                 'description'       => 'Order of the group in the list.',
-                'default'           => 1
+                'default'           => 1,
+                'onupdate'          => 'onupdateOrder'
             ],
 
             'date_from' => [
@@ -330,6 +331,18 @@ class BookingLineGroup extends Model {
                 'foreign_object'    => 'sale\booking\BookingActivity',
                 'foreign_field'     => 'booking_line_group_id',
                 'description'       => "The booking activities that refer to the booking line group."
+            ],
+
+            'activity_group_num' => [
+                'type'              => 'integer',
+                'description'       => "Identifier of the activity group in the booking.",
+                'onupdate'          => 'onupdateActivityGroupNum'
+            ],
+
+            'has_person_with_disability' => [
+                'type'              => 'boolean',
+                'description'       => "At least one person from the group has a disability.",
+                'default'           => false
             ]
 
         ];
@@ -367,8 +380,9 @@ class BookingLineGroup extends Model {
     }
 
     public static function onupdateGroupType($om, $ids, $values, $lang) {
-        $groups = $om->read(self::getType(), $ids, ['group_type'], $lang);
+        $groups = $om->read(self::getType(), $ids, ['group_type', 'booking_id'], $lang);
         if($groups > 0) {
+            $map_booking_ids = [];
             foreach($groups as $id => $group) {
                 if($group['group_type'] == 'simple') {
                     $om->update(self::getType(), $id, ['is_sojourn' => false]);
@@ -377,12 +391,27 @@ class BookingLineGroup extends Model {
                 elseif($group['group_type'] == 'sojourn' || $group['group_type'] == 'camp') {
                     $om->update(self::getType(), $id, ['is_sojourn' => true]);
                     $om->update(self::getType(), $id, ['is_event' => false]);
+
+                    if($group['group_type'] == 'camp') {
+                        $map_booking_ids[$group['booking_id']] = true;
+                    }
                 }
                 elseif($group['group_type'] == 'event') {
                     $om->update(self::getType(), $id, ['is_sojourn' => false]);
                     $om->update(self::getType(), $id, ['is_event' => true]);
                 }
             }
+
+            foreach(array_keys($map_booking_ids) as $booking_id) {
+                self::refreshActivityGroupNumber($booking_id);
+            }
+        }
+    }
+
+    public static function onupdateActivityGroupNum($self) {
+        $self->read(['booking_activities_ids']);
+        foreach($self as $group) {
+            BookingActivity::search(['id', 'in', $group['booking_activities_ids']])->update(['group_num' => null]);
         }
     }
 
@@ -518,6 +547,39 @@ class BookingLineGroup extends Model {
         // #memo - this must be done after all other processing and should not alter price_id assignments (but only reset computed fields)
         $om->callonce('sale\booking\BookingLineGroup', '_resetPrices', $oids, [], $lang);
 
+    }
+
+    public static function onupdateOrder($self) {
+        $self->read(['booking_id']);
+
+        $map_booking_ids = [];
+        foreach ($self as $group) {
+            $map_booking_ids[$group['booking_id']] = true;
+        }
+
+        $booking_ids = array_keys($map_booking_ids);
+
+        foreach ($booking_ids as $booking_id) {
+            self::refreshActivityGroupNumber($booking_id);
+        }
+    }
+
+    public static function refreshActivityGroupNumber(int $booking_id) {
+        $booking = Booking::id($booking_id)
+            ->read(['booking_lines_groups_ids' => ['order', 'group_type']])
+            ->first();
+
+        $map_order_group_id = [];
+        foreach($booking['booking_lines_groups_ids'] as $group) {
+            if($group['group_type'] === 'camp') {
+                $map_order_group_id[$group['order']] = $group['id'];
+            }
+        }
+
+        foreach(array_values($map_order_group_id) as $index => $group_id) {
+            BookingLineGroup::id($group_id)
+                ->update(['activity_group_num' => $index + 1]);
+        }
     }
 
     public static function onupdateDateFrom($om, $oids, $values, $lang) {
