@@ -3,6 +3,8 @@
         [partner]="hovered_partner"
         [activity]="hovered_activity"
         [holidays]="hovered_holidays"
+        [productModelCategories]="productModelCategories"
+        [productModels]="productModels"
         (refresh)="onRefresh()"
         (openLegendDialog)="onOpenLegendDialog()"
         (openPrefDialog)="onOpenPrefDialog()"
@@ -68,8 +70,23 @@
                         (mouseenter)="onhoverPartner(partner); hover_row_index = index"
                         (mouseleave)="onhoverPartner(null); hover_row_index = -1"
                         [style.background]="partner?.color"
-                        (click)="onSelectedPartner(partner)"><span class="partner-name">{{ partner.name }} </span>
-                        <span *ngIf="partner == hovered_partner" class="cell-hint"><span>{{ partner.name }} ({{ partner.relationship === 'employee' ? 'Employé' : 'Prestataire' }})</span></span>
+                        (click)="onSelectedPartner(partner)"
+                    >
+                        <span class="partner-name">{{ partner.name }} </span>
+                        <span *ngIf="partner == hovered_partner" class="cell-hint">
+                            <span>
+                                <ng-container *ngIf="partner.relationship === 'employee'">
+                                    <dt>{{partner.name}} (Employé)</dt>
+                                    <br />
+                                    <dt *ngFor="let id of partner.activity_product_models_ids">
+                                        {{getProductModelName(id)}}
+                                    </dt>
+                                </ng-container>
+                                <ng-container *ngIf="partner.relationship === 'provider'">
+                                    <dt>{{partner.name}} (Prestataire)</dt>
+                                </ng-container>
+                            </span>
+                        </span>
                     </td>
 
                     <!-- #debug - for debugging, add [attr.data-date]="day" -->
