@@ -110,6 +110,26 @@
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "id": "section.partner-events",
+                        "label": "Partner Events",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "partner_events_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             }

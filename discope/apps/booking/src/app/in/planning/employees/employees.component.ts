@@ -148,7 +148,7 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
     }
 
     public onShowBooking(consumption: any) {
-        let descriptor:any
+        let descriptor: any;
 
         // switch depending on object type (booking or ooo)
         if(consumption.type == 'ooo') {
@@ -200,7 +200,7 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
     }
 
     public onShowPartner(partner: any) {
-        let descriptor:any = {
+        let descriptor: any = {
             context_silent: true, // do not update sidebar
             context: {
                 entity: partner.relationship === 'employee' ? 'hr\\employee\\Employee' : 'sale\\provider\\Provider',
@@ -222,6 +222,31 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
         if(this.fullscreen) {
             descriptor.context['dom_container'] = '.planning-body';
         }
+        // prevent angular lifecycles while a context is open
+        this.cd.detach();
+        this.context.change(descriptor);
+    }
+
+    public onShowPartnerEvent(partnerEvent: any) {
+        let descriptor: any = {
+            context_silent: true, // do not update sidebar
+            context: {
+                entity: 'sale\\booking\\PartnerEvent',
+                type: 'form',
+                name: 'default',
+                domain: ['id', '=', partnerEvent.id],
+                mode: 'view',
+                purpose: 'view',
+                display_mode: 'popup',
+                callback: (data:any) => {
+                    // restart angular lifecycles
+                    this.cd.reattach();
+                    // force a refresh
+                    this.planningCalendar.onRefresh();
+                }
+            }
+        };
+
         // prevent angular lifecycles while a context is open
         this.cd.detach();
         this.context.change(descriptor);
