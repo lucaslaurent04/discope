@@ -1,0 +1,48 @@
+{
+    "name": "Employé",
+    "plural": "Employés",
+    "description": "",
+    "model": {
+        "name": {
+            "label": "Nom",
+            "description": "Code mnémo du modèle.",
+            "help": ""
+        },
+        "activity_product_models_ids": {
+            "label": "Modèles de produit",
+            "description": "Les modèles de produit dont l'employé peut être responsable.",
+            "help": ""
+        },
+        "partner_events_ids": {
+            "label": "Planning events",
+            "description": "Planning events of the partner.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Modèle",
+            "description": "Les modèles sont utilisés dans la communication et contiennent plusieurs catégories.",
+            "layout": {
+                "template.content": {
+                    "label": "Contenu"
+                },
+                "section.activity-product-models": {
+                    "label": "Modèles de produit"
+                },
+                "section.partner-events": {
+                    "label": "Evénements"
+                },
+                "section.partner-event-sets": {
+                    "label": "Séries d'événements"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Liste des Modèles",
+            "description": "Liste des modèles.",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

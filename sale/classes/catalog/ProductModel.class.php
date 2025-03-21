@@ -397,6 +397,16 @@ class ProductModel extends Model {
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
             ],
 
+            'activity_employees_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'hr\employee\Employee',
+                'foreign_field'     => 'activity_product_models_ids',
+                'rel_table'         => 'sale_catalog_product_model_rel_hr_employee',
+                'rel_foreign_key'   => 'employee_id',
+                'rel_local_key'     => 'activity_id',
+                'description'       => "Employees eligible to be assigned activities associated with this product model."
+            ],
+
             'has_rental_unit' => [
                 'type'              => 'boolean',
                 'description'       => "Indicates whether the activity requires the assignation of a rental unit.",

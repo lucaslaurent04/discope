@@ -9,6 +9,7 @@
 namespace sale\booking;
 
 use equal\orm\Model;
+use hr\employee\Employee;
 
 class BookingActivity extends Model {
 
@@ -97,6 +98,12 @@ class BookingActivity extends Model {
                 'default'           => 1
             ],
 
+            'counter_total' => [
+                'type'              => 'integer',
+                'description'       => "The total of this type of activity in the booking sojourn for the group.",
+                'default'           => 1
+            ],
+
             'total' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
@@ -124,13 +131,13 @@ class BookingActivity extends Model {
             'employee_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'hr\employee\Employee',
-                'description'       => "Employee assigned to the supervision of the activity.",
+                'description'       => "Employee assigned to the supervision of the activity."
             ],
 
             'activity_date' => [
                 'type'              => 'computed',
                 'result_type'       => 'date',
-                'description'       => 'Specific day time slot on which the service is delivered.',
+                'description'       => "Specific date on which the service is delivered.",
                 'store'             => true,
                 'relation'          => ['activity_booking_line_id' => 'service_date'],
                 'onupdate'          => 'onupdateActivityDate'
@@ -157,9 +164,26 @@ class BookingActivity extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\catalog\ProductModel',
-                'description'       => 'The product model the activity relates to.',
+                'description'       => "The product model the activity relates to.",
                 'store'             => true,
                 'relation'          => ['activity_booking_line_id' => ['product_model_id']]
+            ],
+
+            'has_staff_required' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'foreign_object'    => 'sale\catalog\ProductModel',
+                'description'       => "Does the activity need an employee to be assigned to it.",
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['product_model_id' => ['has_staff_required']]
+            ],
+
+            'group_num' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'store'             => true,
+                'relation'          => ['booking_line_group_id' => ['activity_group_num']]
             ]
 
         ];
@@ -271,11 +295,14 @@ class BookingActivity extends Model {
         $bookingLineGroupIds = array_keys($mapBookingLineGroupIds);
 
         foreach($bookingLineGroupIds as $group_id) {
+            $map_activity_product_counter_total = [];
+            $map_activity_counter = [];
+
             $group_activities = BookingActivity::search(
                 ['booking_line_group_id', '=', $group_id],
                 ['sort' => ['activity_date' => 'asc']]
             )
-                ->read(['activity_date', 'time_slot_id' => ['order']])
+                ->read(['product_model_id', 'activity_date', 'time_slot_id' => ['order']])
                 ->get(true);
 
             usort($group_activities, function($a, $b) {
@@ -284,12 +311,57 @@ class BookingActivity extends Model {
                 return $date_comp !== 0 ? $date_comp : $a['time_slot_id']['order'] <=> $b['time_slot_id']['order'];
             });
 
-            $counter = 1;
+            foreach($group_activities as $booking_activity) {
+                if(!isset($map_activity_product_counter_total[$booking_activity['product_model_id']])) {
+                    $map_activity_product_counter_total[$booking_activity['product_model_id']] = 0;
+                }
+
+                $map_activity_product_counter_total[$booking_activity['product_model_id']] += 1;
+                $map_activity_counter[$booking_activity['id']] = $map_activity_product_counter_total[$booking_activity['product_model_id']];
+            }
+
             foreach($group_activities as $booking_activity) {
                 BookingActivity::id($booking_activity['id'])
-                    ->update(['counter' => $counter++]);
+                    ->update([
+                        'counter'       => $map_activity_counter[$booking_activity['id']],
+                        'counter_total' => $map_activity_product_counter_total[$booking_activity['product_model_id']]
+                    ]);
             }
         }
+    }
+
+    public static function canupdate($self, $values): array {
+        $self->read(['activity_date', 'time_slot_id', 'employee_id', 'product_model_id']);
+        foreach($self as $booking_activity) {
+            $employee_id = array_key_exists('employee_id', $values) ? $values['employee_id'] : $booking_activity['employee_id'];
+            if(is_null($employee_id)) {
+                continue;
+            }
+
+            $employee = Employee::id($employee_id)
+                ->read(['activity_product_models_ids'])
+                ->first();
+
+            if(!in_array($booking_activity['product_model_id'], $employee['activity_product_models_ids'])) {
+                return ['employee_id' => ['not_allowed' => "Employee not qualified for this type of activity."]];
+            }
+
+            $activity_date = $values['activity_date'] ?? $booking_activity['activity_date'];
+            $time_slot_id = $values['time_slot_id'] ?? $booking_activity['time_slot_id'];
+
+            $activities_ids = BookingActivity::search([
+                ['activity_date', '=', $activity_date],
+                ['time_slot_id', '=', $time_slot_id],
+                ['employee_id', '=', $employee_id]
+            ])
+                ->ids();
+
+            if(!empty($activities_ids)) {
+                return ['employee_id' => ['already_assigned' => "An activity is already assigned to this user for that moment."]];
+            }
+        }
+
+        return parent::canupdate($self, $values);
     }
 
     public static function ondelete($self): void {
@@ -306,5 +378,4 @@ class BookingActivity extends Model {
             }
         }
     }
-
 }
