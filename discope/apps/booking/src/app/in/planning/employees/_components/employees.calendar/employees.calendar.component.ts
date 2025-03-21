@@ -51,6 +51,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     @Output() filters = new EventEmitter<ChangeReservationArg>();
     @Output() showBooking = new EventEmitter();
     @Output() showPartner = new EventEmitter();
+    @Output() showPartnerEvent = new EventEmitter();
 
     @Output() openLegendDialog = new EventEmitter();
     @Output() openPrefDialog = new EventEmitter();
@@ -411,6 +412,9 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         clearTimeout(this.mousedownTimeout);
         if(!event?.is_partner_event) {
             this.showBooking.emit(event);
+        }
+        else {
+            this.showPartnerEvent.emit(event);
         }
     }
 

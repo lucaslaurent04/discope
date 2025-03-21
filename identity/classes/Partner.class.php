@@ -125,9 +125,17 @@ class Partner extends Model {
 
             'is_active' => [
                 'type'              => 'boolean',
-                'description'       => 'Mark the partner as active.',
+                'description'       => "Mark the partner as active.",
                 'default'           => true
+            ],
+
+            'partner_events_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\PartnerEvent',
+                'foreign_field'     => 'partner_id',
+                'description'       => "Activity planning events of the partner."
             ]
+
         ];
     }
 

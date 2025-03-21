@@ -370,6 +370,30 @@
             "label": "Modèles de message",
             "help": ""
         },
+        "hr": {
+            "label": "Resources humaines",
+            "help": ""
+        },
+        "hr.employee": {
+            "label": "Employés",
+            "help": ""
+        },
+        "hr.employee.all" : {
+            "label": "Tous",
+            "help": ""
+        },
+        "hr.absences": {
+            "label": "Absences",
+            "help": ""
+        },
+        "hr.absences.all": {
+            "label": "Toutes",
+            "help": ""
+        },
+        "hr.absences.codes": {
+            "label": "Codes",
+            "help": ""
+        },
         "settings.scheduler": {
             "label": "Planificateur",
             "help": ""

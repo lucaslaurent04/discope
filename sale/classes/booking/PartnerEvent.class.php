@@ -27,13 +27,14 @@ class PartnerEvent extends Model {
 
             'description' => [
                 'type'              => 'string',
+                'usage'             => 'text/plain',
                 'description'       => "Complete description of the event."
             ],
 
             'partner_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Partner',
-                'description'       => "Employee assigned to the supervision of the activity.",
+                'description'       => "Partner the event is related to.",
                 'required'          => true,
                 'readonly'          => true
             ],
@@ -55,7 +56,8 @@ class PartnerEvent extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\TimeSlot',
                 'description'       => "Specific day time slot on which the service is delivered.",
-                'required'          => true
+                'required'          => true,
+                'domain'            => ['code', 'in', ['AM', 'PM', 'EV']]
             ]
 
         ];
