@@ -134,6 +134,13 @@ class Partner extends Model {
                 'foreign_object'    => 'sale\booking\PartnerEvent',
                 'foreign_field'     => 'partner_id',
                 'description'       => "Activity planning events of the partner."
+            ],
+
+            'partner_event_sets_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\PartnerEventSet',
+                'foreign_field'     => 'partner_id',
+                'description'       => "Activity planning set of events of the partner."
             ]
 
         ];
