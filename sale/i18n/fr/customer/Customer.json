@@ -74,6 +74,9 @@
                 },
                 "section.customer_bookings": {
                     "label": "Historique des Réservations"
+                },
+                "section.bookings_points": {
+                    "label": "Points de fidélité"
                 }
             }
         },
