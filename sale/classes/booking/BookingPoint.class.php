@@ -87,9 +87,9 @@ class BookingPoint extends Model {
 
     public static function calcName($self) {
         $result = [];
-        $self->read(['booking_id' => ['name', 'customer_id' => ['name']],  'points_value']);
+        $self->read(['booking_id' => ['name'], 'customer_id' => ['name'],  'points_value']);
         foreach($self as $id => $point) {
-            $result[$id] = $point['booking_id']['name'] .' - '. $point['booking_id']['customer_id']['name'];
+            $result[$id] = $point['booking_id']['name'] .' - '. $point['customer_id']['name'];
         }
         return $result;
     }
