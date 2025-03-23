@@ -902,19 +902,6 @@ class Booking extends Model {
                     else {
                         // everything has been paid : booking can be archived
                         $om->update(self::getType(), $id, ['status' => 'balanced']);
-                        $booking_point = BookingPoint::search(['booking_id', '=' , $id])->read('id')->first(true);
-                        if($booking_point){
-                            BookingPoint::id($booking_point['id'])
-                                ->update([
-                                    'nb_paying_pers' => null,
-                                    'nb_nights'      => null,
-                                    'points_value'   => null
-                                ]);
-                        }else {
-                            BookingPoint::create([
-                                'booking_id' =>  $id
-                            ]);
-                        }
                     }
                 }
             }
@@ -939,6 +926,20 @@ class Booking extends Model {
             foreach($bookings as $id => $booking) {
                 if($booking['status'] == 'confirmed') {
                     $om->update(self::getType(), $id, ['has_contract' => true], $lang);
+                }
+
+                if($booking['status'] == 'balanced') {
+                    $has_points_applied = false;
+                    $bookingPoint = BookingPoint::search(['booking_id', '=', $id])->read(['id', 'booking_apply_id'])->first();
+
+                    if($bookingPoint && $bookingPoint['booking_apply_id']) {
+                        $has_points_applied = true;
+                    }
+                    if(!$has_points_applied) {
+                        // remove any previous points related to the booking
+                        BookingPoint::search(['booking_id', '=', $id])->delete(true);
+                        BookingPoint::create(['booking_id' => $id]);
+                    }
                 }
 
                 \eQual::run('do', 'sale_booking_followup_generate-task-status-change', ['booking_id' => $id]);
@@ -1412,11 +1413,22 @@ class Booking extends Model {
         return null;
     }
 
-
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Resets `total` and `price` computed fields.
+     */
     public static function refreshPrice($om, $id) {
         $om->update(self::getType(), $id, ['total' => null, 'price' => null]);
     }
 
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Resets `date_from`, `date_to`, `time_from` and `time_to` computed fields.
+     */
     public static function refreshDate($om, $id) {
         $bookings = $om->read(self::getType(), $id, ['booking_lines_groups_ids.group_type']);
 
@@ -1442,14 +1454,32 @@ class Booking extends Model {
         $om->update(self::getType(), $id, ['date_from' => null, 'date_to' => null, 'time_from' => null, 'time_to' => null]);
     }
 
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Resets `time_from` and `time_to` computed fields.
+     */
     public static function refreshTime($om, $id) {
         $om->update(self::getType(), $id, ['time_from' => null, 'time_to' => null]);
     }
 
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Resets `nb_pers` field.
+     */
     public static function refreshNbPers($om, $id) {
         $om->update(self::getType(), $id, ['nb_pers' => null]);
     }
 
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Recomputes `type_id`.
+     */
     public static function refreshBookingType($om, $id) {
 
         $bookings = $om->read(self::getType(), $id, [
