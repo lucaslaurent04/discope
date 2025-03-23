@@ -3,7 +3,7 @@
     "plural": "Chèques bancaires",
     "description": "",
     "model": {
-        "bankCheck_number": {
+        "bank_check_number": {
             "label": "Numéro du chèque",
             "description": "Le numéro unique officiel attribué au chèque bancaire par la banque émettrice.",
             "help": ""
@@ -48,7 +48,7 @@
             "description": "Le financement associé au chèque bancaire, si applicable.",
             "help": ""
         },
-        "bankCheck_description": {
+        "bank_check_description": {
             "label": "Description",
             "description": "Une description détaillée ou une note relative à ce chèque bancaire.",
             "help": ""
