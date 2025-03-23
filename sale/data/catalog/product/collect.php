@@ -80,13 +80,15 @@ $domain->addCondition(new DomainCondition('can_sell', '=', true));
 
 // 2) reduce domain to products referenced by prices matching the given constraints (center, dates & status)
 $products_ids = Product::search($domain->toArray())->ids();
-$price_lists_ids = PriceList::search([
+$price_lists_ids = PriceList::search(
+        [
             ['price_list_category_id', '=', $center['price_list_category_id']],
             ['date_from', '<=', $params['date_from']],
             ['date_to', '>=', $params['date_from']],
             ['status', '=', ['published']]
         ],
-        ['duration' => 'asc'])
+        ['duration' => 'asc']
+    )
     ->ids();
 
 $prices = Price::search([
