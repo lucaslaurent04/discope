@@ -121,8 +121,6 @@ app-menu-list-item.hidden {
     width: 250px;
     flex: 0 0 250px;
     order: 3;
-    /* this is not present in other apps - workaround for planning loader bar */
-    z-index: 3;
 }
 
 .app-body .app-sidebar .side-inner {
