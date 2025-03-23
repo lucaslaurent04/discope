@@ -84,6 +84,14 @@
                                 background-color: lightgrey;
                             }
                         }
+
+                        .rentalunit-filter {
+                            flex-grow: 1;
+                            margin-left: 20px;
+                            padding-left: 10px;
+                            border-radius: 20px;
+                            border: solid 1px lightgray;
+                        }
                     }
                 }
             }

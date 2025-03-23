@@ -110,7 +110,7 @@
                             <mat-checkbox [checked]="allRentalUnitsSelected" (change)="leftSelectAllRentalUnits()" style="min-width: 140px;">
                                 Toutes <span style="font-size: 0.8rem;">({{selectedRentalUnits.length}}/{{filteredRentalUnits.length}})</span>
                             </mat-checkbox>
-                            <input [value]="filterBy" (keyup)="leftFilterBy($event)" type="text" placeholder="Filtrer" style="flex-grow: 1; margin-left: 20px; padding-left: 10px; border-radius: 20px; border-color: black;">
+                            <input class="rentalunit-filter" [value]="filterBy" (keyup)="leftFilterBy($event)" type="text" placeholder="Filtrer">
                             <mat-slide-toggle [checked]="showOnlyParents" (change)="leftShowOnlyParents($event.checked)" style="margin-left: 20px; transform: scale(0.8);">Parents</mat-slide-toggle>
                             <mat-slide-toggle [checked]="showOnlyChildren" (change)="leftShowOnlyChildren($event.checked)" style="transform: scale(0.8);">Enfants</mat-slide-toggle>
                         </div>
