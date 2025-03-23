@@ -61,7 +61,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "bankCheck_number",
+                                                "value": "bank_check_number",
                                                 "width": "50%"
                                             },
                                             {
@@ -91,7 +91,7 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "bankCheck_description",
+                                                "value": "bank_check_description",
                                                 "width": "100%"
                                             }
                                         ]

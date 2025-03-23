@@ -9,13 +9,13 @@
 			"help": ""
 		},
 		"booking_id": {
-			"label": "Réservation",
+			"label": "Réservation d'origine",
 			"description": "Référence à la réservation associée à cette entrée.",
 			"help": ""
 		},
 		"booking_apply_id": {
-			"label": "Réservation appliquée",
-			"description": "Réservation à laquelle la remise employé a été appliquée.",
+			"label": "Réservation bénéficiaire",
+			"description": "Réservation pour laquelle les points ont été utilisés.",
 			"help": ""
 		},
 		"customer_id": {
@@ -34,8 +34,8 @@
 			"help": ""
 		},
 		"points_value": {
-			"label": "Valeur en points",
-			"description": "Nombre de points gagnés grâce à la réservation.",
+			"label": "Nombre de points",
+			"description": "Nombre de points gagnés grâce à la réservation d'origine.",
 			"help": ""
 		},
 		"description": {

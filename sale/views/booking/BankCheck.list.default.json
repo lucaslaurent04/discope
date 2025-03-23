@@ -25,7 +25,7 @@
         "items": [
             {
                 "type": "field",
-                "value": "bankCheck_number",
+                "value": "bank_check_number",
                 "width": "20%",
                 "sortable": true
             },
