@@ -9,7 +9,7 @@ use sale\booking\BankCheck;
 use sale\booking\Funding;
 use sale\booking\Payment;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Register a manual payment using a bank check to settle the outstanding balance of a funding.",
     'help'          => "This action processes a manual payment via bank check, linking it to the corresponding funding and marking it as paid.",
     'params'        => [
@@ -33,14 +33,13 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'providers'     => ['context']
 ]);
 
 /**
  * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $om
  */
-list($context, $om) = [ $providers['context'], $providers['orm'] ];
+['context' => $context] = $providers;
 
 if(!$params['confirm']) {
     throw new Exception('missing_confirmation', EQ_ERROR_MISSING_PARAM);
@@ -49,11 +48,11 @@ if(!$params['confirm']) {
 $bankCheck = BankCheck::id($params['id'])->read(['id','funding_id','payment_id', 'amount'])->first(true);
 
 if(!$bankCheck){
-    throw new Exception("unknown_bankCheck", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_bankCheck", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($bankCheck['payment_id']){
-    throw new Exception("payment_already_associated", QN_ERROR_INVALID_PARAM);
+    throw new Exception("payment_already_associated", EQ_ERROR_INVALID_PARAM);
 }
 
 $funding = Funding::id($bankCheck['funding_id'])
@@ -61,14 +60,14 @@ $funding = Funding::id($bankCheck['funding_id'])
             ->first(true);
 
 if(!$funding) {
-    throw new Exception("unknown_funding", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_funding", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-$sign = ($funding['due_amount'] >= 0)? 1 : -1;
+$sign = ($funding['due_amount'] >= 0) ? 1 : -1;
 $remaining_amount = abs($funding['due_amount']) - abs($funding['paid_amount']);
 
 if($remaining_amount <= 0) {
-    throw new Exception("nothing_to_pay", QN_ERROR_INVALID_PARAM);
+    throw new Exception("nothing_to_pay", EQ_ERROR_INVALID_PARAM);
 }
 
 $payment = Payment::create([
@@ -81,6 +80,7 @@ $payment = Payment::create([
         'payment_origin'    => 'cashdesk',
         'payment_method'    => 'bank_check'
     ])
+    // this updated funding paid status
     ->update([
         'funding_id'        => $funding['id']
     ])
@@ -88,8 +88,6 @@ $payment = Payment::create([
     ->first(true);
 
 BankCheck::id($bankCheck['id'])->update(['payment_id' => $payment['id'], 'status' => 'paid']);
-
-Funding::id($bankCheck['funding_id'])->update(['is_paid' => true]);
 
 $context->httpResponse()
         ->status(205)
