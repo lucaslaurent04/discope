@@ -15,31 +15,36 @@ class BankCheck extends Model {
         return [
 
             'name' => [
-                'type'              => 'alias',
-                'alias'             => 'bankCheck_number'
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'function'          => 'calcName',
+                'store'             => true
             ],
 
-            'bankCheck_number' => [
+            'bank_check_number' => [
                 'type'              => 'string',
-                'description'       => 'The official unique number assigned to the bank check by the issuing bank.'
+                'description'       => 'The official unique number assigned to the bank check by the issuing bank.',
+                'dependents'        => ['name']
             ],
 
             'amount' => [
                 'type'              => 'float',
                 'usage'             => 'amount/money:2',
-                'description'       => 'The monetary value of the bank check.'
+                'description'       => 'The monetary value of the bank check.',
+                'dependents'        => ['name']
             ],
 
             'emission_date' => [
                 'type'              => 'date',
                 'description'       => "The date when the bank check was issued.",
-                'default'           => time()
+                'default'           => function () { return time(); },
+                'dependents'        => ['name']
             ],
 
             'has_signature' => [
                 'type'              => 'boolean',
                 'description'       => "The bank check has the signature",
-                'default'           => true,
+                'default'           => false
             ],
 
             'status' => [
@@ -59,7 +64,7 @@ class BankCheck extends Model {
                 'description'       => 'The funding associated with the bank check, if applicable.'
             ],
 
-            'bankCheck_description' => [
+            'bank_check_description' => [
                 'type'              => 'string',
                 'usage'             => 'text/plain',
                 'description'       => "'A detailed description or note related to this bank check."
@@ -105,6 +110,16 @@ class BankCheck extends Model {
                 'transitions' => [],
             ],
         ];
+    }
+
+
+    public static function calcName($self) {
+        $result = [];
+        $self->read(['bank_check_number', 'amount', 'emission_date']);
+        foreach($self as $id => $bankCheck) {
+            $result[$id] = $bankCheck['emission_date'] . ' ' . $bankCheck['bank_check_number'] . '(' . $bankCheck['amount'] .')';
+        }
+        return $result;
     }
 
     public static function canupdate($om, $oids, $values, $lang) {
