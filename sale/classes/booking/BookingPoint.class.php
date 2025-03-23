@@ -35,7 +35,7 @@ class BookingPoint extends Model {
             'booking_apply_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
-                'description'       => 'Booking to which the employee discount was applied.',
+                'description'       => 'Booking to which the discount was applied.',
                 'ondelete'          => 'cascade',
             ],
 
@@ -69,12 +69,11 @@ class BookingPoint extends Model {
             'points_value' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
-                'description'       => 'Number of points earned from the booking.',
+                'description'       => 'Number of points earned from the target booking.',
                 'function'          => 'calcPointsValue',
                 'store'             => true,
                 'instant'           => true
             ],
-
 
             'description' => [
                 'type'              => 'string',
@@ -94,11 +93,14 @@ class BookingPoint extends Model {
         return $result;
     }
 
+    /**
+     * computes 1 points per night per paying person
+     */
     public static function calcPointsValue($self) {
         $result = [];
         $self->read(['nb_nights' , 'nb_paying_pers']);
         foreach($self as $id => $point) {
-            $result[$id] =   $point['nb_nights'] * $point['nb_paying_pers'];
+            $result[$id] = $point['nb_nights'] * $point['nb_paying_pers'];
 
         }
         return $result;
