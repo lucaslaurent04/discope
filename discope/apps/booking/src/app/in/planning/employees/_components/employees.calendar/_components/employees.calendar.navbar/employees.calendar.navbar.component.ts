@@ -8,6 +8,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
 import { ProductModelCategory, ProductModel } from '../../employees.calendar.component';
+import { debounceTime } from 'rxjs/operators';
 
 type AggregatedProductModelType = {
     id: number,
@@ -45,6 +46,9 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
     public selectedProductCategory: ProductModelCategory = this.allProductCategory;
     public filteredProductModels: AggregatedProductModelType[] = [];
 
+    public displayedProductModelCategories: ProductModelCategory[] = [];
+    public displayedProductModels: AggregatedProductModelType[] = [];
+
     public partners: any[] = [];
     public selected_partners_ids: any[] = [];
 
@@ -55,7 +59,8 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
             date_to: new FormControl()
         }),
         product_model_code: new FormControl(),
-        show_only_transport: new FormControl()
+        show_only_transport: new FormControl(),
+        filter_product_models: new FormControl('')
     };
 
     constructor(
@@ -157,6 +162,8 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
                 this.params.product_model_id = +value.split('_')[1];
             }
 
+            this.vm.filter_product_models.setValue('');
+
             this.filterProductModels();
         });
 
@@ -164,6 +171,22 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
             this.params.show_only_transport = value;
 
             this.filterProductModels();
+        });
+
+        this.vm.filter_product_models.valueChanges.pipe(debounceTime(300)).subscribe(() => {
+            this.refreshDisplayedProductModels();
+        });
+
+        this.refreshDisplayedProductModels();
+    }
+
+    public refreshDisplayedProductModels() {
+        this.displayedProductModelCategories = this.productModelCategories.filter(cat => {
+            return cat.name.toLowerCase().includes(this.vm.filter_product_models.value.toLowerCase());
+        });
+
+        this.displayedProductModels = this.filteredProductModels.filter(cat => {
+            return cat.name.toLowerCase().includes(this.vm.filter_product_models.value.toLowerCase());
         });
     }
 
@@ -243,6 +266,8 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
             // And unselect selected product model
             this.params.product_model_id = null;
         }
+
+        this.refreshDisplayedProductModels();
     }
 
     public async onchangeDateRange() {
