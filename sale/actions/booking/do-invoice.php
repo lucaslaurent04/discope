@@ -108,7 +108,7 @@ $fundings = Funding::search([ ['paid_amount', '=', 0], ['is_paid', '=', false], 
 // before deleting fundings, we make sure they do not relate to a received payment (shouldn't occur - covers the case where paid_amount is not properly set)
 foreach($fundings as $funding) {
     if(!$funding['payments_ids'] || count($funding['payments_ids']) == 0) {
-        // #memo - an addition check is made in underlying candelete method
+        // #memo - an additional check is made in underlying candelete method
         Funding::id($funding['id'])->delete(true);
         // remove any existing CRON tasks for checking funding overdue
         $cron->cancel("booking.funding.overdue.{$funding['id']}");
