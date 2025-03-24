@@ -1,0 +1,63 @@
+{
+    "name": "Partner Planning",
+    "description": "Advanced collector for Partner Planning.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false
+        }
+    },
+    "controller": "sale_booking_partnerPlanning-collect",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "partner_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "booking_activity_id",
+                "width": "33%"
+            },
+            {
+                "type": "field",
+                "value": "activity_date",
+                "width": "15%"
+            },
+            {
+                "type": "field",
+                "value": "time_slot_id",
+                "width": "15%"
+            },
+            {
+                "type": "field",
+                "value": "customer_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "booking_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "booking_status",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "booking_line_group_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "relationship",
+                "width": "20%",
+                "visible": false
+            }
+        ]
+    }
+}
