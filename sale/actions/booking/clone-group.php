@@ -6,10 +6,12 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use sale\booking\Booking;
 use sale\booking\BookingActivity;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\booking\BookingLineGroupAgeRangeAssignment;
+use sale\booking\SojournProductModel;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Clone a specific booking line group.",
@@ -19,7 +21,6 @@ use sale\booking\BookingLineGroupAgeRangeAssignment;
             'description'   => "Identifier of the booking line group to clone.",
             'required'      => true
         ]
-
     ],
     'access'        => [
         'visibility'    => 'protected',
@@ -135,6 +136,10 @@ $group = BookingLineGroup::id($params['id'])
             'is_virtual',
             'activity_date',
             'time_slot_id'
+        ],
+        'sojourn_product_models_ids' => [
+            'booking_id',
+            'product_model_id'
         ]
     ])
     ->first(true);
@@ -235,6 +240,14 @@ foreach($group['booking_activities_ids'] as $activity) {
     // Link booking lines to newly created activity
     BookingLine::ids($map_old_booking_activity_new_lines_ids[$activity['id']])
         ->update(['booking_activity_id' => $cloned_activity['id']]);
+}
+
+foreach($group['sojourn_product_models_ids'] as $spm) {
+    SojournProductModel::create([
+        'booking_line_group_id' => $cloned_group['id'],
+        'booking_id'            => $spm['booking_id'],
+        'product_model_id'      => $spm['product_model_id']
+    ]);
 }
 
 Booking::refreshPrice($orm, $group['booking_id']['id']);
