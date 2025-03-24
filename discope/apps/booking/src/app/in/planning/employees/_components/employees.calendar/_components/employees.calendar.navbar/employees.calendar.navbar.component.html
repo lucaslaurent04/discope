@@ -34,15 +34,26 @@
                     <mat-slide-toggle [formControl]="vm.show_only_transport" style="margin-left: 30px; margin-top: 10px; transform: scale(0.8);">
                         Avec transport
                     </mat-slide-toggle>
-                    <mat-option *ngFor="let category of productModelCategories" [value]="'cat_'+category.id">
+                    <mat-option style="padding: 0 15px; width: 100%; display: flex;" [disabled]="true">
+                        <input placeholder="Filtrer" style="width: 100%; border-radius: 5px; padding-left: 5px;" [formControl]="vm.filter_product_models">
+                        <button *ngIf="vm.filter_product_models.value.length > 0"
+                                mat-icon-button
+                                style="position: absolute; top: 0; right: 5px; transform: scale(0.6);background: none; border: none; cursor: pointer; color: #393939;"
+                                (click)="vm.filter_product_models.setValue('');"
+                        >
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    </mat-option>
+                    <mat-option *ngFor="let category of displayedProductModelCategories" [value]="'cat_'+category.id">
                         {{category.name}}
                     </mat-option>
+                    <mat-option *ngIf="displayedProductModelCategories.length === 0" [disabled]="true">Aucune</mat-option>
                 </mat-optgroup>
                 <mat-optgroup [label]="'Modèles de produit (' + selectedProductCategory.name + ')'">
-                    <mat-option *ngFor="let model of filteredProductModels" [value]="'mod_'+model.id">
+                    <mat-option *ngFor="let model of displayedProductModels" [value]="'mod_'+model.id">
                         {{model.name}}
                     </mat-option>
-                    <mat-option *ngIf="filteredProductModels.length === 0" [disabled]="true">Aucun</mat-option>
+                    <mat-option *ngIf="displayedProductModels.length === 0" [disabled]="true">Aucun</mat-option>
                 </mat-optgroup>
             </mat-select>
         </mat-form-field>
