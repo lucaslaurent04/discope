@@ -37,6 +37,7 @@ class BookingPoint extends Model {
                 'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'Booking to which the discount was applied.',
                 'ondelete'          => 'cascade',
+                'domain'            => ['customer_id', '=', 'object.customer_id'],
             ],
 
             'customer_id' => [
