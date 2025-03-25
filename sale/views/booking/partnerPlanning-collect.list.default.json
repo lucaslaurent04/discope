@@ -50,6 +50,13 @@
             {
                 "type": "field",
                 "value": "booking_line_group_id",
+                "width": "20%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "label": "Group number",
+                "value": "group_num",
                 "width": "20%"
             },
             {
