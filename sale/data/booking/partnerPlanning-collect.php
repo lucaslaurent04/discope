@@ -65,6 +65,10 @@ list($params, $providers) = eQual::announce([
             'foreign_object'    => 'sale\booking\BookingLineGroup',
             'description'       => "Booking Group the activity is for."
         ],
+        'group_num' => [
+            'type'              => 'integer',
+            'description'       => "Number of the activity booking group."
+        ],
         'booking_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\Booking',
@@ -142,6 +146,7 @@ $activities = BookingActivity::search($domain)
     ->read([
         'name',
         'activity_date',
+        'group_num',
         'time_slot_id'          => ['name'],
         'booking_line_group_id' => ['name'],
         'employee_id'           => ['name'],
@@ -174,6 +179,7 @@ if(!isset($params['relationship']) || $params['relationship'] === 'employee') {
             'time_slot_id'          => $activity['time_slot_id'],
             'customer_id'           => $activity['booking_id']['customer_id'],
             'booking_line_group_id' => $activity['booking_line_group_id'],
+            'group_num'             => $activity['group_num'],
             'booking_id'            => $activity['booking_id'],
             'booking_status'        => $activity['booking_id']['status'],
             'relationship'          => 'employee'
@@ -195,6 +201,7 @@ if(!isset($params['relationship']) || $params['relationship'] === 'provider') {
                 'time_slot_id'          => $activity['time_slot_id'],
                 'customer_id'           => $activity['booking_id']['customer_id'],
                 'booking_line_group_id' => $activity['booking_line_group_id'],
+                'group_num'             => $activity['group_num'],
                 'booking_id'            => $activity['booking_id'],
                 'booking_status'        => $activity['booking_id']['status'],
                 'relationship'          => 'provider'
