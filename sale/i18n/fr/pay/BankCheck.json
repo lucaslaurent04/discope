@@ -57,6 +57,16 @@
             "label": "Signature ?",
             "description": "Indique si le chèque bancaire est signé.",
             "help": ""
+        },
+        "deposit_number": {
+            "label": "Numéro de dépôt",
+            "description": "Le numéro de dépôt officiel fourni par la banque, utilisé pour suivre tous les chèques associés.",
+            "help": ""
+        },
+        "is_voucher": {
+            "label": "Chèque-vacances",
+            "description": "Est-ce un chèque-vacances ?",
+            "help": ""
         }
     },
     "view": {},

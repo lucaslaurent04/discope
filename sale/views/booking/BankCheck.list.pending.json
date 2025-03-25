@@ -1,10 +1,27 @@
 {
-    "name": "Bank Check",
-    "description": "This view is intended for displaying the list of Bank Check.",
+    "name": "Bank Check Pending",
+    "description": "This view is intended for displaying the list of Bank Check pending.",
     "access": {
         "groups": ["booking.default.user"]
     },
-    "controller": "sale_booking_bankCheck_collect",
+    "header": {
+        "selection": {
+            "default": false,
+            "actions" : [
+                {
+                    "id": "add_deposit_number_bulk",
+                    "label": "Numéro de remise",
+                    "icon": "update",
+                    "controller": "sale_booking_bankCheck_bulk-deposit-number",
+                    "confirm": true
+                }
+            ]
+        },
+        "actions": {},
+        "layout": {
+        }
+    },
+    "domain" : ["status" , "=" , "pending"],
     "layout": {
         "items": [
             {

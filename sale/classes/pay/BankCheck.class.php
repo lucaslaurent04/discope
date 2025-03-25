@@ -71,8 +71,14 @@ class BankCheck extends Model {
             ],
 
             'deposit_number' => [
-                'type'        => 'string',
-                'description' => 'The official deposit number provided by the bank, used to track all associated checks.',
+                'type'              => 'string',
+                'description'       => 'The official deposit number provided by the bank, used to track all associated checks.',
+            ],
+
+            'is_voucher'    =>[
+                'type'              => 'boolean',
+                'description'       => "The check is the voucher",
+                'default'           => false
             ]
         ];
     }
