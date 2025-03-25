@@ -36,7 +36,18 @@
                     "help": "Marquez le chèque bancaire comme rejeté par la banque."
                 }
             }
+        },
+        "list.default": {
+            "name": "Tous les chèques bancaires",
+            "description": "Liste de chèques bancaires.",
+            "actions": {}
+        },
+        "list.pending": {
+            "name": "Chèques bancaires en attente",
+            "description": "Liste de chèques bancaires en attente.",
+            "actions": {}
         }
+
     },
     "error": {}
 }
