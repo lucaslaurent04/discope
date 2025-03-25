@@ -7,6 +7,17 @@
     "header": {
         "actions": {
             "ACTION.CREATE": false
+        },
+        "selection": {
+            "default" : false,
+            "actions" : [
+                {
+                    "id": "action.send-partners-planning-selection",
+                    "label": "Send email",
+                    "description": "Send activity reminder to partners.",
+                    "controller": "sale_booking_send-partner-planning"
+                }
+            ]
         }
     },
     "controller": "sale_booking_partnerPlanning-collect",

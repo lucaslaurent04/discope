@@ -8,8 +8,8 @@
 
 use sale\booking\BookingActivity;
 
-list($params, $providers) = eQual::announce([
-    'description'   => "",
+[$params, $providers] = eQual::announce([
+    'description'   => "List activities of partners, used for reminding activities to external employees and providers.",
     'params'        => [
         /**
          * Filters
@@ -36,6 +36,11 @@ list($params, $providers) = eQual::announce([
         /**
          * Virtual model columns
          */
+        'id' => [
+            'type'              => 'integer',
+            'description'       => "Combination of partner_id and booking_activity_id.",
+            'help'              => "Format: \"{partner_id}{booking_activity_id}{partner_id_length}\"."
+        ],
         'partner_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Partner',
@@ -104,7 +109,7 @@ list($params, $providers) = eQual::announce([
                 'employee',
                 'provider'
             ]
-        ],
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -180,7 +185,11 @@ if(!isset($params['relationship']) || $params['relationship'] === 'employee') {
             continue;
         }
 
+        $partner_id_len = str_pad(strlen(strval($activity['employee_id']['id'])), 2, '0', STR_PAD_LEFT);
+        $partner_activity_combined_id = intval($activity['employee_id']['id'].$activity['id'].$partner_id_len);
+
         $result[] = [
+            'id'                    => $partner_activity_combined_id,
             'partner_id'            => $activity['employee_id'],
             'booking_activity_id'   => ['id' => $activity['id'], 'name' => $activity['name']],
             'activity_date'         => $activity['activity_date'],
@@ -204,7 +213,11 @@ if(!isset($params['relationship']) || $params['relationship'] === 'provider') {
                 continue;
             }
 
+            $partner_id_len = str_pad(strlen(strval($provider['id'])), 2, '0', STR_PAD_LEFT);
+            $partner_activity_combined_id = intval($provider['id'].$activity['id'].$partner_id_len);
+
             $result[] = [
+                'id'                    => $partner_activity_combined_id,
                 'partner_id'            => $provider,
                 'booking_activity_id'   => ['id' => $activity['id'], 'name' => $activity['name']],
                 'activity_date'         => $activity['activity_date'],

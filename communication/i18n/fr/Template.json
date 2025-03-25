@@ -21,7 +21,8 @@
                 "contract": "contrat",
                 "invoice": "facture",
                 "funding": "financement",
-                "option": "option"
+                "option": "option",
+                "planning": "planning"
             },
             "help": ""
         }
