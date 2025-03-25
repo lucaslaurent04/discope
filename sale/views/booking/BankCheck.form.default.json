@@ -117,6 +117,12 @@
                                                 "width": "50%",
                                                 "readonly": true,
                                                 "visible": ["state", "<>", "draft"]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_voucher",
+                                                "width": "50%",
+                                                "sortable": true
                                             }
                                         ]
                                     }
