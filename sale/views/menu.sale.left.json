@@ -228,6 +228,16 @@
                             "entity": "sale\\booking\\BankCheck",
                             "view": "list.default"
                         }
+                    },
+                    {
+                        "id": "item.bankchecks.pending",
+                        "type": "entry",
+                        "label": "Checks Pending",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\booking\\BankCheck",
+                            "view": "list.pending"
+                        }
                     }
                 ]
             },
