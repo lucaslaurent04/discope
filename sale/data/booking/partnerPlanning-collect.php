@@ -69,6 +69,14 @@ list($params, $providers) = eQual::announce([
             'type'              => 'integer',
             'description'       => "Number of the activity booking group."
         ],
+        'nb_pers' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of people in the group."
+        ],
+        'nb_children' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of children in the group."
+        ],
         'booking_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\Booking',
@@ -148,9 +156,9 @@ $activities = BookingActivity::search($domain)
         'activity_date',
         'group_num',
         'time_slot_id'          => ['name'],
-        'booking_line_group_id' => ['name'],
         'employee_id'           => ['name'],
         'providers_ids'         => ['name'],
+        'booking_line_group_id' => ['name', 'nb_pers', 'nb_children'],
         'booking_id'            => ['name', 'status', 'customer_id' => ['name']]
     ])
     ->adapt('json')
@@ -180,6 +188,8 @@ if(!isset($params['relationship']) || $params['relationship'] === 'employee') {
             'customer_id'           => $activity['booking_id']['customer_id'],
             'booking_line_group_id' => $activity['booking_line_group_id'],
             'group_num'             => $activity['group_num'],
+            'nb_pers'               => $activity['booking_line_group_id']['nb_pers'],
+            'nb_children'           => $activity['booking_line_group_id']['nb_children'],
             'booking_id'            => $activity['booking_id'],
             'booking_status'        => $activity['booking_id']['status'],
             'relationship'          => 'employee'
@@ -202,6 +212,8 @@ if(!isset($params['relationship']) || $params['relationship'] === 'provider') {
                 'customer_id'           => $activity['booking_id']['customer_id'],
                 'booking_line_group_id' => $activity['booking_line_group_id'],
                 'group_num'             => $activity['group_num'],
+                'nb_pers'               => $activity['booking_line_group_id']['nb_pers'],
+                'nb_children'           => $activity['booking_line_group_id']['nb_children'],
                 'booking_id'            => $activity['booking_id'],
                 'booking_status'        => $activity['booking_id']['status'],
                 'relationship'          => 'provider'
