@@ -61,6 +61,19 @@
             },
             {
                 "type": "field",
+                "label": "Qty people",
+                "value": "nb_pers",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "label": "Qty children",
+                "value": "nb_children",
+                "width": "10%"
+            },
+            {
+                "type": "field",
                 "value": "relationship",
                 "width": "20%",
                 "visible": false
