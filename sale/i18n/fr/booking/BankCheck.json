@@ -20,7 +20,7 @@
             "description": "Formulaire de modification par défaut  de un cheque bancaire.",
             "actions": {
                 "action.transition.add.payment": {
-                    "label": "Marquer comme payé",
+                    "label": "Ajouter un paiement",
                     "help": "Un paiement sera enregistré et associé au chèque."
                 },
                 "action.transition.remove.payment": {
@@ -28,7 +28,7 @@
                     "help": "L'association avec le paiement sera supprimée."
                 },
                 "action.transition.delete": {
-                    "label": "Supprimer le chèque bancaire",
+                    "label": "Supprimer le chèque",
                     "help": "Le chèque bancaire sera définitivement supprimé."
                 },
                 "action.transition.reject": {

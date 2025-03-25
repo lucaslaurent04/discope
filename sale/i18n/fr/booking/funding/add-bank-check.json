@@ -1,6 +1,6 @@
 {
     "name": "Association d'un chèque bancaire",
-    "description": "Cette action génère un nouveau chèque bancaire et le lie à un dossier de financement existant, en mettant à jour son statut en conséquence.",
+    "description": "Cette action génère un nouveau chèque bancaire et le lie à un dossier de financement existant. Le chèque sera avec le statut en attente.",
     "model": {
         "id": {
             "label": "Identifiant",

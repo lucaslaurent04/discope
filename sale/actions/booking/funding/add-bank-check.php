@@ -9,7 +9,7 @@ use sale\booking\BankCheck;
 use sale\booking\Funding;
 
 list($params, $providers) = eQual::announce([
-    'description'   => "Creates a bank check and associates it with a funding record, updating its payment status.",
+    'description'   => "Creates a bank check and associates it with a funding record.",
     'help'          => "This action generates a new bank check and links it to an existing funding record, updating its status accordingly.  
                     No actual payment transaction is processed. The association can be reversed as long as the booking has not been invoiced.",
     'params'        => [
