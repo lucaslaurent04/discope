@@ -106,7 +106,11 @@
             "help": ""
         },
         "item.bankchecks.all": {
-            "label": "Tous les chèques bancaires",
+            "label": "Tous les chèques",
+            "help": ""
+        },
+        "item.bankchecks.pending": {
+            "label": "Chèques en attente",
             "help": ""
         }
     }
