@@ -1,0 +1,33 @@
+{
+    "name": "Recherche avancée de chèque bancaire",
+    "description": "Contrôleur proposant une recherche avancée des chèques bancaires.",
+    "model": {
+        "bank_check_number": {
+            "label": "Numéro du chèque",
+            "description": "Le numéro unique officiel attribué au chèque bancaire par la banque émettrice.",
+            "help": ""
+        },
+        "deposit_number": {
+            "label": "Numéro de dépôt",
+            "description": "Le numéro de dépôt officiel fourni par la banque, utilisé pour suivre tous les chèques associés.",
+            "help": ""
+        },
+        "booking_id": {
+            "label": "Réservation",
+            "description": "La réservation associée au chèque bancaire, si applicable .",
+            "help": ""
+        },
+        "is_voucher": {
+            "label": "Chèque-vacances",
+            "description": "Est-ce un chèque-vacances ?",
+            "selection": {
+                "all": "Tous",
+                "yes": "Oui",
+                "no": "No"
+            },
+            "help": ""
+        }
+    },
+    "view": {},
+    "error": {}
+}
