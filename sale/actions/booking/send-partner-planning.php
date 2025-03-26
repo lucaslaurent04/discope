@@ -78,7 +78,7 @@ $activities = BookingActivity::search(['id', 'in', array_keys($map_activities_id
     ->get();
 
 $partners = Partner::ids(array_keys($map_partner_activities_ids))
-    ->read(['email'])
+    ->read(['email', 'relationship'])
     ->get();
 
 $map_status = [
@@ -171,7 +171,7 @@ foreach($map_partner_activities_ids as $partner_id => $activities_ids) {
             ];
             foreach($data as $key => $val) {
                 if($key === 'activities_table') {
-                    // try to remove p tag if activities table, cause not needed
+                    // try to remove <p></p> tags if activities table, cause not needed
                     $body = str_replace('<p>{'.$key.'}</p>', $val, $body);
                 }
                 $body = str_replace('{'.$key.'}', $val, $body);
@@ -180,13 +180,12 @@ foreach($map_partner_activities_ids as $partner_id => $activities_ids) {
     }
 
     $message = new Email();
-    $message
-        ->setTo($partners[$partner_id]['email'])
+    $message->setTo($partners[$partner_id]['email'])
         ->setSubject($subject)
         ->setContentType('text/html')
         ->setBody($body);
 
-    Mail::queue($message);
+    Mail::queue($message, $partners[$partner_id]['relationship'] === 'employee' ? 'hr\employee\Employee' : 'sale\provider\Provider', $partner_id);
 }
 
 $context->httpResponse()

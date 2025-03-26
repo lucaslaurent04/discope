@@ -1,0 +1,56 @@
+{
+    "name": "Booking Activities",
+    "description": "This view is intended for displaying the list of booking activities.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "activity_date",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "time_slot_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "activity_booking_line_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "booking_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "booking_line_group_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "counter",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "counter_total",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "price",
+                "width": "20%"
+            }
+        ]
+    }
+}
