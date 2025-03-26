@@ -39,11 +39,11 @@
             "help": ""
         },
         "sales.providers": {
-            "label": "Prestaires",
+            "label": "Prestataires",
             "help": ""
         },
         "sales.providers.all": {
-            "label": "Tous les Prestaires",
+            "label": "Tous les prestataires",
             "help": ""
         },
         "sales.customers": {
