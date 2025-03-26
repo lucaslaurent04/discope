@@ -1,0 +1,109 @@
+{
+    "name": "Planning",
+    "description": "Planning des activités des employés et prestataires.",
+    "model": {
+        "partner_id": {
+            "label": "Relation",
+            "description": "",
+            "help": ""
+        },
+        "employee_id": {
+            "label": "Employé",
+            "description": "",
+            "help": ""
+        },
+        "provider_id": {
+            "label": "Prestataire",
+            "description": "",
+            "help": ""
+        },
+        "booking_activity_id": {
+            "label": "Activité",
+            "description": "",
+            "help": ""
+        },
+        "activity_date": {
+            "label": "Date",
+            "description": "",
+            "help": ""
+        },
+        "time_slot_id": {
+            "label": "Créneau horaire",
+            "description": "",
+            "help": ""
+        },
+        "customer_id": {
+            "label": "Client",
+            "description": "",
+            "help": ""
+        },
+        "booking_line_group_id": {
+            "label": "Groupe réservation",
+            "description": "",
+            "help": ""
+        },
+        "group_num": {
+            "label": "Numéro groupe",
+            "description": "",
+            "help": ""
+        },
+        "nb_pers": {
+            "label": "Qté personnnes",
+            "description": "",
+            "help": ""
+        },
+        "nb_children": {
+            "label": "Qté enfants",
+            "description": "",
+            "help": ""
+        },
+        "booking_id": {
+            "label": "Réservation",
+            "description": "",
+            "help": ""
+        },
+        "booking_status": {
+            "label": "Status réservation",
+            "description": "",
+            "help": ""
+        },
+        "relationship": {
+            "label": "Relation",
+            "description": "",
+            "help": ""
+        },
+        "date_from": {
+            "label": "Du",
+            "description": "",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "",
+            "help": ""
+        },
+        "only_not_sent": {
+            "label": "Seulement pas envoyé",
+            "description": "",
+            "help": ""
+        }
+    },
+    "view": {
+        "list.default": {
+            "name": "Planning relations",
+            "description": "",
+            "layout": {}
+        },
+        "list.employee": {
+            "name": "Planning employés",
+            "description": "",
+            "layout": {}
+        },
+        "list.provider": {
+            "name": "Planning prestataires",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

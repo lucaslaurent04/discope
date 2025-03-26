@@ -359,6 +359,37 @@
                         ]
                     },
                     {
+                        "id": "item.planning.partners",
+                        "label": "Relations",
+                        "icon": "handshake",
+                        "description": "",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "item.planning.partners.employees",
+                                "type": "entry",
+                                "label": "Employés",
+                                "description": "",
+                                "route": "/bookings",
+                                "context": {
+                                    "entity": "sale\\booking\\partnerPlanning-collect",
+                                    "view": "list.employee"
+                                }
+                            },
+                            {
+                                "id": "item.planning.partners.providers",
+                                "type": "entry",
+                                "label": "Prestataires",
+                                "description": "",
+                                "route": "/bookings",
+                                "context": {
+                                    "entity": "sale\\booking\\partnerPlanning-collect",
+                                    "view": "list.provider"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "id": "item.planning.cleanups",
                         "type": "entry",
                         "label": "Cleanups",

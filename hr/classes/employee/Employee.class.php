@@ -69,6 +69,14 @@ class Employee extends \identity\Partner {
                 'rel_local_key'     => 'employee_id',
                 'description'       => "Activity product models that the employee can be assigned to.",
                 'domain'            => ['is_activity', '=', true]
+            ],
+
+            'mails_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\PartnerPlanningMail',
+                'foreign_field'     => 'object_id',
+                'description'       => "Mails related to the employee.",
+                'domain'            => ['object_class', '=', 'hr\employee\Employee']
             ]
 
         ];

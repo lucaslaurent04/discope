@@ -10,19 +10,19 @@
         },
         "activity_product_models_ids": {
             "label": "Modèles de produit",
-            "description": "Les modèles de produit dont l'employé peut être responsable.",
+            "description": "Les modèles de produits dont l'employé peut être responsable.",
             "help": ""
         },
         "partner_events_ids": {
-            "label": "Planning events",
-            "description": "Planning events of the partner.",
+            "label": "Evénements planning",
+            "description": "Evénements planning comme: formation, absence, congé ou récupération.",
             "help": ""
         }
     },
     "view": {
         "form.default": {
-            "name": "Modèle",
-            "description": "Les modèles sont utilisés dans la communication et contiennent plusieurs catégories.",
+            "name": "Employé",
+            "description": "Les employés sont les collaborateurs d'une entreprise.",
             "layout": {
                 "template.content": {
                     "label": "Contenu"
@@ -35,12 +35,15 @@
                 },
                 "section.partner-event-sets": {
                     "label": "Séries d'événements"
+                },
+                "section.mails": {
+                    "label": "E-mails"
                 }
             }
         },
         "list.default": {
-            "name": "Liste des Modèles",
-            "description": "Liste des modèles.",
+            "name": "Employés",
+            "description": "Liste des employés.",
             "layout": {}
         }
     },

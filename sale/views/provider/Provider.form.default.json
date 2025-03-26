@@ -1,6 +1,9 @@
 {
-    "name": "Employee",
-    "description": "",
+    "name": "Provider",
+    "description": "Basic form for displaying a Provider",
+    "access": {
+        "groups": ["sale.default.user", "booking.default.user"]
+    },
     "layout": {
         "groups": [
             {
@@ -14,34 +17,9 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "label": "Name",
-                                                "value": "name",
-                                                "width": "33%",
-                                                "widget": {
-                                                    "heading": true,
-                                                    "readonly": true
-                                                }
-                                            },
-                                            {
-                                                "type": "field",
-                                                "label": "Identity",
+                                                "label": "Partner identity",
                                                 "value": "partner_identity_id",
-                                                "width": "66%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "code",
-                                                "width": "33%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "role_id",
-                                                "width": "33%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "is_active",
-                                                "width": "33%"
+                                                "width": "80%"
                                             }
                                         ]
                                     },
@@ -49,30 +27,15 @@
                                         "width": "50%",
                                         "items": [
                                             {
-                                                "type": "label",
+                                                "type": "field",
                                                 "value": "",
                                                 "width": "50%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "email",
-                                                "width": "50%",
-                                                "widget": {
-                                                    "heading": true
-                                                }
-                                            },
-                                            {
-                                                "type": "label",
-                                                "value": "",
+                                                "label": "Owner identity",
+                                                "value": "owner_identity_id",
                                                 "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "mobile",
-                                                "width": "50%",
-                                                "widget": {
-                                                    "heading": true
-                                                }
                                             }
                                         ]
                                     }
@@ -85,25 +48,28 @@
             {
                 "sections": [
                     {
-                        "id": "section.activity-product-models",
-                        "label": "Activity Product Models",
+                        "id": "section.details",
+                        "label": "Details",
                         "rows": [
                             {
                                 "columns": [
                                     {
-                                        "width": "100%",
+                                        "width": "50%",
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "activity_product_models_ids",
-                                                "width": "100%",
-                                                "widget": {
-                                                    "header": {
-                                                        "actions": {
-                                                            "ACTION.CREATE": false
-                                                        }
-                                                    }
-                                                }
+                                                "value": "address",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "vat_number",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "registration_number",
+                                                "width": "50%"
                                             }
                                         ]
                                     }
@@ -112,8 +78,8 @@
                         ]
                     },
                     {
-                        "id": "section.partner-events",
-                        "label": "Partner Events",
+                        "id": "section.product-models",
+                        "label": "Product models",
                         "rows": [
                             {
                                 "columns": [
@@ -122,7 +88,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "partner_events_ids",
+                                                "value": "product_models_ids",
                                                 "width": "100%"
                                             }
                                         ]
@@ -132,8 +98,8 @@
                         ]
                     },
                     {
-                        "id": "section.partner-event-sets",
-                        "label": "Partner events sets",
+                        "id": "section.activities",
+                        "label": "Activities",
                         "rows": [
                             {
                                 "columns": [
@@ -142,7 +108,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "partner_event_sets_ids",
+                                                "value": "booking_activities_ids",
                                                 "width": "100%"
                                             }
                                         ]
@@ -176,4 +142,3 @@
         ]
     }
 }
-
