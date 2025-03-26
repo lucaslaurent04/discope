@@ -22,6 +22,11 @@ use sale\booking\BookingActivity;
             'type'              => 'date',
             'description'       => "End of the time interval of the desired plannings."
         ],
+        'only_not_sent' => [
+            'type'              => 'boolean',
+            'description'       => "If true show only activities that were not reminded yet to partner.",
+            'default'           => true
+        ],
         'partners_ids' => [
             'type'              => 'array',
             'description'       => "Partnerships that relate to the identity.",
@@ -196,7 +201,7 @@ if(!isset($params['relationship']) || $params['relationship'] === 'employee') {
         if(
             is_null($activity['employee_id'])
             || (!empty($params['partners_ids']) && !in_array($activity['employee_id']['id'], $params['partners_ids']))
-            || in_array($activity['employee_id']['id'], $reminded_partners_ids)
+            || ($params['only_not_sent'] && in_array($activity['employee_id']['id'], $reminded_partners_ids))
         ) {
             continue;
         }
@@ -230,7 +235,7 @@ if(!isset($params['relationship']) || $params['relationship'] === 'provider') {
         foreach($activity['providers_ids'] as $provider) {
             if(
                 (!empty($params['partners_ids']) && !in_array($provider['id'], $params['partners_ids']))
-                || in_array($provider['id'], $reminded_partners_ids)
+                || ($params['only_not_sent'] && in_array($provider['id'], $reminded_partners_ids))
             ) {
                 continue;
             }

@@ -29,6 +29,11 @@
                                                 "type": "field",
                                                 "value": "date_to",
                                                 "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "only_not_sent",
+                                                "width": "25%"
                                             }
                                         ]
                                     }
