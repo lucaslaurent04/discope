@@ -63,7 +63,7 @@ class Provider extends \identity\Partner {
                 'rel_table'         => 'sale_catalog_product_model_rel_sale_provider_providers',
                 'rel_foreign_key'   => 'product_model_id',
                 'rel_local_key'     => 'provider_id',
-                'description'       => "The product models that can be required providers."
+                'description'       => "The product models that can be handled by providers."
             ],
 
             'booking_activities_ids' => [
@@ -74,6 +74,14 @@ class Provider extends \identity\Partner {
                 'rel_foreign_key'   => 'booking_activity_id',
                 'rel_local_key'     => 'provider_id',
                 'description'       => "The booking activities organized by the Provider."
+            ],
+
+            'mails_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'core\Mail',
+                'foreign_field'     => 'object_id',
+                'description'       => "Mails related to the provider.",
+                'domain'            => ['object_class', '=', 'sale\provider\Provider']
             ]
 
         ];
