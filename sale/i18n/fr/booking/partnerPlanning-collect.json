@@ -7,6 +7,16 @@
             "description": "",
             "help": ""
         },
+        "employee_id": {
+            "label": "Employé",
+            "description": "",
+            "help": ""
+        },
+        "provider_id": {
+            "label": "Prestataire",
+            "description": "",
+            "help": ""
+        },
         "booking_activity_id": {
             "label": "Activité",
             "description": "",
@@ -18,7 +28,7 @@
             "help": ""
         },
         "time_slot_id": {
-            "label": "Plage horaire",
+            "label": "Créneau horaire",
             "description": "",
             "help": ""
         },
@@ -62,5 +72,23 @@
             "description": "",
             "help": ""
         }
-    }
+    },
+    "view": {
+        "list.default": {
+            "name": "Planning relations",
+            "description": "",
+            "layout": {}
+        },
+        "list.employee": {
+            "name": "Planning employés",
+            "description": "",
+            "layout": {}
+        },
+        "list.provider": {
+            "name": "Planning prestataires",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
 }

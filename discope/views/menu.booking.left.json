@@ -373,8 +373,7 @@
                                 "route": "/bookings",
                                 "context": {
                                     "entity": "sale\\booking\\partnerPlanning-collect",
-                                    "view": "list.default",
-                                    "domain": ["relationship", "=", "employee"]
+                                    "view": "list.employee"
                                 }
                             },
                             {
@@ -385,8 +384,7 @@
                                 "route": "/bookings",
                                 "context": {
                                     "entity": "sale\\booking\\partnerPlanning-collect",
-                                    "view": "list.default",
-                                    "domain": ["relationship", "=", "provider"]
+                                    "view": "list.provider"
                                 }
                             }
                         ]

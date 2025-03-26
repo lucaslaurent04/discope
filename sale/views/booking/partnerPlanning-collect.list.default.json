@@ -1,6 +1,6 @@
 {
-    "name": "Partner Planning",
-    "description": "Advanced collector for Partner Planning.",
+    "name": "Partner planning",
+    "description": "Advanced collector for partners booking activities planning.",
     "access": {
         "groups": ["booking.default.user"]
     },
@@ -25,13 +25,9 @@
         "items": [
             {
                 "type": "field",
-                "value": "partner_id",
-                "width": "20%"
-            },
-            {
-                "type": "field",
-                "value": "booking_activity_id",
-                "width": "33%"
+                "value": "id",
+                "width": "10%",
+                "visible": false
             },
             {
                 "type": "field",
@@ -41,7 +37,18 @@
             {
                 "type": "field",
                 "value": "time_slot_id",
-                "width": "15%"
+                "width": "20%"
+            },
+            {
+                "id": "item.partner_id",
+                "type": "field",
+                "value": "partner_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "booking_activity_id",
+                "width": "33%"
             },
             {
                 "type": "field",
