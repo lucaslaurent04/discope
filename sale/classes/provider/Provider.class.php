@@ -78,7 +78,7 @@ class Provider extends \identity\Partner {
 
             'mails_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'core\Mail',
+                'foreign_object'    => 'sale\booking\PartnerPlanningMail',
                 'foreign_field'     => 'object_id',
                 'description'       => "Mails related to the provider.",
                 'domain'            => ['object_class', '=', 'sale\provider\Provider']
