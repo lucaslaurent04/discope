@@ -1,0 +1,101 @@
+{
+    "name": "Partner planning",
+    "description": "Advanced collector for partners booking activities planning.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false
+        },
+        "selection": {
+            "default" : false,
+            "actions" : [
+                {
+                    "id": "action.send-partners-planning-selection",
+                    "label": "Send email",
+                    "description": "Send activity reminder to partners.",
+                    "controller": "sale_booking_send-partner-planning"
+                }
+            ]
+        }
+    },
+    "controller": "sale_booking_partnerPlanning-collect",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "activity_date",
+                "width": "15%"
+            },
+            {
+                "type": "field",
+                "value": "time_slot_id",
+                "width": "20%"
+            },
+            {
+                "id": "item.partner_id",
+                "type": "field",
+                "value": "partner_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "booking_activity_id",
+                "width": "33%"
+            },
+            {
+                "type": "field",
+                "value": "customer_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "booking_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "booking_status",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "booking_line_group_id",
+                "width": "20%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "label": "Group number",
+                "value": "group_num",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "label": "Qty people",
+                "value": "nb_pers",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "label": "Qty children",
+                "value": "nb_children",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "relationship",
+                "width": "20%",
+                "visible": false
+            }
+        ]
+    }
+}

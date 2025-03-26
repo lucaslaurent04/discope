@@ -1,0 +1,68 @@
+{
+    "name": "Prestataire",
+    "plural": "Prestataires",
+    "description": "Les prestataires qui organises les activités.",
+    "model": {
+        "relationship": {
+            "label": "Relation",
+            "description": "Type de relation.",
+            "help": ""
+        },
+        "address": {
+            "label": "Adresse",
+            "description": "Adresse du prestataire.",
+            "help": ""
+        },
+        "vat_number": {
+            "label": "Numéro de TVA",
+            "description": "Numéro de TVA du prestataire.",
+            "help": ""
+        },
+        "registration_number": {
+            "label": "Numéro d'entreprise",
+            "description": "Numéro d'entreprise du prestataire.",
+            "help": ""
+        },
+        "product_models_ids": {
+            "label": "Modèles de produits",
+            "description": "Les modèles de produits gérés par le prestataire.",
+            "help": ""
+        },
+        "booking_activities_ids": {
+            "label": "Activités",
+            "description": "Activités organisées par le prestataire.",
+            "help": ""
+        },
+        "mails_ids": {
+            "label": "E-mails",
+            "description": "Les e-mails envoyés au prestataire concernant le planning des activités.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Prestataire",
+            "description": "",
+            "layout": {
+                "section.details": {
+                    "label": "Détails"
+                },
+                "section.product-models": {
+                    "label": "Modèles de produits"
+                },
+                "section.activities": {
+                    "label": "Activités"
+                },
+                "section.mails": {
+                    "label": "E-mails"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Prestataires",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}
