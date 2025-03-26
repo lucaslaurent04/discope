@@ -160,14 +160,15 @@ $activities = BookingActivity::search($domain)
         'name',
         'activity_date',
         'group_num',
-        'time_slot_id'          => ['name'],
-        'employee_id'           => ['name'],
-        'providers_ids'         => ['name'],
-        'booking_line_group_id' => ['name', 'nb_pers', 'nb_children'],
-        'booking_id'            => ['name', 'status', 'customer_id' => ['name']]
+        'time_slot_id'                  => ['name'],
+        'employee_id'                   => ['name'],
+        'providers_ids'                 => ['name'],
+        'booking_line_group_id'         => ['name', 'nb_pers', 'nb_children'],
+        'booking_id'                    => ['name', 'status', 'customer_id' => ['name']],
+        'partner_planning_mails_ids'    => ['object_id']
     ])
     ->adapt('json')
-    ->get(true);
+    ->get();
 
 if(isset($params['partner_id'])) {
     $params['partners_ids'] = array_merge(
@@ -178,9 +179,12 @@ if(isset($params['partner_id'])) {
 
 if(!isset($params['relationship']) || $params['relationship'] === 'employee') {
     foreach($activities as $activity) {
+        $reminded_partners_ids = array_column($activity['partner_planning_mails_ids'], 'object_id');
+
         if(
             is_null($activity['employee_id'])
             || (!empty($params['partners_ids']) && !in_array($activity['employee_id']['id'], $params['partners_ids']))
+            || in_array($activity['employee_id']['id'], $reminded_partners_ids)
         ) {
             continue;
         }
@@ -208,8 +212,13 @@ if(!isset($params['relationship']) || $params['relationship'] === 'employee') {
 
 if(!isset($params['relationship']) || $params['relationship'] === 'provider') {
     foreach($activities as $activity) {
+        $reminded_partners_ids = array_column($activity['partner_planning_mails_ids'], 'object_id');
+
         foreach($activity['providers_ids'] as $provider) {
-            if(!empty($params['partners_ids']) && !in_array($provider['id'], $params['partners_ids'])) {
+            if(
+                (!empty($params['partners_ids']) && !in_array($provider['id'], $params['partners_ids']))
+                || in_array($provider['id'], $reminded_partners_ids)
+            ) {
                 continue;
             }
 
