@@ -11,6 +11,7 @@ use core\Mail;
 use equal\email\Email;
 use identity\Partner;
 use sale\booking\BookingActivity;
+use sale\booking\PartnerPlanningMail;
 
 [$params, $providers] = eQual::announce([
     'description'   => "List activities of partners, used for reminding activities to external employees and providers.",
@@ -185,7 +186,9 @@ foreach($map_partner_activities_ids as $partner_id => $activities_ids) {
         ->setContentType('text/html')
         ->setBody($body);
 
-    Mail::queue($message, $partners[$partner_id]['relationship'] === 'employee' ? 'hr\employee\Employee' : 'sale\provider\Provider', $partner_id);
+    $mail_id = Mail::queue($message, $partners[$partner_id]['relationship'] === 'employee' ? 'hr\employee\Employee' : 'sale\provider\Provider', $partner_id);
+
+    PartnerPlanningMail::id($mail_id)->update(['booking_activities_ids' => $activities_ids]);
 }
 
 $context->httpResponse()

@@ -184,6 +184,16 @@ class BookingActivity extends Model {
                 'result_type'       => 'integer',
                 'store'             => true,
                 'relation'          => ['booking_line_group_id' => ['activity_group_num']]
+            ],
+
+            'partner_planning_mails_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\booking\PartnerPlanningMail',
+                'foreign_field'     => 'booking_activities_ids',
+                'rel_table'         => 'sale_booking_bookingactivity_rel_partnerplanningmail',
+                'rel_foreign_key'   => 'partner_planning_mail_id',
+                'rel_local_key'     => 'booking_activity_id',
+                'description'       => "Mails that reminded the activities schedules to partners (employee/providers)."
             ]
 
         ];
