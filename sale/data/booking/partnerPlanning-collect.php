@@ -46,6 +46,18 @@ use sale\booking\BookingActivity;
             'foreign_object'    => 'identity\Partner',
             'description'       => "The counter party organization the invoice relates to."
         ],
+        'employee_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'hr\employee\Employee',
+            'description'       => "The counter party organization the invoice relates to.",
+            'default'           => null
+        ],
+        'provider_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\provider\Provider',
+            'description'       => "The counter party organization the invoice relates to.",
+            'default'           => null
+        ],
         'booking_activity_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\BookingActivity',
@@ -195,6 +207,7 @@ if(!isset($params['relationship']) || $params['relationship'] === 'employee') {
         $result[] = [
             'id'                    => $partner_activity_combined_id,
             'partner_id'            => $activity['employee_id'],
+            'employee_id'           => $activity['employee_id'],
             'booking_activity_id'   => ['id' => $activity['id'], 'name' => $activity['name']],
             'activity_date'         => $activity['activity_date'],
             'time_slot_id'          => $activity['time_slot_id'],
@@ -228,6 +241,7 @@ if(!isset($params['relationship']) || $params['relationship'] === 'provider') {
             $result[] = [
                 'id'                    => $partner_activity_combined_id,
                 'partner_id'            => $provider,
+                'provider_id'           => $provider,
                 'booking_activity_id'   => ['id' => $activity['id'], 'name' => $activity['name']],
                 'activity_date'         => $activity['activity_date'],
                 'time_slot_id'          => $activity['time_slot_id'],
