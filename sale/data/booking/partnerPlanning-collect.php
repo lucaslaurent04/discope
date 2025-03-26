@@ -264,5 +264,6 @@ if(!isset($params['relationship']) || $params['relationship'] === 'provider') {
 }
 
 $context->httpResponse()
+        ->header('X-Total-Count', count($result))
         ->body($result)
         ->send();

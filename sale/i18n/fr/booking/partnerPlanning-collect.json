@@ -71,6 +71,21 @@
             "label": "Relation",
             "description": "",
             "help": ""
+        },
+        "date_from": {
+            "label": "Du",
+            "description": "",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "",
+            "help": ""
+        },
+        "only_not_sent": {
+            "label": "Seulement pas envoyé",
+            "description": "",
+            "help": ""
         }
     },
     "view": {
