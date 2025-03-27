@@ -625,23 +625,27 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcNbPers($om, $oids, $lang) {
+    public static function calcNbPers($self) {
         $result = [];
-        $bookings = $om->read(self::getType(), $oids, ['booking_lines_groups_ids']);
+        $self->read(['booking_lines_groups_ids' => ['nb_pers', 'is_autosale', 'is_extra', 'is_sojourn']]);
+        foreach($self as $id => $booking) {
+            $nb_pers = 0;
 
-        if($bookings > 0) {
-            foreach($bookings as $bid => $booking) {
-                $result[$bid] = 0;
-                $groups = $om->read(\sale\booking\BookingLineGroup::getType(), $booking['booking_lines_groups_ids'], ['nb_pers', 'is_autosale', 'is_extra', 'is_sojourn']);
-                if($groups > 0) {
-                    foreach($groups as $group_id => $group) {
-                        if($group['is_sojourn'] && !$group['is_autosale'] && !$group['is_extra']) {
-                            $result[$bid] += $group['nb_pers'];
-                        }
-                    }
+            foreach($booking['booking_lines_groups_ids'] as $group) {
+                if($group['is_sojourn'] && !$group['is_autosale'] && !$group['is_extra']) {
+                    $nb_pers += $group['nb_pers'];
                 }
             }
+
+            if($nb_pers === 0) {
+                foreach($booking['booking_lines_groups_ids'] as $group) {
+                    $nb_pers += $group['nb_pers'];
+                }
+            }
+
+            $result[$id] = $nb_pers;
         }
+
         return $result;
     }
 
