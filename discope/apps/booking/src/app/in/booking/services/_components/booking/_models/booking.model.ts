@@ -15,6 +15,7 @@ export class Booking {
       public date_to: Date = new Date(),
       public center_id: any = {},
       public customer_id: any = {},
-      public booking_lines_groups_ids: any[] = []
+      public booking_lines_groups_ids: any[] = [],
+      public nb_pers: number = 0
     ) {}
 }
