@@ -2,7 +2,17 @@
 <div class="container">
     <div class="outer-wrapper" style="width: 100%">
         <div class="header">
-            <div *ngIf="cancreateGroup()" style="flex: 1;">Ajouter un groupe de services <button mat-mini-fab color="primary" style="transform: scale(0.66);" (click)="oncreateGroup()"> <mat-icon>add</mat-icon></button></div>
+            <div *ngIf="cancreateGroup()">
+                Ajouter un groupe de services <button mat-mini-fab color="primary" style="transform: scale(0.66);" (click)="oncreateGroup()"> <mat-icon>add</mat-icon></button>
+            </div>
+            <div style="display: flex; flex: 1; align-items: center; justify-content: center; font-style: italic;">
+                <div>
+                    Date : {{instance.date_from | date : 'd MMM y'}} - {{instance.date_to | date : 'd MMM y'}}
+                </div>
+                <div style="margin-left: 50px;">
+                    Qté pers. : {{instance.nb_pers}}
+                </div>
+            </div>
             <div style="margin-left: auto; font-size: 20px;">Total TTC {{ instance?.price ?? 0 | number: '1.2-2'}} €</div>
         </div>
         <div class="inner-wrapper" *ngIf="instance.booking_lines_groups_ids.length">
