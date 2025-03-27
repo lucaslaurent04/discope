@@ -96,6 +96,7 @@ $tree = [
                 'rental_unit_id' => [
                     'id',
                     'name',
+                    'description',
                     'is_accomodation',
                     'capacity'
                 ]
