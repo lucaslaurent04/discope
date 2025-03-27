@@ -104,7 +104,7 @@
             <div *ngIf="mode == 'edit'" class="row row-lists" cdkDropListGroup style="display: flex; width: calc(100% - 20px); height: 250px; justify-content: space-between;">
 
                 <!-- left pane : list of available rental units for current product model -->
-                <div style="display: flex; flex-direction: column; flex: 0 1 calc(50% - 10px);">
+                <div style="display: flex; flex-direction: column; flex: 0 1 calc(50% - 10px); max-width: 50%;">
                     <div style="margin-bottom: 5px;">
                         <div style="display: flex; padding: 0 6px;">
                             <mat-checkbox [checked]="allRentalUnitsSelected" (change)="leftSelectAllRentalUnits()" style="min-width: 140px;">
@@ -126,8 +126,8 @@
                              class="rentalunit-line line-choice"
                              [class.selected]="selectedRentalUnits.indexOf(unit.id) > -1"
                              cdkDrag
-                             [cdkDragData]="unit">
-
+                             [cdkDragData]="unit"
+                        >
                             <div class="drag-preview" *cdkDragPreview>
                                 <div class="drag-preview-inner">{{ selectedRentalUnits.length > 0 ? selectedRentalUnits.length : 1 }}</div>
                             </div>
@@ -138,7 +138,18 @@
                                     (change)="leftSelectRentalUnit($event.checked, unit.id)">
                                 </mat-checkbox>
                             </div>
-                            <div style="padding: 0 5px;" (mousedown)="leftSelectRentalUnit(true, unit.id)">{{unit.name}} <small *ngIf="unit.is_accomodation">({{unit.capacity}})</small></div>
+                            <div style="display: flex; justify-content: space-between; padding: 0 5px; width: calc(100% - 20px)"
+                                 (mousedown)="leftSelectRentalUnit(true, unit.id)"
+                            >
+                                <div>
+                                    {{unit.name}} <small *ngIf="unit.is_accomodation">({{unit.capacity}})</small>
+                                </div>
+                                <a class="rentalunit-description"
+                                   [title]="unit.description"
+                                >
+                                    {{unit.description}}
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
