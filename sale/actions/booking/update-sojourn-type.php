@@ -84,6 +84,7 @@ BookingLineGroup::refreshLines($orm, $group['id']);
 
 BookingLineGroup::refreshPrice($orm, $group['id']);
 Booking::refreshPrice($orm, $group['booking_id']['id']);
+Booking::refreshNbPers($orm, $group['booking_id']['id']);
 
 BookingLineGroup::refreshActivityGroupNumber($group['booking_id']['id']);
 

@@ -35,7 +35,7 @@ list($context) = [$providers['context']];
 
 
 $tree = [
-    'id', 'name', 'created', 'date_from', 'date_to', 'status', 'total', 'price', 'is_locked',
+    'id', 'name', 'created', 'date_from', 'date_to', 'status', 'total', 'price', 'is_locked', 'nb_pers',
     'customer_id' => [
         'id', 'rate_class_id'
     ],

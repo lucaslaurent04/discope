@@ -128,6 +128,7 @@ else {
 
     BookingLineGroup::refreshPrice($orm, $group['id']);
     Booking::refreshPrice($orm, $group['booking_id']['id']);
+    Booking::refreshNbPers($orm, $group['booking_id']['id']);
 }
 
 // restore events in case this controller is chained with others
