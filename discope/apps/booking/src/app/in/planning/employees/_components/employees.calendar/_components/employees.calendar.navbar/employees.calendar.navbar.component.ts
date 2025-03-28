@@ -130,8 +130,6 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
                         'name', 'asc', 0, 500
                     );
 
-                    console.log('partners', partners);
-
                     if(partners.length === 0) {
                         return;
                     }
