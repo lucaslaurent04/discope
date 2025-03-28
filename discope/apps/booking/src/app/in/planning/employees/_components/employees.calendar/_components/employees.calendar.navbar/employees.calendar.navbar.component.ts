@@ -107,7 +107,10 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
                 try {
                     const employees = await this.api.collect(
                         'hr\\employee\\Employee',
-                        ['center_id', 'in', user.centers_ids],
+                        [
+                            ['center_id', 'in', user.centers_ids],
+                            ['relationship', '=', 'employee']
+                        ],
                         ['id'],
                         'name', 'asc', 0, 500
                     );
@@ -126,6 +129,8 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
                         ['id', 'name', 'relationship'],
                         'name', 'asc', 0, 500
                     );
+
+                    console.log('partners', partners);
 
                     if(partners.length === 0) {
                         return;
