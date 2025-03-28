@@ -5,9 +5,13 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\booking;
+
+use core\setting\Setting;
 use equal\orm\Model;
 use identity\Center;
+use sale\catalog\Product;
 use sale\catalog\ProductModel;
 
 class BookingLineGroup extends Model {
@@ -342,6 +346,18 @@ class BookingLineGroup extends Model {
             'has_person_with_disability' => [
                 'type'              => 'boolean',
                 'description'       => "At least one person from the group has a disability.",
+                'default'           => false
+            ],
+
+            'bed_linens' => [
+                'type'              => 'boolean',
+                'description'       => "Does the group include a product related to renting bed linens?",
+                'default'           => false
+            ],
+
+            'make_beds' => [
+                'type'              => 'boolean',
+                'description'       => "Does the group include a product related to bed-making at the beginning of the stay?",
                 'default'           => false
             ]
 
@@ -2837,6 +2853,51 @@ class BookingLineGroup extends Model {
     public static function updateMealPreferences($om, $ids, $values, $lang) {
         foreach($ids as $id) {
             self::refreshMealPreferences($om, $id);
+        }
+    }
+
+    public static function updateBedLinensAndMakeBeds($om, $oids, $values, $lang) {
+        $ignored_lines_ids = $values['ignored_lines_ids'] ?? [];
+        $groups = $om->read(self::getType(), $oids, ['booking_lines_ids.product_id']);
+
+        $bed_linens_skus = Setting::get_value('sale', 'booking', 'bed-linens.sku', false);
+        if($bed_linens_skus) {
+            $bed_linens_skus = explode(',', $bed_linens_skus);
+        }
+        else {
+            $bed_linens_skus = [];
+        }
+
+        $make_beds_skus = Setting::get_value('sale', 'booking', 'make-beds.sku', false);
+        if($make_beds_skus) {
+            $make_beds_skus = explode(',', $make_beds_skus);
+        }
+        else {
+            $make_beds_skus = [];
+        }
+
+        foreach($groups as $id => $group) {
+            $products_ids = [];
+            foreach($group['booking_lines_ids.product_id'] as $lid => $line) {
+                if(!in_array($lid, $ignored_lines_ids)) {
+                    $products_ids[] = $line['product_id'];
+                }
+            }
+
+            $data = ['bed_linens' => false, 'make_beds' => false];
+
+            $products = $om->read(Product::getType(), $products_ids, ['sku']);
+            foreach($products as $product) {
+                if(in_array($product['sku'], $bed_linens_skus)) {
+                    $data['bed_linens'] = true;
+                }
+                if(in_array($product['sku'], $make_beds_skus)) {
+                    $data['bed_linens'] = true;
+                    $data['make_beds'] = true;
+                }
+            }
+
+            $om->update(self::getType(), $id, $data);
         }
     }
 
