@@ -5,9 +5,10 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\booking;
+
 use equal\orm\Model;
-use sale\booking\BookingLineGroup;
 
 class Consumption extends Model {
 
@@ -198,6 +199,12 @@ class Consumption extends Model {
                 'default'           => 'none'
             ],
 
+            'make_beds' => [
+                'type'              => 'boolean',
+                'description'       => "Should bed linens be provided to the customer and should the beds be made.",
+                'default'           => false
+            ],
+
             'age_range_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\AgeRange',
@@ -228,26 +235,38 @@ class Consumption extends Model {
     }
 
     public static function onupdateRentalUnitId($om, $oids, $values, $lang) {
-        $consumptions = $om->read(get_called_class(), $oids, ['rental_unit_id', 'rental_unit_id.is_accomodation', 'date', 'booking_line_group_id.date_from', 'booking_line_group_id.date_to'], $lang);
+        $consumptions = $om->read(self::getType(), $oids, ['rental_unit_id', 'rental_unit_id.is_accomodation', 'date', 'booking_line_group_id.date_from', 'booking_line_group_id.date_to', 'booking_line_group_id.make_beds'], $lang);
 
         if($consumptions > 0) {
-            foreach($consumptions as $cid => $consumption) {
-                if($consumption['rental_unit_id']) {
-                    $cleanup_type = 'none';
-                    if($consumption['rental_unit_id.is_accomodation']) {
-                        $cleanup_type = 'daily';
-                        if($consumption['booking_line_group_id.date_from'] == $consumption['date']) {
-                            // no cleanup the day of arrival
-                            $cleanup_type = 'none';
-                            continue;
-                        }
-                        if($consumption['booking_line_group_id.date_to'] == $consumption['date']) {
-                            // full cleanup on checkout day
-                            $cleanup_type = 'full';
-                        }
-                    }
-                    $om->update(self::getType(), $oids, ['is_rental_unit' => true, 'is_accomodation' => $consumption['rental_unit_id.is_accomodation'], 'cleanup_type' => $cleanup_type]);
+            foreach($consumptions as $consumption) {
+                if(!$consumption['rental_unit_id']) {
+                    continue;
                 }
+
+                $is_accommodation = $consumption['rental_unit_id.is_accomodation'];
+                $cleanup_type = 'none';
+                $make_beds = false;
+
+                if($is_accommodation) {
+                    $is_first_day = $consumption['booking_line_group_id.date_from'] === $consumption['date'];
+                    $is_last_day = $consumption['booking_line_group_id.date_to'] === $consumption['date'];
+                    if($is_first_day) {
+                        $make_beds = $consumption['booking_line_group_id.make_beds'];
+                    }
+                    elseif($is_last_day) {
+                        $cleanup_type = 'full';
+                    }
+                    else {
+                        $cleanup_type = 'daily';
+                    }
+                }
+
+                $om->update(self::getType(), $oids, [
+                    'is_rental_unit'    => true,
+                    'is_accomodation'   => $is_accommodation,
+                    'cleanup_type'      => $cleanup_type,
+                    'make_beds'         => $make_beds
+                ]);
             }
         }
     }
