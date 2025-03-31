@@ -895,10 +895,18 @@ class BookingLine extends Model {
         }
 
         /*
+            update bed_linens and make_beds
+        */
+        $map_groups_ids = [];
+        foreach($lines as $line) {
+            $map_groups_ids[$line['booking_line_group_id']] = true;
+        }
+        $om->callonce(BookingLineGroup::getType(), 'updateBedLinensAndMakeBeds', array_keys($map_groups_ids), [], $lang);
+
+        /*
             reset computed fields related to price
         */
         $om->callonce(self::getType(), '_resetPrices', $oids, [], $lang);
-
     }
 
     private static function generateLineActivities(int $service_date, int $time_slot_id, bool $is_fullday, bool $has_duration, int $duration): array {
@@ -1395,7 +1403,10 @@ class BookingLine extends Model {
 
     /**
      * Hook invoked before object deletion for performing object-specific additional operations.
-     * This hook is used to remove all SPM relating to the product model if parent group does not hold a similar product anymore.
+     * This hook is used:
+     *   - to remove all SPM relating to the product model if parent group does not hold a similar product anymore
+     *   - to update the booking activity counters (place of activity type in sojourn)
+     *   - to update the bed_linens or make_beds flag of the booking line group
      *
      * @param  \equal\orm\ObjectManager     $om         ObjectManager instance.
      * @param  array                        $oids       List of objects identifiers.
@@ -1404,7 +1415,10 @@ class BookingLine extends Model {
     public static function ondelete($om, $oids) {
         $lines = $om->read(self::getType(), $oids, ['booking_line_group_id', 'product_id.product_model_id.is_activity']);
         if($lines > 0) {
+            $map_groups_ids = [];
             foreach($lines as $oid => $odata) {
+                $map_groups_ids[$odata['booking_line_group_id']] = true;
+
                 if($odata['product_id.product_model_id.is_activity']) {
                     BookingActivity::search(['activity_booking_line_id', '=', $oid])->delete(true);
 
@@ -1417,6 +1431,8 @@ class BookingLine extends Model {
                     }
                 }
             }
+
+            $om->callonce(BookingLineGroup::getType(), 'updateBedLinensAndMakeBeds', array_keys($map_groups_ids), ['ignored_lines_ids' => array_keys($lines)]);
         }
 
         $om->callonce(self::getType(), 'updateSPM', $oids, ['deleted' => $oids]);
