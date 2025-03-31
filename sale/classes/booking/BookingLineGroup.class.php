@@ -352,12 +352,14 @@ class BookingLineGroup extends Model {
             'bed_linens' => [
                 'type'              => 'boolean',
                 'description'       => "Does the group include a product related to renting bed linens?",
+                'help'              => "Bed linens are always provided when make_beds is true.",
                 'default'           => false
             ],
 
             'make_beds' => [
                 'type'              => 'boolean',
                 'description'       => "Does the group include a product related to bed-making at the beginning of the stay?",
+                'help'              => "Bed linens are always provided when make_beds is true.",
                 'default'           => false
             ]
 
