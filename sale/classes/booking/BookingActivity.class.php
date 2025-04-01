@@ -348,6 +348,7 @@ class BookingActivity extends Model {
                 continue;
             }
 
+            // #todo - make this check optional (through settings)
             $employee = Employee::id($employee_id)
                 ->read(['activity_product_models_ids'])
                 ->first();
