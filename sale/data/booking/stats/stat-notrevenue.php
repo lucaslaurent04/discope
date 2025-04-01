@@ -117,7 +117,7 @@ if($params['center_id'] && $params['center_id'] > 0) {
 
 $bookings = [];
 
-if(!empty($domain)){
+if(!empty($domain)) {
     $bookings = Booking::search($domain, ['sort'  => ['date_from' => 'asc']])
         ->read([
                 'id',
