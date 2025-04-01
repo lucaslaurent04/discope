@@ -50,7 +50,7 @@ use sale\booking\BookingLineGroup;
         ],
         'duration_days' => [
             'type'              => 'integer',
-            'description'       => 'Total duration of all booking in days.'
+            'description'       => 'Total duration of all bookings in days.'
         ],
         'nb_pers' => [
             'type'              => 'integer',
