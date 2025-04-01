@@ -272,7 +272,7 @@ class Booking extends Model {
                     'ota'                       // cancellation was made through the channel manager
                 ],
                 'description'       => "Reason for which the customer cancelled the booking.",
-                'default'           => 'generic'
+                'default'           => 'other'
             ],
 
             'payment_status' => [
