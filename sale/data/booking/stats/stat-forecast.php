@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
@@ -11,7 +11,7 @@ use identity\User;
 use sale\booking\Booking;
 use sale\booking\BookingLine;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Lists all contracts and their related details for a given period.',
     'params'        => [
         /* mixed-usage parameters: required both for fetching data (input) and property of virtual entity (output) */
@@ -64,6 +64,14 @@ list($params, $providers) = announce([
             'type'              => 'float',
             'description'       => 'Total revenue from animations.'
         ],
+        'internal_animations' => [
+            'type'              => 'float',
+            'description'       => 'Total revenue from internal animations.'
+        ],
+        'external_animations' => [
+            'type'              => 'float',
+            'description'       => 'Total revenue from external animations.'
+        ],
         'meals' => [
             'type'              => 'float',
             'description'       => 'Total revenue from meals.'
@@ -74,55 +82,51 @@ list($params, $providers) = announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'adapt','auth' ]
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
- * @var \equal\data\DataAdapter     $adapter
- * @var \equal\auth\AuthenticationManager $auth
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
  */
-list($context, $orm, $adapter, $auth) = [ $providers['context'], $providers['orm'], $providers['adapt'] , $providers['auth']];
+['context' => $context, 'auth' => $auth] = $providers;
+
+$domain = [];
 
 // #memo - we consider all bookings for which at least one sojourn starts during the given period
-if ($params['center_id'] || $params['all_centers']){
+if($params['center_id'] || $params['all_centers']) {
     $domain = [
-        ['date_from', '>=', $params['date_from'] ],
-        ['date_from', '<=', $params['date_to'] ],
+        ['date_from', '>=', $params['date_from']],
+        ['date_from', '<=', $params['date_to']],
         ['state', 'in', ['instance', 'archive']]
     ];
 
     $status = ($params['is_not_option'] ?? false) ? ['confirmed'] : ['option', 'confirmed'];
 
-    $domain[] = [ 'status', 'in', $status ];
+    $domain[] = ['status', 'in', $status];
 }
 
-
-
-if ($params['all_centers']){
-
+if($params['all_centers']) {
     $user_id = $auth->userId();
     if($user_id <= 0) {
-        throw new Exception('user_unknown', QN_ERROR_NOT_ALLOWED);
+        throw new Exception("unknown_user", QN_ERROR_NOT_ALLOWED);
     }
 
     $user = User::id($user_id)->read(['centers_ids'])->first(true);
-
     if(!$user) {
-        throw new Exception('unexpected_error', QN_ERROR_INVALID_USER);
+        throw new Exception("unexpected_error", QN_ERROR_INVALID_USER);
     }
 
-    $domain[] = ['center_id', 'in', $user['centers_ids'] ];
+    $domain[] = ['center_id', 'in', $user['centers_ids']];
 }
 
 if($params['center_id'] && $params['center_id'] > 0) {
-    $domain[] = [ 'center_id', '=', $params['center_id'] ];
+    $domain[] = ['center_id', '=', $params['center_id']];
 }
 
 $bookings = [];
 
-if($domain){
+if(!empty($domain)) {
     $bookings = Booking::search($domain, ['sort'  => ['date_from' => 'asc']])
         ->read([
                 'id',
@@ -136,8 +140,6 @@ if($domain){
             ])
         ->get(true);
 }
-
-$result = [];
 
 // create map for statistic sections
 $stats = StatSection::search(['code', 'in', ['GITE', 'SEJ', 'RST', 'ANIM']])->read(['id', 'code'])->get(true);
@@ -160,7 +162,7 @@ foreach($bookings as $booking) {
             'id',
             'total',
             'price',
-            'product_model_id' => ['id', 'stat_section_id']
+            'product_model_id' => ['id', 'stat_section_id', 'activity_scope']
         ])
         ->get(true);
 
@@ -171,12 +173,14 @@ foreach($bookings as $booking) {
 
     if(!isset($map_center_values[$booking['center_id']['name']][$date_index])) {
         $map_center_values[$booking['center_id']['name']][$date_index] = [
-            'center'            => $booking['center_id']['name'],
-            'aamm'              => date('Y/m', $booking['date_from']),
-            'bookings'          => 0,
-            'nights'            => 0,
-            'animations'        => 0,
-            'meals'             => 0
+            'center'                => $booking['center_id']['name'],
+            'aamm'                  => date('Y/m', $booking['date_from']),
+            'bookings'              => 0,
+            'nights'                => 0,
+            'animations'            => 0,
+            'internal_animations'   => 0,
+            'external_animations'   => 0,
+            'meals'                 => 0
         ];
     }
 
@@ -198,6 +202,7 @@ foreach($bookings as $booking) {
                 break;
             case 'ANIM':
                 $map_center_values[$booking['center_id']['name']][$date_index]['animations'] += $line['total'];
+                $map_center_values[$booking['center_id']['name']][$date_index][$line['product_model_id']['activity_scope'].'_animations'] += $line['price'];
                 break;
         }
     }

@@ -17,6 +17,14 @@
                 "operation": "SUM",
                 "usage": "amount/money:2"
             },
+            "internal_animations":{
+                "operation": "SUM",
+                "usage": "amount/money:2"
+            },
+            "external_animations":{
+                "operation": "SUM",
+                "usage": "amount/money:2"
+            },
             "meals":{
                 "operation": "SUM",
                 "usage": "amount/money:2"
@@ -51,6 +59,23 @@
             {
                 "type": "field",
                 "value": "animations",
+                "width": "15%",
+                "widget": {
+                    "usage": "amount/money:2"
+                },
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "internal_animations",
+                "width": "15%",
+                "widget": {
+                    "usage": "amount/money:2"
+                }
+            },
+            {
+                "type": "field",
+                "value": "external_animations",
                 "width": "15%",
                 "widget": {
                     "usage": "amount/money:2"
