@@ -931,10 +931,10 @@ $consumption_supply_sheets = Consumption::search([
 $consumption_sheets_beds_made = Consumption::search([
         ['booking_id', '=', $booking['id']],
         ['type', '=', 'book'],
-        ['product_id', '=', $product_sheets_beds_made['product_model_id']]
+        ['product_model_id', '=', $product_sheets_beds_made['product_model_id']]
     ])
     ->read([
-        'product_id' => ['id', 'name']
+        'product_model_id' => ['id', 'name']
     ])
     ->first(true);
 
