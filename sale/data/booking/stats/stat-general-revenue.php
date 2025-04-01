@@ -11,10 +11,9 @@ use identity\User;
 use sale\booking\Booking;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
-use sale\catalog\ProductModel;
 
 [$params, $providers] = eQual::announce([
-    'description'   => 'Lists all contracts and their related details for a given period.',
+    'description'   => 'List general revenues per month.',
     'params'        => [
         /* mixed-usage parameters: required both for fetching data (input) and property of virtual entity (output) */
         'center_id' => [
@@ -49,6 +48,22 @@ use sale\catalog\ProductModel;
             'type'              => 'string',
             'description'       => 'Year and month.'
         ],
+        'duration_days' => [
+            'type'              => 'integer',
+            'description'       => 'Total duration of all bookings in days.'
+        ],
+        'nb_pers' => [
+            'type'              => 'integer',
+            'description'       => 'Number of hosted persons.'
+        ],
+        'nb_nights' => [
+            'type'              => 'integer',
+            'description'       => 'Number of nights.'
+        ],
+        'nb_freebies' => [
+            'type'              => 'integer',
+            'description'       => 'Number of free nights.'
+        ],
         'bookings' => [
             'type'              => 'float',
             'description'       => 'Name of the center.'
@@ -72,7 +87,7 @@ use sale\catalog\ProductModel;
         'meals' => [
             'type'              => 'float',
             'description'       => 'Total revenue from meals.'
-        ],
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -88,15 +103,13 @@ use sale\catalog\ProductModel;
  */
 ['context' => $context, 'auth' => $auth] = $providers;
 
-$domain = [];
-
 // #memo - we consider all bookings for which at least one sojourn starts during the given period
-if($params['center_id'] || $params['all_centers']) {
+if($params['center_id']) {
     $domain = [
         ['date_from', '>=', $params['date_from']],
         ['date_from', '<=', $params['date_to']],
         ['state', 'in', ['instance', 'archive']],
-        ['status', 'in', ['invoiced', 'credit_balance', 'debit_balance', 'balanced']]
+        ['status', 'not in', ['quote', 'option']]
     ];
 }
 
@@ -125,15 +138,15 @@ $bookings = [];
 if(!empty($domain)) {
     $bookings = Booking::search($domain)
         ->read([
-                'id',
-                'created',
-                'name',
-                'date_from',
-                'date_to',
-                'total',
-                'price',
-                'center_id'  => ['id', 'name', 'center_office_id']
-            ])
+            'id',
+            'created',
+            'name',
+            'date_from',
+            'date_to',
+            'total',
+            'price',
+            'center_id' => ['id', 'name', 'center_office_id']
+        ])
         ->get(true);
 }
 
@@ -159,6 +172,10 @@ foreach($bookings as $booking) {
         $map_center_values[$booking['center_id']['name']][$date_index] = [
             'center'                => $booking['center_id']['name'],
             'aamm'                  => date('Y/m', $booking['date_from']),
+            'duration_days'         => 0,
+            'nb_pers'               => 0,
+            'nb_nights'             => 0,
+            'nb_freebies'           => 0,
             'bookings'              => 0,
             'nights'                => 0,
             'animations'            => 0,
@@ -168,21 +185,37 @@ foreach($bookings as $booking) {
         ];
     }
 
+    $diff = $booking['date_to'] - $booking['date_from'];
+    $day_diff = floor($diff / (60 * 60 * 24));
+    $map_center_values[$booking['center_id']['name']][$date_index]['duration_days'] += $day_diff + 1;
+
     $map_center_values[$booking['center_id']['name']][$date_index]['bookings'] += $booking['price'];
 
     $groups = BookingLineGroup::search([
-            ['booking_id', '=', $booking['id']]
-        ])
-        ->read(['id', 'has_pack', 'is_locked', 'date_from', 'date_to', 'vat_rate', 'total', 'price', 'pack_id' => ['id', 'product_model_id']])
+        ['booking_id', '=', $booking['id']]
+    ])
+        ->read(['id', 'has_pack', 'is_locked', 'date_from', 'date_to', 'vat_rate', 'total', 'price', 'nb_pers', 'pack_id' => ['id', 'product_model_id']])
         ->get(true);
 
     foreach($groups as $group) {
-        if($group['has_pack'] && $group['is_locked']) {
-            $product_model = ProductModel::id($group['pack_id']['product_model_id'])
-                ->read(['id', 'stat_section_id', 'activity_scope'])
-                ->first(true);
+        $map_center_values[$booking['center_id']['name']][$date_index]['nb_pers'] += $group['nb_pers'];
 
-            $stat_id = $product_model['stat_section_id'];
+        $lines = BookingLine::search([
+            ['booking_line_group_id', '=', $group['id']]
+        ])
+            ->read([
+                'id',
+                'qty',
+                'free_qty',
+                'total',
+                'price',
+                'is_accomodation',
+                'product_model_id' => ['id', 'stat_section_id', 'activity_scope']
+            ])
+            ->get(true);
+
+        foreach($lines as $line) {
+            $stat_id = $line['product_model_id']['stat_section_id'];
             if(!isset($map_stats[$stat_id])) {
                 continue;
             }
@@ -190,49 +223,20 @@ foreach($bookings as $booking) {
             switch($code) {
                 case 'GITE':
                 case 'SEJ':
-                    $map_center_values[$booking['center_id']['name']][$date_index]['nights'] += $group['price'];
+                    $map_center_values[$booking['center_id']['name']][$date_index]['nights'] += $line['price'];
                     break;
                 case 'RST':
-                    $map_center_values[$booking['center_id']['name']][$date_index]['meals'] += $group['price'];
+                    $map_center_values[$booking['center_id']['name']][$date_index]['meals'] += $line['price'];
                     break;
                 case 'ANIM':
-                    $map_center_values[$booking['center_id']['name']][$date_index]['animations'] += $group['price'];
-                    $map_center_values[$booking['center_id']['name']][$date_index][$product_model['activity_scope'].'_animations'] += $group['price'];
+                    $map_center_values[$booking['center_id']['name']][$date_index]['animations'] += $line['price'];
+                    $map_center_values[$booking['center_id']['name']][$date_index][$line['product_model_id']['activity_scope'].'_animations'] += $line['price'];
                     break;
             }
-        }
-        else {
-            $lines = BookingLine::search([
-                    ['booking_line_group_id', '=', $group['id']]
-                ])
-                ->read([
-                    'id',
-                    'total',
-                    'price',
-                    'product_model_id' => ['id', 'stat_section_id', 'activity_scope']
-                ])
-                ->get(true);
 
-
-            foreach($lines as $line) {
-                $stat_id = $line['product_model_id']['stat_section_id'];
-                if(!isset($map_stats[$stat_id])) {
-                    continue;
-                }
-                $code = $map_stats[$stat_id];
-                switch($code) {
-                    case 'GITE':
-                    case 'SEJ':
-                        $map_center_values[$booking['center_id']['name']][$date_index]['nights'] += $line['price'];
-                        break;
-                    case 'RST':
-                        $map_center_values[$booking['center_id']['name']][$date_index]['meals'] += $line['price'];
-                        break;
-                    case 'ANIM':
-                        $map_center_values[$booking['center_id']['name']][$date_index]['animations'] += $line['price'];
-                        $map_center_values[$booking['center_id']['name']][$date_index][$line['product_model_id']['activity_scope'].'_animations'] += $line['price'];
-                        break;
-                }
+            if($line['is_accomodation']) {
+                $map_center_values[$booking['center_id']['name']][$date_index]['nb_nights'] += $line['qty'];
+                $map_center_values[$booking['center_id']['name']][$date_index]['nb_freebies'] += $line['free_qty'];
             }
         }
     }
@@ -250,3 +254,4 @@ $context->httpResponse()
         ->header('X-Total-Count', count($result))
         ->body($result)
         ->send();
+
