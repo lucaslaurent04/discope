@@ -49,7 +49,8 @@ use sale\booking\BookingActivity;
         'partner_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Partner',
-            'description'       => "The counter party organization the invoice relates to."
+            'description'       => "The counter party organization the invoice relates to.",
+            'domain'            => ['relationship', 'in', ['provider', 'employee']]
         ],
         'employee_id' => [
             'type'              => 'many2one',

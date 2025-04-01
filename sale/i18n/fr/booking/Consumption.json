@@ -102,6 +102,11 @@
             },
             "help": ""
         },
+        "make_beds": {
+            "label": "Faire lits",
+            "description": "Est-ce que les lits doivent être faits?",
+            "help": ""
+        },
         "center_id": {
             "label": "Centre",
             "description": "Le centre auquel se rapporte la consommation.",
