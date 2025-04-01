@@ -13,7 +13,7 @@ use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\catalog\ProductModel;
 
-[$params, $providers] = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Lists all contracts and their related details for a given period.',
     'params'        => [
         /* mixed-usage parameters: required both for fetching data (input) and property of virtual entity (output) */
