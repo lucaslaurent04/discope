@@ -106,6 +106,7 @@ $fields = [
                 'email'
         ],
         'customer_id' => [
+            'rate_class_id' => ['id', 'name'],
             'partner_identity_id' => [
                 'id',
                 'display_name',
