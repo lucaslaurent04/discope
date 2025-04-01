@@ -8,7 +8,6 @@
 
 use core\Lang;
 use core\Mail;
-use core\setting\Setting;
 use equal\email\Email;
 use sale\booking\BookingType;
 use sale\booking\channelmanager\Booking;
@@ -30,7 +29,7 @@ use sale\catalog\Product;
 use sale\price\Price;
 use sale\price\PriceList;
 
-[$params, $providers] = eQual::announce([
+list($params, $providers) = eQual::announce([
     'description'   => "Pull reservations from Cubilis not yet marked as acknowledged.",
     'params'        => [
     ],
@@ -54,16 +53,9 @@ use sale\price\PriceList;
  */
 list($context, $orm, $cron, $dispatch) = [ $providers['context'], $providers['orm'], $providers['cron'], $providers['dispatch'] ];
 
-$channelmanager_enabled = Setting::get_value('sale', 'booking', 'channelmanager.enabled', false);
-
-if(!$channelmanager_enabled) {
-    throw new Exception('disabled_feature', QN_ERROR_INVALID_CONFIG);
-}
-
-$client_domain = Setting::get_value('sale', 'booking', 'channelmanager.client_domain', 'https://discope.yb.run');
-
-// #memo - prevent calls from non-production server
-if(constant('ROOT_APP_URL') != $client_domain) {
+// #todo - @kaleo - this must be adapted according to new domain
+// #memo - temporary solution to prevent calls from non-production server
+if(constant('ROOT_APP_URL') != 'https://discope.yb.run') {
     throw new Exception('wrong_host', QN_ERROR_INVALID_CONFIG);
 }
 
@@ -177,7 +169,7 @@ try {
                             }
                             catch(Exception $e) {
                                 // error while cancelling (unable to cancel)
-                                ++$result['warnings'];
+                                ++$result['errors'];
                                 $result['logs'][] = "WARN- Unable to cancel Booking {$booking['id']} for reservation {$reservation['reservation_id']} : ".$e->getMessage();
                             }
                         }
@@ -772,6 +764,14 @@ try {
                                         'sale_booking_payments_fetch-psp',
                                         [ 'id' => $payment['id'] ]
                                     );
+
+                                // #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
+                                $cron->schedule(
+                                        "psp.fetch.{$payment['id']}",
+                                        time(),
+                                        'lodging_payments_fetch-psp',
+                                        [ 'id' => $payment['id'] ]
+                                    );
                             }
 
                         }
@@ -1021,6 +1021,11 @@ if($result['warnings'] || $result['errors']) {
             // queue message
             Mail::queue($message);
         }
+    }
+
+    if($result['errors']) {
+        // make sure cron task is marked as failed ('error')
+        throw new Exception(serialize($result), EQ_ERROR_UNKNOWN);
     }
 }
 else {
