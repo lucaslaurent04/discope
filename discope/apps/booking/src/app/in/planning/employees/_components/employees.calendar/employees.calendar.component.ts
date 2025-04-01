@@ -496,6 +496,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return date_index === activity_date_index && time_slot == activity.time_slot
 
                // Check employee can handle activity
+               // #todo - make this check optional
                && employee.activity_product_models_ids.map(id => +id).includes(activity.product_model_id.id)
 
                // Check that the employee hasn't been assigned an activity yet
