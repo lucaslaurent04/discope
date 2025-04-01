@@ -815,7 +815,7 @@ class Booking extends Model {
      * #memo - this method differs from the parent one.
      */
     public static function updateStatusFromFundings($om, $ids, $values=[], $lang='en') {
-        $bookings = $om->read(self::getType(), $ids, ['status', 'price', 'fundings_ids'], $lang);
+        $bookings = Booking::ids($ids)->read(['status', 'price', 'fundings_ids'])->get();
         if($bookings > 0 && count($bookings)) {
             foreach($bookings as $id => $booking) {
                 if($booking['status'] == 'confirmed') {
