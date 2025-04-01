@@ -52,6 +52,16 @@
             "label": "Animations",
             "description": "Total des animations.",
             "help": ""
+        },
+        "internal_animations": {
+            "label": "Animations internes",
+            "description": "Total des animations internes.",
+            "help": ""
+        },
+        "external_animations": {
+            "label": "Animations externes",
+            "description": "Total des animations externes.",
+            "help": ""
         }
     },
     "view": {
