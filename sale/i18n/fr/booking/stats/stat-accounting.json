@@ -1,0 +1,67 @@
+{
+    "name": "CA par règle comptable",
+    "plural": "CA par règle comptable",
+    "description": "Chiffre d'affaires généré selon une règle comptable pour une période donnée.",
+    "model": {
+        "organisation_id": {
+            "label": "Organisation",
+            "description": "Organisation pour laquelle obtenir les statistiques.",
+            "help": ""
+        },
+        "center_office_id": {
+            "label": "Équipe de gestion",
+            "description": "Équipe de gestion pour laquelle la statistique est requise.",
+            "help": ""
+        },
+        "date_from": {
+            "label": "Du",
+            "description": "Date de début de la période d'analyse.",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "Date de fin de la période d'analyse.",
+            "help": ""
+        },
+        "accounting_rule_id": {
+            "label": "Règle comptable",
+            "description": "Règle comptable appliquée aux transactions.",
+            "help": ""
+        },
+        "center_office": {
+            "label": "Équipe de gestion",
+            "description": "Nom de l'équipe de gestion.",
+            "help": ""
+        },
+        "invoice": {
+            "label": "Facture",
+            "description": "Nombre  de la facture concernée.",
+            "help": ""
+        },
+        "qty": {
+            "label": "Qté",
+            "description": "Quantité liée à la règle comptable facturée.",
+            "help": ""
+        },
+        "total": {
+            "label": "Total HT",
+            "description": "Montant total hors taxes lié à la règle comptable facturée.",
+            "help": ""
+        },
+        "price": {
+            "label": "Total TTC",
+            "description": "Montant total toutes taxes comprises lié à la règle comptable facturée.",
+            "help": ""
+        }
+    },
+    "view": {
+        "search.default": {
+        },
+        "list.default": {
+        }
+    },
+    "error": {
+        "errors": {
+        }
+    }
+}
