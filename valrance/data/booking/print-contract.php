@@ -316,6 +316,8 @@ $values = [
     'has_activity'               => $has_activity,
     'activities_map'             => '',
     'sheets_beds'                => '',
+    'service_transport'          => '',
+    'has_service_transport'      => 0
 ];
 
 /*
@@ -926,10 +928,10 @@ $consumption_supply_sheets = Consumption::search([
     ->read(['product_model_id' => ['id', 'name']])
     ->first(true);
 
-$consumption_sheets_beds_made = Consumption::search([ 
+$consumption_sheets_beds_made = Consumption::search([
         ['booking_id', '=', $booking['id']],
         ['type', '=', 'book'],
-        ['product_id', '=', $product_sheets_beds_made['product_model_id']] 
+        ['product_id', '=', $product_sheets_beds_made['product_model_id']]
     ])
     ->read([
         'product_id' => ['id', 'name']
@@ -946,6 +948,28 @@ if (!$consumption_supply_sheets && !$consumption_sheets_beds_made) {
 
 $values['sheets_beds'] = $sheets_beds;
 
+
+$setting_transport = Setting::get_value('sale', 'booking', 'sku_round_trip_transport', 'not_found');
+
+$product_transport = Product::search(['sku', '=', $setting_transport])
+    ->read(['id' , 'product_model_id'])
+    ->first(true);
+
+
+$consumption_transport = Consumption::search([
+        ['booking_id', '=', $booking['id']],
+        ['type', '=', 'book'],
+        ['product_model_id', '=', $product_transport['product_model_id']]
+    ])
+    ->read(['product_model_id' => ['id', 'name']])
+    ->first(true);
+
+if ($consumption_transport) {
+    $values['has_service_transport'] = 1;
+    $transport_translation = Setting::get_value('lodging', 'locale', 'i18n.round_trip_transport', null, [], $params['lang']);
+}
+
+$values['service_transport'] = $transport_translation;
 
 $consumptions_map_simple = [];
 

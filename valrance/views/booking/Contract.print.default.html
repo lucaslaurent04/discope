@@ -235,6 +235,11 @@ hr {
     </div>
     <div class="intro">
         {{ contract_service_html | raw }}
+        {% if has_service_transport %}
+            <ul>
+                <li >{{ service_transport }}</li>
+            </ul>
+        {% endif %}
     </div>
     <div class="page-break">
         {{ contract_engage_html | raw }}
