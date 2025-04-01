@@ -13,7 +13,7 @@
                 "operation": "SUM",
                 "usage": "numeric/integer"
             },
-            "nb_days":{
+            "duration_days":{
                 "operation": "SUM",
                 "usage": "numeric/integer"
             },

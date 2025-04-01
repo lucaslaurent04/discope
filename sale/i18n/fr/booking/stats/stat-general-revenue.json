@@ -35,7 +35,7 @@
         },
         "duration_days": {
             "label": "Durée jours",
-            "description": "Durée de la réservation en jours.",
+            "description": "Total durée des réservations en jours.",
             "help": ""
         },
         "nb_pers": {
