@@ -24,6 +24,7 @@ use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use sale\booking\BookingActivity;
+use sale\catalog\Product;
 
 list($params, $providers) = announce([
     'description'   => "Render a contract given its ID as a PDF document.",
@@ -106,6 +107,7 @@ $fields = [
                 'email'
         ],
         'customer_id' => [
+            'rate_class_id' => ['id', 'name'],
             'partner_identity_id' => [
                 'id',
                 'display_name',
@@ -287,6 +289,8 @@ $values = [
     'contract_service_html'       => '',
     'contract_engage_html'        => '',
     'contract_notice_html'        => '',
+    'contract_payment_html'       => '',
+    'contract_cancellation_html'  => '',
     'customer_address1'           => $booking['customer_id']['partner_identity_id']['address_street'],
     'customer_address2'           => $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'].(($booking['customer_id']['partner_identity_id']['address_country'] != 'BE')?(' - '.$booking['customer_id']['partner_identity_id']['address_country']):''),
     'customer_address_dispatch'   => $booking['customer_id']['partner_identity_id']['address_dispatch'],
@@ -310,7 +314,10 @@ $values = [
     'tax_lines'                   => [],
     'total'                       => $contract['total'],
     'has_activity'               => $has_activity,
-    'activities_map'             => ''
+    'activities_map'             => '',
+    'sheets_beds'                => '',
+    'service_transport'          => '',
+    'has_service_transport'      => 0
 ];
 
 /*
@@ -491,9 +498,20 @@ if($booking['center_id']['template_category_id']) {
         elseif($part['name'] == 'notice') {
             $value = $part['value'];
             $value = str_replace('{center}', $booking['center_id']['name'], $value);
+            $value = str_replace('{customer}', $customer_name, $value);
             $value = str_replace('{price}', $booking['price'] ,$value);
             $values['contract_notice_html'] = $value;
-        }elseif($part['name'] == 'contract_approved') {
+        }elseif($part['name'] == 'payment') {
+            $value = $part['value'];
+            $value = str_replace('{center}', $booking['center_id']['name'], $value);
+            $values['contract_payment_html'] = $value;
+        }
+        elseif($part['name'] == 'cancellation') {
+            $value = $part['value'];
+            $value = str_replace('{center}', $booking['center_id']['name'], $value);
+            $values['contract_cancellation_html'] = $value;
+        }
+        elseif($part['name'] == 'contract_approved') {
             $value = $part['value'];
             $values['has_contract_approved'] = 1;
             $values['contract_approved_html'] = $part['value'] . $values['center_signature'];
@@ -889,6 +907,69 @@ $days_names = array_map(function($day) use ($params) {
     Generate consumptions map simple
 */
 
+
+$setting_supply_sheets = Setting::get_value('sale', 'booking', 'sku_supply_sheets', 'not_found');
+
+$product_supply_sheets = Product::search(['sku', '=', $setting_supply_sheets])
+    ->read(['id' , 'product_model_id'])
+    ->first(true);
+
+$setting_supply_sheets_beds_made = Setting::get_value('sale', 'booking', 'supply_sheets_beds_made', 'not_found');
+
+$product_sheets_beds_made = Product::search(['sku', '=', $setting_supply_sheets_beds_made])
+    ->read(['id' , 'product_model_id'])
+    ->first(true);
+
+$consumption_supply_sheets = Consumption::search([
+        ['booking_id', '=', $booking['id']],
+        ['type', '=', 'book'],
+        ['product_model_id', '=', $product_supply_sheets['product_model_id']]
+    ])
+    ->read(['product_model_id' => ['id', 'name']])
+    ->first(true);
+
+$consumption_sheets_beds_made = Consumption::search([
+        ['booking_id', '=', $booking['id']],
+        ['type', '=', 'book'],
+        ['product_model_id', '=', $product_sheets_beds_made['product_model_id']]
+    ])
+    ->read([
+        'product_model_id' => ['id', 'name']
+    ])
+    ->first(true);
+
+if (!$consumption_supply_sheets && !$consumption_sheets_beds_made) {
+    $sheets_beds = Setting::get_value('lodging', 'locale', 'i18n.not_supply_sheets_and_beds', null, [], $params['lang']);
+} elseif ($consumption_supply_sheets && !$consumption_sheets_beds_made) {
+    $sheets_beds = Setting::get_value('lodging', 'locale', 'i18n.supply_sheets', null, [], $params['lang']);
+} elseif ($consumption_sheets_beds_made) {
+    $sheets_beds = Setting::get_value('lodging', 'locale', 'i18n.supply_sheets_beds_made', null, [], $params['lang']);
+}
+
+$values['sheets_beds'] = $sheets_beds;
+
+
+$setting_transport = Setting::get_value('sale', 'booking', 'sku_round_trip_transport', 'not_found');
+
+$product_transport = Product::search(['sku', '=', $setting_transport])
+    ->read(['id' , 'product_model_id'])
+    ->first(true);
+
+
+$consumption_transport = Consumption::search([
+        ['booking_id', '=', $booking['id']],
+        ['type', '=', 'book'],
+        ['product_model_id', '=', $product_transport['product_model_id']]
+    ])
+    ->read(['product_model_id' => ['id', 'name']])
+    ->first(true);
+
+if ($consumption_transport) {
+    $values['has_service_transport'] = 1;
+    $transport_translation = Setting::get_value('lodging', 'locale', 'i18n.round_trip_transport', null, [], $params['lang']);
+}
+
+$values['service_transport'] = $transport_translation;
 
 $consumptions_map_simple = [];
 
