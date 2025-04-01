@@ -126,6 +126,9 @@ hr {
     page-break-after: always;
     border: 0;
 }
+.page-break {
+    page-break-before: always;
+}
 </style>
 
 </head>
@@ -232,8 +235,17 @@ hr {
     </div>
     <div class="intro">
         {{ contract_service_html | raw }}
+        <ul>
+            <li >{{ sheets_beds }}</li>
+        </ul>
+        <br>
+        {% if has_service_transport %}
+            <ul>
+                <li >{{ service_transport }}</li>
+            </ul>
+        {% endif %}
     </div>
-    <div class="intro">
+    <div class="page-break">
         {{ contract_engage_html | raw }}
     </div>
     <div class="wrapper">
@@ -554,7 +566,8 @@ hr {
 {% endif %}
 
 
-<div class="notice">{{ contract_notice_html | raw }}</div>
+<div class="intro">{{ contract_notice_html | raw }}</div>
+<div class="intro">{{ contract_payment_html | raw }}</div>
 
 {% if installment_amount > 0 %}
 <div style="position: relative; margin-top: 40px; border: solid 2px black; height: 180px; page-break-inside: avoid;">
@@ -577,11 +590,13 @@ hr {
 {% endif %}
 
 
-<div>
+<div class="intro">{{ contract_cancellation_html | raw }}</div>
+
+<div class="page-break">
     {{ contract_authorization_html|raw }}
 </div>
 
-<div style="margin-top: 50px;">
+<div class="page-break" style="margin-top: 50px;">
     <table style="width: 100%; page-break-inside: avoid;">
         <tr>
             <td style="width: 60%;">
@@ -600,18 +615,20 @@ hr {
             </td>
         </tr>
     </table>
+
+    {% if has_contract_approved %}
+        <div>
+            {{ contract_approved_html|raw }}
+        </div>
+
+        <div class="signature-container">
+            {{ signature|raw }}
+        </div>
+    {% endif %}
 </div>
 
 
-{% if has_contract_approved %}
-    <div>
-        {{ contract_approved_html|raw }}
-    </div>
 
-    <div class="signature-container">
-        {{ signature|raw }}
-    </div>
-{% endif %}
 
 </body>
 </html>
