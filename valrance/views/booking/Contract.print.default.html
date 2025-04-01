@@ -235,6 +235,10 @@ hr {
     </div>
     <div class="intro">
         {{ contract_service_html | raw }}
+        <ul>
+            <li >{{ sheets_beds }}</li>
+        </ul>
+        <br>
         {% if has_service_transport %}
             <ul>
                 <li >{{ service_transport }}</li>
@@ -243,9 +247,6 @@ hr {
     </div>
     <div class="page-break">
         {{ contract_engage_html | raw }}
-        <ul>
-            <li >{{ sheets_beds }}</li>
-        </ul>
     </div>
     <div class="wrapper">
         <table width="100%" cellpadding="4" cellspacing="0">
