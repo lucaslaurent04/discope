@@ -496,7 +496,15 @@ foreach($invoices as $invoice) {
         }
         // #memo - we don't use $line['price_id']['vat_rate'] since VAT rate can be set manually
         // #memo - this might lead to incorrect values if distinct VAT rates have been applied on distinct products relating to a same account id (in such case, the accounting software will mark the import as invalid)
-        $vat_rate = ($amount != 0.0)?abs(round($vat / $amount, 2)):0.0;
+        // #memo - for small amounts (< 1 $) `price-total` may lead to a rounding issue, so we must make sure applied VTA rate is amongst a predefined list
+        // #todo - use VAT rates from config
+        $allowed_rates = [0.0, 0.06, 0.12, 0.21];
+
+        $raw_rate = ($amount != 0.0) ? abs(round($vat / $amount, 2)) : 0.0;
+        $vat_rate = array_reduce($allowed_rates, function ($c, $r) use ($raw_rate) {
+            return (abs($r - $raw_rate) < abs($c - $raw_rate)) ? $r : $c;
+        });
+
         $accounting_rule_lines_ids = [];
         if($line['product_id'] == $downpayment_product_id) {
             // deposit invoice or credit note
