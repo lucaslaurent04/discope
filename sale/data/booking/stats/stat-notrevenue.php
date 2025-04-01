@@ -97,7 +97,7 @@ if($params['center_id'] || $params['all_centers']) {
     ];
 }
 
-if($params['all_centers']){
+if($params['all_centers']) {
     $user_id = $auth->userId();
     if($user_id <= 0) {
         throw new Exception("unknown_user", QN_ERROR_NOT_ALLOWED);
