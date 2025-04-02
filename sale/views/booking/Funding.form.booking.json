@@ -56,6 +56,17 @@
             }
         },
         {
+            "id": "action.pay_financial_help",
+            "label": "Financial help payment",
+            "description": "Use a financial help to create a funding payment.",
+            "controller": "sale_booking_funding_do-pay-financial-help",
+            "confirm": true,
+            "access": {
+                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
+            },
+            "visible": ["is_paid", "=", false]
+        },
+        {
             "id": "action.unpay_instant",
             "label": "Undo payment",
             "description": "This will remove any manual payment and Funding will be unmarked as paid.",

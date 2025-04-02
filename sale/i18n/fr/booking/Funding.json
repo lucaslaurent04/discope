@@ -109,6 +109,10 @@
                 "action.add_bank_check": {
 					"label": "Enregistrer chèque bancaire",
 					"description": "Enregistrer un chèque bancaire à un financement, marquer le financement comme payé et mettre à jour son statut en cours."
+				},
+				"action.pay_financial_help": {
+					"label": "Payement aide financière",
+					"description": "Payé grâce à une aide financière."
 				}
 			},
 			"layout": {
