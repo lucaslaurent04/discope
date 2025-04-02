@@ -17,7 +17,6 @@ use equal\data\DataFormatter;
 use sale\booking\Consumption;
 use sale\booking\Contract;
 use sale\booking\TimeSlot;
-use sale\customer\Customer;
 use SepaQr\Data;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
@@ -25,6 +24,7 @@ use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use sale\booking\BookingActivity;
 use sale\catalog\Product;
+use sale\booking\BookingLine;
 
 list($params, $providers) = announce([
     'description'   => "Render a contract given its ID as a PDF document.",
@@ -908,67 +908,64 @@ $days_names = array_map(function($day) use ($params) {
 */
 
 
-$setting_supply_sheets = Setting::get_value('sale', 'booking', 'sku_supply_sheets', 'not_found');
+$setting_bed_linens = Setting::get_value('sale', 'booking', 'bed-linens.sku', 'not_found');
 
-$product_supply_sheets = Product::search(['sku', '=', $setting_supply_sheets])
+$product_bed_linens = Product::search(['sku', '=', $setting_bed_linens])
     ->read(['id' , 'product_model_id'])
     ->first(true);
 
-$setting_supply_sheets_beds_made = Setting::get_value('sale', 'booking', 'supply_sheets_beds_made', 'not_found');
-
-$product_sheets_beds_made = Product::search(['sku', '=', $setting_supply_sheets_beds_made])
-    ->read(['id' , 'product_model_id'])
-    ->first(true);
-
-$consumption_supply_sheets = Consumption::search([
+$bl_bed_linens = BookingLine::search([
         ['booking_id', '=', $booking['id']],
-        ['type', '=', 'book'],
-        ['product_model_id', '=', $product_supply_sheets['product_model_id']]
+        ['product_model_id', '=', $product_bed_linens['product_model_id']]
     ])
     ->read(['product_model_id' => ['id', 'name']])
     ->first(true);
 
-$consumption_sheets_beds_made = Consumption::search([
+$setting_make_beds = Setting::get_value('sale', 'booking', 'make-beds.sku', 'not_found');
+
+$product_make_beds = Product::search(['sku', '=', $setting_make_beds])
+    ->read(['id' , 'product_model_id'])
+    ->first(true);
+
+
+$bl_make_beds = BookingLine::search([
         ['booking_id', '=', $booking['id']],
-        ['type', '=', 'book'],
-        ['product_model_id', '=', $product_sheets_beds_made['product_model_id']]
+        ['product_model_id', '=', $product_make_beds['product_model_id']]
     ])
     ->read([
         'product_model_id' => ['id', 'name']
     ])
     ->first(true);
 
-if (!$consumption_supply_sheets && !$consumption_sheets_beds_made) {
-    $sheets_beds = Setting::get_value('lodging', 'locale', 'i18n.not_supply_sheets_and_beds', null, [], $params['lang']);
-} elseif ($consumption_supply_sheets && !$consumption_sheets_beds_made) {
-    $sheets_beds = Setting::get_value('lodging', 'locale', 'i18n.supply_sheets', null, [], $params['lang']);
-} elseif ($consumption_sheets_beds_made) {
-    $sheets_beds = Setting::get_value('lodging', 'locale', 'i18n.supply_sheets_beds_made', null, [], $params['lang']);
+if (!$bl_bed_linens && !$bl_make_beds) {
+    $service_beds = Setting::get_value('lodging', 'locale', 'i18n.not_bed_linens', null, [], $params['lang']);
+} elseif ($bl_bed_linens && !$bl_make_beds) {
+    $service_beds = Setting::get_value('lodging', 'locale', 'i18n.bed_linens', null, [], $params['lang']);
+} elseif ($bl_make_beds) {
+    $service_beds = Setting::get_value('lodging', 'locale', 'i18n.make_beds', null, [], $params['lang']);
 }
 
-$values['sheets_beds'] = $sheets_beds;
+$values['service_beds'] = $service_beds;
 
 
-$setting_transport = Setting::get_value('sale', 'booking', 'sku_round_trip_transport', 'not_found');
+$setting_transport = Setting::get_value('sale', 'booking', 'transport.sku', 'not_found');
 
 $product_transport = Product::search(['sku', '=', $setting_transport])
     ->read(['id' , 'product_model_id'])
     ->first(true);
 
 
-$consumption_transport = Consumption::search([
+$transport = BookingLine::search([
         ['booking_id', '=', $booking['id']],
-        ['type', '=', 'book'],
         ['product_model_id', '=', $product_transport['product_model_id']]
     ])
     ->read(['product_model_id' => ['id', 'name']])
     ->first(true);
 
-if ($consumption_transport) {
+if ($transport) {
     $values['has_service_transport'] = 1;
     $transport_translation = Setting::get_value('lodging', 'locale', 'i18n.round_trip_transport', null, [], $params['lang']);
 }
-
 $values['service_transport'] = $transport_translation;
 
 $consumptions_map_simple = [];
