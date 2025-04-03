@@ -188,7 +188,7 @@ $values = [
     'payments'                  => $payments
 ];
 
-$values['i18n'] = array(
+$values['i18n'] = [
     'invoice'           => Setting::get_value('sale', 'locale', 'terms.invoice', null, array(), $params['lang']),
     'customer_name'     => Setting::get_value('lodging', 'locale', 'i18n.customer_name', null, array(), $params['lang']),
     'customer_address'  => Setting::get_value('lodging', 'locale', 'i18n.customer_address', null, array(), $params['lang']),
@@ -197,7 +197,7 @@ $values['i18n'] = array(
     'vat_number'        => Setting::get_value('lodging', 'locale', 'i18n.vat_number', null, array(), $params['lang']),
     'vat'               => Setting::get_value('lodging', 'locale', 'i18n.vat', null, array(), $params['lang']),
     'total_tax_incl'    => Setting::get_value('lodging', 'locale', 'i18n.total_tax_incl', null, [], $params['lang'])
-);
+];
 
 try {
     $loader = new TwigFilesystemLoader(EQ_BASEDIR.'/packages/sale/views/');
