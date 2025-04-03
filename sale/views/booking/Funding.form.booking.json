@@ -43,7 +43,10 @@
             "access": {
                 "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
             },
-            "visible": ["is_paid", "=", false]
+            "visible": [
+                ["is_paid", "=", false],
+                ["env.sale.booking.allow_instant_payment", "=", true]
+            ]
         },
         {
             "id": "action.add_bank_check",
