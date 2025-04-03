@@ -27,6 +27,16 @@ class FinancialHelp extends Model {
                 'description'       => "More information about the financial help and the organisation who's responsible for it."
             ],
 
+            'status' => [
+                'type'              => 'string',
+                'description'       => "The current status of the financial help.",
+                'selection'         => [
+                    'pending',
+                    'invoiced'
+                ],
+                'default'           => 'pending'
+            ],
+
             'date_from' => [
                 'type'              => 'date',
                 'description'       => "Date at which the financial help starts to be available.",
@@ -101,5 +111,25 @@ class FinancialHelp extends Model {
         }
 
         return $result;
+    }
+
+    public static function getWorkflow(): array {
+        return [
+
+            'pending' => [
+                'description' => "The financial help is pending and can be used to pay for part of customers booking invoices.",
+                'transitions' => [
+                    'invoice' => [
+                        'status'        => 'invoiced',
+                        'description'   => "Mark the financial help as payments \"invoiced\" to the helper."
+                    ]
+                ]
+            ],
+
+            'invoiced' => [
+                'description' => "The financial help payments where invoiced to the helper."
+            ]
+
+        ];
     }
 }

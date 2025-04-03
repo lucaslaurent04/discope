@@ -26,7 +26,8 @@ use sale\booking\Payment;
             'description'       => "The financial help that will take care of the payment.",
             'domain'            => [
                 ['remaining_amount', '>', 0],
-                ['date_to', '>', 'date.this.day']
+                ['date_to', '>', 'date.this.day'],
+                ['status', '=', 'pending']
             ],
             'required'          => true
         ],
@@ -63,6 +64,7 @@ $funding = Funding::id($params['id'])
         'is_paid',
         'paid_amount',
         'due_amount',
+        'status',
         'booking_id' => ['id', 'customer_id', 'date_from', 'date_to']
     ])
     ->first();
@@ -73,6 +75,10 @@ if(is_null($funding)) {
 
 if($funding['is_paid']) {
     throw new Exception("funding_already_paid", EQ_ERROR_INVALID_PARAM);
+}
+
+if($funding['status'] !== 'pending') {
+    throw new Exception("funding_already_invoiced", EQ_ERROR_INVALID_PARAM);
 }
 
 if($funding['due_amount'] < 0 || $funding['paid_amount'] < 0) {
