@@ -459,7 +459,7 @@ if($invoice['partner_id']['partner_identity_id']['id'] != $booking['customer_ide
 /*
     override contact and payment details with center's office, if set
 */
-if($booking['center_id']['use_office_details'] || !strlen($invoice['booking_id'])) {
+if($booking['center_id']['use_office_details']) {
     $office = $invoice['center_office_id'];
     $values['company_iban'] = DataFormatter::format($office['bank_account_iban'], 'iban');
     $values['company_bic'] = DataFormatter::format($office['bank_account_bic'], 'bic');
