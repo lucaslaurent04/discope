@@ -38,6 +38,12 @@
         "form.default": {
             "name": "Aide financière",
             "description": "Vue de modification d'une aide financière.",
+            "actions": {
+                "action.payments-invoice-pdf": {
+                    "label": "Facture paiements PDF",
+                    "description": ""
+                }
+            },
             "layout": {
                 "section.payments": {
                     "label": "Paiements"

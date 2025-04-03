@@ -3,8 +3,8 @@
     "description": "Form view for Financial Help.",
     "actions": [
         {
-            "id": "action.invoice",
-            "label": "Invoice",
+            "id": "action.payments-invoice-pdf",
+            "label": "Payments invoice PDF",
             "description": "Generate invoice to send to the organisation responsible for the financial help for payment.",
             "controller": "sale_booking_financial-help_invoice-payments",
             "confirm": true
