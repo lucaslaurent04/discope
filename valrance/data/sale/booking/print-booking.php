@@ -65,14 +65,23 @@ list($params, $providers) = announce([
     'providers'     => ['context', 'orm']
 ]);
 
-
 list($context, $orm) = [$providers['context'], $providers['orm']];
+
+/**
+ * Methods
+ */
+
+$lodgingBookingPrintBookingFormatMember = function($booking) {
+    $id = $booking['customer_id']['partner_identity_id']['id'];
+    $code = ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
+    return $code.' - '.$booking['customer_id']['partner_identity_id']['display_name'];
+};
 
 /*
     Retrieve the requested template
 */
 
-$entity = 'valrance\booking\Booking';
+$entity = 'valrance\sale\booking\Booking';
 $parts = explode('\\', $entity);
 $package = array_shift($parts);
 $class_path = implode('/', $parts);
@@ -278,9 +287,9 @@ $values = [
     'has_footer'                 => 0,
     'header_img_url'             => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
     'is_price_tbc'               => $booking['is_price_tbc'],
-    'is_agreement_html'    => '',
+    'is_agreement_html'          => '',
     'lines'                      => [],
-    'member'                     => lodging_booking_print_booking_formatMember($booking),
+    'member'                     => $lodgingBookingPrintBookingFormatMember($booking),
     'period'                     => 'Du '.date('d/m/Y', $booking['date_from']).' au '.date('d/m/Y', $booking['date_to']),
     'postal_address'             => sprintf("%s - %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
     'price'                      => $booking['price'],
@@ -757,7 +766,7 @@ foreach($lines as $line) {
 foreach($booking['contacts_ids'] as $contact) {
     if(strlen($values['contact_name']) == 0 || $contact['type'] == 'booking') {
         // overwrite data of customer with contact info
-        $values['contact_name'] = str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title']) . ' ' . $contact['partner_identity_id']['display_name'];
+        $values['contact_name'] = str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title']) . ' print-booking.php' . $contact['partner_identity_id']['display_name'];
         $values['contact_phone'] = (strlen($contact['partner_identity_id']['phone']))?$contact['partner_identity_id']['phone']:$contact['partner_identity_id']['mobile'];
         $values['contact_email'] = $contact['partner_identity_id']['email'];
     }
@@ -1074,11 +1083,3 @@ $context->httpResponse()
         ->header('Content-Disposition', 'inline; filename="document.pdf"')
         ->body($output)
         ->send();
-
-
-
-function lodging_booking_print_booking_formatMember($booking) {
-    $id = $booking['customer_id']['partner_identity_id']['id'];
-    $code = ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
-    return $code.' - '.$booking['customer_id']['partner_identity_id']['display_name'];
-}

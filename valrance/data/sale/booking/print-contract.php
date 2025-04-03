@@ -76,7 +76,7 @@ list($context, $orm) = [$providers['context'], $providers['orm']];
     Retrieve the requested template
 */
 
-$entity = 'valrance\booking\Contract';
+$entity = 'valrance\sale\booking\Contract';
 $parts = explode('\\', $entity);
 $package = array_shift($parts);
 $class_path = implode('/', $parts);
