@@ -27,6 +27,13 @@
             },
             {
                 "type": "field",
+                "value": "status",
+                "width": "25%",
+                "sortable": true,
+                "readonly": true
+            },
+            {
+                "type": "field",
                 "value": "date_from",
                 "width": "25%",
                 "sortable": true,

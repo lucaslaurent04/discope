@@ -8,6 +8,14 @@
             "description": "Descriptif de l'aide financière et de l'organisation qui en est responsable.",
             "help": ""
         },
+        "status": {
+            "label": "Status",
+            "selection": {
+                "pending": "En cours",
+                "invoiced": "Facturée"
+            },
+            "description": "L'état actuel de l'aide financière."
+        },
         "date_from": {
             "label": "Du",
             "description": "Date à laquelle l'aide financière commence à être disponible..",
@@ -39,10 +47,14 @@
             "name": "Aide financière",
             "description": "Vue de modification d'une aide financière.",
             "actions": {
+                "action.transition.invoice": {
+                    "label": "Facturer",
+                    "description": ""
+                },
                 "action.payments-invoice-pdf": {
                     "label": "Facture paiements PDF",
                     "description": ""
-                }
+                 }
             },
             "layout": {
                 "section.payments": {

@@ -100,7 +100,15 @@ $financial_help = FinancialHelp::id($params['id'])
         'payments_ids' => [
             'amount',
             'receipt_date',
-            'funding_id' => ['booking_id' => ['organisation_id', 'date_from', 'date_to', 'customer_id' => ['name']]]
+            'funding_id' => [
+                'booking_id' => [
+                    'organisation_id',
+                    'date_from',
+                    'date_to',
+                    'customer_id'   => ['name']
+                ]
+            ],
+            'invoice_id' => ['number']
         ]
     ])
     ->first(true);
