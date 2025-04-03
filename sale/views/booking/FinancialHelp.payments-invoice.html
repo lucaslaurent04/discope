@@ -4,7 +4,7 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 
     <title>
-        {{i18n['booking_invoice']}}
+        Facture aide financière
     </title>
     <style type="text/css">
         @page {
@@ -158,7 +158,7 @@
         <table>
             <tr>
                 <td style="width: 70px; vertical-align: top;">
-                    <b>{{i18n['customer_name']}}:</b><br />
+                    <b>Aidant:</b><br />
                     <b>{{i18n['customer_address']}}:</b><br />
                 </td>
                 <td>
@@ -209,7 +209,7 @@
                 <th width="33%" style="padding-left: 7px; font-weight: bold; text-align: left;">
                     Date séjour
                 </th>
-                <th width="17%" style="font-weight: bold; text-align: right;  border-left: solid 1px black; padding-right: 7px">
+                <th width="17%" style="text-align: right; font-weight: bold; border-left: solid 1px black; padding-right: 7px">
                     Montant
                 </th>
             </tr>
@@ -223,7 +223,7 @@
                 <td width="33%">
                     {{ payment['funding_id']['booking_id']['date_from'] | format_date() }} - {{ payment['funding_id']['booking_id']['date_to'] | format_date() }}
                 </td>
-                <td width="17%" style="font-weight: bold; text-align: right;  border-left: solid 1px black; padding-right: 7px">
+                <td width="17%" style="text-align: right; border-left: solid 1px black; padding-right: 7px">
                     {{ payment['amount'] | format_money() }}
                 </td>
             </tr>
