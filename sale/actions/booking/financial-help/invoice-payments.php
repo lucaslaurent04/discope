@@ -9,20 +9,15 @@
 use core\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
-use Endroid\QrCode\Builder\Builder;
-use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelMedium;
 use equal\data\DataFormatter;
-use identity\Center;
-use identity\CenterOffice;
 use identity\Identity;
-use SepaQr\Data;
 use Twig\Environment as TwigEnvironment;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Extension\ExtensionInterface;
+use Twig\TwigFilter;
 
 use sale\booking\FinancialHelp;
-use Twig\TwigFilter;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Generates an invoice intended for a specific financial help.",
@@ -174,8 +169,6 @@ $values = [
     'customer_address_dispatch' => $params['helper_address_dispatch'],
     'customer_address2'         => $params['helper_address2'],
 
-    'date'                      => date('d/m/Y', time()),
-
     'price'                     => round($price, 2),
 
     'company_name'              => $organisation['legal_name'],
@@ -188,12 +181,9 @@ $values = [
     'company_has_vat'           => $organisation['has_vat'],
     'company_vat_number'        => $organisation['vat_number'],
 
-
     // by default, we use organisation payment details (overridden in case Center has a management Office, see below)
     'company_iban'              => DataFormatter::format($organisation['bank_account_iban'], 'iban'),
     'company_bic'               => DataFormatter::format($organisation['bank_account_bic'], 'bic'),
-
-    'payment_qr_uri'            => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
 
     'payments'                  => $payments
 ];
