@@ -190,7 +190,6 @@ $values['i18n'] = [
     'invoice'           => Setting::get_value('sale', 'locale', 'terms.invoice', null, array(), $params['lang']),
     'customer_name'     => Setting::get_value('lodging', 'locale', 'i18n.customer_name', null, array(), $params['lang']),
     'customer_address'  => Setting::get_value('lodging', 'locale', 'i18n.customer_address', null, array(), $params['lang']),
-    'booking_invoice'   => Setting::get_value('lodging', 'locale', 'i18n.booking_invoice', null, array(), $params['lang']),
     'company_registry'  => Setting::get_value('lodging', 'locale', 'i18n.company_registry', null, array(), $params['lang']),
     'vat_number'        => Setting::get_value('lodging', 'locale', 'i18n.vat_number', null, array(), $params['lang']),
     'vat'               => Setting::get_value('lodging', 'locale', 'i18n.vat', null, array(), $params['lang']),
