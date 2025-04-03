@@ -77,8 +77,9 @@ class Payment extends \sale\pay\Payment {
                     'cash',                 // cash money
                     'bank_card',            // electronic payment with bank (or credit) card
                     'booking',              // payment through addition to the final (balance) invoice of a specific booking
-                    'voucher',               // gift, coupon, or tour-operator voucher
-                    'bank_check'
+                    'voucher',              // gift, coupon, or tour-operator voucher
+                    'bank_check',           // physical bank check
+                    'financial_help'        // a financial help will take care of the payment
                 ],
                 'description'       => "The method used for payment at the cashdesk.",
                 'visible'           => [ ['payment_origin', '=', 'cashdesk'] ],
@@ -124,6 +125,12 @@ class Payment extends \sale\pay\Payment {
                 'description'       => 'The BankCheck associated with the payment.'
             ],
 
+            'financial_help_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\booking\FinancialHelp',
+                'description'       => "The financial help that takes care of the payment.",
+                'visible'           => ['payment_method', '=', 'financial_help']
+            ]
 
         ];
     }
@@ -184,7 +191,7 @@ class Payment extends \sale\pay\Payment {
                         $map_bookings_ids[$payment['funding_id.booking_id']] = true;
                         $current_year_last_day = mktime(0, 0, 0, 12, 31, date('Y'));
                         if($payment['funding_id.type'] != 'invoice' && $payment['funding_id.booking_id.date_from'] > $current_year_last_day) {
-                            // if payment relates to a funding attached to a booking that will occur after the 31th of december of current year, convert the funding to an invoice
+                            // if payment relates to a funding attached to a booking that will occur after the 31st of december of current year, convert the funding to an invoice
                             // #memo #waiting - to be confirmed
                             // $om->callonce(Funding::getType(), '_convertToInvoice', $payment['funding_id']);
                         }

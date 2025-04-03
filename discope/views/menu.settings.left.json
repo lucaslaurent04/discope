@@ -810,7 +810,17 @@
                                 "label": "Payment terms",
                                 "description": "",
                                 "context": {
-                                        "entity": "sale\\pay\\PaymentTerms",
+                                    "entity": "sale\\pay\\PaymentTerms",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "sales.settings.financial_helps",
+                                "type": "entry",
+                                "label": "Financial helps",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\FinancialHelp",
                                     "view": "list.default"
                                 }
                             }
