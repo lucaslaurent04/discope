@@ -1,0 +1,49 @@
+{
+    "name": "Payments",
+    "description": "This view is intended for displaying the list of Payments of a financial help.",
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false
+        },
+        "selection": false
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "10%",
+                "sortable": true,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "booking_id",
+                "width": "33%",
+                "sortable": true,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "partner_id",
+                "width": "33%",
+                "sortable": true,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "invoice_id",
+                "width": "33%",
+                "sortable": true,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "amount",
+                "width": "10%",
+                "sortable": true,
+                "readonly": true
+            }
+        ]
+    }
+}

@@ -262,6 +262,10 @@
             "label": "Conditions de paiement",
             "help": ""
         },
+        "sales.settings.financial_helps": {
+            "label": "Aides financières",
+            "help": ""
+        },
         "pos": {
             "label": "Points de vente",
             "help": ""
