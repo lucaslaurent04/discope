@@ -61,13 +61,13 @@ use sale\booking\FinancialHelp;
         'helper_name' => [
             'type'              => 'string',
             'description'       => "Financial helper name.",
-            'default'           => 'Helper name'
+            'required'          => true
         ],
 
         'helper_address1' => [
             'type'              => 'string',
             'description'       => "Financial helper address line 1.",
-            'default'           => 'Helper address line 1'
+            'required'          => true
         ],
 
         'helper_address_dispatch' => [
