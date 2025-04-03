@@ -72,14 +72,12 @@ use sale\booking\FinancialHelp;
 
         'helper_address_dispatch' => [
             'type'              => 'string',
-            'description'       => "Financial helper address dispatch.",
-            'default'           => 'Helper address dispatch'
+            'description'       => "Financial helper address dispatch."
         ],
 
         'helper_address2' => [
             'type'              => 'string',
-            'description'       => "Financial helper address line 2.",
-            'default'           => 'Helper address line 2'
+            'description'       => "Financial helper address line 2."
         ]
     ],
     'access'        => [
