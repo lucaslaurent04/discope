@@ -73,14 +73,14 @@ $assignments = SojournProductModelRentalUnitAssignement::search(['booking_line_g
 $total_qty = 0;
 foreach($assignments as $assignment) {
     $total_qty += $assignment['qty'];
-    $rental_unit = RentalUnit::id($assignment['rental_unit_id'])->read(['is_accomodation', 'capacity'])->first(true);
+    $rental_unit = RentalUnit::id($assignment['rental_unit_id'])->read(['is_accomodation', 'capacity', 'extra'])->first(true);
     if(!$rental_unit) {
         throw new Exception('unknown_rental_unit', QN_ERROR_UNKNOWN_OBJECT);
     }
     if($group['nb_pers'] < $assignment['qty']) {
         throw new Exception('quantity_exceeds_group', QN_ERROR_INVALID_PARAM);
     }
-    if($rental_unit['capacity'] < $assignment['qty']) {
+    if(($rental_unit['capacity'] + $rental_unit['extra']) < $assignment['qty']) {
         throw new Exception('quantity_exceed_accommodation', QN_ERROR_INVALID_PARAM);
     }
 }

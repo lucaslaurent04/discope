@@ -37,6 +37,11 @@
             "description": "Le nombre de personnes pouvant séjourner dans l'unité.",
             "help": ""
         },
+        "extra": {
+            "label": "Extra",
+            "description": "Le nombre de personnes \"extra\" pouvant séjourner dans l'unité.",
+            "help": ""
+        },
         "is_accomodation": {
             "label": "Logement",
             "description": "L'unité locative est un logement.",

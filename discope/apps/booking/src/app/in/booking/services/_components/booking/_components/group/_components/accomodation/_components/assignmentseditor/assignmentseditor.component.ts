@@ -156,7 +156,7 @@ export class BookingServicesBookingGroupAccomodationAssignmentsEditorComponent i
             if(assignment_qty > calc_capacity) {
                 assignment_qty = calc_capacity;
             }
-            let assignment = new BookingAccomodationAssignment(0, rentalUnit, assignment_qty, this.group.id)
+            let assignment = new BookingAccomodationAssignment(0, rentalUnit, assignment_qty, false, this.group.id)
             this.rentalUnitsAssignments.push(assignment);
         }
 

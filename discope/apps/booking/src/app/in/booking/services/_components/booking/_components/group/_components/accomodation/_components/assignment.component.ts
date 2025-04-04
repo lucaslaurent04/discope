@@ -40,6 +40,8 @@ export class BookingServicesBookingGroupAccomodationAssignmentComponent extends 
     public qtyFormControl: FormControl;
     public assignmentQtyOpen: boolean = false;
 
+    public useExtraFromControl: FormControl;
+
 
     constructor(
         private api: ApiService,
@@ -51,15 +53,22 @@ export class BookingServicesBookingGroupAccomodationAssignmentComponent extends 
     ) {
         super( new BookingAccomodationAssignment() );
         this.qtyFormControl = new FormControl('', [Validators.required, this.validateQty.bind(this)]);
+        this.useExtraFromControl = new FormControl(false);
     }
 
     private validateQty(c: FormControl) : ValidationErrors {
+
+        let capacity = this.instance.rental_unit_id.capacity;
+        if(this.instance.use_extra) {
+            capacity += this.instance.rental_unit_id.extra;
+        }
+
         // qty cannot be bigger than the rental unit capacity
         // qty cannot be bigger than the number of persons
         return (
                 this.instance &&
                 this.group &&
-                c.value <= this.instance.rental_unit_id.capacity &&
+                c.value <= capacity &&
                 c.value <= this.group.nb_pers
             ) ? null : {
                 validateQty: {
@@ -97,6 +106,7 @@ export class BookingServicesBookingGroupAccomodationAssignmentComponent extends 
         super.update(values);
         // assign VM values
         this.qtyFormControl.setValue(this.instance.qty);
+        this.useExtraFromControl.setValue(this.instance.use_extra);
     }
 
     public ondelete() {
@@ -132,4 +142,15 @@ export class BookingServicesBookingGroupAccomodationAssignmentComponent extends 
         this.assignmentQtyOpen = true;
     }
 
+    public async onchangeUseExtra(useExtra: boolean) {
+        try {
+            await this.api.update(this.instance.entity, [this.instance.id], {use_extra: useExtra});
+            // relay change to parent component
+            this.updated.emit();
+        } catch (response) {
+            this.instance.qty = !useExtra;
+            this.qtyFormControl.setValue(!useExtra);
+            this.api.errorFeedback(response);
+        }
+    }
 }
