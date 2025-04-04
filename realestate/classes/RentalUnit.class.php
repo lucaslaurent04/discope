@@ -75,6 +75,14 @@ class RentalUnit extends Model {
                 'default'           => 1
             ],
 
+            'extra' => [
+                'type'              => 'integer',
+                'description'       => 'The number of extra children that may stay in the unit.',
+                'default'           => 0,
+                'min'               => 0,
+                'max'               => 2
+            ],
+
             'has_children' => [
                 'type'              => 'boolean',
                 'description'       => 'Flag to mark the unit as having sub-units.',
@@ -329,11 +337,27 @@ class RentalUnit extends Model {
 
     public static function getConstraints() {
         return [
+
             'capacity' =>  [
                 'lte_zero' => [
                     'message'       => 'Capacity must be a positive value.',
                     'function'      => function ($qty, $values) {
                         return ($qty > 0);
+                    }
+                ]
+            ],
+
+            'extra' => [
+                'lt_zero' => [
+                    'message'       => 'Extra capacity must be a greater than or equal to zero.',
+                    'function'      => function ($qty, $values) {
+                        return ($qty >= 0);
+                    }
+                ],
+                'gt_two' => [
+                    'message'       => 'Extra capacity must be a lower than two.',
+                    'function'      => function ($qty, $values) {
+                        return ($qty <= 2);
                     }
                 ]
             ]
