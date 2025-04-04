@@ -148,8 +148,8 @@ export class BookingServicesBookingGroupAccomodationAssignmentComponent extends 
             // relay change to parent component
             this.updated.emit();
         } catch (response) {
-            this.instance.qty = !useExtra;
-            this.qtyFormControl.setValue(!useExtra);
+            this.instance.use_extra = !useExtra;
+            this.useExtraFromControl.setValue(!useExtra);
             this.api.errorFeedback(response);
         }
     }
