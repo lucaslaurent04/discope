@@ -92,13 +92,15 @@ $tree = [
             'rental_unit_assignments_ids' => [
                 'id',
                 'qty',
+                'use_extra',
                 'booking_line_group_id',
                 'rental_unit_id' => [
                     'id',
                     'name',
                     'description',
                     'is_accomodation',
-                    'capacity'
+                    'capacity',
+                    'extra'
                 ]
             ]
         ],
