@@ -378,9 +378,11 @@ class BookingLineGroup extends Model {
                     $om->delete(BookingLineGroupAgeRangeAssignment::getType(), $group['age_range_assignments_ids'], true);
 
                     if($group['is_sojourn']) {
+                        $adults_age_range_id = Setting::get_value('sale', 'booking', 'default.age_range_id.adults', 1);
+
                         // create default age_range assignment
                         $assignment = [
-                            'age_range_id'          => 1,                       // adults
+                            'age_range_id'          => $adults_age_range_id,
                             'booking_line_group_id' => $gid,
                             'booking_id'            => $group['booking_id'],
                             'qty'                   => $group['nb_pers']
@@ -3463,9 +3465,11 @@ class BookingLineGroup extends Model {
             $om->update(self::getType(), $id, ['nb_children' => null]);
 
             if($group['is_sojourn']) {
+                $adults_age_range_id = Setting::get_value('sale', 'booking', 'default.age_range_id.adults', 1);
+
                 // create default age_range assignment (default to 'adult' age range)
                 $assignment = [
-                    'age_range_id'          => 1,
+                    'age_range_id'          => $adults_age_range_id,
                     'booking_line_group_id' => $id,
                     'booking_id'            => $group['booking_id'],
                     'qty'                   => $group['nb_pers']
