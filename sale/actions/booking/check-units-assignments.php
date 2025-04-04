@@ -150,11 +150,11 @@ if(!$booking['is_cancelled'] && $booking_line_groups) {
             }
             $assignments = SojournProductModelRentalUnitAssignement::ids($spm['rental_unit_assignments_ids'])
                 ->read([
-                    'is_accomodation', 'qty', 'rental_unit_id' => ['capacity']
+                    'is_accomodation', 'qty', 'rental_unit_id' => ['capacity', 'extra']
                 ])
                 ->get();
             // check the total assigned persons against the group nb_pers
-            $total_capacity = array_reduce($assignments, function($c, $a) {return $c + $a['rental_unit_id']['capacity'];}, 0);
+            $total_capacity = array_reduce($assignments, function($c, $a) {return $c + $a['rental_unit_id']['capacity'] + $a['rental_unit_id']['extra'];}, 0);
             if($spms_max[$product_model_id] > $total_capacity) {
                 trigger_error("ORM::max {$spms_max[$product_model_id]} for $product_model_id is greater than total capacity $total_capacity", QN_REPORT_DEBUG);
                 $mismatch = true;
