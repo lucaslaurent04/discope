@@ -100,7 +100,7 @@ if($channelmanager_enabled) {
     $consumptions = Consumption::search(['booking_id', '=', $params['id']])->read(['id', 'is_accomodation', 'rental_unit_id'])->get(true);
 
     foreach($consumptions as $consumption) {
-        if($consumption['is_accomodation']) {
+        if($consumption['is_accomodation'] && $consumption['rental_unit_id'] !== null) {
             $map_rental_units_ids[$consumption['rental_unit_id']] = true;
         }
     }
@@ -112,18 +112,6 @@ if($channelmanager_enabled) {
             "channelmanager.check-contingencies.{$params['id']}",
             time(),
             'sale_booking_check-contingencies',
-            [
-                'date_from'         => date('c', $booking['date_from']),
-                'date_to'           => date('c', $booking['date_to']),
-                'rental_units_ids'  => array_keys($map_rental_units_ids)
-            ]
-        );
-
-        // #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
-        $cron->schedule(
-            "channelmanager.check-contingencies.{$params['id']}",
-            time(),
-            'lodging_booking_check-contingencies',
             [
                 'date_from'         => date('c', $booking['date_from']),
                 'date_to'           => date('c', $booking['date_to']),

@@ -8,6 +8,7 @@
 
 use core\Lang;
 use core\Mail;
+use core\setting\Setting;
 use equal\email\Email;
 use sale\booking\BookingType;
 use sale\booking\channelmanager\Booking;
@@ -51,13 +52,21 @@ list($params, $providers) = eQual::announce([
  * @var \equal\cron\Scheduler       $cron
  * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $orm, $cron, $dispatch) = [ $providers['context'], $providers['orm'], $providers['cron'], $providers['dispatch'] ];
+['context' => $context, 'orm' => $orm, 'cron' => $cron, 'dispatch' => $dispatch] = $providers;
 
-// #todo - @kaleo - this must be adapted according to new domain
-// #memo - temporary solution to prevent calls from non-production server
-if(constant('ROOT_APP_URL') != 'https://discope.yb.run') {
+$channelmanager_enabled = Setting::get_value('sale', 'booking', 'channelmanager.enabled', false);
+
+if(!$channelmanager_enabled) {
+    throw new Exception('disabled_feature', QN_ERROR_INVALID_CONFIG);
+}
+
+$client_domain = Setting::get_value('sale', 'booking', 'channelmanager.client_domain', 'https://kaleo.discope.run');
+
+// #memo - prevent calls from non-production server
+if(constant('ROOT_APP_URL') != $client_domain) {
     throw new Exception('wrong_host', QN_ERROR_INVALID_CONFIG);
 }
+
 
 $result = [
     'errors'                => 0,
@@ -169,7 +178,7 @@ try {
                             }
                             catch(Exception $e) {
                                 // error while cancelling (unable to cancel)
-                                ++$result['warnings'];
+                                ++$result['errors'];
                                 $result['logs'][] = "WARN- Unable to cancel Booking {$booking['id']} for reservation {$reservation['reservation_id']} : ".$e->getMessage();
                             }
                         }
@@ -1021,6 +1030,11 @@ if($result['warnings'] || $result['errors']) {
             // queue message
             Mail::queue($message);
         }
+    }
+
+    if($result['errors']) {
+        // make sure cron task is marked as failed ('error')
+        throw new Exception(serialize($result), EQ_ERROR_UNKNOWN);
     }
 }
 else {

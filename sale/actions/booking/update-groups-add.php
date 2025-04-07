@@ -10,7 +10,7 @@ use sale\booking\BookingLineGroup;
 
 
 list($params, $providers) = eQual::announce([
-    'description'   => "Checks if the composition is complete for a given booking.",
+    'description'   => "Create a new Booking Lines Group ('Sojourn') for a given booking.",
     'params'        => [
         'id' =>  [
             'description'   => 'Identifier of the targeted booking.',

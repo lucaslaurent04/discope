@@ -205,7 +205,7 @@ class Payment extends \sale\pay\Payment {
                 }
                 else {
                     // void booking_id
-                    $om->update(self::getType(), $ids, ['booking_id' => 0]);
+                    $om->update(self::getType(), $ids, ['booking_id' => null]);
                 }
             }
             $om->callonce(Booking::getType(), 'updateStatusFromFundings', array_keys($map_bookings_ids), [], $lang);
