@@ -77,10 +77,9 @@ class RentalUnit extends Model {
 
             'extra' => [
                 'type'              => 'integer',
+                'usage'             => 'number/integer{0,2}',
                 'description'       => 'The number of extra children that may stay in the unit.',
-                'default'           => 0,
-                'min'               => 0,
-                'max'               => 2
+                'default'           => 0
             ],
 
             'has_children' => [
