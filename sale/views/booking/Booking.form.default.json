@@ -487,17 +487,17 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "description",
-                                                "width": "33%"
-                                            },
-                                            {
-                                                "type": "field",
                                                 "value": "tasks_ids",
                                                 "width": "66%",
                                                 "widget": {
                                                     "view": "list.booking",
                                                     "domain": ["visible_date", "<=", "date.this.day.first"]
                                                 }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "description",
+                                                "width": "33%"
                                             }
                                         ]
                                     }
