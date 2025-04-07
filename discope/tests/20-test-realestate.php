@@ -31,7 +31,8 @@ $tests = [
                     "name"                => "Rental Unit Test",
                     "type"                => "room",
                     "action_required"     => "cleanup_daily",
-                    "capacity"            => 1
+                    "capacity"            => 1,
+                    "extra"               => 0
                 ]
             ]);
 
