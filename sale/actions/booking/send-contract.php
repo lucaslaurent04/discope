@@ -123,14 +123,6 @@ $cron->schedule(
     [ 'id' => $params['booking_id'] ]
 );
 
-// #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
-$cron->schedule(
-    "booking.contract.overdue.{$params['booking_id']}",
-    time() + 10 * 86400,
-    'lodging_booking_check-contract-reminder',
-    [ 'id' => $params['booking_id'] ]
-);
-
 // generate attachment
 $attachment = eQual::run('get', 'sale_booking_print-contract', [
     'id'        => $contract_id ,
@@ -215,14 +207,6 @@ $cron->schedule(
     "booking.email.send.{$params['booking_id']}",
      time() + 10 * 60,
     'sale_booking_check-email-send',
-    [ 'id' => $params['booking_id']]
-);
-
-// #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
-$cron->schedule(
-    "booking.email.send.{$params['booking_id']}",
-     time() + 10 * 60,
-    'lodging_booking_check-email-send',
     [ 'id' => $params['booking_id']]
 );
 

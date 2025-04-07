@@ -85,11 +85,6 @@ class Scheduler extends \equal\cron\Scheduler {
                         continue;
                     }
                 }
-                // #todo - #temp - temporary workaround for Kaleo migration to new Discope version (old instance is progressively dismantled)
-                $allowed_controllers = ['sale_booking_batch-update-checks'];
-                if(!in_array($task['controller'], $allowed_controllers)) {
-                    continue;
-                }
 
                 // if due time has passed or if specific tasks_ids are given, execute the task
                 if($task['moment'] <= $now || count($tasks_ids) > 0) {

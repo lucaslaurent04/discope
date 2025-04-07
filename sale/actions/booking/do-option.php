@@ -190,19 +190,6 @@ else {
         [ 'id' => $params['id'], 'free_rental_units' => $params['free_rental_units'] ]
     );
 
-
-    // #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
-    // setup a scheduled job to set back the booking to a quote according to delay set by Setting `option.validity`
-    $cron->schedule(
-        // assign a reproducible unique name
-        "booking.option.deprecation.{$params['id']}",
-        // remind after {sale.booking.option.validity} days (default 10 days), or manually given value
-        time() + $days_expiry  * 86400,
-        'lodging_booking_update-booking',
-        [ 'id' => $params['id'], 'free_rental_units' => $params['free_rental_units'] ]
-    );
-
-
 }
 
 /*
@@ -246,20 +233,6 @@ if($channelmanager_enabled) {
                 'rental_units_ids'  => array_keys($map_rental_units_ids)
             ]
         );
-
-        // #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
-        $cron->schedule(
-            "channelmanager.check-contingencies.{$params['id']}",
-            time(),
-            'lodging_booking_check-contingencies',
-            [
-                'date_from'         => date('c', $booking['date_from']),
-                'date_to'           => date('c', $booking['date_to']),
-                'rental_units_ids'  => array_keys($map_rental_units_ids)
-            ]
-        );
-
-
     }
 }
 

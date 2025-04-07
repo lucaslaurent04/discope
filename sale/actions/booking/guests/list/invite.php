@@ -215,14 +215,6 @@ $cron->schedule(
         [ 'id' => $booking['id']]
     );
 
-// #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
-$cron->schedule(
-        "booking.guest.email.send.{$booking['id']}",
-        time() + 10 * 86400,
-        'lodging_guests_list_check-sent',
-        [ 'id' => $booking['id']]
-    );
-
 $context->httpResponse()
         ->status(204)
         ->send();

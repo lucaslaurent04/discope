@@ -159,13 +159,6 @@ class PriceList extends Model {
                         'sale_booking_pricelist_check-bookings',
                         [ 'id' => $pid ]
                     );
-                    // #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
-                    $cron->schedule(
-                        "booking.is_tbc.confirm",
-                        time() + 60,
-                        'lodging_pricelist_check-bookings',
-                        [ 'id' => $pid ]
-                    );
                 }
                 // immediate re-compute prices is_active flag
                 $om->update('sale\price\Price', $pricelist['prices_ids'], ['is_active' => null]);
