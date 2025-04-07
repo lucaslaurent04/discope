@@ -11,7 +11,7 @@
     },
     "domain": [ ["center_id", "in", "user.centers_ids"]],
     "limit": 500,
-    "group_by" : ["date"],
+    "group_by": [{"field": "date", "operation": ["SUM", "object.total"]}],
     "order": "date",
     "sort" : "asc",
     "controller": "sale_booking_consumption_stat-meals",
