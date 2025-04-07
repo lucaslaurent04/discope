@@ -85,7 +85,7 @@
             "help": ""
         },
         "schedule_default_value": {
-            "label": "Planification par défaut",
+            "label": "Planification",
             "description": "Valeur par défaut du planning selon son type.",
             "help": "Valeur par défaut du planning selon son type (heure, plage horaire)."
         },
@@ -94,9 +94,14 @@
             "description": "Décalage, en jours, à partir de la date de début de séjour.",
             "help": ""
         },
+        "time_slot_id": {
+            "label": "Tranche horaire",
+            "description": "Les créneaux horaires durant lequel le service peut avoir lieu.",
+            "help": ""
+        },
         "time_slots_ids": {
             "label": "Tranches horaires",
-            "description": "Les créneaux horaires pour classer quand le service peut avoir lieu.",
+            "description": "Les créneaux horaires durant lesquels l'activité peut avoir lieu.",
             "help": ""
         },
         "tracking_type": {
@@ -190,6 +195,21 @@
             "description": "Le produit est-il un repas ?",
             "help": "Le produit est-il un repas ? (les repas peuvent faire partie de la pension / services inclus du séjour)."
         },
+        "nutritional_coefficient": {
+            "label": "Coefficient nutritionnel",
+            "description": "Le coefficient nutritionnel du repas.",
+            "help": ""
+        },
+        "meal_location": {
+            "label": "Emplacement du repas",
+            "description": "Spécification de l'emplacement du repas.",
+            "help": "",
+            "selection": {
+                "inside": "Intérieur",
+                "outside": "Extérieur",
+                "takeaway": "À emporter"
+            }
+        },
         "is_snack": {
             "label": "Est une collation",
             "description": "Le produit est-il une collation ?",
@@ -225,6 +245,11 @@
             "description": "Le produit est-il un service de transport ?",
             "help": "Le produit est-il un service de transport ? (ceci inclut les transferts entre lieux, les navettes, etc.)"
         },
+        "is_supply": {
+            "label": "Est un matériel",
+            "description": "Le produit est-il un service de location de matériel ?",
+            "help": ""
+        },
         "is_activity": {
             "label": "Est une activité",
             "description": "Le produit est-il une activité ?",
@@ -246,7 +271,7 @@
         },
         "activity_duration": {
             "label": "Durée de l'activité",
-            "description": "Précise la durée de l'activité (en heures).",
+            "description": "Durée, en heures, de l'activité.",
             "help": "Indiquer la durée de l'activité en heures pour planifier et allouer les ressources."
         },
         "has_transport_required": {
@@ -292,6 +317,21 @@
         "age_minimum": {
             "label": "Âge minimum",
             "description": "Spécifie l'âge minimum requis pour participer à l'activité.",
+            "help": ""
+        },
+        "has_rental_unit" : {
+            "label": "Nécessite une unité locative",
+            "description": "Indique si l'activité prend place dans une unité locative spécifique.",
+            "help": ""
+        },
+        "activity_rental_units_ids": {
+            "label": "Unités locatives",
+            "description": "Les unités locatives possibles pour accueillir l'activité.",
+            "help": ""
+        },
+        "grouping_code_id": {
+            "label": "Regroupement",
+            "description": "Code de regroupement spécifique auquel ce modèle de produit est associé, le cas échéant.",
             "help": ""
         }
     },

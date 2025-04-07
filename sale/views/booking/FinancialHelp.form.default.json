@@ -1,0 +1,147 @@
+{
+    "name": "Financial Help",
+    "description": "Form view for Financial Help.",
+    "actions": [
+        {
+            "id": "action.transition.invoice",
+            "label": "Invoice",
+            "controller": "model_transition",
+            "params": {
+                "entity": "sale\\booking\\FinancialHelp",
+                "transition": "invoice",
+                "ids": []
+            },
+            "visible": ["status", "=", "pending"]
+        },
+        {
+            "id": "action.payments-invoice-pdf",
+            "label": "Payments invoice PDF",
+            "description": "Generate invoice to send to the organisation responsible for the financial help for payment.",
+            "controller": "sale_booking_financial-help_invoice-payments",
+            "confirm": true,
+            "visible": ["status", "=", "invoiced"]
+        }
+    ],
+    "layout": {
+        "groups": [
+            {
+                "sections": [
+                    {
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "status",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "name",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "heading": true
+                                                }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "date_from",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "date_to",
+                                                "width": "33%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "33%",
+                                                "visible": ["state", "<>", "draft"]
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "66%",
+                                                "visible": ["state", "=", "draft"]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "amount",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "remaining_amount",
+                                                "width": "33%",
+                                                "readonly": true,
+                                                "visible": ["state", "<>", "draft"]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+
+                ]
+            },
+            {
+                "sections": [
+                    {
+                        "id": "section.payments",
+                        "label": "Payments",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "payments_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.financial-help"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.description",
+                        "label": "Description",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "description",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

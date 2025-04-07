@@ -1,17 +1,13 @@
-import { Component, Renderer2, ChangeDetectorRef, OnInit, AfterViewInit, NgZone, ViewChild, ElementRef, HostListener, Inject, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, AfterViewInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 
-import { Subscription } from 'rxjs';
-
-import { BookingDayClass } from 'src/app/model/booking.class';
-import { ChangeReservationArg } from 'src/app/model/changereservationarg';
-import { ApiService, AuthService, ContextService } from 'sb-shared-lib';
+import { ContextService } from 'sb-shared-lib';
 import { PlanningEmployeesCalendarParamService } from './_services/employees.calendar.param.service';
 import { PlanningEmployeesCalendarComponent } from './_components/employees.calendar/employees.calendar.component';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 import * as screenfull from 'screenfull';
-// import { PlanningLegendDialogComponent } from './_components/legend.dialog/legend.component';
-// import { PlanningPreferencesDialogComponent } from './_components/preferences.dialog/preferences.component';
+import { PlanningEmployeesLegendDialogComponent } from './_components/legend.dialog/legend.component';
+import { PlanningEmployeesPreferencesDialogComponent } from './_components/preferences.dialog/preferences.component';
 
 interface DateRange {
   from: Date,
@@ -39,8 +35,6 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
     private refreshTimeout: any;
 
     constructor(
-        private api: ApiService,
-        private auth:AuthService,
         private context: ContextService,
         private params: PlanningEmployeesCalendarParamService,
         private cd: ChangeDetectorRef,
@@ -110,48 +104,6 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
         if(rows_height) {
             this.rowsHeight = parseInt(rows_height, 10);
         }
-        let show_parents = (localStorage.getItem('planning_show_parents') === 'true');
-        let show_children = (localStorage.getItem('planning_show_children') === 'true');
-        let is_accomodation = (localStorage.getItem('planning_show_accomodations_only') === 'true');
-
-        if(!show_parents && !show_children) {
-            show_parents = true;
-            show_children = true;
-        }
-
-        let domain: any[] = [];
-
-        if(show_parents) {
-            if(show_children) {
-                domain.push([['can_rent', '=', true]]);
-            }
-            else {
-                domain.push([['can_rent', '=', true], ['has_parent', '=', false]]);
-            }
-        }
-        else {
-            if(show_children) {
-                domain.push([['can_rent', '=', true], ['has_parent', '=', true]]);
-                domain.push([['can_rent', '=', true], ['has_children', '=', false]]);
-            }
-            else {
-                // this should not occur
-                domain.push([['has_parent', '=', true], ['has_parent', '=', false]]);
-            }
-        }
-
-        if(is_accomodation) {
-            if(!domain.length) {
-                domain.push([['can_rent', '=', true], ['is_accomodation', '=', true]]);
-            }
-            else {
-                for(let i = 0, n = domain.length; i < n; ++i) {
-                    domain[i].push(['is_accomodation', '=', true]);
-                }
-            }
-        }
-
-        this.params.rental_units_filter = domain;
     }
 
     // apply updated settings from localStorage
@@ -167,7 +119,7 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
     }
 
     public async onFullScreen() {
-        if (screenfull.isEnabled) {
+        if(screenfull.isEnabled) {
             this.cd.detach();
             await screenfull.request(this.planningBody.nativeElement);
             this.cd.reattach();
@@ -178,12 +130,11 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
     }
 
     public onOpenLegendDialog(){
-        // const dialogRef = this.dialog.open(PlanningLegendDialogComponent, {});
+        this.dialog.open(PlanningEmployeesLegendDialogComponent, {});
     }
 
     public onOpenPrefDialog() {
-        /*
-        const dialogRef = this.dialog.open(PlanningPreferencesDialogComponent, {
+        const dialogRef = this.dialog.open(PlanningEmployeesPreferencesDialogComponent, {
                 width: '500px',
                 height: '500px'
             });
@@ -191,17 +142,13 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
         dialogRef.afterClosed().subscribe(result => {
             if(result) {
                 localStorage.setItem('planning_rows_height', result.rows_height.toString());
-                localStorage.setItem('planning_show_parents', result.show_parents.toString());
-                localStorage.setItem('planning_show_children', result.show_children.toString());
-                localStorage.setItem('planning_show_accomodations_only', result.show_accomodations_only.toString());
                 this.applySettings();
             }
         });
-        */
     }
 
     public onShowBooking(consumption: any) {
-        let descriptor:any
+        let descriptor: any;
 
         // switch depending on object type (booking or ooo)
         if(consumption.type == 'ooo') {
@@ -252,14 +199,14 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
         this.context.change(descriptor);
     }
 
-    public onShowEmployee(rental_unit: any) {
-        let descriptor:any = {
+    public onShowPartner(partner: any) {
+        let descriptor: any = {
             context_silent: true, // do not update sidebar
             context: {
-                entity: 'realestate\\RentalUnit',
+                entity: partner.relationship === 'employee' ? 'hr\\employee\\Employee' : 'sale\\provider\\Provider',
                 type: 'form',
                 name: 'default',
-                domain: ['id', '=', rental_unit.id],
+                domain: ['id', '=', partner.id],
                 mode: 'view',
                 purpose: 'view',
                 display_mode: 'popup',
@@ -275,6 +222,31 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
         if(this.fullscreen) {
             descriptor.context['dom_container'] = '.planning-body';
         }
+        // prevent angular lifecycles while a context is open
+        this.cd.detach();
+        this.context.change(descriptor);
+    }
+
+    public onShowPartnerEvent(partnerEvent: any) {
+        let descriptor: any = {
+            context_silent: true, // do not update sidebar
+            context: {
+                entity: 'sale\\booking\\PartnerEvent',
+                type: 'form',
+                name: 'default',
+                domain: ['id', '=', partnerEvent.id],
+                mode: 'view',
+                purpose: 'view',
+                display_mode: 'popup',
+                callback: (data:any) => {
+                    // restart angular lifecycles
+                    this.cd.reattach();
+                    // force a refresh
+                    this.planningCalendar.onRefresh();
+                }
+            }
+        };
+
         // prevent angular lifecycles while a context is open
         this.cd.detach();
         this.context.change(descriptor);

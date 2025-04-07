@@ -89,6 +89,13 @@
             },
             {
                 "type": "field",
+                "value": "extra",
+                "width": "10%",
+                "sortable": true,
+                "visible": false
+            },
+            {
+                "type": "field",
                 "value": "has_parent",
                 "width": "10%",
                 "sortable": true

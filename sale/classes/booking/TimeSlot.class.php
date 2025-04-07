@@ -83,8 +83,7 @@ class TimeSlot extends Model {
                 'rel_table'         => 'sale_catalog_product_model_rel_sale_booking_timeslot',
                 'rel_foreign_key'   => 'product_model_id',
                 'rel_local_key'     => 'time_slot_id',
-                'description'       => "The product models that can be scheduled during this time slot.",
-                'visible'           => [ ['type', '=', 'service'], ['service_type', '=', 'schedulable'] ]
+                'description'       => "The product models that can be scheduled during this time slot."
             ]
 
         ];

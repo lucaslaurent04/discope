@@ -81,6 +81,10 @@
             "label": "Toutes les relations",
             "help": ""
         },
+        "item.customers.points": {
+            "label": "Points de fidélité",
+            "help": ""
+        },
         "item.planning.planning": {
             "label": "Planning",
             "help": ""

@@ -62,7 +62,7 @@ export const customer_natures = [
   { id: 36, code: "MO", name: "AMO (Aide en Milieu Ouvert)", rate_class_id: {id: 1, name: '', description: ''}, customer_type_id: {id: 4, code:'NP', name:''} },
   { id: 37, code: "MU", name: "Mutuelle", rate_class_id: {id: 1, name: '', description: ''}, customer_type_id: {id: 4, code:'NP', name:''} },
   { id: 38, code: "OF", name: "Officiels (délégation politique)", rate_class_id: {id: 4, name: '', description: ''}, customer_type_id: {id: 4, code:'PA', name:''} },
-  { id: 50, code: "PP", name: "Parti politque", rate_class_id: {id: 4, name: '', description: ''}, customer_type_id: {id: 4, code:'NP', name:''} },  
+  { id: 50, code: "PP", name: "Parti politque", rate_class_id: {id: 4, name: '', description: ''}, customer_type_id: {id: 4, code:'NP', name:''} },
   { id: 39, code: "OJ", name: "Organisation de jeunesse", rate_class_id: {id: 1, name: '', description: ''}, customer_type_id: {id: 4, code:'NP', name:''} },
   { id: 40, code: "PR", name: "Presse", rate_class_id: {id: 4, name: '', description: ''}, customer_type_id: {id: 3, code:'C', name:''} },
   { id: 41, code: "SC", name: "Mouvement de Jeunesse", rate_class_id: {id: 1, name: '', description: ''}, customer_type_id: {id: 4, code:'NP', name:''} },
@@ -164,7 +164,7 @@ export class ConsumptionClass {
   product_id: ProductClass = new ProductClass();
   booking_line_id: BookingLineClass = new BookingLineClass();
   disclaimed: boolean = false;
-  rental_unit_id: RentalUnitClass = new RentalUnitClass();  
+  rental_unit_id: RentalUnitClass = new RentalUnitClass();
 }
 
 
@@ -175,6 +175,7 @@ export class RentalUnitClass {
   type: string = '';
   center_id: number = 1;
   capacity: number = 1;
+  extra: number = 0;
   has_children: boolean = false;
   parent_id: number = 0;
   category_id: RentalUnitCategoryClass = new RentalUnitCategoryClass();
@@ -186,11 +187,11 @@ export class RentalUnitCategoryClass {
 }
 
 export class CompositionItemClass {
-  id: number = Math.ceil(Math.random() * 1000);  
+  id: number = Math.ceil(Math.random() * 1000);
   firstname: string = 'prénom';
   lastname: string = 'nom';
   gender: string = 'M'; // M, F
-  date_of_birth: Date = new Date(Date.now() - (27*365*24*60*60*1000));  
+  date_of_birth: Date = new Date(Date.now() - (27*365*24*60*60*1000));
   handicap: string = 'none'; // none, slight, moderate, severe
   underprivileged: boolean = false;
 }

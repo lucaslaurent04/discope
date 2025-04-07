@@ -1,0 +1,43 @@
+{
+    "name": "Partner Event Set list view",
+    "description": "Listing view for Partner Event Set items.",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "10%",
+                "sortable": true,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "name",
+                "width": "20%",
+                "sortable": true,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "partner_id",
+                "width": "20%",
+                "sortable": true,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "date_from",
+                "width": "20%",
+                "sortable": true,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "date_to",
+                "width": "20%",
+                "sortable": true,
+                "readonly": true
+            }
+        ]
+    }
+}

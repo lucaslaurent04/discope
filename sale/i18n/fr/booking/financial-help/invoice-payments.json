@@ -1,0 +1,55 @@
+{
+    "name": "Facturé",
+    "plural": "Facturés",
+    "description": "",
+    "model": {
+        "organisation_id": {
+            "label": "Organisation",
+            "description": "",
+            "help": ""
+        },
+        "date_from": {
+            "label": "Du",
+            "description": "",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "",
+            "help": ""
+        },
+        "helper_name": {
+            "label": "Aidant : nom",
+            "description": "",
+            "help": ""
+        },
+        "helper_address1": {
+            "label": "Aidant : adresse ligne 1",
+            "description": "",
+            "help": ""
+        },
+        "helper_address_dispatch": {
+            "label": "Aidant : complément d'adresse",
+            "description": "",
+            "help": ""
+        },
+        "helper_address2": {
+            "label": "Aidant : adresse ligne 2",
+            "description": "",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "",
+            "description": "",
+            "layout": {}
+        },
+        "list.default": {
+            "name": "",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

@@ -5,6 +5,7 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+use sale\booking\BankCheck;
 use sale\booking\Funding;
 use sale\booking\Booking;
 use sale\booking\Payment;
@@ -60,7 +61,9 @@ $payments = Payment::search([
     ])
     ->delete(true);
 
+BankCheck::search(['funding_id' ,'=', $funding['id']])->update(['payment_id' => null]);
 Funding::id($params['id'])
+    ->update(['status' => 'pending'])
     ->update(['paid_amount' => null])
     ->update(['is_paid' => null]);
 

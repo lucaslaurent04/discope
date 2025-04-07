@@ -1,0 +1,71 @@
+{
+	"name": "Code de regroupement",
+	"plural": "Codes de regroupement",
+	"description": "",
+	"model": {
+        "name": {
+            "label": "Nom",
+            "description": "Nom du code de regroupement.",
+            "help": ""
+        },
+        "code": {
+            "label": "Code du regroupement",
+            "description": "Représente le code associé à l'identifiant du code de regroupement.",
+            "help": "",
+            "selection": {
+                "Accommodation": "Pension complète",
+                "Activity": "Activité",
+                "Transport": "Transport",
+                "Supply": "Fourniture"
+            }
+        },
+        "description": {
+            "label": "Description",
+            "description": "La description fournissant un contexte supplémentaire pour le code de regroupement.",
+            "help": ""
+        },
+        "product_models_ids": {
+            "label": "Modèles de produits",
+            "description": "Modèles de produits associés au code de regroupement.",
+            "help": ""
+        },
+        "products_ids": {
+            "label": "Produits",
+            "description": "Produits associés au code de regroupement.",
+            "help": ""
+        },
+        "has_age_range": {
+            "label": "Tranche d'âge?",
+            "description": "Assigné à une tranche d'âge spécifique.",
+            "help": ""
+        },
+        "age_range_id": {
+            "label": "Age (tranche)",
+            "description": "Tranche d'âge associée au regroupement.",
+            "help": ""
+        }
+	},
+	"view": {
+		"form.default": {
+			"name": "Code de regroupement",
+            "description": "Le code de regroupement sont liés aux produits et aux modèles de produits.",
+            "layout": {
+				"section.grouping_code_id": {
+					"label": "Détails"
+				},
+				"section.products": {
+					"label": "Produits"
+				},
+                "section.product_models": {
+					"label": "Modèles de produit"
+				}
+			}
+		},
+		"list.default": {
+			"name": "Codes de regroupement",
+            "description": "Liste des codes de regroupement.",
+            "layout": {}
+		}
+	},
+	"error": {}
+}

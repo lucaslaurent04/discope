@@ -1,9 +1,7 @@
-import { Component, OnInit, AfterViewInit, Inject, ElementRef, QueryList, ViewChild, ViewChildren, NgZone, Renderer2  } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, Renderer2  } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { BookingApiService } from 'src/app/in/booking/_services/booking.api.service';
-import { AuthService, ContextService, EqualUIService } from 'sb-shared-lib';
-import { MatSnackBar } from '@angular/material/snack-bar';
-
+import { ContextService, EqualUIService } from 'sb-shared-lib';
 
 class Booking {
     constructor(
@@ -15,6 +13,14 @@ class Booking {
     ) {}
 }
 
+export interface BookedServicesDisplaySettings {
+    store_folded_settings: boolean;
+    identification_folded: boolean;
+    products_folded: boolean;
+    activities_folded: boolean;
+    accomodations_folded: boolean;
+    meals_folded: boolean;
+}
 
 @Component({
     selector: 'booking-services',
@@ -25,6 +31,15 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
 
     public booking: any = new Booking();
     public booking_id: number = 0;
+
+    public display_settings: BookedServicesDisplaySettings = {
+        store_folded_settings: false,
+        identification_folded: true,
+        products_folded: true,
+        activities_folded: true,
+        accomodations_folded: true,
+        meals_folded: true
+    };
 
     public ready: boolean = false;
 
@@ -44,18 +59,12 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
     }
 
     constructor(
-        private auth: AuthService,
         private api: BookingApiService,
-        private router: Router,
         private route: ActivatedRoute,
-        private snack: MatSnackBar,
-        private zone: NgZone,
         private context:ContextService,
         private eq:EqualUIService,
         private renderer: Renderer2
     ) {}
-
-
 
     /**
      * Set up callbacks when component DOM is ready.
@@ -110,6 +119,8 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
                 }
             }
         });
+
+        this.loadDisplaySettings();
     }
 
     private async refreshActionButton() {
@@ -141,6 +152,35 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
         }
         catch(response) {
             console.log('unexpected error');
+        }
+    }
+
+    private async loadDisplaySettings() {
+        try {
+            this.display_settings = await this.api.fetch('?get=sale_booking_booked-services-settings');
+            if(this.display_settings.store_folded_settings) {
+                this.setDisplaySettingsFromLocalStorage();
+            }
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+    }
+
+    private setDisplaySettingsFromLocalStorage() {
+        const stored_map_bookings_booked_services_settings: string | null = localStorage.getItem('map_bookings_booked_services_settings');
+        if(stored_map_bookings_booked_services_settings === null) {
+            return;
+        }
+
+        const map_bookings_booked_services_settings: {[key: number]: BookedServicesDisplaySettings} = JSON.parse(stored_map_bookings_booked_services_settings);
+        if(!map_bookings_booked_services_settings[this.booking_id]) {
+            return;
+        }
+
+        const booked_services_settings = map_bookings_booked_services_settings[this.booking_id];
+        for(let key of Object.keys(this.display_settings)) {
+            this.display_settings[key as keyof BookedServicesDisplaySettings] = booked_services_settings[key as keyof BookedServicesDisplaySettings];
         }
     }
 }

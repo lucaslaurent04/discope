@@ -213,6 +213,35 @@
                 ]
             },
             {
+                "id": "item.bankchecks",
+                "label": "BankChecks",
+                "description": "",
+                "icon": "account_balance",
+                "type": "parent",
+                "children": [
+                    {
+                        "id": "item.bankchecks.all",
+                        "type": "entry",
+                        "label": "All BankChecks",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\booking\\BankCheck",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "item.bankchecks.pending",
+                        "type": "entry",
+                        "label": "Checks Pending",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\booking\\BankCheck",
+                            "view": "list.pending"
+                        }
+                    }
+                ]
+            },
+            {
                 "id": "item.invoices",
                 "label": "Invoices",
                 "description": "",

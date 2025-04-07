@@ -72,6 +72,12 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "bank_check_id",
+                                                "width": "50%",
+                                                "visible": ["bank_check_id", "<>", null]
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "status",
                                                 "width": "0%",
                                                 "visible": false

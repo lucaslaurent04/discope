@@ -44,7 +44,9 @@
                     </button>
                 </ng-container>
 
-                <div style="margin-left: auto; margin-right: 20px;"><b [class.error]="(instance.qty < group.nb_pers)">Total: {{instance.qty}} p.</b></div>
+                <div style="margin-left: auto; margin-right: 20px;">
+                    <b [class.error]="(instance.qty < group.nb_pers)">Total: {{instance.qty}} p.</b>
+                </div>
             </div>
         </div>
 
@@ -72,7 +74,7 @@
 
                 <!-- left pane : list of available rental units for current product model -->
                 <div class="list" style="flex: 0 1 calc(50% - 10px); border: solid 1px darkgrey;" >
-                    <div *ngFor="let unit of rentalunits"
+                    <div *ngFor="let unit of rentalUnits"
                             class="rentalunit-line line-choice"
                             [class.selected]="selectedRentalUnits.indexOf(unit.id) > -1">
                         <div style="padding: 0 5px;" (mousedown)="leftSelectRentalUnit(true, unit.id)">{{unit.name}} <small *ngIf="unit.is_accomodation">({{unit.capacity}})</small></div>
@@ -99,27 +101,56 @@
 
             </div>
 
-            <div *ngIf="mode == 'edit'" class="row row-lists" cdkDropListGroup style="display: flex; width: calc(100% - 20px); height: 200px; justify-content: space-between;">
+            <div *ngIf="mode == 'edit'" class="row row-lists" cdkDropListGroup style="display: flex; width: calc(100% - 20px); height: 250px; justify-content: space-between;">
 
                 <!-- left pane : list of available rental units for current product model -->
-                <div class="list" cdkDropList cdkDropListSortingDisabled style="flex: 0 1 calc(50% - 10px); border: solid 1px darkgrey;" >
-                    <div *ngFor="let unit of rentalunits"
-                            class="rentalunit-line line-choice"
-                            [class.selected]="selectedRentalUnits.indexOf(unit.id) > -1"
-                            cdkDrag
-                            [cdkDragData]="unit">
-
-                        <div class="drag-preview" *cdkDragPreview>
-                            <div class="drag-preview-inner">{{ selectedRentalUnits.length > 0 ? selectedRentalUnits.length : 1 }}</div>
-                        </div>
-
-                        <div>
-                            <mat-checkbox
-                                [checked]="selectedRentalUnits.indexOf(unit.id) > -1"
-                                (change)="leftSelectRentalUnit($event.checked, unit.id)">
+                <div style="display: flex; flex-direction: column; flex: 0 1 calc(50% - 10px); max-width: 50%;">
+                    <div style="margin-bottom: 5px;">
+                        <div style="display: flex; padding: 0 6px;">
+                            <mat-checkbox [checked]="allRentalUnitsSelected" (change)="leftSelectAllRentalUnits()" style="min-width: 140px;">
+                                Toutes <span style="font-size: 0.8rem;">({{selectedRentalUnits.length}}/{{filteredRentalUnits.length}})</span>
                             </mat-checkbox>
+                            <input class="rentalunit-filter" [value]="filterBy" (keyup)="leftFilterBy($event)" type="text" placeholder="Filtrer">
+                            <mat-slide-toggle [checked]="showOnlyParents" (change)="leftShowOnlyParents($event.checked)" style="margin-left: 20px; transform: scale(0.8);">Parents</mat-slide-toggle>
+                            <mat-slide-toggle [checked]="showOnlyChildren" (change)="leftShowOnlyChildren($event.checked)" style="transform: scale(0.8);">Enfants</mat-slide-toggle>
                         </div>
-                        <div style="padding: 0 5px;" (mousedown)="leftSelectRentalUnit(true, unit.id)">{{unit.name}} <small *ngIf="unit.is_accomodation">({{unit.capacity}})</small></div>
+                    </div>
+                    <div class="list" cdkDropList cdkDropListSortingDisabled style="flex-grow: 1; border: solid 1px darkgrey;">
+                        <div *ngIf="rentalUnits.length === 0" style="padding: 10px;">
+                            Aucune unité locative disponible
+                        </div>
+                        <div *ngIf="filteredRentalUnits.length === 0 && rentalUnits.length !== 0" style="padding: 10px;">
+                            Aucun résultat
+                        </div>
+                        <div *ngFor="let unit of filteredRentalUnits"
+                             class="rentalunit-line line-choice"
+                             [class.selected]="selectedRentalUnits.indexOf(unit.id) > -1"
+                             cdkDrag
+                             [cdkDragData]="unit"
+                        >
+                            <div class="drag-preview" *cdkDragPreview>
+                                <div class="drag-preview-inner">{{ selectedRentalUnits.length > 0 ? selectedRentalUnits.length : 1 }}</div>
+                            </div>
+
+                            <div>
+                                <mat-checkbox
+                                    [checked]="selectedRentalUnits.indexOf(unit.id) > -1"
+                                    (change)="leftSelectRentalUnit($event.checked, unit.id)">
+                                </mat-checkbox>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0 5px; width: calc(100% - 20px)"
+                                 (mousedown)="leftSelectRentalUnit(true, unit.id)"
+                            >
+                                <div>
+                                    {{unit.name}} <small *ngIf="unit.is_accomodation">({{unit.capacity}})</small>
+                                </div>
+                                <a class="rentalunit-description"
+                                   [title]="unit.description"
+                                >
+                                    {{unit.description}}
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- action area -->

@@ -1,0 +1,45 @@
+{
+    "name": "Entrée Coefficient Nutritionnel",
+    "plural": "Entrées Coefficient Nutritionnel",
+    "description": "Une configuration du coefficient nutritionnel nécessaire pour nourrir une personne à partir d'un âge spécifique.",
+    "model": {
+        "table_id": {
+            "label": "Configuration",
+            "description": "La configuration à laquelle appartient le coefficient nutritionnel.",
+            "help": ""
+        },
+        "age_from": {
+            "label": "De",
+            "description": "L'âge minimum à partir duquel le coefficient est applicable. (inclus)",
+            "help": ""
+        },
+        "age_to": {
+            "label": "À",
+            "description": "L'âge maximum à partir duquel le coefficient est applicable. (exclu)",
+            "help": ""
+        },
+        "nutritional_coefficient": {
+            "label": "Coefficient nutritionnel",
+            "description": "Le coefficient nutritionnel du repas nécessaire pour les personnes d'âge_from à âge_to.",
+            "help": ""
+        },
+        "is_sporty": {
+            "label": "Sportif",
+            "description": "Le coefficient nutritionnel est-il destiné aux sportifs ?",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Entrée Coefficient Nutritionnel",
+            "description": "Formulaire permettant d'afficher et de modifier une entrée de coefficient nutritionnel spécifique.",
+            "layout": {}
+        },
+        "list.default": {
+            "name": "Entrées Coefficient Nutritionnel",
+            "description": "Vue de liste des éléments d'entrée de coefficient nutritionnel.",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

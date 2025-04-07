@@ -1,0 +1,51 @@
+{
+    "name": "Employé",
+    "plural": "Employés",
+    "description": "",
+    "model": {
+        "name": {
+            "label": "Nom",
+            "description": "Code mnémo du modèle.",
+            "help": ""
+        },
+        "activity_product_models_ids": {
+            "label": "Modèles de produit",
+            "description": "Les modèles de produits dont l'employé peut être responsable.",
+            "help": ""
+        },
+        "partner_events_ids": {
+            "label": "Evénements planning",
+            "description": "Evénements planning comme: formation, absence, congé ou récupération.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Employé",
+            "description": "Les employés sont les collaborateurs d'une entreprise.",
+            "layout": {
+                "template.content": {
+                    "label": "Contenu"
+                },
+                "section.activity-product-models": {
+                    "label": "Modèles de produit"
+                },
+                "section.partner-events": {
+                    "label": "Evénements"
+                },
+                "section.partner-event-sets": {
+                    "label": "Séries d'événements"
+                },
+                "section.mails": {
+                    "label": "E-mails"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Employés",
+            "description": "Liste des employés.",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

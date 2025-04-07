@@ -139,26 +139,36 @@
                     <mat-hint>Texte descriptif de remplacement (facultatif)</mat-hint>
                 </mat-form-field>
                 <div *ngIf="instance.product_id.product_model_id.type === 'service' && instance.product_id.product_model_id.service_type === 'schedulable' && !instance.product_id.product_model_id.is_repeatable"
-                     style="margin-top: 20px; display: flex; align-items: center;"
+                     style="margin-top: 20px; display: flex; align-items: center; gap: 40px;"
                 >
-                    <div style="width: 50px">
-                        Date:
-                    </div>
-                    <mat-form-field style="max-width: 100px">
+                    <div>Date:</div>
+                    <mat-form-field style="max-width: 100px;">
                         <mat-select [formControl]="vm.service_date.formControl" (selectionChange)="vm.service_date.change()">
                             <mat-option *ngFor="let date of getPossibleServiceDates()" [value]="date">{{ date | date:'dd/MM/YY' }}</mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <mat-form-field *ngIf="!instance.product_id.product_model_id.is_fullday" style="margin-left: 20px; max-width: 100px">
+                    <mat-form-field *ngIf="!instance.product_id.product_model_id.is_fullday" style="max-width: 120px;">
                         <mat-select [formControl]="vm.time_slot_id.formControl" (selectionChange)="vm.time_slot_id.change()">
                             <mat-option *ngFor="let time_slot of getPossibleTimeSlots()" [value]="time_slot.id">
                                 {{ time_slot.name}}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <div *ngIf="instance.product_id.product_model_id.is_fullday" style="margin-left: 20px; width: 100px">
+                    <div *ngIf="instance.product_id.product_model_id.is_fullday">
                         Journée complète
                     </div>
+                </div>
+                <div *ngIf="instance.product_id.product_model_id.type === 'service' && instance.product_id.product_model_id.service_type === 'schedulable' && !instance.product_id.product_model_id.is_repeatable && instance.product_id.product_model_id.is_meal"
+                     style="display: flex; align-items: center; gap: 40px;"
+                >
+                    <div>Emplacement:</div>
+                    <mat-form-field style="max-width: 120px;">
+                        <mat-select [formControl]="vm.meal_location.formControl" (selectionChange)="vm.meal_location.change()">
+                            <mat-option [value]="'inside'">Intérieur</mat-option>
+                            <mat-option [value]="'outside'">Extérieur</mat-option>
+                            <mat-option [value]="'takeaway'">À emporter</mat-option>
+                        </mat-select>
+                    </mat-form-field>
                 </div>
             </div>
         </div>
@@ -272,7 +282,7 @@
         </div>
 
         <!-- 4) manual discounts -->
-        <div class="row row-first" *ngIf="!vProduct.identification.folded && !group.is_locked">
+        <div class="row row-first" *ngIf="!vProduct.identification.folded && !instance.is_activity && !group.is_locked">
             <div class="part cell" style="flex: none; min-width: 38%;" [class.hidden]="!ready">
                 <div class="part-toggle">
                     <button mat-icon-button *ngIf="!vProduct.discounts.folded"

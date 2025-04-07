@@ -1,0 +1,51 @@
+{
+    "name": "Nutritional Coefficient Entries",
+    "description": "Listing view for nutritional coefficient entry items.",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "10%",
+                "sortable": true,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "name",
+                "width": "20%",
+                "sortable": true,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "is_sporty",
+                "width": "10%",
+                "sortable": false,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "age_from",
+                "width": "10%",
+                "sortable": true,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "age_to",
+                "width": "10%",
+                "sortable": true,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "nutritional_coefficient",
+                "width": "25%",
+                "sortable": true,
+                "readonly": false
+            }
+        ]
+    }
+}

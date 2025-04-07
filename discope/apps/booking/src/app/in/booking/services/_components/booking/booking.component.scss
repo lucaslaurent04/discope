@@ -58,7 +58,7 @@
                         overflow: hidden;
 
                         &.group-selected {
-                            max-height: 2000px;
+                            max-height: 4000px;
                             transition: max-height .5s ease-in;
                         }
 
@@ -74,6 +74,12 @@
                             flex: 0 0 30px;
                             width: 30px;
                             transform: translateX(4px) translateY(14px);
+                        }
+
+                        .group-clone {
+                            position: absolute;
+                            right: 100px;
+                            transform: translateY(3px);
                         }
 
                         .group-remove {

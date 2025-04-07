@@ -35,7 +35,7 @@ list($context) = [$providers['context']];
 
 
 $tree = [
-    'id', 'name', 'created', 'date_from', 'date_to', 'status', 'total', 'price', 'is_locked',
+    'id', 'name', 'created', 'date_from', 'date_to', 'status', 'total', 'price', 'is_locked', 'nb_pers',
     'customer_id' => [
         'id', 'rate_class_id'
     ],
@@ -77,7 +77,7 @@ $tree = [
             'description'
         ],
         'age_range_assignments_ids' => [
-            'age_range_id', 'qty'
+            'age_range_id', 'qty', 'age_from', 'age_to'
         ],
         'sojourn_product_models_ids' => [
             'id',
@@ -92,12 +92,15 @@ $tree = [
             'rental_unit_assignments_ids' => [
                 'id',
                 'qty',
+                'use_extra',
                 'booking_line_group_id',
                 'rental_unit_id' => [
                     'id',
                     'name',
+                    'description',
                     'is_accomodation',
-                    'capacity'
+                    'capacity',
+                    'extra'
                 ]
             ]
         ],
@@ -122,8 +125,14 @@ $tree = [
             'is_rental_unit',
             'is_accomodation',
             'is_meal',
+            'meal_location',
+            'is_activity',
+            'is_transport',
+            'is_supply',
+            'is_fullday',
             'service_date',
             'time_slot_id',
+            'booking_activity_id',
             'price_id',
             'product_id' => [
                 'name',
@@ -141,7 +150,11 @@ $tree = [
                     'is_meal',
                     'is_snack',
                     'is_fullday',
-                    'time_slots_ids' => ['name', 'code']
+                    'has_provider',
+                    'has_rental_unit',
+                    'providers_ids'             => ['name'],
+                    'activity_rental_units_ids' => ['name'],
+                    'time_slots_ids'            => ['name', 'code']
                 ]
             ],
             'auto_discounts_ids' => [
@@ -159,6 +172,20 @@ $tree = [
                 'value',
                 'discount_id' => ['name']
             ]
+        ],
+        'booking_activities_ids' => [
+            'activity_booking_line_id',
+            'booking_line_group_id',
+            'supplies_booking_lines_ids',
+            'transports_booking_lines_ids',
+            'counter',
+            'total',
+            'price',
+            'is_virtual',
+            'activity_date',
+            'time_slot_id',
+            'providers_ids',
+            'rental_unit_id'
         ]
     ]
 ];

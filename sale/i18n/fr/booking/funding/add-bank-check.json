@@ -1,0 +1,31 @@
+{
+    "name": "Association d'un chèque bancaire",
+    "description": "Cette action génère un nouveau chèque bancaire et le lie à un dossier de financement existant. Le chèque sera avec le statut en attente.",
+    "model": {
+        "id": {
+            "label": "Identifiant",
+            "description": "Identifiant unique du financement.",
+            "help": ""
+        },
+        "has_signature": {
+            "label": "Signature ?",
+            "description": "Indique si le chèque bancaire est signé.",
+            "help": ""
+        },
+        "amount": {
+            "label": "Montant",
+            "description": "La valeur monétaire du chèque bancaire.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "missing_has_signature": "Le chèque doit être marqué comme ayant une signature",
+            "unknown_funding": "Financement introuvable.",
+            "unknown_bankCheck": "Chèque bancaire introuvable.",
+            "nothing_to_pay": "Le financement est déjà entièrement réglé.",
+            "funding_already_associated": "Ce chèque bancaire est déjà associé à un financement.",
+            "error_bankCheck_payment": "Une erreur est survenue lors du paiement du chèque bancaire."
+        }
+    }
+}

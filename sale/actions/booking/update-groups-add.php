@@ -82,6 +82,8 @@ if($booking['booking_lines_groups_ids']) {
 
 BookingLineGroup::create($values);
 
+Booking::refreshNbPers($orm, $booking['id']);
+
 // restore events in case this controller is chained with others
 $orm->enableEvents();
 

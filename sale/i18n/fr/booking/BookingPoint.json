@@ -1,0 +1,60 @@
+{
+	"name": "Point de fidélité",
+	"plural": "Points de fidélité",
+	"description": "Les points de fidélité permettent de suivre les points gagnés par une réservation et les informations associées.",
+	"model": {
+		"name": {
+			"label": "Nom",
+			"description": "Le nom calculé est basé sur la réservation et le client.",
+			"help": ""
+		},
+		"booking_id": {
+			"label": "Réservation d'origine",
+			"description": "Référence à la réservation associée à cette entrée.",
+			"help": ""
+		},
+		"booking_apply_id": {
+			"label": "Réservation bénéficiaire",
+			"description": "Réservation pour laquelle les points ont été utilisés.",
+			"help": ""
+		},
+		"customer_id": {
+			"label": "Client",
+			"description": "Client associé à la réservation, déterminé en fonction de l'identité sélectionnée.",
+			"help": ""
+		},
+		"nb_paying_pers": {
+			"label": "Personnes payantes",
+			"description": "Nombre estimé de personnes payantes impliquées dans la réservation.",
+			"help": ""
+		},
+		"nb_nights": {
+			"label": "Nombre de nuits",
+			"description": "Nombre de nuits comprises dans la réservation.",
+			"help": ""
+		},
+		"points_value": {
+			"label": "Nombre de points",
+			"description": "Nombre de points gagnés grâce à la réservation d'origine.",
+			"help": ""
+		},
+		"description": {
+			"label": "Description",
+			"description": "Description des points de réservation.",
+			"help": ""
+		}
+	},
+	"view": {
+		"form.default": {
+			"name": "Point de fidélité",
+			"description": "Les points de fidélité permettent de suivre les points gagnés par une réservation et les informations associées.",
+			"layout": {}
+		},
+		"list.default": {
+			"name": "Points de fidélité",
+			"description": "Liste des points de fidélité.",
+			"layout": {}
+		}
+	},
+	"error": {}
+}

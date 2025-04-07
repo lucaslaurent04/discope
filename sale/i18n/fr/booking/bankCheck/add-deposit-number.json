@@ -1,0 +1,22 @@
+{
+    "name": "Attribution d’un numéro de remise à un chèque bancaire",
+    "description": "Cette action met à jour un chèque bancaire en lui attribuant un numéro de remise officiel fourni par la banque. Le chèque ne doit pas avoir été préalablement assigné ni posséder déjà un numéro de remise.",
+    "model": {
+        "id": {
+            "label": "Identifiant",
+            "description": "Identifiant unique du chèque bancaire concerné.",
+            "help": ""
+        },
+        "deposit_number": {
+            "label": "Numéro de remise",
+            "description": "Numéro officiel de remise fourni par la banque, permettant de suivre tous les chèques associés.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "unknown_bankCheck": "Chèque bancaire inconnu.",
+            "bank_check_already_deposit_number": "Impossible d’attribuer le numéro de remise : le chèque bancaire possède déjà un numéro de remise."
+        }
+    }
+}

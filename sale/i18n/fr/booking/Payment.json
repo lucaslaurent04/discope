@@ -67,6 +67,11 @@
             "label": "Exporté",
             "description": "Le paiement a été exporté",
             "help": ""
+        },
+        "bank_check_id": {
+            "label": "Chèque bancaire",
+            "description": "La chèque bancaire à laquelle est lié le paiement",
+            "help": ""
         }
     },
     "view": {

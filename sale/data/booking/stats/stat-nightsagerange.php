@@ -211,6 +211,7 @@ foreach($bookings as $booking) {
 
             // set qty as default value for nb_pers, according to accounting method
             $nb_pers = $line['qty'];
+
             if($line['product_id']['product_model_id']['qty_accounting_method'] == 'person') {
                 $nb_pers /= $group['nb_nights'];
             }

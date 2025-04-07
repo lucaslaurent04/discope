@@ -1,0 +1,45 @@
+{
+    "name": "Evénement relation",
+    "plural": "Evénements relation",
+    "description": "Evénements planning activitées d'une relation.",
+    "model": {
+        "description": {
+            "label": "Description",
+            "description": "",
+            "help": ""
+        },
+        "partner_id": {
+            "label": "Relation",
+            "description": "",
+            "help": ""
+        },
+        "partner_event_set_id": {
+            "label": "Série d'événements",
+            "description": "",
+            "help": ""
+        },
+        "event_date": {
+            "label": "Date",
+            "description": "",
+            "help": ""
+        },
+        "time_slot_id": {
+            "label": "Créneau horaire",
+            "description": "",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Evénement relation",
+            "description": "",
+            "layout": {}
+        },
+        "list.default": {
+            "name": "Evénements relation",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

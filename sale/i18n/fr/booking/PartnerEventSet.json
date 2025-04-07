@@ -1,0 +1,44 @@
+{
+    "name": "Evénement relation",
+    "plural": "Evénements relation",
+    "description": "Evénements planning activitées d'une relation.",
+    "model": {
+        "description": {
+            "label": "Description",
+            "description": "",
+            "help": ""
+        },
+        "partner_id": {
+            "label": "Relation",
+            "description": "",
+            "help": ""
+        },
+        "date_from": {
+            "label": "De",
+            "description": "",
+            "help": ""
+        },
+        "date_to": {
+            "label": "A",
+            "description": "",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Evénement relation",
+            "description": "",
+            "layout": {
+                "section.partner-events": {
+                    "label": "Evénements"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Evénements relation",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}
