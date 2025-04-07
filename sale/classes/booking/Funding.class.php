@@ -94,7 +94,25 @@ class Funding extends \sale\pay\Funding {
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\Payment',
                 'foreign_field'     => 'funding_id'
-            ]
+            ],
+
+            'bank_check_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\BankCheck',
+                'foreign_field'     => 'funding_id'
+            ],
+
+            'status' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'pending',
+                    'in_process',
+                    'paid',
+                ],
+                'description'       => 'The current processing status of the funding',
+                'default'           => 'pending'
+            ],
+
 
         ];
     }
@@ -154,6 +172,7 @@ class Funding extends \sale\pay\Funding {
                     $sign_due  = intval($funding['due_amount'] > 0) - intval($funding['due_amount'] < 0);
                     if($sign_paid == $sign_due && abs(round($funding['paid_amount'], 2)) >= abs(round($funding['due_amount'], 2))) {
                         $result[$fid] = true;
+                        $orm->update(Funding::getType(), $fid, ['status' => 'paid']);
                     }
                 }
             }

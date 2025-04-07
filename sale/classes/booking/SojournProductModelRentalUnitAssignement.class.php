@@ -76,6 +76,14 @@ class SojournProductModelRentalUnitAssignement extends Model {
                 'description'       => 'Flag marking the assignment as an accommodation (from rental unit)).',
                 'function'          => 'calcIsAccomodation',
                 'store'             => true
+            ],
+
+            'use_extra' => [
+                'type'              => 'boolean',
+                'description'       => 'Should use the extra capacity of the rental unit?',
+                'default'           => false,
+                'onupdate'          => 'onupdateUseExtra',
+                'visible'           => ['is_accomodation', '=', true]
             ]
 
         ];
@@ -139,6 +147,15 @@ class SojournProductModelRentalUnitAssignement extends Model {
         }
     }
 
+    public static function onupdateUseExtra($self) {
+        $self->read(['use_extra', 'qty', 'rental_unit_id' => ['capacity']]);
+        foreach($self as $id => $assignment) {
+            if(!$assignment['use_extra'] && $assignment['qty'] > $assignment['rental_unit_id']['capacity']) {
+                self::id($id)->update(['qty' => $assignment['rental_unit_id']['capacity']]);
+            }
+        }
+    }
+
     public function getUnique() {
         return [
             ['sojourn_product_model_id', 'rental_unit_id']
@@ -182,7 +199,7 @@ class SojournProductModelRentalUnitAssignement extends Model {
      */
     public static function canupdate($om, $oids, $values, $lang='en') {
         // fields that can always be changed
-        $allowed_fields = ['qty', 'rental_unit_id'];
+        $allowed_fields = ['qty', 'rental_unit_id', 'use_extra'];
 
         if(count(array_diff(array_keys($values), $allowed_fields))) {
             $assignments = $om->read(self::getType(), $oids, ['booking_id.status', 'booking_line_group_id.is_extra'], $lang);
@@ -201,7 +218,7 @@ class SojournProductModelRentalUnitAssignement extends Model {
     }
 
     /**
-     * Check wether an object can be deleted, and perform some additional operations if necessary.
+     * Check whether an object can be deleted, and perform some additional operations if necessary.
      * This method can be overridden to define a more precise set of tests.
      *
      * @param  object   $om         ObjectManager instance.

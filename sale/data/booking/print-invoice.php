@@ -264,7 +264,8 @@ if($logo_document_data) {
 }
 
 $values = [
-    'header_img_url'        => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
+    'header_img_url'       => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
+    'signature'            => $invoice['organisation_id']['signature'] ?? '',
     'invoice_header_html'  => '',
     'invoice_notice_html'  => '',
 
@@ -458,7 +459,7 @@ if($invoice['partner_id']['partner_identity_id']['id'] != $booking['customer_ide
 /*
     override contact and payment details with center's office, if set
 */
-if($booking['center_id']['use_office_details'] || !strlen($invoice['booking_id'])) {
+if($booking['center_id']['use_office_details']) {
     $office = $invoice['center_office_id'];
     $values['company_iban'] = DataFormatter::format($office['bank_account_iban'], 'iban');
     $values['company_bic'] = DataFormatter::format($office['bank_account_bic'], 'bic');

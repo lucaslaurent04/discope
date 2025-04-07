@@ -110,10 +110,16 @@ class Price extends Model {
 
     public static function calcName($om, $oids, $lang) {
         $result = [];
-        $res = $om->read(__CLASS__, $oids, ['product_id.sku', 'price_list_id.name']);
+        $res = $om->read(__CLASS__, $oids, ['product_id.sku', 'price_list_id.name', 'has_rate_class', 'rate_class_id.name']);
         if($res > 0 && count($res)) {
             foreach($res as $oid => $odata) {
-                $result[$oid] = "{$odata['product_id.sku']} - {$odata['price_list_id.name']}";
+
+            $name= "{$odata['product_id.sku']} - {$odata['price_list_id.name']}";
+
+            if (!empty($odata['has_rate_class']) && !empty($odata['rate_class_id.name'])) {
+                $name .= " - {$odata['rate_class_id.name']}";
+            }
+            $result[$oid] = $name;
             }
         }
         return $result;
@@ -186,7 +192,7 @@ class Price extends Model {
 
     public function getUnique() {
         return [
-            ['product_id', 'price_list_id']
+            ['product_id', 'price_list_id', 'rate_class_id']
         ];
     }
 

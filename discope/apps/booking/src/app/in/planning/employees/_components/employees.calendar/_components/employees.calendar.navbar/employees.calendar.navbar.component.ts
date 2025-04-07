@@ -1,66 +1,75 @@
-import { Component, Input, Output, EventEmitter, OnInit, NgZone, ChangeDetectorRef, AfterViewChecked, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-import { Observable }  from 'rxjs';
-import { find, map, mergeMap, startWith, debounceTime } from 'rxjs/operators';
+import { Component, Input, Output, EventEmitter, OnInit, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 
 import { PlanningEmployeesCalendarParamService } from '../../../../_services/employees.calendar.param.service';
 
-import { HeaderDays } from 'src/app/model/headerdays';
 import { ChangeReservationArg } from 'src/app/model/changereservationarg';
 import { ApiService, AuthService } from 'sb-shared-lib';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
+import { ProductModelCategory, ProductModel } from '../../employees.calendar.component';
+import { debounceTime } from 'rxjs/operators';
+
+type AggregatedProductModelType = {
+    id: number,
+    name: string,
+    categories_ids: number[],
+    product_models_ids: number[]
+}
 
 @Component({
   selector: 'planning-employees-calendar-navbar',
   templateUrl: './employees.calendar.navbar.component.html',
   styleUrls: ['./employees.calendar.navbar.component.scss']
 })
-export class PlanningEmployeesCalendarNavbarComponent implements OnInit, AfterViewInit, AfterViewChecked {
+export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChanges {
     @Input() activity: any;
-    @Input() employee: any;
+    @Input() partner: any;
     @Input() holidays: any;
+    @Input() productModelCategories: ProductModelCategory[];
+    @Input() productModels: ProductModel[];
+
     @Output() changedays = new EventEmitter<ChangeReservationArg>();
     @Output() refresh = new EventEmitter<Boolean>();
-    @ViewChild('centerSelector') centerSelector: MatSelect;
-
     @Output() openLegendDialog = new EventEmitter();
     @Output() openPrefDialog = new EventEmitter();
     @Output() fullScreen = new EventEmitter();
 
-    dateFrom: Date;
-    dateTo: Date;
-    duration: number;
+    @ViewChild('productModelSelector') productModelSelector: MatSelect;
+    @ViewChild('partnerSelector') partnerSelector: MatSelect;
 
-    centers: any[] = [];
-    selected_centers_ids: any[] = [];
+    private dateFrom: Date;
+    private dateTo: Date;
+    public duration: number;
+
+    private allProductCategory: ProductModelCategory = { id: 0, name: 'TOUTES' };
+    public selectedProductCategory: ProductModelCategory = this.allProductCategory;
+    public filteredProductModels: AggregatedProductModelType[] = [];
+
+    public displayedProductModelCategories: ProductModelCategory[] = [];
+    public displayedProductModels: AggregatedProductModelType[] = [];
+
+    public partners: any[] = [];
+    public selected_partners_ids: any[] = [];
 
     vm: any = {
         duration:   '31',
         date_range: new FormGroup({
             date_from: new FormControl(),
             date_to: new FormControl()
-        })
+        }),
+        product_model_code: new FormControl(),
+        show_only_transport: new FormControl(),
+        filter_product_models: new FormControl('')
     };
 
     constructor(
         private api: ApiService,
         private auth: AuthService,
-        private params: PlanningEmployeesCalendarParamService,
-        private cd: ChangeDetectorRef,
-        private zone: NgZone) {
-    }
+        private params: PlanningEmployeesCalendarParamService
+    ) {}
 
-
-    ngAfterViewInit() {
-    }
-
-
-    ngAfterViewChecked() {
-    }
-
-
-    ngOnInit() {
+    public async ngOnInit() {
 
         /*
             Setup events listeners
@@ -72,42 +81,152 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, AfterVi
                 // update local vars according to service new values
                 this.dateFrom = new Date(this.params.date_from.getTime())
                 this.dateTo = new Date(this.params.date_to.getTime())
-
                 this.duration = this.params.duration;
+
                 this.vm.duration = this.duration.toString();
-                this.vm.date_range.get("date_from").setValue(this.dateFrom);
-                this.vm.date_range.get("date_to").setValue(this.dateTo);
+                this.vm.date_range.get('date_from').setValue(this.dateFrom);
+                this.vm.date_range.get('date_to').setValue(this.dateTo);
+                if(this.params.product_model_id === null) {
+                    this.vm.product_model_code.setValue('cat_' + this.params.product_category_id);
+                }
+                else {
+                    this.vm.product_model_code.setValue('mod_' + this.params.product_model_id);
+                }
+                this.vm.show_only_transport.setValue(this.params.show_only_transport);
+
+                this.selectedProductCategory = this.productModelCategories.find((cat) => cat.id === this.params.product_category_id);
             });
 
-
-        // by default set the first center of current user
+        // use user centers_ids to filter displayed employees
         this.auth.getObservable()
             .subscribe( async (user:any) => {
-                if(user.hasOwnProperty('centers_ids') && user.centers_ids.length) {
-                    try {
-                        const centers = await this.api.collect('identity\\Center',
-                            ['id', 'in', user.centers_ids],
-                            ['id', 'name', 'code', 'sojourn_type_id'],
-                            'name','asc',0,50
-                        );
-                        if(centers.length) {
-                            // value stored in local storage prevails
-                            let stored = localStorage.getItem('centers_ids');
-                            if(stored) {
-                                this.selected_centers_ids = JSON.parse(stored);
-                            }
-                            else {
-                                this.selected_centers_ids = centers.map( (e:any) => e.id );
-                            }
-                            this.params.centers_ids = this.selected_centers_ids;
-                            this.centers = centers;
+                if(!user.hasOwnProperty('centers_ids') || !user.centers_ids.length) {
+                    return;
+                }
+
+                try {
+                    const employees = await this.api.collect(
+                        'hr\\employee\\Employee',
+                        [
+                            ['center_id', 'in', user.centers_ids],
+                            ['relationship', '=', 'employee']
+                        ],
+                        ['id'],
+                        'name', 'asc', 0, 500
+                    );
+
+                    if(employees.length === 0) {
+                        return;
+                    }
+
+                    const partners_domain = [
+                        [['id', 'in', employees.map((e: any) => e.id)]],
+                        [['relationship', '=', 'provider']]
+                    ];
+                    const partners = await this.api.collect(
+                        'identity\\Partner',
+                        partners_domain,
+                        ['id', 'name', 'relationship'],
+                        'name', 'asc', 0, 500
+                    );
+
+                    if(partners.length === 0) {
+                        return;
+                    }
+
+                    // value stored in local storage prevails
+                    let stored = localStorage.getItem('partners_ids');
+                    if(stored) {
+                        this.selected_partners_ids = JSON.parse(stored);
+                    }
+                    else {
+                        this.selected_partners_ids = partners.map( (e:any) => e.id );
+                    }
+
+                    this.params.partners_ids = this.selected_partners_ids;
+                    this.partners = partners.sort((a: any, b: any) => {
+                        if (a.relationship !== b.relationship) {
+                            return a.relationship < b.relationship ? -1 : 1;
                         }
-                    }
-                    catch(err) {
-                        console.warn(err) ;
-                    }
+                        return a.name.localeCompare(b.name);
+                    });
+                }
+                catch(err) {
+                    console.warn(err) ;
                 }
             });
+
+        this.vm.product_model_code.valueChanges.subscribe((value: string) => {
+            if(value.startsWith('cat_')) {
+                this.params.product_category_id = +value.split('_')[1];
+                this.params.product_model_id = null;
+            }
+            else {
+                this.params.product_model_id = +value.split('_')[1];
+            }
+
+            this.vm.filter_product_models.setValue('');
+
+            this.filterProductModels();
+        });
+
+        this.vm.show_only_transport.valueChanges.subscribe((value: boolean) => {
+            this.params.show_only_transport = value;
+
+            this.filterProductModels();
+        });
+
+        this.vm.filter_product_models.valueChanges.pipe(debounceTime(300)).subscribe(() => {
+            this.refreshDisplayedProductModels();
+        });
+
+        this.refreshDisplayedProductModels();
+    }
+
+    public refreshDisplayedProductModels() {
+        this.displayedProductModelCategories = this.productModelCategories.filter(cat => {
+            return cat.name.toLowerCase().includes(this.vm.filter_product_models.value.toLowerCase());
+        });
+
+        this.displayedProductModels = this.filteredProductModels.filter(cat => {
+            return cat.name.toLowerCase().includes(this.vm.filter_product_models.value.toLowerCase());
+        });
+    }
+
+    public ngOnChanges(changes: SimpleChanges) {
+        if(changes.productModels) {
+            this.filteredProductModels = this.aggregatedProductModels(this.productModels);
+        }
+    }
+
+    /**
+     * Aggregate product models to not repeat the same name
+     *
+     * @param productModels
+     * @private
+     */
+    private aggregatedProductModels(productModels: ProductModel[]): AggregatedProductModelType[] {
+        const aggregateProductModels: AggregatedProductModelType[] = [];
+
+        for(let productModel of productModels) {
+            const index = aggregateProductModels.findIndex((pm) => pm.name === productModel.name);
+            if(index >= 0) {
+                aggregateProductModels[index].product_models_ids.push(productModel.id);
+                for(let categoryId of productModel.categories_ids) {
+                    if(!aggregateProductModels[index].categories_ids.includes(categoryId)) {
+                        aggregateProductModels[index].categories_ids.push(categoryId);
+                    }
+                }
+            }
+            else {
+                aggregateProductModels.push({
+                    ...productModel,
+                    product_models_ids: [productModel.id]
+                });
+            }
+        }
+
+        return aggregateProductModels;
     }
 
     public onOpenLegendDialog() {
@@ -122,9 +241,41 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, AfterVi
         this.fullScreen.emit();
     }
 
+    private filterProductModels() {
+        let productModels = this.productModels.filter((productModel) => {
+            return !this.params.show_only_transport || productModel.has_transport_required;
+        });
+
+        if(this.params.product_category_id > 0) {
+            productModels = productModels.filter((productModel) => {
+                return productModel.categories_ids.map(p => +p).includes(this.params.product_category_id);
+            });
+        }
+
+        this.filteredProductModels = this.aggregatedProductModels(productModels);
+
+        if(productModels.length > 0) {
+            if(this.params.product_model_id) {
+                const aggregatedProductModel = this.filteredProductModels.find((pm) => pm.id === this.params.product_model_id);
+                this.params.product_model_ids = aggregatedProductModel.product_models_ids;
+            }
+            else {
+                this.params.product_model_ids = productModels.map(p => p.id);
+            }
+        }
+        else {
+            // No product models so show no activities
+            this.params.product_model_ids = [0];
+            // And unselect selected product model
+            this.params.product_model_id = null;
+        }
+
+        this.refreshDisplayedProductModels();
+    }
+
     public async onchangeDateRange() {
-        let start = this.vm.date_range.get("date_from").value;
-        let end = this.vm.date_range.get("date_to").value;
+        let start = this.vm.date_range.get('date_from').value;
+        let end = this.vm.date_range.get('date_to').value;
 
         if(!start || !end) return;
 
@@ -137,12 +288,11 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, AfterVi
         }
 
         if(start <= end) {
-
             // relay change to parent component
             if((start.getTime() != this.dateFrom.getTime() || end.getTime() != this.dateTo.getTime())) {
                 //  update local members and relay to params service
-                this.dateFrom = this.vm.date_range.get("date_from").value;
-                this.dateTo = this.vm.date_range.get("date_to").value;
+                this.dateFrom = this.vm.date_range.get('date_from').value;
+                this.dateTo = this.vm.date_range.get('date_to').value;
                 this.params.date_from = this.dateFrom;
                 this.params.date_to = this.dateTo;
             }
@@ -196,26 +346,24 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, AfterVi
         this.refresh.emit(true);
     }
 
-    public onchangeSelectedCenters() {
-        console.log('::onchangeSelectedCenters');
-        this.params.centers_ids = this.selected_centers_ids;
-        localStorage.setItem('centers_ids', JSON.stringify(this.selected_centers_ids));
+    public onchangeSelectedPartners() {
+        console.log('::onchangeSelectedEmployees');
+        this.params.partners_ids = this.selected_partners_ids;
+        localStorage.setItem('partners_ids', JSON.stringify(this.selected_partners_ids));
     }
 
-    public onclickUnselectAllCenters() {
-        // this.centerSelector.close();
-        this.centerSelector.options.forEach((item: MatOption) => item.deselect());
+    public onclickUnselectAllPartners() {
+        this.partnerSelector.options.forEach((item: MatOption) => item.deselect());
     }
 
-    public onclickSelectAllCenters() {
-        // this.centerSelector.close();
-        this.centerSelector.options.forEach((item: MatOption) => item.select());
+    public onclickSelectAllPartners() {
+        this.partnerSelector.options.forEach((item: MatOption) => item.select());
     }
 
-    public onclickSelectGA() {
-        this.centerSelector.options.forEach((item: MatOption) => {
-            const center = this.centers.find(center => center.id == item.value);
-            if(center.sojourn_type_id == 1) {
+    public onclickSelectInternal() {
+        this.partnerSelector.options.forEach((item: MatOption) => {
+            const partner = this.partners.find(p => p.id == item.value);
+            if(partner.relationship === 'employee') {
                 item.select();
             }
             else {
@@ -224,10 +372,10 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, AfterVi
         });
     }
 
-    public onclickSelectGG() {
-        this.centerSelector.options.forEach((item: MatOption) => {
-            const center = this.centers.find(center => center.id == item.value);
-            if(center.sojourn_type_id == 2) {
+    public onclickSelectExternal() {
+        this.partnerSelector.options.forEach((item: MatOption) => {
+            const partner = this.partners.find(p => p.id == item.value);
+            if(partner.relationship === 'provider') {
                 item.select();
             }
             else {
@@ -239,5 +387,4 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, AfterVi
     public calcHolidays() {
         return this.holidays.map( (a:any) => a.name ).join(', ');
     }
-
 }

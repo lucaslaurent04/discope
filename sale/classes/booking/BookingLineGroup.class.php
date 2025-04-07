@@ -5,9 +5,13 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\booking;
+
+use core\setting\Setting;
 use equal\orm\Model;
 use identity\Center;
+use sale\catalog\Product;
 use sale\catalog\ProductModel;
 
 class BookingLineGroup extends Model {
@@ -31,7 +35,8 @@ class BookingLineGroup extends Model {
             'order' => [
                 'type'              => 'integer',
                 'description'       => 'Order of the group in the list.',
-                'default'           => 1
+                'default'           => 1,
+                'onupdate'          => 'onupdateOrder'
             ],
 
             'date_from' => [
@@ -325,6 +330,39 @@ class BookingLineGroup extends Model {
                 'ondetach'          => 'ondetachAgeRange'
             ],
 
+            'booking_activities_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\BookingActivity',
+                'foreign_field'     => 'booking_line_group_id',
+                'description'       => "The booking activities that refer to the booking line group."
+            ],
+
+            'activity_group_num' => [
+                'type'              => 'integer',
+                'description'       => "Identifier of the activity group in the booking.",
+                'onupdate'          => 'onupdateActivityGroupNum'
+            ],
+
+            'has_person_with_disability' => [
+                'type'              => 'boolean',
+                'description'       => "At least one person from the group has a disability.",
+                'default'           => false
+            ],
+
+            'bed_linens' => [
+                'type'              => 'boolean',
+                'description'       => "Does the group include a product related to renting bed linens?",
+                'help'              => "Bed linens are always provided when make_beds is true.",
+                'default'           => false
+            ],
+
+            'make_beds' => [
+                'type'              => 'boolean',
+                'description'       => "Does the group include a product related to bed-making at the beginning of the stay?",
+                'help'              => "Bed linens are always provided when make_beds is true.",
+                'default'           => false
+            ]
+
         ];
     }
 
@@ -340,9 +378,11 @@ class BookingLineGroup extends Model {
                     $om->delete(BookingLineGroupAgeRangeAssignment::getType(), $group['age_range_assignments_ids'], true);
 
                     if($group['is_sojourn']) {
+                        $adults_age_range_id = Setting::get_value('sale', 'booking', 'default.age_range_id.adults', 1);
+
                         // create default age_range assignment
                         $assignment = [
-                            'age_range_id'          => 1,                       // adults
+                            'age_range_id'          => $adults_age_range_id,
                             'booking_line_group_id' => $gid,
                             'booking_id'            => $group['booking_id'],
                             'qty'                   => $group['nb_pers']
@@ -360,8 +400,9 @@ class BookingLineGroup extends Model {
     }
 
     public static function onupdateGroupType($om, $ids, $values, $lang) {
-        $groups = $om->read(self::getType(), $ids, ['group_type'], $lang);
+        $groups = $om->read(self::getType(), $ids, ['group_type', 'booking_id'], $lang);
         if($groups > 0) {
+            $map_booking_ids = [];
             foreach($groups as $id => $group) {
                 if($group['group_type'] == 'simple') {
                     $om->update(self::getType(), $id, ['is_sojourn' => false]);
@@ -370,12 +411,27 @@ class BookingLineGroup extends Model {
                 elseif($group['group_type'] == 'sojourn' || $group['group_type'] == 'camp') {
                     $om->update(self::getType(), $id, ['is_sojourn' => true]);
                     $om->update(self::getType(), $id, ['is_event' => false]);
+
+                    if($group['group_type'] == 'camp') {
+                        $map_booking_ids[$group['booking_id']] = true;
+                    }
                 }
                 elseif($group['group_type'] == 'event') {
                     $om->update(self::getType(), $id, ['is_sojourn' => false]);
                     $om->update(self::getType(), $id, ['is_event' => true]);
                 }
             }
+
+            foreach(array_keys($map_booking_ids) as $booking_id) {
+                self::refreshActivityGroupNumber($booking_id);
+            }
+        }
+    }
+
+    public static function onupdateActivityGroupNum($self) {
+        $self->read(['booking_activities_ids']);
+        foreach($self as $group) {
+            BookingActivity::search(['id', 'in', $group['booking_activities_ids']])->update(['group_num' => null]);
         }
     }
 
@@ -511,6 +567,39 @@ class BookingLineGroup extends Model {
         // #memo - this must be done after all other processing and should not alter price_id assignments (but only reset computed fields)
         $om->callonce('sale\booking\BookingLineGroup', '_resetPrices', $oids, [], $lang);
 
+    }
+
+    public static function onupdateOrder($self) {
+        $self->read(['booking_id']);
+
+        $map_booking_ids = [];
+        foreach ($self as $group) {
+            $map_booking_ids[$group['booking_id']] = true;
+        }
+
+        $booking_ids = array_keys($map_booking_ids);
+
+        foreach ($booking_ids as $booking_id) {
+            self::refreshActivityGroupNumber($booking_id);
+        }
+    }
+
+    public static function refreshActivityGroupNumber(int $booking_id) {
+        $booking = Booking::id($booking_id)
+            ->read(['booking_lines_groups_ids' => ['order', 'group_type']])
+            ->first();
+
+        $map_order_group_id = [];
+        foreach($booking['booking_lines_groups_ids'] as $group) {
+            if($group['group_type'] === 'camp') {
+                $map_order_group_id[$group['order']] = $group['id'];
+            }
+        }
+
+        foreach(array_values($map_order_group_id) as $index => $group_id) {
+            BookingLineGroup::id($group_id)
+                ->update(['activity_group_num' => $index + 1]);
+        }
     }
 
     public static function onupdateDateFrom($om, $oids, $values, $lang) {
@@ -1090,6 +1179,27 @@ class BookingLineGroup extends Model {
                         }
                     }
 
+                }
+            }
+        }
+
+        if(isset($values['date_from']) || isset($values['date_to'])) {
+            $groups = $om->read(self::getType(), $oids, ['date_from', 'date_to'], $lang);
+
+            if($groups > 0) {
+                foreach($groups as $id => $group) {
+                    $date_from = $values['date_from'] ?? $group['date_from'];
+                    $date_to = $values['date_to'] ?? $group['date_to'];
+
+                    $outside_dates_activities_ids = BookingActivity::search([
+                        [['booking_line_group_id', '=', $id], ['activity_date', '<', $date_from]],
+                        [['booking_line_group_id', '=', $id], ['activity_date', '>', $date_to]]
+                    ])
+                        ->ids();
+
+                    if(!empty($outside_dates_activities_ids)) {
+                        return ['date_from' => ['invalid_daterange' => 'An scheduled activity is outside of the date range.']];
+                    }
                 }
             }
         }
@@ -2058,9 +2168,6 @@ class BookingLineGroup extends Model {
                                     'is_accomodation'       => $spm['product_model_id.is_accomodation'],
                                     'is_meal'               => false,
                                     'is_activity'           => false,
-                                    'has_provider'          => false,
-                                    'activity_provider_id'  => null,
-                                    'has_staff_required'    => false,
                                     'rental_unit_id'        => $rental_unit_id,
                                     'qty'                   => $assignment['qty'],
                                     'type'                  => 'book'
@@ -2109,7 +2216,61 @@ class BookingLineGroup extends Model {
                 }
             }
 
-            // pass-2 : create consumptions for booking lines targeting non-rental_unit products (any other schedulable product, e.g. meals or activity)
+            // pass-2 : create consumptions for activities rental units products
+            foreach($groups as $gid => $group) {
+                $lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], [
+                    'qty',
+                    'is_activity',
+                    'activity_rental_unit_id',
+                    'product_id.product_model_id',
+                    'booking_activities_ids.activity_date',
+                    'booking_activities_ids.time_slot_id.schedule_from',
+                    'booking_activities_ids.time_slot_id.schedule_to'
+                ],
+                    $lang
+                );
+
+                if($lines > 0 && count($lines)) {
+                    foreach($lines as $lid => $line) {
+                        if(!$line['is_activity'] || !$line['activity_rental_unit_id']) {
+                            continue;
+                        }
+
+                        $activities = [];
+                        foreach($line['booking_activities_ids.activity_date'] as $index => $activity) {
+                            $activities[$index] = ['activity_date' => $activity['activity_date']];
+                        }
+                        foreach($line['booking_activities_ids.time_slot_id.schedule_from'] as $index => $activity) {
+                            $activities[$index]['schedule_from'] = $activity['time_slot_id.schedule_from'];
+                        }
+                        foreach($line['booking_activities_ids.time_slot_id.schedule_to'] as $index => $activity) {
+                            $activities[$index]['schedule_to'] = $activity['time_slot_id.schedule_to'];
+                        }
+
+                        foreach($activities as $activity) {
+                            $consumptions[] = [
+                                'booking_id'            => $group['booking_id'],
+                                'booking_line_group_id' => $gid,
+                                'center_id'             => $group['booking_id.center_id'],
+                                'date'                  => $activity['activity_date'],
+                                'schedule_from'         => $activity['schedule_from'],
+                                'schedule_to'           => $activity['schedule_to'],
+                                'product_model_id'      => $line['product_id.product_model_id'],
+                                'age_range_id'          => null,
+                                'is_rental_unit'        => true,
+                                'is_accomodation'       => false,
+                                'is_meal'               => false,
+                                'is_activity'           => true,
+                                'rental_unit_id'        => $line['activity_rental_unit_id'],
+                                'qty'                   => $line['qty'],
+                                'type'                  => 'book'
+                            ];
+                        }
+                    }
+                }
+            }
+
+            // pass-3 : create consumptions for booking lines targeting non-rental_unit products (any other schedulable product, e.g. meals or activity)
             foreach($groups as $gid => $group) {
 
                 $lines = $om->read(\sale\booking\BookingLine::getType(), $group['booking_lines_ids'], [
@@ -2117,11 +2278,13 @@ class BookingLineGroup extends Model {
                     'qty',
                     'qty_vars',
                     'service_date',
-                    'time_slot_id',
+                    'activity_rental_unit_id',
+                    'product_id',
                     'product_id.product_model_id',
                     'product_id.has_age_range',
                     'product_id.age_range_id',
                     'product_id.description',
+                    'time_slot_id',
                     'time_slot_id.schedule_from',
                     'time_slot_id.schedule_to',
                 ],
@@ -2129,7 +2292,7 @@ class BookingLineGroup extends Model {
 
                 if($lines > 0 && count($lines)) {
 
-                    // read all related product models before hand
+                    // read all related product models beforehand
                     $product_models_ids = array_map(function($oid) use($lines) {return $lines[$oid]['product_id.product_model_id'];}, array_keys($lines));
                     $product_models = $om->read(\sale\catalog\ProductModel::getType(), $product_models_ids, [
                         'type',
@@ -2146,9 +2309,8 @@ class BookingLineGroup extends Model {
                         'is_snack',
                         'is_repeatable',
                         'is_activity',
-                        'has_provider',
-                        'providers_ids',
-                        'has_staff_required'
+                        'is_transport',
+                        'is_supply'
                     ]);
 
                     // create consumptions according to each line product and quantity
@@ -2157,8 +2319,15 @@ class BookingLineGroup extends Model {
                         if($line['qty'] <= 0) {
                             continue;
                         }
-                        // ignore rental units : these are already been handled for the booking (grouped in SPM rental unit assignments)
-                        if($product_models[$line['product_id.product_model_id']]['is_rental_unit']) {
+                        // ignore rental units : these have already been handled for the booking (grouped in SPM rental unit assignments)
+                        // ignore activities : these have already been handled for the booking (rental units of activities)
+                        // ignore transports and supplies : these don't generate consumptions
+                        if(
+                            $product_models[$line['product_id.product_model_id']]['is_rental_unit']
+                            || $product_models[$line['product_id.product_model_id']]['is_activity']
+                            || $product_models[$line['product_id.product_model_id']]['is_transport']
+                            || $product_models[$line['product_id.product_model_id']]['is_supply']
+                        ) {
                             continue;
                         }
 
@@ -2193,13 +2362,6 @@ class BookingLineGroup extends Model {
 
                         $is_meal = $product_models[$line['product_id.product_model_id']]['is_meal'];
                         $is_snack = $product_models[$line['product_id.product_model_id']]['is_snack'];
-                        $is_activity = $product_models[$line['product_id.product_model_id']]['is_activity'];
-                        $has_provider = $product_models[$line['product_id.product_model_id']]['has_provider'];
-                        $activity_provider_id = null;
-                        if(count($product_models[$line['product_id.product_model_id']]['providers_ids']) === 1) {
-                            $activity_provider_id = $product_models[$line['product_id.product_model_id']]['providers_ids'][0];
-                        }
-                        $has_staff_required = $product_models[$line['product_id.product_model_id']]['has_staff_required'];
                         $qty_accounting_method = $product_models[$line['product_id.product_model_id']]['qty_accounting_method'];
 
                         // #memo - number of consumptions differs for accommodations (rooms are occupied nb_nights + 1, until sometime in the morning)
@@ -2278,12 +2440,9 @@ class BookingLineGroup extends Model {
                                 'age_range_id'          => $line['product_id.age_range_id'],
                                 'is_rental_unit'        => false,
                                 'is_accomodation'       => false,
+                                'is_activity'           => false,
                                 'is_meal'               => $is_meal,
                                 'is_snack'              => $is_snack,
-                                'is_activity'           => $is_activity,
-                                'has_provider'          => $has_provider,
-                                'activity_provider_id'  => $activity_provider_id,
-                                'has_staff_required'    => $has_staff_required,
                                 'qty'                   => $days_nb_times[$i],
                                 'type'                  => 'book'
                             ];
@@ -2302,9 +2461,6 @@ class BookingLineGroup extends Model {
                                     $description .= "<p>{$type} / {$pref} : {$preference['qty']} ; </p>";
                                 }
                                 $consumption['description'] = $description;
-                            }
-                            elseif($is_activity) {
-                                $consumption['description'] = $line['product_id.description'];
                             }
                             $consumptions[] = $consumption;
                         }
@@ -2684,6 +2840,51 @@ class BookingLineGroup extends Model {
     public static function updateMealPreferences($om, $ids, $values, $lang) {
         foreach($ids as $id) {
             self::refreshMealPreferences($om, $id);
+        }
+    }
+
+    public static function updateBedLinensAndMakeBeds($om, $oids, $values, $lang) {
+        $ignored_lines_ids = $values['ignored_lines_ids'] ?? [];
+        $groups = $om->read(self::getType(), $oids, ['booking_lines_ids.product_id']);
+
+        $bed_linens_skus = Setting::get_value('sale', 'booking', 'bed-linens.sku', false);
+        if($bed_linens_skus) {
+            $bed_linens_skus = explode(',', $bed_linens_skus);
+        }
+        else {
+            $bed_linens_skus = [];
+        }
+
+        $make_beds_skus = Setting::get_value('sale', 'booking', 'make-beds.sku', false);
+        if($make_beds_skus) {
+            $make_beds_skus = explode(',', $make_beds_skus);
+        }
+        else {
+            $make_beds_skus = [];
+        }
+
+        foreach($groups as $id => $group) {
+            $products_ids = [];
+            foreach($group['booking_lines_ids.product_id'] as $lid => $line) {
+                if(!in_array($lid, $ignored_lines_ids)) {
+                    $products_ids[] = $line['product_id'];
+                }
+            }
+
+            $data = ['bed_linens' => false, 'make_beds' => false];
+
+            $products = $om->read(Product::getType(), $products_ids, ['sku']);
+            foreach($products as $product) {
+                if(in_array($product['sku'], $bed_linens_skus)) {
+                    $data['bed_linens'] = true;
+                }
+                if(in_array($product['sku'], $make_beds_skus)) {
+                    $data['bed_linens'] = true;
+                    $data['make_beds'] = true;
+                }
+            }
+
+            $om->update(self::getType(), $id, $data);
         }
     }
 
@@ -3247,9 +3448,11 @@ class BookingLineGroup extends Model {
             $om->update(self::getType(), $id, ['nb_children' => null]);
 
             if($group['is_sojourn']) {
+                $adults_age_range_id = Setting::get_value('sale', 'booking', 'default.age_range_id.adults', 1);
+
                 // create default age_range assignment (default to 'adult' age range)
                 $assignment = [
-                    'age_range_id'          => 1,
+                    'age_range_id'          => $adults_age_range_id,
                     'booking_line_group_id' => $id,
                     'booking_id'            => $group['booking_id'],
                     'qty'                   => $group['nb_pers']
@@ -3745,7 +3948,8 @@ class BookingLineGroup extends Model {
                     'product_id.product_model_id.duration',
                     'product_id.age_range_id',
                     'is_meal',
-                    'is_accomodation'
+                    'is_accomodation',
+                    'is_snack'
                 ]);
 
                 foreach($lines as $line_id => $line) {
@@ -3766,12 +3970,12 @@ class BookingLineGroup extends Model {
                             $group['sojourn_type_id'] == 2 /*'GG'*/ && $line['is_accomodation']
                         )
                         ||
-                        // for GA: apply discounts on meals and accommodations
+                        // for GA: apply discounts on meals, accommodations and snacks
                         (
                             $group['sojourn_type_id'] == 1 /*'GA'*/
                             &&
                             (
-                                $line['is_accomodation'] || $line['is_meal']
+                                $line['is_accomodation'] || $line['is_meal'] || $line['is_snack']
                             )
                         )
                     ) {

@@ -1,0 +1,83 @@
+{
+    "name": "Bank Check Pending",
+    "description": "This view is intended for displaying the list of Bank Check pending.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "header": {
+        "selection": {
+            "default": false,
+            "actions" : [
+                {
+                    "id": "add_deposit_number_bulk",
+                    "label": "Numéro de remise",
+                    "icon": "update",
+                    "controller": "sale_booking_bankCheck_bulk-deposit-number",
+                    "confirm": true
+                }
+            ]
+        },
+        "actions": {},
+        "layout": {
+        }
+    },
+    "domain" : ["status" , "=" , "pending"],
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "bank_check_number",
+                "width": "20%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "emission_date",
+                "width": "10%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "amount",
+                "width": "10%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "status",
+                "width": "15%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "deposit_number",
+                "width": "20%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "is_voucher",
+                "width": "15%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "funding_id",
+                "width": "15%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "booking_id",
+                "width": "15%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "payment_id",
+                "width": "15%",
+                "sortable": true
+            }
+        ]
+    }
+}

@@ -1,27 +1,20 @@
-import { Component, Inject, OnInit, OnChanges, NgZone, Output, Input, EventEmitter, SimpleChanges, AfterViewInit, ViewChild } from '@angular/core';
-import { AuthService, ApiService, ContextService, TreeComponent } from 'sb-shared-lib';
-
-import { AbstractControl, FormControl, Validators } from '@angular/forms';
-import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-
+import { Component, OnInit, Output, Input, EventEmitter, AfterViewInit } from '@angular/core';
+import { ApiService, TreeComponent } from 'sb-shared-lib';
+import { FormControl, Validators } from '@angular/forms';
 import { BookingLineGroup } from '../../../../_models/booking_line_group.model';
 import { BookingAgeRangeAssignment } from '../../../../_models/booking_agerange_assignment.model';
 import { Booking } from '../../../../_models/booking.model';
-
-import {MatSnackBar} from '@angular/material/snack-bar';
-
 import { debounceTime } from 'rxjs/operators';
 
-
 interface BookingGroupAgeRangeComponentsMap {
-};
+}
 
 @Component({
   selector: 'booking-services-booking-group-agerangeassignment',
   templateUrl: 'agerange.component.html',
   styleUrls: ['agerange.component.scss']
 })
-export class BookingServicesBookingGroupAgeRangeComponent extends TreeComponent<BookingAgeRangeAssignment, BookingGroupAgeRangeComponentsMap> implements OnInit, OnChanges, AfterViewInit  {
+export class BookingServicesBookingGroupAgeRangeComponent extends TreeComponent<BookingAgeRangeAssignment, BookingGroupAgeRangeComponentsMap> implements OnInit, AfterViewInit  {
     // server-model relayed by parent
     @Input() set model(values: any) { this.update(values) }
     @Input() agerange: BookingAgeRangeAssignment;
@@ -34,44 +27,27 @@ export class BookingServicesBookingGroupAgeRangeComponent extends TreeComponent<
     public ready: boolean = false;
 
     public age_range_id: number;
+
+    public ageFromFormControl: FormControl;
+    public ageToFormControl: FormControl;
     public qtyFormControl: FormControl;
 
     constructor(
-            private api: ApiService,
-            private auth: AuthService,
-            private zone: NgZone,
-            private snack: MatSnackBar
-        ) {
+        private api: ApiService
+    ) {
         super( new BookingAgeRangeAssignment() );
-        this.qtyFormControl = new FormControl('', [Validators.required, this.validateQty.bind(this)])
-    }
 
-    private validateQty(c: AbstractControl) {
-        // qty cannot be zero
-        return (this.instance
-            && this.group
-            && c.value > 0) ? null : {
-            validateQty: {
-                valid: false
-            }
-        };
-    }
-
-    public ngOnChanges(changes: SimpleChanges) {
-        if(changes.model) {
-        }
+        this.ageFromFormControl = new FormControl('', [Validators.required, Validators.min(0), Validators.max(99)]);
+        this.ageToFormControl = new FormControl('', [Validators.required, Validators.min(0), Validators.max(99)]);
+        this.qtyFormControl = new FormControl('', [Validators.required, Validators.min(1)]);
     }
 
     public ngAfterViewInit() {
-        // init local componentsMap
-        let map:BookingGroupAgeRangeComponentsMap = {
-        };
-        this.componentsMap = map;
-
         this.age_range_id = this.instance.age_range_id;
+        this.ageFromFormControl.setValue(this.instance.age_from);
+        this.ageToFormControl.setValue(this.instance.age_to);
         this.qtyFormControl.setValue(this.instance.qty);
     }
-
 
     public ngOnInit() {
         this.ready = true;
@@ -82,17 +58,21 @@ export class BookingServicesBookingGroupAgeRangeComponent extends TreeComponent<
                 return;
             }
         });
-
     }
 
-    public async update(values:any) {
+    public async update(values: any) {
         super.update(values);
+
         // assign VM values
+        this.ageFromFormControl.setValue(this.instance.age_from);
+        this.ageToFormControl.setValue(this.instance.age_to);
         this.qtyFormControl.setValue(this.instance.qty);
     }
 
-    public async onupdateAgeRange(age_range:any) {
+    public async onupdateAgeRange(age_range: any) {
         this.age_range_id = age_range.id;
+        this.instance.age_from = age_range.age_from;
+        this.instance.age_to = age_range.age_to;
         /*
         if(this.qtyFormControl.value <= 0) {
             return;
@@ -118,30 +98,70 @@ export class BookingServicesBookingGroupAgeRangeComponent extends TreeComponent<
     }
 
     public async onupdateQty() {
-        if(this.qtyFormControl.value <= 0) {
+        if(this.qtyFormControl.invalid || this.age_range_id <= 0) {
             return;
         }
-        if(this.age_range_id <= 0) {
-            return;
-        }
+
         this.updating.emit(true);
+
         // notify back-end about the change
         try {
             await this.api.fetch('?do=sale_booking_update-sojourn-agerange-set', {
-                    id: this.group.id,
-                    age_range_id: this.age_range_id,
-                    age_range_assignment_id: this.instance.id,
-                    qty: this.qtyFormControl.value
-                });
+                id: this.group.id,
+                age_range_id: this.age_range_id,
+                age_range_assignment_id: this.instance.id,
+                qty: this.qtyFormControl.value
+            });
+
             // relay change to parent component (update nb_pers)
             this.updated.emit();
         }
         catch(response) {
             this.api.errorFeedback(response);
-
         }
+
         this.updating.emit(false);
     }
 
+    public async onupdateAgeFrom() {
+        if(this.ageFromFormControl.invalid) {
+            return;
+        }
 
+        // this.updating.emit(true);
+
+        // notify back-end about the change
+        try {
+            await this.api.update('sale\\booking\\BookingLineGroupAgeRangeAssignment', [this.instance.id], {age_from: this.ageFromFormControl.value});
+
+            // relay change to parent component
+            // this.updated.emit();
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+
+        // this.updating.emit(false);
+    }
+
+    public async onupdateAgeTo() {
+        if(this.ageToFormControl.invalid) {
+            return;
+        }
+
+        // this.updating.emit(true);
+
+        // notify back-end about the change
+        try {
+            await this.api.update('sale\\booking\\BookingLineGroupAgeRangeAssignment', [this.instance.id], {age_to: this.ageToFormControl.value});
+
+            // relay change to parent component
+            // this.updated.emit();
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+
+        // this.updating.emit(false);
+    }
 }

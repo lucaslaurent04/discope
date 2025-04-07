@@ -1,0 +1,62 @@
+{
+    "name": "Stat invoiced products",
+    "description": "",
+    "controller": "sale_booking_stats_stat-accounting",
+    "header": {
+        "actions": {
+            "ACTION.CREATE" : false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "operations": {
+        "total": {
+            "total": {
+                "usage": "amount/money",
+                "operation": "SUM"
+            },
+            "price": {
+                "usage": "amount/money",
+                "operation": "SUM"
+            }
+        }
+    },
+    "group_by": [{"field": "center_office"}],
+    "limit": 500,
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "center_office",
+                "width": "25%"
+            },
+            {
+                "type": "field",
+                "value": "invoice",
+                "width": "25%"
+            },
+            {
+                "type": "field",
+                "value": "qty",
+                "width": "25%"
+            },
+            {
+                "type": "field",
+                "value": "total",
+                "width": "25%",
+                "widget": {
+                    "usage": "amount/money:2"
+                }
+            },
+            {
+                "type": "field",
+                "value": "price",
+                "width": "25%",
+                "widget": {
+                    "usage": "amount/money:2"
+                }
+            }
+        ]
+    }
+}

@@ -9,6 +9,7 @@
 namespace sale\booking;
 
 use equal\orm\Model;
+use hr\employee\Employee;
 
 class BookingActivity extends Model {
 
@@ -21,10 +22,10 @@ class BookingActivity extends Model {
 
             'name' => [
                 'type'              => 'computed',
-                'function'          => 'calcName',
                 'result_type'       => 'string',
                 'store'             => true,
-                'description'       => "The name of the booking activity."
+                'description'       => "The name of the booking activity.",
+                'relation'          => ['activity_booking_line_id' => 'name']
             ],
 
             'activity_booking_line_id' => [
@@ -32,6 +33,8 @@ class BookingActivity extends Model {
                 'foreign_object'    => 'sale\booking\BookingLine',
                 'description'       => "Booking Line of the activity.",
                 'help'              => "Stays empty if the booking_line_id is the main activity.",
+                'readonly'          => true,
+                'required'          => true,
                 'dependents'        =>  ['time_slot_id', 'activity_date', 'product_model_id']
             ],
 
@@ -49,7 +52,7 @@ class BookingActivity extends Model {
                 'description'       => "Booking the activity relates to.",
                 'store'             => true,
                 'instant'           => true,
-                'function'          => 'calcBookingId'
+                'relation'          => ['activity_booking_line_id' => 'booking_id']
             ],
 
             'booking_line_group_id' => [
@@ -59,7 +62,17 @@ class BookingActivity extends Model {
                 'description'       => "Booking line group the activity relates to.",
                 'store'             => true,
                 'instant'           => true,
-                'function'          => 'calcBookingLineGroup'
+                'relation'          => ['activity_booking_line_id' => 'booking_line_group_id']
+            ],
+
+            'providers_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\provider\Provider',
+                'foreign_field'     => 'booking_activities_ids',
+                'rel_table'         => 'sale_booking_bookingactivity_rel_sale_provider_providers',
+                'rel_foreign_key'   => 'provider_id',
+                'rel_local_key'     => 'booking_activity_id',
+                'description'       => 'The assigned providers for the activity, if required by product model.'
             ],
 
             'supplies_booking_lines_ids' => [
@@ -85,11 +98,17 @@ class BookingActivity extends Model {
                 'default'           => 1
             ],
 
+            'counter_total' => [
+                'type'              => 'integer',
+                'description'       => "The total of this type of activity in the booking sojourn for the group.",
+                'default'           => 1
+            ],
+
             'total' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:4',
-                'description'       => 'Total tax-excluded price for all lines (computed).',
+                'description'       => "Total tax-excluded price for all lines (computed).",
                 'function'          => 'calcTotal',
                 'store'             => true
             ],
@@ -97,43 +116,101 @@ class BookingActivity extends Model {
             'price' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
-                'description'       => 'Final tax-included price for all lines (computed).',
+                'description'       => "Final tax-included price for all lines (computed).",
                 'function'          => 'calcPrice',
                 'store'             => true
+            ],
+
+            'is_virtual' => [
+                'type'              => 'boolean',
+                'description'       => "Is the activity related to another for a fullday activity or an activity with a duration.",
+                'help'              => "If true the activity is 'virtual' and no booking_line has a direct link to it. This activity will be mainly used for the planning.",
+                'default'           => false
             ],
 
             'employee_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'hr\employee\Employee',
-                'description'       => "Employee assigned to the supervision of the activity.",
+                'description'       => "Employee assigned to the supervision of the activity."
             ],
 
             'activity_date' => [
                 'type'              => 'computed',
                 'result_type'       => 'date',
-                'description'       => 'Specific day time slot on which the service is delivered.',
+                'description'       => "Specific date on which the service is delivered.",
                 'store'             => true,
-                'relation'          => ['activity_booking_line_id' => ['service_date']]
-            ],
-
-            'product_model_id' => [
-                'type'              => 'computed',
-                'result_type'       => 'many2one',
-                'foreign_object'    => 'sale\catalog\ProductModel',
-                'description'       => 'The product model the activity relates to.',
-                'store'             => true,
-                'relation'          => ['activity_booking_line_id' => ['product_model_id']]
+                'relation'          => ['activity_booking_line_id' => 'service_date'],
+                'onupdate'          => 'onupdateActivityDate'
             ],
 
             'time_slot_id' => [
                 'type'              => 'computed',
                 'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\booking\TimeSlot',
-                'description'       => 'Specific day time slot on which the service is delivered.',
+                'description'       => "Specific day time slot on which the service is delivered.",
                 'store'             => true,
-                'relation'          => ['activity_booking_line_id' => ['time_slot_id']]
+                'relation'          => ['activity_booking_line_id' => 'time_slot_id'],
+                'onupdate'          => 'onupdateTimeSlotId'
+            ],
+
+            'rental_unit_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'realestate\RentalUnit',
+                'description'       => "The rental unit needed for the activity to take place.",
+                'onupdate'          => 'onupdateRentalUnitId'
+            ],
+
+            'product_model_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\catalog\ProductModel',
+                'description'       => "The product model the activity relates to.",
+                'store'             => true,
+                'relation'          => ['activity_booking_line_id' => ['product_model_id']]
+            ],
+
+            'has_staff_required' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'foreign_object'    => 'sale\catalog\ProductModel',
+                'description'       => "Does the activity need an employee to be assigned to it.",
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['product_model_id' => ['has_staff_required']]
+            ],
+
+            'group_num' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'store'             => true,
+                'relation'          => ['booking_line_group_id' => ['activity_group_num']]
+            ],
+
+            'partner_planning_mails_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\booking\PartnerPlanningMail',
+                'foreign_field'     => 'booking_activities_ids',
+                'rel_table'         => 'sale_booking_bookingactivity_rel_partnerplanningmail',
+                'rel_foreign_key'   => 'partner_planning_mail_id',
+                'rel_local_key'     => 'booking_activity_id',
+                'description'       => "Mails that reminded the activities schedules to partners (employee/providers)."
             ]
 
+        ];
+    }
+
+    public static function getActions(): array {
+        return [
+            'reset-prices' => [
+                'description'   => "Reset the prices fields values so they can be re-calculated.",
+                'policies'      => [],
+                'function'      => 'doResetPrices'
+            ],
+            'update-counters' => [
+                'description'   => "Re-calculate the activities counters by group.",
+                'policies'      => [],
+                'function'      => 'doUpdateCounters'
+            ]
         ];
     }
 
@@ -197,6 +274,107 @@ class BookingActivity extends Model {
         return $result;
     }
 
+    public static function onupdateActivityDate($self) {
+        $self->do('update-counters');
+    }
+
+    public static function onupdateTimeSlotId($self) {
+        $self->do('update-counters');
+    }
+
+    public static function onupdateRentalUnitId($self) {
+        $self->read(['activity_booking_line_id', 'rental_unit_id']);
+        foreach($self as $booking_activity) {
+            BookingLine::id($booking_activity['activity_booking_line_id'])
+                ->update(['activity_rental_unit_id' => $booking_activity['rental_unit_id']]);
+        }
+    }
+
+    public static function doResetPrices($self) {
+        // reset computed fields related to price
+        $self->update(['total' => null, 'price' => null]);
+    }
+
+    public static function doUpdateCounters($self) {
+        $self->read(['booking_line_group_id']);
+
+        $mapBookingLineGroupIds = [];
+        foreach($self as $booking_activity) {
+            $mapBookingLineGroupIds[$booking_activity['booking_line_group_id']] = true;
+        }
+        $bookingLineGroupIds = array_keys($mapBookingLineGroupIds);
+
+        foreach($bookingLineGroupIds as $group_id) {
+            $map_activity_product_counter_total = [];
+            $map_activity_counter = [];
+
+            $group_activities = BookingActivity::search(
+                ['booking_line_group_id', '=', $group_id],
+                ['sort' => ['activity_date' => 'asc']]
+            )
+                ->read(['product_model_id', 'activity_date', 'time_slot_id' => ['order']])
+                ->get(true);
+
+            usort($group_activities, function($a, $b) {
+                $date_comp = $a['activity_date'] <=> $b['activity_date'];
+
+                return $date_comp !== 0 ? $date_comp : $a['time_slot_id']['order'] <=> $b['time_slot_id']['order'];
+            });
+
+            foreach($group_activities as $booking_activity) {
+                if(!isset($map_activity_product_counter_total[$booking_activity['product_model_id']])) {
+                    $map_activity_product_counter_total[$booking_activity['product_model_id']] = 0;
+                }
+
+                $map_activity_product_counter_total[$booking_activity['product_model_id']] += 1;
+                $map_activity_counter[$booking_activity['id']] = $map_activity_product_counter_total[$booking_activity['product_model_id']];
+            }
+
+            foreach($group_activities as $booking_activity) {
+                BookingActivity::id($booking_activity['id'])
+                    ->update([
+                        'counter'       => $map_activity_counter[$booking_activity['id']],
+                        'counter_total' => $map_activity_product_counter_total[$booking_activity['product_model_id']]
+                    ]);
+            }
+        }
+    }
+
+    public static function canupdate($self, $values): array {
+        $self->read(['activity_date', 'time_slot_id', 'employee_id', 'product_model_id']);
+        foreach($self as $booking_activity) {
+            $employee_id = array_key_exists('employee_id', $values) ? $values['employee_id'] : $booking_activity['employee_id'];
+            if(is_null($employee_id)) {
+                continue;
+            }
+
+            // #todo - make this check optional (through settings)
+            $employee = Employee::id($employee_id)
+                ->read(['activity_product_models_ids'])
+                ->first();
+
+            if(!in_array($booking_activity['product_model_id'], $employee['activity_product_models_ids'])) {
+                return ['employee_id' => ['not_allowed' => "Employee not qualified for this type of activity."]];
+            }
+
+            $activity_date = $values['activity_date'] ?? $booking_activity['activity_date'];
+            $time_slot_id = $values['time_slot_id'] ?? $booking_activity['time_slot_id'];
+
+            $activities_ids = BookingActivity::search([
+                ['activity_date', '=', $activity_date],
+                ['time_slot_id', '=', $time_slot_id],
+                ['employee_id', '=', $employee_id]
+            ])
+                ->ids();
+
+            if(!empty($activities_ids)) {
+                return ['employee_id' => ['already_assigned' => "An activity is already assigned to this user for that moment."]];
+            }
+        }
+
+        return parent::canupdate($self, $values);
+    }
+
     public static function ondelete($self): void {
         $self->read(['booking_line_group_id', 'booking_lines_ids']);
         foreach($self as $booking_activity) {
@@ -210,10 +388,5 @@ class BookingActivity extends Model {
                     ->update(['booking_lines_ids' => $booking_lines_ids_remove]);
             }
         }
-    }
-
-    public static function _resetPrices($self) {
-        // reset computed fields related to price
-        $self->update(['total' => null, 'price' => null]);
     }
 }

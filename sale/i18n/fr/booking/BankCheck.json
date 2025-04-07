@@ -1,0 +1,53 @@
+{
+    "name": "Chèque bancaire",
+    "plural": "Chèques bancaires",
+    "description": "",
+    "model": {
+        "booking_id": {
+            "label": "Réservation",
+            "description": "La réservation associée au chèque bancaire, si applicable .",
+            "help": ""
+        },
+        "payment_id": {
+            "label": "Paiement",
+            "description": "Le paiement associé au chèque bancaire, si applicable.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Chèque bancaire",
+            "description": "Formulaire de modification par défaut  de un cheque bancaire.",
+            "actions": {
+                "action.transition.add.payment": {
+                    "label": "Ajouter un paiement",
+                    "help": "Un paiement sera enregistré et associé au chèque."
+                },
+                "action.transition.remove.payment": {
+                    "label": "Supprimer le paiement",
+                    "help": "L'association avec le paiement sera supprimée."
+                },
+                "action.transition.delete": {
+                    "label": "Supprimer le chèque",
+                    "help": "Le chèque bancaire sera définitivement supprimé."
+                },
+                "action.transition.reject": {
+                    "label": "Rejeter",
+                    "help": "Marquez le chèque bancaire comme rejeté par la banque."
+                }
+            }
+        },
+        "list.default": {
+            "name": "Tous les chèques bancaires",
+            "description": "Liste de chèques bancaires.",
+            "actions": {}
+        },
+        "list.pending": {
+            "name": "Chèques bancaires en attente",
+            "description": "Liste de chèques bancaires en attente.",
+            "actions": {}
+        }
+
+    },
+    "error": {}
+}

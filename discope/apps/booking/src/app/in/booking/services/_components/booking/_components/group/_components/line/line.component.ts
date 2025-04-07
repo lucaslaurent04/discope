@@ -47,6 +47,10 @@ interface vmModel {
         formControl: FormControl,
         change: () => void
     },
+    meal_location: {
+        formControl: FormControl,
+        change: () => void
+    },
     qty_vars: {
         values: any,
         change: (index: number, event: any) => void,
@@ -114,6 +118,10 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
                 formControl:    new FormControl(),
                 change:         () => this.timeSlotIdChange()
             },
+            meal_location: {
+                formControl:    new FormControl(),
+                change:         () => this.mealLocationIdChange()
+            },
             qty_vars: {
                 values:         {},
                 change:         (index:number, event:any) => this.qtyVarsChange(index, event),
@@ -150,6 +158,15 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
                 for(let val of values) {
                     this.vm.qty_vars.values.push(val);
                 }
+            }
+
+            if(!this.instance.is_activity && !this.instance.is_meal) {
+                this.vm.service_date.formControl.disable();
+                this.vm.time_slot_id.formControl.disable();
+            }
+            else {
+                this.vm.service_date.formControl.enable();
+                this.vm.time_slot_id.formControl.enable();
             }
         }
     }
@@ -188,12 +205,25 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         this.vm.service_date.formControl.setValue(this.instance.service_date.toISOString().split('T')[0]);
         // time_slot_id
         this.vm.time_slot_id.formControl.setValue(this.instance.time_slot_id);
+        // meal_location
+        this.vm.meal_location.formControl.setValue(this.instance.meal_location);
+        if(!this.instance.is_activity && !this.instance.is_meal) {
+            this.vm.service_date.formControl.disable();
+            this.vm.time_slot_id.formControl.disable();
+        }
+        else {
+            this.vm.service_date.formControl.enable();
+            this.vm.time_slot_id.formControl.enable();
+        }
         // qty_vars
         if(this.instance.qty_vars && this.instance.qty_vars.length) {
             this.vm.qty_vars.values = JSON.parse(this.instance.qty_vars);
         }
         if(!this.instance.price_id) {
             this.vm.product.formControl.setErrors({'missing_price': 'Pas de liste de prix pour ce produit.'});
+        }
+        else {
+            this.vm.product.formControl.setErrors(null);
         }
     }
 
@@ -311,6 +341,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
             this.updated.emit();
         }
         catch(response) {
+            this.vm.service_date.formControl.setValue(this.instance.service_date.toISOString().split('T')[0]);
             this.api.errorFeedback(response);
         }
     }
@@ -327,6 +358,24 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
             this.updated.emit();
         }
         catch(response) {
+            this.vm.time_slot_id.formControl.setValue(this.instance.time_slot_id);
+            this.api.errorFeedback(response);
+        }
+    }
+
+    public async mealLocationIdChange() {
+        if(this.instance.meal_location == this.vm.meal_location.formControl.value) {
+            return;
+        }
+
+        // notify back-end about the change
+        try {
+            await this.api.update(this.instance.entity, [this.instance.id], {meal_location: this.vm.meal_location.formControl.value});
+            // relay change to parent component
+            this.updated.emit();
+        }
+        catch(response) {
+            this.vm.meal_location.formControl.setValue(this.instance.meal_location);
             this.api.errorFeedback(response);
         }
     }
@@ -392,19 +441,20 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         let filtered:any[] = [];
         try {
             let domain = [
-                ["is_pack", "=", false]
-            ];
+                    ['is_pack', '=', false],
+                    ['is_activity', '=', false]
+                ];
 
             if(name && name.length) {
-                domain.push(["name", "ilike", '%'+name+'%']);
+                domain.push(['name', 'ilike', '%'+name+'%']);
             }
 
             const data:any[] = await this.api.fetch('?get=sale_catalog_product_collect', {
-                center_id: this.booking.center_id.id,
-                domain: JSON.stringify(domain),
-                date_from: this.booking.date_from.toISOString(),
-                date_to: this.booking.date_to.toISOString()
-            });
+                    center_id: this.booking.center_id.id,
+                    domain: JSON.stringify(domain),
+                    date_from: this.booking.date_from.toISOString(),
+                    date_to: this.booking.date_to.toISOString()
+                });
             filtered = data;
         }
         catch(response) {

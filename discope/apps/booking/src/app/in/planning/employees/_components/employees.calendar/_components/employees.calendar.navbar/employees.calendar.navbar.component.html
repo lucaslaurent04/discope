@@ -1,34 +1,67 @@
 <div class="panelFilters">
-
-    <!--
-    <div>
+    <div class="partners-selector">
         <mat-form-field>
-        <mat-select name="capacity" [ngModel]="capacity" (selectionChange)="onCapacityChange($event)">
-            <mat-option value="0">-- All room --</mat-option>
-            <mat-option value="1">Single</mat-option>
-            <mat-option value="2">Double</mat-option>
-            <mat-option value="3">Triple</mat-option>
-        </mat-select>
-        </mat-form-field>
-    </div>
-    -->
-    <div class="centers-selector">
-        <mat-form-field>
-            <mat-select
-                    #centerSelector multiple
-                    [(ngModel)]="selected_centers_ids"
-                    panelClass="centers-selector"
-                    [disableOptionCentering]="true"
-                    (closed)="onchangeSelectedCenters()"
-                    (selectionChange)="onchangeSelectedCenters()">
-                <mat-optgroup [label]="'Sélection'">&nbsp;<a style="cursor: pointer;" (click)="onclickSelectAllCenters()">Tous</a> &nbsp; <a style="cursor: pointer;" (click)="onclickUnselectAllCenters()">Aucun</a> &nbsp; <a style="cursor: pointer;" (click)="onclickSelectGA()">GA</a> &nbsp; <a style="cursor: pointer;" (click)="onclickSelectGG()">GG</a></mat-optgroup>
-                <mat-option *ngFor="let center of centers" [value]="center.id" >{{center.name}}</mat-option>
+            <mat-select #partnerSelector
+                        multiple
+                        [(ngModel)]="selected_partners_ids"
+                        panelClass="partners-selector"
+                        [disableOptionCentering]="true"
+                        (closed)="onchangeSelectedPartners()"
+                        (selectionChange)="onchangeSelectedPartners()"
+            >
+                <mat-optgroup [label]="'Sélection'">
+                    &nbsp; <a style="cursor: pointer;" (click)="onclickSelectAllPartners()">Tous</a>
+                    &nbsp; <a style="cursor: pointer;" (click)="onclickUnselectAllPartners()">Aucun</a>
+                    &nbsp; <a style="cursor: pointer;" (click)="onclickSelectInternal()">Interne</a>
+                    &nbsp; <a style="cursor: pointer;" (click)="onclickSelectExternal()">Externe</a>
+                </mat-optgroup>
+                <ng-container *ngFor="let partner of partners; let i = index">
+                    <mat-divider *ngIf="i > 0 && partners[i-1].relationship !== partner.relationship"></mat-divider>
+                    <mat-option [value]="partner.id">
+                        {{partner.name}}
+                    </mat-option>
+                </ng-container>
             </mat-select>
         </mat-form-field>
+    </div>
+    <div class="product-model-selector">
+        <mat-form-field>
+            <mat-select #productModelSelector
+                        [formControl]="vm.product_model_code"
+                        panelClass="product-model-selector"
+            >
+                <mat-optgroup [label]="'Catégories'">
+                    <mat-slide-toggle [formControl]="vm.show_only_transport" style="margin-left: 30px; margin-top: 10px; transform: scale(0.8);">
+                        Avec transport
+                    </mat-slide-toggle>
+                    <mat-option style="padding: 0 15px; width: 100%; display: flex;" [disabled]="true">
+                        <input placeholder="Filtrer" style="width: 100%; border-radius: 5px; padding-left: 5px;" [formControl]="vm.filter_product_models">
+                        <button *ngIf="vm.filter_product_models.value.length > 0"
+                                mat-icon-button
+                                style="position: absolute; top: 0; right: 5px; transform: scale(0.6);background: none; border: none; cursor: pointer; color: #393939;"
+                                (click)="vm.filter_product_models.setValue('');"
+                        >
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    </mat-option>
+                    <mat-option *ngFor="let category of displayedProductModelCategories" [value]="'cat_'+category.id">
+                        {{category.name}}
+                    </mat-option>
+                    <mat-option *ngIf="displayedProductModelCategories.length === 0" [disabled]="true">Aucune</mat-option>
+                </mat-optgroup>
+                <mat-optgroup [label]="'Modèles de produit (' + selectedProductCategory.name + ')'">
+                    <mat-option *ngFor="let model of displayedProductModels" [value]="'mod_'+model.id">
+                        {{model.name}}
+                    </mat-option>
+                    <mat-option *ngIf="displayedProductModels.length === 0" [disabled]="true">Aucun</mat-option>
+                </mat-optgroup>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div class="info-settings">
         <button mat-icon-button (click)="onOpenLegendDialog()"><mat-icon>info</mat-icon></button>
         <button mat-icon-button (click)="onOpenPrefDialog()"><mat-icon>settings</mat-icon></button>
     </div>
-
 </div>
 
 <div class="panelStatus">
@@ -96,7 +129,7 @@
 
 <div class="overlay">
     <div class="rental-unit-details">
-        <span *ngIf="employee">{{employee.name}} ({{employee.capacity}})</span>
+        <span *ngIf="partner">{{partner.name}} ({{partner.relationship === 'employee' ? 'Employé' : 'Prestataire'}})</span>
     </div>
     <div class="consumption-details">
         <span *ngIf="activity">

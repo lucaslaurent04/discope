@@ -39,11 +39,11 @@
             "help": ""
         },
         "sales.providers": {
-            "label": "Prestaires",
+            "label": "Prestataires",
             "help": ""
         },
         "sales.providers.all": {
-            "label": "Tous les Prestaires",
+            "label": "Tous les prestataires",
             "help": ""
         },
         "sales.customers": {
@@ -198,6 +198,10 @@
             "label": "Tranches horaires",
             "help": ""
         },
+        "sales.catalog.groupingCode": {
+            "label": "Regroupement",
+            "help": ""
+        },
         "sales.settings": {
             "label": "Paramètres",
             "help": ""
@@ -256,6 +260,10 @@
         },
         "sales.settings.payments_terms": {
             "label": "Conditions de paiement",
+            "help": ""
+        },
+        "sales.settings.financial_helps": {
+            "label": "Aides financières",
             "help": ""
         },
         "pos": {
@@ -368,6 +376,30 @@
         },
         "communication.alert.message_models": {
             "label": "Modèles de message",
+            "help": ""
+        },
+        "hr": {
+            "label": "Resources humaines",
+            "help": ""
+        },
+        "hr.employee": {
+            "label": "Employés",
+            "help": ""
+        },
+        "hr.employee.all" : {
+            "label": "Tous",
+            "help": ""
+        },
+        "hr.absences": {
+            "label": "Absences",
+            "help": ""
+        },
+        "hr.absences.all": {
+            "label": "Toutes",
+            "help": ""
+        },
+        "hr.absences.codes": {
+            "label": "Codes",
             "help": ""
         },
         "settings.scheduler": {
@@ -536,6 +568,38 @@
         },
         "guest.items.settings": {
             "label": "Hôtes",
+            "help": ""
+        },
+        "tasks": {
+            "label": "Suivi de tâches",
+            "help": ""
+        },
+        "tasks.events": {
+            "label": "Evénements",
+            "help": ""
+        },
+        "tasks.models": {
+            "label": "Modèles",
+            "help": ""
+        },
+        "tasks.tasks": {
+            "label": "Tâches",
+            "help": ""
+        },
+        "tasks.booking-tasks": {
+            "label": "Tâches réservation",
+            "help": ""
+        },
+        "tasks.booking-tasks.events": {
+            "label": "Evénements",
+            "help": ""
+        },
+        "tasks.booking-tasks.models": {
+            "label": "Modèles",
+            "help": ""
+        },
+        "tasks.booking-tasks.tasks": {
+            "label": "Tâches",
             "help": ""
         }
     }

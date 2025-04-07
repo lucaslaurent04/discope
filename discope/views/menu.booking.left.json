@@ -213,6 +213,28 @@
                             "entity": "identity\\Partner",
                             "view": "list.default"
                         }
+                    },
+                    {
+                        "id": "item.customers.all",
+                        "type": "entry",
+                        "label": "All customer",
+                        "description": "",
+                        "route": "/bookings",
+                        "context": {
+                            "entity": "sale\\customer\\Customer",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "item.customers.points",
+                        "type": "entry",
+                        "label": "All Points",
+                        "description": "",
+                        "route": "/bookings",
+                        "context": {
+                            "entity": "sale\\booking\\BookingPoint",
+                            "view": "list.default"
+                        }
                     }
                 ]
             },
@@ -332,6 +354,37 @@
                                 "context": {
                                     "entity": "sale\\booking\\consumption\\stat-meals",
                                     "view": "list.default"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "item.planning.partners",
+                        "label": "Relations",
+                        "icon": "handshake",
+                        "description": "",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "item.planning.partners.employees",
+                                "type": "entry",
+                                "label": "Employés",
+                                "description": "",
+                                "route": "/bookings",
+                                "context": {
+                                    "entity": "sale\\booking\\partnerPlanning-collect",
+                                    "view": "list.employee"
+                                }
+                            },
+                            {
+                                "id": "item.planning.partners.providers",
+                                "type": "entry",
+                                "label": "Prestataires",
+                                "description": "",
+                                "route": "/bookings",
+                                "context": {
+                                    "entity": "sale\\booking\\partnerPlanning-collect",
+                                    "view": "list.provider"
                                 }
                             }
                         ]

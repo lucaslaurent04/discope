@@ -666,6 +666,17 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "id": "sales.catalog.groupingCode",
+                                "type": "entry",
+                                "icon": "group",
+                                "label": "Grouping Code",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\catalog\\GroupingCode",
+                                    "view": "list.default"
+                                }
                             }
                         ]
                     },
@@ -799,7 +810,17 @@
                                 "label": "Payment terms",
                                 "description": "",
                                 "context": {
-                                        "entity": "sale\\pay\\PaymentTerms",
+                                    "entity": "sale\\pay\\PaymentTerms",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "sales.settings.financial_helps",
+                                "type": "entry",
+                                "label": "Financial helps",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\FinancialHelp",
                                     "view": "list.default"
                                 }
                             }
@@ -1149,13 +1170,100 @@
                                 }
                             },
                             {
-                                "id": "hr.absences.all",
+                                "id": "hr.absences.codes",
                                 "type": "entry",
                                 "label": "Absence codes",
                                 "description": "",
                                 "context": {
                                     "entity": "hr\\absence\\Code",
                                     "view": "list.default"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "tasks",
+                "label": "Tasks",
+                "description": "",
+                "icon": "task",
+                "type": "parent",
+                "children": [
+                    {
+                        "id": "tasks.events",
+                        "type": "entry",
+                        "label": "Events",
+                        "description": "",
+                        "icon": "event",
+                        "context": {
+                            "entity": "core\\followup\\TaskEvent",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "tasks.models",
+                        "type": "entry",
+                        "label": "Models",
+                        "description": "",
+                        "icon": "description",
+                        "context": {
+                            "entity": "core\\followup\\TaskModel",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "tasks.tasks",
+                        "type": "entry",
+                        "label": "Tasks",
+                        "description": "",
+                        "icon": "task",
+                        "context": {
+                            "entity": "core\\followup\\Task",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "tasks.booking-tasks",
+                        "label": "Booking tasks",
+                        "description": "",
+                        "icon": "task",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "tasks.booking-tasks.events",
+                                "type": "entry",
+                                "label": "Events",
+                                "description": "",
+                                "icon": "event",
+                                "context": {
+                                    "entity": "sale\\booking\\followup\\TaskEvent",
+                                    "view": "list.default",
+                                    "domain": ["entity", "=", "sale\\booking\\Booking"]
+                                }
+                            },
+                            {
+                                "id": "tasks.booking-tasks.models",
+                                "type": "entry",
+                                "label": "Models",
+                                "description": "",
+                                "icon": "description",
+                                "context": {
+                                    "entity": "sale\\booking\\followup\\TaskModel",
+                                    "view": "list.default",
+                                    "domain": ["entity", "=", "sale\\booking\\Booking"]
+                                }
+                            },
+                            {
+                                "id": "tasks.booking-tasks.tasks",
+                                "type": "entry",
+                                "label": "Tasks",
+                                "description": "",
+                                "icon": "task",
+                                "context": {
+                                    "entity": "sale\\booking\\followup\\Task",
+                                    "view": "list.default",
+                                    "domain": ["entity", "=", "sale\\booking\\Booking"]
                                 }
                             }
                         ]

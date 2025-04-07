@@ -485,6 +485,20 @@ class Booking extends Model {
                 'description'       => "The consumptions meter readings  relates to Booking.."
             ],
 
+            'booking_activities_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\BookingActivity',
+                'foreign_field'     => 'booking_id',
+                'description'       => "The booking activities that refer to the booking."
+            ],
+
+            'tasks_ids' => [
+                'type'              => 'one2many',
+                'foreign_field'     => 'booking_id',
+                'foreign_object'    => 'sale\booking\followup\Task',
+                'description'       => "Follow up tasks that are associated with the booking."
+            ]
+
         ];
     }
 
@@ -612,23 +626,27 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcNbPers($om, $oids, $lang) {
+    public static function calcNbPers($self) {
         $result = [];
-        $bookings = $om->read(self::getType(), $oids, ['booking_lines_groups_ids']);
+        $self->read(['booking_lines_groups_ids' => ['nb_pers', 'is_autosale', 'is_extra', 'is_sojourn']]);
+        foreach($self as $id => $booking) {
+            $nb_pers = 0;
 
-        if($bookings > 0) {
-            foreach($bookings as $bid => $booking) {
-                $result[$bid] = 0;
-                $groups = $om->read(\sale\booking\BookingLineGroup::getType(), $booking['booking_lines_groups_ids'], ['nb_pers', 'is_autosale', 'is_extra', 'is_sojourn']);
-                if($groups > 0) {
-                    foreach($groups as $group_id => $group) {
-                        if($group['is_sojourn'] && !$group['is_autosale'] && !$group['is_extra']) {
-                            $result[$bid] += $group['nb_pers'];
-                        }
-                    }
+            foreach($booking['booking_lines_groups_ids'] as $group) {
+                if($group['is_sojourn'] && !$group['is_autosale'] && !$group['is_extra']) {
+                    $nb_pers += $group['nb_pers'];
                 }
             }
+
+            if($nb_pers === 0) {
+                foreach($booking['booking_lines_groups_ids'] as $group) {
+                    $nb_pers += $group['nb_pers'];
+                }
+            }
+
+            $result[$id] = $nb_pers;
         }
+
         return $result;
     }
 
@@ -914,6 +932,22 @@ class Booking extends Model {
                 if($booking['status'] == 'confirmed') {
                     $om->update(self::getType(), $id, ['has_contract' => true], $lang);
                 }
+
+                if($booking['status'] == 'balanced') {
+                    $has_points_applied = false;
+                    $bookingPoint = BookingPoint::search(['booking_id', '=', $id])->read(['id', 'booking_apply_id'])->first();
+
+                    if($bookingPoint && $bookingPoint['booking_apply_id']) {
+                        $has_points_applied = true;
+                    }
+                    if(!$has_points_applied) {
+                        // remove any previous points related to the booking
+                        BookingPoint::search(['booking_id', '=', $id])->delete(true);
+                        BookingPoint::create(['booking_id' => $id]);
+                    }
+                }
+
+                \eQual::run('do', 'sale_booking_followup_generate-task-status-change', ['booking_id' => $id]);
             }
         }
     }
@@ -1384,11 +1418,22 @@ class Booking extends Model {
         return null;
     }
 
-
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Resets `total` and `price` computed fields.
+     */
     public static function refreshPrice($om, $id) {
         $om->update(self::getType(), $id, ['total' => null, 'price' => null]);
     }
 
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Resets `date_from`, `date_to`, `time_from` and `time_to` computed fields.
+     */
     public static function refreshDate($om, $id) {
         $bookings = $om->read(self::getType(), $id, ['booking_lines_groups_ids.group_type']);
 
@@ -1414,14 +1459,32 @@ class Booking extends Model {
         $om->update(self::getType(), $id, ['date_from' => null, 'date_to' => null, 'time_from' => null, 'time_to' => null]);
     }
 
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Resets `time_from` and `time_to` computed fields.
+     */
     public static function refreshTime($om, $id) {
         $om->update(self::getType(), $id, ['time_from' => null, 'time_to' => null]);
     }
 
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Resets `nb_pers` field.
+     */
     public static function refreshNbPers($om, $id) {
         $om->update(self::getType(), $id, ['nb_pers' => null]);
     }
 
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Recomputes `type_id`.
+     */
     public static function refreshBookingType($om, $id) {
 
         $bookings = $om->read(self::getType(), $id, [

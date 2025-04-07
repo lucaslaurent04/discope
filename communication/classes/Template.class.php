@@ -45,7 +45,7 @@ class Template extends Model {
 
             'type' => [
                 'type'              => 'string',
-                'selection'         => [ 'quote', 'option', 'contract', 'funding', 'invoice', 'guest' ],
+                'selection'         => [ 'quote', 'option', 'contract', 'funding', 'invoice', 'guest', 'planning' ],
                 'description'       => 'The context in which the template is meant to be used.',
                 'onupdate'          => 'onupdateType'
             ],

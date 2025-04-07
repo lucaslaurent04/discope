@@ -92,6 +92,11 @@
             "label": "Repas",
             "description": "La ligne de réservation se rapporte à un repas.",
             "help": ""
+        },
+        "is_snack": {
+            "label": "Collation",
+            "description": "La ligne de réservation se rapporte à une collation",
+            "help": "La ligne de réservation se rapporte à une collation"
         }
     },
     "view": {

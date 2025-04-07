@@ -1,0 +1,27 @@
+{
+    "name": "stock",
+    "depends_on": [
+        "core",
+        "identity"
+    ],
+    "apps": [
+        {
+            "id": "stock",
+            "name": "Stock",
+            "extends": "app",
+            "description": "",
+            "icon": "inventory",
+            "color": "#8F6019",
+            "access": {
+                "groups": [
+                    "admins"
+                ]
+            },
+            "params": {
+                "menus": {
+                    "left": "stock.left"
+                }
+            }
+        }
+    ]
+}

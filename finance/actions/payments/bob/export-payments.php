@@ -22,7 +22,7 @@ list($params, $providers) = eQual::announce([
         ]
     ],
     'access'        => [
-        'groups' => ['finance.default.user'],
+        'groups'        => ['finance.default.user'],
     ],
     'response'      => [
         'charset'       => 'utf-8',

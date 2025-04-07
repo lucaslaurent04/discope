@@ -54,6 +54,22 @@ class BookingLineGroupAgeRangeAssignment extends Model {
                 'description'       => 'Age range assigned to booking group.',
                 'ondelete'          => 'null',
                 'onupdate'          => 'onupdateAgeRangeId'
+            ],
+
+            'age_from' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => "Age for the lower bound (included).",
+                'store'             => true,
+                'relation'          => ['age_range_id' => ['age_from']],
+            ],
+
+            'age_to' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => "Age for the upper bound (excluded).",
+                'store'             => true,
+                'relation'          => ['age_range_id' => ['age_to']],
             ]
 
         ];

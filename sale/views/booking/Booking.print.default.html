@@ -127,6 +127,21 @@ hr {
     page-break-after: always;
     border: 0;
 }
+
+.signature-container {
+    max-width: 200px;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+    float: right;
+}
+
+.signature-container img {
+    max-width: 200px;
+    width: 100%;
+    height: auto;
+    display: block;
+}
 </style>
 
 </head>
@@ -231,7 +246,7 @@ hr {
 
 <div class="inner">
     <div class="intro">
-        {{ quote_header_html | raw }}
+        {{ header_html | raw }}
     </div>
     <div class="wrapper">
         <table width="100%" cellpadding="4" cellspacing="0">
@@ -478,6 +493,71 @@ hr {
     </div>
     {% endif %}
 {% endif %}
+
+{% if has_activity %}
+    {% if activities_map | length > 0 %}
+        <b>{{i18n['activities_details']}}:</b>
+        {% for group, dates in activities_map %}
+        <div style="position: relative; margin-top: 30px; margin-bottom: 30px; page-break-inside: avoid;">
+            <table style="border: solid 1px black; border-collapse: collapse; width: 100%;" border="1">
+                <tr>
+                    <th colspan="3" style="text-align: center;">{{ group }}</th>
+                </tr>
+                <tr>
+                    <td style="text-align: center; width: 25%;"><b>{{i18n['day']}}</b></td>
+                    <td style="text-align: center; width: 25%"><b>{{i18n['time_slot']}}</b></td>
+                    <td style="text-align: center; width: 50%"><b>{{i18n['activity']}}</b></td>
+                </tr>
+                {% for date, details in dates %}
+                    <tr>
+                        <td style="text-align: center;" rowspan="{{ details.time_slots | length }}">{{ date }}</td>
+                        {% set first = true %}
+                        {% for time_slot, activity in details.time_slots %}
+                            {% if not first %}<tr>{% endif %}
+                                <td style="text-align: center;">{{ time_slot }}</td>
+                                <td style="text-align: left;">{{ activity ?: '' }}</td>
+                            </tr>
+                            {% set first = false %}
+                        {% endfor %}
+                {% endfor %}
+            </table>
+        </div>
+        {% endfor %}
+    {% endif %}
+{% endif %}
+
+
+{% if has_footer %}
+    <div>
+        {{ footer_html|raw }}
+    </div>
+
+    <div class="signature-container">
+        {{ signature|raw }}
+    </div>
+
+{% endif %}
+
+{% if is_agreement_html %}
+    <table style="border: solid 1px black;border-collapse: collapse;  width: 100%; clear: both;">
+        <tr>
+            <td class="title" style="background-color: rgb(204, 204, 204); text-align: center; text-transform: uppercase;  border: 1px solid black; padding: 5px;">
+                <strong>{{i18n['title_agreement']}}</strong>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 5px;">{{i18n['date_and_signature']}}:  </td>
+        </tr>
+        <tr>
+            <td style="height:75px;"></td>
+        </tr>
+        <tr>
+            <td style="font-style: italic; padding:5px; vertical-align: sub;">{{ agreement_html | raw }}</td>
+        </tr>
+    </table>
+{% endif %}
+
+
 
 </body>
 </html>

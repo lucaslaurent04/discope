@@ -7,6 +7,8 @@ export class BookingAgeRangeAssignment {
     constructor(
         public id: number = 0,
         public age_range_id: any = {},
-        public qty: number = 0
+        public qty: number = 0,
+        public age_from: number = 0,
+        public age_to: number = 0
     ) {}
 }

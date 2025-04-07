@@ -11,7 +11,7 @@ use identity\User;
 use realestate\RentalUnit;
 use sale\booking\Booking;
 
-list($params, $providers) = announce([
+[$params, $providers] = announce([
     'description'   => 'Advanced search for Consumptions of the clean rooms: returns a collection of Consumptions according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
@@ -40,7 +40,8 @@ list($params, $providers) = announce([
             'selection'         => [
                 'all',
                 'daily',
-                'full'
+                'full',
+                'none'
             ],
             'default'           => 'all'
         ],
@@ -48,7 +49,7 @@ list($params, $providers) = announce([
             'type'              => 'boolean',
             'description'       => 'Discard quote and option bookings.',
             'default'           =>  true
-        ],
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -66,7 +67,6 @@ list($params, $providers) = announce([
 ['context' => $context, 'orm' => $orm, 'auth' => $auth] = $providers;
 
 $domain = $params['domain'];
-
 
 if(isset($params['center_id']) && $params['center_id'] > 0) {
     // add constraint on center_id

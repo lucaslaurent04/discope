@@ -73,10 +73,11 @@ class Product extends Model {
 
             'product_model_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => ProductModel::getType(),
+                'foreign_object'    => 'sale\catalog\ProductModel',
                 'description'       => "Product Model of this variant.",
                 'required'          => true,
-                'onupdate'          => 'onupdateProductModelId'
+                'onupdate'          => 'onupdateProductModelId',
+                'dependents'        => ['has_own_price', 'is_pack', 'is_rental_unit', 'is_meal', 'is_snack', 'is_activity', 'is_transport', 'is_supply']
             ],
 
             'family_id' => [
@@ -88,16 +89,23 @@ class Product extends Model {
             'is_pack' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
-                'function'          => 'calcIsPack',
+                'relation'          => ['product_model_id' => 'is_pack'],
                 'description'       => 'Is the product a pack? (from model).',
                 'store'             => true,
                 'readonly'          => true
             ],
 
+            'is_locked' => [
+                'type'              => 'boolean',
+                'description'       => 'Is the pack static? (cannot be modified).',
+                'default'           => false,
+                'visible'           => [ ['is_pack', '=', true] ]
+            ],
+
             'has_own_price' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
-                'function'          => 'calcHasOwnPrice',
+                'relation'          => ['product_model_id' => 'has_own_price'],
                 'description'       => 'Product is a pack with its own price (from model).',
                 'visible'           => ['is_pack', '=', true],
                 'store'             => true,
@@ -120,11 +128,53 @@ class Product extends Model {
                 'ondetach'          => 'delete'
             ],
 
-            'is_locked' => [
-                'type'              => 'boolean',
-                'description'       => 'Is the pack static? (cannot be modified).',
-                'default'           => false,
-                'visible'           => [ ['is_pack', '=', true] ]
+            'is_rental_unit' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'relation'          => ['product_model_id' => 'is_rental_unit'],
+                'store'             => true
+            ],
+
+            'is_meal' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'relation'          => ['product_model_id' => 'is_meal'],
+                'store'             => true
+            ],
+
+            'is_snack' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'relation'          => ['product_model_id' => 'is_snack'],
+                'store'             => true
+            ],
+
+            'is_activity' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'relation'          => ['product_model_id' => 'is_activity'],
+                'store'             => true
+            ],
+
+            'is_transport' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'relation'          => ['product_model_id' => 'is_transport'],
+                'store'             => true
+            ],
+
+            'is_supply' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'relation'          => ['product_model_id' => 'is_supply'],
+                'store'             => true
+            ],
+
+            'is_fullday' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'relation'          => ['product_model_id' => 'is_fullday'],
+                'store'             => true
             ],
 
             // if the organisation uses price-lists, the price to use depends on the applicable
@@ -147,7 +197,7 @@ class Product extends Model {
 
             'can_buy' => [
                 'type'              => 'boolean',
-                'description'       => "Can this product be purchassed?",
+                'description'       => "Can this product be purchased?",
                 'default'           => false
             ],
 
@@ -187,49 +237,43 @@ class Product extends Model {
                 'visible'           => [ ['has_age_range', '=', true] ]
             ],
 
+            'grouping_code_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\catalog\GroupingCode',
+                'function'          => 'calcGroupingCode',
+                'description'       => "Specific GroupingCode this Product related to, if any",
+                'instant'           => true,
+                'store'             => true
+            ]
         ];
     }
 
+
+    public static function calcGroupingCode($om, $oids, $lang) {
+        $result = [];
+        $lines = $om->read(self::getType(), $oids, [
+            'product_model_id.grouping_code_id'
+        ]);
+        if($lines > 0 && count($lines)) {
+            foreach($lines as $oid => $odata) {
+                $result[$oid] = $odata['product_model_id.grouping_code_id'];
+            }
+        }
+        return $result;
+    }
     /**
      * Computes the display name of the product as a concatenation of Label and SKU.
      *
      */
-    public static function calcName($om, $oids, $lang) {
+    public static function calcName($om, $ids, $lang) {
         $result = [];
-        $res = $om->read(get_called_class(), $oids, ['label', 'sku'], $lang);
-        foreach($res as $oid => $odata) {
+        $res = $om->read(get_called_class(), $ids, ['label', 'sku'], $lang);
+        foreach($res as $id => $odata) {
             if( (isset($odata['label']) && strlen($odata['label']) > 0 ) || (isset($odata['sku']) && strlen($odata['sku']) > 0) ) {
-                $result[$oid] = "{$odata['label']} ({$odata['sku']})";
+                $result[$id] = "{$odata['label']} ({$odata['sku']})";
             }
         }
-        return $result;
-    }
-
-    public static function calcIsPack($om, $oids, $lang) {
-        $result = [];
-
-        $res = $om->read(get_called_class(), $oids, ['product_model_id.is_pack']);
-
-        if($res > 0 && count($res)) {
-            foreach($res as $oid => $odata) {
-                $result[$oid] = $odata['product_model_id.is_pack'];
-            }
-        }
-
-        return $result;
-    }
-
-    public static function calcHasOwnPrice($om, $oids, $lang) {
-        $result = [];
-
-        $res = $om->read(get_called_class(), $oids, ['product_model_id.has_own_price']);
-
-        if($res > 0 && count($res)) {
-            foreach($res as $oid => $odata) {
-                $result[$oid] = (bool) $odata['product_model_id.has_own_price'];
-            }
-        }
-
         return $result;
     }
 
@@ -249,12 +293,10 @@ class Product extends Model {
         $om->update(self::getType(), $ids, ['name' => null], $lang);
     }
 
-    public static function onupdateProductModelId($om, $oids, $values, $lang) {
-        $products = $om->read(get_called_class(), $oids, ['product_model_id.can_sell', 'product_model_id.groups_ids', 'product_model_id.family_id']);
-        foreach($products as $pid => $product) {
-            $om->write(get_called_class(), $pid, [
-                'is_pack'       => null,
-                'has_own_price' => null,
+    public static function onupdateProductModelId($om, $ids, $values, $lang) {
+        $products = $om->read(get_called_class(), $ids, ['product_model_id.can_sell', 'product_model_id.groups_ids', 'product_model_id.family_id']);
+        foreach($products as $id => $product) {
+            $om->update(self::getType(), $id, [
                 'can_sell'      => $product['product_model_id.can_sell'],
                 'groups_ids'    => $product['product_model_id.groups_ids'],
                 'family_id'     => $product['product_model_id.family_id']

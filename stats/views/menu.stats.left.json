@@ -20,6 +20,16 @@
                         "description": "",
                         "children": [
                             {
+                                "id": "stats.booking.total_bookings.generalRevenue",
+                                "type": "entry",
+                                "label": "CA général",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\stats\\stat-general-revenue",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
                                 "id": "stats.booking.total_bookings.revenue",
                                 "type": "entry",
                                 "label": "CA facturé",
@@ -66,6 +76,16 @@
                                 "description": "",
                                 "context": {
                                     "entity": "sale\\booking\\stats\\stat-products",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.booking.total_bookings.accounting",
+                                "type": "entry",
+                                "label": "CA par règle comptable",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\stats\\stat-accounting",
                                     "view": "list.default"
                                 }
                             }

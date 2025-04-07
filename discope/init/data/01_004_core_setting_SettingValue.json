@@ -72,6 +72,66 @@
                 "name": "identity.locale.account.sequence_format",
                 "setting_id": 150,
                 "value": "%3d{prefix}%5d{sequence}"
+            },
+            {
+                "name": "sale.booking.display.store.folded.settings",
+                "setting_id": 151,
+                "value": "0"
+            },
+            {
+                "name": "sale.booking.display.identification.folded",
+                "setting_id": 152,
+                "value": "0"
+            },
+            {
+                "name": "sale.booking.display.products.folded",
+                "setting_id": 153,
+                "value": "0"
+            },
+            {
+                "name": "sale.booking.display.activities.folded",
+                "setting_id": 154,
+                "value": "0"
+            },
+            {
+                "name": "sale.booking.display.accomodations.folded",
+                "setting_id": 155,
+                "value": "0"
+            },
+            {
+                "name": "sale.booking.display.meals.folded",
+                "setting_id": 156,
+                "value": "0"
+            },
+            {
+                "name": "lodging.locale.i18n.activity",
+                "setting_id": 157,
+                "value": "Activité"
+            },
+            {
+                "name": "lodging.locale.i18n.activities_details",
+                "setting_id": 158,
+                "value": "Détail des activitie"
+            },
+            {
+                "name": "sale.booking.has_activity",
+                "setting_id": 159,
+                "value": "1"
+            },
+            {
+                "name": "lodging.locale.i18n.activity_schedule",
+                "setting_id": 160,
+                "value": "Planning prévisionnel des activités"
+            },
+            {
+                "name": "lodging.locale.i18n.children",
+                "setting_id": 161,
+                "value": "enfant(s)"
+            },
+            {
+                "name": "lodging.locale.i18n.people",
+                "setting_id": 162,
+                "value": "personne(s)"
             }
         ]
     }

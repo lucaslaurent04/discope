@@ -154,6 +154,35 @@
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "id": "section.bookings_points",
+                        "label": "Bookings Points",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "bookings_points_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.customer",
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE" : false
+                                                        },
+                                                        "selection": false
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             }

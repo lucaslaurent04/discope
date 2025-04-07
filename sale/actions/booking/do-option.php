@@ -68,6 +68,7 @@ $booking = Booking::id($params['id'])
     ->read([
         'status',
         'is_price_tbc',
+        'date_from',
         'date_expiry',
         'consumptions_ids' => ['is_accomodation', 'rental_unit_id'],
         'type_id' => ['id', 'days_expiry_option']
@@ -82,11 +83,14 @@ if($booking['status'] != 'quote') {
     throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
 }
 
-$days_expiry = $params['days_expiry'];
+$remaining_days = (int) floor(($booking['date_from'] - time()) / (60 * 60 * 24));
+$days_expiry = min($remaining_days, $params['days_expiry']);
+
 // Check if the expiration days of the reservation type are greater than the days entered in the option to obtain the days until the reservation date in the option
-if(isset($booking['type_id']['days_expiry_option']) && $booking['type_id']['days_expiry_option'] > $params['days_expiry']) {
-    $days_expiry = $booking['type_id']['days_expiry_option'];
+if($params['days_expiry'] == 10 && isset($booking['type_id']['days_expiry_option'])) {
+    $days_expiry = min($remaining_days, $booking['type_id']['days_expiry_option']);
 }
+
 /*
     Check booking consistency
 */

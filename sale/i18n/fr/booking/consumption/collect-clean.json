@@ -22,9 +22,15 @@
             "description": "Le type de nettoyage a réaliser.",
             "selection": {
                 "all": "Tout",
-                "daily": "quotidien",
-                "full": "complet"
+                "daily": "Quotidien",
+                "full": "Complet",
+                "none": "Aucun"
             },
+            "help": ""
+        },
+        "make_beds": {
+            "label": "Faire lits",
+            "description": "Est-ce que les lits doivent être faits?",
             "help": ""
         },
         "is_not_option": {

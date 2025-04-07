@@ -5,32 +5,31 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\BookingLine;
-use sale\booking\BookingLineGroup;
-use sale\catalog\Product;
 
 // announce script and fetch parameters values
-list($params, $providers) = eQual::announce([
-    'description'	=>	"Updates a Booking Line by changed its product. This script is meant to be called by the `booking/services` UI.",
-    'params' 		=>	[
-        'id' =>  [
+[$params, $providers] = eQual::announce([
+    'description'	=> "Updates a Booking Line by changed its product. This script is meant to be called by the `booking/services` UI.",
+    'params' 		=> [
+        'id' => [
             'description'       => 'Identifier of the targeted Booking Line.',
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\BookingLine',
             'required'          => true
         ],
-        'product_id' =>  [
+        'product_id' => [
             'type'              => 'many2one',
             'description'       => 'Identifier of the product to assign the line to.',
             'foreign_object'    => 'sale\catalog\Product',
             'default'           => false
         ]
     ],
-    'access' => [
+    'access'        => [
         'visibility'        => 'protected',
         'groups'            => ['booking.default.user']
     ],
-    'response' => [
+    'response'      => [
         'content-type'      => 'application/json',
         'charset'           => 'utf-8',
         'accept-origin'     => '*'
@@ -42,7 +41,7 @@ list($params, $providers) = eQual::announce([
  * @var \equal\php\Context          $context
  * @var \equal\orm\ObjectManager    $orm
  */
-list($context, $orm) = [$providers['context'], $providers['orm']];
+['context' => $context, 'orm' => $orm] = $providers;
 
 // step-1 - make sure that there is at least one price available (published or unpublished)
 $line_id = $params['id'];

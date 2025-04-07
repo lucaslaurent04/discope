@@ -1,0 +1,72 @@
+{
+    "name": "Aide Financière",
+    "plural": "Aides Financières",
+    "description": "",
+    "model": {
+        "description": {
+            "label": "Description",
+            "description": "Descriptif de l'aide financière et de l'organisation qui en est responsable.",
+            "help": ""
+        },
+        "status": {
+            "label": "Status",
+            "selection": {
+                "pending": "En cours",
+                "invoiced": "Facturée"
+            },
+            "description": "L'état actuel de l'aide financière."
+        },
+        "date_from": {
+            "label": "Du",
+            "description": "Date à laquelle l'aide financière commence à être disponible..",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "Date jusqu'à laquelle l'aide financière reste disponible.",
+            "help": ""
+        },
+        "amount": {
+            "label": "Montant",
+            "description": "Le montant total de l'aide financière.",
+            "help": ""
+        },
+        "remaining_amount": {
+            "label": "Montant restant",
+            "description": "Le montant restant de l'aide financière.",
+            "help": ""
+        },
+        "payments_ids": {
+            "label": "Paiements",
+            "description": "Les paiements qui sont basés sur cette aide financière.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Aide financière",
+            "description": "Vue de modification d'une aide financière.",
+            "actions": {
+                "action.transition.invoice": {
+                    "label": "Facturer",
+                    "description": ""
+                },
+                "action.payments-invoice-pdf": {
+                    "label": "Facture paiements PDF",
+                    "description": ""
+                 }
+            },
+            "layout": {
+                "section.payments": {
+                    "label": "Paiements"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Aides financières",
+            "description": "Vue listant les aides financières.",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

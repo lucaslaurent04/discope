@@ -138,6 +138,14 @@ class ProductModel extends Model {
                 'visible'           => [ ['type', '=', 'service'], ['service_type', '=', 'schedulable'] ]
             ],
 
+            'time_slot_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\booking\TimeSlot',
+                'description'       => "The specific time slot at which the service can take place.",
+                'help'              => "This value is used when creating the consumptions relating to scheduled products (mostly meals).",
+                'visible'           => [ ['type', '=', 'service'], ['service_type', '=', 'schedulable'] ]
+            ],
+
             'time_slots_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\booking\TimeSlot',
@@ -145,13 +153,26 @@ class ProductModel extends Model {
                 'rel_table'         => 'sale_catalog_product_model_rel_sale_booking_timeslot',
                 'rel_foreign_key'   => 'time_slot_id',
                 'rel_local_key'     => 'product_model_id',
-                'description'       => "The time slots to classify when the service can take place.",
+                'description'       => "The specific time slots at which the service can take place.",
+                'help'              => "This field applies only to activities that can be scheduled on specific time slots. Most of the time a product is linked to a single time slot.",
                 'visible'           => [
-                                         ['type', '=', 'service'],
-                                         ['service_type', '=', 'schedulable'] ,
-                                         ['is_activity', '=', true],
-                                         ['is_fullday', '=', false]
-                                        ]
+                                            [
+                                                ['type', '=', 'service'],
+                                                ['service_type', '=', 'schedulable'] ,
+                                                ['is_activity', '=', true],
+                                                ['is_fullday', '=', false]
+                                            ],
+                                            [
+                                                ['type', '=', 'service'],
+                                                ['service_type', '=', 'schedulable'] ,
+                                                ['is_meal', '=', true]
+                                            ],
+                                            [
+                                                ['type', '=', 'service'],
+                                                ['service_type', '=', 'schedulable'] ,
+                                                ['is_snack', '=', true]
+                                            ]
+                                        ],
             ],
 
             'tracking_type' => [
@@ -242,28 +263,42 @@ class ProductModel extends Model {
                 'description'       => 'Is the product a rental_unit?',
                 'default'           => false,
                 'onupdate'          => 'onupdateIsRentalUnit',
-                'visible'           => [ ['type', '=', 'service'], ['is_meal', '=', false] , ['is_snack', '=', false]]
+                'visible'           => [ ['type', '=', 'service'], ['is_meal', '=', false] , ['is_snack', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ]
             ],
 
             'is_meal' => [
                 'type'              => 'boolean',
                 'description'       => 'Is the product a meal? (meals might be part of the board / included services of the stay).',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false] , ['is_snack', '=', false] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false] , ['is_snack', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ]
             ],
 
-            'is_transport' => [
+            'is_snack' => [
                 'type'              => 'boolean',
-                'description'       => 'Indicates whether the product is a transport service.',
+                'description'       => 'Is the product a snack?.',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ]
             ],
 
             'is_activity' => [
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the product is an activity or animation.',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_transport', '=', false], ['is_snack', '=', false], ['is_meal', '=', false] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ]
+            ],
+
+            'is_transport' => [
+                'type'              => 'boolean',
+                'description'       => 'Indicates whether the product is an activity transport service (transport to and back from an activity).',
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_supply', '=', false] ]
+            ],
+
+            'is_supply' => [
+                'type'              => 'boolean',
+                'description'       => 'Indicates whether the product is an activity supply service (supply to rent for an activity).',
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_transport', '=', false] ]
             ],
 
             'activity_scope' => [
@@ -327,7 +362,7 @@ class ProductModel extends Model {
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the product requires specific provider.',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_staff_required', '=', false] ]
             ],
 
             'providers_ids' => [
@@ -338,7 +373,7 @@ class ProductModel extends Model {
                 'rel_foreign_key'   => 'provider_id',
                 'rel_local_key'     => 'product_model_id',
                 'description'       => 'References the providers required for the activity.',
-                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_provider', '=', true] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_provider', '=', true], ['has_staff_required', '=', false] ]
             ],
 
             'is_fullday' => [
@@ -360,6 +395,36 @@ class ProductModel extends Model {
                 'description'       => 'Indicates whether the activity requires dedicated staff to be assigned.',
                 'default'           => false,
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+            ],
+
+            'activity_employees_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'hr\employee\Employee',
+                'foreign_field'     => 'activity_product_models_ids',
+                'rel_table'         => 'sale_catalog_product_model_rel_hr_employee',
+                'rel_foreign_key'   => 'employee_id',
+                'rel_local_key'     => 'activity_id',
+                'description'       => "Employees eligible to be assigned activities associated with this product model."
+            ],
+
+            'has_rental_unit' => [
+                'type'              => 'boolean',
+                'description'       => "Indicates whether the activity requires the assignation of a rental unit.",
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ],
+                'onupdate'          => 'onupdateHasRentalUnit'
+            ],
+
+            'activity_rental_units_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'realestate\RentalUnit',
+                'foreign_field'     => 'product_models_ids',
+                'rel_table'         => 'sale_catalog_product_model_rel_realestate_rentalunit',
+                'rel_foreign_key'   => 'rental_unit_id',
+                'rel_local_key'     => 'product_model_id',
+                'description'       => 'Rental Units this Activity relate.',
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_rental_unit', '=', true] ],
+                'onupdate'          => 'onupdateActivityRentalUnitIds'
             ],
 
             'has_age_range' => [
@@ -386,11 +451,11 @@ class ProductModel extends Model {
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] , ['has_age_range', '=', true]]
             ],
 
-            'is_snack' => [
-                'type'              => 'boolean',
-                'description'       => 'Is the product a snack?.',
-                'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_meal', '=', false] ]
+            'nutritional_coefficient' => [
+                'type'              => 'integer',
+                'description'       => "The nutritional coefficient of the meal.",
+                'default'           => 1,
+                'visible'           => ['is_meal', '=', true]
             ],
 
             'rental_unit_assignement' => [
@@ -447,7 +512,28 @@ class ProductModel extends Model {
                 'default'           => true,
                 'visible'           => ['is_pack', '=', true],
                 'onupdate'          => 'onupdateAllowPriceAdaptation'
-            ]
+            ],
+
+            'meal_location' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'inside',
+                    'outside',
+                    'takeaway'
+                ],
+                'default'           => 'inside',
+                'visible'           => [
+                    ['is_meal', '=', true],
+                    ['is_repeatable', '=', false]
+                ]
+            ],
+
+            'grouping_code_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\catalog\GroupingCode',
+                'description'       => "Specific GroupingCode this Product Model related to, if any",
+                'onupdate'          => 'onupdateGroupingCode'
+            ],
 
         ];
     }
@@ -515,6 +601,37 @@ class ProductModel extends Model {
     }
 
     /**
+     * Keep activity_rental_units_ids synced with has_rental_unit
+     */
+    public static function onupdateHasRentalUnit($self) {
+        $self->read(['has_rental_unit', 'activity_rental_units_ids']);
+        foreach($self as $id => $product_model) {
+            if(!$product_model['has_rental_unit'] && !empty($product_model['activity_rental_units_ids'])) {
+                $ids_to_remove = [];
+                foreach($product_model['activity_rental_units_ids'] as $rental_unit_id) {
+                    $ids_to_remove[] = -$rental_unit_id;
+                }
+                self::id($id)->update(['activity_rental_units_ids' => $ids_to_remove]);
+            }
+        }
+    }
+
+    /**
+     * Keep has_rental_unit synced with activity_rental_units_ids
+     */
+    public static function onupdateActivityRentalUnitIds($self) {
+        $self->read(['has_rental_unit', 'activity_rental_units_ids']);
+        foreach($self as $id => $product_model) {
+            if(!empty($product_model['activity_rental_units_ids']) && !$product_model['has_rental_unit']) {
+                self::id($id)->update(['has_rental_unit' => true]);
+            }
+            elseif(empty($product_model['activity_rental_units_ids']) && $product_model['has_rental_unit']) {
+                self::id($id)->update(['has_rental_unit' => false]);
+            }
+        }
+    }
+
+    /**
      * Assign the related rental unity capacity as own capacity.
      */
     public static function onupdateRentalUnitId($om, $ids, $values, $lang) {
@@ -540,6 +657,13 @@ class ProductModel extends Model {
             if(!$model['is_rental_unit']) {
                 $om->update(self::gettype(), $id, ['is_accomodation' => false]);
             }
+        }
+    }
+
+    public static function onupdateGroupingCode($om, $ids, $values, $lang) {
+        $models = $om->read(self::getType(), $ids, ['products_ids','grouping_code_id'], $lang);
+        foreach($models as $id => $model) {
+            $om->update('sale\catalog\Product', $model['products_ids'], ['grouping_code_id' => $model['grouping_code_id']]);
         }
     }
 

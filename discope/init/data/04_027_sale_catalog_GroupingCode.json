@@ -1,0 +1,64 @@
+[
+    {
+        "name": "sale\\catalog\\GroupingCode",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 8,
+                "name": "Pension complète - Enfants",
+                "code": "Accommodation",
+                "has_age_range": true,
+                "age_range_id": 2,
+                "description": null
+            },
+            {
+                "id": 9,
+                "name": "Pension complète - Enseignant ",
+                "code": "Accommodation",
+                "has_age_range": true,
+                "age_range_id": 7,
+                "description": null
+            },
+            {
+                "id": 10,
+                "name": "Pension complète - Accompagnateur",
+                "code": "Accommodation",
+                "has_age_range": true,
+                "age_range_id": 10,
+                "description": null
+            },
+            {
+                "id": 11,
+                "name": "Pension complète - Chauffeur",
+                "code": "Accommodation",
+                "has_age_range": true,
+                "age_range_id": 9,
+                "description": null
+            },
+            {
+                "id": 12,
+                "name": "Activité",
+                "code": "Activity",
+                "has_age_range": false,
+                "age_range_id": null,
+                "description": null
+            },
+            {
+                "id": 13,
+                "name": "Transport",
+                "code": "Transport",
+                "has_age_range": false,
+                "age_range_id": null,
+                "description": null
+            },
+            {
+                "id": 14,
+                "name": "Fourniture",
+                "code": "Supply",
+                "has_age_range": false,
+                "age_range_id": null,
+                "description": null
+            }
+        ]
+    }
+]

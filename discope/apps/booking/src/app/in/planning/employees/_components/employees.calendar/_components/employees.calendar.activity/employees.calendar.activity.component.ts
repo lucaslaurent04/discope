@@ -1,7 +1,4 @@
-import { Component, Input, Output, ElementRef, EventEmitter, OnInit, OnChanges, SimpleChanges, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { de, es } from 'date-fns/locale';
-
-const millisecondsPerDay:number = 24 * 60 * 60 * 1000;
+import { Component, Input, Output, ElementRef, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'planning-employees-calendar-activity',
@@ -28,46 +25,8 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
             this.datasourceChanged();
         }
         if(changes.height) {
-            this.elementRef.nativeElement.style.setProperty('--height', this.height+'px');
+            this.elementRef.nativeElement.style.setProperty('--height', (this.height-1)+'px');
         }
-    }
-
-    /**
-     * Convert a string-formatted time to a unix timestamp-like value (i.e the number of seconds elapsed since midnight).
-     *
-     */
-    private getTime(time:string) : number {
-        let parts = time.split(':');
-        return (parseInt(parts[0])*3600) + (parseInt(parts[1])*60) + parseInt(parts[2]);
-    }
-
-    /**
-     * Provide the absolute value, in days, of the difference between two dates.
-    */
-    private calcDiff(date1: Date, date2: Date) : number {
-        let start = new Date(date1.getTime());
-        start.setMinutes(start.getMinutes() - start.getTimezoneOffset());
-        let end = new Date(date2.getTime());
-        end.setMinutes(end.getMinutes() - end.getTimezoneOffset());
-        let diff = Math.abs(start.getTime() - end.getTime());
-        return Math.round(diff / (1000 * 3600 * 24));
-    }
-
-    private calcDateInt(day: Date) {
-        let timestamp = day.getTime();
-        let offset = day.getTimezoneOffset()*60*1000;
-        let moment = new Date(timestamp-offset);
-        return parseInt(moment.toISOString().substring(0, 10).replace(/-/g, ''), 10);
-    }
-
-    private isSameDate(date1: Date, date2: Date) : boolean {
-        try {
-            return (this.calcDateInt(date1) == this.calcDateInt(date2));
-        }
-        catch(error) {
-            // ignore errors
-        }
-        return false;
     }
 
     private datasourceChanged() {
@@ -78,7 +37,7 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
         }
 
         this.elementRef.nativeElement.style.setProperty('--width', '100%');
-        this.elementRef.nativeElement.style.setProperty('--height', this.height+'px');
+        this.elementRef.nativeElement.style.setProperty('--height', (this.height-1)+'px');
 
     }
 
@@ -104,10 +63,14 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
             violet: '#9575cd',
             red: '#c80651',
             grey: '#988a7d',
+            dark_grey: '#655c58',
             purple: '#7733aa'
         };
 
-        if(this.activity.type == 'ooo') {
+        if(this.activity?.is_partner_event){
+            return colors['dark_grey'];
+        }
+        else if(this.activity.type == 'ooo') {
             return colors['red'];
         }
         else if(this.activity.booking_id?.status == 'quote') {
@@ -165,5 +128,4 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
         }
         return '';
     }
-
 }

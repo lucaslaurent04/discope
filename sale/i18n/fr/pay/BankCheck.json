@@ -1,0 +1,85 @@
+{
+    "name": "Chèque bancaire",
+    "plural": "Chèques bancaires",
+    "description": "",
+    "model": {
+        "bank_check_number": {
+            "label": "Numéro du chèque",
+            "description": "Le numéro unique officiel attribué au chèque bancaire par la banque émettrice.",
+            "help": ""
+        },
+        "amount": {
+            "label": "Montant",
+            "description": "La valeur monétaire du chèque bancaire.",
+            "help": ""
+        },
+        "emission_date": {
+            "label": "Date d'émission",
+            "description": "La date à laquelle le chèque bancaire a été émis.",
+            "help": ""
+        },
+        "partner_id": {
+            "label": "Client",
+            "description": "Le Client associé au chèque bancaire.",
+            "help": ""
+        },
+        "bank_account_iban": {
+            "label": "IBAN du compte bancaire",
+            "description": "Le numéro IBAN du compte bancaire du client, si disponible.",
+            "help": ""
+        },
+        "bank_account_bic": {
+            "label": "BIC de la banque",
+            "description": "Le code BIC (Bank Identifier Code) de la banque du  client, si fourni.",
+            "help": ""
+        },
+        "status": {
+            "label": "Statut",
+            "description": "Le statut actuel du traitement du chèque bancaire.",
+            "selection": {
+                "pending": "En attente",
+                "paid": "Payé",
+                "rejected": "Rejeté"
+            },
+            "help": ""
+        },
+        "funding_id": {
+            "label": "Financement",
+            "description": "Le financement associé au chèque bancaire, si applicable.",
+            "help": ""
+        },
+        "bank_check_description": {
+            "label": "Description",
+            "description": "Une description détaillée ou une note relative à ce chèque bancaire.",
+            "help": ""
+        },
+        "has_signature": {
+            "label": "Signature ?",
+            "description": "Indique si le chèque bancaire est signé.",
+            "help": ""
+        },
+        "deposit_number": {
+            "label": "Numéro de dépôt",
+            "description": "Le numéro de dépôt officiel fourni par la banque, utilisé pour suivre tous les chèques associés.",
+            "help": ""
+        },
+        "is_voucher": {
+            "label": "Chèque-vacances",
+            "description": "Est-ce un chèque-vacances ?",
+            "help": ""
+        }
+    },
+    "view": {},
+    "error": {
+        "status": {
+            "non_editable": "Une fois le chèque bancaire payé, il ne peut plus être modifié.",
+            "non_removable": "Un chèque bancaire payé ne peut pas être supprimé."
+        },
+        "amount": {
+            "non_editable": "Le montant du chèque bancaire ne peut pas être négatif."
+        },
+        "funding_id": {
+            "non_editable": "Les modifications ne sont pas autorisées une fois que le financement a été entièrement payé."
+        }
+    }
+}

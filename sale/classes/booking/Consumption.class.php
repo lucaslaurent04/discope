@@ -5,9 +5,10 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\booking;
+
 use equal\orm\Model;
-use sale\booking\BookingLineGroup;
 
 class Consumption extends Model {
 
@@ -198,6 +199,12 @@ class Consumption extends Model {
                 'default'           => 'none'
             ],
 
+            'make_beds' => [
+                'type'              => 'boolean',
+                'description'       => "Should bed linens be provided to the customer and should the beds be made.",
+                'default'           => false
+            ],
+
             'age_range_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\AgeRange',
@@ -207,29 +214,7 @@ class Consumption extends Model {
             'is_activity' => [
                 'type'              => 'boolean',
                 'description'       => 'Does the consumption relate to an activity?',
-                'help'              => 'Need to be linked to an activity provider.',
                 'default'           => false
-            ],
-
-            'has_provider' => [
-                'type'              => 'boolean',
-                'description'       => "Indicates whether the consumption requires a specific provider.",
-                'default'           => false,
-                'visible'           => ['is_activity', '=', true]
-            ],
-
-            'activity_provider_id' => [
-                'type'              => 'many2one',
-                'foreign_object'    => 'sale\provider\Provider',
-                'description'       => "The activity provider the consumption is assigned to.",
-                'visible'           => [ ['is_activity', '=', true], ['has_provider', '=', true] ]
-            ],
-
-            'has_staff_required' => [
-                'type'              => 'boolean',
-                'description'       => "Indicates whether the activity requires dedicated staff to be assigned.",
-                'default'           => false,
-                'visible'           => ['is_activity', '=', true]
             ]
 
         ];
@@ -250,26 +235,38 @@ class Consumption extends Model {
     }
 
     public static function onupdateRentalUnitId($om, $oids, $values, $lang) {
-        $consumptions = $om->read(get_called_class(), $oids, ['rental_unit_id', 'rental_unit_id.is_accomodation', 'date', 'booking_line_group_id.date_from', 'booking_line_group_id.date_to'], $lang);
+        $consumptions = $om->read(self::getType(), $oids, ['rental_unit_id', 'rental_unit_id.is_accomodation', 'date', 'booking_line_group_id.date_from', 'booking_line_group_id.date_to', 'booking_line_group_id.make_beds'], $lang);
 
         if($consumptions > 0) {
-            foreach($consumptions as $cid => $consumption) {
-                if($consumption['rental_unit_id']) {
-                    $cleanup_type = 'none';
-                    if($consumption['rental_unit_id.is_accomodation']) {
-                        $cleanup_type = 'daily';
-                        if($consumption['booking_line_group_id.date_from'] == $consumption['date']) {
-                            // no cleanup the day of arrival
-                            $cleanup_type = 'none';
-                            continue;
-                        }
-                        if($consumption['booking_line_group_id.date_to'] == $consumption['date']) {
-                            // full cleanup on checkout day
-                            $cleanup_type = 'full';
-                        }
-                    }
-                    $om->update(self::getType(), $oids, ['is_rental_unit' => true, 'is_accomodation' => $consumption['rental_unit_id.is_accomodation'], 'cleanup_type' => $cleanup_type]);
+            foreach($consumptions as $consumption) {
+                if(!$consumption['rental_unit_id']) {
+                    continue;
                 }
+
+                $is_accommodation = $consumption['rental_unit_id.is_accomodation'];
+                $cleanup_type = 'none';
+                $make_beds = false;
+
+                if($is_accommodation) {
+                    $is_first_day = $consumption['booking_line_group_id.date_from'] === $consumption['date'];
+                    $is_last_day = $consumption['booking_line_group_id.date_to'] === $consumption['date'];
+                    if($is_first_day) {
+                        $make_beds = $consumption['booking_line_group_id.make_beds'];
+                    }
+                    elseif($is_last_day) {
+                        $cleanup_type = 'full';
+                    }
+                    else {
+                        $cleanup_type = 'daily';
+                    }
+                }
+
+                $om->update(self::getType(), $oids, [
+                    'is_rental_unit'    => true,
+                    'is_accomodation'   => $is_accommodation,
+                    'cleanup_type'      => $cleanup_type,
+                    'make_beds'         => $make_beds
+                ]);
             }
         }
     }
@@ -443,7 +440,8 @@ class Consumption extends Model {
             'booking_line_group_id',
             'repairing_id',
             'schedule_from',
-            'schedule_to'
+            'schedule_to',
+            'is_activity'
         ]);
 
         /*
@@ -533,17 +531,23 @@ class Consumption extends Model {
 
                 // handle consumptions from bookings
                 if(isset($consumption['booking_line_group_id'])) {
-                    $booking_line_group_id = $consumption['booking_line_group_id'];
-
-                    foreach($bookings_map[$rental_unit_id][$booking_line_group_id] as $cid) {
-                        $processed_consumptions[$cid] = true;
+                    if($consumption['is_activity']) {
+                        $consumption['date_from'] = $consumption['date'];
+                        $consumption['date_to'] = $consumption['date'];
                     }
+                    else {
+                        $booking_line_group_id = $consumption['booking_line_group_id'];
 
-                    $consumption['date_from'] = $booking_line_groups[$booking_line_group_id]['date_from'];
-                    // #todo - date_to should be the latest date from all consumptions relating to the group (the sojourn might be shorter than initially set, in case of partial cancellation)
-                    $consumption['date_to'] = $booking_line_groups[$booking_line_group_id]['date_to'];
-                    $consumption['schedule_from'] = $booking_line_groups[$booking_line_group_id]['time_from'];
-                    $consumption['schedule_to'] = $booking_line_groups[$booking_line_group_id]['time_to'];
+                        foreach($bookings_map[$rental_unit_id][$booking_line_group_id] as $cid) {
+                            $processed_consumptions[$cid] = true;
+                        }
+
+                        $consumption['date_from'] = $booking_line_groups[$booking_line_group_id]['date_from'];
+                        // #todo - date_to should be the latest date from all consumptions relating to the group (the sojourn might be shorter than initially set, in case of partial cancellation)
+                        $consumption['date_to'] = $booking_line_groups[$booking_line_group_id]['date_to'];
+                        $consumption['schedule_from'] = $booking_line_groups[$booking_line_group_id]['time_from'];
+                        $consumption['schedule_to'] = $booking_line_groups[$booking_line_group_id]['time_to'];
+                    }
                 }
                 // handle consumptions from repairings
                 elseif(isset($consumption['repairing_id'])) {

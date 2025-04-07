@@ -75,6 +75,13 @@ class RentalUnit extends Model {
                 'default'           => 1
             ],
 
+            'extra' => [
+                'type'              => 'integer',
+                'usage'             => 'number/integer{0,2}',
+                'description'       => 'The number of extra children that may stay in the unit.',
+                'default'           => 0
+            ],
+
             'has_children' => [
                 'type'              => 'boolean',
                 'description'       => 'Flag to mark the unit as having sub-units.',
@@ -249,7 +256,17 @@ class RentalUnit extends Model {
                 'type'        => 'boolean',
                 'description' => 'The rental unit is equipped for Persons with Hearing Impairments (PHI), including visual alarms, subtitles, or other suitable aids.',
                 'default'     => false
-            ]
+            ],
+
+            'product_models_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\catalog\ProductModel',
+                'foreign_field'     => 'activity_rental_units_ids',
+                'rel_table'         => 'sale_catalog_product_model_rel_realestate_rentalunit',
+                'rel_foreign_key'   => 'product_model_id',
+                'rel_local_key'     => 'rental_unit_id',
+                'description'       => 'Product model related to this Rental Unit.'
+            ],
 
         ];
     }
@@ -319,11 +336,27 @@ class RentalUnit extends Model {
 
     public static function getConstraints() {
         return [
+
             'capacity' =>  [
                 'lte_zero' => [
                     'message'       => 'Capacity must be a positive value.',
                     'function'      => function ($qty, $values) {
                         return ($qty > 0);
+                    }
+                ]
+            ],
+
+            'extra' => [
+                'lt_zero' => [
+                    'message'       => 'Extra capacity must be a greater than or equal to zero.',
+                    'function'      => function ($qty, $values) {
+                        return ($qty >= 0);
+                    }
+                ],
+                'gt_two' => [
+                    'message'       => 'Extra capacity must be a lower than two.',
+                    'function'      => function ($qty, $values) {
+                        return ($qty <= 2);
                     }
                 ]
             ]

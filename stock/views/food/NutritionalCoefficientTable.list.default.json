@@ -1,0 +1,30 @@
+{
+    "name": "Nutritional Coefficient Configurations",
+    "description": "Listing view for nutritional coefficient configuration items.",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "10%",
+                "sortable": true,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "name",
+                "width": "50%",
+                "sortable": true,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "center_id",
+                "width": "50%",
+                "sortable": true,
+                "readonly": true
+            }
+        ]
+    }
+}
