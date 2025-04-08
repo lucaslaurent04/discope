@@ -59,7 +59,8 @@ class BookingLine extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\catalog\Product',
                 'description'       => 'The product (SKU) the line relates to.',
-                'onupdate'          => 'onupdateProductId'
+                'onupdate'          => 'onupdateProductId',
+                'dependents'        => ['product_model_id', 'time_slot_id']
             ],
 
             'product_model_id' => [
