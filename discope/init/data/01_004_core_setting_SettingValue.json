@@ -137,6 +137,11 @@
                 "name": "sale.features.channelmanager.enabled",
                 "setting_id": 140,
                 "value": "1"
+            },
+            {
+                "name": "sale.features.channelmanager.client_domain",
+                "setting_id": 160,
+                "value": null
             }
         ]
     }

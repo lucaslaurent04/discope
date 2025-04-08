@@ -526,6 +526,22 @@
                 "is_multilang": 0,
                 "is_sequence": null,
                 "object_class": null
+            },
+            {
+                "id": 160,
+                "name": "sale.features.channelmanager.client_domain",
+                "code": "channelmanager.client_domain",
+                "package": "sale",
+                "section_id": 7,
+                "title": "Domaine du client appellant l'API du channel manager",
+                "description": "Utilisé pour faire la distinction entre les instances.",
+                "help": "<p>Il faut que cette valeur soit identique à ROOT_APP_URL pour que les appels soient lancés.</p>",
+                "type": "string",
+                "form_control": "input",
+                "section": "features",
+                "is_multilang": 0,
+                "is_sequence": 0,
+                "object_class": null
             }
 
         ]
