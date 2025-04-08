@@ -134,7 +134,7 @@
                 "value": "personne(s)"
             },
             {
-                "name": "sale.booking.channelmanager.enabled",
+                "name": "sale.features.channelmanager.enabled",
                 "setting_id": 140,
                 "value": "1"
             }
