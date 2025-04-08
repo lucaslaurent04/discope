@@ -63,11 +63,11 @@ use sale\price\PriceList;
 
 $result = [];
 
-$fields = ['id', 'name', 'sku', 'can_sell', 'product_model_id'];
+$fields = ['id', 'name', 'sku', 'can_sell', 'product_model_id', 'groups_ids'];
 
 // retrieve center and related catalog info
 $center = Center::id($params['center_id'])
-    ->read(['id', 'price_list_category_id'])
+    ->read(['id', 'price_list_category_id', 'product_groups_ids'])
     ->first(true);
 
 if(!$center) {
@@ -106,9 +106,15 @@ $products = Product::ids($products_ids)
     ->adapt('json')
     ->get(true);
 
+// Checks if there is an intersection between the product groups and those of the center
+$center_groups = $center['product_groups_ids'];
+$filtered_products = array_filter($products, function($product) use ($center_groups) {
+    return !empty(array_intersect($product['groups_ids'], $center_groups));
+});
+
 // 4) sort products by name (on ascending order)
-usort($products, function($a, $b) {return strcmp($a['name'], $b['name']);});
+usort($filtered_products, function($a, $b) {return strcmp($a['name'], $b['name']);});
 
 $context->httpResponse()
-        ->body($products)
+        ->body($filtered_products)
         ->send();
