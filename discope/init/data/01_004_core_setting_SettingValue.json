@@ -132,6 +132,11 @@
                 "name": "lodging.locale.i18n.people",
                 "setting_id": 162,
                 "value": "personne(s)"
+            },
+            {
+                "name": "sale.booking.channelmanager.enabled",
+                "setting_id": 140,
+                "value": "1"
             }
         ]
     }
