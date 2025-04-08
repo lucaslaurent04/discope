@@ -55,13 +55,13 @@ use sale\booking\channelmanager\Property;
  */
 ['context' => $context, 'cron' => $cron] = $providers;
 
-$channelmanager_enabled = Setting::get_value('sale', 'booking', 'channelmanager.enabled', false);
+$channelmanager_enabled = Setting::get_value('sale', 'features', 'channelmanager.enabled', false);
 
 if(!$channelmanager_enabled) {
     throw new Exception('disabled_feature', QN_ERROR_INVALID_CONFIG);
 }
 
-$client_domain = Setting::get_value('sale', 'booking', 'channelmanager.client_domain', 'https://discope.yb.run');
+$client_domain = Setting::get_value('sale', 'features', 'channelmanager.client_domain');
 
 // #memo - prevent calls from non-production server
 if(constant('ROOT_APP_URL') != $client_domain) {

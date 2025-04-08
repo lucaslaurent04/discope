@@ -110,7 +110,7 @@ if($rental_unit['has_children']) {
     $collection->update(['rental_units_ids' => $rental_unit['children_ids']]);
 }
 
-$channelmanager_enabled = Setting::get_value('sale', 'booking', 'channelmanager.enabled', false);
+$channelmanager_enabled = Setting::get_value('sale', 'features', 'channelmanager.enabled', false);
 if($channelmanager_enabled) {
     /*
         Check if consistency must be maintained with channel manager (if repairing impacts a rental unit that is linked to a channelmanager room type)

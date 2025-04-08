@@ -513,19 +513,34 @@
                 "object_class": null
             },
             {
-                "id": 140,
-                "state": "instance",
-                "name": "sale.booking.channelmanager.enabled",
+                "id": 164,
+                "name": "sale.features.channelmanager.enabled",
                 "code": "channelmanager.enabled",
                 "package": "sale",
-                "section_id": 6,
+                "section_id": 7,
                 "title": "Channelmanager activé",
                 "description": "Est-ce que le channelmangager Cubilis est activé pour cette instance de Discope ?",
                 "type": "boolean",
                 "form_control": "toggle",
-                "section": "booking",
+                "section": "features",
                 "is_multilang": 0,
                 "is_sequence": null,
+                "object_class": null
+            },
+            {
+                "id": 165,
+                "name": "sale.features.channelmanager.client_domain",
+                "code": "channelmanager.client_domain",
+                "package": "sale",
+                "section_id": 7,
+                "title": "Domaine du client appellant l'API du channel manager",
+                "description": "Utilisé pour faire la distinction entre les instances.",
+                "help": "<p>Il faut que cette valeur soit identique à ROOT_APP_URL pour que les appels soient lancés.</p>",
+                "type": "string",
+                "form_control": "input",
+                "section": "features",
+                "is_multilang": 0,
+                "is_sequence": 0,
                 "object_class": null
             }
 

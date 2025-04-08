@@ -14,6 +14,12 @@
                 "name": "Réservation",
                 "description": "Paramètres pour la création des réservations",
                 "code": "booking"
+            },
+            {
+                "id": 7,
+                "name": "Features",
+                "description": "Paramètres pour la création des features",
+                "code": "features"
             }
         ]
     },
@@ -30,6 +36,11 @@
                 "id": 6,
                 "name": "Booking",
                 "description": "Settings for booking creation"
+            },
+            {
+                "id": 7,
+                "name": "Features",
+                "description": "Settings for feature creation"
             }
         ]
     }
