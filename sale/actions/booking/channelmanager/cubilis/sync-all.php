@@ -55,7 +55,7 @@ use sale\booking\channelmanager\Property;
  */
 ['context' => $context, 'cron' => $cron] = $providers;
 
-$channelmanager_enabled = Setting::get_value('sale', 'booking', 'channelmanager.enabled', false);
+$channelmanager_enabled = Setting::get_value('sale', 'features', 'channelmanager.enabled', false);
 
 if(!$channelmanager_enabled) {
     throw new Exception('disabled_feature', QN_ERROR_INVALID_CONFIG);

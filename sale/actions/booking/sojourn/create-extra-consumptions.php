@@ -129,7 +129,7 @@ $orm->call(BookingLineGroup::getType(), 'createConsumptions', $params['id']);
 
 BookingLineGroup::id($params['id'])->update(['has_consumptions' => true]);
 
-$channelmanager_enabled = Setting::get_value('sale', 'booking', 'channelmanager.enabled', false);
+$channelmanager_enabled = Setting::get_value('sale', 'features', 'channelmanager.enabled', false);
 if($channelmanager_enabled) {
     // rental units were assigned: check if consistency must be maintained with channel manager (if booking impacts a rental unit that is linked to a channelmanager room type)
     $map_rental_units_ids = [];
