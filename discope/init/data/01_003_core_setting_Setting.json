@@ -593,7 +593,7 @@
                 "object_class": null
             },
             {
-                "id": 160,
+                "id": 165,
                 "name": "sale.features.channelmanager.client_domain",
                 "code": "channelmanager.client_domain",
                 "package": "sale",
