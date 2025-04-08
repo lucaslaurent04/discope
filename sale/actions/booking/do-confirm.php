@@ -80,6 +80,7 @@ $booking = Booking::id($params['id'])
             'type',
             'is_paid',
             'due_amount',
+            'type',
             'paid_amount'
         ],
         'booking_lines_groups_ids' => [
@@ -450,6 +451,9 @@ Booking::id($params['id'])->update(['payment_plan_id' => $payment_plan['id']]);
 $fundings_handled_sum = 0.0;
 foreach($booking['fundings_ids'] as $funding) {
     $fid = $funding['id'];
+    if($funding['type'] == 'invoice') {
+        continue;
+    }
     // we're about to generate a new payment plan : remove unpaid fundings
     if(round($funding['paid_amount'], 2) == 0 && !$funding['is_paid']) {
         Funding::id($fid)->delete(true);
