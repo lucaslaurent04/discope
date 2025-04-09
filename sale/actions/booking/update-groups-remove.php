@@ -6,6 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 use sale\booking\Booking;
+use sale\booking\BookingActivity;
 use sale\booking\BookingLineGroup;
 
 list($params, $providers) = eQual::announce([
@@ -66,6 +67,8 @@ if($sojourn['booking_id'] != $booking['id']) {
 $orm->disableEvents();
 
 BookingLineGroup::id($params['booking_line_group_id'])->delete(true);
+
+BookingActivity::search(['booking_line_group_id', '=', $params['booking_line_group_id']])->delete(true);
 
 // recompute total price of the booking
 Booking::refreshPrice($orm, $booking['id']);

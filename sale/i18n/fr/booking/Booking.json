@@ -318,6 +318,9 @@
                 },
                 "item.booking.payments": {
                     "label": "Paiements"
+                },
+                "item.booking.activities-planning": {
+                    "label": "Planning activités"
                 }
             },
             "layout": {

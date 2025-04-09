@@ -1,0 +1,11 @@
+:host {
+    display: flex;
+    width: 100%;
+    padding: 20px;
+    gap: 50px;
+    font-size: 1.1rem;
+
+    .value {
+        font-weight: bold;
+    }
+}

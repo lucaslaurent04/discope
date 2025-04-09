@@ -34,6 +34,11 @@ import { BookingQuoteComponent } from './quote/quote.component';
 import { BookingInvoiceComponent } from './invoice/invoice.component';
 import { BookingOptionComponent } from './option/option.component';
 
+import { BookingActivitiesPlanningComponent } from './activities-planning/activities-planning.component';
+import { BookingActivitiesPlanningActivityDetailsComponent } from './activities-planning/_components/activity-details/activity-details.component';
+import { BookingActivitiesPlanningBookingGroupDetailsComponent } from './activities-planning/_components/booking-group-details/booking-group-details.component';
+import { BookingActivitiesPlanningWeekActivitiesComponent } from './activities-planning/_components/week-activities/week-activities.component';
+
 @NgModule({
   imports: [
     SharedLibModule,
@@ -58,7 +63,11 @@ import { BookingOptionComponent } from './option/option.component';
     BookingCompositionLinesComponent,
     BookingQuoteComponent,
     BookingInvoiceComponent,
-    BookingOptionComponent
+    BookingOptionComponent,
+    BookingActivitiesPlanningComponent,
+    BookingActivitiesPlanningActivityDetailsComponent,
+    BookingActivitiesPlanningBookingGroupDetailsComponent,
+    BookingActivitiesPlanningWeekActivitiesComponent
   ],
   providers: [
     DatePipe,
