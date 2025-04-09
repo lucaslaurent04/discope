@@ -1,5 +1,5 @@
 <div>
-    Groupe : <span *ngIf="group" class="value">{{ group.activity_group_num }}</span>
+    <span *ngIf="group">{{ group.name }} <small>({{ group.activity_group_num }})</small></span>
 </div>
 
 <div>

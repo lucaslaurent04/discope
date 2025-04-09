@@ -596,10 +596,13 @@ class BookingLineGroup extends Model {
             }
         }
 
-        foreach(array_values($map_order_group_id) as $index => $group_id) {
+        $group_ids = array_values($map_order_group_id);
+        foreach($group_ids as $index => $group_id) {
             BookingLineGroup::id($group_id)
                 ->update(['activity_group_num' => $index + 1]);
         }
+
+        BookingActivity::search(['booking_line_group_id', 'in', $group_ids])->update(['group_num' => null]);
     }
 
     public static function onupdateDateFrom($om, $oids, $values, $lang) {
