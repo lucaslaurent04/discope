@@ -27,11 +27,6 @@
     <mat-form-field class="product-form-field">
         <mat-label>Activité</mat-label>
         <input matInput [disabled]="group && group.is_locked" type="text" [value]="vm.product.name" readonly="readonly" />
-        <mat-hint [align]="'end'">
-            <span *ngIf="bookingLine?.qty_accounting_method == 'accomodation'">au logement</span>
-            <span *ngIf="bookingLine?.qty_accounting_method == 'person'">à la personne</span>
-            <span *ngIf="bookingLine?.qty_accounting_method == 'unit'">à l'unité</span>
-        </mat-hint>
     </mat-form-field>
 
     <button mat-icon-button
