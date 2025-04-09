@@ -44,7 +44,7 @@
                     <span *ngIf="instance.group_type == 'simple'">simple</span>
                     <span *ngIf="instance.group_type == 'sojourn'">séjour</span>
                     <span *ngIf="instance.group_type == 'event'">événement</span>
-                    <span *ngIf="instance.group_type == 'camp'">stage/activité</span>
+                    <span *ngIf="instance.group_type == 'camp'">stage/activité <small>({{instance.activity_group_num}})</small></span>
                 </div>
                 <div *ngIf="groupTypeOpen" style="position: relative;" (click)="onclickGroupType()">
                     <mat-form-field appearance="standard" style="transform: translateY(-31px); padding: 0;">

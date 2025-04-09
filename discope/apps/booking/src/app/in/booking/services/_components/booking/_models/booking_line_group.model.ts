@@ -36,6 +36,7 @@ export class BookingLineGroup {
         public meal_preferences_ids: any[] = [],
         public age_range_assignments_ids: any[] = [],
         public sojourn_product_models_ids: any[] = [],
-        public booking_activities_ids: any[] = []
+        public booking_activities_ids: any[] = [],
+        public activity_group_num: number = 0
     ) {}
 }

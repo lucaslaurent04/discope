@@ -67,6 +67,7 @@ $tree = [
         'has_locked_rental_units',
         'booking_id',
         'sojourn_type_id',
+        'activity_group_num',
         'pack_id' => [
             'id',
             'name'
