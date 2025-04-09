@@ -1,0 +1,52 @@
+<div class="container">
+    <div class="booking-header">
+        <a href="#/bookings">Réservations</a><span> › </span> <a href="#/booking/{{booking.id}}">Réservation <small>[{{booking.name}} - {{booking.id}}]</small></a> <span> › </span> Planning activités
+    </div>
+    <div class="booking-body">
+        <div class="selection-details">
+            <div class="day-date">
+                <ng-container *ngIf="selectedDay">
+                    <span class="day-name">{{ dayName(selectedDay) }}</span> <span class="time-slot-name">{{ timeSlotName(selectedTimeSlot) }}</span>
+                </ng-container>
+            </div>
+
+            <div class="group-activity-details">
+                <booking-activities-planning-booking-group-details [group]="selectedGroup"></booking-activities-planning-booking-group-details>
+
+                <booking-activities-planning-activity-details [activity]="selectedActivity"
+                                                              [booking]="booking"
+                                                              [group]="selectedGroup"
+                                                              (productSelected)="onProductSelected($event)"
+                                                              (activityDeleted)="onActivityDeleted()"
+                ></booking-activities-planning-activity-details>
+            </div>
+        </div>
+
+        <booking-activities-planning-week-activities [startDate]="weekStartDate"
+                                                     [endDate]="weekEndDate"
+                                                     [booking]="booking"
+                                                     [mapDateTimeSlotGroupActivity]="planning"
+                                                     [groups]="activityGroups"
+                                                     [selectedDay]="selectedDay"
+                                                     [selectedTimeSlot]="selectedTimeSlot"
+                                                     [selectedGroup]="selectedGroup"
+                                                     [selectedActivity]="selectedActivity"
+                                                     (daySelected)="onDaySelected($event)"
+                                                     (timeSlotSelected)="onTimeSlotSelected($event)"
+                                                     (groupSelected)="onGroupSelected($event)"
+                                                     (activitySelected)="onActivitySelected($event)"
+        ></booking-activities-planning-week-activities>
+
+        <div class="week-navigations">
+            <button mat-icon-button (click)="previousWeek()">
+                <mat-icon>chevron_left</mat-icon> <span style="margin-top: 5px">Précédent</span>
+            </button>
+
+            <div style="flex-grow: 1"></div>
+
+            <button mat-icon-button style="min-width: 80px" (click)="nextWeek()">
+                <span style="margin-top: 5px">Suivant</span> <mat-icon>chevron_right</mat-icon>
+            </button>
+        </div>
+    </div>
+</div>

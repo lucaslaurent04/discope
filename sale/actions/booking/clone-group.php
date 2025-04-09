@@ -251,6 +251,7 @@ foreach($group['sojourn_product_models_ids'] as $spm) {
 }
 
 Booking::refreshPrice($orm, $group['booking_id']['id']);
+BookingLineGroup::refreshActivityGroupNumber($group['booking_id']['id']);
 
 $orm->enableEvents();
 

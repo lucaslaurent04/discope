@@ -8,6 +8,7 @@ import { BookingCompositionInviteComponent } from './composition/invite/invite.c
 import { BookingQuoteComponent } from './quote/quote.component';
 import { BookingInvoiceComponent } from './invoice/invoice.component';
 import { BookingOptionComponent } from './option/option.component';
+import { BookingActivitiesPlanningComponent } from './activities-planning/activities-planning.component';
 
 const routes: Routes = [
     {
@@ -21,6 +22,10 @@ const routes: Routes = [
     {
         path: 'composition/invite',
         component: BookingCompositionInviteComponent
+    },
+    {
+        path: 'activities-planning',
+        component: BookingActivitiesPlanningComponent
     },
     {
         path: 'quote',
