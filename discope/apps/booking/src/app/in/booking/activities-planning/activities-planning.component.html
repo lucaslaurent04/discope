@@ -38,13 +38,13 @@
         ></booking-activities-planning-week-activities>
 
         <div class="week-navigations">
-            <button mat-icon-button (click)="previousWeek()">
+            <button [disabled]="!showPrevBtn" mat-icon-button (click)="previousWeek()">
                 <mat-icon>chevron_left</mat-icon> <span style="margin-top: 5px">Précédent</span>
             </button>
 
             <div style="flex-grow: 1"></div>
 
-            <button mat-icon-button style="min-width: 80px" (click)="nextWeek()">
+            <button [disabled]="!showNextBtn" mat-icon-button style="min-width: 80px" (click)="nextWeek()">
                 <span style="margin-top: 5px">Suivant</span> <mat-icon>chevron_right</mat-icon>
             </button>
         </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BookingApiService } from '../_services/booking.api.service';
 import { ContextService } from 'sb-shared-lib';
@@ -7,6 +7,9 @@ import { Activity } from './_models/activity.model';
 import { BookingLineGroup } from './_models/booking-line-group.model';
 import { TimeSlot } from './_models/time-slot.model';
 import { Product } from './_models/product.model';
+import { BookingActivitiesPlanningActivityDetailsComponent } from './_components/activity-details/activity-details.component';
+import { BehaviorSubject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 type PlanningTimeSlot = {
     [groupNum: number]: Activity;
@@ -27,19 +30,32 @@ type Planning = {
 })
 export class BookingActivitiesPlanningComponent implements OnInit {
 
+    @ViewChild(BookingActivitiesPlanningActivityDetailsComponent) activityDetailsComponent!: BookingActivitiesPlanningActivityDetailsComponent;
+
+    @HostListener('document:keyup', ['$event'])
+    public async onKeydown(event: KeyboardEvent) {
+        if(event.key === 'Delete' && this.selectedGroup && !this.selectedGroup.is_locked && this.selectedActivity) {
+            await this.onActivityDeleted();
+        }
+    }
+
     private bookingId: number = null;
     public booking = new Booking();
 
     public weekStartDate: Date = null;
     public weekEndDate: Date = null;
 
+    public showPrevBtn: boolean = false;
+    public showNextBtn: boolean = false;
+
     private mapTimeSlotIdCode: {[key: number]: 'AM'|'PM'|'EV'} = {};
 
     public selectedDay: string = null;
     public selectedTimeSlot: 'AM'|'PM'|'EV' = 'AM';
-
     public selectedGroup: BookingLineGroup = null;
-    public activityGroups: BookingLineGroup[] = []
+    public selectedItem$ = new BehaviorSubject<string>(null);
+
+    public activityGroups: BookingLineGroup[] = [];
 
     public selectedActivity: Activity = null;
     public planning: Planning = {};
@@ -80,9 +96,17 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                 if(this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num]) {
                     this.selectedActivity = this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num];
                 }
+
+                this.selectedItem$.next(`${this.selectedDay}_${this.selectedTimeSlot}_${this.selectedGroup.activity_group_num}`);
             }
             catch(response) {
                 console.warn(response);
+            }
+        });
+
+        this.selectedItem$.pipe(debounceTime(300)).subscribe((selectedItem) => {
+            if(!this.selectedActivity) {
+                this.activityDetailsComponent.focusInput();
             }
         });
     }
@@ -117,6 +141,9 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                 const weekEndDate = new Date(this.weekStartDate);
                 weekEndDate.setDate(weekEndDate.getDate() + 6);
                 this.weekEndDate = weekEndDate;
+
+                this.showPrevBtn = this.weekStartDate.getTime() > this.booking.date_from.getTime();
+                this.showNextBtn = this.weekEndDate.getTime() < this.booking.date_to.getTime();
             }
         }
         catch(response) {
@@ -301,14 +328,17 @@ export class BookingActivitiesPlanningComponent implements OnInit {
 
     public onDaySelected(dateString: string) {
         this.selectedDay = dateString;
+        this.selectedItem$.next(`${dateString}_${this.selectedTimeSlot}_${this.selectedGroup.activity_group_num}`);
     }
 
     public onTimeSlotSelected(timeSlotCode: 'AM'|'PM'|'EV') {
         this.selectedTimeSlot = timeSlotCode;
+        this.selectedItem$.next(`${this.selectedDay}_${timeSlotCode}_${this.selectedGroup.activity_group_num}`);
     }
 
     public onGroupSelected(group: BookingLineGroup) {
         this.selectedGroup = group;
+        this.selectedItem$.next(`${this.selectedDay}_${this.selectedTimeSlot}_${group.activity_group_num}`);
     }
 
     public onActivitySelected(activity: Activity|null) {

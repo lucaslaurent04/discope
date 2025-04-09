@@ -2,6 +2,7 @@
     <mat-label>Activité</mat-label>
     <input *ngIf="!group.is_locked"
            matInput
+           #inputField
            type="text"
            [matAutocomplete]="productAutocomplete"
            [(ngModel)]="vm.product.name"
@@ -34,7 +35,7 @@
     </mat-form-field>
 
     <button mat-icon-button
-            *ngIf="activity && !activity.is_virtual"
+            *ngIf="activity && !activity.is_virtual && !group.is_locked"
             class="delete-activity"
             (click)="ondeleteActivity();"
     >

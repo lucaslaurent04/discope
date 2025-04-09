@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Activity } from '../../_models/activity.model';
 import { FormControl } from '@angular/forms';
 import { Observable, ReplaySubject } from 'rxjs';
@@ -36,6 +36,8 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
     @Output() productSelected = new EventEmitter<Product>();
     @Output() activityDeleted = new EventEmitter<Product>();
 
+    @ViewChild('inputField') inputField!: ElementRef;
+
     public vm: vmModel;
 
     public bookingLine: BookingLine = null;
@@ -68,14 +70,14 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
         );
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
+    public async ngOnChanges(changes: SimpleChanges) {
         if(changes.activity) {
             if(!this.activity) {
                 this.product = null;
                 this.vm.product.name = '';
             }
             else {
-                this.loadProduct(this.activity.activity_booking_line_id);
+                await this.loadProduct(this.activity.activity_booking_line_id);
             }
         }
     }
@@ -159,5 +161,9 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
 
     public async ondeleteActivity() {
         this.activityDeleted.emit();
+    }
+
+    public focusInput(): void {
+        this.inputField.nativeElement.focus();
     }
 }
