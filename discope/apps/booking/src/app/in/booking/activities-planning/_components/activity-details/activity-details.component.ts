@@ -31,6 +31,7 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
 
     @Input() booking: Booking;
     @Input() activity: Activity|null;
+    @Input() timeSlot: 'AM'|'PM'|'EV';
     @Input() group: BookingLineGroup|null;
 
     @Output() productSelected = new EventEmitter<Product>();
@@ -87,9 +88,9 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
                 ['is_activity', '=', true]
             ];
 
-            /*if(!this.allowFulldaySelection) {
+            if(this.timeSlot !== 'EV') {
                 domain.push(['is_fullday', '=', false]);
-            }*/
+            }
 
             if(name && name.length) {
                 domain.push(['name', 'ilike', `%${name}%`]);
