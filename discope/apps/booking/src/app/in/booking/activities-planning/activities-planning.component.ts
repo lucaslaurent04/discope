@@ -260,10 +260,9 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                 ['booking_line_group_id', '=', this.selectedGroup.id]
             ];
             const bookingLines = await this.api.collect('sale\\booking\\BookingLine', domain, ['id']);
-            const order = bookingLines.length;
 
             newLine = await this.api.create('sale\\booking\\BookingLine', {
-                order: order + 1,
+                order: bookingLines.length + 1,
                 booking_id: this.booking.id,
                 booking_line_group_id: this.selectedGroup.id,
                 service_date: (new Date(this.selectedDay)).getTime() / 1000,
