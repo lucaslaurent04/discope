@@ -628,16 +628,31 @@ class Booking extends Model {
 
     public static function calcNbPers($self) {
         $result = [];
-        $self->read(['booking_lines_groups_ids' => ['nb_pers', 'is_autosale', 'is_extra', 'is_sojourn']]);
+        $self->read(['booking_lines_groups_ids' => ['nb_pers', 'is_autosale', 'is_extra', 'group_type']]);
         foreach($self as $id => $booking) {
             $nb_pers = 0;
 
+            // pass-1 - consider only sojourns
             foreach($booking['booking_lines_groups_ids'] as $group) {
-                if($group['is_sojourn'] && !$group['is_autosale'] && !$group['is_extra']) {
+                if($group['is_autosale'] || $group['is_extra']) {
+                    continue;
+                }
+                if($group['group_type'] === 'sojourn') {
                     $nb_pers += $group['nb_pers'];
                 }
             }
 
+            // pass-2 - no sojourn, consider other types (event, camp, simple)
+            if($nb_pers === 0) {
+                foreach($booking['booking_lines_groups_ids'] as $group) {
+                    if($group['is_autosale'] || $group['is_extra']) {
+                        continue;
+                    }
+                    $nb_pers += $group['nb_pers'];
+                }
+            }
+
+            // pass-3 - no match, fall back to any group available
             if($nb_pers === 0) {
                 foreach($booking['booking_lines_groups_ids'] as $group) {
                     $nb_pers += $group['nb_pers'];
