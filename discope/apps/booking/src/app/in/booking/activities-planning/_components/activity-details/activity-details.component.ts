@@ -4,7 +4,6 @@ import { FormControl } from '@angular/forms';
 import { Observable, ReplaySubject } from 'rxjs';
 import { BookingLineGroup } from '../../_models/booking-line-group.model';
 import { Product } from '../../_models/product.model';
-import { BookingLine } from '../../_models/booking-line.model';
 import { ApiService } from 'sb-shared-lib';
 import { debounceTime, map, mergeMap } from 'rxjs/operators';
 import { Booking } from '../../_models/booking.model';
@@ -40,8 +39,6 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
     @ViewChild('inputField') inputField!: ElementRef;
 
     public vm: vmModel;
-
-    public bookingLine: BookingLine = null;
 
     constructor(
         public api: ApiService
