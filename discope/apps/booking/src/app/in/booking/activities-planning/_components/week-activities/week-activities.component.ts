@@ -27,6 +27,9 @@ export class BookingActivitiesPlanningWeekActivitiesComponent implements OnInit,
 
     public days: string[] = [];
 
+    public gapBetweenTimeSlot = 50;
+    public gapBetweenGroupLine = 7;
+
     public ngOnInit() {
         console.log('init BookingActivitiesPlanningWeekActivitiesComponent');
     }
@@ -70,6 +73,20 @@ export class BookingActivitiesPlanningWeekActivitiesComponent implements OnInit,
         const day = String(date.getDate()).padStart(2, '0');
 
         return `${day}/${month}`;
+    }
+
+    public dayNameHeight() {
+        const dayNameHeight = 24;
+
+        return this.gapBetweenTimeSlot + dayNameHeight;
+    }
+
+    public timeSlotIconSeparatorHeight() {
+        const gQty = this.groups.length;
+        const iconHeight = 24;
+        const groupLineHeight = 24;
+
+        return this.gapBetweenTimeSlot - iconHeight + (gQty * groupLineHeight) + ((gQty - 1) * this.gapBetweenGroupLine);
     }
 
     public dateInBooking(dateString: string) {
