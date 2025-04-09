@@ -41,7 +41,6 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
     public vm: vmModel;
 
     public bookingLine: BookingLine = null;
-    public product: Product = null;
 
     constructor(
         public api: ApiService
@@ -70,33 +69,14 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
         );
     }
 
-    public async ngOnChanges(changes: SimpleChanges) {
+    public ngOnChanges(changes: SimpleChanges) {
         if(changes.activity) {
             if(!this.activity) {
-                this.product = null;
                 this.vm.product.name = '';
             }
             else {
-                await this.loadProduct(this.activity.activity_booking_line_id);
+                this.vm.product.name = this.activity.name;
             }
-        }
-    }
-
-    private async loadProduct(bookingLineId: number) {
-        try {
-            const bookingLines = await this.api.read('sale\\booking\\BookingLine', [bookingLineId], ['product_id', 'qty_accounting_method']);
-            if(bookingLines && bookingLines.length) {
-                const bookingLine = bookingLines[0];
-
-                const products = await this.api.read('sale\\catalog\\Product', [bookingLine.product_id], ['name']);
-                if(products && products.length) {
-                    this.product = products[0];
-                    this.vm.product.name = this.product.name;
-                }
-            }
-        }
-        catch(response) {
-            console.log(response);
         }
     }
 
@@ -140,7 +120,7 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
 
     private productRestore() {
         this.vm.product.formControl.setErrors(null);
-        this.vm.product.name = this.product ? this.product.name : '';
+        this.vm.product.name = this.activity ? this.activity.name : '';
     }
 
     private productDisplay(product: any): string {
@@ -152,10 +132,9 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
 
         // from mat-autocomplete
         if(event && event.option && event.option.value) {
-            this.product = event.option.value;
-            this.vm.product.name = this.product.name;
+            this.vm.product.name = event.option.value.name;
 
-            this.productSelected.emit(this.product);
+            this.productSelected.emit(event.option.value);
         }
     }
 

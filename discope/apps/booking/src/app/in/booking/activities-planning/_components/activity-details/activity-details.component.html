@@ -1,4 +1,4 @@
-<mat-form-field *ngIf="!product && group" class="product-form-field">
+<mat-form-field *ngIf="!activity && group" class="product-form-field">
     <mat-label>Activité</mat-label>
     <input *ngIf="!group.is_locked"
            matInput
@@ -23,7 +23,7 @@
     </mat-autocomplete>
 </mat-form-field>
 
-<ng-container *ngIf="product && group">
+<ng-container *ngIf="activity && group">
     <mat-form-field class="product-form-field">
         <mat-label>Activité</mat-label>
         <input matInput [disabled]="group && group.is_locked" type="text" [value]="vm.product.name" readonly="readonly" />
