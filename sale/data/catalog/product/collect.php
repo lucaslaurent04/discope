@@ -85,7 +85,7 @@ $price_lists_ids = PriceList::search(
             ['price_list_category_id', '=', $center['price_list_category_id']],
             ['date_from', '<=', $params['date_from']],
             ['date_to', '>=', $params['date_from']],
-            ['status', '=', ['published']]
+            ['status', 'in', ['published', 'pending']]
         ],
         ['duration' => 'asc']
     )
