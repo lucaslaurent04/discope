@@ -88,7 +88,7 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
                 ['is_activity', '=', true]
             ];
 
-            if(this.timeSlot !== 'EV') {
+            if(this.timeSlot === 'EV') {
                 domain.push(['is_fullday', '=', false]);
             }
 
