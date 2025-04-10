@@ -53,7 +53,8 @@
             "confirm": true,
             "access": {
                 "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
-            }
+            },
+            "visible": [true, "=", "env.sale.features.payment.bank_check"]
         },
         {
             "id": "action.pay_financial_help",
@@ -64,7 +65,7 @@
             "access": {
                 "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
             },
-            "visible": ["is_paid", "=", false]
+            "visible": [["is_paid", "=", false], [true, "=", "env.sale.features.payment.financial_help"]]
         },
         {
             "id": "action.unpay_instant",
@@ -285,7 +286,8 @@
                     },
                     {
                         "label": "Bank Checks",
-                        "id": "section.backchecks",
+                        "id": "section.bankchecks",
+                        "visible": [true, "=", "env.sale.features.payment.bank_check"],
                         "rows": [
                             {
                                 "columns": [

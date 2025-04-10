@@ -218,6 +218,7 @@
                 "description": "",
                 "icon": "account_balance",
                 "type": "parent",
+                "visible": [true, "=", "env.sale.features.payment.bank_check"],
                 "children": [
                     {
                         "id": "item.bankchecks.all",
