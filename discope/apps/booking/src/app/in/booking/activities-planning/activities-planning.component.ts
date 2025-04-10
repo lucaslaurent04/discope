@@ -171,7 +171,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                 ['group_type', '=', 'camp'],
                 ['booking_id', '=', this.bookingId]
             ];
-            this.activityGroups = await this.api.collect('sale\\booking\\BookingLineGroup', domain, fields);
+            this.activityGroups = await this.api.collect('sale\\booking\\BookingLineGroup', domain, fields, 'activity_group_num', 'asc');
 
             for(let group of this.activityGroups) {
                 if(group.activity_group_num === 1) {
@@ -241,6 +241,20 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         }
         catch(response) {
             console.log(response)
+        }
+    }
+
+    public async onNbPersChanged(nbPers: number) {
+        try {
+            await this.api.fetch('?do=sale_booking_update-sojourn-nbpers', {
+                id: this.selectedGroup.id,
+                nb_pers: nbPers
+            });
+
+            await this.loadActivityGroups(Object.getOwnPropertyNames(new BookingLineGroup()));
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
         }
     }
 
