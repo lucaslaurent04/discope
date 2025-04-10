@@ -575,6 +575,22 @@
                 "is_multilang": 0,
                 "is_sequence": 0,
                 "object_class": null
+            },
+            {
+                "id": 205,
+                "name": "sale.organization.booking.channel_manager.client_domain",
+                "code": "booking.channel_manager.client_domain",
+                "package": "sale",
+                "section_id": 18,
+                "title": "Domaine du client channel manager.",
+                "description": "Domaine de l'instance autorisée à contacter le channel manager.",
+                "help": "Ceci permet de limiter les accès channel manager à l'instance de PROD qui partage la config avec les intances de staging.",
+                "type": "string",
+                "form_control": "input",
+                "section": "organization",
+                "is_multilang": 0,
+                "is_sequence": 0,
+                "object_class": null
             }
         ]
     }
