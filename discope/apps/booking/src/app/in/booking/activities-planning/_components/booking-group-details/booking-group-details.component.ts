@@ -24,8 +24,8 @@ export class BookingActivitiesPlanningBookingGroupDetailsComponent implements On
     constructor(
     ) {
         this.nbPersFormControl = new FormControl(0, [Validators.min(1)]);
-        this.ageFromFormControl = new FormControl(0, [Validators.min(1), Validators.max(99), this.maxAgeTo()]);
-        this.ageToFormControl = new FormControl(0, [Validators.min(1), Validators.max(99), this.minAgeFrom()]);
+        this.ageFromFormControl = new FormControl(0, [Validators.min(0), Validators.max(99), this.maxAgeTo()]);
+        this.ageToFormControl = new FormControl(0, [Validators.min(0), Validators.max(99), this.minAgeFrom()]);
     }
 
     public maxAgeTo(): ValidatorFn {
