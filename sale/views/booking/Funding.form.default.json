@@ -266,7 +266,7 @@
                     },
                     {
                         "label": "Bank Checks",
-                        "id": "section.backchecks",
+                        "id": "section.bankchecks",
                         "rows": [
                             {
                                 "columns": [
