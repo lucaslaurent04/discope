@@ -1,33 +1,35 @@
-<div class="time-slot-icons">
-    <div [style]="'height: '+dayNameHeight()+'px;'"></div>
-    <mat-icon class="time-slot-icon">wb_twilight</mat-icon>
-    <div [style]="'height:'+timeSlotIconSeparatorHeight()+'px'"></div>
-    <mat-icon class="time-slot-icon">sunny</mat-icon>
-    <div [style]="'height:'+timeSlotIconSeparatorHeight()+'px'"></div>
-    <mat-icon class="time-slot-icon">nights_stay</mat-icon>
-</div>
-
-<div *ngFor="let dateString of days" class="day-activities" [class.day-disabled]="!dateInBooking(dateString)" [style]="'gap: '+gapBetweenTimeSlot+'px;'">
-    <div class="day-date">
-        <span class="day-name">{{ dayName(dateString) }}</span> <span class="date">{{ dateComplete(dateString) }}</span>
+<div class="week-activities">
+    <div class="time-slot-icons">
+        <div [style]="'min-height: '+dayNameHeight()+'px;'"></div>
+        <mat-icon class="time-slot-icon">wb_twilight</mat-icon>
+        <div [style]="'min-height:'+timeSlotIconSeparatorHeight()+'px'"></div>
+        <mat-icon class="time-slot-icon">sunny</mat-icon>
+        <div [style]="'min-height:'+timeSlotIconSeparatorHeight()+'px'"></div>
+        <mat-icon class="time-slot-icon">nights_stay</mat-icon>
     </div>
 
-    <div *ngFor="let timeSlotCode of ['AM', 'PM', 'EV']" class="time-slot-activities" [style]="'gap: '+gapBetweenGroupLine+'px;'">
-        <ng-container *ngIf="dateInBooking(dateString)">
-            <div *ngFor="let group of groups"
-                 class="group-activity"
-                 [class.group-selected]="dateString === selectedDay && timeSlotCode === selectedTimeSlot && group.id === selectedGroup.id"
-                 (click)="selectGroupActivity(dateString, timeSlotCode, group)"
-            >
+    <div *ngFor="let dateString of days" class="day-activities" [class.day-disabled]="!dateInBooking(dateString)" [style]="'gap: '+gapBetweenTimeSlot+'px;'">
+        <div class="day-date">
+            <span class="day-name">{{ dayName(dateString) }}</span> <span class="date">{{ dateComplete(dateString) }}</span>
+        </div>
+
+        <div *ngFor="let timeSlotCode of ['AM', 'PM', 'EV']" class="time-slot-activities" [style]="'gap: '+gapBetweenGroupLine+'px;'">
+            <ng-container *ngIf="dateInBooking(dateString)">
+                <div *ngFor="let group of groups"
+                     class="group-activity"
+                     [class.group-selected]="dateString === selectedDay && timeSlotCode === selectedTimeSlot && group.id === selectedGroup.id"
+                     (click)="selectGroupActivity(dateString, timeSlotCode, group)"
+                >
                 <span class="group-num">
                     {{ group.activity_group_num }}
                 </span>
-                <span *ngIf="mapDateTimeSlotGroupActivity[dateString]?.[timeSlotCode]?.[group.activity_group_num]">
+                    <span *ngIf="mapDateTimeSlotGroupActivity[dateString]?.[timeSlotCode]?.[group.activity_group_num]">
                     <a [title]="mapDateTimeSlotGroupActivity[dateString]?.[timeSlotCode]?.[group.activity_group_num].name" class="activity-name">
                         {{ activityShortName(mapDateTimeSlotGroupActivity[dateString]?.[timeSlotCode]?.[group.activity_group_num].name) }}
                     </a>
                 </span>
-            </div>
-        </ng-container>
+                </div>
+            </ng-container>
+        </div>
     </div>
 </div>
