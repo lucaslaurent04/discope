@@ -559,9 +559,23 @@
                 "is_multilang": 0,
                 "is_sequence": 0,
                 "object_class": null
+            },
+            {
+                "id": 204,
+                "name": "sale.features.payment.financial_help",
+                "code": "payment.financial_help",
+                "package": "sale",
+                "section_id": 12,
+                "title": "Paiements avec aide financière",
+                "description": "Permettre les paiements via aide financière ?",
+                "help": "Si cette valeur est mise à true, les options de paiement via aide financière sont disponibles.",
+                "type": "boolean",
+                "form_control": "toggle",
+                "section": "features",
+                "is_multilang": 0,
+                "is_sequence": 0,
+                "object_class": null
             }
-
-
         ]
     }
 ]
