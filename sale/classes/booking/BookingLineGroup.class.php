@@ -3437,7 +3437,7 @@ class BookingLineGroup extends Model {
      * Resets the Age range assignments to a single assignment (adults) according to nb_pers.
      */
     public static function refreshAgeRangeAssignments($om, $id) {
-        $groups = $om->read(self::getType(), $id, ['booking_id', 'nb_pers', 'is_sojourn', 'age_range_assignments_ids', 'age_range_assignments_ids.age_range_id']);
+        $groups = $om->read(self::getType(), $id, ['booking_id', 'nb_pers', 'is_sojourn', 'age_range_assignments_ids', 'age_range_assignments_ids.age_range_id', 'age_range_assignments_ids.age_from', 'age_range_assignments_ids.age_to']);
         if($groups <= 0) {
             return;
         }
@@ -3450,9 +3450,12 @@ class BookingLineGroup extends Model {
             // reset nb_children
             $om->update(self::getType(), $id, ['nb_children' => null]);
 
+            $age_from = $age_to = null;
             if(count($group['age_range_assignments_ids']) === 1) {
                 // keep previous age range if only one
                 $age_range_id = array_values($group['age_range_assignments_ids.age_range_id'])[0]['age_range_id'];
+                $age_from = array_values($group['age_range_assignments_ids.age_from'])[0]['age_from'];
+                $age_to = array_values($group['age_range_assignments_ids.age_to'])[0]['age_to'];
             }
             else {
                 // else use default 'adult' age range from setting
@@ -3466,6 +3469,12 @@ class BookingLineGroup extends Model {
                 'booking_id'            => $group['booking_id'],
                 'qty'                   => $group['nb_pers']
             ];
+            if(!is_null($age_from)) {
+                $assignment['age_from'] = $age_from;
+            }
+            if(!is_null($age_to)) {
+                $assignment['age_to'] = $age_to;
+            }
             $om->create(BookingLineGroupAgeRangeAssignment::getType(), $assignment);
         }
     }
