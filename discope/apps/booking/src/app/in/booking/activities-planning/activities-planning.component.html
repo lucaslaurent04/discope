@@ -12,7 +12,10 @@
 
             <div class="group-activity-details">
                 <booking-activities-planning-booking-group-details [group]="selectedGroup"
+                                                                   [mapGroupAgeRangeAssignment]="mapGroupAgeRangeAssignment"
                                                                    (nbPersChanged)="onNbPersChanged($event)"
+                                                                   (ageFromChanged)="onAgeFromChanged($event)"
+                                                                   (ageToChanged)="onAgeToChanged($event)"
                 ></booking-activities-planning-booking-group-details>
 
                 <booking-activities-planning-activity-details [activity]="selectedActivity"
