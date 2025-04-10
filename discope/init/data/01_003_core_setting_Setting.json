@@ -511,7 +511,57 @@
                 "is_multilang": 1,
                 "is_sequence": 0,
                 "object_class": null
+            },
+            {
+                "id": 201,
+                "name": "sale.features.booking.channel_manager",
+                "code": "booking.channel_manager",
+                "package": "sale",
+                "section_id": 12,
+                "title": "Channelmanager activé",
+                "description": "Est-ce que le channelmangager Cubilis est activé pour cette instance de Discope ?",
+                "help": "Si cette valeur est mise à false, les controllers liés à la synchronisation avec le channel manager ne s'exécutent pas.",
+                "type": "boolean",
+                "form_control": "toggle",
+                "section": "features",
+                "is_multilang": 0,
+                "is_sequence": 0,
+                "object_class": null
+            },
+            {
+                "id": 202,
+                "name": "sale.features.booking.instant_payment",
+                "code": "booking.instant_payment",
+                "package": "sale",
+                "section_id": 12,
+                "title": "Paiement instantané activé",
+                "description": "Autoriser le marquage manuel des financements comme payés ?",
+                "help": "Si cette valeur est mise à true, les financements peuvent être marqués comme payés en simulant une opération de caisse ?.",
+                "type": "boolean",
+                "form_control": "toggle",
+                "section": "features",
+                "is_multilang": 0,
+                "is_sequence": 0,
+                "object_class": null
+            },
+            {
+                "id": 203,
+                "name": "sale.features.payment.bank_check",
+                "code": "payment.bank_check",
+                "package": "sale",
+                "section_id": 12,
+                "title": "Paiements par chèque",
+                "description": "Est-ce que le paiements par chèque sont activés?",
+                "help": "Si cette valeur est mise à true, les options de paiement via chèque bancaire sont disponibles.",
+                "type": "boolean",
+                "form_control": "toggle",
+                "section": "features",
+                "is_multilang": 0,
+                "is_sequence": 0,
+                "object_class": null
             }
+
+
         ]
     }
 ]
