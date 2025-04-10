@@ -54,7 +54,7 @@ list($params, $providers) = eQual::announce([
  */
 ['context' => $context, 'orm' => $orm, 'cron' => $cron, 'dispatch' => $dispatch] = $providers;
 
-$channelmanager_enabled = Setting::get_value('sale', 'booking', 'channelmanager.enabled', false);
+$channelmanager_enabled = Setting::get_value('sale', 'features', 'booking.channel_manager', false);
 
 if(!$channelmanager_enabled) {
     throw new Exception('disabled_feature', QN_ERROR_INVALID_CONFIG);
