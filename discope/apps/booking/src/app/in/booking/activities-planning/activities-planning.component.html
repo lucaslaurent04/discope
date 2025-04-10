@@ -11,7 +11,9 @@
             </div>
 
             <div class="group-activity-details">
-                <booking-activities-planning-booking-group-details [group]="selectedGroup"></booking-activities-planning-booking-group-details>
+                <booking-activities-planning-booking-group-details [group]="selectedGroup"
+                                                                   (nbPersChanged)="onNbPersChanged($event)"
+                ></booking-activities-planning-booking-group-details>
 
                 <booking-activities-planning-activity-details [activity]="selectedActivity"
                                                               [booking]="booking"
