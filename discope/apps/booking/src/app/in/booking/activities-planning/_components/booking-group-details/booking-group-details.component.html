@@ -9,4 +9,22 @@
         <input type="number" matInput [formControl]="nbPersFormControl" (blur)="onNbPersChanges()">
         <mat-error *ngIf="nbPersFormControl.hasError('min')">Min 1.</mat-error>
     </mat-form-field>
+
+    <ng-container *ngIf="mapGroupAgeRangeAssignment[group.id]">
+        <mat-form-field class="age-from-form-field">
+            <mat-label>De</mat-label>
+            <input type="number" matInput [formControl]="ageFromFormControl" (blur)="onAgeFromChanges()">
+            <mat-error *ngIf="ageFromFormControl.hasError('min')">Min 1.</mat-error>
+            <mat-error *ngIf="ageFromFormControl.hasError('max')">Max 99.</mat-error>
+            <mat-error *ngIf="ageFromFormControl.hasError('maxAgeTo')">Doit être plus petit que "A".</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="age-to-form-field">
+            <mat-label>A</mat-label>
+            <input type="number" matInput [formControl]="ageToFormControl" (blur)="onAgeToChanges()">
+            <mat-error *ngIf="ageToFormControl.hasError('min')">Min 1.</mat-error>
+            <mat-error *ngIf="ageToFormControl.hasError('max')">Max 99.</mat-error>
+            <mat-error *ngIf="ageToFormControl.hasError('minAgeFrom')">Doit être plus grand que "De".</mat-error>
+        </mat-form-field>
+    </ng-container>
 </ng-container>

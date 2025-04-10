@@ -10,6 +10,7 @@ import { Product } from './_models/product.model';
 import { BookingActivitiesPlanningActivityDetailsComponent } from './_components/activity-details/activity-details.component';
 import { BehaviorSubject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { AgeRangeAssignment } from './_models/age-range-assignment.model';
 
 type PlanningTimeSlot = {
     [groupNum: number]: Activity;
@@ -56,6 +57,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
     public selectedItem$ = new BehaviorSubject<string>(null);
 
     public activityGroups: BookingLineGroup[] = [];
+    public mapGroupAgeRangeAssignment: {[groupId: number]: AgeRangeAssignment} = {};
 
     public selectedActivity: Activity = null;
     public planning: Planning = {};
@@ -178,9 +180,34 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                     this.selectedGroup = group;
                 }
             }
+
+            await this.loadMapGroupAgeRangeAssigment();
         }
         catch(response) {
             console.log('unexpected error', response);
+        }
+    }
+
+    private async loadMapGroupAgeRangeAssigment() {
+        let ageRangeAssignmentsIds: number[] = [];
+        for(let group of this.activityGroups) {
+            if(group.age_range_assignments_ids.length === 1) {
+                ageRangeAssignmentsIds = [
+                    ...ageRangeAssignmentsIds,
+                    ...group.age_range_assignments_ids
+                ];
+            }
+        }
+
+        if(ageRangeAssignmentsIds.length > 0) {
+            const ageRangeAssignments = await this.api.read('sale\\booking\\BookingLineGroupAgeRangeAssignment', ageRangeAssignmentsIds, Object.getOwnPropertyNames(new AgeRangeAssignment()));
+
+            const mapGroupAgeRangeAssignment: {[groupId: number]: AgeRangeAssignment} = {};
+            for(let ageRangeAssign of ageRangeAssignments as AgeRangeAssignment[]) {
+                mapGroupAgeRangeAssignment[ageRangeAssign.booking_line_group_id] = ageRangeAssign;
+            }
+
+            this.mapGroupAgeRangeAssignment = mapGroupAgeRangeAssignment;
         }
     }
 
@@ -249,6 +276,36 @@ export class BookingActivitiesPlanningComponent implements OnInit {
             await this.api.fetch('?do=sale_booking_update-sojourn-nbpers', {
                 id: this.selectedGroup.id,
                 nb_pers: nbPers
+            });
+
+            await this.loadActivityGroups(Object.getOwnPropertyNames(new BookingLineGroup()));
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+    }
+
+    public async onAgeFromChanged(ageFrom: number) {
+        const ageRangeAssign = this.mapGroupAgeRangeAssignment[this.selectedGroup.id];
+
+        try {
+            await this.api.update('sale\\booking\\BookingLineGroupAgeRangeAssignment', [ageRangeAssign.id], {
+                age_from: ageFrom
+            });
+
+            await this.loadActivityGroups(Object.getOwnPropertyNames(new BookingLineGroup()));
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+    }
+
+    public async onAgeToChanged(ageTo: number) {
+        const ageRangeAssign = this.mapGroupAgeRangeAssignment[this.selectedGroup.id];
+
+        try {
+            await this.api.update('sale\\booking\\BookingLineGroupAgeRangeAssignment', [ageRangeAssign.id], {
+                age_to: ageTo
             });
 
             await this.loadActivityGroups(Object.getOwnPropertyNames(new BookingLineGroup()));
