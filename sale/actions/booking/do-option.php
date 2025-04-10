@@ -205,7 +205,7 @@ Booking::id($params['id'])->update(['status' => 'option']);
 // check booking rental units assignment
 eQual::run('do', 'sale_booking_check-consistency', ['id' => $booking['id']]);
 
-$channelmanager_enabled = Setting::get_value('sale', 'booking', 'channelmanager.enabled', false);
+$channelmanager_enabled = Setting::get_value('sale', 'features', 'booking.channel_manager', false);
 if($channelmanager_enabled) {
     /*
         Check if consistency must be maintained with channel manager (if booking impacts a rental unit that is linked to a channelmanager room type)
