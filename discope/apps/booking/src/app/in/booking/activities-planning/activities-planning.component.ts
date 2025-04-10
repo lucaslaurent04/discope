@@ -40,6 +40,8 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         }
     }
 
+    public loading: boolean = true;
+
     private bookingId: number = null;
     public booking = new Booking();
 
@@ -104,6 +106,8 @@ export class BookingActivitiesPlanningComponent implements OnInit {
             catch(response) {
                 console.warn(response);
             }
+
+            this.loading = false;
         });
 
         this.selectedItem$.pipe(debounceTime(300)).subscribe((selectedItem) => {
@@ -212,6 +216,8 @@ export class BookingActivitiesPlanningComponent implements OnInit {
     }
 
     public async previousWeek() {
+        this.loading = true;
+
         const weekStartDate = new Date(this.weekStartDate);
         weekStartDate.setDate(weekStartDate.getDate() - 7);
         this.weekStartDate = weekStartDate;
@@ -223,9 +229,20 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         this.weekEndDate = weekEndDate;
 
         await this.loadWeekActivities(Object.getOwnPropertyNames(new Activity()));
+
+        if(this.planning?.[this.selectedDay]?.[this.selectedTimeSlot]?.[this.selectedGroup.activity_group_num]) {
+            this.selectedActivity = this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num];
+        }
+        else {
+            this.selectedActivity = null;
+        }
+
+        this.loading = false;
     }
 
     public async nextWeek() {
+        this.loading = true;
+
         const weekStartDate = new Date(this.weekStartDate);
         weekStartDate.setDate(weekStartDate.getDate() + 7);
         this.weekStartDate = weekStartDate;
@@ -237,6 +254,15 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         this.weekEndDate = weekEndDate;
 
         await this.loadWeekActivities(Object.getOwnPropertyNames(new Activity()));
+
+        if(this.planning?.[this.selectedDay]?.[this.selectedTimeSlot]?.[this.selectedGroup.activity_group_num]) {
+            this.selectedActivity = this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num];
+        }
+        else {
+            this.selectedActivity = null;
+        }
+
+        this.loading = false;
     }
 
     private async loadWeekActivities(fields: string[]) {
@@ -272,6 +298,8 @@ export class BookingActivitiesPlanningComponent implements OnInit {
     }
 
     public async onNbPersChanged(nbPers: number) {
+        this.loading = true;
+
         try {
             await this.api.fetch('?do=sale_booking_update-sojourn-nbpers', {
                 id: this.selectedGroup.id,
@@ -283,9 +311,13 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         catch(response) {
             this.api.errorFeedback(response);
         }
+
+        this.loading = false;
     }
 
     public async onAgeFromChanged(ageFrom: number) {
+        this.loading = true;
+
         const ageRangeAssign = this.mapGroupAgeRangeAssignment[this.selectedGroup.id];
 
         try {
@@ -298,9 +330,13 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         catch(response) {
             this.api.errorFeedback(response);
         }
+
+        this.loading = false;
     }
 
     public async onAgeToChanged(ageTo: number) {
+        this.loading = true;
+
         const ageRangeAssign = this.mapGroupAgeRangeAssignment[this.selectedGroup.id];
 
         try {
@@ -313,9 +349,13 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         catch(response) {
             this.api.errorFeedback(response);
         }
+
+        this.loading = false;
     }
 
     public async onProductSelected(product: Product) {
+        this.loading = true;
+
         let newLine: any = null;
 
         // notify back-end about the change
@@ -356,11 +396,14 @@ export class BookingActivitiesPlanningComponent implements OnInit {
             }
             this.api.errorFeedback(response);
         }
+
+        this.loading = false;
     }
 
     public async onActivityDeleted() {
+        this.loading = true;
+
         try {
-            // #todo #refresh - this triggers onupdateBookingLinesIds, which triggers _resetPrices
             await this.api.update('sale\\booking\\BookingLineGroup', [this.selectedGroup.id], {booking_lines_ids: [-this.selectedActivity.activity_booking_line_id]});
 
             await this.loadWeekActivities(Object.getOwnPropertyNames(new Activity()));
@@ -368,9 +411,10 @@ export class BookingActivitiesPlanningComponent implements OnInit {
             this.selectedActivity = null;
         }
         catch(response) {
-            console.log('RESPONSE', response);
             this.api.errorFeedback(response);
         }
+
+        this.loading = false;
     }
 
     public formatDayIndex(date: Date) {
