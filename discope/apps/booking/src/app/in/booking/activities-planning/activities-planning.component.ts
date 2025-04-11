@@ -12,6 +12,7 @@ import { BehaviorSubject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { AgeRangeAssignment } from './_models/age-range-assignment.model';
 import { Partner } from './_models/partner.model';
+import { BookingLine } from './_models/booking-line.model';
 
 type PlanningTimeSlot = {
     [groupNum: number]: Activity;
@@ -99,7 +100,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                     }
                 });
 
-                await this.loadWeekActivities(Object.getOwnPropertyNames(new Activity()));
+                await this.loadWeekActivities();
 
                 if(this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num]) {
                     this.selectedActivity = this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num];
@@ -257,7 +258,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         weekEndDate.setDate(weekEndDate.getDate() + 6);
         this.weekEndDate = weekEndDate;
 
-        await this.loadWeekActivities(Object.getOwnPropertyNames(new Activity()));
+        await this.loadWeekActivities();
 
         if(this.planning?.[this.selectedDay]?.[this.selectedTimeSlot]?.[this.selectedGroup.activity_group_num]) {
             this.selectedActivity = this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num];
@@ -282,7 +283,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         weekEndDate.setDate(weekEndDate.getDate() + 6);
         this.weekEndDate = weekEndDate;
 
-        await this.loadWeekActivities(Object.getOwnPropertyNames(new Activity()));
+        await this.loadWeekActivities();
 
         if(this.planning?.[this.selectedDay]?.[this.selectedTimeSlot]?.[this.selectedGroup.activity_group_num]) {
             this.selectedActivity = this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num];
@@ -294,20 +295,34 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         this.loading = false;
     }
 
-    private async loadWeekActivities(fields: string[]) {
+    private async loadWeekActivities() {
         try {
             const weekStartDate = (new Date(this.weekStartDate)).getTime() / 1000;
             const weekEndDate = (new Date(this.weekStartDate)).setDate(this.weekStartDate.getDate() + 6) / 1000;
 
-            const domain = [
+            const domainActivities = [
                 ['booking_id', '=', this.bookingId],
                 ['activity_date', '>=', weekStartDate],
                 ['activity_date', '<=', weekEndDate]
             ];
-            const activities: Activity[] = await this.api.collect('sale\\booking\\BookingActivity', domain, fields);
+            const activitiesPromise = this.api.collect('sale\\booking\\BookingActivity', domainActivities, Object.getOwnPropertyNames(new Activity()));
+
+            const domainBookingLines = [
+                ['booking_id', '=', this.bookingId],
+                ['is_activity', '=', true]
+            ];
+            const bookingLinesPromise = this.api.collect('sale\\booking\\BookingLine', domainBookingLines, Object.getOwnPropertyNames(new BookingLine()));
+
+            const [activities, bookingLines] = await Promise.all([activitiesPromise, bookingLinesPromise])
 
             this.planning = {};
             for(let activity of activities) {
+                for(let bookingLine of bookingLines) {
+                    if(activity.activity_booking_line_id === bookingLine.id) {
+                        activity.activity_booking_line_id = bookingLine;
+                    }
+                }
+
                 const formattedDate = this.formatDayIndex(new Date(activity.activity_date));
                 if(this.planning[formattedDate] === undefined) {
                     this.planning[formattedDate] = {};
@@ -417,7 +432,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                 product_id: product.id
             });
 
-            await this.loadWeekActivities(Object.getOwnPropertyNames(new Activity()));
+            await this.loadWeekActivities();
 
             if(this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num]) {
                 this.selectedActivity = this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num];
@@ -439,7 +454,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         try {
             await this.api.update('sale\\booking\\BookingLineGroup', [this.selectedGroup.id], {booking_lines_ids: [-this.selectedActivity.activity_booking_line_id]});
 
-            await this.loadWeekActivities(Object.getOwnPropertyNames(new Activity()));
+            await this.loadWeekActivities();
 
             this.selectedActivity = null;
         }
@@ -456,7 +471,38 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         try {
             await this.api.update('sale\\booking\\BookingActivity', [this.selectedActivity.id], {employee_id: employeeId});
 
-            await this.loadWeekActivities(Object.getOwnPropertyNames(new Activity()));
+            await this.loadWeekActivities();
+        }
+        catch(response) {
+            onFail();
+
+            this.api.errorFeedback(response);
+        }
+
+        this.loading = false;
+    }
+
+    public async onProvidersChanged({providersIds: newProvidersIds, onFail}: {providersIds: number[], onFail: () => void}) {
+        this.loading = true;
+
+        let providersIdsToRemove = [];
+        for(let provId of this.selectedActivity.providers_ids) {
+            let idStillPresent = false;
+            for(let newProvId of newProvidersIds) {
+                if(provId === newProvId) {
+                    idStillPresent = true;
+                    break;
+                }
+            }
+            if(!idStillPresent) {
+                providersIdsToRemove.push(-provId);
+            }
+        }
+
+        try {
+            await this.api.update('sale\\booking\\BookingActivity', [this.selectedActivity.id], {providers_ids: [...providersIdsToRemove, ...newProvidersIds]});
+
+            await this.loadWeekActivities();
         }
         catch(response) {
             onFail();

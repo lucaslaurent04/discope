@@ -16,11 +16,13 @@
         }
     }
 
-    .staff-wrapper {
-        display: flex;
-        align-items: center;
+    .employee-form-field {
+        margin-left: 5px;
     }
 
     .providers-wrapper {
+        .provider-form-field {
+            margin-left: 5px;
+        }
     }
 }
