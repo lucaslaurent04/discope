@@ -349,6 +349,10 @@ class BookingActivity extends Model {
     }
 
     public static function canupdate($self, $values): array {
+        if(!isset($values['activity_date']) && !isset($values['time_slot_id']) && !isset($values['employee_id'])) {
+            return parent::canupdate($self, $values);
+        }
+
         $self->read(['activity_date', 'time_slot_id', 'employee_id', 'product_model_id']);
         foreach($self as $booking_activity) {
             $employee_id = array_key_exists('employee_id', $values) ? $values['employee_id'] : $booking_activity['employee_id'];

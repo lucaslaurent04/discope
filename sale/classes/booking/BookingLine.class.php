@@ -480,14 +480,17 @@ class BookingLine extends Model {
                 ]);
 
                 if($product['product_model_id']['is_fullday']) {
-                    foreach($self as $line) {
+                    foreach($self as $id => $line) {
                         if(!in_array($line['time_slot_id'], $AM_PM_time_slot_ids)) {
+                            // remove empty line because cannot set to activity
+                            self::id($id)->delete(true);
+
                             return ['time_slot_id' => ['not_allowed' => 'A full day activity can only happen on AM or PM time slots.']];
                         }
                     }
                 }
 
-                foreach($self as $line) {
+                foreach($self as $id => $line) {
                     $activities_to_check = self::generateLineActivities(
                         $line['service_date'],
                         $line['time_slot_id'],
@@ -501,6 +504,9 @@ class BookingLine extends Model {
                             $activity_to_check['activity_date'] < $line['booking_line_group_id']['date_from']
                             || $activity_to_check['activity_date'] > $line['booking_line_group_id']['date_to']
                         ) {
+                            // remove empty line because cannot set to activity
+                            self::id($id)->delete(true);
+
                             return ['service_date' => ['outside_of_group_dates' => 'The activity has to be planned inside the group period.']];
                         }
 
@@ -513,6 +519,9 @@ class BookingLine extends Model {
                             ->first();
 
                         if(!is_null($activity)) {
+                            // remove empty line because cannot set to activity
+                            self::id($id)->delete(true);
+
                             return ['service_date' => ['already_used' => 'Moment conflict with another activity of the group.']];
                         }
                     }
