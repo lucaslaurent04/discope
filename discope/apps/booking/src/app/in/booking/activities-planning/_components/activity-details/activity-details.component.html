@@ -40,17 +40,22 @@
     </ng-container>
 </div>
 
-<div *ngIf="activity && activity.has_staff_required" class="staff-wrapper">
-    <mat-form-field class="employee-form-field">
-        <mat-label>Employé</mat-label>
-        <mat-select [formControl]="vm.employee.formControl" (valueChange)="onEmployeeChanged($event)">
-            <mat-option *ngFor="let employee of employees" [value]="employee.id">
-                {{employee.name}}
+<mat-form-field *ngIf="activity && activity.has_staff_required" class="employee-form-field">
+    <mat-label>Employé</mat-label>
+    <mat-select [formControl]="vm.employee.formControl" (selectionChange)="vm.employee.change()">
+        <mat-option *ngFor="let employee of employees" [value]="employee.id">
+            {{employee.name}}
+        </mat-option>
+    </mat-select>
+</mat-form-field>
+
+<div *ngIf="activity && activity.has_provider" class="providers-wrapper">
+    <mat-form-field *ngFor="let formControl of vm.providers.formControls" class="provider-form-field">
+        <mat-label>Prestataire</mat-label>
+        <mat-select [formControl]="formControl" (selectionChange)="vm.providers.change()">
+            <mat-option *ngFor="let provider of providers" [value]="provider.id">
+                {{provider.name}}
             </mat-option>
         </mat-select>
     </mat-form-field>
-</div>
-
-<div *ngIf="activity && activity.has_provider" class="providers-wrapper">
-
 </div>

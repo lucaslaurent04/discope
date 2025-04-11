@@ -21,7 +21,12 @@ interface vmModel {
         display: (type: any) => string
     },
     employee: {
-        formControl: FormControl
+        formControl: FormControl,
+        change: () => void
+    },
+    providers: {
+        formControls: FormControl[],
+        change: () => void
     }
 }
 
@@ -42,6 +47,7 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
     @Output() productSelected = new EventEmitter<Product>();
     @Output() activityDeleted = new EventEmitter();
     @Output() employeeChanged = new EventEmitter<{employeeId: number, onFail: () => void}>();
+    @Output() providersChanged = new EventEmitter<{providersIds: number[], onFail: () => void}>();
 
     @ViewChild('inputField') inputField!: ElementRef;
 
@@ -62,7 +68,12 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
                 display: (type:any) => this.productDisplay(type)
             },
             employee: {
-                formControl: new FormControl(null)
+                formControl: new FormControl(null),
+                change: () => this.employeeChange()
+            },
+            providers: {
+                formControls: [],
+                change: () => this.providerChange()
             }
         };
     }
@@ -88,6 +99,17 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
                 if(this.activity.has_staff_required) {
                     this.vm.employee.formControl.setValue(this.activity.employee_id);
                 }
+
+                const providersFormControls = [];
+                const providersQty = this.activity.activity_booking_line_id.qty_accounting_method === 'unit' ? this.activity.activity_booking_line_id.qty : 1;
+                for(let i = 0; i < providersQty; i++) {
+                    let providerId: number | null = null;
+                    if(this.activity?.providers_ids?.[i]) {
+                        providerId = +this.activity.providers_ids[i];
+                    }
+                    providersFormControls.push(new FormControl(providerId));
+                }
+                this.vm.providers.formControls = providersFormControls;
             }
         }
     }
@@ -154,11 +176,31 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
         this.activityDeleted.emit();
     }
 
-    public onEmployeeChanged(employeeId: number) {
+    public employeeChange() {
         this.employeeChanged.emit({
-            employeeId,
+            employeeId: this.vm.employee.formControl.value,
             onFail: () => {
                 this.vm.employee.formControl.setValue(this.activity.employee_id);
+            }
+        });
+    }
+
+    public providerChange() {
+        const providersIds: number[] = this.vm.providers.formControls.map((formControl) => formControl.value);
+
+        this.providersChanged.emit({
+            providersIds,
+            onFail: () => {
+                let i = 0;
+                for(let formControl of this.vm.providers.formControls) {
+                    if(this.activity.providers_ids[i]) {
+                        formControl.setValue(this.activity.providers_ids[i]);
+                    }
+                    else {
+                        formControl.setValue(null);
+                    }
+                    i++;
+                }
             }
         });
     }
