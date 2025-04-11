@@ -23,8 +23,11 @@
                                                               [booking]="booking"
                                                               [timeSlot]="selectedTimeSlot"
                                                               [group]="selectedGroup"
+                                                              [employees]="employees"
+                                                              [providers]="providers"
                                                               (productSelected)="onProductSelected($event)"
                                                               (activityDeleted)="onActivityDeleted()"
+                                                              (employeeChanged)="onEmployeeChanged($event)"
                 ></booking-activities-planning-activity-details>
             </div>
         </div>
