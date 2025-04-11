@@ -1,11 +1,26 @@
 :host {
+    display: flex;
     padding: 20px;
+    gap: 30px;
 
-    .product-form-field {
-        width: 400px;
+    .product-wrapper {
+        display: flex;
+        align-items: center;
+
+        .product-form-field {
+            width: 400px;
+        }
+
+        .delete-activity {
+            margin-left: 5px;
+        }
     }
 
-    .delete-activity {
-        margin-left: 15px;
+    .staff-wrapper {
+        display: flex;
+        align-items: center;
+    }
+
+    .providers-wrapper {
     }
 }

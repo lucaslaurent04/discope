@@ -7,6 +7,7 @@ import { Product } from '../../_models/product.model';
 import { ApiService } from 'sb-shared-lib';
 import { debounceTime, map, mergeMap } from 'rxjs/operators';
 import { Booking } from '../../_models/booking.model';
+import { Partner } from '../../_models/partner.model';
 
 interface vmModel {
     product: {
@@ -18,6 +19,9 @@ interface vmModel {
         focus: () => void,
         restore: () => void,
         display: (type: any) => string
+    },
+    employee: {
+        formControl: FormControl
     }
 }
 
@@ -32,9 +36,12 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
     @Input() activity: Activity|null;
     @Input() timeSlot: 'AM'|'PM'|'EV';
     @Input() group: BookingLineGroup|null;
+    @Input() employees: Partner[];
+    @Input() providers: Partner[];
 
     @Output() productSelected = new EventEmitter<Product>();
-    @Output() activityDeleted = new EventEmitter<Product>();
+    @Output() activityDeleted = new EventEmitter();
+    @Output() employeeChanged = new EventEmitter<{employeeId: number, onFail: () => void}>();
 
     @ViewChild('inputField') inputField!: ElementRef;
 
@@ -53,6 +60,9 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
                 focus: () => this.productFocus(),
                 restore: () => this.productRestore(),
                 display: (type:any) => this.productDisplay(type)
+            },
+            employee: {
+                formControl: new FormControl(null)
             }
         };
     }
@@ -74,6 +84,10 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
             }
             else {
                 this.vm.product.name = this.activity.name;
+
+                if(this.activity.has_staff_required) {
+                    this.vm.employee.formControl.setValue(this.activity.employee_id);
+                }
             }
         }
     }
@@ -138,6 +152,15 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
 
     public async ondeleteActivity() {
         this.activityDeleted.emit();
+    }
+
+    public onEmployeeChanged(employeeId: number) {
+        this.employeeChanged.emit({
+            employeeId,
+            onFail: () => {
+                this.vm.employee.formControl.setValue(this.activity.employee_id);
+            }
+        });
     }
 
     public focusInput(): void {
