@@ -11,6 +11,7 @@ import { BookingActivitiesPlanningActivityDetailsComponent } from './_components
 import { BehaviorSubject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { AgeRangeAssignment } from './_models/age-range-assignment.model';
+import { Partner } from './_models/partner.model';
 
 type PlanningTimeSlot = {
     [groupNum: number]: Activity;
@@ -64,6 +65,9 @@ export class BookingActivitiesPlanningComponent implements OnInit {
     public selectedActivity: Activity = null;
     public planning: Planning = {};
 
+    public employees: Partner[] = [];
+    public providers: Partner[] = [];
+
     constructor(
         private api: BookingApiService,
         private context: ContextService,
@@ -102,6 +106,9 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                 }
 
                 this.selectedItem$.next(`${this.selectedDay}_${this.selectedTimeSlot}_${this.selectedGroup.activity_group_num}`);
+
+                this.loadEmployees(Object.getOwnPropertyNames(new Partner()));
+                this.loadProviders(Object.getOwnPropertyNames(new Partner()));
             }
             catch(response) {
                 console.warn(response);
@@ -215,6 +222,28 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         }
     }
 
+    private async loadEmployees(fields: string[]) {
+        try {
+            const domain = ['relationship','=', 'employee'];
+
+            this.employees = await this.api.collect('hr\\employee\\Employee', domain, fields);
+        }
+        catch(response) {
+            console.log('unexpected error', response);
+        }
+    }
+
+    private async loadProviders(fields: string[]) {
+        try {
+            const domain = ['relationship','=', 'provider'];
+
+            this.providers = await this.api.collect('sale\\provider\\Provider', domain, fields);
+        }
+        catch(response) {
+            console.log('unexpected error', response);
+        }
+    }
+
     public async previousWeek() {
         this.loading = true;
 
@@ -290,6 +319,10 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                 }
 
                 this.planning[formattedDate][timeSlotCode][activity.group_num] = activity;
+
+                if(this.selectedActivity && this.selectedActivity.id === activity.id) {
+                    this.selectedActivity = activity;
+                }
             }
         }
         catch(response) {
@@ -411,6 +444,23 @@ export class BookingActivitiesPlanningComponent implements OnInit {
             this.selectedActivity = null;
         }
         catch(response) {
+            this.api.errorFeedback(response);
+        }
+
+        this.loading = false;
+    }
+
+    public async onEmployeeChanged({employeeId, onFail}: {employeeId: number, onFail: () => void}) {
+        this.loading = true;
+
+        try {
+            await this.api.update('sale\\booking\\BookingActivity', [this.selectedActivity.id], {employee_id: employeeId});
+
+            await this.loadWeekActivities(Object.getOwnPropertyNames(new Activity()));
+        }
+        catch(response) {
+            onFail();
+
             this.api.errorFeedback(response);
         }
 
