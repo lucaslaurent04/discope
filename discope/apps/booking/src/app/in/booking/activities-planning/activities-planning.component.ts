@@ -308,12 +308,11 @@ export class BookingActivitiesPlanningComponent implements OnInit {
             const activitiesPromise = this.api.collect('sale\\booking\\BookingActivity', domainActivities, Object.getOwnPropertyNames(new Activity()));
 
             const domainBookingLines = [
-                ['booking_id', '=', this.bookingId],
-                ['is_activity', '=', true]
+                ['booking_id', '=', this.bookingId]
             ];
             const bookingLinesPromise = this.api.collect('sale\\booking\\BookingLine', domainBookingLines, Object.getOwnPropertyNames(new BookingLine()));
 
-            const [activities, bookingLines] = await Promise.all([activitiesPromise, bookingLinesPromise])
+            const [activities, bookingLines] = await Promise.all([activitiesPromise, bookingLinesPromise]);
 
             this.planning = {};
             for(let activity of activities) {
@@ -452,7 +451,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         this.loading = true;
 
         try {
-            await this.api.update('sale\\booking\\BookingLineGroup', [this.selectedGroup.id], {booking_lines_ids: [-this.selectedActivity.activity_booking_line_id]});
+            await this.api.update('sale\\booking\\BookingLineGroup', [this.selectedGroup.id], {booking_lines_ids: [-this.selectedActivity.activity_booking_line_id.id]});
 
             await this.loadWeekActivities();
 
