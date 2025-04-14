@@ -201,6 +201,7 @@ $fields = [
         'name',
         'has_pack',
         'is_locked',
+        'is_sojourn',
         'pack_id'  => ['label'],
         'qty',
         'unit_price',
@@ -212,7 +213,7 @@ $fields = [
         'date_from',
         'date_to',
         'nb_pers',
-        'age_range_assignments_ids'=> ['id', 'age_range_id','booking_line_group_id','qty'],
+        'age_range_assignments_ids'=> ['id', 'age_range_id' =>['id', 'name'] ,'booking_line_group_id','qty'],
         'booking_lines_ids' => [
             'name',
             'product_id' => [
@@ -416,6 +417,16 @@ if($booking['center_id']['use_office_details']) {
 }
 
 
+$conection_languages = [
+    ['fr' => 'et', 'en' => 'and', 'nl' => 'en'],
+];
+
+$conection_names = array_map(function($item) use ($params) {
+    return $item[$params['lang']];
+}, $conection_languages);
+
+
+
 /*
     retrieve templates
 */
@@ -433,9 +444,31 @@ if($booking['center_id']['template_category_id']) {
         if($part['name'] == 'header') {
             $value = $part['value'];
             $value = str_replace('{center}', $booking['center_id']['name'], $value);
-            $value = str_replace('{nb_pers}', $booking['nb_pers'] ,$value);
             $value = str_replace('{date_from}', $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']) , $value);
             $value = str_replace('{date_to}',  $days_names[date('w', $booking['date_to'])] . ' '. date('d/m/Y', $booking['date_to']) , $value);
+
+            $age_rang_maps = [];
+            foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
+                if($booking_line_group['is_sojourn']){
+                    foreach($booking_line_group['age_range_assignments_ids'] as $age_range_assignment) {
+                        $age_range_assignment_code = $age_range_assignment['age_range_id']['id'];
+                        if (!isset($age_rang_maps[$age_range_assignment_code])) {
+                            $age_rang_maps[$age_range_assignment_code] = [
+                                'age_range'    => $age_range_assignment['age_range_id']['name'],
+                                'qty'          => NULL
+                            ];
+                        }
+                        $age_rang_maps[$age_range_assignment_code]['qty'] += $age_range_assignment['qty'];
+                    }
+                }
+            }
+
+            $parts = array_map(fn($item) => $item['qty'] . ' ' . strtolower($item['age_range']), $age_rang_maps);
+            $last = array_pop($parts);
+            $text_pers= count($parts) ? implode(', ', $parts) . ' ' . $conection_names[0]. ' ' . $last : $last;
+
+            $value = str_replace('{nb_pers}', $text_pers,$value);
+
             $values['header_html'] = $value;
         }
         if($part['name'] == 'service') {
@@ -717,7 +750,7 @@ if($params['mode'] == 'grouped') {
                 }
                 $lines[$grouping_code_id]['price'] += $product['price'];
                 $lines[$grouping_code_id]['total'] += $product['total'];
-                
+
 
 
                 if ($product['has_pack']){
