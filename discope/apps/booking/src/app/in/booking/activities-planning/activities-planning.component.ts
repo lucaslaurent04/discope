@@ -344,6 +344,40 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         }
     }
 
+    public async onScheduleFromChanged(scheduleFrom: string) {
+        this.loading = true;
+
+        try {
+            await this.api.update('sale\\booking\\BookingActivity', [this.selectedActivity.id], {
+                schedule_from: scheduleFrom
+            });
+
+            await this.loadWeekActivities();
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+
+        this.loading = false;
+    }
+
+    public async onScheduleToChanged(scheduleTo: string) {
+        this.loading = true;
+
+        try {
+            await this.api.update('sale\\booking\\BookingActivity', [this.selectedActivity.id], {
+                schedule_to: scheduleTo
+            });
+
+            await this.loadWeekActivities();
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+
+        this.loading = false;
+    }
+
     public async onNbPersChanged(nbPers: number) {
         this.loading = true;
 

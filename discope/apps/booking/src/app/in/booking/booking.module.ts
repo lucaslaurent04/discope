@@ -38,6 +38,7 @@ import { BookingActivitiesPlanningComponent } from './activities-planning/activi
 import { BookingActivitiesPlanningActivityDetailsComponent } from './activities-planning/_components/activity-details/activity-details.component';
 import { BookingActivitiesPlanningBookingGroupDetailsComponent } from './activities-planning/_components/booking-group-details/booking-group-details.component';
 import { BookingActivitiesPlanningWeekActivitiesComponent } from './activities-planning/_components/week-activities/week-activities.component';
+import { BookingActivitiesPlanningActivityScheduleComponent } from './activities-planning/_components/activity-schedule/activity-schedule.component';
 
 @NgModule({
   imports: [
@@ -66,6 +67,7 @@ import { BookingActivitiesPlanningWeekActivitiesComponent } from './activities-p
     BookingOptionComponent,
     BookingActivitiesPlanningComponent,
     BookingActivitiesPlanningActivityDetailsComponent,
+    BookingActivitiesPlanningActivityScheduleComponent,
     BookingActivitiesPlanningBookingGroupDetailsComponent,
     BookingActivitiesPlanningWeekActivitiesComponent
   ],

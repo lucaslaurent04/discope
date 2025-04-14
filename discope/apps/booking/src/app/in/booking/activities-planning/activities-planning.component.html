@@ -5,10 +5,15 @@
     </div>
     <div class="booking-body">
         <div class="selection-details">
-            <div class="day-date">
-                <ng-container *ngIf="selectedDay">
+            <div class="moment-details">
+                <div *ngIf="selectedDay" class="day-date">
                     <span class="day-name">{{ dayName(selectedDay) }}</span> <span class="time-slot-name">{{ timeSlotName(selectedTimeSlot) }}</span>
-                </ng-container>
+                </div>
+                <booking-activities-planning-activity-schedule *ngIf="selectedActivity"
+                                                               [activity]="selectedActivity"
+                                                               (scheduleFromChanged)="onScheduleFromChanged($event)"
+                                                               (scheduleToChanged)="onScheduleToChanged($event)"
+                ></booking-activities-planning-activity-schedule>
             </div>
 
             <div class="group-activity-details">
