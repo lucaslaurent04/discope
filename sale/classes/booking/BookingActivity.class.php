@@ -153,6 +153,22 @@ class BookingActivity extends Model {
                 'onupdate'          => 'onupdateTimeSlotId'
             ],
 
+            'schedule_from' => [
+                'type'              => 'computed',
+                'result_type'       => 'time',
+                'description'       => "Time at which the activity starts (included).",
+                'store'             => true,
+                'function'          => 'calcScheduleFrom'
+            ],
+
+            'schedule_to' => [
+                'type'              => 'computed',
+                'result_type'       => 'time',
+                'description'       => "Time at which the activity ends (excluded).",
+                'store'             => true,
+                'function'          => 'calcScheduleTo'
+            ],
+
             'rental_unit_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'realestate\RentalUnit',
@@ -277,6 +293,30 @@ class BookingActivity extends Model {
                 $price += $line['price'];
             }
             $result[$id] = $price;
+        }
+
+        return $result;
+    }
+
+    public static function calcScheduleFrom($self): array {
+        $result = [];
+        $self->read(['time_slot_id' => ['schedule_from']]);
+        foreach($self as $id => $booking_activity) {
+            if(isset($booking_activity['time_slot_id']['schedule_from'])) {
+                $result[$id] = $booking_activity['time_slot_id']['schedule_from'];
+            }
+        }
+
+        return $result;
+    }
+
+    public static function calcScheduleTo($self): array {
+        $result = [];
+        $self->read(['time_slot_id' => ['schedule_to']]);
+        foreach($self as $id => $booking_activity) {
+            if(isset($booking_activity['time_slot_id']['schedule_to'])) {
+                $result[$id] = $booking_activity['time_slot_id']['schedule_to'];
+            }
         }
 
         return $result;

@@ -8,6 +8,8 @@ export class Activity {
         public activity_date: Date = new Date(),
         public activity_booking_line_id: BookingLine|null = null,
         public time_slot_id: number = 0,
+        public schedule_from: string = '',
+        public schedule_to: string = '',
         public group_num: number = 0,
         public is_virtual: boolean = false,
         public has_staff_required: boolean = false,
