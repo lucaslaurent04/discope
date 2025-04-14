@@ -93,6 +93,19 @@ if(!file_exists($file)) {
     throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
 }
 
+$days_languages = [
+    ['fr' => 'Dimanche',  'en' => 'Sunday',    'nl' => 'Zondag'],
+    ['fr' => 'Lundi',     'en' => 'Monday',    'nl' => 'Maandag'],
+    ['fr' => 'Mardi',     'en' => 'Tuesday',   'nl' => 'Dinsdag'],
+    ['fr' => 'Mercredi',  'en' => 'Wednesday', 'nl' => 'Woensdag'],
+    ['fr' => 'Jeudi',     'en' => 'Thursday',  'nl' => 'Donderdag'],
+    ['fr' => 'Vendredi',  'en' => 'Friday',    'nl' => 'Vrijdag'],
+    ['fr' => 'Samedi',    'en' => 'Saturday',  'nl' => 'Zaterdag']
+];
+
+$days_names = array_map(function($day) use ($params) {
+    return $day[$params['lang']];
+}, $days_languages);
 
 // read booking
 $fields = [
@@ -421,8 +434,8 @@ if($booking['center_id']['template_category_id']) {
             $value = $part['value'];
             $value = str_replace('{center}', $booking['center_id']['name'], $value);
             $value = str_replace('{nb_pers}', $booking['nb_pers'] ,$value);
-            $value = str_replace('{date_from}', date('d/m/Y', $booking['date_from']), $value);
-            $value = str_replace('{date_to}', date('d/m/Y', $booking['date_to']), $value);
+            $value = str_replace('{date_from}', $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']) , $value);
+            $value = str_replace('{date_to}',  $days_names[date('w', $booking['date_to'])] . ' '. date('d/m/Y', $booking['date_to']) , $value);
             $values['header_html'] = $value;
         }
         if($part['name'] == 'service') {
@@ -771,22 +784,6 @@ foreach($booking['contacts_ids'] as $contact) {
         $values['contact_email'] = $contact['partner_identity_id']['email'];
     }
 }
-
-$days_languages = [
-    ['fr' => 'Dimanche',  'en' => 'Sunday',    'nl' => 'Zondag'],
-    ['fr' => 'Lundi',     'en' => 'Monday',    'nl' => 'Maandag'],
-    ['fr' => 'Mardi',     'en' => 'Tuesday',   'nl' => 'Dinsdag'],
-    ['fr' => 'Mercredi',  'en' => 'Wednesday', 'nl' => 'Woensdag'],
-    ['fr' => 'Jeudi',     'en' => 'Thursday',  'nl' => 'Donderdag'],
-    ['fr' => 'Vendredi',  'en' => 'Friday',    'nl' => 'Vrijdag'],
-    ['fr' => 'Samedi',    'en' => 'Saturday',  'nl' => 'Zaterdag']
-];
-
-$days_names = array_map(function($day) use ($params) {
-    return $day[$params['lang']];
-}, $days_languages);
-
-
 
 /*
     Generate simple consumptions map
