@@ -33,19 +33,19 @@ export class BookingActivitiesPlanningActivityScheduleComponent implements OnCha
     ) {
         this.vm = {
             scheduleFrom: {
-                formControl: new FormControl('', [Validators.pattern(/^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/), this.maxScheduleTo()]),
+                formControl: new FormControl('', [Validators.pattern(/^(?:[01][0-9]|2[0-3]):[0-5][0-9]$/), this.maxScheduleTo()]),
                 change: () => this.scheduleFromChange()
             },
             scheduleTo: {
-                formControl: new FormControl('', [Validators.pattern(/^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/), this.minScheduleFrom()]),
+                formControl: new FormControl('', [Validators.pattern(/^(?:[01][0-9]|2[0-3]):[0-5][0-9]$/), this.minScheduleFrom()]),
                 change: () => this.scheduleToChange()
             }
         };
     }
 
     private timeToSeconds(timeStr: string) {
-        const [hours, minutes, seconds] = timeStr.split(':').map(Number);
-        return hours * 3600 + minutes * 60 + seconds;
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        return hours * 3600 + minutes * 60;
     }
 
     public maxScheduleTo(): ValidatorFn {
@@ -75,25 +75,28 @@ export class BookingActivitiesPlanningActivityScheduleComponent implements OnCha
     public ngOnChanges(changes: SimpleChanges) {
         if(changes.activity) {
             if(this.activity) {
-                this.vm.scheduleFrom.formControl.setValue(this.activity.schedule_from);
-                this.vm.scheduleTo.formControl.setValue(this.activity.schedule_to);
+                const scheduleFrom = this.activity.schedule_from.split(':');
+                const scheduleTo = this.activity.schedule_to.split(':');
+
+                this.vm.scheduleFrom.formControl.setValue(`${scheduleFrom[0]}:${scheduleFrom[1]}`);
+                this.vm.scheduleTo.formControl.setValue(`${scheduleTo[0]}:${scheduleTo[1]}`);
             }
         }
     }
 
     public async scheduleFromChange() {
-        if(!this.vm.scheduleFrom.formControl.valid || this.vm.scheduleFrom.formControl.value === this.activity.schedule_from) {
+        if(!this.vm.scheduleFrom.formControl.valid || (this.vm.scheduleFrom.formControl.value + ':00') === this.activity.schedule_from) {
             return;
         }
 
-        this.scheduleFromChanged.emit(this.vm.scheduleFrom.formControl.value);
+        this.scheduleFromChanged.emit(this.vm.scheduleFrom.formControl.value + ':00');
     }
 
     public async scheduleToChange() {
-        if(!this.vm.scheduleTo.formControl.valid || this.vm.scheduleTo.formControl.value === this.activity.schedule_to) {
+        if(!this.vm.scheduleTo.formControl.valid || (this.vm.scheduleTo.formControl.value + ':00') === this.activity.schedule_to) {
             return;
         }
 
-        this.scheduleToChanged.emit(this.vm.scheduleTo.formControl.value);
+        this.scheduleToChanged.emit(this.vm.scheduleTo.formControl.value + ':00');
     }
 }
