@@ -254,6 +254,11 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "has_contract",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "nb_pers",
                                                 "visible": false
                                             },
