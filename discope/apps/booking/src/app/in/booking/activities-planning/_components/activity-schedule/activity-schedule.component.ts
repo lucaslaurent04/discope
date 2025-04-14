@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Activity } from '../../_models/activity.model';
-import { FormControl, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { ApiService } from 'sb-shared-lib';
 
 interface vmModel {
@@ -33,13 +33,42 @@ export class BookingActivitiesPlanningActivityScheduleComponent implements OnCha
     ) {
         this.vm = {
             scheduleFrom: {
-                formControl: new FormControl('', [Validators.pattern(/^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/)]),
+                formControl: new FormControl('', [Validators.pattern(/^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/), this.maxScheduleTo()]),
                 change: () => this.scheduleFromChange()
             },
             scheduleTo: {
-                formControl: new FormControl('', Validators.pattern(/^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/)),
+                formControl: new FormControl('', [Validators.pattern(/^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/), this.minScheduleFrom()]),
                 change: () => this.scheduleToChange()
             }
+        };
+    }
+
+    private timeToSeconds(timeStr: string) {
+        const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+        return hours * 3600 + minutes * 60 + seconds;
+    }
+
+    public maxScheduleTo(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            if(!this.activity) {
+                return null;
+            }
+
+            const scheduleFrom = control.value;
+
+            return this.timeToSeconds(scheduleFrom) > this.timeToSeconds(this.activity.schedule_to) ? { maxScheduleTo: true } : null;
+        };
+    }
+
+    public minScheduleFrom(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            if(!this.activity) {
+                return null;
+            }
+
+            const scheduleTo = control.value;
+
+            return this.timeToSeconds(scheduleTo) < this.timeToSeconds(this.activity.schedule_from) ? { minScheduleFrom: true } : null;
         };
     }
 
@@ -53,7 +82,7 @@ export class BookingActivitiesPlanningActivityScheduleComponent implements OnCha
     }
 
     public async scheduleFromChange() {
-        if(!this.vm.scheduleFrom.formControl.valid) {
+        if(!this.vm.scheduleFrom.formControl.valid || this.vm.scheduleFrom.formControl.value === this.activity.schedule_from) {
             return;
         }
 
@@ -61,7 +90,7 @@ export class BookingActivitiesPlanningActivityScheduleComponent implements OnCha
     }
 
     public async scheduleToChange() {
-        if(!this.vm.scheduleTo.formControl.valid) {
+        if(!this.vm.scheduleTo.formControl.valid || this.vm.scheduleTo.formControl.value === this.activity.schedule_to) {
             return;
         }
 
