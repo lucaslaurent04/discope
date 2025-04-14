@@ -621,7 +621,7 @@ foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
 
             if($params['mode'] == 'grouped') {
                 $line = [
-                    'name'          => (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['name'],
+                    'name'          => (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['product_id']['label'],
                     'price'         => null,
                     'total'         => null,
                     'unit_price'    => null,
@@ -635,7 +635,7 @@ foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
             }
             else {
                 $line = [
-                    'name'          => (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['name'],
+                    'name'          => (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['product_id']['label'],
                     'price'         => $booking_line['price'],
                     'total'         => $booking_line['total'],
                     'unit_price'    => $booking_line['unit_price'],
@@ -703,7 +703,7 @@ if($params['mode'] == 'grouped') {
             $grouping_code = isset($product['grouping_code_id']['name'])
                 ? $product['grouping_code_id']['name']
                 : ($product['product_model_id']['grouping_code_id']['name']
-                ?? (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['name']);
+                ?? (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['product_id']['label']);
 
             if (!isset($lines_map[$booking_line_group_id])) {
                 $lines_map[$booking_line_group_id] = [];
