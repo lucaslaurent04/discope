@@ -1,11 +1,13 @@
 <mat-form-field class="schedule-input">
-    <mat-label>From</mat-label>
+    <mat-label>De</mat-label>
     <input type="text" matInput [formControl]="vm.scheduleFrom.formControl" (blur)="vm.scheduleFrom.change()">
     <mat-error *ngIf="vm.scheduleFrom.formControl.hasError('pattern')">Format hh:mm:ss</mat-error>
+    <mat-error *ngIf="vm.scheduleFrom.formControl.hasError('maxScheduleTo')">Max {{ activity.schedule_to }}.</mat-error>
 </mat-form-field>
 
 <mat-form-field class="schedule-input">
-    <mat-label>To</mat-label>
+    <mat-label>À</mat-label>
     <input type="text" matInput [formControl]="vm.scheduleTo.formControl" (blur)="vm.scheduleTo.change()">
     <mat-error *ngIf="vm.scheduleTo.formControl.hasError('pattern')">Format hh:mm:ss</mat-error>
+    <mat-error *ngIf="vm.scheduleTo.formControl.hasError('minScheduleFrom')">Min {{ activity.schedule_from }}.</mat-error>
 </mat-form-field>
