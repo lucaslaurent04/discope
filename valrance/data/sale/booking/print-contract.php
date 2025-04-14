@@ -1132,7 +1132,7 @@ if($has_activity){
             'id',
             'name',
             'activity_date',
-            'activity_booking_line_id' => ['product_id' => ['id','name']],
+            'activity_booking_line_id'  => ['id','name', 'product_id' => ['id', 'label']],
             'booking_line_group_id' => ['id', 'name'],
             'time_slot_id' => ['id', 'code','name'],
         ])
@@ -1169,7 +1169,7 @@ if($has_activity){
 
         $time_slot_name = $activity['time_slot_id']['name'];
         if (isset($activities_map[$group][$date]['time_slots'][$time_slot_name])) {
-            $activities_map[$group][$date]['time_slots'][$time_slot_name][] = $activity['name'];
+            $activities_map[$group][$date]['time_slots'][$time_slot_name][] = $activity['activity_booking_line_id']['product_id']['label'];
         }
     }
 
