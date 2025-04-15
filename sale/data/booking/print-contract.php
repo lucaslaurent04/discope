@@ -799,13 +799,6 @@ foreach($consumptions_simple as $cid => $consumption) {
 
     if($consumption['is_meal']) {
         $consumption_time_slot_code = $consumption['time_slot_id']['code'];
-        // #todo - remove this temporary mapping (once time_slot_id will be correctly set)
-        $consumption_time_slot_code = [
-                1 => 'B',
-                2 => 'L',
-                3 => 'D',
-                4 => 'D'
-            ][$consumption['time_slot_id']['id']];
 
         if(!isset($consumptions_map_simple[$date][$consumption_time_slot_code])) {
             $consumptions_map_simple[$date][$consumption_time_slot_code] = 0;
