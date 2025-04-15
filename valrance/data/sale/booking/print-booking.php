@@ -216,6 +216,9 @@ $fields = [
         'age_range_assignments_ids'=> ['id', 'age_range_id' =>['id', 'name'] ,'booking_line_group_id','qty'],
         'booking_lines_ids' => [
             'name',
+            'is_activity',
+            'is_transport',
+            'is_supply',
             'product_id' => [
                 'id',
                 'label' ,
@@ -223,6 +226,11 @@ $fields = [
                 'grouping_code_id' => ['id', 'name'],
                 'product_model_id' => ['id', 'name', 'grouping_code_id' => ['id', 'name']]
             ],
+            'booking_activity_id' => [
+                    'id', 'name', 'total', 'price',
+                    'supplies_booking_lines_ids' => ['id', 'qty', 'total', 'price'],
+                    'transports_booking_lines_ids' => ['id', 'qty', 'total', 'price']
+                    ],
             'description',
             'is_accomodation',
             'qty',
@@ -693,10 +701,20 @@ foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
 
 $lines_map = [];
 
+
+
 if($params['mode'] == 'grouped') {
     $lines = [];
     foreach ($booking['booking_lines_groups_ids'] as $booking_line_group) {
         foreach ($booking_line_group['booking_lines_ids'] as $booking_line) {
+            if ($booking_line['is_transport'] && !empty($booking_line['booking_activity_id'])){
+                continue;
+            }
+
+            if ($booking_line['is_supply'] && !empty($booking_line['booking_activity_id'])){
+                continue;
+            }
+
             $booking_line_group_id = $booking_line_group['id'];
             $product = $booking_line['product_id'];
 
@@ -715,9 +733,9 @@ if($params['mode'] == 'grouped') {
             if (!isset($lines_map[$booking_line_group_id][$grouping_code][$product['id']])) {
                 $lines_map[$booking_line_group_id][$grouping_code][$product['id']] = [
                     'name'          => $booking_line['name'],
-                    'price'         => $booking_line['price'],
-                    'total'         => $booking_line['total'],
-                    'unit_price'    => $booking_line['unit_price'],
+                    'price'         => $null,
+                    'total'         => null,
+                    'unit_price'    => null,
                     'vat_rate'      => null,
                     'qty'           => $booking_line['qty'],
                     'discount'      => null,
@@ -725,6 +743,21 @@ if($params['mode'] == 'grouped') {
                     'free_qty'      => $booking_line['free_qty'],
                     'grouping'      => $grouping_code
                 ];
+
+                if($booking_line['booking_activity_id'] &&
+                    (!empty($booking_line['booking_activity_id']['supplies_booking_lines_ids']) ||
+                     !empty($booking_line['booking_activity_id']['transports_booking_lines_ids'])
+                    )
+                  ){
+                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['unit_price'] = $booking_line['booking_activity_id']['unit_price'];
+                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] += $booking_line['booking_activity_id']['price'];
+                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] += $booking_line['booking_activity_id']['total'];
+                }
+                else{
+                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['unit_price'] = $booking_line['unit_price'];
+                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] = $booking_line['price'];
+                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] = $booking_line['total'];
+                }
             } else {
                 $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] += $booking_line['price'];
                 $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] += $booking_line['total'];
@@ -759,7 +792,7 @@ if($params['mode'] == 'grouped') {
                     $lines[$grouping_code_id]['unit_price'] += $product['unit_price'];
 
                 } else{
-                    $lines[$grouping_code_id]['qty'] += 1;
+                    $lines[$grouping_code_id]['qty'] = $product['qty'];
                     $lines[$grouping_code_id]['unit_price'] = $lines[$grouping_code_id]['total'] / $lines[$grouping_code_id]['qty'];
                 }
             }
