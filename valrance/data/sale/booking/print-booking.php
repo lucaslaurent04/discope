@@ -268,6 +268,8 @@ if($logo_document_data) {
 $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
 $has_activity = Setting::get_value('sale', 'booking', 'has_activity', 0);
+
+$consumption_table_show  = Setting::get_value('sale', 'features', 'templates.quote.consumption_table.show', 1);
 $values = [
     'attn_address1'              => '',
     'attn_address2'              => '',
@@ -324,7 +326,8 @@ $values = [
     'tax_lines'                  => [],
     'total'                      => $booking['total'],
     'has_activity'               => $has_activity,
-    'activities_map'             => ''
+    'activities_map'             => '',
+    'show_consumption'           => $consumption_table_show
 ];
 
 

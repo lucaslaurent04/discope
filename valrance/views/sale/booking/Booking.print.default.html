@@ -397,103 +397,104 @@ hr {
     </div>
     {% endif %}
 </div>
+{% if show_consumption %}
+    {% if consumptions_tye == 'simple' %}
+        {% if consumptions_map_simple | length > 0  %}
+        <div style="position: relative; margin-top: 30px; margin-bottom: 30px; page-break-inside: avoid;">
+            <div class="consumptions">
+                <b>{{i18n['consumptions_details']}}:</b>
+            </div>
 
-{% if consumptions_tye == 'simple' %}
-    {% if consumptions_map_simple | length > 0  %}
-    <div style="position: relative; margin-top: 30px; margin-bottom: 30px; page-break-inside: avoid;">
-        <div class="consumptions">
-            <b>{{i18n['consumptions_details']}}:</b>
-        </div>
-
-        <table style="border: solid 1px black; border-collapse: collapse; width: 100%;" border="1">
-            <tr>
-                <td style="width: 40%;"><b>{{i18n['day']}}</b></td>
-                {% if center_office == 'GA' %}
-                    <td style="text-align: center; width: 15%"><b>{{i18n['meals_morning']}}</b></td>
-                    <td style="text-align: center; width: 15%"><b>{{i18n['meals_midday']}}</b></td>
-                    <td style="text-align: center; width: 15%"><b>{{i18n['meal_evening']}}</b></td>
-                {% endif %}
-                <td style="text-align: center; width: 15%"><b>{{i18n['nights']}}</b></td>
-            </tr>
-            {% for date_index,map in consumptions_map_simple %}
-            {% if date_index != 'total' %}
-            <tr>
-                <td>{{ date_index }}</td>
-                {% if center_office == 'GA' %}
-                    <td style="text-align: center;">{{ map["B"] | default("") }}</td><!-- meals in the morning -->
-                    <td style="text-align: center;">{{ map["L"] | default("") }}</td><!-- meals at lunchtime -->
-                    <td style="text-align: center;">{{ map["D"] | default("")}}</td><!-- meals in the evening -->
-                {% endif %}
-                <td style="text-align: center;">{{ map['night'] | default("0")}}</td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-            <tr>
-                <td><b>TOTAL</b></td>
-                {% if center_office == 'GA' %}
-                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_simple['total']["B"] | default("0") }}</td>
-                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_simple['total']["L"] | default("0") }}</td>
-                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_simple['total']["D"] | default("0")}}</td>
-                {% endif %}
-                <td style="text-align: center; font-weight: bold;">{{ consumptions_map_simple['total']['night'] | default("0")}}</td>
-            </tr>
-        </table>
-
-    </div>
-    {% endif %}
-{% endif %}
-
-{% if consumptions_tye == 'detailed' %}
-    {% if consumptions_map_detailed | length > 0 %}
-    <div style="position: relative; margin-top: 30px; margin-bottom: 30px; page-break-inside: avoid;">
-        <div class="consumptions">
-            <b>{{i18n['consumptions_details']}}:</b>
-        </div>
-
-        <table style="border: solid 1px black; border-collapse: collapse; width: 100%;" border="1">
-            <tr>
-                <td style="text-align: center; width: 15%;"><b>{{i18n['day']}}</b></td>
-                <td style="text-align: center; width: 15%"><b>{{i18n['time_slot']}}</b></td>
-                {% if center_office == 'GA' %}
-                    <td style="text-align: center; width: 15%"><b>{{i18n['snack']}}</b></td>
-                    <td style="text-align: center; width: 15%"><b>{{i18n['meals']}}</b></td>
-                {% endif %}
-                <td style="text-align: center; width: 15%"><b>{{i18n['nights']}}</b></td>
-            </tr>
-            {% set last_date = '' %}
-            {% for date_index, map in consumptions_map_detailed %}
+            <table style="border: solid 1px black; border-collapse: collapse; width: 100%;" border="1">
+                <tr>
+                    <td style="width: 40%;"><b>{{i18n['day']}}</b></td>
+                    {% if center_office == 'GA' %}
+                        <td style="text-align: center; width: 15%"><b>{{i18n['meals_morning']}}</b></td>
+                        <td style="text-align: center; width: 15%"><b>{{i18n['meals_midday']}}</b></td>
+                        <td style="text-align: center; width: 15%"><b>{{i18n['meal_evening']}}</b></td>
+                    {% endif %}
+                    <td style="text-align: center; width: 15%"><b>{{i18n['nights']}}</b></td>
+                </tr>
+                {% for date_index,map in consumptions_map_simple %}
                 {% if date_index != 'total' %}
-                    {% set show_nights = true %}
-                    {% for slot_name, totals in map.time_slots %}
-                        <tr>
-                            {% if date_index != last_date %}
-                                <td rowspan="{{ map.time_slots | length }}" style="text-align: center;">{{ date_index }}</td>
-                                {% set last_date = date_index %}
-                            {% endif %}
-                            <td style="text-align: center;">{{ slot_name }}</td>
-                            {% if center_office == 'GA' %}
-                                <td style="text-align: center;">{{ (totals.total_snack | default(0)) > 0 ? totals.total_snack : '' }}</td>
-                                <td style="text-align: center;">{{ (totals.total_meals | default(0)) > 0 ? totals.total_meals : '' }}</td>
-                            {% endif %}
-                            {% if show_nights %}
-                                <td rowspan="{{ map.time_slots | length }}" style="text-align: center;">{{ map.total_nights | default(0) }}</td>
-                                {% set show_nights = false %}
-                            {% else %}
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
+                <tr>
+                    <td>{{ date_index }}</td>
+                    {% if center_office == 'GA' %}
+                        <td style="text-align: center;">{{ map["B"] | default("") }}</td><!-- meals in the morning -->
+                        <td style="text-align: center;">{{ map["L"] | default("") }}</td><!-- meals at lunchtime -->
+                        <td style="text-align: center;">{{ map["D"] | default("")}}</td><!-- meals in the evening -->
+                    {% endif %}
+                    <td style="text-align: center;">{{ map['night'] | default("0")}}</td>
+                </tr>
                 {% endif %}
-            {% endfor %}
-            <tr>
-                <td colspan="2" style="text-align: center;"><b>TOTAL</b></td>
-                {% if center_office == 'GA' %}
-                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_detailed['total']['total_snack'] | default("0") }}</td>
-                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_detailed['total']['total_meals'] | default("0")}}</td>
-                {% endif %}
-                <td style="text-align: center; font-weight: bold;">{{ consumptions_map_detailed['total']['total_nights'] | default("0")}}</td>
-            </tr>
-        </table>
-    </div>
+                {% endfor %}
+                <tr>
+                    <td><b>TOTAL</b></td>
+                    {% if center_office == 'GA' %}
+                        <td style="text-align: center; font-weight: bold;">{{ consumptions_map_simple['total']["B"] | default("0") }}</td>
+                        <td style="text-align: center; font-weight: bold;">{{ consumptions_map_simple['total']["L"] | default("0") }}</td>
+                        <td style="text-align: center; font-weight: bold;">{{ consumptions_map_simple['total']["D"] | default("0")}}</td>
+                    {% endif %}
+                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_simple['total']['night'] | default("0")}}</td>
+                </tr>
+            </table>
+
+        </div>
+        {% endif %}
+    {% endif %}
+
+    {% if consumptions_tye == 'detailed' %}
+        {% if consumptions_map_detailed | length > 0 %}
+        <div style="position: relative; margin-top: 30px; margin-bottom: 30px; page-break-inside: avoid;">
+            <div class="consumptions">
+                <b>{{i18n['consumptions_details']}}:</b>
+            </div>
+
+            <table style="border: solid 1px black; border-collapse: collapse; width: 100%;" border="1">
+                <tr>
+                    <td style="text-align: center; width: 15%;"><b>{{i18n['day']}}</b></td>
+                    <td style="text-align: center; width: 15%"><b>{{i18n['time_slot']}}</b></td>
+                    {% if center_office == 'GA' %}
+                        <td style="text-align: center; width: 15%"><b>{{i18n['snack']}}</b></td>
+                        <td style="text-align: center; width: 15%"><b>{{i18n['meals']}}</b></td>
+                    {% endif %}
+                    <td style="text-align: center; width: 15%"><b>{{i18n['nights']}}</b></td>
+                </tr>
+                {% set last_date = '' %}
+                {% for date_index, map in consumptions_map_detailed %}
+                    {% if date_index != 'total' %}
+                        {% set show_nights = true %}
+                        {% for slot_name, totals in map.time_slots %}
+                            <tr>
+                                {% if date_index != last_date %}
+                                    <td rowspan="{{ map.time_slots | length }}" style="text-align: center;">{{ date_index }}</td>
+                                    {% set last_date = date_index %}
+                                {% endif %}
+                                <td style="text-align: center;">{{ slot_name }}</td>
+                                {% if center_office == 'GA' %}
+                                    <td style="text-align: center;">{{ (totals.total_snack | default(0)) > 0 ? totals.total_snack : '' }}</td>
+                                    <td style="text-align: center;">{{ (totals.total_meals | default(0)) > 0 ? totals.total_meals : '' }}</td>
+                                {% endif %}
+                                {% if show_nights %}
+                                    <td rowspan="{{ map.time_slots | length }}" style="text-align: center;">{{ map.total_nights | default(0) }}</td>
+                                    {% set show_nights = false %}
+                                {% else %}
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                <tr>
+                    <td colspan="2" style="text-align: center;"><b>TOTAL</b></td>
+                    {% if center_office == 'GA' %}
+                        <td style="text-align: center; font-weight: bold;">{{ consumptions_map_detailed['total']['total_snack'] | default("0") }}</td>
+                        <td style="text-align: center; font-weight: bold;">{{ consumptions_map_detailed['total']['total_meals'] | default("0")}}</td>
+                    {% endif %}
+                    <td style="text-align: center; font-weight: bold;">{{ consumptions_map_detailed['total']['total_nights'] | default("0")}}</td>
+                </tr>
+            </table>
+        </div>
+        {% endif %}
     {% endif %}
 {% endif %}
 
