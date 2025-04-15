@@ -799,7 +799,9 @@ if($params['mode'] == 'grouped') {
 
                 } else{
                     $lines[$grouping_code_id]['qty'] = $product['qty'];
-                    $lines[$grouping_code_id]['unit_price'] = $lines[$grouping_code_id]['total'] / $lines[$grouping_code_id]['qty'];
+                    if ($lines[$grouping_code_id]['qty'] > 0) {
+                        $lines[$grouping_code_id]['unit_price'] = $lines[$grouping_code_id]['total'] / $lines[$grouping_code_id]['qty'];
+                    }
                 }
             }
         }
