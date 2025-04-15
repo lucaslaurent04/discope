@@ -103,6 +103,28 @@ $days_names = array_map(function($day) use ($params) {
 }, $days_languages);
 
 
+$lodgingBookingPrintAgeRangesText = function($booking, $conection_names) {
+    $age_rang_maps = [];
+
+    foreach ($booking['booking_lines_groups_ids'] as $booking_line_group) {
+        if ($booking_line_group['is_sojourn']) {
+            foreach ($booking_line_group['age_range_assignments_ids'] as $age_range_assignment) {
+                $age_range_assignment_code = $age_range_assignment['age_range_id']['id'];
+                if (!isset($age_rang_maps[$age_range_assignment_code])) {
+                    $age_rang_maps[$age_range_assignment_code] = [
+                        'age_range' => $age_range_assignment['age_range_id']['name'],
+                        'qty' => 0
+                    ];
+                }
+                $age_rang_maps[$age_range_assignment_code]['qty'] += $age_range_assignment['qty'];
+            }
+        }
+    }
+
+    $parts = array_map(fn($item) => $item['qty'] . ' ' . strtolower($item['age_range']), $age_rang_maps);
+    $last = array_pop($parts);
+    return count($parts) ? implode(', ', $parts) . ' ' . $conection_names[0] . ' ' . $last : $last;
+};
 // read contract
 $fields = [
     'created',
@@ -192,7 +214,12 @@ $fields = [
             'due_amount',
             'payment_reference',
             'payment_deadline_id' => ['name']
-        ]
+        ],
+        'booking_lines_groups_ids' => [
+            'id',
+            'is_sojourn',
+            'age_range_assignments_ids'=> ['id', 'age_range_id' =>['id', 'name'] ,'booking_line_group_id','qty'],
+        ],
     ],
     'contract_line_groups_ids' => [
         'name',
@@ -476,7 +503,10 @@ if($booking['center_id']['template_category_id']) {
             $value = $part['value'];
             $value = str_replace('{center}', $booking['center_id']['name'], $value);
             $value = str_replace('{customer}', $customer_name, $value);
-            $value = str_replace('{nb_pers}', $booking['nb_pers'] ,$value);
+
+            $text_pers = $lodgingBookingPrintAgeRangesText($booking, $conection_names);
+            $value = str_replace('{nb_pers}', $text_pers, $value);
+
             $value = str_replace('{date_from}', $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']) , $value);
             $value = str_replace('{date_to}',  $days_names[date('w', $booking['date_to'])] . ' '. date('d/m/Y', $booking['date_to']) , $value);
 
