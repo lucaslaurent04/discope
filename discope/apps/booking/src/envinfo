@@ -1,9 +1,9 @@
 {
     "env_mode": "development",
     "production": true,
-    "parent_domain": "discope.local",
-    "backend_url": "http:\/\/discope.local",
-    "rest_api_url": "http:\/\/discope.local\/",
+    "parent_domain": "discope2.local",
+    "backend_url": "http:\/\/discope2.local",
+    "rest_api_url": "http:\/\/discope2.local\/",
     "lang": "fr",
     "locale": "fr",
     "version": "1.0.0",

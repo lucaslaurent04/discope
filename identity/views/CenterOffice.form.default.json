@@ -35,7 +35,7 @@
                                                 "value": "organisation_id",
                                                 "width": "33%",
                                                 "widget": {
-                                                    "domain": ["id", "in", [1,2,3,4,100]]
+                                                    "domain": ["id", "in", [1,2,3,4]]
                                                 }
                                             }
                                         ]
