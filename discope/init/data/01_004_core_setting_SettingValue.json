@@ -142,6 +142,11 @@
                 "name": "sale.features.channelmanager.client_domain",
                 "setting_id": 165,
                 "value": " "
+            },
+            {
+                "name": "sale.features.templates.quote.consumption_table.show",
+                "setting_id": 166,
+                "value": 1
             }
         ]
     }

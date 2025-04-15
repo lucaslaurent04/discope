@@ -607,6 +607,22 @@
                 "is_multilang": 0,
                 "is_sequence": 0,
                 "object_class": null
+            },
+            {
+                "id": 166,
+                "name": "sale.features.templates.quote.consumption_table.show",
+                "code": "templates.quote.consumption_table.show",
+                "package": "sale",
+                "section_id": 7,
+                "title": "Visualisation de la consommation associée au devis",
+                "description": null,
+                "help": null,
+                "type": "boolean",
+                "form_control": "input",
+                "section": "features",
+                "is_multilang": 0,
+                "is_sequence": 0,
+                "object_class": null
             }
         ]
     }
