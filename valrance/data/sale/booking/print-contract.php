@@ -216,10 +216,57 @@ $fields = [
             'payment_deadline_id' => ['name']
         ],
         'booking_lines_groups_ids' => [
+            
             'id',
+            'name',
+            'has_pack',
+            'is_locked',
             'is_sojourn',
+            'pack_id'  => ['label'],
+            'qty',
+            'unit_price',
+            'vat_rate',
+            'total',
+            'price',
+            'fare_benefit',
+            'rate_class_id' => ['id', 'name', 'description'],
+            'date_from',
+            'date_to',
+            'nb_pers',
             'age_range_assignments_ids'=> ['id', 'age_range_id' =>['id', 'name'] ,'booking_line_group_id','qty'],
-        ],
+            'booking_lines_ids' => [
+                'name',
+                'is_activity',
+                'is_transport',
+                'is_supply',
+                'product_id' => [
+                    'id',
+                    'label' ,
+                    'age_range_id',
+                    'grouping_code_id' => ['id', 'name'],
+                    'product_model_id' => ['id', 'name', 'grouping_code_id' => ['id', 'name']]
+                ],
+                'booking_activity_id' => [
+                        'id', 'name', 'total', 'price',
+                        'supplies_booking_lines_ids' => ['id', 'qty', 'total', 'price'],
+                        'transports_booking_lines_ids' => ['id', 'qty', 'total', 'price']
+                        ],
+                'description',
+                'is_accomodation',
+                'qty',
+                'unit_price',
+                'free_qty',
+                'discount',
+                'total',
+                'price',
+                'vat_rate',
+                'qty_accounting_method',
+                'qty_vars',
+                'has_own_qty',
+                'own_duration',
+                'price_adapters_ids' => ['type', 'value', 'is_manual_discount']
+            ]
+        ]
     ],
     'contract_line_groups_ids' => [
         'name',
@@ -759,52 +806,69 @@ $lines_map = [];
 
 if($params['mode'] == 'grouped') {
     $lines = [];
-    foreach($contract['contract_line_groups_ids'] as $contract_line_group) {
-        foreach ($contract_line_group['contract_lines_ids'] as $contract_line) {
-            $contract_line_group_id = $contract_line_group['id'];
-            $product = $contract_line['product_id'];
+    foreach ($booking['booking_lines_groups_ids'] as $booking_line_group) {
+        foreach ($booking_line_group['booking_lines_ids'] as $booking_line) {
+            if ($booking_line['is_transport'] && !empty($booking_line['booking_activity_id'])){
+                continue;
+            }
+
+            if ($booking_line['is_supply'] && !empty($booking_line['booking_activity_id'])){
+                continue;
+            }
+
+            $booking_line_group_id = $booking_line_group['id'];
+            $product = $booking_line['product_id'];
 
             $grouping_code = isset($product['grouping_code_id']['name'])
                 ? $product['grouping_code_id']['name']
                 : ($product['product_model_id']['grouping_code_id']['name']
-                ?? $contract_line['name']);
+                ?? (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['product_id']['label']);
 
-            if (!isset($lines_map[$contract_line_group_id])) {
-                $lines_map[$contract_line_group_id] = [];
+            if (!isset($lines_map[$booking_line_group_id])) {
+                $lines_map[$booking_line_group_id] = [];
             }
-            if (!isset($lines_map[$contract_line_group_id][$grouping_code])) {
-                $lines_map[$contract_line_group_id][$grouping_code] = [];
+            if (!isset($lines_map[$booking_line_group_id][$grouping_code])) {
+                $lines_map[$booking_line_group_id][$grouping_code] = [];
             }
 
-            if (!isset($lines_map[$contract_line_group_id][$grouping_code][$product['id']])) {
-                $lines_map[$contract_line_group_id][$grouping_code][$product['id']] = [
-                    'name'          => $contract_line['name'],
-                    'price'         => $contract_line['price'],
-                    'total'         => $contract_line['total'],
-                    'unit_price'    => $contract_line['unit_price'],
+            if (!isset($lines_map[$booking_line_group_id][$grouping_code][$product['id']])) {
+                $lines_map[$booking_line_group_id][$grouping_code][$product['id']] = [
+                    'name'          => $booking_line['name'],
+                    'price'         => $null,
+                    'total'         => null,
+                    'unit_price'    => null,
                     'vat_rate'      => null,
-                    'qty'           => $contract_line['qty'],
+                    'qty'           => $booking_line['qty'],
                     'discount'      => null,
-                    'is_pack'       => $contract_line_group['is_pack'],
-                    'has_age_range' => isset($product['grouping_code_id']['has_age_range'])
-                                        ? $product['grouping_code_id']['has_age_range']
-                                        : ($product['product_model_id']['grouping_code_id']['has_age_range'] ?? true),
-                    'free_qty'      => $contract_line['free_qty'],
+                    'has_pack'      => $booking_line_group['has_pack'],
+                    'free_qty'      => $booking_line['free_qty'],
                     'grouping'      => $grouping_code
                 ];
+
+                if($booking_line['booking_activity_id'] &&
+                    (!empty($booking_line['booking_activity_id']['supplies_booking_lines_ids']) ||
+                     !empty($booking_line['booking_activity_id']['transports_booking_lines_ids'])
+                    )
+                  ){
+                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['unit_price'] = $booking_line['booking_activity_id']['unit_price'];
+                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] += $booking_line['booking_activity_id']['price'];
+                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] += $booking_line['booking_activity_id']['total'];
+                }
+                else{
+                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['unit_price'] = $booking_line['unit_price'];
+                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] = $booking_line['price'];
+                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] = $booking_line['total'];
+                }
             } else {
-                $lines_map[$contract_line_group_id][$grouping_code][$product['id']]['price'] += $contract_line['price'];
-                $lines_map[$contract_line_group_id][$grouping_code][$product['id']]['total'] += $contract_line['total'];
-                $lines_map[$contract_line_group_id][$grouping_code][$product['id']]['qty'] += $contract_line['qty'];
+                $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] += $booking_line['price'];
+                $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] += $booking_line['total'];
+                $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['qty'] += $booking_line['qty'];
             }
         }
     }
-
-
-    foreach ($lines_map as $contract_line_group_id => $groupings) {
+    foreach ($lines_map as $booking_line_group_id => $groupings) {
         foreach ($groupings as $grouping_code_id => $products) {
             foreach ($products as $product_id => $product) {
-
                 if (!isset($lines[$grouping_code_id])) {
                         $lines[$grouping_code_id] = [
                             'name'          => $product['grouping'],
@@ -814,19 +878,22 @@ if($params['mode'] == 'grouped') {
                             'qty'           => 0,
                             'price'         => 0,
                             'total'         => 0,
-                            'is_group'      => false
+                            'is_group'      => false,
+                            'is_pack'       => false
                         ];
                 }
                 $lines[$grouping_code_id]['price'] += $product['price'];
                 $lines[$grouping_code_id]['total'] += $product['total'];
 
-                if ($product['has_age_range']){
+
+
+                if ($product['has_pack']){
                     $lines[$grouping_code_id]['qty'] = $product['qty'];
                     $lines[$grouping_code_id]['free_qty'] = $product['free_qty'];
                     $lines[$grouping_code_id]['unit_price'] += $product['unit_price'];
 
                 } else{
-                    $lines[$grouping_code_id]['qty'] += 1;
+                    $lines[$grouping_code_id]['qty'] = $product['qty'];
                     $lines[$grouping_code_id]['unit_price'] = $lines[$grouping_code_id]['total'] / $lines[$grouping_code_id]['qty'];
                 }
             }
