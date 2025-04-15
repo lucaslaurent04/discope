@@ -253,6 +253,7 @@ $postal_address = sprintf("%s - %s %s", $booking['center_id']['organisation_id']
 $customer_name = substr($booking['customer_id']['partner_identity_id']['display_name'], 0,  66);
 $customer_address = $booking['customer_id']['partner_identity_id']['address_street'] .' '. $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'];
 $has_activity = Setting::get_value('sale', 'booking', 'has_activity', 0);
+$consumption_table_show  = Setting::get_value('sale', 'features', 'templates.quote.consumption_table.show', 1);
 $values = [
     'attn_address1'               => '',
     'attn_address2'               => '',
@@ -317,7 +318,8 @@ $values = [
     'activities_map'             => '',
     'sheets_beds'                => '',
     'service_transport'          => '',
-    'has_service_transport'      => 0
+    'has_service_transport'      => 0 ,
+    'show_consumption'           => $consumption_table_show
 ];
 
 /*
