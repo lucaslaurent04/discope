@@ -12,6 +12,13 @@ class TicketAttachment extends \documents\Document {
     public static function getColumns() {
         return [
 
+            'name' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'function '         => 'calcName',
+                'store'             => true
+            ],
+
             'category_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'documents\DocumentCategory',
@@ -23,7 +30,8 @@ class TicketAttachment extends \documents\Document {
                 'type'              => 'many2one',
                 'foreign_object'    => 'support\Ticket',
                 'description'       => 'Ticket of the attachment.',
-                'ondelete'          => 'cascade'
+                'ondelete'          => 'cascade',
+                'dependents'        => ['name']
             ],
 
             'ticket_entry_id' => [
@@ -34,5 +42,14 @@ class TicketAttachment extends \documents\Document {
             ]
 
         ];
+    }
+
+    public static function calcName($self) {
+        $result = [];
+        $self->read(['ticket_id']);
+        foreach($result as $id => $ticketAttachment) {
+            $result[$id] = sprintf("attachment ticket %05d", $ticketAttachment['ticket_id']);
+        }
+        return $result;
     }
 }
