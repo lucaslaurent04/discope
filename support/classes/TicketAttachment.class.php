@@ -15,7 +15,7 @@ class TicketAttachment extends \documents\Document {
             'name' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
-                'function '         => 'calcName',
+                'function'          => 'calcName',
                 'store'             => true
             ],
 
