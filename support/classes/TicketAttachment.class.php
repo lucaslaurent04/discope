@@ -48,7 +48,9 @@ class TicketAttachment extends \documents\Document {
         $result = [];
         $self->read(['ticket_id']);
         foreach($result as $id => $ticketAttachment) {
-            $result[$id] = sprintf("attachment ticket %05d", $ticketAttachment['ticket_id']);
+            if(isset($ticketAttachment['ticket_id'])) {
+                $result[$id] = sprintf("attachment [ticket %05d]", $ticketAttachment['ticket_id']);
+            }
         }
         return $result;
     }
