@@ -1,6 +1,21 @@
 {
     "name": "Enrollment",
     "description": "Form view for Enrollment.",
+    "actions": [
+        {
+            "id": "action.transition.pending",
+            "label": "Set Pending",
+            "controller": "model_transition",
+            "params": {
+                "entity": "sale\\camp\\Enrollment",
+                "transition": "pending",
+                "ids": []
+            },
+            "visible": [
+                ["status", "=", "waitlisted"]
+            ]
+        }
+    ],
     "layout": {
         "groups": [
             {
