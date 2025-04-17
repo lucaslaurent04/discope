@@ -124,6 +124,12 @@ class Camp extends Model {
                 'default'           => 0
             ],
 
+            'need_license_ffe' => [
+                'type'              => 'boolean',
+                'description'       => "Does the camp requires to child to have a 'licence fédération française équitation'.",
+                'default'           => false
+            ],
+
             'required_skills_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\camp\Skill',
@@ -182,6 +188,7 @@ class Camp extends Model {
                     'camp_type',
                     'with_accommodation',
                     'employee_ratio',
+                    'need_license_ffe',
                     'product_id' => ['id', 'name']
                 ])
                 ->first(true);
@@ -191,6 +198,7 @@ class Camp extends Model {
                 $result['with_accommodation'] = $camp_model['with_accommodation'];
                 $result['employee_ratio'] = $camp_model['employee_ratio'];
                 $result['product_id'] = $camp_model['product_id'];
+                $result['need_license_ffe'] = $camp_model['need_license_ffe'];
 
                 if(empty($values['name'])) {
                     $result['name'] = $camp_model['name'];
