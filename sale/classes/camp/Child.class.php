@@ -96,6 +96,17 @@ class Child extends Model {
                 'description'       => "Name of the 'centre plein air' the child is member of."
             ],
 
+            'camp_class' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'other',
+                    'member',
+                    'close-member'
+                ],
+                'description'       => "The camp class of the child, to know which price to apply.",
+                'default'           => 'other'
+            ],
+
             'skills_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\camp\Skill',
