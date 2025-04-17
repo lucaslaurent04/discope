@@ -55,6 +55,41 @@ class Enrollment extends Model {
         ];
     }
 
+    public static function policyRemoveFromWaitlist($self) {
+        $result = [];
+        $self->read([
+            'camp_id' => [
+                'max_children',
+                'enrollments_ids' => ['status']
+            ]
+        ]);
+        foreach($self as $enrollment) {
+            $pending_confirmed_enrollments_qty = 0;
+            foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
+                if(in_array($en['status'], ['pending', 'confirmed'])) {
+                    $pending_confirmed_enrollments_qty++;
+                }
+            }
+
+            if($pending_confirmed_enrollments_qty >= $enrollment['camp_id']['max_children']) {
+                return ['camp_id' => ['full' => "The camp is full."]];
+            }
+        }
+
+        return $result;
+    }
+
+    public static function getPolicies(): array {
+        return [
+
+            'remove-from-waitlist' => [
+                'description' => "Check if the camp isn't full yet.",
+                'function'    => 'policyRemoveFromWaitlist'
+            ]
+
+        ];
+    }
+
     public static function getWorkflow(): array {
         return [
 
@@ -75,9 +110,10 @@ class Enrollment extends Model {
             'waitlisted' => [
                 'description' => "The enrollment is waiting for a confirmation.",
                 'transitions' => [
-                    'confirm' => [
-                        'status'        => 'confirmed',
-                        'description'   => "Confirm the enrollment because another was cancelled."
+                    'pending' => [
+                        'status'        => 'pending',
+                        'description'   => "Remove from the waitlist.",
+                        'policies'      => ['remove-from-waitlist']
                     ],
                     'cancel' => [
                         'status'        => 'canceled',
@@ -114,14 +150,14 @@ class Enrollment extends Model {
         foreach($self as $enrollment) {
             $status = $values['status'] ?? $enrollment['status'];
             if($status === 'pending') {
-                $not_canceled_enrollments_qty = 0;
+                $pending_confirmed_enrollments_qty = 0;
                 foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
-                    if($en['status'] !== 'canceled') {
-                        $not_canceled_enrollments_qty++;
+                    if(in_array($en['status'], ['pending', 'confirmed'])) {
+                        $pending_confirmed_enrollments_qty++;
                     }
                 }
 
-                if($not_canceled_enrollments_qty >= $enrollment['camp_id']['max_children']) {
+                if($pending_confirmed_enrollments_qty >= $enrollment['camp_id']['max_children']) {
                     return ['camp_id' => ['full' => "The camp is full."]];
                 }
             }
