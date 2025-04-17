@@ -43,14 +43,24 @@
                                                 "width": "50%"
                                             },
                                             {
-                                                "type": "label",
-                                                "value": "",
-                                                "width": "100%"
-                                            },
-                                            {
                                                 "type": "field",
                                                 "value": "cpa_club",
                                                 "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "",
+                                                "width": "66%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_foster",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "institution_id",
+                                                "width": "50%"
                                             }
                                         ]
                                     },

@@ -19,6 +19,14 @@ class Guardian extends Model {
     public static function getColumns(): array {
         return [
 
+            'name' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Complete name of the child.",
+                'store'             => true,
+                'function'          => 'calcName'
+            ],
+
             'firstname' => [
                 'type'              => 'string',
                 'description'       => "First name of the guardian of the child.",
@@ -35,7 +43,7 @@ class Guardian extends Model {
                 'type'              => 'string',
                 'result_type'       => 'string',
                 'usage'             => 'email',
-                'description'       => 'Email of the guardian of the child.',
+                'description'       => "Email of the guardian of the child.",
                 'required'          => true
             ],
 
@@ -83,5 +91,16 @@ class Guardian extends Model {
 
         ];
     }
-}
 
+    public static function calcName($self): array {
+        $result = [];
+        $self->read(['firstname', 'lastname']);
+        foreach($self as $id => $child) {
+            if(isset($child['firstname'], $child['lastname'])) {
+                $result[$id] = $child['firstname'].' '.$child['lastname'];
+            }
+        }
+
+        return $result;
+    }
+}
