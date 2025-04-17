@@ -45,12 +45,17 @@
                                             {
                                                 "type": "field",
                                                 "value": "cpa_club",
-                                                "width": "33%"
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "camp_class",
+                                                "width": "25%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "",
-                                                "width": "66%"
+                                                "width": "25%"
                                             },
                                             {
                                                 "type": "field",
