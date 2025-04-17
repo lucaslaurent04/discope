@@ -96,6 +96,17 @@ class Child extends Model {
                 'description'       => "Name of the 'centre plein air' the child is member of."
             ],
 
+            'licence_ffe' => [
+                'type'              => 'string',
+                'description'       => "Licence 'fédération française équitation'."
+            ],
+
+            'year_licence_ffe' => [
+                'type'              => 'integer',
+                'usage'             => 'number/integer{2000,'.date('Y').'}',
+                'description'       => "Year the licence ffe was acquired"
+            ],
+
             'camp_class' => [
                 'type'              => 'string',
                 'selection'         => [
