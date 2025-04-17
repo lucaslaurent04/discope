@@ -188,6 +188,7 @@ class Camp extends Model {
                     'camp_type',
                     'with_accommodation',
                     'employee_ratio',
+                    'max_children',
                     'need_license_ffe',
                     'product_id' => ['id', 'name']
                 ])
@@ -198,6 +199,7 @@ class Camp extends Model {
                 $result['with_accommodation'] = $camp_model['with_accommodation'];
                 $result['employee_ratio'] = $camp_model['employee_ratio'];
                 $result['product_id'] = $camp_model['product_id'];
+                $result['max_children'] = $camp_model['max_children'];
                 $result['need_license_ffe'] = $camp_model['need_license_ffe'];
 
                 if(empty($values['name'])) {
