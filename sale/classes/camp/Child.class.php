@@ -55,6 +55,40 @@ class Child extends Model {
                 'default'           => 'F'
             ],
 
+            'fullname_of_person_in_charge' => [
+                'type'              => 'string',
+                'description'       => "Full name of the person in charge of the child.",
+                'required'          => true
+            ],
+
+            'address_street' => [
+                'type'              => 'string',
+                'description'       => "Street and number of the child's guardian.",
+                'required'          => true
+            ],
+
+            'address_dispatch' => [
+                'type'              => 'string',
+                'description'       => "Optional info for mail dispatch (appartment, box, floor, ...)."
+            ],
+
+            'address_zip' => [
+                'type'              => 'string',
+                'description'       => "Zip code of the child's guardian.",
+                'required'          => true
+            ],
+
+            'address_city' => [
+                'type'              => 'string',
+                'description'       => "City of the child's guardian.",
+                'required'          => true
+            ],
+
+            'cpa_club_id' => [
+                'type'              => 'string',
+                'description'       => "Identifier of the 'centre plein air' the child is member of."
+            ],
+
             'skills_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\camp\Skill',
