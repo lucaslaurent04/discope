@@ -96,6 +96,15 @@ class Employee extends \identity\Partner {
                 'type'              => 'string',
                 'default'           => 'employee',
                 'description'       => 'Activity assigned to the employee.'
+            ],
+
+            'camps_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\camp\Camp',
+                'foreign_field'     => 'employees_ids',
+                'rel_table'         => 'sale_hr_rel_camp_employee',
+                'rel_foreign_key'   => 'camp_id',
+                'rel_local_key'     => 'employee_id'
             ]
 
         ];
