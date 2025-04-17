@@ -59,6 +59,7 @@ class Consumption extends Model {
                 'result_type'       => 'many2one',
                 'relation'          => ['booking_id' => ['customer_id']],
                 'store'             => true,
+                'instant'           => true,
                 'foreign_object'    => 'sale\customer\Customer',
                 'description'       => "The customer whom the consumption relates to (computed).",
             ],
