@@ -22,7 +22,7 @@ list($params, $providers) = eQual::announce([
             'min'           => 1,
             'required'      => true
         ],
-        // this must remain synced with field definition Booking::cancellation_reason
+        // this must remain synced with field definition Booking::cancellation_reason and transaltions in do-cancel.json
         'reason' =>  [
             'description'   => 'Reason of the booking cancellation.',
             'type'          => 'string',
