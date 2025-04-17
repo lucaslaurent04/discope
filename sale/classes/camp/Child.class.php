@@ -84,9 +84,9 @@ class Child extends Model {
                 'required'          => true
             ],
 
-            'cpa_club_id' => [
+            'cpa_club' => [
                 'type'              => 'string',
-                'description'       => "Identifier of the 'centre plein air' the child is member of."
+                'description'       => "Name of the 'centre plein air' the child is member of."
             ],
 
             'skills_ids' => [
