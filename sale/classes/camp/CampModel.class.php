@@ -62,6 +62,12 @@ class CampModel extends Model {
                 'default'           => 12
             ],
 
+            'need_license_ffe' => [
+                'type'              => 'boolean',
+                'description'       => "Does the camp requires to child to have a 'lisence fédération française équitation'.",
+                'default'           => false
+            ],
+
             'required_skills_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\camp\Skill',

@@ -88,6 +88,11 @@
                                                 "type": "field",
                                                 "value": "with_accommodation",
                                                 "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "need_license_ffe",
+                                                "width": "33%"
                                             }
                                         ]
                                     }
@@ -163,6 +168,27 @@
                                             {
                                                 "type": "field",
                                                 "value": "required_documents_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.employees",
+                        "label": "Employees",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "employees_ids",
                                                 "width": "100%"
                                             }
                                         ]
