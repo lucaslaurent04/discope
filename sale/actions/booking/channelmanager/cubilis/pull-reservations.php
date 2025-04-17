@@ -179,7 +179,7 @@ try {
                             catch(Exception $e) {
                                 // error while cancelling (unable to cancel)
                                 ++$result['errors'];
-                                $result['logs'][] = "WARN- Unable to cancel Booking {$booking['id']} for reservation {$reservation['reservation_id']} : ".$e->getMessage();
+                                $result['logs'][] = "ERR - Unable to cancel Booking {$booking['id']} for reservation {$reservation['reservation_id']} : ".$e->getMessage();
                             }
                         }
                     }
@@ -920,7 +920,7 @@ try {
                             catch(Exception $e) {
                                 // error while cancelling (unable to cancel ?)
                                 ++$result['errors'];
-                                $result['logs'][] = "WARN- Unable to cancel reservation for Cubilis reservation {$reservation['reservation_id']} (property {$property['extref_property_id']}) : ".$e->getMessage();
+                                $result['logs'][] = "ERR - Unable to cancel reservation for Cubilis reservation {$reservation['reservation_id']} (property {$property['extref_property_id']}) : ".$e->getMessage();
                             }
                         }
                     }
