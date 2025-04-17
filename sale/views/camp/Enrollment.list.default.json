@@ -1,0 +1,28 @@
+{
+    "name": "Enrollments",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "child_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "camp_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "status",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            }
+        ]
+    }
+}
