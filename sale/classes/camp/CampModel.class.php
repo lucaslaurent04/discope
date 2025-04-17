@@ -62,6 +62,12 @@ class CampModel extends Model {
                 'default'           => 12
             ],
 
+            'max_children' => [
+                'type'              => 'integer',
+                'description'       => "Max quantity of children that can take part to the camp.",
+                'default'           => 20
+            ],
+
             'need_license_ffe' => [
                 'type'              => 'boolean',
                 'description'       => "Does the camp requires to child to have a 'lisence fédération française équitation'.",
