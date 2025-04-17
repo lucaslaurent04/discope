@@ -18,6 +18,21 @@
                                                 "widget": {
                                                     "heading": true
                                                 }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "",
+                                                "width": "10%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "max_children",
+                                                "width": "25%"
                                             }
                                         ]
                                     },
