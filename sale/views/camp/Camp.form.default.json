@@ -14,7 +14,10 @@
                                             {
                                                 "type": "field",
                                                 "value": "name",
-                                                "width": "80%"
+                                                "width": "80%",
+                                                "widget": {
+                                                    "heading": true
+                                                }
                                             },
                                             {
                                                 "type": "field",

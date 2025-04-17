@@ -326,6 +326,16 @@
                                             "entity": "sale\\camp\\Guardian",
                                             "view": "list.default"
                                         }
+                                    },
+                                    {
+                                        "id": "sale.camp.people.institutes",
+                                        "type": "entry",
+                                        "label": "Institutions",
+                                        "description": "",
+                                        "context": {
+                                            "entity": "sale\\camp\\Institution",
+                                            "view": "list.default"
+                                        }
                                     }
                                 ]
                             }

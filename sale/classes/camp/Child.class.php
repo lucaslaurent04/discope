@@ -55,6 +55,13 @@ class Child extends Model {
                 'default'           => 'F'
             ],
 
+            'is_foster' => [
+                'type'              => 'boolean',
+                'description'       => "Is the child living in a forster family/home.",
+                'default'           => false,
+                'onupdate'          => ['onupdateIsFoster']
+            ],
+
             'fullname_of_person_in_charge' => [
                 'type'              => 'string',
                 'description'       => "Full name of the person in charge of the child.",
@@ -99,6 +106,13 @@ class Child extends Model {
                 'description'       => "Skills needed to participate to the camp."
             ],
 
+            'institution_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\Institution',
+                'description'       => "The booking the composition relates to.",
+                'visible'           => ['is_foster', '=', true]
+            ],
+
             'guardians_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\camp\Guardian',
@@ -129,6 +143,15 @@ class Child extends Model {
         }
 
         return $result;
+    }
+
+    public static function onupdateIsFoster($self) {
+        $self->read(['is_foster']);
+        foreach($self as $id => $child) {
+            if(!$child['is_foster']) {
+                self::id($id)->update(['institution_id' => null]);
+            }
+        }
     }
 }
 
