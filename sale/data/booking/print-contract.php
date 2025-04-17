@@ -988,7 +988,7 @@ try {
     /**  @var ExtensionInterface **/
     $extension  = new IntlExtension();
     $twig->addExtension($extension);
-    $currency = Setting::get_value('core', 'units', 'currency', '€');
+    $currency = Setting::get_value('core', 'locale', 'currency', '€');
     // #todo - temp workaround against LOCALE mixups
     $filter = new \Twig\TwigFilter('format_money', function ($value) use($currency) {
         return number_format((float)($value), 2, ",", ".") . ' ' .$currency;
