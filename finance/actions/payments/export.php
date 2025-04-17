@@ -27,6 +27,7 @@ list($params, $providers) = eQual::announce([
  */
 ['context' => $context] = $providers;
 
+// #todo - rename to finance.accounting.invoice.export_type
 $export_type = Setting::get_value('finance', 'invoice', 'export_type', 'bob');
 
 eQual::run('do', sprintf('finance_payments_%s_export', $export_type));
