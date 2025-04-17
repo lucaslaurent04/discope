@@ -98,7 +98,7 @@
                 "id": "object.id"
             },
             "confirm": true,
-            "visible": [ ["status", "not in", ["invoiced", "debit_balance", "credit_balance", "balanced"]], ["is_from_channelmanager", "=", false] ]
+            "visible": [ ["status", "not in", ["invoiced", "debit_balance", "credit_balance", "balanced"]]]
         },
         {
             "id": "action.import-contacts",
