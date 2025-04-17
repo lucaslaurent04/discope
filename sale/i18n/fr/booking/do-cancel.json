@@ -18,7 +18,7 @@
                 "internal_impediment": "Force majeure interne: incident empêchant la réservation",
                 "external_impediment": "Force majeure externe (accident, transport, pandémie, ...)",
                 "health_impediment": "Motif médical ou familial",
-                "ota": "Annulé via plateforme externe"
+                "ota": "Annulé via plateforme externe (OTA)"
             }
         }
     },
