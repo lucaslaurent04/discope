@@ -175,6 +175,13 @@ class Product extends Model {
                 'store'             => true
             ],
 
+            'is_camp' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'relation'          => ['product_model_id' => 'is_camp'],
+                'store'             => true
+            ],
+
             'is_fullday' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',

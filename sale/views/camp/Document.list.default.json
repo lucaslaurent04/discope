@@ -1,0 +1,21 @@
+{
+    "name": "Documents",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "25%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "description",
+                "width": "75%",
+                "sortable": false,
+                "readonly": true
+            }
+        ]
+    }
+}

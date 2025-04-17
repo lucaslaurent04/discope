@@ -241,6 +241,97 @@
                         ]
                     },
                     {
+                        "id": "sale.camp",
+                        "label": "Camps",
+                        "description": "",
+                        "icon": "forest",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "sales.camp.camp-models",
+                                "type": "entry",
+                                "label": "Camp Models",
+                                "description": "",
+                                "icon": "cabin",
+                                "context": {
+                                    "entity": "sale\\camp\\CampModel",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "sales.camp.camps",
+                                "type": "entry",
+                                "label": "Camps",
+                                "description": "",
+                                "icon": "holiday_village",
+                                "context": {
+                                    "entity": "sale\\camp\\Camp",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "sale.camp.catalog",
+                                "label": "Catalog",
+                                "description": "",
+                                "icon": "library_books",
+                                "type": "parent",
+                                "children": [
+                                    {
+                                        "id": "sale.camp.catalog.products",
+                                        "type": "entry",
+                                        "label": "Products",
+                                        "description": "",
+                                        "context": {
+                                            "entity": "sale\\camp\\catalog\\Product",
+                                            "view": "list.default",
+                                            "domain": ["is_camp", "=", true]
+                                        }
+                                    },
+                                    {
+                                        "id": "sale.camp.catalog.product-models",
+                                        "type": "entry",
+                                        "label": "Products Models",
+                                        "description": "",
+                                        "context": {
+                                            "entity": "sale\\camp\\catalog\\ProductModel",
+                                            "view": "list.default",
+                                            "domain": ["is_camp", "=", true]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "sale.camp.people",
+                                "label": "People",
+                                "description": "",
+                                "icon": "escalator_warning",
+                                "type": "parent",
+                                "children": [
+                                    {
+                                        "id": "sale.camp.people.children",
+                                        "type": "entry",
+                                        "label": "Children",
+                                        "description": "",
+                                        "context": {
+                                            "entity": "sale\\camp\\Child",
+                                            "view": "list.default"
+                                        }
+                                    },
+                                    {
+                                        "id": "sale.camp.people.guardians",
+                                        "type": "entry",
+                                        "label": "Guardians",
+                                        "description": "",
+                                        "context": {
+                                            "entity": "sale\\camp\\Guardian",
+                                            "view": "list.default"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "id": "sales.providers",
                         "label": "Providers",
                         "description": "",

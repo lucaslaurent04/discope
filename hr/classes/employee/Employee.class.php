@@ -77,6 +77,15 @@ class Employee extends \identity\Partner {
                 'foreign_field'     => 'object_id',
                 'description'       => "Mails related to the employee.",
                 'domain'            => ['object_class', '=', 'hr\employee\Employee']
+            ],
+
+            'camps_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\camp\Camp',
+                'foreign_field'     => 'employees_ids',
+                'rel_table'         => 'sale_hr_rel_camp_employee',
+                'rel_foreign_key'   => 'camp_id',
+                'rel_local_key'     => 'employee_id'
             ]
 
         ];
