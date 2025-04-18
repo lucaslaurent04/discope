@@ -79,6 +79,29 @@ class Guardian extends Model {
                 'default'           => 'mother'
             ],
 
+            'address_street' => [
+                'type'              => 'string',
+                'description'       => "Street and number of the child's guardian.",
+                'required'          => true
+            ],
+
+            'address_dispatch' => [
+                'type'              => 'string',
+                'description'       => "Optional info for mail dispatch (apartment, box, floor, ...)."
+            ],
+
+            'address_zip' => [
+                'type'              => 'string',
+                'description'       => "Zip code of the child's guardian.",
+                'required'          => true
+            ],
+
+            'address_city' => [
+                'type'              => 'string',
+                'description'       => "City of the child's guardian.",
+                'required'          => true
+            ],
+
             'children_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\camp\Child',
