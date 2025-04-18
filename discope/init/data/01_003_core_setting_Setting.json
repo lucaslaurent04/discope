@@ -623,6 +623,40 @@
                 "is_multilang": 0,
                 "is_sequence": 0,
                 "object_class": null
+            },
+            {
+                "id": 167,
+                "name": "sale.features.booking.checkin.default",
+                "code": "booking.checkin.default",
+                "package": "sale",
+                "section_id": 7,
+                "title": "L'horaire par défaut du check-in",
+                "description": null,
+                "help": null,
+                "type": "integer",
+                "form_control": "input",
+                "section": "features",
+                "is_multilang": 0,
+                "is_sequence": 0,
+                "object_class": null,
+                "value": null
+            },
+            {
+                "id": 168,
+                "name": "sale.features.booking.checkout.default",
+                "code": "booking.checkout.default",
+                "package": "sale",
+                "section_id": 7,
+                "title": "L'horaire par défaut du check-out",
+                "description": null,
+                "help": null,
+                "type": "integer",
+                "form_control": "input",
+                "section": "features",
+                "is_multilang": 0,
+                "is_sequence": 0,
+                "object_class": null,
+                "value": null
             }
         ]
     }
