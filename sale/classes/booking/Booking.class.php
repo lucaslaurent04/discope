@@ -528,10 +528,11 @@ class Booking extends Model {
 
     public static function calcDisplayName($om, $oids, $lang) {
         $result = [];
-        $bookings = $om->read(self::getType(), $oids, ['name','customer_identity_id','customer_id.name' ], $lang);
+        $customer_assignment = Setting::get_value('sale', 'features', 'customer.number_assignment', 'customer_identity_id');
+        $bookings = $om->read(self::getType(), $oids, ['name','customer_id.name',  $customer_assignment ], $lang);
         if($bookings > 0) {
             foreach($bookings as $id => $booking) {
-                $result[$id] = $booking['name'] .' - '.$booking['customer_id.name']  .' ('.$booking['customer_identity_id'] . ')' ;
+                $result[$id] = $booking['name'] .' - '.$booking['customer_id.name']  .' ('.$booking[$customer_assignment] . ')' ;
             }
         }
         return $result;
