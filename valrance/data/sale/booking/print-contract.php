@@ -103,6 +103,18 @@ $days_names = array_map(function($day) use ($params) {
 }, $days_languages);
 
 
+$lodgingBookingPrintBookingFormatMember = function($booking) {
+    $has_number_assignment = Setting::get_value('sale', 'features', 'customer.member.has_number_assignment', 0);
+    if ($has_number_assignment) {
+        $customer_assignment = Setting::get_value('sale', 'features', 'customer.member.number_assignment');
+        $code = $booking['customer_id']['partner_identity_id'][$customer_assignment];
+    }else {
+        $id = $booking['customer_id']['partner_identity_id']['id'];
+        $code = ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
+    }
+    return $code.' - '.$booking['customer_id']['partner_identity_id']['display_name'];
+};
+
 $lodgingBookingPrintAgeRangesText = function($booking, $conection_names) {
     $age_rang_maps = [];
 
@@ -147,6 +159,7 @@ $fields = [
             'partner_identity_id' => [
                 'id',
                 'display_name',
+                'accounting_account',
                 'type',
                 'address_street', 'address_dispatch', 'address_city', 'address_zip', 'address_country',
                 'type',
@@ -333,7 +346,7 @@ if($logo_document_data) {
     $img_url = "data:{$content_type};base64, ".base64_encode($logo_document_data);
 }
 
-$member_name = lodging_booking_print_contract_formatMember($booking);
+$member_name = $lodgingBookingPrintBookingFormatMember($booking);
 
 $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
@@ -1350,8 +1363,3 @@ $context->httpResponse()
 
 
 
-function lodging_booking_print_contract_formatMember($booking) {
-    $id = $booking['customer_id']['partner_identity_id']['id'];
-    $code = ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
-    return $code.' - '.$booking['customer_id']['partner_identity_id']['display_name'];
-}
