@@ -657,6 +657,23 @@
                 "is_sequence": 0,
                 "object_class": null,
                 "value": null
+            },
+            {
+                "id": 208,
+                "name": "sale.features.customer.number_assignment",
+                "code": "customer.number_assignment",
+                "package": "sale",
+                "section_id": 7,
+                "title": "Champ d’attribution du numéro client pour le dsiplay name ",
+                "description": null,
+                "help": null,
+                "type": "string",
+                "form_control": "input",
+                "section": "features",
+                "is_multilang": 0,
+                "is_sequence": 0,
+                "object_class": null,
+                "value": null
             }
         ]
     }
