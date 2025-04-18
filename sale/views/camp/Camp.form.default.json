@@ -42,7 +42,8 @@
                                             {
                                                 "type": "field",
                                                 "value": "max_children",
-                                                "width": "25%"
+                                                "width": "25%",
+                                                "readonly": true
                                             },
                                             {
                                                 "type": "field",
@@ -135,6 +136,72 @@
                         ]
                     },
                     {
+                        "id": "section.camp-groups",
+                        "label": "Groups",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "camp_groups_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.enrollments",
+                        "label": "Enrollments",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "enrollments_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.camp"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.employees",
+                        "label": "Employees",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "employees_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "id": "section.required-skills",
                         "label": "Required skills",
                         "visible": ["state", "<>", "draft"],
@@ -169,51 +236,6 @@
                                                 "type": "field",
                                                 "value": "required_documents_ids",
                                                 "width": "100%"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "section.employees",
-                        "label": "Employees",
-                        "visible": ["state", "<>", "draft"],
-                        "rows": [
-                            {
-                                "columns": [
-                                    {
-                                        "width": "100%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "employees_ids",
-                                                "width": "100%"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "section.enrollments",
-                        "label": "Enrollments",
-                        "visible": ["state", "<>", "draft"],
-                        "rows": [
-                            {
-                                "columns": [
-                                    {
-                                        "width": "100%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "enrollments_ids",
-                                                "width": "100%",
-                                                "widget": {
-                                                    "view": "list.camp"
-                                                }
                                             }
                                         ]
                                     }
