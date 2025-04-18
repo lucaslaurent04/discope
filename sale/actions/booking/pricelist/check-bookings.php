@@ -52,6 +52,11 @@ if(!$pricelist) {
 
 if($pricelist['status'] == 'published') {
 
+    // Callbacks are defined on Booking, BookingLine, and BookingLineGroup to ensure consistency across these entities.
+    // While these callbacks are useful for maintaining data integrity (they and are used in tests),
+    // they need to be disabled here to prevent recursive cycles that could lead to deep cycling issues.
+    $orm->disableEvents();
+
     // find related centers
     $centers_ids = Center::search(['price_list_category_id', '=', $pricelist['price_list_category_id']])->ids();
 
@@ -65,16 +70,40 @@ if($pricelist['status'] == 'published') {
         ->read(['center_office_id', 'booking_lines_groups_ids', 'booking_lines_ids'])
         ->get();
 
-    foreach($bookings as $bid => $booking) {
-        BookingLine::ids($booking['booking_lines_ids'])->update(['unit_price' => null, 'price' => null, 'vat_rate' => null, 'total' => null]);
-        BookingLineGroup::ids($booking['booking_lines_groups_ids'])->update(['unit_price' => null, 'price' => null, 'vat_rate' => null, 'total' => null]);
-        Booking::id($bid)->update(['is_price_tbc' => false, 'price' => null, 'total' => null]);
+    foreach($bookings as $booking_id => $booking) {
+        $bookingLines = BookingLine::ids($booking['booking_lines_ids'])->read(['has_manual_unit_price', 'has_manual_vat_rate']);
+        // reset booking lines prices and vat according to `has_manual_unit_price` & `has_manual_vat_rate`
+        foreach($bookingLines as $booking_line_id => $bookingLine) {
+            $values = [];
+            if(!$bookingLine['has_manual_unit_price']) {
+                $values['unit_price'] = null;
+                $values['price'] = null;
+                $values['total'] = null;
+            }
+            if(!$bookingLine['has_manual_vat_rate']) {
+                $values['vat_rate'] = null;
+            }
+            BookingLine::id($booking_line_id)->update($values);
+        }
+
+        BookingLineGroup::ids($booking['booking_lines_groups_ids'])
+            ->update(['unit_price' => null, 'price' => null, 'vat_rate' => null, 'total' => null]);
+
+        Booking::id($booking_id)
+            ->update(['is_price_tbc' => false, 'price' => null, 'total' => null]);
+
+        // force recomputing fields at once
+        BookingLine::ids($booking['booking_lines_ids'])->read(['unit_price', 'vat_rate', 'total', 'price']);
+        BookingLineGroup::ids($booking['booking_lines_groups_ids'])->read(['unit_price', 'vat_rate', 'price', 'total']);
+        Booking::id($booking_id)->read(['total', 'price']);
 
         // dispatch a message for notifying users
-        $dispatch->dispatch('lodging.booking.ready', 'sale\booking\Booking', $bid, 'warning', null, [], [], null, $booking['center_office_id']);
+        $dispatch->dispatch('lodging.booking.ready', 'sale\booking\Booking', $booking_id, 'warning', null, [], [], null, $booking['center_office_id']);
     }
-}
 
+    // restore events in case this controller is chained with others
+    $orm->enableEvents();
+}
 
 $context->httpResponse()
         ->status(204)
