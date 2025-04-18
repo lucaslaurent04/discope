@@ -50,6 +50,13 @@ class Enrollment extends Model {
                 ],
                 'description'       => "The status of the enrollment.",
                 'default'           => 'pending'
+            ],
+
+            'is_ase' => [
+                'type'              => 'boolean',
+                'description'       => "Is \"aide sociale à l'enfance\".",
+                'default'           => false,
+                'onupdate'          => 'onupdateIsAse'
             ]
 
         ];
@@ -143,7 +150,12 @@ class Enrollment extends Model {
         $self->read([
             'camp_id' => [
                 'max_children',
-                'enrollments_ids' => ['status', 'child_id']
+                'ase_quota',
+                'enrollments_ids' => [
+                    'status',
+                    'child_id',
+                    'is_ase'
+                ]
             ]
         ]);
 
@@ -165,6 +177,21 @@ class Enrollment extends Model {
             foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
                 if($en['child_id'] === $values['child_id']) {
                     return ['child_id' => ['already_enrolled' => "The child has already enrolled to this camp."]];
+                }
+            }
+        }
+
+        if(isset($values['is_ase']) && $values['is_ase']) {
+            foreach($self as $enrollment) {
+                $ase_children_qty = 1;
+                foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
+                    if($en['is_ase'] && $en['id'] !== $enrollment['id']) {
+                        $ase_children_qty++;
+                    }
+                }
+
+                if($ase_children_qty > $enrollment['camp_id']['ase_quota']) {
+                    return ['is_ase' => ['too_many_ase_children' => "The ase children quota is full."]];
                 }
             }
         }

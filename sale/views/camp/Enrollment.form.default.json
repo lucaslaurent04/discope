@@ -36,6 +36,11 @@
                                                 "type": "field",
                                                 "value": "camp_id",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_ase",
+                                                "width": "33%"
                                             }
                                         ]
                                     },
