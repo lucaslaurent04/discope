@@ -270,35 +270,40 @@ class ProductModel extends Model {
                 'type'              => 'boolean',
                 'description'       => 'Is the product a meal? (meals might be part of the board / included services of the stay).',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false] , ['is_snack', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false] , ['is_snack', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ] ,
+                'dependents'        => [ 'products_ids' => 'is_meal']
             ],
 
             'is_snack' => [
                 'type'              => 'boolean',
                 'description'       => 'Is the product a snack?.',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ],
+                'dependents'        => [ 'products_ids' => 'is_snack']
             ],
 
             'is_activity' => [
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the product is an activity or animation.',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ],
+                'dependents'        => [ 'products_ids' => 'is_activity']
             ],
 
             'is_transport' => [
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the product is an activity transport service (transport to and back from an activity).',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_supply', '=', false] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_supply', '=', false] ] ,
+                'dependents'        => [ 'products_ids'  => ['is_transport']]
             ],
 
             'is_supply' => [
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the product is an activity supply service (supply to rent for an activity).',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_transport', '=', false] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_transport', '=', false] ] ,
+                'dependents'        => [ 'products_ids'  => ['is_supply']]
             ],
 
             'activity_scope' => [
@@ -380,7 +385,8 @@ class ProductModel extends Model {
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the animation lasts the full day. If true, assignments must include both AM and PM; otherwise, only one of them.',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ],
+                'dependents'        => [ 'products_ids'  => ['is_supply']]
             ],
 
             'is_billable' => [
