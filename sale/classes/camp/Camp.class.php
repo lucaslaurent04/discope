@@ -181,7 +181,8 @@ class Camp extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\camp\Enrollment',
                 'foreign_field'     => 'camp_id',
-                'description'       => "All the enrollments linked to camp."
+                'description'       => "All the enrollments linked to camp.",
+                'ondetach'          => 'delete'
             ]
 
         ];
