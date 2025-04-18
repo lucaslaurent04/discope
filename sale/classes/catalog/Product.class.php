@@ -132,6 +132,7 @@ class Product extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
                 'relation'          => ['product_model_id' => 'is_rental_unit'],
+                'instant'           => true,
                 'store'             => true
             ],
 
@@ -139,6 +140,7 @@ class Product extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
                 'relation'          => ['product_model_id' => 'is_meal'],
+                'instant'           => true,
                 'store'             => true
             ],
 
@@ -153,6 +155,7 @@ class Product extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
                 'relation'          => ['product_model_id' => 'is_activity'],
+                'instant'           => true,
                 'store'             => true
             ],
 
@@ -160,6 +163,7 @@ class Product extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
                 'relation'          => ['product_model_id' => 'is_transport'],
+                'instant'           => true,
                 'store'             => true
             ],
 
@@ -167,6 +171,7 @@ class Product extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
                 'relation'          => ['product_model_id' => 'is_supply'],
+                'instant'           => true,
                 'store'             => true
             ],
 
@@ -174,6 +179,7 @@ class Product extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
                 'relation'          => ['product_model_id' => 'is_fullday'],
+                'instant'           => true,
                 'store'             => true
             ],
 
