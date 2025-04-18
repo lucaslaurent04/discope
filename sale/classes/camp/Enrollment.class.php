@@ -57,9 +57,55 @@ class Enrollment extends Model {
                 'description'       => "Is \"aide sociale à l'enfance\".",
                 'default'           => false,
                 'onupdate'          => 'onupdateIsAse'
+            ],
+
+            'total' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => "Total price of the enrollment.",
+                'store'             => true,
+                'function'          => 'calcTotal'
+            ],
+
+            'documents_ids' => [
+                'type'              => 'one2many',
+                'foreign_field'     => 'enrollment_id',
+                'foreign_object'    => 'sale\camp\document\Document',
+                'description'       => "The documents needed for the child to enroll to the camp."
             ]
 
         ];
+    }
+
+    public static function calcTotal($self): array {
+        $result = [];
+        $self->read([
+            'child_id' => [
+                'camp_class'
+            ],
+            'camp_id' => [
+                'product_id' => [
+                    'prices_ids' => [
+                        'price_vat',
+                        'camp_class'
+                    ]
+                ]
+            ]
+        ]);
+
+        foreach($self as $id => $enrollment) {
+            if(!isset($enrollment['child_id'], $enrollment['camp_id']['product_id']['prices_ids'])) {
+                continue;
+            }
+
+            foreach($enrollment['camp_id']['product_id']['prices_ids'] as $price) {
+                if($enrollment['child_id']['camp_class'] === $price['camp_class']) {
+                    $result[$id] = $price['price_vat'];
+                }
+            }
+        }
+
+        return $result;
     }
 
     public static function policyRemoveFromWaitlist($self) {
