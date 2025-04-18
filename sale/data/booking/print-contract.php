@@ -71,9 +71,35 @@ list($params, $providers) = announce([
 
 list($context, $orm) = [$providers['context'], $providers['orm']];
 
-/*
-    Retrieve the requested template
-*/
+/**
+ * Methods
+ */
+
+ $lodgingBookingPrintBookingFormatMember = function($booking) {
+    $has_number_assignment = Setting::get_value('sale', 'features', 'customer.member.has_number_assignment', 0);
+    if ($has_number_assignment) {
+        $customer_assignment = Setting::get_value('sale', 'features', 'customer.member.number_assignment');
+        $code = $booking['customer_id']['partner_identity_id'][$customer_assignment];
+    }else {
+        $id = $booking['customer_id']['partner_identity_id']['id'];
+        $code = ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
+    }
+    return $code.' - '.$booking['customer_id']['partner_identity_id']['display_name'];
+};
+
+/**
+ * Action
+ */
+
+$print_contract_package = Setting::get_value('sale', 'booking', 'print_contract_package', 'sale');
+
+if($print_contract_package !== 'sale') {
+    $output = eQual::run('get', "{$print_contract_package}_sale_booking_print-contract", $params, true);
+}
+else {
+    /*
+        Retrieve the requested template
+    */
 
 $entity = 'sale\booking\Contract';
 $parts = explode('\\', $entity);
@@ -104,112 +130,113 @@ $fields = [
                 'phone',
                 'mobile',
                 'email'
-        ],
-        'customer_id' => [
-            'partner_identity_id' => [
-                'id',
-                'display_name',
-                'type',
-                'address_street', 'address_dispatch', 'address_city', 'address_zip', 'address_country',
-                'type',
-                'phone',
-                'mobile',
-                'email',
-                'has_vat',
-                'vat_number'
-            ]
-        ],
-        'center_id' => [
-            'name',
-            'manager_id' => ['name'],
-            'address_street',
-            'address_city',
-            'address_zip',
-            'phone',
-            'email',
-            'bank_account_iban',
-            'bank_account_bic',
-            'template_category_id',
-            'use_office_details',
-            'center_office_id' => [
-                'code',
+            ],
+            'customer_id' => [
+                'partner_identity_id' => [
+                    'id',
+                    'display_name',
+                    'accounting_account',
+                    'type',
+                    'address_street', 'address_dispatch', 'address_city', 'address_zip', 'address_country',
+                    'type',
+                    'phone',
+                    'mobile',
+                    'email',
+                    'has_vat',
+                    'vat_number'
+                ]
+            ],
+            'center_id' => [
+                'name',
+                'manager_id' => ['name'],
                 'address_street',
                 'address_city',
                 'address_zip',
                 'phone',
                 'email',
-                'signature',
-                'bank_account_iban',
-                'bank_account_bic'
-            ],
-            'organisation_id' => [
-                'id',
-                'legal_name',
-                'address_street', 'address_zip', 'address_city',
-                'email',
-                'phone',
-                'fax',
-                'website',
-                'registration_number',
-                'has_vat',
-                'vat_number',
                 'bank_account_iban',
                 'bank_account_bic',
-                'signature',
-                'logo_document_id' => ['id', 'type', 'data']
+                'template_category_id',
+                'use_office_details',
+                'center_office_id' => [
+                    'code',
+                    'address_street',
+                    'address_city',
+                    'address_zip',
+                    'phone',
+                    'email',
+                    'signature',
+                    'bank_account_iban',
+                    'bank_account_bic'
+                ],
+                'organisation_id' => [
+                    'id',
+                    'legal_name',
+                    'address_street', 'address_zip', 'address_city',
+                    'email',
+                    'phone',
+                    'fax',
+                    'website',
+                    'registration_number',
+                    'has_vat',
+                    'vat_number',
+                    'bank_account_iban',
+                    'bank_account_bic',
+                    'signature',
+                    'logo_document_id' => ['id', 'type', 'data']
+                ]
+            ],
+            'contacts_ids' => [
+                'type',
+                'partner_identity_id' => [
+                    'display_name',
+                    'phone',
+                    'mobile',
+                    'email',
+                    'title'
+                ]
+            ],
+            'fundings_ids' => [
+                'description',
+                'due_date',
+                'is_paid',
+                'due_amount',
+                'payment_reference',
+                'payment_deadline_id' => ['name']
             ]
         ],
-        'contacts_ids' => [
-            'type',
-            'partner_identity_id' => [
-                'display_name',
-                'phone',
-                'mobile',
-                'email',
-                'title'
+        'contract_line_groups_ids' => [
+            'name',
+            'is_pack',
+            'fare_benefit',
+            'total',
+            'price',
+            'rate_class_id' => ['id', 'name', 'description'],
+            'contract_line_id' => [
+                'name',
+                'qty',
+                'unit_price',
+                'discount',
+                'free_qty',
+                'vat_rate',
+                'total',
+                'price'
+            ],
+            'contract_lines_ids' => [
+                'name',
+                'description',
+                'qty',
+                'unit_price',
+                'discount',
+                'free_qty',
+                'vat_rate',
+                'total',
+                'price'
             ]
         ],
-        'fundings_ids' => [
-            'description',
-            'due_date',
-            'is_paid',
-            'due_amount',
-            'payment_reference',
-            'payment_deadline_id' => ['name']
-        ]
-    ],
-    'contract_line_groups_ids' => [
-        'name',
-        'is_pack',
-        'fare_benefit',
-        'total',
         'price',
-        'rate_class_id' => ['id', 'name', 'description'],
-        'contract_line_id' => [
-            'name',
-            'qty',
-            'unit_price',
-            'discount',
-            'free_qty',
-            'vat_rate',
-            'total',
-            'price'
-        ],
-        'contract_lines_ids' => [
-            'name',
-            'description',
-            'qty',
-            'unit_price',
-            'discount',
-            'free_qty',
-            'vat_rate',
-            'total',
-            'price'
-        ]
-    ],
-    'price',
-    'total'
-];
+        'total'
+    ];
 
 
 $contract = Contract::id($params['id'])->read($fields, $params['lang'])->first(true);
@@ -236,7 +263,7 @@ if($logo_document_data) {
     $img_url = "data:{$content_type};base64, ".base64_encode($logo_document_data);
 }
 
-$member_name = lodging_booking_print_contract_formatMember($booking);
+    $member_name = $lodgingBookingPrintBookingFormatMember($booking);
 
 $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
