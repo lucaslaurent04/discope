@@ -68,6 +68,12 @@ class CampModel extends Model {
                 'default'           => false
             ],
 
+            'ase_quota' => [
+                'type'              => 'integer',
+                'description'       => "Max quantity of children, using financial help \"Aide sociale à l'enfance\", that can take part to the camp.",
+                'default'           => 4
+            ],
+
             'required_skills_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\camp\Skill',
