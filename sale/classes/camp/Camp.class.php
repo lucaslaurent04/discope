@@ -109,25 +109,43 @@ class Camp extends Model {
                 'description'       => "The quantity of children one employee can handle alone.",
                 'store'             => true,
                 'function'          => 'calcDefaultEmployeeRatio',
-                'default'           => 12
+                'dependencies'      => ['max_children'],
+                'onupdate'          => 'onupdateEmployeeRatio'
             ],
 
             'max_children' => [
-                'type'              => 'integer',
+                'type'              => 'computed',
+                'result_type'       => 'integer',
                 'description'       => "Max quantity of children that can take part to the camp.",
-                'default'           => 20
+                'store'             => true,
+                'function'          => 'calcMaxChildren'
+            ],
+
+            'camp_group_qty' => [
+                'type'              => 'integer',
+                'description'       => "The quantity of camp groups.",
+                'default'           => 1,
+                'dependencies'      => ['max_children']
             ],
 
             'ase_quota' => [
                 'type'              => 'integer',
                 'description'       => "Max quantity of children, using financial help \"Aide sociale à l'enfance\", that can take part to the camp.",
-                'default'           => 0
+                'default'           => 4
             ],
 
             'need_license_ffe' => [
                 'type'              => 'boolean',
                 'description'       => "Does the camp requires to child to have a 'licence fédération française équitation'.",
                 'default'           => false
+            ],
+
+            'camp_groups_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\camp\CampGroup',
+                'foreign_field'     => 'camp_id',
+                'description'       => "The groups of children of the camp.",
+                'ondetach'          => 'delete'
             ],
 
             'required_skills_ids' => [
@@ -179,6 +197,16 @@ class Camp extends Model {
         return $result;
     }
 
+    public static function calcMaxChildren($self): array {
+        $result = [];
+        $self->read(['employee_ratio', 'camp_group_qty']);
+        foreach($self as $id => $camp) {
+            $result[$id] = $camp['employee_ratio'] * $camp['camp_group_qty'];
+        }
+
+        return $result;
+    }
+
     public static function onchange($event, $values) {
         $result = [];
         if(isset($event['camp_model_id'])) {
@@ -188,7 +216,6 @@ class Camp extends Model {
                     'camp_type',
                     'with_accommodation',
                     'employee_ratio',
-                    'max_children',
                     'need_license_ffe',
                     'product_id' => ['id', 'name']
                 ])
@@ -199,7 +226,6 @@ class Camp extends Model {
                 $result['with_accommodation'] = $camp_model['with_accommodation'];
                 $result['employee_ratio'] = $camp_model['employee_ratio'];
                 $result['product_id'] = $camp_model['product_id'];
-                $result['max_children'] = $camp_model['max_children'];
                 $result['need_license_ffe'] = $camp_model['need_license_ffe'];
 
                 if(empty($values['name'])) {
@@ -232,5 +258,56 @@ class Camp extends Model {
                 ]);
             }
         }
+    }
+
+    public static function onupdateEmployeeRatio($self) {
+        $self->read(['camp_groups_ids']);
+        foreach($self as $camp) {
+            CampGroup::ids($camp['camp_groups_ids'])
+                ->update(['max_children' => null]);
+        }
+    }
+
+    public static function onupdate($self, $values) {
+        $self->read(['camp_groups_ids']);
+        foreach($self as $id => $camp) {
+            if(count($camp['camp_groups_ids']) > 0) {
+                continue;
+            }
+
+            CampGroup::create([
+                'camp_id'      => $id,
+                'max_children' => $camp['employee_ratio']
+            ]);
+        }
+    }
+
+    public static function canupdate($self, $values): array {
+        $self->read([
+            'camp_group_qty',
+            'enrollments_ids' => ['status']
+        ]);
+
+        if(isset($values['employee_ratio'])) {
+            $enrolled_children_qty = 0;
+
+            foreach($self as $camp) {
+                foreach($camp['enrollments_ids'] as $enrollment) {
+                    if(in_array($enrollment['status'], ['pending', 'confirmed'])) {
+                        $enrolled_children_qty++;
+                    }
+                }
+
+                if($enrolled_children_qty > ($camp['camp_group_qty'] * $values['employee_ratio'])) {
+                    return [
+                        'employee_ratio' => [
+                            'too_many_children' => "There is too many children enrolled in the camp to modify the employee ratio to {$values['employee_ratio']}."
+                        ]
+                    ];
+                }
+            }
+        }
+
+        return parent::canupdate($self, $values);
     }
 }

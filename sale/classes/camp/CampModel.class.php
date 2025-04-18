@@ -58,19 +58,13 @@ class CampModel extends Model {
             'employee_ratio' => [
                 'type'              => 'integer',
                 'usage'             => 'number/integer{1,50}',
-                'description'       => "The quantity of children one employee can handle alone.",
+                'description'       => "The quantity of children one employee can handle alone, max_children for one camp group.",
                 'default'           => 12
-            ],
-
-            'max_children' => [
-                'type'              => 'integer',
-                'description'       => "Max quantity of children that can take part to the camp.",
-                'default'           => 20
             ],
 
             'need_license_ffe' => [
                 'type'              => 'boolean',
-                'description'       => "Does the camp requires to child to have a 'lisence fédération française équitation'.",
+                'description'       => "Does the camp requires to child to have a 'licence fédération française équitation'.",
                 'default'           => false
             ],
 
