@@ -585,7 +585,7 @@ class Booking extends Model {
 
         foreach($bookings as $bid => $booking) {
             $min_date = PHP_INT_MAX;
-            $time_from = 0;
+            $time_from = Setting::get_value('sale', 'features',  'booking.checkin.default', 14 * 3600);
             $booking_line_groups = $om->read('sale\booking\BookingLineGroup', $booking['booking_lines_groups_ids'], ['date_from', 'time_from', 'is_sojourn', 'is_event']);
             if($booking_line_groups > 0 && count($booking_line_groups)) {
                 foreach($booking_line_groups as $gid => $group) {
@@ -594,8 +594,8 @@ class Booking extends Model {
                         $time_from = $group['time_from'];
                     }
                 }
-                $result[$bid] = $time_from;
             }
+            $result[$bid] = $time_from;
         }
 
         return $result;
@@ -608,7 +608,7 @@ class Booking extends Model {
         if($bookings > 0) {
             foreach($bookings as $bid => $booking) {
                 $max_date = 0;
-                $time_to = 0;
+                $time_to =  Setting::get_value('sale', 'features',  'booking.checkout.default' ,  10 * 3600);
                 $booking_line_groups = $om->read('sale\booking\BookingLineGroup', $booking['booking_lines_groups_ids'], ['date_to', 'time_to', 'is_sojourn', 'is_event']);
                 if($booking_line_groups > 0 && count($booking_line_groups)) {
                     foreach($booking_line_groups as $gid => $group) {
@@ -617,8 +617,8 @@ class Booking extends Model {
                             $time_to = $group['time_to'];
                         }
                     }
-                    $result[$bid] = $time_to;
                 }
+                $result[$bid] = $time_to;
             }
         }
 
