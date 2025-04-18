@@ -218,6 +218,7 @@ class Camp extends Model {
                     'with_accommodation',
                     'employee_ratio',
                     'need_license_ffe',
+                    'ase_quota',
                     'product_id' => ['id', 'name']
                 ])
                 ->first(true);
@@ -228,6 +229,7 @@ class Camp extends Model {
                 $result['employee_ratio'] = $camp_model['employee_ratio'];
                 $result['product_id'] = $camp_model['product_id'];
                 $result['need_license_ffe'] = $camp_model['need_license_ffe'];
+                $result['ase_quota'] = $camp_model['ase_quota'];
 
                 if(empty($values['name'])) {
                     $result['name'] = $camp_model['name'];
