@@ -458,11 +458,12 @@ foreach($invoices as $invoice) {
     Generate lines: LOPDIV_FACT.txt
 */
 
+// #todo #settings - adapt to new conventions
 $account_sales = Setting::get_value('finance', 'invoice', 'account.sales', '7000000');
 $account_downpayment = Setting::get_value('finance', 'invoice', 'downpayment.account', '4460000');
 $account_discount = Setting::get_value('finance', 'invoice', 'account.discount', '7080000');
 
-// #todo - store this value in the settings
+// #todo #settings #catalog - store this value in the settings
 // discount product is the same for all organisations: KA-Remise-A [65]
 $discount_product_id = 65;
 
