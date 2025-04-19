@@ -56,14 +56,14 @@ class BookingLineGroup extends Model {
             'time_from' => [
                 'type'              => 'time',
                 'description'       => "Checkin time on the day of arrival.",
-                'default'           => Setting::get_value('sale', 'features',  'booking.checkin.default', 14 * 3600),
+                'default'           => Setting::get_value('sale', 'features', 'booking.checkin.default', 14 * 3600),
                 'onupdate'          => 'onupdateTimeFrom'
             ],
 
             'time_to' => [
                 'type'              => 'time',
                 'description'       => "Checkout time on the day of departure.",
-                'default'           =>  Setting::get_value('sale', 'features',  'booking.checkout.default' ,  10 * 3600),
+                'default'           =>  Setting::get_value('sale', 'features', 'booking.checkout.default', 10 * 3600),
                 'onupdate'          => 'onupdateTimeTo'
             ],
 
