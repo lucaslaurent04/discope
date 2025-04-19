@@ -102,7 +102,7 @@ if(!$cashdeskSession) {
     throw new Exception("unknown_cashdeskSession", QN_ERROR_UNKNOWN_OBJECT);
 }
 
-// #todo - fetch from settings
+// #todo #settings - fetch from settings
 $tz = new \DateTimeZone("Europe/Brussels");
 
 $cashdeskSession['created'] += $tz->getOffset(new \DateTime('@'.$cashdeskSession['created']));
@@ -304,7 +304,7 @@ try {
     /**  @var ExtensionInterface **/
     $extension  = new IntlExtension();
     $twig->addExtension($extension);
-    // #todo - temp workaround against LOCALE mixups
+    // do not rely on system locale (LC_*)
     $filter = new \Twig\TwigFilter('format_money', function ($value) {
         return number_format((float)($value),2,",",".").' €';
     });

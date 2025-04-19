@@ -2455,7 +2455,7 @@ class BookingLineGroup extends Model {
                                 }
                                 $meal_preferences = $om->read(\sale\booking\MealPreference::getType(), $group['meal_preferences_ids'], ['type','pref', 'qty'], $lang);
                                 foreach($meal_preferences as $oid => $preference) {
-                                    // #todo : use translation file
+                                    // #todo #i18n - use translation file
                                     $type = ($preference['type'] == '3_courses')?'3 services':'2 services';
                                     $pref = ($preference['pref'] == 'veggie')?'végétarien':(($preference['pref'] == 'allergen_free')?'sans allergène':'normal');
                                     $description .= "<p>{$type} / {$pref} : {$preference['qty']} ; </p>";

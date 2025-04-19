@@ -69,7 +69,7 @@ if($booking && in_array($booking['status'], ['option', 'confirmed'])) {
     $has_error = false;
 
     foreach($booking['booking_lines_groups_ids'] as $group) {
-        // #todo 2024-02-21 - quick workaround for allowing camps without rental units
+        // allow camps to be booked without rental units
         if($group['group_type'] == 'camp') {
             continue;
         }

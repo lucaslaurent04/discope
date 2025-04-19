@@ -129,8 +129,7 @@ class Booking extends Model {
                 'store'             => true
             ],
 
-            // #todo
-            // origin ID (internal, OTA, TO)
+            // #todo - add origin ID (internal, OTA, TO)
 
             // A booking can have several contacts (extending identity\Partner)
             'contacts_ids' => [

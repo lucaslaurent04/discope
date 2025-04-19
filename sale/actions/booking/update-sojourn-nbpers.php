@@ -73,7 +73,7 @@ $orm->disableEvents();
 // a) special case for booking which price in not impacted by `nb_pers`
 if($group['booking_id']['status'] != 'quote') {
     // #memo - for GG, the number of persons does not impact the booking (GG only has pricing by_accomodation), so we allow change of nb_pers under specific circumstances
-    // #todo - use a dedicated setting for the family_id to be exempted from nb_pers restriction
+    // #todo #settings - use a dedicated setting for the family_id to be exempted from nb_pers restriction
     if($group['is_sojourn'] && $group['has_pack'] && $group['pack_id']['family_id'] == 3) {
         BookingLineGroup::id($group['id'])
             ->update([

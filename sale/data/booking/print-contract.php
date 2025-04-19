@@ -989,7 +989,7 @@ try {
     $extension  = new IntlExtension();
     $twig->addExtension($extension);
     $currency = Setting::get_value('core', 'locale', 'currency', '€');
-    // #todo - temp workaround against LOCALE mixups
+    // do not rely on system locale (LC_*)
     $filter = new \Twig\TwigFilter('format_money', function ($value) use($currency) {
         return number_format((float)($value), 2, ",", ".") . ' ' .$currency;
     });
@@ -997,12 +997,7 @@ try {
 
     $template = $twig->load("{$class_path}.{$params['view_id']}.html");
 
-    // #todo - use localization prefs for rendering (independent from locale)
-    // setlocale(LC_ALL, constant('L10N_LOCALE'));
-    // render template
     $html = $template->render($values);
-    // restore original locale
-    // setlocale(LC_ALL, 0);
 }
 catch(Exception $e) {
     trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
