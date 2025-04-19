@@ -526,14 +526,16 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcDisplayName($om, $oids, $lang) {
+    public static function calcDisplayName($self) {
         $result = [];
-        $customer_assignment = Setting::get_value('sale', 'features', 'customer.number_assignment', 'customer_identity_id');
-        $bookings = $om->read(self::getType(), $oids, ['name','customer_id.name',  $customer_assignment ], $lang);
-        if($bookings > 0) {
-            foreach($bookings as $id => $booking) {
-                $result[$id] = $booking['name'] .' - '.$booking['customer_id.name']  .' ('.$booking[$customer_assignment] . ')' ;
+        $customer_assignment = Setting::get_value('sale', 'organization', 'customer.number_assignment', 'id');
+        $self->read(['name', 'customer_identity_id' => ['name', 'id', 'accounting_account']]);
+        foreach($self as $id => $booking) {
+            $name = $booking['name'] . ' - ' . $booking['customer_identity_id']['name'];
+            if(isset($booking['customer_identity_id'][$customer_assignment])) {
+                $name .= ' (' . $booking['customer_identity_id'][$customer_assignment] . ')' ;
             }
+            $result[$id] = $name;
         }
         return $result;
     }
