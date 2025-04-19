@@ -71,16 +71,18 @@ list($context, $orm) = [$providers['context'], $providers['orm']];
  * Methods
  */
 
+// #todo - this should be in the Customer class
 $lodgingBookingPrintBookingFormatMember = function($booking) {
-    $has_number_assignment = Setting::get_value('sale', 'features', 'customer.member.has_number_assignment', 0);
+    $has_number_assignment = Setting::get_value('sale', 'organization', 'customer.has_number_assignment', 0);
     if ($has_number_assignment) {
-        $customer_assignment = Setting::get_value('sale', 'features', 'customer.member.number_assignment');
+        $customer_assignment = Setting::get_value('sale', 'organization', 'customer.number_assignment');
         $code = $booking['customer_id']['partner_identity_id'][$customer_assignment];
-    }else {
+    }
+    else {
         $id = $booking['customer_id']['partner_identity_id']['id'];
         $code = ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
     }
-    return $code.' - '.$booking['customer_id']['partner_identity_id']['display_name'];
+    return $code . ' - ' . $booking['customer_id']['partner_identity_id']['display_name'];
 };
 
 $lodgingBookingPrintAgeRangesText = function($booking, $conection_names) {
