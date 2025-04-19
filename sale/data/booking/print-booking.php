@@ -67,35 +67,9 @@ list($params, $providers) = announce([
 
 list($context, $orm) = [$providers['context'], $providers['orm']];
 
-/**
- * Methods
- */
-
- $lodgingBookingPrintBookingFormatMember = function($booking) {
-    $has_number_assignment = Setting::get_value('sale', 'features', 'customer.member.has_number_assignment', 0);
-    if ($has_number_assignment) {
-        $customer_assignment = Setting::get_value('sale', 'features', 'customer.member.number_assignment');
-        $code = $booking['customer_id']['partner_identity_id'][$customer_assignment];
-    }else {
-        $id = $booking['customer_id']['partner_identity_id']['id'];
-        $code = ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
-    }
-    return $code.' - '.$booking['customer_id']['partner_identity_id']['display_name'];
-};
-
-/**
- * Action
- */
-
-$print_booking_package = Setting::get_value('sale', 'booking', 'print_booking_package', 'sale');
-
-if($print_booking_package !== 'sale') {
-    $output = eQual::run('get', "{$print_booking_package}_sale_booking_print-booking", $params, true);
-}
-else {
-    /*
-        Retrieve the requested template
-    */
+/*
+    Retrieve the requested template
+*/
 
 $entity = 'sale\booking\Booking';
 $parts = explode('\\', $entity);
@@ -132,103 +106,102 @@ $fields = [
             'phone',
             'mobile',
             'email'
-        ],
-        'customer_id' => [
-            'partner_identity_id' => [
-                'id',
-                'display_name',
-                'accounting_account',
-                'type',
-                'address_street', 'address_dispatch', 'address_city', 'address_zip', 'address_country',
-                'type',
-                'phone',
-                'mobile',
-                'email',
-                'has_vat',
-                'vat_number'
-            ]
-        ],
-        'center_id' => [
-            'name',
-            'manager_id' => ['name'],
+    ],
+    'customer_id' => [
+        'partner_identity_id' => [
+            'id',
+            'display_name',
+            'type',
+            'address_street', 'address_dispatch', 'address_city', 'address_zip', 'address_country',
+            'type',
+            'phone',
+            'mobile',
+            'email',
+            'has_vat',
+            'vat_number'
+        ]
+    ],
+    'center_id' => [
+        'name',
+        'manager_id' => ['name'],
+        'address_street',
+        'address_city',
+        'address_zip',
+        'phone',
+        'email',
+        'bank_account_iban',
+        'template_category_id',
+        'use_office_details',
+        'center_office_id' => [
+            'code',
             'address_street',
             'address_city',
             'address_zip',
             'phone',
             'email',
+            'signature',
             'bank_account_iban',
-            'template_category_id',
-            'use_office_details',
-            'center_office_id' => [
-                'code',
-                'address_street',
-                'address_city',
-                'address_zip',
-                'phone',
-                'email',
-                'signature',
-                'bank_account_iban',
-                'bank_account_bic'
-            ],
-            'organisation_id' => [
-                'id',
-                'legal_name',
-                'address_street',
-                'address_zip',
-                'address_city',
-                'email',
-                'phone',
-                'fax',
-                'website',
-                'registration_number',
-                'has_vat',
-                'vat_number',
-                'bank_account_iban',
-                'bank_account_bic',
-                'signature',
-                'logo_document_id' => ['id', 'type', 'data']
-            ]
+            'bank_account_bic'
         ],
-        'contacts_ids' => [
-            'type',
-            'partner_identity_id' => [
-                'display_name',
-                'phone',
-                'mobile',
-                'email',
-                'title'
-            ]
-        ],
-        'booking_lines_groups_ids' => [
+        'organisation_id' => [
+            'id',
+            'legal_name',
+            'address_street',
+            'address_zip',
+            'address_city',
+            'email',
+            'phone',
+            'fax',
+            'website',
+            'registration_number',
+            'has_vat',
+            'vat_number',
+            'bank_account_iban',
+            'bank_account_bic',
+            'signature',
+            'logo_document_id' => ['id', 'type', 'data']
+        ]
+    ],
+    'contacts_ids' => [
+        'type',
+        'partner_identity_id' => [
+            'display_name',
+            'phone',
+            'mobile',
+            'email',
+            'title'
+        ]
+    ],
+    'booking_lines_groups_ids' => [
+        'name',
+        'has_pack',
+        'is_locked',
+        'pack_id'  => ['label'],
+        'qty',
+        'unit_price',
+        'vat_rate',
+        'total',
+        'price',
+        'fare_benefit',
+        'rate_class_id' => ['id', 'name', 'description'],
+        'date_from',
+        'date_to',
+        'nb_pers',
+        'booking_lines_ids' => [
             'name',
-            'has_pack',
-            'is_locked',
-            'pack_id'  => ['label'],
+            'product_id' => ['label'],
+            'description',
             'qty',
             'unit_price',
-            'vat_rate',
+            'free_qty',
+            'discount',
             'total',
             'price',
-            'fare_benefit',
-            'rate_class_id' => ['id', 'name', 'description'],
-            'date_from',
-            'date_to',
-            'nb_pers',
-            'booking_lines_ids' => [
-                'name',
-                'product_id' => ['label'],
-                'description',
-                'qty',
-                'unit_price',
-                'free_qty',
-                'discount',
-                'total',
-                'price',
-                'vat_rate',
-                'qty_accounting_method',
-                'price_adapters_ids' => ['type', 'value', 'is_manual_discount']
-            ]
+            'vat_rate',
+            'qty_accounting_method',
+            'price_adapters_ids' => ['type', 'value', 'is_manual_discount']
         ]
+    ]
 
 ];
 
