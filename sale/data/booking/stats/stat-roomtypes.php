@@ -95,7 +95,7 @@ foreach($property['room_types_ids'] as $room_type) {
                         $date_index = substr(date('c', $d), 0, 10);
                         if(isset($map_dates_availability[$date_index]) && $map_dates_availability[$date_index] > 0) {
                             --$map_dates_availability[$date_index];
-                            // #memo #todo - this might require a review in case of change in the logic of repairings (the same processing occurs in the planning.calendar.component of the Booking App)
+                            // #todo - this might require a review in case of change in the logic of repairings (the same processing occurs in the planning.calendar.component of the Booking App)
                             if($consumption['type'] == 'ooo' && $d == $consumption['date_from']+$consumption['schedule_from']) {
                                 $prev_date_index = substr(date('c', strtotime('-1 day', $consumption['date_from']+$consumption['schedule_from'])), 0, 10);
                                 if(isset($map_dates_availability[$prev_date_index]) && $map_dates_availability[$prev_date_index] > 0) {

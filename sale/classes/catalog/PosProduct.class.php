@@ -56,7 +56,7 @@ class PosProduct extends Product {
         $user = reset($users);
 
         // pos.default.administrator [42]
-        // #todo - request the ID from core\Groups
+        // #todo #pos #permissions - request the ID from core\Groups
         if(!in_array(42, $user['groups_ids'])) {
             return ['id' => ['missing_permission' => 'Only PoS admins can update a PoS Product.']];
         }

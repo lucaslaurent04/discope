@@ -70,7 +70,7 @@ class MealPreference extends Model {
 
     public function getUnique() {
         return [
-        // #todo - to adapt once the structure will be final
+        // #todo #meals - to adapt once the structure will be final
         // ['booking_line_group_id', 'type', 'pref']
         ];
     }

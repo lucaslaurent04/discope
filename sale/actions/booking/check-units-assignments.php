@@ -74,7 +74,7 @@ $mismatch = false;
 
 if(!$booking['is_cancelled'] && $booking_line_groups) {
     foreach($booking_line_groups as $gid => $group) {
-        // #todo 2024-02-21 - quick workaround for allowing camps without rental units
+        // allow camps to be booked without rental units
         if($group['group_type'] == 'camp') {
             continue;
         }
