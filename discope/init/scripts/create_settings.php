@@ -14,11 +14,13 @@ Setting::assert_value('sale', 'features', 'booking.services.products.folded', fa
 Setting::assert_value('sale', 'features', 'booking.services.activities.folded', false);
 Setting::assert_value('sale', 'features', 'booking.services.accommodations.folded', false);
 Setting::assert_value('sale', 'features', 'booking.services.meals.folded', false);
-Setting::assert_value('sale', 'features', 'customer.number_assignment', 'account number');
+Setting::assert_value('sale', 'features', 'booking.checkin.default', 14*3600);
+Setting::assert_value('sale', 'features', 'booking.checkout.default', 10*3600);
 Setting::assert_value('sale', 'features', 'templates.quote.consumption_table.show', false);
 Setting::assert_value('sale', 'features', 'templates.quote.activities.show', false);
 
 // === sale.organization ===
+Setting::assert_value('sale', 'organization', 'customer.number_assignment', 'accounting_account');
 Setting::assert_value('sale', 'organization', 'booking.channel_manager.client_domain');
 
 // === finance.accounting ===
