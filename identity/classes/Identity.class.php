@@ -213,7 +213,7 @@ class Identity extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'string',
                 'description'       => "Unique code identifying the associated accounting account.",
-                'function'          => 'calcAccount',
+                'function'          => 'calcAccountingAccount',
                 'store'             => true
             ],
 
@@ -740,36 +740,28 @@ class Identity extends Model {
         ];
     }
 
-    public static function calcAccount($self) {
+    public static function calcAccountingAccount($self) {
         $result = [];
         $self->read(['id','name']);
         foreach($self as $id => $identity) {
+            $prefix_account = Setting::get_value('identity', 'accounting', 'customer_account.prefix', '411');
+            $sequence_account = Setting::get_value('identity', 'accounting', 'customer_account.sequence', 1);
+            $format = Setting::get_value('identity', 'accounting', 'customer_account.sequence_format', '%3d{prefix}%5d{sequence}');
 
-            $prefix_account = Setting::get_value('identity', 'locale', 'account.prefix');
-            $sequence_account = Setting::get_value('identity', 'locale', 'account.sequence');
-            $format = Setting::get_value('identity', 'locale', 'account.sequence_format', '%3d{prefix}%5d{sequence}');
+            do {
+                Setting::set_value('identity', 'accounting', 'customer_account.sequence', $sequence_account + 1);
 
-            if(isset($prefix_account) && isset($sequence_account) && $format) {
-                Setting::set_value('identity', 'locale', 'account.sequence', $sequence_account + 1);
+                $accounting_account = Setting::parse_format($format, [
+                        'prefix'    => $prefix_account,
+                        'sequence'  => $sequence_account
+                    ]);
 
-                $acounting_value = Setting::parse_format($format, [
-                    'prefix'    => $prefix_account,
-                    'sequence'  => $sequence_account
-                ]);
-
-                $identity_found = Identity::search([
-                                ['id', '<>' , $identity['id']],
-                                ['accounting_account' ,  '=',  $acounting_value]
-                            ])
-                            ->read('id')
-                            ->first(true);
-
-                if(!$identity_found){
-                    $result[$id] = $acounting_value;
-                }
-
+                $existingIdentity = Identity::search(['accounting_account', '=', $accounting_account])->first();
+                ++$sequence_account;
             }
+            while($existingIdentity);
 
+            $result[$id] = $accounting_account;
         }
         return $result;
     }
