@@ -59,8 +59,7 @@ if(!$channelmanager_enabled) {
     throw new Exception('disabled_feature', QN_ERROR_INVALID_CONFIG);
 }
 
-// #todo - replace setting with `sale.organization.booking.channel_manager.client_domain`
-$client_domain = Setting::get_value('sale', 'booking', 'channelmanager.client_domain', 'https://kaleo.discope.run');
+$client_domain = Setting::get_value('sale', 'organization', 'booking.channel_manager.client_domain', 'https://kaleo.discope.run');
 
 // #memo - prevent calls from non-production server
 if(constant('ROOT_APP_URL') != $client_domain) {
@@ -76,6 +75,7 @@ if(!$property) {
 
 $xml = Property::cubilis_HotelAvailNotifRQ_generateXmlPayload($params['property_id'], $property['username'], $property['password'], $property['api_id'], $params['room_type_id'], $params['date'], $params['availability']);
 
+// #todo #settings - use a setting for this
 $entrypoint_url = "https://cubilis.eu/plugins/PMS_ota/set_availability.aspx";
 
 $request = new HttpRequest('POST '.$entrypoint_url);
