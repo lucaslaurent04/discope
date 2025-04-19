@@ -831,14 +831,6 @@ foreach($consumptions_simple as $cid => $consumption) {
     if($consumption['is_meal']) {
         $consumption_time_slot_code = $consumption['time_slot_id']['code'];
 
-        // #todo - remove this temporary mapping (once time_slot_id will be correctly set)
-        $consumption_time_slot_code = [
-                1 => 'B',
-                2 => 'L',
-                3 => 'D',
-                4 => 'D'
-            ][$consumption['time_slot_id']['id']];
-
         if(!isset($consumptions_map_simple[$date][$consumption_time_slot_code])) {
             $consumptions_map_simple[$date][$consumption_time_slot_code] = 0;
         }
@@ -1028,7 +1020,7 @@ try {
     /**  @var ExtensionInterface **/
     $extension  = new IntlExtension();
     $twig->addExtension($extension);
-    // #todo - temp workaround against LOCALE mixups
+    // do not rely on system locale (LC_*)
     $filter = new \Twig\TwigFilter('format_money', function ($value) {
         return number_format((float)($value),2,",",".").' €';
     });
@@ -1036,12 +1028,7 @@ try {
 
     $template = $twig->load("{$class_path}.{$params['view_id']}.html");
 
-    // #todo - use localization prefs for rendering (independent from locale)
-    // setlocale(LC_ALL, constant('L10N_LOCALE'));
-    // render template
     $html = $template->render($values);
-    // restore original locale
-    // setlocale(LC_ALL, 0);
 }
 catch(Exception $e) {
     trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
