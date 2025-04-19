@@ -337,7 +337,7 @@ try {
                                     $values['tour_operator_id'] = 18717;
                                     $values['tour_operator_ref'] = $reservation['partner_reservation_id'];
                                 }
-                                // #todo - AirBnB
+                                // #todo #channelmanager - AirBnB
                                 Booking::id($booking['id'])->update($values);
                             }
                         }
@@ -774,13 +774,6 @@ try {
                                         [ 'id' => $payment['id'] ]
                                     );
 
-                                // #todo - @kaleo - required for backward compatibility - remove this once all centers will have been migrated to new instance
-                                $cron->schedule(
-                                        "psp.fetch.{$payment['id']}",
-                                        time(),
-                                        'lodging_payments_fetch-psp',
-                                        [ 'id' => $payment['id'] ]
-                                    );
                             }
 
                         }
