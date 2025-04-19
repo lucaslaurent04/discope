@@ -49,7 +49,7 @@ if(!$channelmanager_enabled) {
     throw new Exception('disabled_feature', QN_ERROR_INVALID_CONFIG);
 }
 
-$client_domain = Setting::get_value('sale', 'features', 'channelmanager.client_domain');
+$client_domain = Setting::get_value('sale', 'organization', 'booking.channel_manager.client_domain', 'https://kaleo.discope.run');
 
 // #memo - prevent calls from non-production server
 if(constant('ROOT_APP_URL') != $client_domain) {
