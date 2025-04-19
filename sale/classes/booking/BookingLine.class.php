@@ -482,6 +482,8 @@ class BookingLine extends Model {
                 if($product['product_model_id']['is_fullday']) {
                     foreach($self as $id => $line) {
                         if(!in_array($line['time_slot_id'], $AM_PM_time_slot_ids)) {
+                            
+                            // #todo - this should be done by the front-end with a distinct call (`canupdate` should not perform any data update)
                             // remove empty line because cannot set to activity
                             self::id($id)->delete(true);
 
@@ -504,6 +506,8 @@ class BookingLine extends Model {
                             $activity_to_check['activity_date'] < $line['booking_line_group_id']['date_from']
                             || $activity_to_check['activity_date'] > $line['booking_line_group_id']['date_to']
                         ) {
+
+                            // #todo - this should be done by the front-end with a distinct call (`canupdate` should not perform any data update)
                             // remove empty line because cannot set to activity
                             self::id($id)->delete(true);
 
@@ -519,6 +523,8 @@ class BookingLine extends Model {
                             ->first();
 
                         if(!is_null($activity)) {
+
+                            // #todo - this should be done by the front-end with a distinct call (`canupdate` should not perform any data update)
                             // remove empty line because cannot set to activity
                             self::id($id)->delete(true);
 
