@@ -1,35 +1,132 @@
 <?php
-
-use core\setting\Setting;
-
+use core\setting\Setting; /* #memo - +35 settings from core */
 // === sale.features ===
 Setting::assert_value('sale', 'features', 'booking.channel_manager', false);
 Setting::assert_value('sale', 'features', 'booking.instant_payment', false);
 Setting::assert_value('sale', 'features', 'booking.has_activity', false);
 Setting::assert_value('sale', 'features', 'payment.bank_check', false);
 Setting::assert_value('sale', 'features', 'payment.financial_help', false);
-Setting::assert_value('sale', 'features', 'booking.services.store.folded', false);
-Setting::assert_value('sale', 'features', 'booking.services.identification.folded', false);
-Setting::assert_value('sale', 'features', 'booking.services.products.folded', false);
-Setting::assert_value('sale', 'features', 'booking.services.activities.folded', false);
-Setting::assert_value('sale', 'features', 'booking.services.accommodations.folded', false);
-Setting::assert_value('sale', 'features', 'booking.services.meals.folded', false);
 Setting::assert_value('sale', 'features', 'booking.checkin.default', 14*3600);
 Setting::assert_value('sale', 'features', 'booking.checkout.default', 10*3600);
-Setting::assert_value('sale', 'features', 'templates.quote.consumption_table.show', false);
-Setting::assert_value('sale', 'features', 'templates.quote.activities.show', false);
-
+Setting::assert_value('sale', 'features', 'booking.archive_delay', 60);
+Setting::assert_value('sale', 'features', 'quote.validity_delay', 10);
+Setting::assert_value('sale', 'features', 'quote.remind_delay', 7);
+Setting::assert_value('sale', 'features', 'option.validity_delay', 10);
+Setting::assert_value('sale', 'features', 'invoice.downpayment', false);
+Setting::assert_value('sale', 'features', 'ui.booking.store_folded_settings', '0');
+Setting::assert_value('sale', 'features', 'ui.booking.identification_folded', '0');
+Setting::assert_value('sale', 'features', 'ui.booking.products_folded', '1');
+Setting::assert_value('sale', 'features', 'ui.booking.activities_folded', '1');
+Setting::assert_value('sale', 'features', 'ui.booking.accommodations_folded', '1');
+Setting::assert_value('sale', 'features', 'ui.booking.meals_folded', '1');
+Setting::assert_value('sale', 'features', 'templates.quote.consumption_table', '1');
+Setting::assert_value('sale', 'features', 'templates.quote.activities', '0');
 // === sale.organization ===
 Setting::assert_value('sale', 'organization', 'customer.number_assignment', 'accounting_account');
+Setting::assert_value('sale', 'organization', 'customer.number_format', 'accounting_account');
 Setting::assert_value('sale', 'organization', 'booking.channel_manager.client_domain');
-
+Setting::assert_value('sale', 'organization', 'booking.sequence_format', '%1d{center}%05d{sequence}');
+Setting::assert_value('sale', 'organization', 'booking.sequence', 1);
+// for compatibility when there are more than one center office
+Setting::assert_value('sale', 'organization', 'booking.sequence.1', 1);
+Setting::assert_value('sale', 'organization', 'booking.option_validity', '10');
+Setting::assert_value('sale', 'organization', 'sku.downpayment.1', 'ACPTE-A');
+Setting::assert_value('sale', 'organization', 'sku.bed_linens');
+Setting::assert_value('sale', 'organization', 'sku.make_beds');
+Setting::assert_value('sale', 'organization', 'sku.transport');
+Setting::assert_value('sale', 'organization', 'age_range_default');
 // === finance.accounting ===
 Setting::assert_value('finance', 'accounting', 'invoice.export_type');
-Setting::assert_value('finance', 'accounting', 'account.sales');
-Setting::assert_value('finance', 'accounting', 'account.sales_taxes');
-Setting::assert_value('finance', 'accounting', 'account.trade_debtors');
+Setting::assert_value('finance', 'accounting', 'account.sales', '7000000');
+Setting::assert_value('finance', 'accounting', 'account.discount', '7080000');
+Setting::assert_value('finance', 'accounting', 'account.downpayment', '7080000');
+Setting::assert_value('finance', 'accounting', 'account.sales_taxes', 451);
+Setting::assert_value('finance', 'accounting', 'account.trade_debtors', 400);
+Setting::assert_value('finance', 'accounting', 'fiscal_year');
+// === sale.accounting ===
+Setting::assert_value('sale', 'accounting', 'invoice.downpayment_account', false);
+Setting::assert_value('sale', 'accounting', 'invoice.sequence_format', '%2d{year}-%02d{office}-%05d{sequence}');
+Setting::assert_value('sale', 'accounting', 'invoice.sequence', 1);
+// for compatibility when there are more than one center office
+Setting::assert_value('sale', 'accounting', 'invoice.sequence.1', 1);
+// === identity.accounting ===
+Setting::assert_value('identity', 'accounting', 'customer_account.prefix', '411');
+Setting::assert_value('identity', 'accounting', 'customer_account.sequence', 1);
+Setting::assert_value('identity', 'accounting', 'customer_account.sequence_format', '%3d{prefix}%5d{sequence}');
+// === lodging.locale translations (i18n) ===
+Setting::assert_value('lodging', 'locale', 'i18n.activity', 'Activité');
+Setting::assert_value('lodging', 'locale', 'i18n.activities_details', 'Détail des activités');
+Setting::assert_value('lodging', 'locale', 'i18n.activity_schedule', 'Planning prévisionnel des activités');
+Setting::assert_value('lodging', 'locale', 'i18n.children', 'enfant(s)');
+Setting::assert_value('lodging', 'locale', 'i18n.people', 'personne(s)');
+Setting::assert_value('lodging', 'locale', 'i18n.installment', 'versement');
+Setting::assert_value('lodging', 'locale', 'i18n.invoice', 'facture');
+Setting::assert_value('lodging', 'locale', 'i18n.downpayments', 'acompte');
+Setting::assert_value('lodging', 'locale', 'i18n.contract', 'contrat');
+Setting::assert_value('lodging', 'locale', 'i18n.quote', 'devis');
+Setting::assert_value('lodging', 'locale', 'i18n.booking_invoice', 'Facture de réservation');
+Setting::assert_value('lodging', 'locale', 'i18n.credit_note', 'Note de crédit');
+Setting::assert_value('lodging', 'locale', 'i18n.company_registry', 'Numéro d\'entreprise');
+Setting::assert_value('lodging', 'locale', 'i18n.vat_number', 'Numéro de TVA');
+Setting::assert_value('lodging', 'locale', 'i18n.vat', 'TVA');
+Setting::assert_value('lodging', 'locale', 'i18n.your_stay_at', 'Votre séjour à ');
+Setting::assert_value('lodging', 'locale', 'i18n.contact', 'Contact');
+Setting::assert_value('lodging', 'locale', 'i18n.period', 'Période');
+Setting::assert_value('lodging', 'locale', 'i18n.member', 'Membre');
+Setting::assert_value('lodging', 'locale', 'i18n.phone', 'Tél');
+Setting::assert_value('lodging', 'locale', 'i18n.email', 'Email');
+Setting::assert_value('lodging', 'locale', 'i18n.booking_ref', 'Réf. réservation');
+Setting::assert_value('lodging', 'locale', 'i18n.your_reference', 'VOTRE RÉFÉRENCE');
+Setting::assert_value('lodging', 'locale', 'i18n.number_short', 'N°');
+Setting::assert_value('lodging', 'locale', 'i18n.date', 'Date');
+Setting::assert_value('lodging', 'locale', 'i18n.status', 'Statut');
+Setting::assert_value('lodging', 'locale', 'i18n.paid', 'payé');
+Setting::assert_value('lodging', 'locale', 'i18n.to_pay', 'à payer');
+Setting::assert_value('lodging', 'locale', 'i18n.to_refund', 'à rembourser');
+Setting::assert_value('lodging', 'locale', 'i18n.product_label', 'Libellé produit');
+Setting::assert_value('lodging', 'locale', 'i18n.quantity_short', 'Qté');
+Setting::assert_value('lodging', 'locale', 'i18n.freebies_short', 'Gté');
+Setting::assert_value('lodging', 'locale', 'i18n.unit_price', 'Prix unit.');
+Setting::assert_value('lodging', 'locale', 'i18n.discount_short', 'Rem%');
+Setting::assert_value('lodging', 'locale', 'i18n.taxes', 'Taxes');
+Setting::assert_value('lodging', 'locale', 'i18n.price', 'Prix');
+Setting::assert_value('lodging', 'locale', 'i18n.total', 'Total');
+Setting::assert_value('lodging', 'locale', 'i18n.price_tax_excl', 'Prix HT');
+Setting::assert_value('lodging', 'locale', 'i18n.total_tax_excl', 'TOTAL HT');
+Setting::assert_value('lodging', 'locale', 'i18n.total_tax_incl', 'TOTAL TTC');
+Setting::assert_value('lodging', 'locale', 'i18n.stay_total_tax_incl', 'TOTAL DU SÉJOUR TTC');
+Setting::assert_value('lodging', 'locale', 'i18n.balance_of', 'Solde de');
+Setting::assert_value('lodging', 'locale', 'i18n.to_be_paid_before', 'à payer avant le');
+Setting::assert_value('lodging', 'locale', 'i18n.communication', 'COMMUNICATION');
+Setting::assert_value('lodging', 'locale', 'i18n.amount_to_be_refunded', 'Le montant suivant vous sera remboursé prochainement');
+Setting::assert_value('lodging', 'locale', 'i18n.advantage_included', 'Votre avantage déjà inclus');
+Setting::assert_value('lodging', 'locale', 'i18n.fare_category', 'Categorie tarifaire');
+Setting::assert_value('lodging', 'locale', 'i18n.advantage', 'Avantage');
+Setting::assert_value('lodging', 'locale', 'i18n.consumptions_details', 'Détail des consommations');
+Setting::assert_value('lodging', 'locale', 'i18n.day', 'Jour');
+Setting::assert_value('lodging', 'locale', 'i18n.meals_morning', 'Repas matin');
+Setting::assert_value('lodging', 'locale', 'i18n.meals_midday', 'Repas midi');
+Setting::assert_value('lodging', 'locale', 'i18n.meal_evening', 'Repas soir');
+Setting::assert_value('lodging', 'locale', 'i18n.nights', 'Nuitées');
+Setting::assert_value('lodging', 'locale', 'i18n.payments_schedule', 'Echéancier des paiements');
+Setting::assert_value('lodging', 'locale', 'i18n.payment', 'Paiement');
+Setting::assert_value('lodging', 'locale', 'i18n.already_paid', 'Déjà payé');
+Setting::assert_value('lodging', 'locale', 'i18n.amount', 'Montant');
+Setting::assert_value('lodging', 'locale', 'i18n.yes', 'oui');
+Setting::assert_value('lodging', 'locale', 'i18n.no', 'non');
+Setting::assert_value('lodging', 'locale', 'i18n.the_amount_of', 'Le montant de ');
+Setting::assert_value('lodging', 'locale', 'i18n.must_be_paid_before', 'doit être versé avant le ');
+Setting::assert_value('lodging', 'locale', 'i18n.booking_contract', 'Contrat de réservation');
+Setting::assert_value('lodging', 'locale', 'i18n.booking_quote', 'Devis de réservation');
+Setting::assert_value('lodging', 'locale', 'i18n.date_and_signature', 'Date et signature');
+Setting::assert_value('lodging', 'locale', 'i18n.origin', 'Origine');
+Setting::assert_value('lodging', 'locale', 'i18n.received', 'Reçu');
+Setting::assert_value('lodging', 'locale', 'i18n.left_to_pay', 'Restant à payer');
+Setting::assert_value('lodging', 'locale', 'i18n.payments_history', 'Historique des paiements');
+Setting::assert_value('lodging', 'locale', 'i18n.customer_name', 'Client');
+Setting::assert_value('lodging', 'locale', 'i18n.customer_address', 'Adresse');
+Setting::assert_value('lodging', 'locale', 'i18n.customer_num', 'Num. Client');
+Setting::assert_value('lodging', 'locale', 'i18n.time_slot', 'Tranche horaire');
+Setting::assert_value('lodging', 'locale', 'i18n.snack', 'Collation');
+Setting::assert_value('lodging', 'locale', 'i18n.meals', 'Repas');
 
-// === identity.locale ===
-Setting::assert_value('identity', 'locale', 'account.prefix');
-Setting::assert_value('identity', 'locale', 'account.sequence');
-Setting::assert_value('identity', 'locale', 'account.sequence_format');
