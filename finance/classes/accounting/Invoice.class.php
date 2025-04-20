@@ -331,13 +331,13 @@ class Invoice extends Model {
             }
 
             $organisation_id = $invoice['organisation_id'];
-            $format = Setting::get_value('finance', 'invoice', 'invoice.sequence_format', '%05d{sequence}');
-            $fiscal_year = Setting::get_value('finance', 'invoice', 'fiscal_year');
+            $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format', '%05d{sequence}');
+            $fiscal_year = Setting::get_value('finance', 'accounting', 'fiscal_year');
             $year = date('Y', $invoice['date']);
-            $sequence = Setting::get_value('lodging', 'invoice', 'sequence.'.$invoice['center_office_id.code']);
+            $sequence = Setting::get_value('sale', 'accounting', 'invoice.sequence.'.$invoice['center_office_id.code']);
 
             if(intval($year) == intval($fiscal_year) && $sequence) {
-                Setting::set_value('lodging', 'invoice', 'sequence.'.$invoice['center_office_id.code'], $sequence + 1);
+                Setting::set_value('sale', 'accounting', 'invoice.sequence.'.$invoice['center_office_id.code'], $sequence + 1);
 
                 $result[$id] = Setting::parse_format($format, [
                     'year'      => $year,
@@ -460,7 +460,7 @@ class Invoice extends Model {
         foreach($invoices as $oid => $invoice) {
             // retrieve downpayment product
             $downpayment_product_id = 0;
-            $downpayment_sku = Setting::get_value('sale', 'invoice', 'downpayment.sku.'.$invoice['organisation_id']);
+            $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']);
             if($downpayment_sku) {
                 $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();
                 if($products_ids) {
@@ -509,7 +509,7 @@ class Invoice extends Model {
         foreach($invoices as $oid => $invoice) {
             // retrieve downpayment product
             $downpayment_product_id = 0;
-            $downpayment_sku = Setting::get_value('sale', 'invoice', 'downpayment.sku.'.$invoice['organisation_id']);
+            $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']);
             if($downpayment_sku) {
                 $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();
                 if($products_ids) {
@@ -705,9 +705,9 @@ class Invoice extends Model {
         $invoices = $om->read(self::getType(), $oids, ['status', 'type', 'organisation_id', 'invoice_lines_ids'], $lang);
         if($invoices > 0) {
             // retrieve specific accounts numbers
-            $account_sales = Setting::get_value('finance', 'invoice', 'account.sales', 'not_found');
-            $account_sales_taxes = Setting::get_value('finance', 'invoice', 'account.sales_taxes', 'not_found');
-            $account_trade_debtors = Setting::get_value('finance', 'invoice', 'account.trade_debtors', 'not_found');
+            $account_sales = Setting::get_value('finance', 'accounting', 'account.sales', 'not_found');
+            $account_sales_taxes = Setting::get_value('finance', 'accounting', 'account.sales_taxes', 'not_found');
+            $account_trade_debtors = Setting::get_value('finance', 'accounting', 'account.trade_debtors', 'not_found');
 
             $res = $om->search(\finance\accounting\AccountChartLine::getType(), ['code', '=', $account_sales]);
             $account_sales_id = reset($res);
@@ -734,7 +734,7 @@ class Invoice extends Model {
                 // discount product is the same for all organisations: KA-Remise-A [65]
                 $discount_product_id = 65;
                 // retrieve downpayment product
-                $downpayment_sku = Setting::get_value('sale', 'invoice', 'downpayment.sku.'.$invoice['organisation_id']);
+                $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']);
                 if($downpayment_sku) {
                     $products_ids = $om->search(\sale\catalog\Product::getType(), ['sku', '=', $downpayment_sku]);
                     if($products_ids) {

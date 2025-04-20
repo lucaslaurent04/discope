@@ -44,9 +44,9 @@ if(!$booking) {
     throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
 }
 
-$quote_delay = Setting::get_value('lodging', 'main', 'quote.validity_delay');
+$quote_delay = Setting::get_value('sale', 'features', 'quote.validity_delay');
 
-$booking_delay = Setting::get_value('lodging', 'main', 'booking.archive_delay');
+$booking_delay = Setting::get_value('sale', 'features', 'booking.archive_delay');
 
 if($booking['state'] == 'archive') {
     throw new Exception("invalid_states_booking", QN_ERROR_INVALID_PARAM);

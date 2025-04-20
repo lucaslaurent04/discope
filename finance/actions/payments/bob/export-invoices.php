@@ -459,9 +459,9 @@ foreach($invoices as $invoice) {
 */
 
 // #todo #settings - adapt to new conventions
-$account_sales = Setting::get_value('finance', 'invoice', 'account.sales', '7000000');
-$account_downpayment = Setting::get_value('finance', 'invoice', 'downpayment.account', '4460000');
-$account_discount = Setting::get_value('finance', 'invoice', 'account.discount', '7080000');
+$account_sales = Setting::get_value('finance', 'accounting', 'account.sales', '7000000');
+$account_downpayment = Setting::get_value('sale', 'accounting', 'invoice.downpayment_account', '4460000');
+$account_discount = Setting::get_value('finance', 'accounting', 'account.discount', '7080000');
 
 // #todo #settings #catalog - store this value in the settings
 // discount product is the same for all organisations: KA-Remise-A [65]
@@ -474,7 +474,7 @@ foreach($invoices as $invoice) {
 
     // retrieve downpayment product
     $downpayment_product_id = 0;
-    $downpayment_sku = Setting::get_value('sale', 'invoice', 'downpayment.sku.'.$invoice['organisation_id']);
+    $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']);
     if($downpayment_sku) {
         $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();
         if($products_ids) {

@@ -37,22 +37,13 @@ if(is_null($user)) {
 }
 
 $result = [
-    'store_folded_settings' => Setting::get_value('sale', 'booking', 'display.store.folded.settings', false),
-    'identification_folded' => Setting::get_value('sale', 'booking', 'display.identification.folded', true),
-    'products_folded'       => Setting::get_value('sale', 'booking', 'display.products.folded', true),
-    'activities_folded'     => Setting::get_value('sale', 'booking', 'display.activities.folded', true),
-    'accomodations_folded'  => Setting::get_value('sale', 'booking', 'display.accomodations.folded', true),
-    'meals_folded'          => Setting::get_value('sale', 'booking', 'display.meals.folded', true)
+    'store_folded_settings' => Setting::get_value('sale', 'features', 'ui.booking.store_folded_settings', false),
+    'identification_folded' => Setting::get_value('sale', 'features', 'ui.booking.identification_folded', true),
+    'products_folded'       => Setting::get_value('sale', 'features', 'ui.booking.products_folded', true),
+    'activities_folded'     => Setting::get_value('sale', 'features', 'ui.booking.activities_folded', true),
+    'accomodations_folded'  => Setting::get_value('sale', 'features', 'ui.booking.accommodations_folded', true),
+    'meals_folded'          => Setting::get_value('sale', 'features', 'ui.booking.meals_folded', true)
 ];
-
-if(isset($user['organisation_id'])) {
-    $result['store_folded_settings'] = Setting::get_value('sale', 'booking', "display.store.folded.settings.{$user['organisation_id']}", $result['store_folded_settings']);
-    $result['identification_folded'] = Setting::get_value('sale', 'booking', "display.identification.folded.{$user['organisation_id']}", $result['identification_folded']);
-    $result['products_folded'] = Setting::get_value('sale', 'booking', "display.products.folded.{$user['organisation_id']}", $result['products_folded']);
-    $result['activities_folded'] = Setting::get_value('sale', 'booking', "display.activities.folded.{$user['organisation_id']}", $result['activities_folded']);
-    $result['accomodations_folded'] = Setting::get_value('sale', 'booking', "display.accomodations.folded.{$user['organisation_id']}", $result['accomodations_folded']);
-    $result['meals_folded'] = Setting::get_value('sale', 'booking', "display.meals.folded.{$user['organisation_id']}", $result['meals_folded']);
-}
 
 $context->httpResponse()
         ->body($result)

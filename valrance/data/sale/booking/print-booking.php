@@ -73,14 +73,10 @@ list($context, $orm) = [$providers['context'], $providers['orm']];
 
 // #todo - this should be in the Customer class
 $lodgingBookingPrintBookingFormatMember = function($booking) {
-    $has_number_assignment = Setting::get_value('sale', 'organization', 'customer.has_number_assignment', 0);
-    if ($has_number_assignment) {
-        $customer_assignment = Setting::get_value('sale', 'organization', 'customer.number_assignment');
-        $code = $booking['customer_id']['partner_identity_id'][$customer_assignment];
-    }
-    else {
-        $id = $booking['customer_id']['partner_identity_id']['id'];
-        $code = ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
+    $customer_assignment = Setting::get_value('sale', 'organization', 'customer.number_assignment', 'id');
+    $code = $booking['customer_id']['partner_identity_id'][$customer_assignment];
+    if($customer_assignment === 'id') {
+        $code = ltrim(sprintf("%3d.%03d.%03d", intval($code) / 1000000, (intval($code) / 1000) % 1000, intval($code)% 1000), '0');
     }
     return $code . ' - ' . $booking['customer_id']['partner_identity_id']['display_name'];
 };
@@ -298,9 +294,9 @@ if($logo_document_data) {
 
 $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
-$has_activity = Setting::get_value('sale', 'booking', 'has_activity', 0);
+$has_activity = Setting::get_value('sale', 'features', 'booking.has_activity', 0);
 
-$consumption_table_show  = Setting::get_value('sale', 'features', 'templates.quote.consumption_table.show', 1);
+$consumption_table_show  = Setting::get_value('sale', 'features', 'templates.quote.consumption_table', 1);
 $values = [
     'attn_address1'              => '',
     'attn_address2'              => '',
@@ -366,10 +362,10 @@ $values = [
     retrieve terms translations
 */
 $values['i18n'] = [
-    'invoice'               => Setting::get_value('sale', 'locale', 'terms.invoice', null, [], $params['lang']),
-    'quote'                 => Setting::get_value('sale', 'locale', 'terms.quote', null, [], $params['lang']),
-    'option'                => Setting::get_value('sale', 'locale', 'terms.option', null, [], $params['lang']),
-    'contract'              => Setting::get_value('sale', 'locale', 'terms.contract', null, [], $params['lang']),
+    'invoice'               => Setting::get_value('lodging', 'locale', 'i18n.invoice', null, [], $params['lang']),
+    'quote'                 => Setting::get_value('lodging', 'locale', 'i18n.quote', null, [], $params['lang']),
+    'option'                => Setting::get_value('lodging', 'locale', 'i18n.option', null, [], $params['lang']),
+    'contract'              => Setting::get_value('lodging', 'locale', 'i18n.contract', null, [], $params['lang']),
     'booking_invoice'       => Setting::get_value('lodging', 'locale', 'i18n.booking_invoice', null, [], $params['lang']),
     'booking_quote'         => Setting::get_value('lodging', 'locale', 'i18n.booking_quote', null, [], $params['lang']),
     'booking_contract'      => Setting::get_value('lodging', 'locale', 'i18n.booking_contract', null, [], $params['lang']),

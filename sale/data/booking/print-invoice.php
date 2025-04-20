@@ -242,7 +242,7 @@ if(!$invoice) {
     retrieve downpayment product (based on the organisation)
 */
 
-$downpayment_sku = Setting::get_value('sale', 'invoice', 'downpayment.sku.'.$invoice['organisation_id']['id']);
+$downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']['id']);
 if($downpayment_sku) {
     $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();
     if($products_ids) {
@@ -376,10 +376,10 @@ if($invoice['type'] == 'credit_note') {
     retrieve terms translations
 */
 $values['i18n'] = [
-    'invoice'           => Setting::get_value('sale', 'locale', 'terms.invoice', null, [], $params['lang']),
-    'quote'             => Setting::get_value('sale', 'locale', 'terms.quote', null, [], $params['lang']),
-    'option'            => Setting::get_value('sale', 'locale', 'terms.option', null, [], $params['lang']),
-    'contract'          => Setting::get_value('sale', 'locale', 'terms.contract', null, [], $params['lang']),
+    'invoice'           => Setting::get_value('lodging', 'locale', 'i18n.invoice', null, [], $params['lang']),
+    'quote'             => Setting::get_value('lodging', 'locale', 'i18n.quote', null, [], $params['lang']),
+    'option'            => Setting::get_value('lodging', 'locale', 'i18n.option', null, [], $params['lang']),
+    'contract'          => Setting::get_value('lodging', 'locale', 'i18n.contract', null, [], $params['lang']),
     'customer_name'     => Setting::get_value('lodging', 'locale', 'i18n.customer_name', null, [], $params['lang']),
     'customer_address'  => Setting::get_value('lodging', 'locale', 'i18n.customer_address', null, [], $params['lang']),
     'booking_invoice'   => Setting::get_value('lodging', 'locale', 'i18n.booking_invoice', null, [], $params['lang']),

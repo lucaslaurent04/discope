@@ -31,7 +31,7 @@ use identity\CenterOffice;
 
 
 $year = date('Y');
-$fiscal_year = Setting::get_value('finance', 'invoice', 'fiscal_year');
+$fiscal_year = Setting::get_value('finance', 'accounting', 'fiscal_year');
 
 if(!$fiscal_year) {
     throw new Exception("missing_fiscal_year", EQ_ERROR_INVALID_CONFIG);
@@ -42,12 +42,12 @@ if(intval($year) <= intval($fiscal_year)) {
 }
 
 // update fiscal year to current year
-Setting::set_value('finance', 'invoice', 'fiscal_year', $year);
+Setting::set_value('finance', 'accounting', 'fiscal_year', $year);
 
 // reset invoice sequences for all Center Offices
 $center_offices = CenterOffice::search()->read(['id', 'code'])->get(true);
 foreach($center_offices as $center_office) {
-    Setting::set_value('lodging', 'invoice', 'sequence.'.$center_office['code'], 1);
+    Setting::set_value('sale', 'accounting', 'invoice.sequence.'.$center_office['code'], 1);
 }
 
 $context->httpResponse()
