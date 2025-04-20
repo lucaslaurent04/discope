@@ -59,13 +59,18 @@ foreach($adaptations as $entry) {
 
     echo "updating : {$before['package']}.{$before['section']}.{$before['code']} => {$package}.{$section}.{$code}\n";
 
-    Setting::id($setting['id'])->update([
-            'package'       => $package,
-            'section'       => $section,
-            'section_id'    => $section_id,
-            'code'          => $code
-        ]);
-
+    try {
+        Setting::id($setting['id'])->update([
+                'package'       => $package,
+                'section'       => $section,
+                'section_id'    => $section_id,
+                'code'          => $code
+            ]);
+    }
+    catch(Exception $e) {
+        echo "error while updating : {$before['package']}.{$before['section']}.{$before['code']} => {$package}.{$section}.{$code}\n";
+        echo $e->getMessage()."\n";
+    }
 }
 
 echo "\nupdate complete.\n";
