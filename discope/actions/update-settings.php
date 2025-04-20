@@ -3,11 +3,9 @@ use core\setting\Setting;
 
 $sections = [
         1 => 'locale',
-        2 => 'main',
         3 => 'security',
-        4 => 'units',
-        5 => 'invoice',
-        6 => 'booking',
+        4 => 'default',
+        5 => 'accounting',
         12 => 'features',
         11 => 'analytics',
         13 => 'storage',
