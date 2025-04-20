@@ -30,7 +30,7 @@ list($params, $providers) = eQual::announce([
         'days_expiry' =>  [
             'description'   => 'The number of days for the option to expire.',
             'type'          => 'integer',
-            'default'       =>  Setting::get_value('sale', 'booking', 'option.validity', 10)
+            'default'       =>  Setting::get_value('sale', 'features', 'option.validity_delay', 10)
         ]
     ],
     'access'        => [

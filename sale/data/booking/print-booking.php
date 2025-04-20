@@ -220,7 +220,7 @@ if($logo_document_data) {
 
 $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
-$has_activity = Setting::get_value('sale', 'booking', 'has_activity', 0);
+$has_activity = Setting::get_value('sale', 'features', 'booking.has_activity', 0);
 $values = [
     'attn_address1'              => '',
     'attn_address2'              => '',
@@ -284,10 +284,10 @@ $values = [
     retrieve terms translations
 */
 $values['i18n'] = [
-    'invoice'               => Setting::get_value('sale', 'locale', 'terms.invoice', null, [], $params['lang']),
-    'quote'                 => Setting::get_value('sale', 'locale', 'terms.quote', null, [], $params['lang']),
-    'option'                => Setting::get_value('sale', 'locale', 'terms.option', null, [], $params['lang']),
-    'contract'              => Setting::get_value('sale', 'locale', 'terms.contract', null, [], $params['lang']),
+    'invoice'               => Setting::get_value('lodging', 'locale', 'i18n.invoice', null, [], $params['lang']),
+    'quote'                 => Setting::get_value('lodging', 'locale', 'i18n.quote', null, [], $params['lang']),
+    'option'                => Setting::get_value('lodging', 'locale', 'i18n.option', null, [], $params['lang']),
+    'contract'              => Setting::get_value('lodging', 'locale', 'i18n.contract', null, [], $params['lang']),
     'booking_invoice'       => Setting::get_value('lodging', 'locale', 'i18n.booking_invoice', null, [], $params['lang']),
     'booking_quote'         => Setting::get_value('lodging', 'locale', 'i18n.booking_quote', null, [], $params['lang']),
     'booking_contract'      => Setting::get_value('lodging', 'locale', 'i18n.booking_contract', null, [], $params['lang']),

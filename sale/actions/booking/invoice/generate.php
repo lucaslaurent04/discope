@@ -254,7 +254,7 @@ if($fundings) {
     // retrieve downpayment product
     $downpayment_product_id = 0;
 
-    $downpayment_sku = Setting::get_value('sale', 'invoice', 'downpayment.sku.'.$booking['center_office_id']['organisation_id']);
+    $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$booking['center_office_id']['organisation_id']);
     if($downpayment_sku) {
         $product = Product::search(['sku', '=', $downpayment_sku])->read(['id'])->first(true);
         if($product) {

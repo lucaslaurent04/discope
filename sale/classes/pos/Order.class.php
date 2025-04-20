@@ -424,9 +424,9 @@ class Order extends Model {
         $orders = $om->read(self::getType(), $oids, ['status'], $lang);
         if($orders > 0) {
             // retrieve specific accounts numbers
-            $account_sales = Setting::get_value('finance', 'invoice', 'account.sales', 'not_found');
-            $account_sales_taxes = Setting::get_value('finance', 'invoice', 'account.sales_taxes', 'not_found');
-            $account_trade_debtors = Setting::get_value('finance', 'invoice', 'account.trade_debtors', 'not_found');
+            $account_sales = Setting::get_value('finance', 'accounting', 'account.sales', 'not_found');
+            $account_sales_taxes = Setting::get_value('finance', 'accounting', 'account.sales_taxes', 'not_found');
+            $account_trade_debtors = Setting::get_value('finance', 'accounting', 'account.trade_debtors', 'not_found');
 
             $res = $om->search(\finance\accounting\AccountChartLine::getType(), ['code', '=', $account_sales]);
             $account_sales_id = reset($res);

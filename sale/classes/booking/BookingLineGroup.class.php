@@ -378,7 +378,7 @@ class BookingLineGroup extends Model {
                     $om->delete(BookingLineGroupAgeRangeAssignment::getType(), $group['age_range_assignments_ids'], true);
 
                     if($group['is_sojourn']) {
-                        $adults_age_range_id = Setting::get_value('sale', 'booking', 'default.age_range_id.adults', 1);
+                        $adults_age_range_id = Setting::get_value('sale', 'organization', 'age_range_default', 1);
 
                         // create default age_range assignment
                         $assignment = [
@@ -2850,7 +2850,7 @@ class BookingLineGroup extends Model {
         $ignored_lines_ids = $values['ignored_lines_ids'] ?? [];
         $groups = $om->read(self::getType(), $oids, ['booking_lines_ids.product_id']);
 
-        $bed_linens_skus = Setting::get_value('sale', 'booking', 'bed-linens.sku', false);
+        $bed_linens_skus = Setting::get_value('sale', 'organization', 'sku.bed_linens', false);
         if($bed_linens_skus) {
             $bed_linens_skus = explode(',', $bed_linens_skus);
         }
@@ -2858,7 +2858,7 @@ class BookingLineGroup extends Model {
             $bed_linens_skus = [];
         }
 
-        $make_beds_skus = Setting::get_value('sale', 'booking', 'make-beds.sku', false);
+        $make_beds_skus = Setting::get_value('sale', 'organization', 'sku.make_beds', false);
         if($make_beds_skus) {
             $make_beds_skus = explode(',', $make_beds_skus);
         }
@@ -3459,7 +3459,7 @@ class BookingLineGroup extends Model {
             }
             else {
                 // else use default 'adult' age range from setting
-                $age_range_id = Setting::get_value('sale', 'booking', 'default.age_range_id.adults', 1);
+                $age_range_id = Setting::get_value('sale', 'organization', 'age_range_default', 1);
             }
 
             // create age_range assignment

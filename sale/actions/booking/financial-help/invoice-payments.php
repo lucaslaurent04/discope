@@ -195,7 +195,7 @@ $values = [
 ];
 
 $values['i18n'] = [
-    'invoice'           => Setting::get_value('sale', 'locale', 'terms.invoice', null, array(), $params['lang']),
+    'invoice'           => Setting::get_value('lodging', 'locale', 'i18n.invoice', null, array(), $params['lang']),
     'customer_name'     => Setting::get_value('lodging', 'locale', 'i18n.customer_name', null, array(), $params['lang']),
     'customer_address'  => Setting::get_value('lodging', 'locale', 'i18n.customer_address', null, array(), $params['lang']),
     'company_registry'  => Setting::get_value('lodging', 'locale', 'i18n.company_registry', null, array(), $params['lang']),

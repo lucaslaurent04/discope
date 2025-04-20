@@ -506,19 +506,17 @@ class Booking extends Model {
         $result = [];
 
         $bookings = $om->read(self::getType(), $oids, ['center_id.center_office_id.code'], $lang);
-        $format = Setting::get_value('sale', 'booking', 'booking.sequence_format', '%05d{sequence}');
+        $format = Setting::get_value('sale', 'organization', 'booking.sequence_format', '%05d{sequence}');
 
         foreach($bookings as $oid => $booking) {
+            $sequence_name = 'booking.sequence.'.$booking['center_id.center_office_id.code'];
+            $sequence_value = Setting::get_value('sale', 'organization', $sequence_name);
 
-            $setting_name = 'booking.sequence.'.$booking['center_id.center_office_id.code'];
-            $sequence = Setting::get_value('sale', 'booking', $setting_name);
-
-            if($sequence) {
-                Setting::set_value('sale', 'booking', $setting_name, $sequence + 1);
-
+            if($sequence_value) {
+                Setting::set_value('sale', 'organization', $sequence_name, $sequence_value + 1);
                 $result[$oid] = Setting::parse_format($format, [
                     'center'    => $booking['center_id.center_office_id.code'],
-                    'sequence'  => $sequence
+                    'sequence'  => $sequence_value
                 ]);
             }
 
