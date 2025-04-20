@@ -79,5 +79,4 @@ if($status != 200) {
 }
 
 $context->httpResponse()
-        ->body($result)
         ->send();
