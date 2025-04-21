@@ -3,16 +3,6 @@
         "name": "core\\Task",
         "lang": "fr",
         "data": [
-            {
-                "name": "Export invoices and payments",
-                "controller": "finance_payments_export",
-                "is_active": true,
-                "is_recurring": true,
-                "after_execution": "keep",
-                "repeat_axis": "day",
-                "repeat_step": 7,
-                "is_exclusive": false
-            }
         ]
     }
 ]
