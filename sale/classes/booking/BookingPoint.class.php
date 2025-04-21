@@ -89,7 +89,16 @@ class BookingPoint extends Model {
         $result = [];
         $self->read(['booking_id' => ['name'], 'customer_id' => ['name'],  'points_value']);
         foreach($self as $id => $point) {
-            $result[$id] = $point['booking_id']['name'] .' - '. $point['customer_id']['name'];
+            $parts = [];
+            if($point['booking_id'] && strlen($point['booking_id']['name'])) {
+                $parts[] = $point['booking_id']['name'];
+            }
+            if($point['customer_id'] && strlen($point['customer_id']['name'])) {
+                $parts[] = $point['customer_id']['name'];
+            }
+            if(count($parts)) {
+                $result[$id] = implode(' - ', $parts);
+            }
         }
         return $result;
     }
