@@ -178,7 +178,8 @@
             "label": "Activities planning",
             "description": "",
             "icon": "view_week",
-            "route": "/booking/object.id/activities-planning"
+            "route": "/booking/object.id/activities-planning",
+            "visible": [true, "=", "env.sale.features.booking.has_activity"]
         },
         {
             "id": "item.booking.composition",
