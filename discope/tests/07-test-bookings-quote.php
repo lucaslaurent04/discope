@@ -32,7 +32,7 @@ $tests = [
             Change the reservation status from 'option' to 'quote'",
         'arrange'           =>  function () {
 
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
@@ -160,7 +160,7 @@ $tests = [
             Change the reservation status from 'quote' to 'option'
             Change the reservation status from 'option' to 'quote'",
         'arrange'           =>  function () {
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
@@ -291,7 +291,7 @@ $tests = [
             Verify that the reservation is in the quote status.",
 
         'arrange'           =>  function () {
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);

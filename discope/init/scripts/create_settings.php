@@ -4,15 +4,16 @@ use core\setting\Setting; /* #memo - +35 settings from core */
 Setting::assert_value('sale', 'features', 'booking.channel_manager', false);
 Setting::assert_value('sale', 'features', 'booking.instant_payment', false);
 Setting::assert_value('sale', 'features', 'booking.activity', false);
+Setting::assert_value('sale', 'features', 'booking.meal', false);
 Setting::assert_value('sale', 'features', 'payment.bank_check', false);
 Setting::assert_value('sale', 'features', 'payment.financial_help', false);
 Setting::assert_value('sale', 'features', 'payment.quick_pay', false);
 Setting::assert_value('sale', 'features', 'booking.checkin.default', 14*3600);
 Setting::assert_value('sale', 'features', 'booking.checkout.default', 10*3600);
-Setting::assert_value('sale', 'features', 'booking.employee_planning');
-Setting::assert_value('sale', 'features', 'booking.employee.activity_filter');
-Setting::assert_value('sale', 'features', 'booking.loyalty_points');
-Setting::assert_value('sale', 'features', 'booking.consumption_meters');
+Setting::assert_value('sale', 'features', 'booking.employee_planning', false);
+Setting::assert_value('sale', 'features', 'booking.employee.activity_filter', false);
+Setting::assert_value('sale', 'features', 'booking.loyalty_points', false);
+Setting::assert_value('sale', 'features', 'booking.consumption_meters', false);
 Setting::assert_value('sale', 'features', 'booking.archive_delay', 60);
 Setting::assert_value('sale', 'features', 'quote.validity_delay', 10);
 Setting::assert_value('sale', 'features', 'quote.remind_auto', false);
@@ -39,12 +40,12 @@ Setting::assert_value('discope', 'features', 'custom_package');
 // === sale.organization ===
 Setting::assert_value('sale', 'organization', 'customer.number_assignment', 'accounting_account');
 Setting::assert_value('sale', 'organization', 'customer.number_format', 'accounting_account');
-Setting::assert_value('sale', 'organization', 'booking.channel_manager.client_domain');
+Setting::assert_value('sale', 'organization', 'booking.channel_manager.client_domain', '');
 Setting::assert_value('sale', 'organization', 'booking.sequence_format', '%1d{center}%05d{sequence}');
 Setting::assert_value('sale', 'organization', 'booking.sequence', 1);
 // for compatibility when there are more than one center office
 Setting::assert_value('sale', 'organization', 'booking.sequence.1', 1);
-Setting::assert_value('sale', 'organization', 'booking.reference_type');
+Setting::assert_value('sale', 'organization', 'booking.reference_type', 'VCS');
 Setting::assert_value('sale', 'organization', 'sku.downpayment.1', 'ACPTE-A');
 Setting::assert_value('sale', 'organization', 'sku.bed_linens');
 Setting::assert_value('sale', 'organization', 'sku.make_beds');

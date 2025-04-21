@@ -20,7 +20,7 @@ $tests = [
         'description'       =>  'Validate if the guest line exists in the booking return. If the guest line does not exist, it will be created.',
         'arrange'           =>  function () {
 
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['name', 'like', '%Tout public%'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search(['display_name', '=', 'John DOE'])->read(['id'])->first(true);
