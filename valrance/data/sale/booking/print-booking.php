@@ -601,6 +601,8 @@ foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
         // group is a pack with no own price
         $group_is_pack = false;
 
+        $vat_rate = floatval($booking_line_group['total']) ? (floatval($booking_line_group['price']) / floatval($booking_line_group['total']) - 1.0) : 0;
+
         if($params['mode'] == 'grouped') {
             $line = [
                 'name'          => $booking_line_group['name'],
