@@ -22,6 +22,15 @@
                 "route": "/planning"
             },
             {
+                "id": "item.planning",
+                "label": "Planning Animateurs",
+                "description": "",
+                "icon": "person_outline",
+                "type": "entry",
+                "route": "/planning/employees",
+                "visible": [true, "=", "env.sale.features.booking.employee_planning"]
+            },
+            {
                 "id": "item.bookings",
                 "label": "Bookings",
                 "description": "",

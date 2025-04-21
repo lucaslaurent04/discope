@@ -97,6 +97,18 @@
             "label": "Repas (tous)",
             "help": ""
         },
+        "item.planning.partners": {
+            "label": "Assignations",
+            "help": ""
+        },
+        "item.planning.partners.employees": {
+            "label": "Employés",
+            "help": ""
+        },
+        "item.planning.partners.providers": {
+            "label": "Prestataires",
+            "help": ""
+        },
         "item.planning.meals.stat": {
             "label": "Consolidé",
             "help": ""
