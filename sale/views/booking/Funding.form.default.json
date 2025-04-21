@@ -43,7 +43,7 @@
             "access": {
                 "groups": ["finance.default.administrator", "finance.default.user"]
             },
-            "visible": ["is_paid", "=", false]
+            "visible": [[true, "=", "env.sale.features.payment.instant"], ["is_paid", "=", false]]
         },
         {
             "id": "action.unpay_instant",
