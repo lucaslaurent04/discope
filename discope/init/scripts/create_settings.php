@@ -13,16 +13,16 @@ Setting::assert_value('sale', 'features', 'quote.validity_delay', 10);
 Setting::assert_value('sale', 'features', 'quote.remind_delay', 7);
 Setting::assert_value('sale', 'features', 'option.validity_delay', 10);
 Setting::assert_value('sale', 'features', 'invoice.downpayment', false);
-Setting::assert_value('sale', 'features', 'ui.booking.store_folded_settings', '0');
-Setting::assert_value('sale', 'features', 'ui.booking.identification_folded', '0');
-Setting::assert_value('sale', 'features', 'ui.booking.products_folded', '1');
-Setting::assert_value('sale', 'features', 'ui.booking.activities_folded', '1');
-Setting::assert_value('sale', 'features', 'ui.booking.accommodations_folded', '1');
-Setting::assert_value('sale', 'features', 'ui.booking.meals_folded', '1');
-Setting::assert_value('sale', 'features', 'templates.quote.consumption_table', '1');
-Setting::assert_value('sale', 'features', 'templates.quote.activities', '0');
+Setting::assert_value('sale', 'features', 'ui.booking.store_folded_settings', false);
+Setting::assert_value('sale', 'features', 'ui.booking.identification_folded', false);
+Setting::assert_value('sale', 'features', 'ui.booking.products_folded', true);
+Setting::assert_value('sale', 'features', 'ui.booking.activities_folded', true);
+Setting::assert_value('sale', 'features', 'ui.booking.accommodations_folded', true);
+Setting::assert_value('sale', 'features', 'ui.booking.meals_folded', true);
+Setting::assert_value('sale', 'features', 'templates.quote.consumption_table', true);
+Setting::assert_value('sale', 'features', 'templates.quote.activities', false);
 // === discope.features ===
-Setting::assert_value('discope', 'features', 'has_custom_package', '0');
+Setting::assert_value('discope', 'features', 'has_custom_package', false);
 Setting::assert_value('discope', 'features', 'custom_package');
 // === sale.organization ===
 Setting::assert_value('sale', 'organization', 'customer.number_assignment', 'accounting_account');
