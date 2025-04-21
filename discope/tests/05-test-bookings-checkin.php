@@ -30,7 +30,7 @@ $tests = [
             Validate that the supplements have been included in the reservation.",
         'arrange'           =>  function () {
 
-            $center = Center::search(['name', 'like', '%Your Establisment%'])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
@@ -232,7 +232,7 @@ $tests = [
         'description'       => 'Validate that the reservation cannot be in check-in status if the contract is not signed.',
         'arrange'           =>  function () {
 
-            $center = Center::search(['name', 'like', '%Your Establisment%'])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
