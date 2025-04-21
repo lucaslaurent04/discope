@@ -3,6 +3,7 @@
     "view": {
         "item.home": {"label": "Accueil", "help": ""},
         "item.planning": {"label": "Planning", "help": ""},
+        "item.planning_employees": {"label": "Planning Animateurs", "help": ""},
         "item.bookings": {"label": "Réservations", "help": ""}
     }
 }
