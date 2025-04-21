@@ -369,7 +369,7 @@
                             {
                                 "id": "item.planning.partners.employees",
                                 "type": "entry",
-                                "label": "Employés",
+                                "label": "Employees",
                                 "description": "",
                                 "route": "/bookings",
                                 "context": {
@@ -380,7 +380,7 @@
                             {
                                 "id": "item.planning.partners.providers",
                                 "type": "entry",
-                                "label": "Prestataires",
+                                "label": "Providers",
                                 "description": "",
                                 "route": "/bookings",
                                 "context": {
