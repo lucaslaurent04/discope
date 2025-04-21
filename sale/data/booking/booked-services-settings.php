@@ -41,8 +41,10 @@ $result = [
     'identification_folded' => Setting::get_value('sale', 'features', 'ui.booking.identification_folded', true),
     'products_folded'       => Setting::get_value('sale', 'features', 'ui.booking.products_folded', true),
     'activities_folded'     => Setting::get_value('sale', 'features', 'ui.booking.activities_folded', true),
-    'accomodations_folded'  => Setting::get_value('sale', 'features', 'ui.booking.accommodations_folded', true),
-    'meals_folded'          => Setting::get_value('sale', 'features', 'ui.booking.meals_folded', true)
+    'accommodations_folded' => Setting::get_value('sale', 'features', 'ui.booking.accommodations_folded', true),
+    'meals_folded'          => Setting::get_value('sale', 'features', 'ui.booking.meals_folded', true),
+    'activities_show'       => Setting::get_value('sale', 'features', 'booking.activity', false),
+    'meals_show'            => Setting::get_value('sale', 'features', 'booking.meal', true),
 ];
 
 $context->httpResponse()
