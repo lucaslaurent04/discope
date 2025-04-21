@@ -948,7 +948,8 @@ class Booking extends Model {
                     $om->update(self::getType(), $id, ['has_contract' => true], $lang);
                 }
 
-                if($booking['status'] == 'balanced') {
+                $loyalty_points_feature = Setting::get_value('sale', 'features', 'booking.loyalty_points', false);
+                if($loyalty_points_feature && $booking['status'] == 'balanced') {
                     $has_points_applied = false;
                     $bookingPoint = BookingPoint::search(['booking_id', '=', $id])->read(['id', 'booking_apply_id'])->first();
 
