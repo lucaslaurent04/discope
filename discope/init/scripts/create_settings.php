@@ -51,9 +51,9 @@ Setting::assert_value('sale', 'organization', 'sku.bed_linens');
 Setting::assert_value('sale', 'organization', 'sku.make_beds');
 Setting::assert_value('sale', 'organization', 'sku.transport');
 Setting::assert_value('sale', 'organization', 'age_range_default');
-Setting::assert_value('sale', 'organization', 'identity_type_default');
 Setting::assert_value('sale', 'organization', 'payment_terms_default');
 Setting::assert_value('identity', 'organization', 'country_default', 'BE');
+Setting::assert_value('identity', 'organization', 'identity_type_default', 1);
 // === finance.accounting ===
 Setting::assert_value('finance', 'accounting', 'invoice.export_type');  // possible values so far: 'bob', 'ebp'
 Setting::assert_value('finance', 'accounting', 'account.sales', '7000000');
@@ -62,6 +62,8 @@ Setting::assert_value('finance', 'accounting', 'account.downpayment', '7080000')
 Setting::assert_value('finance', 'accounting', 'account.sales_taxes', 451);
 Setting::assert_value('finance', 'accounting', 'account.trade_debtors', 400);
 Setting::assert_value('finance', 'accounting', 'fiscal_year');
+Setting::assert_value('finance', 'accounting', 'fiscal_year.date_from');
+Setting::assert_value('finance', 'accounting', 'fiscal_year.date_to');
 // === sale.accounting ===
 Setting::assert_value('sale', 'accounting', 'invoice.downpayment_account', false);
 Setting::assert_value('sale', 'accounting', 'invoice.sequence_format', '%2d{year}-%02d{office}-%05d{sequence}');
