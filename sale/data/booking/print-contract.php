@@ -17,7 +17,6 @@ use equal\data\DataFormatter;
 use sale\booking\Consumption;
 use sale\booking\Contract;
 use sale\booking\TimeSlot;
-use sale\customer\Customer;
 use SepaQr\Data;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
@@ -25,7 +24,7 @@ use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use sale\booking\BookingActivity;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Render a contract given its ID as a PDF document.",
     'params'        => [
         'id' => [
@@ -65,11 +64,32 @@ list($params, $providers) = announce([
         'content-type'      => 'application/pdf',
         'accept-origin'     => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'providers'     => ['context']
 ]);
 
+/**
+ * @var \equal\php\Context               $context
+ */
+['context' => $context] = $providers;
 
-list($context, $orm) = [$providers['context'], $providers['orm']];
+// steer towards custom controller, if any
+$has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
+if($has_custom_package) {
+    $custom_package = Setting::get_value('discope', 'features', 'custom_package');
+    if(!$custom_package) {
+        trigger_error('APP::Missing customization package setting (despite `discope.features.has_custom_package`)', EQ_REPORT_WARNING);
+    }
+    elseif($custom_package !== 'sale') {
+        if(file_exists(EQ_BASEDIR."/packages/{$custom_package}/data/sale/booking/print-contract.php")) {
+            $output = eQual::run('get', "{$custom_package}_sale_booking_print-contract", $params, true);
+            $context->httpResponse()
+                ->header('Content-Disposition', 'inline; filename="document.pdf"')
+                ->body($output)
+                ->send();
+            exit(0);
+        }
+    }
+}
 
 /*
     Retrieve the requested template
