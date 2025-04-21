@@ -5,8 +5,8 @@
         "data": [
             {
                 "id": 1,
-                "name": "Your Establisment",
-                "legal_name": "Establisment",
+                "name": "Etablissement d'hébergement",
+                "legal_name": "Votre Establissement",
                 "description": null,
                 "organisation_id": 1,
                 "phone": null,
