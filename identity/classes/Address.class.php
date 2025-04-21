@@ -6,6 +6,8 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace identity;
+
+use core\setting\Setting;
 use equal\orm\Model;
 
 
