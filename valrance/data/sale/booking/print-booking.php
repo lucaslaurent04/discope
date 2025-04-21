@@ -608,7 +608,7 @@ foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
                 'price'         => $booking_line_group['price'],
                 'total'         => $booking_line_group['total'],
                 'unit_price'    => $booking_line_group['total'],
-                'vat_rate'      => (floatval($booking_line_group['price'])/floatval($booking_line_group['total']) - 1.0),
+                'vat_rate'      => (floatval($booking_line_group['price']) / floatval($booking_line_group['total'] ?? 1) - 1.0),
                 'qty'           => 1,
                 'free_qty'      => 0,
                 'discount'      => 0,
@@ -640,7 +640,7 @@ foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
 
             if($params['mode'] == 'grouped') {
                 $line = [
-                    'name'          => (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['product_id']['label'],
+                    'name'          => (strlen($booking_line['description']) > 0) ? $booking_line['description']:$booking_line['product_id']['label'],
                     'price'         => null,
                     'total'         => null,
                     'unit_price'    => null,
@@ -654,7 +654,7 @@ foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
             }
             else {
                 $line = [
-                    'name'          => (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['product_id']['label'],
+                    'name'          => (strlen($booking_line['description']) > 0) ? $booking_line['description'] : $booking_line['product_id']['label'],
                     'price'         => $booking_line['price'],
                     'total'         => $booking_line['total'],
                     'unit_price'    => $booking_line['unit_price'],
