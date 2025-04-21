@@ -21,6 +21,9 @@ Setting::assert_value('sale', 'features', 'ui.booking.accommodations_folded', '1
 Setting::assert_value('sale', 'features', 'ui.booking.meals_folded', '1');
 Setting::assert_value('sale', 'features', 'templates.quote.consumption_table', '1');
 Setting::assert_value('sale', 'features', 'templates.quote.activities', '0');
+// === discope.features ===
+Setting::assert_value('discope', 'features', 'has_custom_package', '0');
+Setting::assert_value('discope', 'features', 'custom_package');
 // === sale.organization ===
 Setting::assert_value('sale', 'organization', 'customer.number_assignment', 'accounting_account');
 Setting::assert_value('sale', 'organization', 'customer.number_format', 'accounting_account');
