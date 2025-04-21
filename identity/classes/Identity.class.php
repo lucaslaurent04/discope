@@ -53,12 +53,14 @@ class Identity extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\IdentityType',
                 'onupdate'          => 'onupdateTypeId',
-                'default'           => 1,                                    // default is 'I' individual
-                'description'       => 'Type of identity.'
+                'default'           => Setting::get_value('identity', 'organization', 'identity_type_default', 1),
+                'description'       => 'Type of identity.',
+                'dependents'        => ['type']
             ],
 
             'type' => [
-                'type'              => 'string',
+                'type'              => 'computed',
+                'result_type'       => 'string',
                 'selection'         => [
                     'I'  => 'Individual (natural person)',
                     'SE' => 'Self-employed',
@@ -66,9 +68,11 @@ class Identity extends Model {
                     'NP' => 'Non-profit organisation',
                     'PA' => 'Public administration'
                 ],
-                'default'           => 'I',
-                'readonly'          => true,                                // has to be changed through type_id
-                'description'       => 'Code of the type of identity.'
+                'function'          => 'calcType',
+                'readonly'          => true,
+                'store'             => true,
+                'description'       => 'Code of the type of identity.',
+                'help'              => 'This value has to be changed through type_id'
             ],
 
             'description' => [
@@ -738,6 +742,17 @@ class Identity extends Model {
 
 
         ];
+    }
+
+    public static function calcType($self) {
+        $result = [];
+        $self->read(['type_id' => ['code']]);
+        foreach($self as $id => $identity) {
+            if(isset($identity['type_id']['code'])) {
+                $result[$id] = $identity['type_id']['code'];
+            }
+        }
+        return $result;
     }
 
     public static function calcAccountingAccount($self) {
