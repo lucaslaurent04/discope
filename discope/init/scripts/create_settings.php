@@ -2,12 +2,9 @@
 use core\setting\Setting; /* #memo - +35 settings from core */
 // === sale.features ===
 Setting::assert_value('sale', 'features', 'booking.channel_manager', false);
-Setting::assert_value('sale', 'features', 'booking.instant_payment', false);
 Setting::assert_value('sale', 'features', 'booking.activity', false);
+Setting::assert_value('sale', 'features', 'booking.activity_schedule_table', false);
 Setting::assert_value('sale', 'features', 'booking.meal', false);
-Setting::assert_value('sale', 'features', 'payment.bank_check', false);
-Setting::assert_value('sale', 'features', 'payment.financial_help', false);
-Setting::assert_value('sale', 'features', 'payment.quick_pay', false);
 Setting::assert_value('sale', 'features', 'booking.checkin.default', 14*3600);
 Setting::assert_value('sale', 'features', 'booking.checkout.default', 10*3600);
 Setting::assert_value('sale', 'features', 'booking.employee_planning', false);
@@ -26,6 +23,9 @@ Setting::assert_value('sale', 'features', 'contract.remind_delay', 15);
 Setting::assert_value('sale', 'features', 'invoice.downpayment', false);
 Setting::assert_value('sale', 'features', 'invoice.remind_auto', false);
 Setting::assert_value('sale', 'features', 'invoice.remind_delay', 30);
+Setting::assert_value('sale', 'features', 'payment.bank_check', false);
+Setting::assert_value('sale', 'features', 'payment.financial_help', false);
+Setting::assert_value('sale', 'features', 'payment.instant', false);
 Setting::assert_value('sale', 'features', 'ui.booking.store_folded_settings', false);
 Setting::assert_value('sale', 'features', 'ui.booking.identification_folded', false);
 Setting::assert_value('sale', 'features', 'ui.booking.products_folded', true);
@@ -52,8 +52,8 @@ Setting::assert_value('sale', 'organization', 'sku.make_beds');
 Setting::assert_value('sale', 'organization', 'sku.transport');
 Setting::assert_value('sale', 'organization', 'age_range_default');
 Setting::assert_value('sale', 'organization', 'identity_type_default');
-Setting::assert_value('sale', 'organization', 'country_default', 'BE');
 Setting::assert_value('sale', 'organization', 'payment_terms_default');
+Setting::assert_value('identity', 'organization', 'country_default', 'BE');
 // === finance.accounting ===
 Setting::assert_value('finance', 'accounting', 'invoice.export_type');  // possible values so far: 'bob', 'ebp'
 Setting::assert_value('finance', 'accounting', 'account.sales', '7000000');
