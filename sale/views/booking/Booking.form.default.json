@@ -179,7 +179,7 @@
             "description": "",
             "icon": "view_week",
             "route": "/booking/object.id/activities-planning",
-            "visible": [true, "=", "env.sale.features.booking.activity"]
+            "visible": [true, "=", "env.sale.features.booking.activity_schedule_table"]
         },
         {
             "id": "item.booking.composition",
@@ -584,7 +584,7 @@
                     {
                         "label": "Consumptions",
                         "id": "section.booking_consumptions",
-                        "comment": "#memo - this property has been removed to allow user to see non-freed rental units - \"visible\": [\"status\", \"<>\", \"quote\"]",
+                        "comment": "#memo - visible property has been removed to allow user to see non-freed rental units - \"visible\": [\"status\", \"<>\", \"quote\"]",
                         "rows": [
                             {
                                 "columns": [
@@ -643,7 +643,7 @@
                     {
                         "id": "section.meters_readings",
                         "label": "Meters Reading",
-                        "visible": [ ["status", "=", "checkedout"], ["is_cancelled", "=", false], [1, "=" , "object.center_office_id"] ],
+                        "visible": [ [true, "=", "sale.features.booking.consumption_meters"], ["status", "=", "checkedout"], ["is_cancelled", "=", false], [1, "=" , "object.center_office_id"] ],
                         "comment": "This tab is meant for GG only.",
                         "rows": [
                             {
