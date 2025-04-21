@@ -610,7 +610,7 @@ foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
                 'price'         => $booking_line_group['price'],
                 'total'         => $booking_line_group['total'],
                 'unit_price'    => $booking_line_group['total'],
-                'vat_rate'      => (floatval($booking_line_group['price']) / floatval($booking_line_group['total'] ?? 1) - 1.0),
+                'vat_rate'      => $vat_rate,
                 'qty'           => 1,
                 'free_qty'      => 0,
                 'discount'      => 0,
