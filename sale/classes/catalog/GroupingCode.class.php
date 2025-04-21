@@ -21,13 +21,16 @@ class GroupingCode extends Model {
 
             'code' => [
                 'type'              => 'string',
+                /*
                 'selection'         => [
                     'Accommodation',
                     'Activity',
                     'Transport',
                     'Supply',
                 ],
-                'description'       => 'Represents the code associated with the ID of the group code'
+                */
+                'description'       => 'Represents the code associated with the ID of the group code',
+                'help'              => 'User must be free to create arbitrary codes'
             ],
 
             'has_age_range' => [
