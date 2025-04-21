@@ -18,8 +18,10 @@ export interface BookedServicesDisplaySettings {
     identification_folded: boolean;
     products_folded: boolean;
     activities_folded: boolean;
-    accomodations_folded: boolean;
+    accommodations_folded: boolean;
     meals_folded: boolean;
+    activities_show: boolean;
+    meals_show: boolean;
 }
 
 @Component({
@@ -37,8 +39,10 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
         identification_folded: true,
         products_folded: true,
         activities_folded: true,
-        accomodations_folded: true,
-        meals_folded: true
+        accommodations_folded: true,
+        meals_folded: true,
+        meals_show: true,
+        activities_show: true
     };
 
     public ready: boolean = false;
@@ -157,6 +161,7 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
 
     private async loadDisplaySettings() {
         try {
+            // #todo - use EnvService from sb-shared-lib
             this.display_settings = await this.api.fetch('?get=sale_booking_booked-services-settings');
             if(this.display_settings.store_folded_settings) {
                 this.setDisplaySettingsFromLocalStorage();
