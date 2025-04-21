@@ -294,7 +294,7 @@ if($logo_document_data) {
 
 $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
-$has_activity = Setting::get_value('sale', 'features', 'booking.has_activity', 0);
+$has_activity = Setting::get_value('sale', 'features', 'booking.activity', true);
 
 $consumption_table_show  = Setting::get_value('sale', 'features', 'templates.quote.consumption_table', 1);
 $values = [
