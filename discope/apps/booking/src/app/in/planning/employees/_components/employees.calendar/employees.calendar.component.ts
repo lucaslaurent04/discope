@@ -4,7 +4,7 @@ import { ChangeReservationArg } from 'src/app/model/changereservationarg';
 import { HeaderDays } from 'src/app/model/headerdays';
 
 
-import { ApiService } from 'sb-shared-lib';
+import { ApiService, EnvService } from 'sb-shared-lib';
 import { PlanningEmployeesCalendarParamService } from '../../_services/employees.calendar.param.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -124,6 +124,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     public currentDraggedActivity: any = null;
 
     private mousedownTimeout: any;
+    private environment: any;
 
     // duration history as hint for refreshing cell width
     private previous_duration: number;
@@ -136,6 +137,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     constructor(
         private params: PlanningEmployeesCalendarParamService,
         private api: ApiService,
+        private env: EnvService,
         private snack: MatSnackBar,
         private elementRef: ElementRef,
         private cd: ChangeDetectorRef
@@ -175,6 +177,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             Object.getOwnPropertyNames(new ProductModel()),
             'name', 'asc', 0, 500
         );
+
+        this.environment = await this.env.getEnv();
     }
 
     /**
@@ -492,15 +496,23 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
         const activity_date_index = this.calcDateIndex(new Date(activity.activity_date));
 
-               // Check drop and activity moment match
-        return date_index === activity_date_index && time_slot == activity.time_slot
+        // Check drop and activity moment match
+        if(date_index !== activity_date_index || time_slot !== activity.time_slot) {
+            return false;
+        }
 
-               // Check employee can handle activity
-               // #todo - make this check optional
-               && employee.activity_product_models_ids.map(id => +id).includes(activity.product_model_id.id)
+        // Check employee can handle activity
+        if(this.environment.hasOwnProperty('sale.features.employee.activity_filter') && this.environment['sale.features.employee.activity_filter']) {
+            if(!employee.activity_product_models_ids.map(id => +id).includes(activity.product_model_id.id)) {
+                return false;
+            }
+        }
 
-               // Check that the employee hasn't been assigned an activity yet
-               && !this.hasActivity(employee, date_index, time_slot, true);
+        // Check that the employee hasn't been assigned an activity yet
+        if(this.hasActivity(employee, date_index, time_slot, true)) {
+            return false;
+        }
+        return true;
     }
 
     public onDragStart(activity: any) {
