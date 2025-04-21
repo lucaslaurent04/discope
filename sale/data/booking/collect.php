@@ -6,6 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use core\setting\Setting;
 use equal\orm\Domain;
 use identity\Identity;
 use sale\booking\Booking;
@@ -15,7 +16,7 @@ use sale\booking\BankStatementLine;
 use sale\booking\Payment;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Advanced search for Bookings: returns a collection of Booking according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
@@ -24,16 +25,17 @@ list($params, $providers) = eQual::announce([
             'type'          => 'string',
             'default'       => 'sale\booking\Booking'
         ],
+
         'date_from' => [
             'type'          => 'date',
             'description'   => "First date of the time interval.",
-            'default'       => null
+            'default'       => function () { $default = Setting::get_value('finance', 'accounting', 'fiscal_year.date_from'); return ($default) ? strtotime($default) : null; }
         ],
 
         'date_to' => [
             'type'          => 'date',
             'description'   => "Last date of the time interval.",
-            'default'       => null
+            'default'       => function () { $default = Setting::get_value('finance', 'accounting', 'fiscal_year.date_to'); return ($default) ? strtotime($default) : null; }
         ],
 
         'bank_account_iban' => [
@@ -103,7 +105,7 @@ list($params, $providers) = eQual::announce([
  * @var \equal\php\Context $context
  * @var \equal\orm\ObjectManager $orm
  */
-list($context, $orm) = [ $providers['context'], $providers['orm'] ];
+['context' => $context, 'orm' => $orm] = $providers;
 
 
 /*
