@@ -1,5 +1,5 @@
 <!-- template vars -->
-<div #vGroup="var" [var]="{identification: {folded: displaySettings.identification_folded}, products: {folded: displaySettings.products_folded}, activities: {folded: displaySettings.activities_folded}, accomodations: {folded: displaySettings.accomodations_folded}, meals: {folded: displaySettings.meals_folded}}"></div>
+<div #vGroup="var" [var]="{identification: {folded: displaySettings.identification_folded}, products: {folded: displaySettings.products_folded}, activities: {show: displaySettings.activities_show, folded: displaySettings.activities_folded}, accommodations: {folded: displaySettings.accommodations_folded}, meals: {show: displaySettings.meals_show, folded: displaySettings.meals_folded}}"></div>
 
 <div [class.hidden]="!ready">
 
@@ -554,7 +554,7 @@
         </div>
 
         <!-- activities -->
-        <div class="part">
+        <div class="part" *ngIf="vGroup.activities.show">
             <div class="part-toggle" [class.highlight]="!vGroup.activities.folded">
                 <button mat-icon-button *ngIf="!vGroup.activities.folded" (click)="vGroup.activities.folded = true; sectionFold('activities')">
                     <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
@@ -617,16 +617,16 @@
         <!-- accommodations -->
         <div class="part">
 
-            <div class="part-toggle" [class.highlight]="!vGroup.accomodations.folded">
-                <button mat-icon-button *ngIf="!vGroup.accomodations.folded" (click)="vGroup.accomodations.folded = !vGroup.accomodations.folded; sectionFold('accomodations')">
+            <div class="part-toggle" [class.highlight]="!vGroup.accommodations.folded">
+                <button mat-icon-button *ngIf="!vGroup.accommodations.folded" (click)="vGroup.accommodations.folded = !vGroup.accommodations.folded; sectionFold('accomodations')">
                     <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
                 </button>
-                <button mat-icon-button *ngIf="vGroup.accomodations.folded" (click)="vGroup.accomodations.folded = !vGroup.accomodations.folded; sectionUnfold('accomodations')">
+                <button mat-icon-button *ngIf="vGroup.accommodations.folded" (click)="vGroup.accommodations.folded = !vGroup.accommodations.folded; sectionUnfold('accomodations')">
                     <mat-icon style="font-size: 15px;">keyboard_arrow_right</mat-icon>
                 </button>
             </div>
 
-            <div class="part-container" [class.highlight]="!vGroup.accomodations.folded">
+            <div class="part-container" [class.highlight]="!vGroup.accommodations.folded">
                 <div class="row">
                     <div style="flex: 1; height: 40px; line-height: 40px;">
                         <span>Unités locatives</span>
@@ -644,7 +644,7 @@
                         </mat-form-field>
                     </div>
                 </div>
-                <div class="row" style="display: block;" *ngIf="!vGroup.accomodations.folded">
+                <div class="row" style="display: block;" *ngIf="!vGroup.accommodations.folded">
                     <div class="accomodation-item" *ngFor="let accomodation of instance?.sojourn_product_models_ids; let index = index;">
                         <booking-services-booking-group-rentalunitassignment
                             [model]="accomodation"
@@ -659,7 +659,7 @@
         </div>
 
         <!-- meals preferences (for hostels only / 'GA')-->
-        <div class="part" *ngIf="(instance?.is_sojourn && instance?.sojourn_type_id == 1) || instance.group_type == 'event'">
+        <div class="part" *ngIf="vGroup.meals.show && ((instance?.is_sojourn && instance?.sojourn_type_id == 1) || instance.group_type == 'event')">
 
             <div class="part-toggle" style="padding-top: 12px;">
                 <button mat-icon-button *ngIf="!vGroup.meals.folded" (click)="vGroup.meals.folded = true; sectionFold('meals')">
