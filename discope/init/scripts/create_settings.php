@@ -39,7 +39,7 @@ Setting::assert_value('sale', 'organization', 'sku.make_beds');
 Setting::assert_value('sale', 'organization', 'sku.transport');
 Setting::assert_value('sale', 'organization', 'age_range_default');
 // === finance.accounting ===
-Setting::assert_value('finance', 'accounting', 'invoice.export_type');
+Setting::assert_value('finance', 'accounting', 'invoice.export_type');  // possible values so far: 'bob', 'ebp'
 Setting::assert_value('finance', 'accounting', 'account.sales', '7000000');
 Setting::assert_value('finance', 'accounting', 'account.discount', '7080000');
 Setting::assert_value('finance', 'accounting', 'account.downpayment', '7080000');
