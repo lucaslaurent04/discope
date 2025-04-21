@@ -54,7 +54,7 @@
             "access": {
                 "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
             },
-            "visible": [true, "=", "env.sale.features.payment.bank_check"]
+            "visible": [[true, "=", "env.sale.features.payment.bank_check"], ["is_paid", "=", false]]
         },
         {
             "id": "action.pay_financial_help",
@@ -65,7 +65,7 @@
             "access": {
                 "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
             },
-            "visible": [["is_paid", "=", false], [true, "=", "env.sale.features.payment.financial_help"]]
+            "visible": [[true, "=", "env.sale.features.payment.financial_help"], ["is_paid", "=", false]]
         },
         {
             "id": "action.unpay_instant",
