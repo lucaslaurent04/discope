@@ -100,9 +100,9 @@ if(!empty($task_models)) {
         }
 
         $task = Task::search([
-            ['task_model_id', '=', $task_model['id']],
-            ['booking_id', '=', $booking['id']]
-        ])
+                ['task_model_id', '=', $task_model['id']],
+                ['booking_id', '=', $booking['id']]
+            ])
             ->read(['notes'])
             ->first();
 
