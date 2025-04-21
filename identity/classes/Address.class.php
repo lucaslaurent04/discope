@@ -52,7 +52,7 @@ class Address extends Model {
             'role' => [
                 'type'              => 'string',
                 'selection'         => [ 'legal', 'invoice', 'delivery', 'other' ],
-                'description'       => 'The main purpose for which the address is to be preferred.' 
+                'description'       => 'The main purpose for which the address is to be preferred.'
             ],
 
             /*
@@ -75,7 +75,7 @@ class Address extends Model {
                 'description'       => 'City.',
                 'onupdate'          => 'onupdateAddress'
             ],
-            
+
             'address_zip' => [
                 'type'              => 'string',
                 'description'       => 'Postal code.',
@@ -92,13 +92,14 @@ class Address extends Model {
                 'type'              => 'string',
                 'usage'             => 'country/iso-3166:2',
                 'description'       => 'Country.',
+                'default'           => Setting::get_value('identity', 'organization', 'country_default', 'BE'),
                 'onupdate'          => 'onupdateAddress'
             ],
 
 
         ];
     }
-    
+
     public static function calcIdentityName($om, $oids, $lang) {
         $result = [];
         $res = $om->read(__CLASS__, $oids, ['identity_id.name']);
@@ -123,5 +124,5 @@ class Address extends Model {
 
     public static function onupdateAddress($om, $oids, $values, $lang) {
         $om->write(__CLASS__, $oids, [ 'display_name' => null ], $lang);
-    }    
+    }
 }

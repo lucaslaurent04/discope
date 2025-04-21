@@ -143,7 +143,7 @@ class Identity extends Model {
                 'type'              => 'string',
                 'usage'             => 'country/iso-3166:2',
                 'description'       => 'The country the person is citizen of.',
-                'default'           => 'BE'
+                'default'           => Setting::get_value('identity', 'organization', 'country_default', 'BE')
             ],
 
             /*
@@ -253,7 +253,7 @@ class Identity extends Model {
                 'type'              => 'string',
                 'usage'             => 'country/iso-3166:2',
                 'description'       => 'Country.',
-                'default'           => 'BE',
+                'default'           => Setting::get_value('identity', 'organization', 'country_default', 'BE'),
                 'selection'         => [
                     'AF'    => 'Afghanistan',
                     'AX'    => 'Aland Islands',
@@ -746,7 +746,7 @@ class Identity extends Model {
         foreach($self as $id => $identity) {
             $prefix_account = Setting::get_value('identity', 'accounting', 'customer_account.prefix', '411');
             $sequence_account = Setting::get_value('identity', 'accounting', 'customer_account.sequence', 1);
-            $format = Setting::get_value('identity', 'accounting', 'customer_account.sequence_format', '%3d{prefix}%5d{sequence}');
+            $format = Setting::get_value('identity', 'accounting', 'customer_account.sequence_format', '%3d{prefix}%05d{sequence}');
 
             do {
                 Setting::set_value('identity', 'accounting', 'customer_account.sequence', $sequence_account + 1);
