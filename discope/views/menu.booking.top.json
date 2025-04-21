@@ -22,8 +22,8 @@
                 "route": "/planning"
             },
             {
-                "id": "item.planning",
-                "label": "Planning Animateurs",
+                "id": "item.planning_employees",
+                "label": "Employees schedule",
                 "description": "",
                 "icon": "person_outline",
                 "type": "entry",
