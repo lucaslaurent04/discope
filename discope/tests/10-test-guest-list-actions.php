@@ -30,7 +30,7 @@ $tests = [
         'description' => "Test that status is changed to sent when a guest list is submitted.",
 
         'arrange' => function () {
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);;
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search(['display_name', '=', 'John DOE'])->read(['id'])->first(true);
@@ -90,7 +90,7 @@ $tests = [
         'description' => "Test that compositions are created when a guest list is submitted.",
 
         'arrange' => function () {
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);;
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search(['display_name', '=', 'John DOE'])->read(['id'])->first(true);
@@ -270,7 +270,7 @@ $tests = [
         'description' => "Test that email is added to queue when a customer is invited to complete a guest list.",
 
         'arrange' => function () {
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);;
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search(['display_name', '=', 'John DOE'])->read(['id', 'lang_id' => ['code']])->first(true);

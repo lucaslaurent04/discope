@@ -45,7 +45,7 @@ $tests = [
         ",
         'arrange'           =>  function () {
 
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id', 'center_office_id'])->first(true);
+            $center = Center::id(1)->read(['id', 'center_office_id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
@@ -230,7 +230,7 @@ $tests = [
                 The paid amount must be equal than the amount of the payment.
         ",
         'arrange'           =>  function () {
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);

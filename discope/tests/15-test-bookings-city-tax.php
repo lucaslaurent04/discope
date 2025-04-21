@@ -28,7 +28,7 @@ $tests = [
             Children: 10s",
         'arrange'           =>  function () {
 
-            Center::search(['name', 'like', '%Your Establisment%' ])->update(['has_citytax_school' => true]);
+            Center::id(1)->update(['has_citytax_school' => true]);
             $center =  Center::search(['name', 'like', '%Your Establisment%'])->read(['id', 'center_office_id', 'has_citytax_school'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
@@ -121,7 +121,7 @@ $tests = [
             Children: 10",
         'arrange'           =>  function () {
 
-            Center::search(['name', 'like', '%Your Establisment%' ])->update(['has_citytax_school' => false]);
+            Center::id(1)->update(['has_citytax_school' => false]);
             $center =  Center::search(['name', 'like', '%Your Establisment%'])->read(['id', 'center_office_id', 'has_citytax_school'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
@@ -201,7 +201,7 @@ $tests = [
         },
         'rollback'          =>  function () {
             Booking::search(['description', 'like', '%'. 'Booking test without the city tax.'.'%'])->delete(true);
-            Center::search(['name', 'like', '%Your Establisment%' ])->update(['has_citytax_school' => true]);
+            Center::id(1)->update(['has_citytax_school' => true]);
 
         }
     ]

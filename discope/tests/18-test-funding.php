@@ -36,7 +36,7 @@ $tests = [
         ",
         'arrange'           =>  function () {
 
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
@@ -209,7 +209,7 @@ $tests = [
         ",
         'arrange'           =>  function () {
 
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
@@ -382,7 +382,7 @@ $tests = [
         ",
         'arrange'           =>  function () {
 
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
@@ -558,7 +558,7 @@ $tests = [
             There are no payments associated with the funding.
         ",
         'arrange'           =>  function () {
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
@@ -722,7 +722,7 @@ $tests = [
         'description'       =>  'Validation that the funding cannot be removed when there is a payment received.',
         'help'              =>  "",
         'arrange'           =>  function () {
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
@@ -904,7 +904,7 @@ $tests = [
         ",
         'arrange'           =>  function () {
 
-            $center = Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);

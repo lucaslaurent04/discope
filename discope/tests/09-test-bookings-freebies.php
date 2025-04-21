@@ -28,7 +28,7 @@ $tests = [
 
         'arrange' => function() {
             return [
-                Center::search(['name', 'like', '%Your Establisment%' ])->read(['id','center_office_id'])->first(true),
+                Center::id(1)->read(['id','center_office_id'])->first(true),
                 BookingType::search(['code', '=', 'SEJ'])->read(['id'])->first(true)['id'],
                 CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true)['id'],
                 Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true)['id'],
@@ -159,7 +159,7 @@ $tests = [
         'description'   => 'Test that the sojourn tax (KA-CTaxSej-A) is not automaticaly sold when a scholar sojourn pack is used.',
         'arrange'       => function() {
             return [
-                Center::search(['name', 'like', '%Your Establisment%' ])->read(['id'])->first(true)['id'],
+                Center::id(1)->read(['id'])->first(true)['id'],
                 BookingType::search(['code', '=', 'SEJ'])->read(['id'])->first(true)['id'],
                 CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true)['id'],
                 Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true)['id'],
