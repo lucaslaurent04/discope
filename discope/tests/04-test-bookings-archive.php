@@ -22,7 +22,7 @@ $tests = [
             Status: Quote
             Price 0",
         'arrange'           =>  function () {
-            $center = Center::search(['name', 'like', '%Your Establisment%'])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
@@ -67,7 +67,7 @@ $tests = [
     '0402' => [
         'description'       => 'Validate that the reservation cannot be archived if the client has made a payment.',
         'arrange'           =>  function () {
-            $center = Center::search(['name', 'like', '%Your Establisment%'])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
@@ -150,7 +150,7 @@ $tests = [
     '0403' => [
         'description'       => 'Validate that the reservation cannot be archived if the reservation is not in quote or checkout status.',
         'arrange'           =>  function () {
-            $center = Center::search(['name', 'like', '%Your Establisment%'])->read(['id'])->first(true);
+            $center = Center::id(1)->read(['id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
