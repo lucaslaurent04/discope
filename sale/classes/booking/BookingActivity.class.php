@@ -8,6 +8,7 @@
 
 namespace sale\booking;
 
+use core\setting\Setting;
 use equal\orm\Model;
 use hr\employee\Employee;
 
@@ -396,27 +397,32 @@ class BookingActivity extends Model {
         $self->read(['activity_date', 'time_slot_id', 'employee_id', 'product_model_id']);
         foreach($self as $booking_activity) {
             $employee_id = array_key_exists('employee_id', $values) ? $values['employee_id'] : $booking_activity['employee_id'];
+
             if(is_null($employee_id)) {
                 continue;
             }
 
-            // #todo - make this check optional (through settings)
-            $employee = Employee::id($employee_id)
-                ->read(['activity_product_models_ids'])
-                ->first();
+            // check employee qualification for given activity
+            $activity_filter = Setting::get_value('sale', 'features', 'employee.activity_filter', false);
+            if($activity_filter) {
+                $employee = Employee::id($employee_id)
+                    ->read(['activity_product_models_ids'])
+                    ->first();
 
-            if(!in_array($booking_activity['product_model_id'], $employee['activity_product_models_ids'])) {
-                return ['employee_id' => ['not_allowed' => "Employee not qualified for this type of activity."]];
+                if($employee && !in_array($booking_activity['product_model_id'], $employee['activity_product_models_ids'])) {
+                    return ['employee_id' => ['not_allowed' => "Employee not qualified for this type of activity."]];
+                }
             }
 
+            // check current assignment, if any
             $activity_date = $values['activity_date'] ?? $booking_activity['activity_date'];
             $time_slot_id = $values['time_slot_id'] ?? $booking_activity['time_slot_id'];
 
             $activities_ids = BookingActivity::search([
-                ['activity_date', '=', $activity_date],
-                ['time_slot_id', '=', $time_slot_id],
-                ['employee_id', '=', $employee_id]
-            ])
+                    ['activity_date', '=', $activity_date],
+                    ['time_slot_id', '=', $time_slot_id],
+                    ['employee_id', '=', $employee_id]
+                ])
                 ->ids();
 
             if(!empty($activities_ids)) {
