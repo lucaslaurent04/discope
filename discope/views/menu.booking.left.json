@@ -234,7 +234,8 @@
                         "context": {
                             "entity": "sale\\booking\\BookingPoint",
                             "view": "list.default"
-                        }
+                        },
+                        "visible": [true, "=", "env.sale.features.booking.loyalty_points"]
                     }
                 ]
             },
