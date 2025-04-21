@@ -94,7 +94,8 @@ class Establishment extends Model {
             'address_country' => [
                 'type'              => 'string',
                 'usage'             => 'country/iso-3166:2',
-                'description'       => 'Country in which the establishment is located (ISO 3166).'
+                'description'       => 'Country in which the establishment is located (ISO 3166).',
+                'default'           => Setting::get_value('identity', 'organization', 'country_default', 'BE')
             ],
 
             'registration_number' => [
