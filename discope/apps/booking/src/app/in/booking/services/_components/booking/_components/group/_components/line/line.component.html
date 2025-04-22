@@ -174,8 +174,12 @@
         </div>
 
         <!-- 2) quantity variations -->
+        <!--
+            #memo - visibility condition changed from "!vProduct.identification.folded && !group.is_locked && instance.qty_accounting_method == 'person' && (!instance.is_accomodation || instance.product_id.product_model_id.capacity == 1)"
+            (unsure why it was hidden for is_accomodation since a check is made on accounting_method)
+        -->
         <div class="row row-first"
-            *ngIf="!vProduct.identification.folded && !group.is_locked && instance.qty_accounting_method == 'person' && (!instance.is_accomodation || instance.product_id.product_model_id.capacity == 1)">
+            *ngIf="!vProduct.identification.folded && !group.is_locked && instance.qty_accounting_method == 'person'">
             <div class="part cell" [class.hidden]="!ready">
                 <div class="part-toggle">
                     <button mat-icon-button *ngIf="!vProduct.variations.folded"
