@@ -970,7 +970,7 @@ class Booking extends Model {
 
     /**
      * Handler for updating values relating the customer.
-     * Customer and Identity are synced : only the identity can be changes through views, customer always derives from the selected identity.
+     * Customer and Identity are synced : only the identity can be changed through views, customer always derives from the selected identity.
      * This handler is always triggered by the onupdateCustomerIdentityId method.
      *
      * @param  \equal\orm\ObjectManager     $om        Object Manager instance.
@@ -1098,11 +1098,11 @@ class Booking extends Model {
                     }
                 }
 
+                $values = [];
+
                 // if description is empty, replace it with assigned customer's description
                 if(strlen((string) $booking['description']) == 0) {
-                    $values = [
-                        'description' => $booking['customer_identity_id.description']
-                    ];
+                    $values['description'] = $booking['customer_identity_id.description'];
                 }
 
                 if($partner_id && $partner_id > 0) {
