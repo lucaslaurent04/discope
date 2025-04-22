@@ -63,9 +63,17 @@ class Enrollment extends Model {
             'total' => [
                 'type'              => 'computed',
                 'result_type'       => 'integer',
-                'description'       => "Total price of the enrollment.",
+                'description'       => "Total price of the enrollment (VTA excluded).",
                 'store'             => true,
                 'function'          => 'calcTotal'
+            ],
+
+            'price' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => "Total price of the enrollment (VTA included).",
+                'store'             => true,
+                'function'          => 'calcPrice'
             ],
 
             'documents_ids' => [
@@ -87,6 +95,21 @@ class Enrollment extends Model {
     }
 
     public static function calcTotal($self): array {
+        $result = [];
+        $self->read(['enrollment_lines_ids' => ['total']]);
+        foreach($self as $id => $enrollment) {
+            $total = 0.0;
+            foreach($enrollment['enrollment_lines_ids'] as $enrollment_line) {
+                $total += $enrollment_line['total'];
+            }
+
+            $result[$id] = $total;
+        }
+
+        return $result;
+    }
+
+    public static function calcPrice($self): array {
         $result = [];
         $self->read(['enrollment_lines_ids' => ['price']]);
         foreach($self as $id => $enrollment) {
