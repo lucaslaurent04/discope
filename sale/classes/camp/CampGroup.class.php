@@ -20,9 +20,11 @@ class CampGroup extends Model {
         return [
 
             'name' => [
-                'type'              => 'string',
+                'type'              => 'computed',
+                'result_type'       => 'string',
                 'description'       => "The name of the camp group.",
-                'required'          => true
+                'store'             => true,
+                'function'          => 'calcName'
             ],
 
             'camp_id' => [
@@ -42,6 +44,20 @@ class CampGroup extends Model {
             ]
 
         ];
+    }
+
+    public static function calcName($self): array {
+        $result = [];
+        $self->read(['state', 'camp_id' => ['name', 'camp_groups_ids']]);
+        foreach($self as $id =>  $camp_group) {
+            $group_num = count($camp_group['camp_id']['camp_groups_ids']);
+            if($camp_group['state'] === 'draft') {
+                $group_num++;
+            }
+            $result[$id] = $camp_group['camp_id']['name'].' ('.$group_num.')';
+        }
+
+        return $result;
     }
 
     public static function calcMaxChildren($self): array {

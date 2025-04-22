@@ -37,7 +37,8 @@ class Enrollment extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Camp',
                 'description'       => "The camp the child is enrolled to.",
-                'required'          => true
+                'required'          => true,
+                'onupdate'          => 'onupdateCampId'
             ],
 
             'status' => [
@@ -72,6 +73,13 @@ class Enrollment extends Model {
                 'foreign_field'     => 'enrollment_id',
                 'foreign_object'    => 'sale\camp\document\Document',
                 'description'       => "The documents needed for the child to enroll to the camp."
+            ],
+
+            'enrollment_lines_ids' => [
+                'type'              => 'one2many',
+                'foreign_field'     => 'enrollment_id',
+                'foreign_object'    => 'sale\camp\EnrollmentLine',
+                'description'       => "The line that list the products of the child's enrollment."
             ]
 
         ];
@@ -79,30 +87,14 @@ class Enrollment extends Model {
 
     public static function calcTotal($self): array {
         $result = [];
-        $self->read([
-            'child_id' => [
-                'camp_class'
-            ],
-            'camp_id' => [
-                'product_id' => [
-                    'prices_ids' => [
-                        'price_vat',
-                        'camp_class'
-                    ]
-                ]
-            ]
-        ]);
-
+        $self->read(['enrollment_lines_ids' => ['price']]);
         foreach($self as $id => $enrollment) {
-            if(!isset($enrollment['child_id'], $enrollment['camp_id']['product_id']['prices_ids'])) {
-                continue;
+            $price = 0.0;
+            foreach($enrollment['enrollment_lines_ids'] as $enrollment_line) {
+                $price += $enrollment_line['price'];
             }
 
-            foreach($enrollment['camp_id']['product_id']['prices_ids'] as $price) {
-                if($enrollment['child_id']['camp_class'] === $price['camp_class']) {
-                    $result[$id] = $price['price_vat'];
-                }
-            }
+            $result[$id] = $price;
         }
 
         return $result;
@@ -194,7 +186,9 @@ class Enrollment extends Model {
 
     public static function canupdate($self, $values): array {
         $self->read([
+            'child_id',
             'camp_id' => [
+                'id',
                 'max_children',
                 'ase_quota',
                 'enrollments_ids' => [
@@ -242,6 +236,72 @@ class Enrollment extends Model {
             }
         }
 
+        if(isset($values['camp_id']) || isset($values['child_id'])) {
+            foreach($self as $enrollment) {
+                $camp_id = $values['camp_id'] ?? $enrollment['camp_id']['id'];
+                $camp = Camp::id($camp_id)
+                    ->read([
+                        'product_id' => [
+                            'prices_ids' => [
+                                'camp_class'
+                            ]
+                        ]
+                    ])
+                    ->first();
+
+                $child_id = $values['child_id'] ?? $enrollment['child_id'];
+                $child = Child::id($child_id)
+                    ->read(['camp_class'])
+                    ->first();
+
+                $camp_class_price = null;
+                foreach($camp['product_id']['prices_ids'] as $price) {
+                    if($child['camp_class'] === $price['camp_class']) {
+                        $camp_class_price = $price;
+                    }
+                }
+
+                if(is_null($camp_class_price)) {
+                    return ['child_id' => ['camp_class_price_missing' => "The price for the child camp class is missing."]];
+                }
+            }
+        }
+
         return parent::cancreate($self, $values);
+    }
+
+    public static function onupdateCampId($self) {
+        $self->read([
+            'child_id'  => [
+                'camp_class'
+            ],
+            'camp_id'   => [
+                'product_id' => [
+                    'prices_ids' => [
+                        'camp_class'
+                    ]
+                ]
+            ]
+        ]);
+
+        foreach($self as $id => $enrollment) {
+            if(!isset($enrollment['camp_id']) || !isset($enrollment['child_id'])) {
+                continue;
+            }
+
+            $camp_class_price = null;
+            foreach($enrollment['camp_id']['product_id']['prices_ids'] as $price) {
+                if($enrollment['child_id']['camp_class'] === $price['camp_class']) {
+                    $camp_class_price = $price;
+                }
+            }
+
+            EnrollmentLine::create([
+                'enrollment_id' => $id,
+                'product_id'    => $enrollment['camp_id']['product_id']['id'],
+                'price_id'      => $camp_class_price['id'],
+                'qty'           => 1
+            ]);
+        }
     }
 }

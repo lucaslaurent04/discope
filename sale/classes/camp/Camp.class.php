@@ -240,7 +240,7 @@ class Camp extends Model {
             if(isset($values['camp_type'])) {
                 $date_from = date('Y-m-d', $event['date_from']);
                 if($values['camp_type'] === 'week') {
-                    $result['date_to'] = strtotime($date_from.' +6 days');
+                    $result['date_to'] = strtotime($date_from.' +4 days');
                 }
                 if($values['camp_type'] === 'weekend') {
                     $result['date_to'] = strtotime($date_from.' +1 days');
