@@ -408,13 +408,14 @@ class BookingLineGroup extends Model {
                     $om->update(self::getType(), $id, ['is_sojourn' => false]);
                     $om->update(self::getType(), $id, ['is_event' => false]);
                 }
-                elseif($group['group_type'] == 'sojourn' || $group['group_type'] == 'camp') {
+                elseif($group['group_type'] == 'sojourn') {
                     $om->update(self::getType(), $id, ['is_sojourn' => true]);
                     $om->update(self::getType(), $id, ['is_event' => false]);
-
-                    if($group['group_type'] == 'camp') {
-                        $map_booking_ids[$group['booking_id']] = true;
-                    }
+                }
+                elseif($group['group_type'] == 'camp') {
+                    $om->update(self::getType(), $id, ['is_sojourn' => false]);
+                    $om->update(self::getType(), $id, ['is_event' => false]);
+                    $map_booking_ids[$group['booking_id']] = true;
                 }
                 elseif($group['group_type'] == 'event') {
                     $om->update(self::getType(), $id, ['is_sojourn' => false]);
@@ -431,7 +432,7 @@ class BookingLineGroup extends Model {
     public static function onupdateActivityGroupNum($self) {
         $self->read(['booking_activities_ids']);
         foreach($self as $group) {
-            BookingActivity::search(['id', 'in', $group['booking_activities_ids']])->update(['group_num' => null]);
+            BookingActivity::ids($group['booking_activities_ids'])->update(['group_num' => null]);
         }
     }
 
