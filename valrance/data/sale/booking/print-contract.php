@@ -350,7 +350,11 @@ $center_office_code = (isset( $booking['center_id']['center_office_id']['code'])
 $postal_address = sprintf("%s - %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']);
 $customer_name = substr($booking['customer_id']['partner_identity_id']['display_name'], 0,  66);
 $customer_address = $booking['customer_id']['partner_identity_id']['address_street'] .' '. $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'];
-$has_activity = Setting::get_value('sale', 'features', 'booking.activity', true);
+
+// #memo - client has request no to show activites on booking/contract but always use disctint doc (print-booking-activity)
+// $has_activity = Setting::get_value('sale', 'features', 'booking.activity', true);
+$has_activity = false;
+
 $consumption_table_show  = Setting::get_value('sale', 'features', 'templates.quote.consumption_table', 1);
 $values = [
     'attn_address1'               => '',

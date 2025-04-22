@@ -294,7 +294,9 @@ if($logo_document_data) {
 
 $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
-$has_activity = Setting::get_value('sale', 'features', 'booking.activity', true);
+// #memo - client has requested no to show activites on booking/contract but always use disctint doc (print-booking-activity)
+// $has_activity = Setting::get_value('sale', 'features', 'booking.activity', true);
+$has_activity = false;
 
 $consumption_table_show  = Setting::get_value('sale', 'features', 'templates.quote.consumption_table', 1);
 $values = [
