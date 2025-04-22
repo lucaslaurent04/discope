@@ -49,6 +49,7 @@ class EnrollmentLine extends Model {
                 'result_type'       => 'float',
                 'description'       => "Tax-excluded unit price (with automated discounts applied).",
                 'store'             => true,
+                'instant'           => true,
                 'function'          => 'calcUnitPrice',
                 'dependencies'      => ['total']
             ],
@@ -59,6 +60,7 @@ class EnrollmentLine extends Model {
                 'usage'             => 'amount/money:4',
                 'description'       => "Total tax-excluded price of the line (computed).",
                 'store'             => true,
+                'instant'           => true,
                 'function'          => 'calcTotal',
                 'dependencies'      => ['price']
             ],
@@ -68,6 +70,7 @@ class EnrollmentLine extends Model {
                 'result_type'       => 'float',
                 'description'       => "VAT rate that applies to this line.",
                 'store'             => true,
+                'instant'           => true,
                 'function'          => 'calcVatRate',
                 'dependencies'      => ['price']
             ],
@@ -78,6 +81,7 @@ class EnrollmentLine extends Model {
                 'usage'             => 'amount/money:2',
                 'description'       => "Final tax-included price (computed).",
                 'store'             => true,
+                'instant'           => true,
                 'function'          => 'calcPrice',
                 'onupdate'          => 'onupdatePrice'
             ]
@@ -148,16 +152,16 @@ class EnrollmentLine extends Model {
     public static function getActions(): array {
         return [
 
-            'reset-enrollment-total' => [
+            'reset-enrollments-prices' => [
                 'description'   => "Reset the prices fields values so they can be re-calculated.",
                 'policies'      => [],
-                'function'      => 'doResetEnrollmentTotal'
+                'function'      => 'doResetEnrollmentsPrices'
             ]
 
         ];
     }
 
-    public static function doResetEnrollmentTotal($self) {
+    public static function doResetEnrollmentsPrices($self) {
         $self->read(['enrollment_id']);
 
         $map_enrollment_ids = [];
@@ -165,14 +169,18 @@ class EnrollmentLine extends Model {
             $map_enrollment_ids[$enrollment_line['enrollment_id']] = true;
         }
 
-        Enrollment::ids(array_keys($map_enrollment_ids))->update(['total' => null]);
+        Enrollment::ids(array_keys($map_enrollment_ids))
+            ->update([
+                'total' => null,
+                'price' => null
+            ]);
     }
 
     public static function onupdatePrice($self): void {
-        $self->do('reset-enrollment-total');
+        $self->do('reset-enrollments-prices');
     }
 
     public static function ondelete($self): void {
-        $self->do('reset-enrollment-total');
+        $self->do('reset-enrollments-prices');
     }
 }
