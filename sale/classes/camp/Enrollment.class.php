@@ -79,7 +79,8 @@ class Enrollment extends Model {
                 'type'              => 'one2many',
                 'foreign_field'     => 'enrollment_id',
                 'foreign_object'    => 'sale\camp\EnrollmentLine',
-                'description'       => "The line that list the products of the child's enrollment."
+                'description'       => "The lines who list the products of the child's enrollment.",
+                'ondetach'          => 'delete'
             ]
 
         ];
