@@ -25,6 +25,7 @@ class EnrollmentLine extends Model {
                 'foreign_object'    => 'sale\camp\catalog\Product',
                 'description'       => "The product targeted by the line.",
                 'required'          => true,
+                'readonly'          => true,
                 'domain'            => ['is_camp', '=', true]
             ],
 
@@ -33,7 +34,6 @@ class EnrollmentLine extends Model {
                 'foreign_object'    => 'sale\price\Price',
                 'description'       => "The price the line relates to (retrieved by price list).",
                 'required'          => true,
-                'dependencies'      => ['unit_price'],
                 'domain'            => ['product_id', '=', 'object.product_id']
             ],
 
@@ -41,7 +41,7 @@ class EnrollmentLine extends Model {
                 'type'              => 'integer',
                 'description'       => "Quantity of the product that is purchased.",
                 'default'           => 1,
-                'dependencies'      => ['total']
+                'onupdate'          => 'onupdateQty'
             ],
 
             'unit_price' => [
@@ -51,7 +51,7 @@ class EnrollmentLine extends Model {
                 'store'             => true,
                 'instant'           => true,
                 'function'          => 'calcUnitPrice',
-                'dependencies'      => ['total']
+                'onupdate'          => 'onupdateUnitPrice'
             ],
 
             'total' => [
@@ -62,7 +62,7 @@ class EnrollmentLine extends Model {
                 'store'             => true,
                 'instant'           => true,
                 'function'          => 'calcTotal',
-                'dependencies'      => ['price']
+                'onupdate'          => 'onupdateTotal'
             ],
 
             'vat_rate' => [
@@ -72,7 +72,7 @@ class EnrollmentLine extends Model {
                 'store'             => true,
                 'instant'           => true,
                 'function'          => 'calcVatRate',
-                'dependencies'      => ['price']
+                'onupdate'          => 'onupdateVatRate'
             ],
 
             'price' => [
@@ -153,7 +153,7 @@ class EnrollmentLine extends Model {
         return [
 
             'reset-enrollments-prices' => [
-                'description'   => "Reset the prices fields values so they can be re-calculated.",
+                'description'   => "Reset the enrollments prices fields values so they can be re-calculated.",
                 'policies'      => [],
                 'function'      => 'doResetEnrollmentsPrices'
             ]
@@ -174,6 +174,30 @@ class EnrollmentLine extends Model {
                 'total' => null,
                 'price' => null
             ]);
+    }
+
+    public static function onupdateQty($self) {
+        $self->update(['total' => null, 'price' => null]);
+
+        $self->do('reset-enrollments-prices');
+    }
+
+    public static function onupdateUnitPrice($self): void {
+        $self->update(['total' => null, 'price' => null]);
+
+        $self->do('reset-enrollments-prices');
+    }
+
+    public static function onupdateTotal($self): void {
+        $self->update(['price' => null]);
+
+        $self->do('reset-enrollments-prices');
+    }
+
+    public static function onupdateVatRate($self): void {
+        $self->update(['price' => null]);
+
+        $self->do('reset-enrollments-prices');
     }
 
     public static function onupdatePrice($self): void {
