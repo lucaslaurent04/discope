@@ -24,7 +24,8 @@ class EnrollmentLine extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
                 'description'       => "The product targeted by the line.",
-                'required'          => true
+                'required'          => true,
+                'domain'            => ['is_camp', '=', true]
             ],
 
             'price_id' => [
@@ -32,7 +33,8 @@ class EnrollmentLine extends Model {
                 'foreign_object'    => 'sale\price\Price',
                 'description'       => "The price the line relates to (retrieved by price list).",
                 'required'          => true,
-                'dependencies'      => ['unit_price']
+                'dependencies'      => ['unit_price'],
+                'domain'            => ['product_id', '=', 'object.product_id']
             ],
 
             'qty' => [
@@ -76,7 +78,8 @@ class EnrollmentLine extends Model {
                 'usage'             => 'amount/money:2',
                 'description'       => "Final tax-included price (computed).",
                 'store'             => true,
-                'function'          => 'calcPrice'
+                'function'          => 'calcPrice',
+                'onupdate'          => 'onupdatePrice'
             ]
 
         ];
@@ -140,5 +143,36 @@ class EnrollmentLine extends Model {
         }
 
         return $result;
+    }
+
+    public static function getActions(): array {
+        return [
+
+            'reset-enrollment-total' => [
+                'description'   => "Reset the prices fields values so they can be re-calculated.",
+                'policies'      => [],
+                'function'      => 'doResetEnrollmentTotal'
+            ]
+
+        ];
+    }
+
+    public static function doResetEnrollmentTotal($self) {
+        $self->read(['enrollment_id']);
+
+        $map_enrollment_ids = [];
+        foreach($self as $enrollment_line) {
+            $map_enrollment_ids[$enrollment_line['enrollment_id']] = true;
+        }
+
+        Enrollment::ids(array_keys($map_enrollment_ids))->update(['total' => null]);
+    }
+
+    public static function onupdatePrice($self): void {
+        $self->do('reset-enrollment-total');
+    }
+
+    public static function ondelete($self): void {
+        $self->do('reset-enrollment-total');
     }
 }
