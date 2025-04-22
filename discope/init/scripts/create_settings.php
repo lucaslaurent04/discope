@@ -11,6 +11,7 @@ Setting::assert_value('sale', 'features', 'booking.employee_planning', false);
 Setting::assert_value('sale', 'features', 'booking.loyalty_points', false);
 Setting::assert_value('sale', 'features', 'booking.consumption_meters', false);
 Setting::assert_value('sale', 'features', 'booking.archive_delay', 60);
+Setting::assert_value('sale', 'features', 'booking.tasks_table', false);
 Setting::assert_value('sale', 'features', 'employee.activity_filter', false);
 Setting::assert_value('sale', 'features', 'quote.validity_delay', 10);
 Setting::assert_value('sale', 'features', 'quote.remind_auto', false);
@@ -52,6 +53,10 @@ Setting::assert_value('sale', 'organization', 'sku.make_beds');
 Setting::assert_value('sale', 'organization', 'sku.transport');
 Setting::assert_value('sale', 'organization', 'age_range_default');
 Setting::assert_value('sale', 'organization', 'payment_terms_default');
+Setting::assert_value('sale', 'organization', 'quote.output_level_default');
+Setting::assert_value('sale', 'organization', 'option.output_level_default');
+Setting::assert_value('sale', 'organization', 'contract.output_level_default');
+Setting::assert_value('sale', 'organization', 'invoice.output_level_default');
 Setting::assert_value('identity', 'organization', 'country_default', 'BE');
 Setting::assert_value('identity', 'organization', 'identity_type_default', 1);
 // === finance.accounting ===
@@ -150,4 +155,3 @@ Setting::assert_value('lodging', 'locale', 'i18n.customer_num', 'Num. Client');
 Setting::assert_value('lodging', 'locale', 'i18n.time_slot', 'Tranche horaire');
 Setting::assert_value('lodging', 'locale', 'i18n.snack', 'Collation');
 Setting::assert_value('lodging', 'locale', 'i18n.meals', 'Repas');
-
