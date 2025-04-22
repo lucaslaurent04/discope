@@ -60,11 +60,16 @@
                                             {
                                                 "type": "field",
                                                 "value": "",
-                                                "width": "66%"
+                                                "width": "33%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "total",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "price",
                                                 "width": "33%"
                                             }
                                         ]
