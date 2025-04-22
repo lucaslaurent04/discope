@@ -59,6 +59,11 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "value": "",
+                                                "width": "66%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "total",
                                                 "width": "33%"
                                             }
@@ -73,8 +78,30 @@
             {
                 "sections": [
                     {
+                        "id": "section.lines",
+                        "label": "Lines",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "enrollment_lines_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "id": "section.documents",
                         "label": "Documents",
+                        "visible": ["state", "<>", "draft"],
                         "rows": [
                             {
                                 "columns": [
