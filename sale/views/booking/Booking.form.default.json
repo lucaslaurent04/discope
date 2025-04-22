@@ -501,16 +501,18 @@
                                             {
                                                 "type": "field",
                                                 "value": "tasks_ids",
-                                                "width": "66%",
+                                                "width": "100%",
                                                 "widget": {
                                                     "view": "list.booking",
                                                     "domain": ["visible_date", "<=", "date.this.day.first"]
-                                                }
+                                                },
+                                                "visible": [true, "=", "env.sale.features.booking.tasks_table"]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "description",
-                                                "width": "33%"
+                                                "width": "100%",
+                                                "visible": [true, "<>", "env.sale.features.booking.tasks_table"]
                                             }
                                         ]
                                     }
