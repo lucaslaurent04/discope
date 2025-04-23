@@ -1,0 +1,76 @@
+{
+    "name": "Inscription",
+    "plural": "Inscriptions",
+    "description": "L'inscription d'un enfant à un camp.",
+    "model": {
+        "child_id": {
+            "label": "Enfant",
+            "description": "L'enfant à inscrire.",
+            "help": ""
+        },
+        "child_health_remarks": {
+            "label": "Remarque santé",
+            "description": "Remarques à propos de la santé de l'enfant au moment de l'inscription.",
+            "help": ""
+        },
+        "camp_id": {
+            "label": "Camp",
+            "description": "Camp auquel l'enfant s'inscrit.",
+            "help": ""
+        },
+        "status": {
+            "label": "Status",
+            "description": "Status de l'inscription.",
+            "help": "",
+            "selection": {
+                "pending": "En cours",
+                "waitlisted": "Sur liste d'attente",
+                "confirmed": "Confirmée",
+                "canceled": "Annulée"
+            }
+        },
+        "is_ase": {
+            "label": "ASE",
+            "description": "Est \"aide sociale à l'enfance\".",
+            "help": ""
+        },
+        "total": {
+            "label": "Prix (HTVA)",
+            "description": "Prix de l'inscription (Hors TVA).",
+            "help": ""
+        },
+        "price": {
+            "label": "Prix (TVAC)",
+            "description": "Prix de l'inscription (TVA comprise).",
+            "help": ""
+        },
+        "is_locked": {
+            "label": "Verrouillée",
+            "description": "Est-ce que l'inscription peut-être modifiée?",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Inscription",
+            "description": "",
+            "layout": {
+                "section.documents": {
+                    "label": "Documents"
+                },
+                "section.enrollment-lines": {
+                    "label": "Lignes"
+                },
+                "section.price-adapters": {
+                    "label": "Réductions"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Inscriptions",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}

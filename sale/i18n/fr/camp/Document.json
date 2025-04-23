@@ -1,0 +1,32 @@
+{
+    "name": "Document",
+    "plural": "Documents",
+    "description": "Document needed to participate to a camp.",
+    "model": {
+        "description": {
+            "label": "Description",
+            "description": "Description du document.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Document",
+            "description": "",
+            "layout": {
+                "section.camp-models": {
+                    "label": "Modèles"
+                },
+                "section.camps": {
+                    "label": "Camps"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Documents",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}

@@ -1,0 +1,72 @@
+{
+    "name": "Modèle de Camp",
+    "plural": "Modèles de Camp",
+    "description": "Modèle qui sert de base à la création de camps",
+    "model": {
+        "description": {
+            "label": "Description",
+            "description": "Description du modèle de camp.",
+            "help": ""
+        },
+        "product_id": {
+            "label": "Produit",
+            "description": "Le produit qui sera utilisé.",
+            "help": ""
+        },
+        "camp_type": {
+            "label": "Type",
+            "description": "Type de camp.",
+            "help": "",
+            "selection": {
+                "week": "Semaine",
+                "weekend": "Week-end"
+            }
+        },
+        "with_accommodation": {
+            "label": "Avec logement",
+            "description": "Est-ce que le camp le logement?",
+            "help": ""
+        },
+        "employee_ratio": {
+            "label": "Ratio employé",
+            "description": "La quantité d'enfants qu'un employé peut géré seul.",
+            "help": ""
+        },
+        "need_license_ffe": {
+            "label": "Besoin licence FFE",
+            "description": "Est-ce que les enfants on besoin d'une 'licence fédération française équitation' pour participé au camp.",
+            "help": ""
+        },
+        "ase_quota": {
+            "label": "Quota ASE",
+            "description": "Max d'enfants \"Aide social à l'enfance\" pour ce camp.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Modèle",
+            "description": "",
+            "layout": {
+                "section.description": {
+                    "label": "Description"
+                },
+                "section.required-skills": {
+                    "label": "Compétences requises"
+                },
+                "section.required-documents": {
+                    "label": "Documents requis"
+                },
+                "section.camps": {
+                    "label": "Camps"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Modèles",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}
