@@ -58,7 +58,7 @@
                 "section.documents": {
                     "label": "Documents"
                 },
-                "section.enrollment-lines": {
+                "section.lines": {
                     "label": "Lignes"
                 },
                 "section.price-adapters": {
