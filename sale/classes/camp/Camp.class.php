@@ -307,9 +307,6 @@ class Camp extends Model {
                         $enrolled_children_qty++;
                     }
                 }
-                if($enrolled_children_qty === 0) {
-                    continue;
-                }
 
                 $values_camp_groups_ids = array_map(
                     function($id) {
@@ -342,6 +339,10 @@ class Camp extends Model {
                             'one_needed' => "A camp should have at least one camp group."
                         ]
                     ];
+                }
+
+                if($enrolled_children_qty === 0) {
+                    continue;
                 }
 
                 $groups = CampGroup::ids($final_camp_group_ids)
