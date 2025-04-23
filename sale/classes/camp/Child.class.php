@@ -59,7 +59,7 @@ class Child extends Model {
                 'type'              => 'boolean',
                 'description'       => "Is the child living in a forster family/home.",
                 'default'           => false,
-                'onupdate'          => ['onupdateIsFoster']
+                'onupdate'          => 'onupdateIsFoster'
             ],
 
             'cpa_club' => [
@@ -147,4 +147,3 @@ class Child extends Model {
         }
     }
 }
-
