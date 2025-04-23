@@ -7,6 +7,16 @@
             "label": "Description",
             "description": "Description du document.",
             "help": ""
+        },
+        "enrollment_type": {
+            "label": "Description",
+            "description": "Description du document.",
+            "selection": {
+                "other": "Autre",
+                "help-ccvg": "Aide CCVG (Communauté de communes Vienne et Gartempe)",
+                "health-sheet": "Fiche sanitaire"
+            },
+            "help": ""
         }
     },
     "view": {
