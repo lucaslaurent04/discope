@@ -39,6 +39,11 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "is_locked",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "is_ase",
                                                 "width": "33%"
                                             },
@@ -95,6 +100,27 @@
                                             {
                                                 "type": "field",
                                                 "value": "enrollment_lines_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.reductions",
+                        "label": "Reductions",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "price_adapters_ids",
                                                 "width": "100%"
                                             }
                                         ]

@@ -1,46 +1,38 @@
 {
-    "name": "Enrollments",
+    "name": "Price Adapters",
     "layout": {
         "items": [
             {
                 "type": "field",
-                "value": "child_id",
+                "value": "name",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
             },
             {
                 "type": "field",
-                "value": "camp_id",
+                "value": "enrollment_id",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
             },
             {
                 "type": "field",
-                "value": "status",
+                "value": "price_adapter_type",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
             },
             {
                 "type": "field",
-                "value": "is_locked",
+                "value": "description",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
             },
             {
                 "type": "field",
-                "value": "is_ase",
-                "width": "20%",
-                "sortable": false,
-                "readonly": true,
-                "visible": false
-            },
-            {
-                "type": "field",
-                "value": "price",
+                "value": "amount",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true

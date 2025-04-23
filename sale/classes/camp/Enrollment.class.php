@@ -62,7 +62,8 @@ class Enrollment extends Model {
 
             'total' => [
                 'type'              => 'computed',
-                'result_type'       => 'integer',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:4',
                 'description'       => "Total price of the enrollment (VTA excluded).",
                 'store'             => true,
                 'function'          => 'calcTotal'
@@ -70,10 +71,17 @@ class Enrollment extends Model {
 
             'price' => [
                 'type'              => 'computed',
-                'result_type'       => 'integer',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:2',
                 'description'       => "Total price of the enrollment (VTA included).",
                 'store'             => true,
                 'function'          => 'calcPrice'
+            ],
+
+            'is_locked' => [
+                'type'              => 'boolean',
+                'description'       => "Can the enrollment be modified or not?",
+                'default'           => false
             ],
 
             'documents_ids' => [
@@ -89,6 +97,14 @@ class Enrollment extends Model {
                 'foreign_object'    => 'sale\camp\EnrollmentLine',
                 'description'       => "The lines who list the products of the child's enrollment.",
                 'ondetach'          => 'delete'
+            ],
+
+            'price_adapters_ids' => [
+                'type'              => 'one2many',
+                'foreign_field'     => 'enrollment_id',
+                'foreign_object'    => 'sale\camp\price\PriceAdapter',
+                'description'       => "The adapters of price for reductions.",
+                'ondetach'          => 'delete'
             ]
 
         ];
@@ -96,11 +112,18 @@ class Enrollment extends Model {
 
     public static function calcTotal($self): array {
         $result = [];
-        $self->read(['enrollment_lines_ids' => ['total']]);
+        $self->read([
+            'enrollment_lines_ids'  => ['total'],
+            'price_adapters_ids'    => ['amount']
+        ]);
         foreach($self as $id => $enrollment) {
             $total = 0.0;
             foreach($enrollment['enrollment_lines_ids'] as $enrollment_line) {
                 $total += $enrollment_line['total'];
+            }
+
+            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+                $total -= $price_adapter['amount'];
             }
 
             $result[$id] = $total;
@@ -111,11 +134,18 @@ class Enrollment extends Model {
 
     public static function calcPrice($self): array {
         $result = [];
-        $self->read(['enrollment_lines_ids' => ['price']]);
+        $self->read([
+            'enrollment_lines_ids'  => ['price'],
+            'price_adapters_ids'    => ['amount']
+        ]);
         foreach($self as $id => $enrollment) {
             $price = 0.0;
             foreach($enrollment['enrollment_lines_ids'] as $enrollment_line) {
                 $price += $enrollment_line['price'];
+            }
+
+            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+                $price -= $price_adapter['amount'];
             }
 
             $result[$id] = $price;
@@ -210,6 +240,7 @@ class Enrollment extends Model {
 
     public static function canupdate($self, $values): array {
         $self->read([
+            'is_locked',
             'child_id',
             'camp_id' => [
                 'id',
@@ -224,6 +255,10 @@ class Enrollment extends Model {
         ]);
 
         foreach($self as $enrollment) {
+            if($enrollment['is_locked']) {
+                return ['is_locked' => ['locked_enrollment' => "Cannot modify a locked enrollment."]];
+            }
+
             $status = $values['status'] ?? $enrollment['status'];
             if($status === 'pending') {
                 $pending_confirmed_enrollments_qty = 0;

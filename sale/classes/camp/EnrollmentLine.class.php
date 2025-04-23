@@ -31,10 +31,11 @@ class EnrollmentLine extends Model {
 
             'price_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'sale\price\Price',
+                'foreign_object'    => 'sale\camp\price\Price',
                 'description'       => "The price the line relates to (retrieved by price list).",
                 'required'          => true,
-                'domain'            => ['product_id', '=', 'object.product_id']
+                'domain'            => ['product_id', '=', 'object.product_id'],
+                'onupdate'          => 'onupdatePriceId'
             ],
 
             'qty' => [
@@ -182,29 +183,46 @@ class EnrollmentLine extends Model {
         $self->do('reset-enrollments-prices');
     }
 
-    public static function onupdateUnitPrice($self): void {
+    public static function onupdatePriceId($self) {
+        $self->update(['unit_price' => null, 'total' => null, 'price' => null]);
+
+        $self->do('reset-enrollments-prices');
+    }
+
+    public static function onupdateUnitPrice($self) {
         $self->update(['total' => null, 'price' => null]);
 
         $self->do('reset-enrollments-prices');
     }
 
-    public static function onupdateTotal($self): void {
+    public static function onupdateTotal($self) {
         $self->update(['price' => null]);
 
         $self->do('reset-enrollments-prices');
     }
 
-    public static function onupdateVatRate($self): void {
+    public static function onupdateVatRate($self) {
         $self->update(['price' => null]);
 
         $self->do('reset-enrollments-prices');
     }
 
-    public static function onupdatePrice($self): void {
+    public static function onupdatePrice($self) {
         $self->do('reset-enrollments-prices');
     }
 
-    public static function ondelete($self): void {
+    public static function ondelete($self) {
         $self->do('reset-enrollments-prices');
+    }
+
+    public static function canupdate($self, $values): array {
+        $self->read(['enrollment_id' => ['is_locked']]);
+        foreach($self as $enrollment_line) {
+            if($enrollment_line['is_locked']) {
+                return ['camp_id' => ['locked_enrollment' => "Cannot modify a line of a locked enrollment."]];
+            }
+        }
+
+        return parent::canupdate($self, $values);
     }
 }
