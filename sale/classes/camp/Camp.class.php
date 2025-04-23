@@ -293,14 +293,78 @@ class Camp extends Model {
 
     public static function canupdate($self, $values): array {
         $self->read([
+            'camp_groups_ids',
             'camp_group_qty',
             'enrollments_ids' => ['status']
         ]);
 
-        if(isset($values['employee_ratio'])) {
-            $enrolled_children_qty = 0;
-
+        if(isset($values['camp_groups_ids'])) {
             foreach($self as $camp) {
+                $enrolled_children_qty = 0;
+                foreach($camp['enrollments_ids'] as $enrollment) {
+                    if(in_array($enrollment['status'], ['pending', 'confirmed'])) {
+                        $enrolled_children_qty++;
+                    }
+                }
+                if($enrolled_children_qty === 0) {
+                    continue;
+                }
+
+                $values_camp_groups_ids = array_map(
+                    function($id) {
+                        return (int) $id;
+                    },
+                    $values['camp_groups_ids']
+                );
+
+                $to_add_camp_groups_ids = [];
+                $to_remove_camp_groups_ids = [];
+                foreach($values_camp_groups_ids as $id) {
+                    if($id > 0) {
+                        $to_add_camp_groups_ids[] = $id;
+                    }
+                    else {
+                        $to_remove_camp_groups_ids[] = $id * -1;
+                    }
+                }
+
+                $final_camp_group_ids = [];
+                foreach(array_merge($camp['camp_groups_ids'], $to_add_camp_groups_ids) as $id) {
+                    if(!in_array($id, $to_remove_camp_groups_ids)) {
+                        $final_camp_group_ids[] = $id;
+                    }
+                }
+                $final_camp_group_ids = array_unique($final_camp_group_ids);
+                if(empty($final_camp_group_ids)) {
+                    return [
+                        'camp_groups_ids' => [
+                            'one_needed' => "A camp should have at least one camp group."
+                        ]
+                    ];
+                }
+
+                $groups = CampGroup::ids($final_camp_group_ids)
+                    ->read(['max_children'])
+                    ->get();
+
+                $max_children = 0;
+                foreach($groups as $group) {
+                    $max_children += $group['max_children'];
+                }
+
+                if($enrolled_children_qty > $max_children) {
+                    return [
+                        'camp_groups_ids' => [
+                            'too_many_children' => "There is too many children enrolled in the camp groups."
+                        ]
+                    ];
+                }
+            }
+        }
+
+        if(isset($values['employee_ratio'])) {
+            foreach($self as $camp) {
+                $enrolled_children_qty = 0;
                 foreach($camp['enrollments_ids'] as $enrollment) {
                     if(in_array($enrollment['status'], ['pending', 'confirmed'])) {
                         $enrolled_children_qty++;
