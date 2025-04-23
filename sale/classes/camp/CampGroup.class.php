@@ -136,14 +136,14 @@ class CampGroup extends Model {
         $camps = Camp::ids(array_keys($map_camp_ids))
             ->read([
                 'camp_groups_ids'   => ['max_children'],
-                'children_ids'      => ['status']
+                'enrollments_ids'   => ['status']
             ])
             ->get();
 
         foreach($camps as $camp) {
             $enrolled_qty = 0;
-            foreach($camp['children_ids'] as $child) {
-                if(in_array($child['status'], ['pending', 'confirmed'])) {
+            foreach($camp['enrollments_ids'] as $enrollment) {
+                if(in_array($enrollment['status'], ['pending', 'confirmed'])) {
                     $enrolled_qty++;
                 }
             }
