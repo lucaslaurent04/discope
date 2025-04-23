@@ -71,6 +71,11 @@
                                                 "type": "field",
                                                 "value": "",
                                                 "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "accounting_code",
+                                                "width": "50%"
                                             }
                                         ]
                                     },
