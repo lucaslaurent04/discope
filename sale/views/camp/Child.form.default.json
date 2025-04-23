@@ -140,7 +140,7 @@
                         ]
                     },
                     {
-                        "id": "section.camps",
+                        "id": "section.enrollments",
                         "label": "Enrollments",
                         "visible": ["state", "<>", "draft"],
                         "rows": [

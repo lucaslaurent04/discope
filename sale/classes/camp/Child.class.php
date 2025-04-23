@@ -75,7 +75,7 @@ class Child extends Model {
             'year_licence_ffe' => [
                 'type'              => 'integer',
                 'usage'             => 'number/integer{2000,'.date('Y').'}',
-                'description'       => "Year the licence ffe was acquired"
+                'description'       => "Year the licence ffe was acquired."
             ],
 
             'camp_class' => [
@@ -102,7 +102,7 @@ class Child extends Model {
             'institution_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Institution',
-                'description'       => "The booking the composition relates to.",
+                'description'       => "The institution that is taking care or the child.",
                 'visible'           => ['is_foster', '=', true]
             ],
 
