@@ -134,6 +134,12 @@ class Camp extends Model {
                 'default'           => 4
             ],
 
+            'accounting_code' => [
+                'type'              => 'string',
+                'description'       => "Specific accounting code for the camp.",
+                'unique'            => true
+            ],
+
             'need_license_ffe' => [
                 'type'              => 'boolean',
                 'description'       => "Does the camp requires to child to have a 'licence fédération française équitation'.",
