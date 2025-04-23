@@ -142,6 +142,26 @@
                         ]
                     },
                     {
+                        "id": "section.child-health-remarks",
+                        "label": "Child health remarks",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "child_health_remarks",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "id": "section.documents",
                         "label": "Documents",
                         "visible": ["state", "<>", "draft"],

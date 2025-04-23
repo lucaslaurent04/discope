@@ -33,6 +33,12 @@ class Enrollment extends Model {
                 'required'          => true
             ],
 
+            'child_health_remarks' => [
+                'type'              => 'string',
+                'usage'             => 'text/plain',
+                'description'       => "Remarks about the child's health at the time of the enrollment."
+            ],
+
             'camp_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Camp',
