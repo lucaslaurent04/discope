@@ -63,6 +63,9 @@
                 },
                 "section.price-adapters": {
                     "label": "Réductions"
+                },
+                "section.child-health-remarks": {
+                    "label": "Remarques santé enfant"
                 }
             }
         },
