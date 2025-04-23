@@ -180,7 +180,8 @@ class Camp extends Model {
                 'foreign_field'     => 'camps_ids',
                 'rel_table'         => 'sale_hr_rel_camp_employee',
                 'rel_foreign_key'   => 'employee_id',
-                'rel_local_key'     => 'camp_id'
+                'rel_local_key'     => 'camp_id',
+                'description'       => "Employees that will take care of the children during the camp."
             ],
 
             'enrollments_ids' => [
