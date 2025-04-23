@@ -1236,7 +1236,6 @@ class BookingLine extends Model {
 
                     if (!empty($prices_ids)) {
                         $result[$line_id] = reset($prices_ids);
-                        file_put_contents('/var/www/html/log/error.log', " searchPriceId In the if  rate_class_id" . PHP_EOL, FILE_APPEND);
                         break;
                     }
 
@@ -1246,7 +1245,6 @@ class BookingLine extends Model {
                     ]);
 
                     if (!empty($prices_ids)) {
-                        file_put_contents('/var/www/html/log/error.log', " searchPriceId Not  rate_class_id" . PHP_EOL, FILE_APPEND);
                         $result[$line_id] = reset($prices_ids);
                         break;
                     }
