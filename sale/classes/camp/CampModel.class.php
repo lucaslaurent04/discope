@@ -13,7 +13,7 @@ use equal\orm\Model;
 class CampModel extends Model {
 
     public static function getDescription(): string {
-        return "Modal that acts as a creation base for new camps.";
+        return "Model that acts as a creation base for new camps.";
     }
 
     public static function getColumns(): array {

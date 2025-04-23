@@ -34,6 +34,46 @@
             "label": "Types de réservations",
             "help": ""
         },
+        "sale.camp": {
+            "label": "Camps",
+            "help": ""
+        },
+        "sales.camp.camp-models": {
+            "label": "Modèles",
+            "help": ""
+        },
+        "sales.camp.camps" : {
+            "label": "Camps",
+            "help": ""
+        },
+        "sale.camp.catalog" : {
+            "label": "Catalogue",
+            "help": ""
+        },
+        "sale.camp.catalog.products" : {
+            "label": "Produits",
+            "help": ""
+        },
+        "sale.camp.catalog.product-models" : {
+            "label": "Modèles",
+            "help": ""
+        },
+        "sale.camp.people" : {
+            "label": "Participants",
+            "help": ""
+        },
+        "sale.camp.people.children" : {
+            "label": "Enfants",
+            "help": ""
+        },
+        "sale.camp.people.guardians" : {
+            "label": "Tuteurs",
+            "help": ""
+        },
+        "sale.camp.people.institutes" : {
+            "label": "Institutions",
+            "help": ""
+        },
         "sales.tour_operators": {
             "label": "Tour Opérateurs",
             "help": ""

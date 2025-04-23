@@ -65,7 +65,7 @@
             {
                 "sections": [
                     {
-                        "id": "section.children_ids",
+                        "id": "section.children",
                         "label": "children",
                         "rows": [
                             {
