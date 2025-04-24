@@ -126,4 +126,29 @@ class Guardian extends Model {
 
         return $result;
     }
+
+    public static function ondelete($self, $values): void {
+        $self->read(['children_ids' => ['main_guardian_id', 'guardians_ids']]);
+
+        $map_del_guardian_ids = [];
+        foreach($self as $id => $guardian) {
+            $map_del_guardian_ids[$id] = true;
+        }
+
+        foreach($self as $guardian) {
+            foreach($guardian['children_ids'] as $cid => $child) {
+                $new_main_guardian_id = null;
+                foreach($child['children_ids']['guardians_ids'] as $guardian) {
+                    if(!isset($map_del_guardian_ids[$guardian['id']])) {
+                        $new_main_guardian_id = $guardian['id'];
+                        break;
+                    }
+                }
+
+                Child::id($cid)->update(['main_guardian_id' => $new_main_guardian_id]);
+            }
+        }
+
+        parent::ondelete($self, $values);
+    }
 }

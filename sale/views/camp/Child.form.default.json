@@ -103,27 +103,6 @@
             {
                 "sections": [
                     {
-                        "id": "section.skills",
-                        "label": "Skills",
-                        "visible": ["state", "<>", "draft"],
-                        "rows": [
-                            {
-                                "columns": [
-                                    {
-                                        "width": "100%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "skills_ids",
-                                                "width": "100%"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
                         "id": "section.guardians",
                         "label": "Guardians",
                         "visible": ["state", "<>", "draft"],
@@ -133,6 +112,11 @@
                                     {
                                         "width": "100%",
                                         "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "main_guardian_id",
+                                                "width": "15%"
+                                            },
                                             {
                                                 "type": "field",
                                                 "value": "guardians_ids",
@@ -157,6 +141,27 @@
                                             {
                                                 "type": "field",
                                                 "value": "enrollments_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.skills",
+                        "label": "Skills",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "skills_ids",
                                                 "width": "100%"
                                             }
                                         ]
