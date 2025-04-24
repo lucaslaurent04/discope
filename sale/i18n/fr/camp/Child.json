@@ -32,6 +32,11 @@
             "description": "Est-ce que l'enfant vit dans une famille accueil.",
             "help": ""
         },
+        "is_cpa_member": {
+            "label": "Membre CPA",
+            "description": "Est membre d'un 'centre plein air'?",
+            "help": ""
+        },
         "cpa_club": {
             "label": "Club CPA",
             "description": "Nom du 'centre plein air' dont l'enfant fait partie.",

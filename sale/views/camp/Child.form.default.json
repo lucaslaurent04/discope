@@ -54,6 +54,11 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "value": "is_cpa_member",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "cpa_club",
                                                 "width": "50%"
                                             },
