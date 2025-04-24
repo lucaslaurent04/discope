@@ -66,6 +66,11 @@
             "label": "Institution",
             "description": "L'institution qui prend en charge l'enfant.",
             "help": ""
+        },
+        "main_guardian_id": {
+            "label": "Tuteur principal",
+            "description": "Le tuteur principal responsable de l'enfant.",
+            "help": "Utilisé pour savoir quelle adresse utiliser pour la facturation."
         }
     },
     "view": {
@@ -77,7 +82,7 @@
                     "label": "Compétences"
                 },
                 "section.guardians": {
-                    "label": "Gardiens"
+                    "label": "Tuteurs"
                 },
                 "section.enrollments": {
                     "label": "Inscriptions"
