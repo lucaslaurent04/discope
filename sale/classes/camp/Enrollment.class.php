@@ -80,6 +80,11 @@ class Enrollment extends Model {
                 'default'           => 'pending'
             ],
 
+            'cancellation_date' => [
+                'type'              => 'date',
+                'description'       => "Date of cancellation."
+            ],
+
             'is_ase' => [
                 'type'              => 'boolean',
                 'description'       => "Is \"aide sociale à l'enfance\".",
@@ -238,6 +243,10 @@ class Enrollment extends Model {
         $self->update(['is_locked' => true]);
     }
 
+    public static function onafterCancel($self) {
+        $self->update(['cancellation_date' => time()]);
+    }
+
     public static function getWorkflow(): array {
         return [
 
@@ -251,7 +260,8 @@ class Enrollment extends Model {
                     ],
                     'cancel' => [
                         'status'        => 'canceled',
-                        'description'   => "Cancel the pending enrollment."
+                        'description'   => "Cancel the pending enrollment.",
+                        'onafter'       => 'onafterCancel'
                     ]
                 ]
             ],
@@ -266,7 +276,8 @@ class Enrollment extends Model {
                     ],
                     'cancel' => [
                         'status'        => 'canceled',
-                        'description'   => "Cancel the waiting enrollment."
+                        'description'   => "Cancel the waiting enrollment.",
+                        'onafter'       => 'onafterCancel'
                     ]
                 ]
             ],
@@ -276,7 +287,8 @@ class Enrollment extends Model {
                 'transitions' => [
                     'cancel' => [
                         'status'        => 'canceled',
-                        'description'   => "Cancel the confirmed enrollment."
+                        'description'   => "Cancel the confirmed enrollment.",
+                        'onafter'       => 'onafterCancel'
                     ]
                 ]
             ],
