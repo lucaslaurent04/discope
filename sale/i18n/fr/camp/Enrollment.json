@@ -8,9 +8,14 @@
             "description": "L'enfant à inscrire.",
             "help": ""
         },
-        "child_health_remarks": {
-            "label": "Remarque santé",
-            "description": "Remarques à propos de la santé de l'enfant au moment de l'inscription.",
+        "child_remarks": {
+            "label": "Remarques",
+            "description": "Remarques à propos de l'enfant, de sa santé au moment de l'inscription, ...",
+            "help": ""
+        },
+        "child_age": {
+            "label": "Age enfant",
+            "description": "Age de l'enfant au moment du camp.",
             "help": ""
         },
         "camp_id": {
@@ -64,8 +69,8 @@
                 "section.price-adapters": {
                     "label": "Réductions"
                 },
-                "section.child-health-remarks": {
-                    "label": "Remarques santé enfant"
+                "section.child-remarks": {
+                    "label": "Remarques enfant"
                 }
             }
         },

@@ -137,7 +137,8 @@ class Camp extends Model {
             'accounting_code' => [
                 'type'              => 'string',
                 'description'       => "Specific accounting code for the camp.",
-                'unique'            => true
+                'unique'            => true,
+                'required'          => true
             ],
 
             'need_license_ffe' => [
