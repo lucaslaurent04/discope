@@ -138,9 +138,9 @@ class Guardian extends Model {
         foreach($self as $guardian) {
             foreach($guardian['children_ids'] as $cid => $child) {
                 $new_main_guardian_id = null;
-                foreach($child['children_ids']['guardians_ids'] as $guardian) {
-                    if(!isset($map_del_guardian_ids[$guardian['id']])) {
-                        $new_main_guardian_id = $guardian['id'];
+                foreach($child['children_ids']['guardians_ids'] as $g) {
+                    if(!isset($map_del_guardian_ids[$g['id']])) {
+                        $new_main_guardian_id = $g['id'];
                         break;
                     }
                 }
