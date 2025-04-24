@@ -18,13 +18,6 @@
             },
             {
                 "type": "field",
-                "value": "is_locked",
-                "width": "20%",
-                "sortable": false,
-                "readonly": true
-            },
-            {
-                "type": "field",
                 "value": "is_ase",
                 "width": "20%",
                 "sortable": false,

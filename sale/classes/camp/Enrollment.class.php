@@ -231,6 +231,13 @@ class Enrollment extends Model {
         ];
     }
 
+    /**
+     * Lock enrollment after status to confirm
+     */
+    public static function onafterConfirm($self) {
+        $self->update(['is_locked' => true]);
+    }
+
     public static function getWorkflow(): array {
         return [
 
@@ -239,7 +246,8 @@ class Enrollment extends Model {
                 'transitions' => [
                     'confirm' => [
                         'status'        => 'confirmed',
-                        'description'   => "Confirm the pending enrollment."
+                        'description'   => "Confirm the pending enrollment.",
+                        'onafter'       => 'onafterConfirm'
                     ],
                     'cancel' => [
                         'status'        => 'canceled',
