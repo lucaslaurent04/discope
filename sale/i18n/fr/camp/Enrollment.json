@@ -23,6 +23,16 @@
             "description": "Camp auquel l'enfant s'inscrit.",
             "help": ""
         },
+        "camp_class": {
+            "label": "Classe camp de l'enfant",
+            "description": "La classe du camp de l'enfant pour l'inscription, pour savoir quel prix utiliser.",
+            "help": "",
+            "selection": {
+                "other": "Autre",
+                "member": "Membre",
+                "close-member": "Membre proche"
+            }
+        },
         "status": {
             "label": "Status",
             "description": "Status de l'inscription.",

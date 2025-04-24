@@ -259,6 +259,9 @@ class Camp extends Model {
         return $result;
     }
 
+    /**
+     * Sync camp model required skills and documents with the camp.
+     */
     public static function onupdateCampModelId($self) {
         $self->read(['camp_model_id' => ['required_skills_ids', 'required_documents_ids']]);
         foreach($self as $id => $camp) {
@@ -279,6 +282,9 @@ class Camp extends Model {
         }
     }
 
+    /**
+     * Creates first camp group that is necessary.
+     */
     public static function onupdate($self, $values) {
         $self->read(['camp_groups_ids']);
         foreach($self as $id => $camp) {
@@ -300,6 +306,7 @@ class Camp extends Model {
             'enrollments_ids' => ['status']
         ]);
 
+        // Checks that modification of camp groups still allows enough enrollments
         if(isset($values['camp_groups_ids'])) {
             foreach($self as $camp) {
                 $enrolled_children_qty = 0;
@@ -365,6 +372,7 @@ class Camp extends Model {
             }
         }
 
+        // Checks that modification of employee ratio still allows enough enrollments
         if(isset($values['employee_ratio'])) {
             foreach($self as $camp) {
                 $enrolled_children_qty = 0;
