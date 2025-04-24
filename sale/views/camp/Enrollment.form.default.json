@@ -76,18 +76,23 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "",
-                                                "width": "33%"
+                                                "value": "camp_class",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "camp_class",
+                                                "width": "25%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "total",
-                                                "width": "33%"
+                                                "width": "25%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "price",
-                                                "width": "33%"
+                                                "width": "25%"
                                             }
                                         ]
                                     }
