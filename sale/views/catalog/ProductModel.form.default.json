@@ -221,6 +221,11 @@
                                                 "type": "field",
                                                 "value": "is_supply",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_camp",
+                                                "width": "50%"
                                             }
                                         ]
                                     },

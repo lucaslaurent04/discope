@@ -1,0 +1,54 @@
+{
+    "name": "Institution",
+    "plural": "Institutions",
+    "description": "Institution responsable d'un enfant.",
+    "model": {
+        "address_street": {
+            "label": "Rue",
+            "description": "Street and number of the child's institution.",
+            "help": ""
+        },
+        "address_dispatch": {
+            "label": "Complément d'adresse",
+            "description": "Infos optionnelles pour l'envoi du courrier.",
+            "help": ""
+        },
+        "address_zip": {
+            "label": "Code Postal",
+            "description": "Code Postal.",
+            "help": ""
+        },
+        "address_city": {
+            "label": "Ville",
+            "description": "Ville.",
+            "help": ""
+        },
+        "email": {
+            "label": "Email",
+            "description": "Adresse e-mail.",
+            "help": ""
+        },
+        "phone": {
+            "label": "Téléphone",
+            "description": "Numéro de téléphone.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Institution",
+            "description": "",
+            "layout": {
+                "section.children": {
+                    "label": "Enfants"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Institutions",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}

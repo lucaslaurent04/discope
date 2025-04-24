@@ -1,0 +1,99 @@
+{
+    "name": "Enfant",
+    "plural": "Enfants",
+    "description": "Enfant qui participe à un camp.",
+    "model": {
+        "firstname": {
+            "label": "Prénom",
+            "description": "Prénom de l'enfant.",
+            "help": ""
+        },
+        "lastname": {
+            "label": "Nom",
+            "description": "Nom de famille de l'enfant.",
+            "help": ""
+        },
+        "birthdate": {
+            "label": "Date de naissance",
+            "description": "La date de naissance de l'enfant.",
+            "help": ""
+        },
+        "gender": {
+            "label": "Genre",
+            "description": "Le genre de l'enfant.",
+            "help": "",
+            "selection": {
+                "F": "Féminin",
+                "M": "Masculin"
+            }
+        },
+        "is_foster": {
+            "label": "Famille d'accueil",
+            "description": "Est-ce que l'enfant vit dans une famille accueil.",
+            "help": ""
+        },
+        "is_cpa_member": {
+            "label": "Membre CPA",
+            "description": "Est membre d'un 'centre plein air'?",
+            "help": ""
+        },
+        "cpa_club": {
+            "label": "Club CPA",
+            "description": "Nom du 'centre plein air' dont l'enfant fait partie.",
+            "help": ""
+        },
+        "licence_ffe": {
+            "label": "Licence FFE",
+            "description": "Licence 'fédération française équitation'.",
+            "help": ""
+        },
+        "year_licence_ffe": {
+            "label": "Année licence FFE",
+            "description": "Année d'acquisition de la licence FFE.",
+            "help": ""
+        },
+        "camp_class": {
+            "label": "Classe camp",
+            "description": "La classe du camp, pour savoir quel prix utiliser.",
+            "help": "",
+            "selection": {
+                "other": "Autre",
+                "member": "Membre",
+                "close-member": "Membre proche"
+            }
+        },
+        "institution_id": {
+            "label": "Institution",
+            "description": "L'institution qui prend en charge l'enfant.",
+            "help": ""
+        },
+        "main_guardian_id": {
+            "label": "Tuteur principal",
+            "description": "Le tuteur principal responsable de l'enfant.",
+            "help": "Utilisé pour savoir quelle adresse utiliser pour la facturation."
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Enfant",
+            "description": "",
+            "layout": {
+                "section.skills": {
+                    "label": "Compétences"
+                },
+                "section.guardians": {
+                    "label": "Tuteurs"
+                },
+                "section.enrollments": {
+                    "label": "Inscriptions"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Enfants",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}

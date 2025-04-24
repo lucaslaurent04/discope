@@ -1,0 +1,30 @@
+{
+    "name": "Prix",
+    "plural": "Prix",
+    "description": "Prix d'un camp.",
+    "model": {
+        "camp_class": {
+            "label": "Classe camp",
+            "description": "La classe du camp, pour savoir quel prix utiliser.",
+            "help": "",
+            "selection": {
+                "other": "Autre",
+                "member": "Membre",
+                "close-member": "Membre proche"
+            }
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Prix",
+            "description": "",
+            "layout": []
+        },
+        "list.default": {
+            "name": "Prix",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}
