@@ -1,0 +1,103 @@
+{
+    "name": "Inscription",
+    "plural": "Inscriptions",
+    "description": "L'inscription d'un enfant à un camp.",
+    "model": {
+        "child_id": {
+            "label": "Enfant",
+            "description": "L'enfant à inscrire.",
+            "help": ""
+        },
+        "child_remarks": {
+            "label": "Remarques",
+            "description": "Remarques à propos de l'enfant, de sa santé au moment de l'inscription, ...",
+            "help": ""
+        },
+        "child_age": {
+            "label": "Age enfant",
+            "description": "Age de l'enfant au moment du camp.",
+            "help": ""
+        },
+        "camp_id": {
+            "label": "Camp",
+            "description": "Camp auquel l'enfant s'inscrit.",
+            "help": ""
+        },
+        "camp_class": {
+            "label": "Classe camp de l'enfant",
+            "description": "La classe du camp de l'enfant pour l'inscription, pour savoir quel prix utiliser.",
+            "help": "",
+            "selection": {
+                "other": "Autre",
+                "member": "Membre",
+                "close-member": "Membre proche"
+            }
+        },
+        "status": {
+            "label": "Status",
+            "description": "Status de l'inscription.",
+            "help": "",
+            "selection": {
+                "pending": "En cours",
+                "waitlisted": "Sur liste d'attente",
+                "confirmed": "Confirmée",
+                "canceled": "Annulée"
+            }
+        },
+        "is_ase": {
+            "label": "ASE",
+            "description": "Est \"aide sociale à l'enfance\".",
+            "help": ""
+        },
+        "total": {
+            "label": "Prix (HTVA)",
+            "description": "Prix de l'inscription (Hors TVA).",
+            "help": ""
+        },
+        "price": {
+            "label": "Prix (TVAC)",
+            "description": "Prix de l'inscription (TVA comprise).",
+            "help": ""
+        },
+        "is_locked": {
+            "label": "Verrouillée",
+            "description": "Est-ce que l'inscription peut-être modifiée?",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Inscription",
+            "description": "",
+            "layout": {
+                "action.transition.pending": {
+                    "label": "En cours"
+                },
+                "action.transition.confirm": {
+                    "label": "Confirm"
+                },
+                "action.transition.cancel": {
+                    "label": "Annuler"
+                },
+                "section.documents": {
+                    "label": "Documents"
+                },
+                "section.lines": {
+                    "label": "Lignes"
+                },
+                "section.price-adapters": {
+                    "label": "Réductions"
+                },
+                "section.child-remarks": {
+                    "label": "Remarques enfant"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Inscriptions",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}

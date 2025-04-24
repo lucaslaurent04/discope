@@ -1,0 +1,132 @@
+{
+    "name": "Camp",
+    "plural": "Camps",
+    "description": "Camp d'activités.",
+    "model": {
+        "status": {
+            "label": "Status",
+            "description": "Status du camp.",
+            "help": "",
+            "selection": {
+                "pending": "En cours",
+                "canceled": "Annulé"
+            }
+        },
+        "remarks": {
+            "label": "Remarques",
+            "description": "Description du camp.",
+            "help": ""
+        },
+        "public_description": {
+            "label": "Description publique",
+            "description": "Description publique du camp.",
+            "help": ""
+        },
+        "date_from": {
+            "label": "Du",
+            "description": "Début du camp.",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "Fin du camp.",
+            "help": ""
+        },
+        "product_id": {
+            "label": "Produit",
+            "description": "Le produit de vente du camp.",
+            "help": ""
+        },
+        "camp_type": {
+            "label": "Type",
+            "description": "Type de camp.",
+            "help": "",
+            "selection": {
+                "week": "Semaine",
+                "weekend": "Week-end"
+            }
+        },
+        "camp_model_id": {
+            "label": "Modèle",
+            "description": "Modèle qui a été utilisé pour créé le camp.",
+            "help": ""
+        },
+        "with_accommodation": {
+            "label": "Avec logement",
+            "description": "Est-ce que le camp le logement?",
+            "help": ""
+        },
+        "min_age": {
+            "label": "Age min",
+            "description": "Age minimum des participants.",
+            "help": ""
+        },
+        "max_age": {
+            "label": "Age max",
+            "description": "Age maximum des participants.",
+            "help": ""
+        },
+        "employee_ratio": {
+            "label": "Ratio employé",
+            "description": "La quantité d'enfants qu'un employé peut géré seul.",
+            "help": ""
+        },
+        "max_children": {
+            "label": "Max enfants",
+            "description": "Quantité maximal d'enfants qui peuvent participés au camp.",
+            "help": ""
+        },
+        "camp_group_qty": {
+            "label": "Quantité de groupes",
+            "description": "La quanitités des groupes d'enfants du camp.",
+            "help": ""
+        },
+        "ase_quota": {
+            "label": "Quota ASE",
+            "description": "Max d'enfants \"Aide social à l'enfance\" pour ce camp.",
+            "help": ""
+        },
+        "accounting_code": {
+            "label": "Code comptable",
+            "description": "Code comptable du camp.",
+            "help": ""
+        },
+        "need_license_ffe": {
+            "label": "Besoin licence FFE",
+            "description": "Est-ce que les enfants on besoin d'une 'licence fédération française équitation' pour participé au camp.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Camp",
+            "description": "",
+            "layout": {
+                "section.descriptions": {
+                    "label": "Descriptions"
+                },
+                "section.camp-groups": {
+                    "label": "Groupes"
+                },
+                "section.enrollments": {
+                    "label": "Inscriptions"
+                },
+                "section.employees": {
+                    "label": "Employés"
+                },
+                "section.required-skills": {
+                    "label": "Compétences requises"
+                },
+                "section.required-documents": {
+                    "label": "Documents requis"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Camps",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": []
+}

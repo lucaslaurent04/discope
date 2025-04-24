@@ -241,6 +241,141 @@
                         ]
                     },
                     {
+                        "id": "sales.camp",
+                        "label": "Camps",
+                        "description": "",
+                        "icon": "forest",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "sales.camp.camp-models",
+                                "type": "entry",
+                                "label": "Camp Models",
+                                "description": "",
+                                "icon": "cabin",
+                                "context": {
+                                    "entity": "sale\\camp\\CampModel",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "sales.camp.camps",
+                                "type": "entry",
+                                "label": "Camps",
+                                "description": "",
+                                "icon": "holiday_village",
+                                "context": {
+                                    "entity": "sale\\camp\\Camp",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "sales.camp.people",
+                                "label": "People",
+                                "description": "",
+                                "icon": "family_restroom",
+                                "type": "parent",
+                                "children": [
+                                    {
+                                        "id": "sales.camp.people.children",
+                                        "type": "entry",
+                                        "label": "Children",
+                                        "description": "",
+                                        "icon": "boy",
+                                        "context": {
+                                            "entity": "sale\\camp\\Child",
+                                            "view": "list.default"
+                                        }
+                                    },
+                                    {
+                                        "id": "sales.camp.people.guardians",
+                                        "type": "entry",
+                                        "label": "Guardians",
+                                        "description": "",
+                                        "icon": "escalator_warning",
+                                        "context": {
+                                            "entity": "sale\\camp\\Guardian",
+                                            "view": "list.default"
+                                        }
+                                    },
+                                    {
+                                        "id": "sales.camp.people.institutes",
+                                        "type": "entry",
+                                        "label": "Institutions",
+                                        "description": "",
+                                        "icon": "supervisor_account",
+                                        "context": {
+                                            "entity": "sale\\camp\\Institution",
+                                            "view": "list.default"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "sales.camp.catalog",
+                                "label": "Catalog",
+                                "description": "",
+                                "icon": "library_books",
+                                "type": "parent",
+                                "children": [
+                                    {
+                                        "id": "sales.camp.catalog.products",
+                                        "type": "entry",
+                                        "label": "Products",
+                                        "description": "",
+                                        "context": {
+                                            "entity": "sale\\camp\\catalog\\Product",
+                                            "view": "list.default",
+                                            "domain": ["is_camp", "=", true]
+                                        }
+                                    },
+                                    {
+                                        "id": "sales.camp.catalog.product-models",
+                                        "type": "entry",
+                                        "label": "Products Models",
+                                        "description": "",
+                                        "context": {
+                                            "entity": "sale\\camp\\catalog\\ProductModel",
+                                            "view": "list.default",
+                                            "domain": ["is_camp", "=", true]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "sales.camp.requirements",
+                                "label": "Requirements",
+                                "description": "",
+                                "icon": "checklist_rtl",
+                                "type": "parent",
+                                "children": [
+                                    {
+                                        "id": "sales.camp.requirements.skills",
+                                        "type": "entry",
+                                        "label": "Skills",
+                                        "description": "",
+                                        "icon": "sports_handball",
+                                        "context": {
+                                            "entity": "sale\\camp\\Skill",
+                                            "view": "list.default"
+                                        }
+                                    },
+                                    {
+                                        "id": "sales.camp.requirements.documents",
+                                        "type": "entry",
+                                        "label": "Documents",
+                                        "description": "",
+                                        "icon": "task",
+                                        "context": {
+                                            "entity": "sale\\camp\\Document",
+                                            "view": "list.default"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "id": "sales.providers",
                         "label": "Providers",
                         "description": "",
