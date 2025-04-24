@@ -33,10 +33,18 @@ class Enrollment extends Model {
                 'required'          => true
             ],
 
-            'child_health_remarks' => [
+            'child_remarks' => [
                 'type'              => 'string',
                 'usage'             => 'text/plain',
                 'description'       => "Remarks about the child's health at the time of the enrollment."
+            ],
+
+            'child_age' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => "The age of the child during the camp.",
+                'store'             => true,
+                'function'          => 'calcChildAge'
             ],
 
             'camp_id' => [
@@ -114,6 +122,21 @@ class Enrollment extends Model {
             ]
 
         ];
+    }
+
+    public static function calcChildAge($self): array {
+        $result = [];
+        $self->read([
+            'camp_id'   => ['date_from'],
+            'child_id'  => ['birthdate']
+        ]);
+        foreach($self as $id => $enrollment) {
+            $date_from = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from']);
+            $birthdate = (new \DateTime())->setTimestamp($enrollment['child_id']['birthdate']);
+            $result[$id] = $birthdate->diff($date_from)->y;
+        }
+
+        return $result;
     }
 
     public static function calcTotal($self): array {

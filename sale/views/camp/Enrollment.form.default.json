@@ -51,7 +51,7 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "is_locked",
+                                                "value": "child_age",
                                                 "width": "33%"
                                             },
                                             {
@@ -142,8 +142,8 @@
                         ]
                     },
                     {
-                        "id": "section.child-health-remarks",
-                        "label": "Child health remarks",
+                        "id": "section.child-remarks",
+                        "label": "Child remarks",
                         "rows": [
                             {
                                 "columns": [
@@ -152,7 +152,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "child_health_remarks",
+                                                "value": "child_remarks",
                                                 "width": "100%"
                                             }
                                         ]
