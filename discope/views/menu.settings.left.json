@@ -241,7 +241,7 @@
                         ]
                     },
                     {
-                        "id": "sale.camp",
+                        "id": "sales.camp",
                         "label": "Camps",
                         "description": "",
                         "icon": "forest",
@@ -270,14 +270,56 @@
                                 }
                             },
                             {
-                                "id": "sale.camp.catalog",
+                                "id": "sales.camp.people",
+                                "label": "People",
+                                "description": "",
+                                "icon": "family_restroom",
+                                "type": "parent",
+                                "children": [
+                                    {
+                                        "id": "sales.camp.people.children",
+                                        "type": "entry",
+                                        "label": "Children",
+                                        "description": "",
+                                        "icon": "boy",
+                                        "context": {
+                                            "entity": "sale\\camp\\Child",
+                                            "view": "list.default"
+                                        }
+                                    },
+                                    {
+                                        "id": "sales.camp.people.guardians",
+                                        "type": "entry",
+                                        "label": "Guardians",
+                                        "description": "",
+                                        "icon": "escalator_warning",
+                                        "context": {
+                                            "entity": "sale\\camp\\Guardian",
+                                            "view": "list.default"
+                                        }
+                                    },
+                                    {
+                                        "id": "sales.camp.people.institutes",
+                                        "type": "entry",
+                                        "label": "Institutions",
+                                        "description": "",
+                                        "icon": "supervisor_account",
+                                        "context": {
+                                            "entity": "sale\\camp\\Institution",
+                                            "view": "list.default"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "sales.camp.catalog",
                                 "label": "Catalog",
                                 "description": "",
                                 "icon": "library_books",
                                 "type": "parent",
                                 "children": [
                                     {
-                                        "id": "sale.camp.catalog.products",
+                                        "id": "sales.camp.catalog.products",
                                         "type": "entry",
                                         "label": "Products",
                                         "description": "",
@@ -288,7 +330,7 @@
                                         }
                                     },
                                     {
-                                        "id": "sale.camp.catalog.product-models",
+                                        "id": "sales.camp.catalog.product-models",
                                         "type": "entry",
                                         "label": "Products Models",
                                         "description": "",
@@ -301,39 +343,31 @@
                                 ]
                             },
                             {
-                                "id": "sale.camp.people",
-                                "label": "People",
+                                "id": "sales.camp.requirements",
+                                "label": "Requirements",
                                 "description": "",
-                                "icon": "escalator_warning",
+                                "icon": "checklist_rtl",
                                 "type": "parent",
                                 "children": [
                                     {
-                                        "id": "sale.camp.people.children",
+                                        "id": "sales.camp.requirements.skills",
                                         "type": "entry",
-                                        "label": "Children",
+                                        "label": "Skills",
                                         "description": "",
+                                        "icon": "sports_handball",
                                         "context": {
-                                            "entity": "sale\\camp\\Child",
+                                            "entity": "sale\\camp\\Skill",
                                             "view": "list.default"
                                         }
                                     },
                                     {
-                                        "id": "sale.camp.people.guardians",
+                                        "id": "sales.camp.requirements.documents",
                                         "type": "entry",
-                                        "label": "Guardians",
+                                        "label": "Documents",
                                         "description": "",
+                                        "icon": "task",
                                         "context": {
-                                            "entity": "sale\\camp\\Guardian",
-                                            "view": "list.default"
-                                        }
-                                    },
-                                    {
-                                        "id": "sale.camp.people.institutes",
-                                        "type": "entry",
-                                        "label": "Institutions",
-                                        "description": "",
-                                        "context": {
-                                            "entity": "sale\\camp\\Institution",
+                                            "entity": "sale\\camp\\Document",
                                             "view": "list.default"
                                         }
                                     }
