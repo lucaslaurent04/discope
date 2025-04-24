@@ -25,7 +25,6 @@ class EnrollmentLine extends Model {
                 'foreign_object'    => 'sale\camp\catalog\Product',
                 'description'       => "The product targeted by the line.",
                 'required'          => true,
-                'readonly'          => true,
                 'domain'            => ['is_camp', '=', true]
             ],
 

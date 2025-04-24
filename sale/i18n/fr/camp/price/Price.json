@@ -4,7 +4,7 @@
     "description": "Prix d'un camp.",
     "model": {
         "camp_class": {
-            "label": "Classe",
+            "label": "Classe camp",
             "description": "La classe du camp, pour savoir quel prix utiliser.",
             "help": "",
             "selection": {

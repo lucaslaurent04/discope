@@ -9,6 +9,7 @@
 namespace sale\camp;
 
 use equal\orm\Model;
+use sale\camp\price\Price;
 
 class Enrollment extends Model {
 
@@ -53,6 +54,18 @@ class Enrollment extends Model {
                 'description'       => "The camp the child is enrolled to.",
                 'required'          => true,
                 'onupdate'          => 'onupdateCampId'
+            ],
+
+            'camp_class' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'other',
+                    'member',
+                    'close-member'
+                ],
+                'description'       => "The camp class of the child for this enrollment, to know which price to apply.",
+                'default'           => 'other',
+                'onupdate'          => 'onupdateCampClass'
             ],
 
             'status' => [
@@ -183,7 +196,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function policyRemoveFromWaitlist($self) {
+    public static function policyRemoveFromWaitlist($self): array {
         $result = [];
         $self->read([
             'camp_id' => [
@@ -200,7 +213,7 @@ class Enrollment extends Model {
             }
 
             if($pending_confirmed_enrollments_qty >= $enrollment['camp_id']['max_children']) {
-                return ['camp_id' => ['full' => "The camp is full."]];
+                return ['camp_id' => ['camp_full' => "The camp is full."]];
             }
         }
 
@@ -358,6 +371,9 @@ class Enrollment extends Model {
         return parent::cancreate($self, $values);
     }
 
+    /**
+     * Creates the first enrollment line with the camp product.
+     */
     public static function onupdateCampId($self) {
         $self->read([
             'child_id'  => [
@@ -390,6 +406,38 @@ class Enrollment extends Model {
                 'price_id'      => $camp_class_price['id'],
                 'qty'           => 1
             ]);
+        }
+    }
+
+    /**
+     * Adapts the lines prices to the new camp_class.
+     */
+    public static function onupdateCampClass($self) {
+        $self->read([
+            'camp_class',
+            'enrollment_lines_ids' => [
+                'product_id',
+                'price_id' => ['camp_class']
+            ]
+        ]);
+        foreach($self as $enrollment) {
+            foreach($enrollment['enrollment_lines_ids'] as $lid => $line) {
+                if(is_null($line['price_id']['camp_class']) || $line['price_id']['camp_class'] === $enrollment['camp_class']) {
+                    continue;
+                }
+
+                $price = Price::search([
+                    ['product_id', '=', $line['product_id']],
+                    ['camp_class', '=', $enrollment['camp_class']]
+                ])
+                    ->read(['id'])
+                    ->first();
+
+                if(!is_null($price)) {
+                    EnrollmentLine::id($lid)
+                        ->update(['price_id' => $price['id']]);
+                }
+            }
         }
     }
 }
