@@ -62,9 +62,17 @@ class Child extends Model {
                 'onupdate'          => 'onupdateIsFoster'
             ],
 
+            'is_cpa_member' => [
+                'type'              => 'boolean',
+                'description'       => "Is the child member of a CPA club.",
+                'default'           => false,
+                'onupdate'          => 'onupdateIsCpaNumber'
+            ],
+
             'cpa_club' => [
                 'type'              => 'string',
-                'description'       => "Name of the 'centre plein air' the child is member of."
+                'description'       => "Name of the 'centre plein air' the child is member of.",
+                'visible'           => ['is_cpa_member', '=', true]
             ],
 
             'licence_ffe' => [
@@ -136,6 +144,16 @@ class Child extends Model {
         }
 
         return $result;
+    }
+
+    public static function onupdateIsCpaNumber($self) {
+        $self->read(['is_cpa_member', 'cpa_club']);
+        foreach($self as $id => $child) {
+            if(!$child['is_cpa_member'] && !empty($child['cpa_club'])) {
+                self::id($id)
+                    ->update(['cpa_club' => null]);
+            }
+        }
     }
 
     public static function onupdateIsFoster($self) {
