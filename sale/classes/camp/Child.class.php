@@ -114,6 +114,16 @@ class Child extends Model {
                 'visible'           => ['is_foster', '=', true]
             ],
 
+            'main_guardian_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\camp\Guardian',
+                'description'       => "The main guardian responsible of the child.",
+                'help'              => "Used to know which address to use for invoicing.",
+                'store'             => true,
+                'function'          => 'calcMainGuardianId'
+            ],
+
             'guardians_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\camp\Guardian',
@@ -140,6 +150,18 @@ class Child extends Model {
         foreach($self as $id => $child) {
             if(isset($child['firstname'], $child['lastname'])) {
                 $result[$id] = $child['firstname'].' '.$child['lastname'];
+            }
+        }
+
+        return $result;
+    }
+
+    public static function calcMainGuardianId($self): array {
+        $result = [];
+        $self->read(['guardians_ids']);
+        foreach($self as $id => $child) {
+            if(!empty($child['guardians_ids'])) {
+                $result[$id] = $child['guardians_ids'][0];
             }
         }
 
