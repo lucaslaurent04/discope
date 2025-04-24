@@ -34,7 +34,7 @@
             "label": "Types de réservations",
             "help": ""
         },
-        "sale.camp": {
+        "sales.camp": {
             "label": "Camps",
             "help": ""
         },
@@ -46,32 +46,44 @@
             "label": "Camps",
             "help": ""
         },
-        "sale.camp.catalog" : {
+        "sales.camp.catalog" : {
             "label": "Catalogue",
             "help": ""
         },
-        "sale.camp.catalog.products" : {
+        "sales.camp.catalog.products" : {
             "label": "Produits",
             "help": ""
         },
-        "sale.camp.catalog.product-models" : {
+        "sales.camp.catalog.product-models" : {
             "label": "Modèles",
             "help": ""
         },
-        "sale.camp.people" : {
+        "sales.camp.people" : {
             "label": "Participants",
             "help": ""
         },
-        "sale.camp.people.children" : {
+        "sales.camp.people.children" : {
             "label": "Enfants",
             "help": ""
         },
-        "sale.camp.people.guardians" : {
+        "sales.camp.people.guardians" : {
             "label": "Tuteurs",
             "help": ""
         },
-        "sale.camp.people.institutes" : {
+        "sales.camp.people.institutes" : {
             "label": "Institutions",
+            "help": ""
+        },
+        "sales.camp.requirements": {
+            "label": "Exigences",
+            "help": ""
+        },
+        "sales.camp.requirements.skills": {
+            "label": "Compétences",
+            "help": ""
+        },
+        "sales.camp.requirements.documents": {
+            "label": "Documents",
             "help": ""
         },
         "sales.tour_operators": {
