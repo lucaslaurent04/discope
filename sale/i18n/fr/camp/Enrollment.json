@@ -70,6 +70,15 @@
             "name": "Inscription",
             "description": "",
             "layout": {
+                "action.transition.pending": {
+                    "label": "En cours"
+                },
+                "action.transition.confirm": {
+                    "label": "Confirm"
+                },
+                "action.transition.cancel": {
+                    "label": "Annuler"
+                },
                 "section.documents": {
                     "label": "Documents"
                 },
