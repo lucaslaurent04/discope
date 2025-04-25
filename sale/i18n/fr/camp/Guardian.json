@@ -64,6 +64,31 @@
             "label": "Ville",
             "description": "Ville.",
             "help": ""
+        },
+        "different_invoicing_address": {
+            "label": "Adresse de facturation différente",
+            "description": "",
+            "help": ""
+        },
+        "invoicing_address_street": {
+            "label": "Rue",
+            "description": "Rue et numéro.",
+            "help": ""
+        },
+        "invoicing_address_dispatch": {
+            "label": "Complément d'adresse",
+            "description": "Infos optionnelles pour l'envoi du courrier.",
+            "help": ""
+        },
+        "invoicing_address_zip": {
+            "label": "Code Postal",
+            "description": "Code Postal.",
+            "help": ""
+        },
+        "invoicing_address_city": {
+            "label": "Ville",
+            "description": "Ville.",
+            "help": ""
         }
     },
     "view": {
@@ -73,6 +98,9 @@
             "layout": {
                 "section.children": {
                     "label": "Enfants"
+                },
+                "section.invoicing-address": {
+                    "label": "Adresse facturation"
                 }
             }
         },

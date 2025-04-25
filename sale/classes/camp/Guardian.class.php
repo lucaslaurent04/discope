@@ -102,6 +102,36 @@ class Guardian extends Model {
                 'required'          => true
             ],
 
+            'different_invoicing_address' => [
+                'type'              => 'boolean',
+                'description'       => "The invoicing address is different.",
+                'default'           => false
+            ],
+
+            'invoicing_address_street' => [
+                'type'              => 'string',
+                'description'       => "Street and number of the child's guardian.",
+                'visible'           => ['different_invoicing_address', '=', true]
+            ],
+
+            'invoicing_address_dispatch' => [
+                'type'              => 'string',
+                'description'       => "Optional info for mail dispatch (apartment, box, floor, ...).",
+                'visible'           => ['different_invoicing_address', '=', true]
+            ],
+
+            'invoicing_address_zip' => [
+                'type'              => 'string',
+                'description'       => "Zip code of the child's guardian.",
+                'visible'           => ['different_invoicing_address', '=', true]
+            ],
+
+            'invoicing_address_city' => [
+                'type'              => 'string',
+                'description'       => "City of the child's guardian.",
+                'visible'           => ['different_invoicing_address', '=', true]
+            ],
+
             'children_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\camp\Child',
