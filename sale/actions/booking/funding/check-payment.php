@@ -6,6 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 use sale\booking\Funding;
+use core\setting\Setting;
 
 list($params, $providers) = eQual::announce([
     'description'   => "Checks that a given funding has been paid (should be scheduled on due_date).",
@@ -47,6 +48,10 @@ if(!$funding['is_paid'] && $funding['due_amount'] > 0 ) {
     // dispatch a message for notifying users
     $dispatch->dispatch('lodging.booking.payments', 'sale\booking\Booking', $funding['booking_id']['id'], 'warning', null, [], [], null, $funding['booking_id']['center_office_id']);
 
+    $payment_remind = Setting::get_value('sale', 'features', 'payment.remind.active', 1);
+    if (!$payment_remind) {
+        return;
+    }
     try {
        eQual::run('do', 'sale_booking_funding_remind-payment', ['id' => $params['id']]);
     }
