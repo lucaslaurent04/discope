@@ -3571,8 +3571,7 @@ class BookingLineGroup extends Model {
 			$operands['nb_pers'] = $group['nb_pers'];
 			$operands['nb_nights'] = $group['nb_nights'];
 
-            $operands['count_booking_fiscal_year'] = Booking::computeCountBookingYearFiscal( $group['booking_id'], $group['booking_id.customer_id']);
-			$autosales = $om->read('sale\autosale\AutosaleLine', $autosale_list['autosale_lines_ids'], [
+            $autosales = $om->read('sale\autosale\AutosaleLine', $autosale_list['autosale_lines_ids'], [
 				'product_id.id',
 				'product_id.name',
 				'product_id.sku',
