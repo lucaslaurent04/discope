@@ -25,11 +25,6 @@
                 "horse-riding": "Équitation"
             }
         },
-        "with_accommodation": {
-            "label": "Avec logement",
-            "description": "Est-ce que le camp le logement?",
-            "help": ""
-        },
         "employee_ratio": {
             "label": "Ratio employé",
             "description": "La quantité d'enfants qu'un employé peut géré seul.",

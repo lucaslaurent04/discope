@@ -88,12 +88,6 @@ class Camp extends Model {
                 'onupdate'          => 'onupdateCampModelId'
             ],
 
-            'with_accommodation' => [
-                'type'              => 'boolean',
-                'description'       => "Does the camp include accommodation?",
-                'default'           => false
-            ],
-
             'min_age' => [
                 'type'              => 'integer',
                 'description'       => "Minimal age of the participants.",
@@ -277,7 +271,6 @@ class Camp extends Model {
                 ->read([
                     'name',
                     'camp_type',
-                    'with_accommodation',
                     'employee_ratio',
                     'need_license_ffe',
                     'ase_quota',
@@ -287,7 +280,6 @@ class Camp extends Model {
 
             if(!is_null($camp_model)) {
                 $result['camp_type'] = $camp_model['camp_type'];
-                $result['with_accommodation'] = $camp_model['with_accommodation'];
                 $result['employee_ratio'] = $camp_model['employee_ratio'];
                 $result['product_id'] = $camp_model['product_id'];
                 $result['need_license_ffe'] = $camp_model['need_license_ffe'];

@@ -60,14 +60,6 @@
             },
             {
                 "type": "field",
-                "value": "with_accommodations",
-                "width": "20%",
-                "sortable": false,
-                "readonly": true,
-                "visible": false
-            },
-            {
-                "type": "field",
                 "value": "employee_ratio",
                 "width": "20%",
                 "sortable": false,

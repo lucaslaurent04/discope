@@ -52,12 +52,6 @@ class CampModel extends Model {
                 'default'           => 'sport'
             ],
 
-            'with_accommodation' => [
-                'type'              => 'boolean',
-                'description'       => "Does the camp model include accommodation?",
-                'default'           => false
-            ],
-
             'employee_ratio' => [
                 'type'              => 'integer',
                 'usage'             => 'number/integer{1,50}',
