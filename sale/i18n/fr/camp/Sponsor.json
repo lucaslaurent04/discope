@@ -45,9 +45,15 @@
                 "commune": "Commune",
                 "community-of-communes": "Communauté de communes",
                 "department-caf": "CAF",
-                "department-msa": "MSA"
+                "department-msa": "MSA",
+                "ce": "Comité d'entreprise"
             },
-            "description": "Type of the sponsor financial help.",
+            "description": "Type d'aide financière.",
+            "help": ""
+        },
+        "code_ce": {
+            "label": "Code CE",
+            "description": "Code du comité d'entreprise.",
             "help": ""
         }
     },
@@ -55,7 +61,11 @@
         "form.default": {
             "name": "Aide",
             "description": "",
-            "layout": []
+            "layout": {
+                "section.enrollments": {
+                    "label": "Inscriptions"
+                }
+            }
         },
         "list.default": {
             "name": "Aides",

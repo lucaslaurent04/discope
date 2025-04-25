@@ -8,9 +8,23 @@
             "description": "Inscription sur laquelle la réduction est appliquée.",
             "help": ""
         },
+        "is_manual_discount": {
+            "label": "Remise manuelle?",
+            "description": "Réduction manuelle.",
+            "help": ""
+        },
         "price_adapter_type": {
             "label": "Type",
-            "description": "Type de réduction.",
+            "description": "Type de réduction, pourcentage ou montant.",
+            "help": "",
+            "selection": {
+                "percent": "Pourcentage",
+                "amount": "Montant"
+            }
+        },
+        "origin_type": {
+            "label": "Origine",
+            "description": "Type de l'origine de la réduction.",
             "help": "",
             "selection": {
                 "other": "Autre",
@@ -18,8 +32,8 @@
                 "help-community-of-communes": "Aide communauté de communes",
                 "help-department-caf": "Aide CAF",
                 "help-department-msa": "Aide MSA",
-                "holiday-voucher": "Chèque vacances",
-                "loyalty-discount": "Réduction fidélité"
+                "loyalty-discount": "Réduction fidélité",
+                "ce": "Comité d'entreprise"
             }
         },
         "description": {
@@ -27,9 +41,9 @@
             "description": "Information supplémentaires sur la réduction.",
             "help": ""
         },
-        "amount": {
-            "label": "Montant",
-            "description": "Montant à retirer au prix de l'inscription.",
+        "value": {
+            "label": "Valeur",
+            "description": "Montant/pourcentage à retirer au prix de l'inscription.",
             "help": ""
         },
         "sponsor_id": {

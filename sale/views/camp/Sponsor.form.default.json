@@ -31,6 +31,11 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "code_ce",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "amount",
                                                 "width": "33%"
                                             }
@@ -70,8 +75,8 @@
             {
                 "sections": [
                     {
-                        "id": "section.sponsor",
-                        "label": "Sponsors",
+                        "id": "section.enrollments",
+                        "label": "Enrollments",
                         "visible": ["state", "<>", "draft"],
                         "rows": [
                             {
@@ -82,7 +87,14 @@
                                             {
                                                 "type": "field",
                                                 "value": "enrollments_ids",
-                                                "width": "100%"
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
