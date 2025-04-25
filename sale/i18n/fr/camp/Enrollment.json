@@ -90,9 +90,6 @@
                 },
                 "section.child-remarks": {
                     "label": "Remarques enfant"
-                },
-                "section.sponsors": {
-                    "label": "Aides"
                 }
             }
         },

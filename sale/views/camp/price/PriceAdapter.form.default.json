@@ -28,7 +28,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "",
+                                                "value": "sponsor_id",
                                                 "width": "33%"
                                             },
                                             {

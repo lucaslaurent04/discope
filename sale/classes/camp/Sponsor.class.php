@@ -73,16 +73,6 @@ class Sponsor extends Model {
                 ],
                 'description'       => "Type of the sponsor.",
                 'default'           => 'other'
-            ],
-
-            'enrollments_ids' => [
-                'type'              => 'many2many',
-                'foreign_object'    => 'sale\camp\Enrollment',
-                'foreign_field'     => 'sponsors_ids',
-                'rel_table'         => 'sale_rel_enrollment_sponsor',
-                'rel_foreign_key'   => 'enrollment_id',
-                'rel_local_key'     => 'sponsor_id',
-                'description'       => "Sponsored children enrollments."
             ]
 
         ];
