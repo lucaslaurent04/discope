@@ -20,6 +20,16 @@
                                                 "type": "field",
                                                 "value": "enrollment_id",
                                                 "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_manual_discount",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "price_adapter_type",
+                                                "width": "33%"
                                             }
                                         ]
                                     },
@@ -33,12 +43,12 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "price_adapter_type",
+                                                "value": "origin_type",
                                                 "width": "33%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "amount",
+                                                "value": "value",
                                                 "width": "33%"
                                             }
                                         ]

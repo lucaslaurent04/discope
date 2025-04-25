@@ -86,6 +86,10 @@
             "label": "Documents",
             "help": ""
         },
+        "sales.camp.sponsors": {
+            "label": "Aides",
+            "help": ""
+        },
         "sales.tour_operators": {
             "label": "Tour Opérateurs",
             "help": ""

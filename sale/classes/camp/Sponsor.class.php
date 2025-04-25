@@ -69,10 +69,24 @@ class Sponsor extends Model {
                     'commune',
                     'community-of-communes',
                     'department-caf',
-                    'department-msa'
+                    'department-msa',
+                    'ce'
                 ],
                 'description'       => "Type of the sponsor.",
                 'default'           => 'other'
+            ],
+
+            'code_ce' => [
+                'type'              => 'string',
+                'description'       => "Code of the \"commité d'entreprise\".",
+                'visible'           => ['sponsor_type', '=', 'ce']
+            ],
+
+            'enrollments_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\camp\Enrollment',
+                'foreign_field'     => 'sponsor_id',
+                'description'       => "Sponsored enrollments."
             ]
 
         ];

@@ -18,7 +18,7 @@
             },
             {
                 "type": "field",
-                "value": "price_adapter_type",
+                "value": "origin_type",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
