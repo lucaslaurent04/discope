@@ -51,10 +51,19 @@ class PriceAdapter extends Model {
             ],
 
             'amount' => [
-                'type'              => 'float',
+                'type'              => 'compute',
+                'result_type'       => 'float',
                 'usage'             => 'amount/money:4',
                 'description'       => "Amount to remove to the enrollment price.",
+                'store'             => true,
+                'function'          => 'calcAmount',
                 'onupdate'          => 'onupdateAmount'
+            ],
+
+            'sponsor_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\Sponsor',
+                'description'       => "The origin of the price adapter."
             ]
 
         ];
@@ -89,5 +98,17 @@ class PriceAdapter extends Model {
 
     public static function onupdateAmount($self) {
         $self->do('reset-enrollments-prices');
+    }
+
+    public static function calcAmount($self): array {
+        $result = [];
+        $self->read(['sponsor_id' => ['amount']]);
+        foreach($self as $id => $price_adapter) {
+            if(isset($price_adapter['sponsor_id']['amount'])) {
+                $result[$id] = $price_adapter['sponsor_id']['amount'];
+            }
+        }
+
+        return $result;
     }
 }
