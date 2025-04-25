@@ -85,7 +85,8 @@ class Camp extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\CampModel',
                 'description'       => "Model that was used as a base to create this camp.",
-                'onupdate'          => 'onupdateCampModelId'
+                'onupdate'          => 'onupdateCampModelId',
+                'required'          => true
             ],
 
             'min_age' => [
@@ -256,9 +257,16 @@ class Camp extends Model {
             ->read(['accounting_code'])
             ->first();
 
-        $code = $last_accounting_code['accounting_code'] ?? 0;
+        $code = 0;
+        if(!is_null($last_accounting_code)) {
+            $code_array = explode('C', $last_accounting_code['accounting_code']);
+            if(isset($code_array[1])) {
+                $code = (int) $code_array[1];
+            }
+        }
+
         foreach($self as $id => $camp) {
-            $result[$id] = ++$code;
+            $result[$id] = '411C'.str_pad(++$code, 4, '0', STR_PAD_LEFT);
         }
 
         return $result;
