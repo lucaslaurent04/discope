@@ -42,11 +42,14 @@ class CampModel extends Model {
             'camp_type' => [
                 'type'              => 'string',
                 'selection'         => [
-                    'week',
-                    'weekend'
+                    'sport',
+                    'circus',
+                    'culture',
+                    'environment',
+                    'horse-riding'
                 ],
                 'description'       => "Type of camp.",
-                'default'           => 'week'
+                'default'           => 'sport'
             ],
 
             'with_accommodation' => [
