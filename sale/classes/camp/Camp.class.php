@@ -135,10 +135,12 @@ class Camp extends Model {
             ],
 
             'accounting_code' => [
-                'type'              => 'string',
+                'type'              => 'computed',
+                'result_type'       => 'string',
                 'description'       => "Specific accounting code for the camp.",
                 'unique'            => true,
-                'required'          => true
+                'store'             => true,
+                'function'          => 'calcAccountingCode'
             ],
 
             'need_license_ffe' => [
@@ -211,6 +213,20 @@ class Camp extends Model {
         $self->read(['employee_ratio', 'camp_group_qty']);
         foreach($self as $id => $camp) {
             $result[$id] = $camp['employee_ratio'] * $camp['camp_group_qty'];
+        }
+
+        return $result;
+    }
+
+    public static function calcAccountingCode($self): array {
+        $result = [];
+        $last_accounting_code = self::search([], ['sort' => ['created' => 'desc']])
+            ->read(['accounting_code'])
+            ->first();
+
+        $code = $last_accounting_code['accounting_code'] ?? 0;
+        foreach($self as $id => $camp) {
+            $result[$id] = ++$code;
         }
 
         return $result;
