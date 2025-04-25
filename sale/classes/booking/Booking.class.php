@@ -1694,6 +1694,19 @@ class Booking extends Model {
         $om->update(self::getType(), $id, ['is_price_tbc' => $is_tbc]);
     }
 
+    private static function computeCountBookingYearFiscal($booking_id, $customer_id) {
+        $date_from =  Setting::get_value('finance', 'accounting', 'fiscal_year.date_from');
+        $bookings_ids =Booking::search([
+            ['id', '<>', $booking_id],
+            ['customer_id', '=', $customer_id],
+            ['date_from', '>=',  strtotime($date_from)],
+            ['is_cancelled', '=', false],
+            ['status', 'not in', ['quote', 'option']]
+        ])
+        ->ids();
+        return count($bookings_ids);
+    }
+
     /**
      * This method is called by `update-sojourn-[...]` controllers.
      * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
@@ -1785,6 +1798,7 @@ class Booking extends Model {
 
             $operands['count_booking_12'] = count($bookings_ids);
 
+            $operands['count_booking_fiscal_year'] = self::computeCountBookingYearFiscal($id, $booking['customer_id']);
             $operands['nb_pers'] = $booking['nb_pers'];
 
             $autosales = $om->read('sale\autosale\AutosaleLine', $autosale_list['autosale_lines_ids'], [
