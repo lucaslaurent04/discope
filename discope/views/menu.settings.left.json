@@ -372,6 +372,17 @@
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                "id": "sales.camp.sponsors",
+                                "type": "entry",
+                                "label": "Sponsors",
+                                "description": "",
+                                "icon": "payments",
+                                "context": {
+                                    "entity": "sale\\camp\\Sponsor",
+                                    "view": "list.default"
+                                }
                             }
                         ]
                     },
