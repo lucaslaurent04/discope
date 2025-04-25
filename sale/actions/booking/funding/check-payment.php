@@ -38,7 +38,7 @@ list($context, $auth, $dispatch) = [ $providers['context'], $providers['auth'], 
 // switch to root account (access is 'private')
 $auth->su();
 
-$funding = Funding::id($params['id'])->read(['id', 'is_paid','due_amount', 'due_date', 'booking_id' => ['id', 'center_office_id']])->first(true);
+$funding = Funding::id($params['id'])->read(['id', 'is_paid','due_amount', 'due_date', 'booking_id' => ['id', 'center_office_id' => ['id','code']]])->first(true);
 
 if(!$funding) {
     throw new Exception("unknown_funding", QN_ERROR_UNKNOWN_OBJECT);
@@ -46,9 +46,9 @@ if(!$funding) {
 
 if(!$funding['is_paid'] && $funding['due_amount'] > 0 ) {
     // dispatch a message for notifying users
-    $dispatch->dispatch('lodging.booking.payments', 'sale\booking\Booking', $funding['booking_id']['id'], 'warning', null, [], [], null, $funding['booking_id']['center_office_id']);
+    $dispatch->dispatch('lodging.booking.payments', 'sale\booking\Booking', $funding['booking_id']['id'], 'warning', null, [], [], null, $funding['booking_id']['center_office_id']['id']);
 
-    $payment_remind = Setting::get_value('sale', 'features', 'payment.remind.active', 1);
+    $payment_remind = Setting::get_value('sale', 'features', 'payment.remind.active'.$funding['booking_id']['center_office_id']['code'], 1);
     if (!$payment_remind) {
         return;
     }
