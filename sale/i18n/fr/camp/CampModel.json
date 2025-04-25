@@ -18,8 +18,11 @@
             "description": "Type de camp.",
             "help": "",
             "selection": {
-                "week": "Semaine",
-                "weekend": "Week-end"
+                "sport": "Sport",
+                "circus": "Cirque",
+                "culture": "Culture",
+                "environment": "Environnement",
+                "horse-riding": "Équitation"
             }
         },
         "with_accommodation": {

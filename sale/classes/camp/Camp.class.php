@@ -71,11 +71,14 @@ class Camp extends Model {
             'camp_type' => [
                 'type'              => 'string',
                 'selection'         => [
-                    'week',
-                    'weekend'
+                    'sport',
+                    'circus',
+                    'culture',
+                    'environment',
+                    'horse-riding'
                 ],
                 'description'       => "Type of camp.",
-                'default'           => 'week'
+                'default'           => 'sport'
             ],
 
             'camp_model_id' => [
@@ -296,15 +299,8 @@ class Camp extends Model {
             }
         }
         if(isset($event['date_from'])) {
-            if(isset($values['camp_type'])) {
-                $date_from = date('Y-m-d', $event['date_from']);
-                if($values['camp_type'] === 'week') {
-                    $result['date_to'] = strtotime($date_from.' +5 days');
-                }
-                if($values['camp_type'] === 'weekend') {
-                    $result['date_to'] = strtotime($date_from.' +1 days');
-                }
-            }
+            $date_from = date('Y-m-d', $event['date_from']);
+            $result['date_to'] = strtotime($date_from.' +5 days');
         }
 
         return $result;
