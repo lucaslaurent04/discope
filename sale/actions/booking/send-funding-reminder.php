@@ -78,6 +78,10 @@ list($params, $providers) = eQual::announce([
  */
 list($context, $dispatch) = [ $providers['context'], $providers['dispatch'] ];
 
+$payment_remind = Setting::get_value('sale', 'features', 'payment.remind.active', 1);
+if(!$payment_remind) {
+    throw new Exception("payment_remind_feature_disabled", QN_ERROR_UNKNOWN_OBJECT);
+}
 $funding = Funding::id($params['funding_id'])
     ->read(['booking_id' => ['id', 'date_from', 'status',
                              'center_id' => ['id', 'center_office_id' => ['email_bcc']],
