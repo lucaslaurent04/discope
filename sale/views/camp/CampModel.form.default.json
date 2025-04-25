@@ -51,11 +51,6 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "with_accommodation",
-                                                "width": "33%"
-                                            },
-                                            {
-                                                "type": "field",
                                                 "value": "need_license_ffe",
                                                 "width": "50%"
                                             }
