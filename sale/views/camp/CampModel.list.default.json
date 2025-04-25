@@ -18,13 +18,6 @@
             },
             {
                 "type": "field",
-                "value": "with_accommodation",
-                "width": "20%",
-                "sortable": false,
-                "readonly": true
-            },
-            {
-                "type": "field",
                 "value": "employee_ratio",
                 "width": "20%",
                 "sortable": false,

@@ -55,11 +55,6 @@
             "description": "Modèle qui a été utilisé pour créé le camp.",
             "help": ""
         },
-        "with_accommodation": {
-            "label": "Avec logement",
-            "description": "Est-ce que le camp le logement?",
-            "help": ""
-        },
         "min_age": {
             "label": "Age min",
             "description": "Age minimum des participants.",
