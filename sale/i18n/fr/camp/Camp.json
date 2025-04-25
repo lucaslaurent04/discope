@@ -8,7 +8,8 @@
             "description": "Status du camp.",
             "help": "",
             "selection": {
-                "pending": "En cours",
+                "unpublished": "Non publié",
+                "published": "Publié",
                 "canceled": "Annulé"
             }
         },
@@ -101,6 +102,14 @@
         "form.default": {
             "name": "Camp",
             "description": "",
+            "actions": {
+                "action.transition.publish": {
+                    "label": "Publier"
+                },
+                "action.transition.cancel": {
+                    "label": "Annuler"
+                }
+            },
             "layout": {
                 "section.descriptions": {
                     "label": "Descriptions"

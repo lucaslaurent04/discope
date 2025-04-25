@@ -28,11 +28,12 @@ class Camp extends Model {
             'status' => [
                 'type'              => 'string',
                 'selection'         => [
-                    'pending',
+                    'unpublished',
+                    'published',
                     'canceled'
                 ],
                 'description'       => "Status of the camp.",
-                'default'           => 'pending'
+                'default'           => 'unpublished'
             ],
 
             'remarks' => [
@@ -198,6 +199,40 @@ class Camp extends Model {
         ];
     }
 
+    public static function getWorkflow(): array {
+        return [
+
+            'unpublished' => [
+                'description' => "The camp is still being configured.",
+                'transitions' => [
+                    'confirm' => [
+                        'status'        => 'publish',
+                        'description'   => "Publish the camp on the website."
+                    ],
+                    'cancel' => [
+                        'status'        => 'canceled',
+                        'description'   => "Cancel the camp."
+                    ]
+                ]
+            ],
+
+            'published' => [
+                'description' => "The camp is configured and published on the website.",
+                'transitions' => [
+                    'cancel' => [
+                        'status'        => 'canceled',
+                        'description'   => "Cancel the camp."
+                    ]
+                ]
+            ],
+
+            'canceled' => [
+                'description' => "The camp was canceled.",
+            ]
+
+        ];
+    }
+
     public static function calcDefaultEmployeeRatio($self): array {
         $result = [];
         $self->read(['camp_model_id' => ['default_employee_ratio']]);
@@ -264,7 +299,7 @@ class Camp extends Model {
             if(isset($values['camp_type'])) {
                 $date_from = date('Y-m-d', $event['date_from']);
                 if($values['camp_type'] === 'week') {
-                    $result['date_to'] = strtotime($date_from.' +4 days');
+                    $result['date_to'] = strtotime($date_from.' +5 days');
                 }
                 if($values['camp_type'] === 'weekend') {
                     $result['date_to'] = strtotime($date_from.' +1 days');

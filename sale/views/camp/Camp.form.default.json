@@ -12,6 +12,34 @@
             ]
         }
     },
+    "actions": [
+        {
+            "id": "action.transition.publish",
+            "label": "Publish",
+            "controller": "model_transition",
+            "params": {
+                "entity": "sale\\camp\\Camp",
+                "transition": "publish",
+                "ids": []
+            },
+            "visible": [
+                ["status", "=", "unpublished"]
+            ]
+        },
+        {
+            "id": "action.transition.cancel",
+            "label": "Cancel",
+            "controller": "model_transition",
+            "params": {
+                "entity": "sale\\camp\\Camp",
+                "transition": "cancel",
+                "ids": []
+            },
+            "visible": [
+                ["status", "in", ["unpublished", "published"]]
+            ]
+        }
+    ],
     "layout": {
         "groups": [
             {
