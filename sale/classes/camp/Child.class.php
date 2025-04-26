@@ -169,6 +169,9 @@ class Child extends Model {
         return $result;
     }
 
+    /**
+     * Reset child age of not locked enrollments of children
+     */
     public static function onupdateBirthdate($self) {
         $reset_age_enrollments_ids = [];
         $self->read(['enrollments_ids' => ['is_locked']]);
