@@ -313,6 +313,7 @@ class Enrollment extends Model {
     public static function canupdate($self, $values): array {
         $self->read([
             'is_locked',
+            'status',
             'child_id',
             'camp_id' => [
                 'id',
@@ -326,32 +327,49 @@ class Enrollment extends Model {
             ]
         ]);
 
+        // If is_locked cannot be modified
         foreach($self as $enrollment) {
             if($enrollment['is_locked']) {
                 return ['is_locked' => ['locked_enrollment' => "Cannot modify a locked enrollment."]];
             }
+        }
 
-            $status = $values['status'] ?? $enrollment['status'];
-            if($status === 'pending') {
+        // Check that camp is not already full and that child is not already enrolled
+        if(isset($values['camp_id']) || (isset($values['status']) && in_array($values['status'], ['pending', 'confirmed']))) {
+            foreach($self as $enrollment) {
                 $pending_confirmed_enrollments_qty = 0;
-                foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
-                    if(in_array($en['status'], ['pending', 'confirmed'])) {
+
+                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
+                    ->read([
+                        'id',
+                        'max_children',
+                        'ase_quota',
+                        'enrollments_ids' => [
+                            'status',
+                            'child_id',
+                            'is_ase'
+                        ]
+                    ])
+                    ->first();
+
+                foreach($camp['enrollments_ids'] as $en) {
+                    if(in_array($en['status'], ['pending', 'confirmed']) && $en['id'] !== $enrollment['id']) {
                         $pending_confirmed_enrollments_qty++;
                     }
                 }
-
-                if($pending_confirmed_enrollments_qty >= $enrollment['camp_id']['max_children']) {
+                if($pending_confirmed_enrollments_qty >= $camp['max_children']) {
                     return ['camp_id' => ['full' => "The camp is full."]];
                 }
-            }
 
-            foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
-                if($en['child_id'] === $values['child_id']) {
-                    return ['child_id' => ['already_enrolled' => "The child has already enrolled to this camp."]];
+                foreach($camp['enrollments_ids'] as $en) {
+                    if($en['child_id'] === $values['child_id'] && $en['id'] !== $enrollment['id']) {
+                        return ['child_id' => ['already_enrolled' => "The child has already enrolled to this camp."]];
+                    }
                 }
             }
         }
 
+        // Check max quot ase
         if(isset($values['is_ase']) && $values['is_ase']) {
             foreach($self as $enrollment) {
                 $ase_children_qty = 1;
@@ -367,6 +385,7 @@ class Enrollment extends Model {
             }
         }
 
+        // Check prices isn't missing for child specific camp_class
         if(isset($values['camp_id']) || isset($values['child_id'])) {
             foreach($self as $enrollment) {
                 $camp_id = $values['camp_id'] ?? $enrollment['camp_id']['id'];
