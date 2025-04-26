@@ -385,20 +385,6 @@ class Enrollment extends Model {
             }
         }
 
-        // If camp modified then remove lines
-        if(isset($values['camp_id'])) {
-            $enrollment_lines_ids = [];
-            foreach($self as $enrollment) {
-                foreach($enrollment['enrollment_lines_ids'] as $line) {
-                    $enrollment_lines_ids[] = $line['id'];
-                }
-            }
-            if(!empty($enrollment_lines_ids)) {
-                EnrollmentLine::ids($enrollment_lines_ids)
-                    ->delete(true);
-            }
-        }
-
         // Check max quot ase
         if(isset($values['is_ase']) && $values['is_ase']) {
             foreach($self as $enrollment) {
@@ -455,6 +441,7 @@ class Enrollment extends Model {
      */
     public static function onupdateCampId($self) {
         $self->read([
+            'enrollment_lines_ids',
             'child_id'  => [
                 'camp_class'
             ],
@@ -468,7 +455,7 @@ class Enrollment extends Model {
         ]);
 
         foreach($self as $id => $enrollment) {
-            if(!isset($enrollment['camp_id']) || !isset($enrollment['child_id'])) {
+            if(!isset($enrollment['camp_id']) || !isset($enrollment['child_id']) || !empty($enrollment['enrollment_lines_ids'])) {
                 continue;
             }
 
