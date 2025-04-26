@@ -337,28 +337,31 @@ class Enrollment extends Model {
         // Check that camp is not already full and that child is not already enrolled
         if(isset($values['camp_id']) || (isset($values['status']) && in_array($values['status'], ['pending', 'confirmed']))) {
             foreach($self as $enrollment) {
-                $pending_confirmed_enrollments_qty = 0;
+                $status = $values['status'] ?? $enrollment['status'];
+                if(in_array($status, ['pending', 'confirmed'])) {
+                    $pending_confirmed_enrollments_qty = 0;
 
-                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
-                    ->read([
-                        'id',
-                        'max_children',
-                        'ase_quota',
-                        'enrollments_ids' => [
-                            'status',
-                            'child_id',
-                            'is_ase'
-                        ]
-                    ])
-                    ->first();
+                    $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
+                        ->read([
+                            'id',
+                            'max_children',
+                            'ase_quota',
+                            'enrollments_ids' => [
+                                'status',
+                                'child_id',
+                                'is_ase'
+                            ]
+                        ])
+                        ->first();
 
-                foreach($camp['enrollments_ids'] as $en) {
-                    if(in_array($en['status'], ['pending', 'confirmed']) && $en['id'] !== $enrollment['id']) {
-                        $pending_confirmed_enrollments_qty++;
+                    foreach($camp['enrollments_ids'] as $en) {
+                        if(in_array($en['status'], ['pending', 'confirmed']) && $en['id'] !== $enrollment['id']) {
+                            $pending_confirmed_enrollments_qty++;
+                        }
                     }
-                }
-                if($pending_confirmed_enrollments_qty >= $camp['max_children']) {
-                    return ['camp_id' => ['full' => "The camp is full."]];
+                    if($pending_confirmed_enrollments_qty >= $camp['max_children']) {
+                        return ['camp_id' => ['full' => "The camp is full."]];
+                    }
                 }
 
                 foreach($camp['enrollments_ids'] as $en) {
