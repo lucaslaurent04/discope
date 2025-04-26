@@ -42,7 +42,8 @@ class Child extends Model {
             'birthdate' => [
                 'type'              => 'date',
                 'description'       => "The child's birthdate.",
-                'required'          => true
+                'required'          => true,
+                'onupdate'          => 'onupdateBirthdate'
             ],
 
             'gender' => [
@@ -166,6 +167,23 @@ class Child extends Model {
         }
 
         return $result;
+    }
+
+    public static function onupdateBirthdate($self) {
+        $reset_age_enrollments_ids = [];
+        $self->read(['enrollments_ids' => ['is_locked']]);
+        foreach($self as $child) {
+            foreach($child['enrollments_ids'] as $enrollment) {
+                if(!$enrollment['is_locked']) {
+                    $reset_age_enrollments_ids[] = $enrollment['id'];
+                }
+            }
+        }
+
+        if(!empty($reset_age_enrollments_ids)) {
+            Enrollment::ids($reset_age_enrollments_ids)
+                ->update(['child_age' => null]);
+        }
     }
 
     public static function onupdateIsCpaNumber($self) {
