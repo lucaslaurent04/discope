@@ -524,6 +524,28 @@ class Enrollment extends Model {
             }
         }
 
+        // Check that child is not already enrolled to another camp at the same time
+        if(isset($values['camp_id']) || isset($values['child_id'])) {
+            foreach($self as $enrollment) {
+                $camp_id = $values['camp_id'] ?? $enrollment['camp_id'];
+                $child_id = $values['child_id'] ?? $enrollment['child_id'];
+
+                $camp = Camp::id($camp_id)
+                    ->read(['date_from', 'date_to'])
+                    ->first();
+
+                $child = Child::id($child_id)
+                    ->read(['enrollments_ids' => ['camp_id' => ['date_from', 'date_to']]])
+                    ->first();
+
+                foreach($child['enrollments_ids'] as $en) {
+                    if($enrollment['id'] !== $en['id'] && $camp['date_from'] <= $en['camp_id']['date_to'] && $camp['date_to'] >= $en['camp_id']['date_from']) {
+                        return ['child_id' => ['child_already_enrolled_to_other_camp' => 'Child has already been enrolled to another camp during this period.']];
+                    }
+                }
+            }
+        }
+
         return parent::cancreate($self, $values);
     }
 
