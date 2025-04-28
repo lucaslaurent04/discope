@@ -1,0 +1,220 @@
+{
+    "name": "Enrollment",
+    "description": "Form view for Enrollment.",
+    "header": {
+        "actions": {
+            "ACTION.SAVE": [
+                {
+                    "id": "SAVE_AND_CONTINUE"
+                },
+                {
+                    "id": "SAVE_AND_CLOSE"
+                }
+            ]
+        }
+    },
+    "actions": [
+        {
+            "id": "action.transition.pending",
+            "label": "Set pending",
+            "controller": "model_transition",
+            "params": {
+                "entity": "sale\\camp\\Enrollment",
+                "transition": "pending",
+                "ids": []
+            },
+            "visible": [
+                ["status", "=", "waitlisted"]
+            ]
+        },
+        {
+            "id": "action.transition.confirm",
+            "label": "Confirm",
+            "controller": "model_transition",
+            "params": {
+                "entity": "sale\\camp\\Enrollment",
+                "transition": "confirm",
+                "ids": []
+            },
+            "visible": [
+                ["status", "=", "pending"]
+            ]
+        },
+        {
+            "id": "action.transition.cancel",
+            "label": "Cancel",
+            "controller": "model_transition",
+            "params": {
+                "entity": "sale\\camp\\Enrollment",
+                "transition": "cancel",
+                "ids": []
+            },
+            "visible": [
+                ["status", "in", ["waitlisted", "pending", "confirm"]]
+            ]
+        }
+    ],
+    "layout": {
+        "groups": [
+            {
+                "sections": [
+                    {
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "child_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "camp_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "child_age",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_ase",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "status",
+                                                "width": "33%",
+                                                "visible": ["state", "=", "draft"],
+                                                "selection": {
+                                                    "pending": "Pending",
+                                                    "waitlisted": "Waitlisted"
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "camp_class",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "camp_class",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "total",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "price",
+                                                "width": "25%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "sections": [
+                    {
+                        "id": "section.lines",
+                        "label": "Lines",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "enrollment_lines_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.reductions",
+                        "label": "Reductions",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "price_adapters_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.child-remarks",
+                        "label": "Child remarks",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "child_remarks",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.documents",
+                        "label": "Documents",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "documents_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

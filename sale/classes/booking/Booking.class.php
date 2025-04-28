@@ -758,16 +758,26 @@ class Booking extends Model {
      *  as 10000000 % 97 = 76
      *  we do (aaa * 76 + bbbbbbb) % 97
      */
-    public static function calcPaymentReference($om, $ids, $lang) {
+    public static function calcPaymentReference($self) {
         $result = [];
-        $bookings = $om->read(self::getType(), $ids, ['name'], $lang);
-        foreach($bookings as $id => $booking) {
-            $booking_code = intval($booking['name']);
+        $self->read(['name', 'customer_identity_id' => ['name', 'id', 'accounting_account']]);
+        foreach($self as $id => $booking) {
             // #memo - arbitrary value : used in the accounting software for identifying payments with a temporary account entry counterpart
-            $code_ref = 150;
-            $control = ((76*$code_ref) + $booking_code) % 97;
-            $control = ($control == 0)?97:$control;
-            $result[$id] = sprintf("%3d%04d%03d%02d", $code_ref, $booking_code / 1000, $booking_code % 1000, $control);
+            $code_ref =  Setting::get_value('sale', 'organization',  'booking.reference.code' , 150);
+            $reference_type =  Setting::get_value('sale', 'organization',  'booking.reference.type' , 'name');
+            $has_format =  Setting::get_value('sale', 'organization',  'booking.reference.has_format' ,  1);
+            $reference_format = Setting::get_value('sale', 'organization', 'booking.reference.payment_format', '%3d%04d%03d%02d');
+
+            if($has_format) {
+                $booking_code = intval($booking[$reference_type]);
+                $control = ((76*$code_ref) + $booking_code) % 97;
+                $control = ($control == 0)?97:$control;
+                $code_reference = sprintf($reference_format, $code_ref, $booking_code / 1000, $booking_code % 1000, $control);
+            } else {
+                $code_reference = $booking['customer_identity_id'][$reference_type];
+            }
+
+            $result[$id] = $code_reference;
         }
         return $result;
     }
@@ -1636,6 +1646,19 @@ class Booking extends Model {
         $om->update(self::getType(), $id, ['is_price_tbc' => $is_tbc]);
     }
 
+    private static function computeCountBookingYearFiscal($booking_id, $customer_id) {
+        $date_from =  Setting::get_value('finance', 'accounting', 'fiscal_year.date_from');
+        $bookings_ids =Booking::search([
+            ['id', '<>', $booking_id],
+            ['customer_id', '=', $customer_id],
+            ['date_from', '>=',  strtotime($date_from)],
+            ['is_cancelled', '=', false],
+            ['status', 'not in', ['quote', 'option']]
+        ])
+        ->ids();
+        return count($bookings_ids);
+    }
+
     /**
      * This method is called by `update-sojourn-[...]` controllers.
      * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
@@ -1727,6 +1750,7 @@ class Booking extends Model {
 
             $operands['count_booking_12'] = count($bookings_ids);
 
+            $operands['count_booking_fiscal_year'] = self::computeCountBookingYearFiscal($id, $booking['customer_id']);
             $operands['nb_pers'] = $booking['nb_pers'];
 
             $autosales = $om->read('sale\autosale\AutosaleLine', $autosale_list['autosale_lines_ids'], [
