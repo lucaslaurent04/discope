@@ -1,0 +1,35 @@
+{
+    "name": "Compétence",
+    "plural": "Compétences",
+    "description": "Compétence requise pour pouvoir participer à un camp.",
+    "model": {
+        "description": {
+            "label": "Description",
+            "description": "Description de la compétence.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Compétence",
+            "description": "",
+            "layout": {
+                "section.camp-models": {
+                    "label": "Modèles"
+                },
+                "section.camps": {
+                    "label": "Camps"
+                },
+                "section.children": {
+                    "label": "Enfants"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Compétences",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}

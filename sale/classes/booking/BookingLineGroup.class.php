@@ -3570,7 +3570,7 @@ class BookingLineGroup extends Model {
 			$operands['nb_pers'] = $group['nb_pers'];
 			$operands['nb_nights'] = $group['nb_nights'];
 
-			$autosales = $om->read('sale\autosale\AutosaleLine', $autosale_list['autosale_lines_ids'], [
+            $autosales = $om->read('sale\autosale\AutosaleLine', $autosale_list['autosale_lines_ids'], [
 				'product_id.id',
 				'product_id.name',
 				'product_id.sku',
