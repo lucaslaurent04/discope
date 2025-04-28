@@ -1,0 +1,49 @@
+{
+    "name": "Conseil d'entreprise",
+    "plural": "Conseils d'entreprises",
+    "description": "Le comité d'entreprise offre une aide financière aux enfants pour les camps d'été. En cas d'inscription auprès du comité d'entreprise, la classe de camp est augmentée d'un niveau.",
+    "model": {
+        "code": {
+            "label": "Code",
+            "description": "Code du conseil d'entreprise.",
+            "help": ""
+        },
+        "address_street": {
+            "label": "Rue",
+            "description": "Rue et numéro du comité d'entreprise.",
+            "help": ""
+        },
+        "address_dispatch": {
+            "label": "Complément d'adresse",
+            "description": "Informations facultatives pour l'envoi du courrier (appartement, boîte, étage, ...).",
+            "help": ""
+        },
+        "address_zip": {
+            "label": "Code postal",
+            "description": "Code postal du comité d'entreprise.",
+            "help": ""
+        },
+        "address_city": {
+            "label": "Ville",
+            "description": "Comité d'entreprise de la ville.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Conseil d'entreprise",
+            "description": "",
+            "layout": {
+                "section.enrollments": {
+                    "label": "Inscriptions"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Conseils d'entreprises",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}

@@ -1,5 +1,5 @@
 {
-    "name": "Sponsor",
+    "name": "Works Council",
     "layout": {
         "groups": [
             {
@@ -14,30 +14,15 @@
                                             {
                                                 "type": "field",
                                                 "value": "name",
-                                                "width": "60%",
+                                                "width": "80%",
                                                 "widget": {
                                                     "heading": true
                                                 }
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "complete_name",
-                                                "width": "80%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "sponsor_type",
+                                                "value": "code",
                                                 "width": "33%"
-                                            },
-                                            {
-                                                "type": "label",
-                                                "value": "",
-                                                "width": "25%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "amount",
-                                                "width": "25%"
                                             }
                                         ]
                                     },

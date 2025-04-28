@@ -78,12 +78,52 @@
                                             {
                                                 "type": "field",
                                                 "value": "child_age",
-                                                "width": "33%"
+                                                "width": "33%",
+                                                "readonly": true
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "is_ase",
                                                 "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "works_council_id",
+                                                "width": "33%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "25%",
+                                                "visible": ["state", "<>", "draft"]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "camp_class",
+                                                "width": "25%",
+                                                "visible": ["state", "<>", "draft"]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "total",
+                                                "width": "25%",
+                                                "visible": ["state", "<>", "draft"]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "price",
+                                                "width": "25%",
+                                                "visible": ["state", "<>", "draft"]
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "66%"
                                             },
                                             {
                                                 "type": "field",
@@ -94,31 +134,6 @@
                                                     "pending": "Pending",
                                                     "waitlisted": "Waitlisted"
                                                 }
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "width": "50%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "camp_class",
-                                                "width": "25%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "camp_class",
-                                                "width": "25%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "total",
-                                                "width": "25%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "price",
-                                                "width": "25%"
                                             }
                                         ]
                                     }
