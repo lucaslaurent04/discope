@@ -13,31 +13,47 @@
                             {
                                 "columns": [
                                     {
-                                        "width": "50%",
+                                        "width": "25%",
                                         "items": [
                                             {
                                                 "type": "field",
                                                 "label": "Identifiant",
                                                 "value": "identifier",
-                                                "width": "50%"
+                                                "width": "100%"
                                             },
-
                                             {
                                                 "type": "field",
-                                                "label": "Nom (partiel)",
-                                                "value": "query",
-                                                "width": "50%"
+                                                "label": "City",
+                                                "value": "address_city",
+                                                "width": "100%"
                                             }
                                         ]
                                     },
                                     {
-                                        "width": "50%",
+                                        "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "label": "Nom (partiel)",
+                                                "value": "query",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Zip",
+                                                "value": "address_zip",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "25%",
                                         "items": [
                                             {
                                                 "type": "field",
                                                 "label": "Contact",
                                                 "value": "contact_identity_id",
-                                                "width": "50%"
+                                                "width": "100%"
                                             }
                                         ]
                                     }
