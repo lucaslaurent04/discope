@@ -16,6 +16,16 @@
             "label": "Contact",
             "description": "Contact lié à l'identité recherchée.",
             "help": ""
+        },
+        "address_city": {
+            "label": "Ville",
+            "description": "Le nom de la ville de l’identité.",
+            "help": ""
+        },
+        "address_zip": {
+            "label": "Code postal",
+            "description": "Le code postal de l’identité.",
+            "help": ""
         }
     },
     "error": {
