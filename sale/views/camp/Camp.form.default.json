@@ -75,7 +75,7 @@
                                                 "width": "25%"
                                             },
                                             {
-                                                "type": "field",
+                                                "type": "label",
                                                 "value": "",
                                                 "width": "10%"
                                             },
@@ -96,7 +96,7 @@
                                                 "width": "33%"
                                             },
                                             {
-                                                "type": "field",
+                                                "type": "label",
                                                 "value": "",
                                                 "width": "33%"
                                             },

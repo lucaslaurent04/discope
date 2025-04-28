@@ -51,13 +51,15 @@ class Camp extends Model {
             'date_from' => [
                 'type'              => 'date',
                 'description'       => "When the camp starts.",
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['enrollments_ids' => ['date_from']]
             ],
 
             'date_to' => [
                 'type'              => 'date',
                 'description'       => "When the camp ends.",
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['enrollments_ids' => ['date_to']]
             ],
 
             'product_id' => [
@@ -108,7 +110,7 @@ class Camp extends Model {
                 'description'       => "The quantity of children one employee can handle alone.",
                 'store'             => true,
                 'function'          => 'calcDefaultEmployeeRatio',
-                'dependencies'      => ['max_children'],
+                'dependents'        => ['max_children'],
                 'onupdate'          => 'onupdateEmployeeRatio'
             ],
 
@@ -124,7 +126,7 @@ class Camp extends Model {
                 'type'              => 'integer',
                 'description'       => "The quantity of camp groups.",
                 'default'           => 1,
-                'dependencies'      => ['max_children']
+                'dependents'        => ['max_children']
             ],
 
             'ase_quota' => [

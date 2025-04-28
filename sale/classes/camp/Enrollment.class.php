@@ -56,15 +56,33 @@ class Enrollment extends Model {
                 'onupdate'          => 'onupdateCampId'
             ],
 
+            'date_from' => [
+                'type'              => 'computed',
+                'result_type'       => 'date',
+                'description'       => "Start date of the camp.",
+                'store'             => true,
+                'relation'          => ['camp_id' => 'date_from']
+            ],
+
+            'date_to' => [
+                'type'              => 'computed',
+                'result_type'       => 'date',
+                'description'       => "End date of the camp.",
+                'store'             => true,
+                'relation'          => ['camp_id' => 'date_to']
+            ],
+
             'camp_class' => [
-                'type'              => 'string',
+                'type'              => 'computed',
+                'result_type'       => 'string',
                 'selection'         => [
                     'other',
                     'member',
                     'close-member'
                 ],
                 'description'       => "The camp class of the child for this enrollment, to know which price to apply.",
-                'default'           => 'other',
+                'store'             => true,
+                'function'          => 'calcCampClass',
                 'onupdate'          => 'onupdateCampClass'
             ],
 
@@ -116,6 +134,13 @@ class Enrollment extends Model {
                 'default'           => false
             ],
 
+            'works_council_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\WorksCouncil',
+                'description'       => "The works council that will enhance the camp class by one level.",
+                'dependents'        => ['camp_class']
+            ],
+
             'documents_ids' => [
                 'type'              => 'one2many',
                 'foreign_field'     => 'enrollment_id',
@@ -150,6 +175,72 @@ class Enrollment extends Model {
             ]
 
         ];
+    }
+
+    public static function onchange($event, $values): array {
+        $result = [];
+        if(isset($event['child_id'])) {
+            $child = Child::id($event['child_id'])
+                ->read(['camp_class', 'birthdate'])
+                ->first();
+
+            $result['camp_class'] = $child['camp_class'];
+        }
+        elseif(isset($event['works_council_id']) && isset($values['child_id'])) {
+            $child = Child::id($values['child_id'])
+                ->read(['camp_class'])
+                ->first();
+
+            $camp_class = $child['camp_class'];
+            if($camp_class === 'other') {
+                $camp_class = 'member';
+            }
+            elseif($camp_class === 'member') {
+                $camp_class = 'close-member';
+            }
+
+            $result['camp_class'] = $camp_class;
+        }
+
+        if(
+            (isset($event['child_id']) && isset($values['camp_id']))
+            || (isset($event['camp_id']) && isset($values['child_id']))
+        ) {
+            $child_id = $event['child_id'] ?? $values['child_id'];
+            $child = Child::id($child_id)
+                ->read(['birthdate'])
+                ->first();
+
+            $camp_id = $event['camp_id'] ?? $values['camp_id'];
+            $camp = Camp::id($camp_id)
+                ->read(['date_from'])
+                ->first();
+
+            $birthdate = (new \DateTime())->setTimestamp($child['birthdate']);
+            $date_from = (new \DateTime())->setTimestamp($camp['date_from']);
+            $result['child_age'] = $birthdate->diff($date_from)->y;
+        }
+
+        return $result;
+    }
+
+    public static function calcCampClass($self): array {
+        $result = [];
+        $self->read(['works_council_id', 'child_id' => ['camp_class']]);
+        foreach($self as $id => $enrollment) {
+            $camp_class = $enrollment['child_id']['camp_class'];
+            if(!is_null($enrollment['works_council_id'])) {
+                if($camp_class === 'other') {
+                    $camp_class = 'member';
+                }
+                elseif($camp_class === 'member') {
+                    $camp_class = 'close-member';
+                }
+            }
+            $result[$id] = $camp_class;
+        }
+
+        return $result;
     }
 
     public static function calcChildAge($self): array {
@@ -487,6 +578,10 @@ class Enrollment extends Model {
             ]
         ]);
         foreach($self as $enrollment) {
+            if(is_null($enrollment['camp_class'])) {
+                continue;
+            }
+
             foreach($enrollment['enrollment_lines_ids'] as $lid => $line) {
                 if(is_null($line['price_id']['camp_class']) || $line['price_id']['camp_class'] === $enrollment['camp_class']) {
                     continue;

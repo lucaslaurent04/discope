@@ -23,6 +23,16 @@
             "description": "Camp auquel l'enfant s'inscrit.",
             "help": ""
         },
+        "date_from": {
+            "label": "Du",
+            "description": "Date de début du camp.",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "Date de fin du camp.",
+            "help": ""
+        },
         "camp_class": {
             "label": "Classe camp de l'enfant",
             "description": "La classe du camp de l'enfant pour l'inscription, pour savoir quel prix utiliser.",
@@ -62,6 +72,11 @@
         "is_locked": {
             "label": "Verrouillée",
             "description": "Est-ce que l'inscription peut-être modifiée?",
+            "help": ""
+        },
+        "works_council_id": {
+            "label": "Conseil d'entreprise",
+            "description": "Le comité d'entreprise qui va rehausser la classe du camp d'un niveau.",
             "help": ""
         }
     },
