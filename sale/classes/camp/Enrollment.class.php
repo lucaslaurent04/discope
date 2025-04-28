@@ -527,7 +527,7 @@ class Enrollment extends Model {
         // Check that child is not already enrolled to another camp at the same time
         if(isset($values['camp_id']) || isset($values['child_id'])) {
             foreach($self as $enrollment) {
-                $camp_id = $values['camp_id'] ?? $enrollment['camp_id'];
+                $camp_id = $values['camp_id'] ?? $enrollment['camp_id']['id'];
                 $child_id = $values['child_id'] ?? $enrollment['child_id'];
 
                 $camp = Camp::id($camp_id)
