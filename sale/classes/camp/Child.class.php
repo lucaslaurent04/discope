@@ -88,14 +88,16 @@ class Child extends Model {
             ],
 
             'camp_class' => [
-                'type'              => 'string',
+                'type'              => 'computed',
+                'result_type'       => 'string',
                 'selection'         => [
                     'other',
                     'member',
                     'close-member'
                 ],
                 'description'       => "The camp class of the child, to know which price to apply.",
-                'default'           => 'other'
+                'store'             => true,
+                'function'          => 'calcCampClass'
             ],
 
             'skills_ids' => [
@@ -116,13 +118,11 @@ class Child extends Model {
             ],
 
             'main_guardian_id' => [
-                'type'              => 'computed',
-                'result_type'       => 'many2one',
+                'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Guardian',
                 'description'       => "The main guardian responsible of the child.",
                 'help'              => "Used to know which address to use for invoicing.",
-                'store'             => true,
-                'function'          => 'calcMainGuardianId'
+                'onupdate'          => 'onupdateMainGuardianId'
             ],
 
             'guardians_ids' => [
@@ -132,7 +132,8 @@ class Child extends Model {
                 'rel_table'         => 'sale_camp_rel_child_guardian',
                 'rel_foreign_key'   => 'guardian_id',
                 'rel_local_key'     => 'child_id',
-                'description'       => "Guardians of the child."
+                'description'       => "Guardians of the child.",
+                'onupdate'          => 'onupdateGuardiansIds'
             ],
 
             'enrollments_ids' => [
@@ -157,13 +158,21 @@ class Child extends Model {
         return $result;
     }
 
-    public static function calcMainGuardianId($self): array {
+    public static function calcCampClass($self): array {
         $result = [];
-        $self->read(['guardians_ids']);
+        $self->read(['camp_class', 'is_cpa_member', 'main_guardian_id' => ['is_vienne', 'is_ccvg']]);
         foreach($self as $id => $child) {
-            if(!empty($child['guardians_ids'])) {
-                $result[$id] = $child['guardians_ids'][0];
+            $new_camp_class = 'other';
+            if(isset($child['main_guardian_id'])) {
+                if($child['main_guardian_id']['is_ccvg'] || $child['is_cpa_member']) {
+                    $new_camp_class = 'close-member';
+                }
+                elseif($child['main_guardian_id']['is_vienne']) {
+                    $new_camp_class = 'member';
+                }
             }
+
+            $result[$id] = $new_camp_class;
         }
 
         return $result;
@@ -189,6 +198,15 @@ class Child extends Model {
         }
     }
 
+    public static function onupdateIsFoster($self) {
+        $self->read(['is_foster']);
+        foreach($self as $id => $child) {
+            if(!$child['is_foster']) {
+                self::id($id)->update(['institution_id' => null]);
+            }
+        }
+    }
+
     public static function onupdateIsCpaNumber($self) {
         $self->read(['is_cpa_member', 'cpa_club']);
         foreach($self as $id => $child) {
@@ -196,15 +214,27 @@ class Child extends Model {
                 self::id($id)
                     ->update(['cpa_club' => null]);
             }
+            if($child['is_cpa_member']) {
+                self::id($id)->update(['camp_class' => 'close-member']);
+            }
         }
     }
 
-    public static function onupdateIsFoster($self) {
-        $self->read(['is_foster']);
+    public static function onupdateMainGuardianId($self) {
+        $self->read(['camp_class']);
         foreach($self as $id => $child) {
-            if(!$child['is_foster']) {
-                self::id($id)->update(['institution_id' => null]);
+            if($child['camp_class'] === 'other') {
+                Child::id($id)
+                    ->update(['camp_class' => null]);
             }
+        }
+    }
+
+    public static function onupdateGuardiansIds($self) {
+        $self->read(['main_guardian_id', 'guardians_ids']);
+        foreach($self as $id => $child) {
+            Child::id($id)
+                ->update(['main_guardian_id' => $child['guardians_ids'][0] ?? null]);
         }
     }
 }
