@@ -531,17 +531,29 @@ class Enrollment extends Model {
             }
         }
 
-        // Check max quot ase
+        // Check max quota ase
         if(isset($values['is_ase']) && $values['is_ase']) {
+            $camp = null;
+            if(isset($values['camp_id'])) {
+                $camp = Camp::id($values['camp_id'])
+                    ->read(['ase_quota', 'enrollments_ids' => ['is_ase']])
+                    ->first();
+            }
+
             foreach($self as $enrollment) {
+                $c = $enrollment['camp_id'];
+                if(!is_null($camp)) {
+                    $c = $camp;
+                }
+
                 $ase_children_qty = 1;
-                foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
+                foreach($c['enrollments_ids'] as $en) {
                     if($en['is_ase'] && $en['id'] !== $enrollment['id']) {
                         $ase_children_qty++;
                     }
                 }
 
-                if($ase_children_qty > $enrollment['camp_id']['ase_quota']) {
+                if($ase_children_qty > $c['ase_quota']) {
                     return ['is_ase' => ['too_many_ase_children' => "The ase children quota is full."]];
                 }
             }
