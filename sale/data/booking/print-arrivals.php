@@ -283,7 +283,7 @@ foreach($bookings as $booking) {
         if($contact['type'] == 'booking') {
             // overwrite data of customer with contact info
             $item['contacts'][] = [
-                'name'  => str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title']) . ' print-arrivals.php' . $contact['partner_identity_id']['name'],
+                'name'  => str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title']) . ' ' . $contact['partner_identity_id']['name'],
                 'phone' => (strlen($contact['partner_identity_id']['mobile']))?$contact['partner_identity_id']['mobile']:$contact['partner_identity_id']['phone'],
                 'email' => $contact['partner_identity_id']['email']
             ];
