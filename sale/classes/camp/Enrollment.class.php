@@ -453,24 +453,7 @@ class Enrollment extends Model {
     }
 
     public static function canupdate($self, $values): array {
-        $self->read([
-            'is_locked',
-            'status',
-            'child_id',
-            'enrollment_lines_ids' => [
-                'id'
-            ],
-            'camp_id' => [
-                'id',
-                'max_children',
-                'ase_quota',
-                'enrollments_ids' => [
-                    'status',
-                    'child_id',
-                    'is_ase'
-                ]
-            ]
-        ]);
+        $self->read(['is_locked', 'status', 'child_id', 'camp_id']);
 
         // If is_locked cannot be modified
         foreach($self as $enrollment) {
@@ -483,18 +466,24 @@ class Enrollment extends Model {
             }
         }
 
+        // Check that camp isn't canceled
+        if(isset($values['camp_id'])) {
+            $camp = Camp::id($values['camp_id'])
+                ->read(['status'])
+                ->first();
+
+            if($camp['status'] === 'canceled') {
+                return ['camp_id' => ['canceled_camp' => "Cannot enroll to a canceled camp."]];
+            }
+        }
+
         // Check that camp is not already full and that child is not already enrolled
         if(isset($values['camp_id']) || (isset($values['status']) && in_array($values['status'], ['pending', 'confirmed']))) {
             foreach($self as $enrollment) {
                 $status = $values['status'] ?? $enrollment['status'];
 
-                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id']['id'])
-                    ->read([
-                        'max_children',
-                        'enrollments_ids' => [
-                            'status',
-                        ]
-                    ])
+                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
+                    ->read(['max_children', 'enrollments_ids' => ['status']])
                     ->first();
 
                 if(in_array($status, ['pending', 'confirmed'])) {
@@ -515,12 +504,8 @@ class Enrollment extends Model {
         // Check that child not already enrolled to camp
         if(isset($values['child_id'])) {
             foreach($self as $enrollment) {
-                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id']['id'])
-                    ->read([
-                        'enrollments_ids' => [
-                            'child_id',
-                        ]
-                    ])
+                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
+                    ->read(['enrollments_ids' => ['child_id']])
                     ->first();
 
                 foreach($camp['enrollments_ids'] as $en) {
@@ -533,59 +518,32 @@ class Enrollment extends Model {
 
         // Check max quota ase
         if(isset($values['is_ase']) && $values['is_ase']) {
-            $camp = null;
-            if(isset($values['camp_id'])) {
-                $camp = Camp::id($values['camp_id'])
+            foreach($self as $enrollment) {
+                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
                     ->read(['ase_quota', 'enrollments_ids' => ['is_ase']])
                     ->first();
-            }
-
-            foreach($self as $enrollment) {
-                $c = $enrollment['camp_id'];
-                if(!is_null($camp)) {
-                    $c = $camp;
-                }
 
                 $ase_children_qty = 1;
-                foreach($c['enrollments_ids'] as $en) {
+                foreach($camp['enrollments_ids'] as $en) {
                     if($en['is_ase'] && $en['id'] !== $enrollment['id']) {
                         $ase_children_qty++;
                     }
                 }
 
-                if($ase_children_qty > $c['ase_quota']) {
+                if($ase_children_qty > $camp['ase_quota']) {
                     return ['is_ase' => ['too_many_ase_children' => "The ase children quota is full."]];
                 }
-            }
-        }
-
-        // Check that camp isn't canceled
-        if(isset($values['camp_id'])) {
-            $camp = Camp::id($values['camp_id'])
-                ->read(['status'])
-                ->first();
-
-            if($camp['status'] === 'canceled') {
-                return ['camp_id' => ['canceled_camp' => "Cannot enroll to a canceled camp."]];
             }
         }
 
         // Check prices isn't missing for child specific camp_class
         if(isset($values['camp_id']) || isset($values['child_id'])) {
             foreach($self as $enrollment) {
-                $camp_id = $values['camp_id'] ?? $enrollment['camp_id']['id'];
-                $camp = Camp::id($camp_id)
-                    ->read([
-                        'product_id' => [
-                            'prices_ids' => [
-                                'camp_class'
-                            ]
-                        ]
-                    ])
+                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
+                    ->read(['product_id' => ['prices_ids' => ['camp_class']]])
                     ->first();
 
-                $child_id = $values['child_id'] ?? $enrollment['child_id'];
-                $child = Child::id($child_id)
+                $child = Child::id($values['child_id'] ?? $enrollment['child_id'])
                     ->read(['camp_class'])
                     ->first();
 
@@ -605,14 +563,11 @@ class Enrollment extends Model {
         // Check that child is not already enrolled to another camp at the same time
         if(isset($values['camp_id']) || isset($values['child_id'])) {
             foreach($self as $enrollment) {
-                $camp_id = $values['camp_id'] ?? $enrollment['camp_id']['id'];
-                $child_id = $values['child_id'] ?? $enrollment['child_id'];
-
-                $camp = Camp::id($camp_id)
+                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
                     ->read(['date_from', 'date_to'])
                     ->first();
 
-                $child = Child::id($child_id)
+                $child = Child::id($values['child_id'] ?? $enrollment['child_id'])
                     ->read(['enrollments_ids' => ['camp_id' => ['date_from', 'date_to']]])
                     ->first();
 
