@@ -421,11 +421,7 @@ class Camp extends Model {
                 }
                 $final_camp_group_ids = array_unique($final_camp_group_ids);
                 if(empty($final_camp_group_ids)) {
-                    return [
-                        'camp_groups_ids' => [
-                            'one_needed' => "A camp should have at least one camp group."
-                        ]
-                    ];
+                    return ['camp_groups_ids' => ['one_needed' => "A camp must have at least one camp group."]];
                 }
 
                 if($enrolled_children_qty === 0) {
@@ -442,11 +438,7 @@ class Camp extends Model {
                 }
 
                 if($enrolled_children_qty > $max_children) {
-                    return [
-                        'camp_groups_ids' => [
-                            'too_many_children' => "There is too many children enrolled in the camp groups."
-                        ]
-                    ];
+                    return ['camp_groups_ids' => ['too_many_children' => "There is too many children enrolled in the camp groups."]];
                 }
             }
         }
@@ -462,11 +454,7 @@ class Camp extends Model {
                 }
 
                 if($enrolled_children_qty > ($camp['camp_group_qty'] * $values['employee_ratio'])) {
-                    return [
-                        'employee_ratio' => [
-                            'too_many_children' => "There is too many children enrolled in the camp to modify the employee ratio to {$values['employee_ratio']}."
-                        ]
-                    ];
+                    return ['employee_ratio' => ['too_many_children' => "There is too many children enrolled in the camp."]];
                 }
             }
         }

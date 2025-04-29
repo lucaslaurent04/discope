@@ -138,5 +138,19 @@
             "layout": []
         }
     },
-    "error": []
+    "error": {
+        "is_locked": {
+            "locked_enrollment": "Impossible de modifier une inscription verrouillée."
+        },
+        "camp_id": {
+            "canceled_camp": "Inscription à un camp annulé impossible.",
+            "full": "Le camp est complet."
+        },
+        "child_id": {
+            "already_enrolled": "L'enfant est déjà inscrit à ce camp."
+        },
+        "is_ase": {
+            "too_many_ase_children": "Le quota d'enfants de cette catégorie est plein."
+        }
+    }
 }
