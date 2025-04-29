@@ -205,8 +205,8 @@ class Camp extends Model {
             'draft' => [
                 'description' => "The camp is still being configured.",
                 'transitions' => [
-                    'confirm' => [
-                        'status'        => 'publish',
+                    'publish' => [
+                        'status'        => 'published',
                         'description'   => "Publish the camp on the website."
                     ],
                     'cancel' => [

@@ -34,13 +34,13 @@ use sale\camp\Enrollment;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'providers'     => ['context']
 ]);
 
-['context' => $context, 'orm' => $orm] = $providers;
+['context' => $context] = $providers;
 
 $enrollment = Enrollment::id($params['id'])
-    ->read(['camp_id'])
+    ->read(['camp_id', 'is_locked'])
     ->first();
 
 if(is_null($enrollment)) {
@@ -59,9 +59,26 @@ if($camp['status'] === 'canceled') {
     throw new Exception("canceled_camp", EQ_ERROR_INVALID_PARAM);
 }
 
-// Checks are done in Enrollment::canupdate
-Enrollment::id($enrollment['id'])
-    ->update(['camp_id' => $camp['id']]);
+$was_locked = false;
+if($enrollment['is_locked']) {
+    $was_locked = true;
+    Enrollment::id($enrollment['id'])->update(['is_locked' => false]);
+}
+
+try {
+    // Checks are done in Enrollment::canupdate
+    Enrollment::id($enrollment['id'])->update(['camp_id' => $camp['id']]);
+}
+catch(Exception $e) {
+    if($was_locked) {
+        Enrollment::id($enrollment['id'])->update(['is_locked' => true]);
+    }
+    throw $e;
+}
+
+if($was_locked) {
+    Enrollment::id($enrollment['id'])->update(['is_locked' => true]);
+}
 
 $context->httpResponse()
         ->status(204)

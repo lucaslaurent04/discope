@@ -84,7 +84,7 @@
         "form.default": {
             "name": "Inscription",
             "description": "",
-            "layout": {
+            "actions": {
                 "action.transition.pending": {
                     "label": "En cours"
                 },
@@ -94,6 +94,11 @@
                 "action.transition.cancel": {
                     "label": "Annuler"
                 },
+                "action.transition.transfer": {
+                    "label": "Transférer"
+                }
+            },
+            "layout": {
                 "section.documents": {
                     "label": "Documents"
                 },
