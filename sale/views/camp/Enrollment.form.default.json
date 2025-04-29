@@ -52,7 +52,7 @@
                 "ids": []
             },
             "visible": [
-                ["status", "in", ["waitlisted", "pending", "confirm"]],
+                ["status", "in", ["waitlisted", "pending", "confirmed"]],
                 ["state", "<>", "draft"]
             ]
         },
@@ -60,7 +60,10 @@
             "id": "action.transition.transfer",
             "label": "Transfer",
             "controller": "sale_camp_transfer-enrollment",
-            "visible": ["state", "<>", "draft"]
+            "visible": [
+                ["status", "<>", "canceled"],
+                ["state", "<>", "draft"]
+            ]
         }
     ],
     "layout": {
