@@ -270,7 +270,7 @@ class Enrollment extends Model {
         $result = [];
         $self->read([
             'enrollment_lines_ids'  => ['total'],
-            'price_adapters_ids'    => ['amount']
+            'price_adapters_ids'    => ['price_adapter_type', 'value']
         ]);
         foreach($self as $id => $enrollment) {
             $total = 0.0;
@@ -279,8 +279,27 @@ class Enrollment extends Model {
             }
 
             foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-                $total -= $price_adapter['amount'];
+                if($price_adapter['price_adapter_type'] !== 'amount') {
+                    continue;
+                }
+                $total -= $price_adapter['value'];
             }
+            if($total < 0) {
+                $total = 0;
+            }
+
+            $percentage = 0;
+            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+                if($price_adapter['price_adapter_type'] !== 'percent') {
+                    continue;
+                }
+                $percentage += $price_adapter['value'];
+            }
+            if($percentage > 100) {
+                $percentage = 100;
+            }
+
+            $total -= $total / 100 * $percentage;
 
             $result[$id] = $total;
         }
@@ -292,7 +311,7 @@ class Enrollment extends Model {
         $result = [];
         $self->read([
             'enrollment_lines_ids'  => ['price'],
-            'price_adapters_ids'    => ['amount']
+            'price_adapters_ids'    => ['price_adapter_type', 'value']
         ]);
         foreach($self as $id => $enrollment) {
             $price = 0.0;
@@ -301,8 +320,27 @@ class Enrollment extends Model {
             }
 
             foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-                $price -= $price_adapter['amount'];
+                if($price_adapter['price_adapter_type'] !== 'amount') {
+                    continue;
+                }
+                $price -= $price_adapter['value'];
             }
+            if($price < 0) {
+                $price = 0;
+            }
+
+            $percentage = 0;
+            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+                if($price_adapter['price_adapter_type'] !== 'percent') {
+                    continue;
+                }
+                $percentage += $price_adapter['value'];
+            }
+            if($percentage > 100) {
+                $percentage = 100;
+            }
+
+            $price -= $price / 100 * $percentage;
 
             $result[$id] = $price;
         }

@@ -54,9 +54,7 @@ class PriceAdapter extends Model {
                     'help-commune',
                     'help-community-of-communes',
                     'help-department-caf',
-                    'help-department-msa',
-                    'loyalty-discount',
-                    'ce'
+                    'help-department-msa'
                 ],
                 'description'       => "Type of the price adapter.",
                 'default'           => 'other'
@@ -69,13 +67,10 @@ class PriceAdapter extends Model {
             ],
 
             'value' => [
-                'type'              => 'compute',
-                'result_type'       => 'float',
+                'type'              => 'float',
                 'usage'             => 'amount/money:4',
                 'description'       => "Amount/percentage to remove to the enrollment price.",
-                'store'             => true,
-                'function'          => 'calcAmount',
-                'onupdate'          => 'onupdateAmount'
+                'onupdate'          => 'onupdateValue'
             ],
 
             'sponsor_id' => [
@@ -98,7 +93,7 @@ class PriceAdapter extends Model {
                 ->first();
 
             $result['value'] = $sponsor['amount'];
-            $result['origin_type'] = $sponsor['sponsor_type'];
+            $result['origin_type'] = 'help-'.$sponsor['sponsor_type'];
             $result['price_adapter_type'] = 'amount';
             $result['is_manual_discount'] = false;
             if(empty($values['name'])) {
@@ -136,19 +131,7 @@ class PriceAdapter extends Model {
             ]);
     }
 
-    public static function onupdateAmount($self) {
+    public static function onupdateValue($self) {
         $self->do('reset-enrollments-prices');
-    }
-
-    public static function calcAmount($self): array {
-        $result = [];
-        $self->read(['sponsor_id' => ['amount']]);
-        foreach($self as $id => $price_adapter) {
-            if(isset($price_adapter['sponsor_id']['amount'])) {
-                $result[$id] = $price_adapter['sponsor_id']['amount'];
-            }
-        }
-
-        return $result;
     }
 }
