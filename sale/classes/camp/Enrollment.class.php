@@ -592,9 +592,12 @@ class Enrollment extends Model {
                 'camp_class'
             ],
             'camp_id'   => [
+                'date_from',
+                'date_to',
                 'product_id' => [
                     'prices_ids' => [
-                        'camp_class'
+                        'camp_class',
+                        'price_list_id' => ['date_from', 'date_to']
                     ]
                 ]
             ]
@@ -607,7 +610,11 @@ class Enrollment extends Model {
 
             $camp_class_price = null;
             foreach($enrollment['camp_id']['product_id']['prices_ids'] as $price) {
-                if($enrollment['child_id']['camp_class'] === $price['camp_class']) {
+                if(
+                    $enrollment['child_id']['camp_class'] === $price['camp_class']
+                    && $enrollment['camp_id']['date_from'] >= $price['price_list_id']['date_from']
+                    && $enrollment['camp_id']['date_from'] <= $price['price_list_id']['date_to']
+                ) {
                     $camp_class_price = $price;
                 }
             }
@@ -615,7 +622,7 @@ class Enrollment extends Model {
             EnrollmentLine::create([
                 'enrollment_id' => $id,
                 'product_id'    => $enrollment['camp_id']['product_id']['id'],
-                'price_id'      => $camp_class_price['id'],
+                'price_id'      => $camp_class_price['id'] ?? null,
                 'qty'           => 1
             ]);
         }
