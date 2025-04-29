@@ -65,24 +65,35 @@
                                                 "visible": false
                                             },
                                             {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "20%"
+                                            },
+                                            {
                                                 "type": "field",
                                                 "value": "min_age",
-                                                "width": "25%"
+                                                "width": "20%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "max_age",
-                                                "width": "25%"
+                                                "width": "20%"
                                             },
                                             {
                                                 "type": "label",
                                                 "value": "",
-                                                "width": "10%"
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "enrollments_qty",
+                                                "width": "20%",
+                                                "readonly": true
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "max_children",
-                                                "width": "25%",
+                                                "width": "20%",
                                                 "readonly": true
                                             },
                                             {

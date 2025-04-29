@@ -80,6 +80,11 @@
             "description": "Quantité maximal d'enfants qui peuvent participés au camp.",
             "help": ""
         },
+        "enrollments_qty": {
+            "label": "Qté inscriptions",
+            "description": "La quanitités des inscriptions non annulées ou sur une liste d'attente.",
+            "help": ""
+        },
         "camp_group_qty": {
             "label": "Quantité de groupes",
             "description": "La quanitités des groupes d'enfants du camp.",
