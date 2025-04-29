@@ -28,12 +28,12 @@ class Camp extends Model {
             'status' => [
                 'type'              => 'string',
                 'selection'         => [
-                    'unpublished',
+                    'draft',
                     'published',
                     'canceled'
                 ],
                 'description'       => "Status of the camp.",
-                'default'           => 'unpublished'
+                'default'           => 'draft'
             ],
 
             'remarks' => [
@@ -202,7 +202,7 @@ class Camp extends Model {
     public static function getWorkflow(): array {
         return [
 
-            'unpublished' => [
+            'draft' => [
                 'description' => "The camp is still being configured.",
                 'transitions' => [
                     'confirm' => [
