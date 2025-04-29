@@ -83,6 +83,12 @@ class Camp extends Model {
                 'default'           => 'sport'
             ],
 
+            'is_clsh' => [
+                'type'              => 'boolean',
+                'description'       => "Is \"Centre loisir sans hébergement\"",
+                'default'           => false
+            ],
+
             'camp_model_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\CampModel',

@@ -104,6 +104,11 @@
                                                 "type": "field",
                                                 "value": "accounting_code",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_clsh",
+                                                "width": "33"
                                             }
                                         ]
                                     },
