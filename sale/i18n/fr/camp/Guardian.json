@@ -40,9 +40,10 @@
             "selection": {
                 "mother": "Mère",
                 "father": "Père",
-                "legal_tutor": "Tuteur légal",
-                "family_member": "Membre famille",
-                "home_manager": "Responssable foyer"
+                "legal-tutor": "Tuteur légal",
+                "family-member": "Membre famille",
+                "home-manager": "Responssable foyer",
+                "departmental-council": "Conseil département"
             }
         },
         "address_street": {
