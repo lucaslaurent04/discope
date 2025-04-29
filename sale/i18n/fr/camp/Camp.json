@@ -50,6 +50,11 @@
                 "horse-riding": "Équitation"
             }
         },
+        "is_clsh": {
+            "label": "CLSH",
+            "description": "Centre loisir sans hébergement.",
+            "help": ""
+        },
         "camp_model_id": {
             "label": "Modèle",
             "description": "Modèle qui a été utilisé pour créé le camp.",
