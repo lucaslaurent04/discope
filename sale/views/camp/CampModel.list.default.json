@@ -11,7 +11,14 @@
             },
             {
                 "type": "field",
-                "value": "description",
+                "value": "camp_type",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "product_id",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true

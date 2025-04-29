@@ -258,6 +258,10 @@ class Enrollment extends Model {
             'child_id'  => ['birthdate']
         ]);
         foreach($self as $id => $enrollment) {
+            if(!isset($enrollment['camp_id']['date_from'], $enrollment['child_id']['birthdate'])) {
+                continue;
+            }
+
             $date_from = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from']);
             $birthdate = (new \DateTime())->setTimestamp($enrollment['child_id']['birthdate']);
             $result[$id] = $birthdate->diff($date_from)->y;
