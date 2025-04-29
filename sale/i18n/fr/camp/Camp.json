@@ -8,7 +8,7 @@
             "description": "Status du camp.",
             "help": "",
             "selection": {
-                "unpublished": "Non publié",
+                "draft": "Brouillon",
                 "published": "Publié",
                 "canceled": "Annulé"
             }

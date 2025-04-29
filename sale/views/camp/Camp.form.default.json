@@ -23,7 +23,7 @@
                 "ids": []
             },
             "visible": [
-                ["status", "=", "unpublished"]
+                ["status", "=", "draft"]
             ]
         },
         {
@@ -36,7 +36,7 @@
                 "ids": []
             },
             "visible": [
-                ["status", "in", ["unpublished", "published"]]
+                ["status", "in", ["draft", "published"]]
             ]
         }
     ],
