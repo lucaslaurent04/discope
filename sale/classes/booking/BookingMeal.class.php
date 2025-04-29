@@ -52,7 +52,8 @@ class BookingMeal extends Model {
             'meal_type_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\MealType',
-                'description'       => 'Type of the meal being served.'
+                'description'       => 'Type of the meal being served.',
+                'default'           => 1
             ],
 
             'meal_place' => [
@@ -69,11 +70,14 @@ class BookingMeal extends Model {
 
 /*
 Les repas sont globaux à une réservation, mais doivent nécessairement se mettre sur un groupe de service (il peut donc y en avoir plusieurs en parallèle pour une même réservation)
-Par convention, les bookingMeal ne sont visibles que sur les groupes de type "sojourn" (pas "simple", "événement ou "activité")
+Les bookingMeal ne sont visibles que sur les groupes de type "sojourn" (pas "simple", "événement ou "activité")
+
+refreshMeals
 
 * lorsqu'on créée une bookingline marquée is_meal dans un groupe "sojourn", on vérifie si un bookingMeal existe pour cetee réservation, ce groupe, le time_slot correspondant, pour chacune des date du séjour
 si pas encore : on crée un bookingMeal
 ensuite on assigne automatiquement la ligne au bookingMeal
+(il peut y avoir plusieurs fois un produit repas pour un même moment, avec une variation sur la tranche d'âge)
 
 * les bookingMeal peuvent être modifiés en UI, mais pas créés
 
