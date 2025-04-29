@@ -1,0 +1,58 @@
+[
+    {
+        "name": "sale\\booking\\MealType",
+        "lang": "en",
+        "data": [
+            {
+                "id": 1,
+                "name": "Picnic",
+                "code": "picnic",
+                "description": "A meal packed to be eaten outdoors or taken away, typically simple and portable."
+            },
+            {
+                "id": 2,
+                "name": "Buffet",
+                "code": "buffet",
+                "description": "A self-service meal offering a variety of dishes for guests to choose from."
+            },
+            {
+                "id": 3,
+                "name": "Brunch",
+                "code": "brunch",
+                "description": "A meal combining breakfast and lunch, typically served in late morning."
+            },
+            {
+                "id": 4,
+                "name": "Themed meal",
+                "code": "themed",
+                "description": "A meal organized around a specific theme (e.g., Asian, Italian, Medieval)."
+            }
+        ]
+    },
+    {
+        "name": "sale\\booking\\MealType",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "Pique-nique",
+                "description": "Repas préparé à emporter ou à consommer en extérieur, simple et pratique."
+            },
+            {
+                "id": 2,
+                "name": "Buffet",
+                "description": "Repas en libre-service proposant une variété de plats."
+            },
+            {
+                "id": 3,
+                "name": "Brunch",
+                "description": "Repas combinant petit-déjeuner et déjeuner, généralement servi en fin de matinée."
+            },
+            {
+                "id": 4,
+                "name": "Repas thématique",
+                "description": "Repas organisé autour d'un thème spécifique (ex. asiatique, italien, médiéval)."
+            }
+        ]
+    }
+]
