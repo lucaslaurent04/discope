@@ -11,7 +11,6 @@ use sale\booking\BookingLineGroup;
 use sale\booking\BookingLineGroupAgeRangeAssignment;
 use sale\customer\AgeRange;
 
-// announce script and fetch parameters values
 list($params, $providers) = eQual::announce([
     'description'	=>	"Create an empty additional age range. This script is meant to be called by the `booking/services` UI.",
     'params' 		=>	[
