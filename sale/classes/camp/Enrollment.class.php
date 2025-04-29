@@ -349,11 +349,16 @@ class Enrollment extends Model {
      * Lock enrollment after status to confirm
      */
     public static function onafterConfirm($self) {
-        $self->update(['is_locked' => true]);
+        $self->update([
+            'is_locked' => true,
+            'status'    => 'confirmed'
+        ]);
     }
 
     public static function onafterCancel($self) {
-        $self->update(['cancellation_date' => time()]);
+        $self->update([
+            'cancellation_date' => time()
+        ]);
     }
 
     public static function getWorkflow(): array {
@@ -432,7 +437,11 @@ class Enrollment extends Model {
         // If is_locked cannot be modified
         foreach($self as $enrollment) {
             if($enrollment['is_locked']) {
-                return ['is_locked' => ['locked_enrollment' => "Cannot modify a locked enrollment."]];
+                foreach(array_keys($values) as $column) {
+                    if(!in_array($column, ['is_locked', 'status'])) {
+                        return ['is_locked' => ['locked_enrollment' => "Cannot modify a locked enrollment."]];
+                    }
+                }
             }
         }
 
