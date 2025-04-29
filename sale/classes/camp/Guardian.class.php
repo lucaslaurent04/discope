@@ -71,9 +71,10 @@ class Guardian extends Model {
                 'selection'         => [
                     'mother',
                     'father',
-                    'legal_tutor',
-                    'family_member',
-                    'home_manager'
+                    'legal-tutor',
+                    'family-member',
+                    'home-manager',
+                    'departmental-council'
                 ],
                 'description'       => "Relation of the person to the guardian.",
                 'default'           => 'mother'
