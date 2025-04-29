@@ -387,20 +387,35 @@ class Enrollment extends Model {
         ];
     }
 
+    public static function onafterPending($self) {
+        $self->update([
+            'is_locked' => false,
+            'status'    => 'pending'            // #todo - find why needed and fix error
+        ]);
+
+        $self->do('reset-camp-enrollments-qty');
+    }
+
     /**
      * Lock enrollment after status to confirm
      */
     public static function onafterConfirm($self) {
         $self->update([
             'is_locked' => true,
-            'status'    => 'confirmed'
+            'status'    => 'confirmed'          // #todo - find why needed and fix error
         ]);
+
+        $self->do('reset-camp-enrollments-qty');
     }
 
     public static function onafterCancel($self) {
         $self->update([
-            'cancellation_date' => time()
+            'is_locked'         => false,
+            'cancellation_date' => time(),
+            'status'            => 'canceled'   // #todo - find why needed and fix error
         ]);
+
+        $self->do('reset-camp-enrollments-qty');
     }
 
     public static function getWorkflow(): array {
@@ -428,7 +443,8 @@ class Enrollment extends Model {
                     'pending' => [
                         'status'        => 'pending',
                         'description'   => "Remove from the waitlist.",
-                        'policies'      => ['remove-from-waitlist']
+                        'policies'      => ['remove-from-waitlist'],
+                        'onafter'       => 'onafterPending'
                     ],
                     'cancel' => [
                         'status'        => 'canceled',
@@ -463,7 +479,7 @@ class Enrollment extends Model {
         foreach($self as $enrollment) {
             if($enrollment['is_locked']) {
                 foreach(array_keys($values) as $column) {
-                    if(!in_array($column, ['is_locked', 'status'])) {
+                    if(!in_array($column, ['is_locked', 'status', 'cancellation_date'])) {
                         return ['is_locked' => ['locked_enrollment' => "Cannot modify a locked enrollment."]];
                     }
                 }
@@ -666,5 +682,34 @@ class Enrollment extends Model {
                 }
             }
         }
+    }
+
+    public static function onupdate($self, $values) {
+        if(isset($values['status'])) {
+            $self->do('reset-camp-enrollments-qty');
+        }
+    }
+
+    public static function doResetCampEnrollmentsQty($self) {
+        $self->read(['camp_id']);
+
+        $map_camps_ids = [];
+        foreach($self as $enrollment) {
+            $map_camps_ids[$enrollment['camp_id']] = true;
+        }
+
+        Camp::ids(array_keys($map_camps_ids))->update(['enrollments_qty' => null]);
+    }
+
+    public static function getActions(): array {
+        return [
+
+            'reset-camp-enrollments-qty' => [
+                'description'   => "Reset the enrollments prices fields values so they can be re-calculated.",
+                'policies'      => [],
+                'function'      => 'doResetCampEnrollmentsQty'
+            ]
+
+        ];
     }
 }

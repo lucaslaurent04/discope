@@ -57,7 +57,7 @@
             ]
         },
         {
-            "id": "action.transition.transfer",
+            "id": "action.transfer",
             "label": "Transfer",
             "controller": "sale_camp_transfer-enrollment",
             "visible": [

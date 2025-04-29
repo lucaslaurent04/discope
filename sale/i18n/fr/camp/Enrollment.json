@@ -89,12 +89,12 @@
                     "label": "En cours"
                 },
                 "action.transition.confirm": {
-                    "label": "Confirm"
+                    "label": "Confirmer"
                 },
                 "action.transition.cancel": {
                     "label": "Annuler"
                 },
-                "action.transition.transfer": {
+                "action.transfer": {
                     "label": "Transférer"
                 }
             },
@@ -113,6 +113,22 @@
                 },
                 "section.mails": {
                     "label": "E-mails"
+                }
+            }
+        },
+        "form.camp": {
+            "actions": {
+                "action.transition.pending": {
+                    "label": "En cours"
+                },
+                "action.transition.confirm": {
+                    "label": "Confirmer"
+                },
+                "action.transition.cancel": {
+                    "label": "Annuler"
+                },
+                "action.transfer": {
+                    "label": "Transférer"
                 }
             }
         },

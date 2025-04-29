@@ -68,11 +68,19 @@
             },
             {
                 "type": "field",
+                "value": "enrollments_qty",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": true
+            },
+            {
+                "type": "field",
                 "value": "max_children",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true,
-                "visible": false
+                "visible": true
             },
             {
                 "type": "field",
