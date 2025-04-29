@@ -530,7 +530,7 @@ class Enrollment extends Model {
 
                 foreach($camp['enrollments_ids'] as $en) {
                     if($en['child_id'] === $values['child_id'] && $en['id'] !== $enrollment['id']) {
-                        return ['child_id' => ['already_enrolled' => "The child has already enrolled to this camp."]];
+                        return ['child_id' => ['already_enrolled' => "The child is already enrolled in this camp."]];
                     }
                 }
             }
