@@ -128,6 +128,14 @@ class Camp extends Model {
                 'function'          => 'calcMaxChildren'
             ],
 
+            'enrollments_qty' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => "Quantity of enrollments that aren't canceled or waitlisted.",
+                'store'             => true,
+                'function'          => 'calcEnrollmentsQty'
+            ],
+
             'camp_group_qty' => [
                 'type'              => 'integer',
                 'description'       => "The quantity of camp groups.",
@@ -254,6 +262,22 @@ class Camp extends Model {
         $self->read(['employee_ratio', 'camp_group_qty']);
         foreach($self as $id => $camp) {
             $result[$id] = $camp['employee_ratio'] * $camp['camp_group_qty'];
+        }
+
+        return $result;
+    }
+
+    public static function calcEnrollmentsQty($self): array {
+        $result = [];
+        $self->read(['enrollments_ids' => ['status']]);
+        foreach($self as $id => $camp) {
+            $enrollment_qty = 0;
+            foreach($camp['enrollments_ids'] as $enrollment) {
+                if(!in_array($enrollment['status'], ['canceled', 'waitlisted'])) {
+                    $enrollment_qty++;
+                }
+            }
+            $result[$id] = $enrollment_qty;
         }
 
         return $result;
