@@ -172,6 +172,14 @@ class Enrollment extends Model {
                 'rel_foreign_key'   => 'sponsor_id',
                 'rel_local_key'     => 'enrollment_id',
                 'description'       => "Sponsors that reduce the price of the enrollment."
+            ],
+
+            'mails_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'core\Mail',
+                'foreign_field'     => 'object_id',
+                'description'       => "Mails related to the enrollment.",
+                'domain'            => ['object_class', '=', 'sale\camp\Enrollment']
             ]
 
         ];
