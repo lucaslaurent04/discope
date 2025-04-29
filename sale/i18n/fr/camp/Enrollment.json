@@ -105,6 +105,9 @@
                 },
                 "section.child-remarks": {
                     "label": "Remarques enfant"
+                },
+                "section.mails": {
+                    "label": "E-mails"
                 }
             }
         },
