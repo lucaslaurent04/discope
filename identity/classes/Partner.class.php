@@ -94,7 +94,7 @@ class Partner extends Model {
                 'type'              => 'computed',
                 'relation'          => ['partner_identity_id' => 'phone'],
                 'result_type'       => 'string',
-                'usage'             => 'phone',
+                // 'usage'             => 'phone',
                 'store'             => true,
                 'description'       => 'Phone number of the contact (from Identity).'
             ],
@@ -103,7 +103,7 @@ class Partner extends Model {
                 'type'              => 'computed',
                 'relation'          => ['partner_identity_id' => 'mobile'],
                 'result_type'       => 'string',
-                'usage'             => 'phone',
+                // 'usage'             => 'phone',
                 'store'             => true,
                 'description'       => 'Mobile phone number of the contact (from Identity).'
             ],
