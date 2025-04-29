@@ -24,7 +24,8 @@
                 "ids": []
             },
             "visible": [
-                ["status", "=", "waitlisted"]
+                ["status", "=", "waitlisted"],
+                ["state", "<>", "draft"]
             ]
         },
         {
@@ -37,7 +38,8 @@
                 "ids": []
             },
             "visible": [
-                ["status", "=", "pending"]
+                ["status", "=", "pending"],
+                ["state", "<>", "draft"]
             ]
         },
         {
@@ -50,8 +52,15 @@
                 "ids": []
             },
             "visible": [
-                ["status", "in", ["waitlisted", "pending", "confirm"]]
+                ["status", "in", ["waitlisted", "pending", "confirm"]],
+                ["state", "<>", "draft"]
             ]
+        },
+        {
+            "id": "action.transition.transfer",
+            "label": "Transfer",
+            "controller": "sale_camp_transfer-enrollment",
+            "visible": ["state", "<>", "draft"]
         }
     ],
     "layout": {
@@ -103,10 +112,15 @@
                                                 "visible": ["state", "<>", "draft"]
                                             },
                                             {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "50%",
+                                                "visible": ["state", "=", "draft"]
+                                            },
+                                            {
                                                 "type": "field",
                                                 "value": "camp_class",
-                                                "width": "25%",
-                                                "visible": ["state", "<>", "draft"]
+                                                "width": "25%"
                                             },
                                             {
                                                 "type": "field",
@@ -121,19 +135,10 @@
                                                 "visible": ["state", "<>", "draft"]
                                             },
                                             {
-                                                "type": "label",
-                                                "value": "",
-                                                "width": "66%"
-                                            },
-                                            {
                                                 "type": "field",
                                                 "value": "status",
-                                                "width": "33%",
-                                                "visible": ["state", "=", "draft"],
-                                                "selection": {
-                                                    "pending": "Pending",
-                                                    "waitlisted": "Waitlisted"
-                                                }
+                                                "width": "25%",
+                                                "visible": ["state", "=", "draft"]
                                             }
                                         ]
                                     }
