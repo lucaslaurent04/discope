@@ -547,6 +547,17 @@ class Enrollment extends Model {
             }
         }
 
+        // Check that camp isn't canceled
+        if(isset($values['camp_id'])) {
+            $camp = Camp::id($values['camp_id'])
+                ->read(['status'])
+                ->first();
+
+            if($camp['status'] === 'canceled') {
+                return ['camp_id' => ['canceled_camp' => "Cannot enroll to a canceled camp."]];
+            }
+        }
+
         // Check prices isn't missing for child specific camp_class
         if(isset($values['camp_id']) || isset($values['child_id'])) {
             foreach($self as $enrollment) {
