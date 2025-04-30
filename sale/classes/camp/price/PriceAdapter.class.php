@@ -54,7 +54,8 @@ class PriceAdapter extends Model {
                     'help-commune',
                     'help-community-of-communes',
                     'help-department-caf',
-                    'help-department-msa'
+                    'help-department-msa',
+                    'loyalty-discount'
                 ],
                 'description'       => "Type of the price adapter.",
                 'default'           => 'other'
