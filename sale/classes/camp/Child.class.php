@@ -79,15 +79,23 @@ class Child extends Model {
                 'visible'           => ['is_cpa_member', '=', true]
             ],
 
-            'licence_ffe' => [
-                'type'              => 'string',
-                'description'       => "Licence 'fédération française équitation'."
+            'has_license_ffe' => [
+                'type'              => 'boolean',
+                'description'       => "The child has a licence (Fédération française équitation)",
+                'default'           => false
             ],
 
-            'year_licence_ffe' => [
+            'license_ffe' => [
+                'type'              => 'string',
+                'description'       => "Licence (Fédération française équitation).",
+                'visible'           => ['has_license_ffe', '=', true]
+            ],
+
+            'year_license_ffe' => [
                 'type'              => 'integer',
                 'usage'             => 'number/integer{2000,'.date('Y').'}',
-                'description'       => "Year the licence ffe was acquired."
+                'description'       => "Year the licence ffe was acquired.",
+                'visible'           => ['has_license_ffe', '=', true]
             ],
 
             'camp_class' => [
