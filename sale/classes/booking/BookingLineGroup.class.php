@@ -3201,6 +3201,47 @@ class BookingLineGroup extends Model {
      * This method is called by `update-sojourn-[...]` controllers.
      * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
      *
+     */
+    public static function refreshMeals($om, $id) {
+        /*
+        For all bookingLines of type meal (is_meal), we check if a bookingMeal exists for this group (for this reservation) and for the corresponding time_slot, for each date of the stay.
+            If not yet: we create a bookingMeal
+            (the line is linked to the bookingMeal via the booking_meals_ids relation)
+            (there can be multiple meal products for the same time slot, as variations of the same model [variation based on age group or other criteria])
+        */
+
+        $groups = $om->read(self::getType(), $id, ['booking_id', 'date_from', 'date_to', 'booking_lines_ids']);
+        if($groups <= 0) {
+            return;
+        }
+        $group = reset($groups);
+
+        $lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], ['is_meal', 'time_slot_id']);
+        if($lines <= 0) {
+            return;
+        }
+        foreach($lines as $line_id => $line) {
+            if(!$line['is_meal']) {
+                continue;
+            }
+            for($date = $group['date_from']; $date <= $group['date_to']; $date += 86400) {
+                $meals_ids = $om->search(BookingMeal::getType(), [['booking_line_group_id', '=', $id], ['time_slot_id', '=', $line['time_slot_id']], ['date', '=', $date]]);
+                if(!count($meals_ids)) {
+                    $res = $om->create(BookingMeal::getType(), ['booking_id' => $group['booking_id'], 'booking_line_group_id' => $id, 'date' => $date, 'time_slot_id' => $line['time_slot_id']]);
+                    if($res > 0) {
+                        $meals_ids = [$res];
+                    }
+                }
+                // create a new relation
+                $om->update(BookingLine::getType(), $line_id, ['booking_meals_ids' => [$meals_ids]]);
+            }
+        }
+    }
+
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
      * Resets lines according to PackLines assigned to it, according to `pack_id`.
      * This only applies to groups marked as Pack (`has_pack`).
      */

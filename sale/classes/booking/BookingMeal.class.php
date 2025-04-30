@@ -31,9 +31,12 @@ class BookingMeal extends Model {
             ],
 
             'booking_lines_ids' => [
-                'type'              => 'one2many',
+                'type'              => 'many2many',
                 'foreign_object'    => 'sale\booking\BookingLine',
-                'foreign_field'     => 'booking_meal_id',
+                'foreign_field'     => 'booking_meals_ids',
+                'rel_table'         => 'sale_booking_line_rel_booking_meal',
+                'rel_foreign_key'   => 'booking_line_id',
+                'rel_local_key'     => 'booking_meal_id',
                 'description'       => "All booking lines that are linked the meal (moment).",
             ],
 
@@ -56,7 +59,7 @@ class BookingMeal extends Model {
                 'default'           => 1
             ],
 
-            'meal_place' => [
+            'meal_place' => [   
                 'type'              => 'string',
                 'selection'         => ['indoor', 'outdoor', 'bbq_place'],
                 'description'       => 'Place where the meal is served.',
@@ -69,18 +72,20 @@ class BookingMeal extends Model {
 
 
 /*
-Les repas sont globaux à une réservation, mais doivent nécessairement se mettre sur un groupe de service (il peut donc y en avoir plusieurs en parallèle pour une même réservation)
-Les bookingMeal ne sont visibles que sur les groupes de type "sojourn" (pas "simple", "événement ou "activité")
+    * Les repas sont globaux à une réservation, mais doivent nécessairement se mettre sur un groupe de service (il peut donc y avoir plusieurs BookingMeal en parallèle [même date, même tranche horaire] pour une même réservation)
+    * Les bookingMeal ne sont visibles que sur les groupes de type "sojourn" (pas "simple", "événement" ou "activité")
+    * les bookingMeal peuvent être modifiés en UI, mais pas créés
+    * les meals sont dans une section distincte "Repas" d'un bookingLineGroup
 
-refreshMeals
+    refreshMeals()
+        à chaque modification de bookingLine (product_id)
+        à chaque modification de la durée d'un groupe de service
+        à chaque modification du type d'un groupe de service
 
-* lorsqu'on créée une bookingline marquée is_meal dans un groupe "sojourn", on vérifie si un bookingMeal existe pour cetee réservation, ce groupe, le time_slot correspondant, pour chacune des date du séjour
-si pas encore : on crée un bookingMeal
-ensuite on assigne automatiquement la ligne au bookingMeal
-(il peut y avoir plusieurs fois un produit repas pour un même moment, avec une variation sur la tranche d'âge)
+    Pour toutes les bookingLine de type repas (is_meal), on vérifie si un bookingMeal existe pour ce groupe (pour cette réservation), et pour le time_slot correspondant, pour chacune des dates du séjour
+    si pas encore : on crée un bookingMeal
+    ensuite on assigne automatiquement la ligne au bookingMeal
+    (il peut y avoir plusieurs produits repas pour un même moment, comme variantes d'un même modèle [variation sur la tranche d'âge ou autre])
 
-* les bookingMeal peuvent être modifiés en UI, mais pas créés
-
-* les meals sont dans une section distincte "Repas" d'un bookingLineGroup
 
 */
