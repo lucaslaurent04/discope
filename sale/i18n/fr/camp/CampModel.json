@@ -37,7 +37,7 @@
         },
         "ase_quota": {
             "label": "Quota ASE (par groupe)",
-            "description": "\"Max d'enfants ASE par groupe (Aide social à l'enfance).",
+            "description": "Max d'enfants ASE par groupe (Aide social à l'enfance).",
             "help": ""
         }
     },
