@@ -80,12 +80,12 @@
                                             {
                                                 "type": "field",
                                                 "value": "child_id",
-                                                "width": "50%"
+                                                "width": "40%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "camp_id",
-                                                "width": "50%"
+                                                "width": "60%"
                                             },
                                             {
                                                 "type": "field",
