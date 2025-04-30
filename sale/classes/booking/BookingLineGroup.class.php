@@ -3530,6 +3530,7 @@ class BookingLineGroup extends Model {
                 'is_autosale',
                 'is_sojourn',
                 'nb_pers',
+                'nb_children',
                 'nb_nights',
                 'date_from',
                 'date_to',
@@ -3605,7 +3606,8 @@ class BookingLineGroup extends Model {
 			$operands['count_booking_12'] = self::computeCountBooking12($om, $group['booking_id'], $group['booking_id.customer_id'], $group['date_from']);
 			$operands['nb_pers'] = $group['nb_pers'];
 			$operands['nb_nights'] = $group['nb_nights'];
-
+            $operands['nb_adults'] = $group['nb_pers'] - $group['nb_children'];
+            
             $autosales = $om->read('sale\autosale\AutosaleLine', $autosale_list['autosale_lines_ids'], [
 				'product_id.id',
 				'product_id.name',
@@ -3691,7 +3693,13 @@ class BookingLineGroup extends Model {
 					$line_id = $om->create(BookingLine::getType(), $line);
 					// set product_id (#memo - we're in a refresh method called with disabled events - this does not trigger recompute)
 					$om->update(BookingLine::getType(), $line_id, ['product_id' => $product['id']]);
-					BookingLine::refreshPriceId($om, $line_id);
+                    $booking_line =  BookingLine::id($line_id)->read(['product_id'=>['id','sku']])->first(true);
+                    $has_specific_city_tax_calculation = Setting::get_value('sale', 'organization', 'has_specific_city_tax_calculation', 0);
+                    $city_tax_sku = Setting::get_value('sale', 'organization', 'sku.city_tax');
+                    if ($has_specific_city_tax_calculation && $city_tax_sku == $booking_line['product_id']['sku'] ){
+                        $om->update(BookingLine::getType(), $line_id, ['qty' => $group['nb_nights'] *  ( $group['nb_pers'] - $group['nb_children'])]);
+                    }
+                    BookingLine::refreshPriceId($om, $line_id);
 					// read the resulting product
 					$lines = $om->read(BookingLine::getType(), $line_id, ['price_id', 'price_id.price']);
 					// prevent adding autosale products for which a price could not be retrieved (invoices with lines without accounting rule are invalid)
