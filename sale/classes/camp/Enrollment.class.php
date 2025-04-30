@@ -540,7 +540,7 @@ class Enrollment extends Model {
         if(isset($values['is_ase']) && $values['is_ase']) {
             foreach($self as $enrollment) {
                 $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
-                    ->read(['ase_quota', 'enrollments_ids' => ['is_ase']])
+                    ->read(['ase_quota', 'camp_group_qty', 'enrollments_ids' => ['is_ase']])
                     ->first();
 
                 $ase_children_qty = 1;
@@ -550,7 +550,7 @@ class Enrollment extends Model {
                     }
                 }
 
-                if($ase_children_qty > $camp['ase_quota']) {
+                if($ase_children_qty > ($camp['ase_quota'] * $camp['camp_group_qty'])) {
                     return ['is_ase' => ['too_many_ase_children' => "The ase children quota is full."]];
                 }
             }
