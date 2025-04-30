@@ -685,7 +685,7 @@ class Enrollment extends Model {
     }
 
     public static function onupdate($self, $values) {
-        if(isset($values['status'])) {
+        if(isset($values['status']) || (isset($values['state']) && $values['state'] === 'instance')) {
             $self->do('reset-camp-enrollments-qty');
         }
     }
@@ -701,6 +701,18 @@ class Enrollment extends Model {
         Camp::ids(array_keys($map_camps_ids))->update(['enrollments_qty' => null]);
     }
 
+    public static function doDeleteLines($self) {
+        $lines_to_del = [];
+        $self->read(['enrollment_lines_ids']);
+        foreach($self as $enrollment) {
+            $lines_to_del = [...$lines_to_del, ...$enrollment['enrollment_lines_ids']];
+        }
+
+        if(!empty($lines_to_del)) {
+            EnrollmentLine::ids($lines_to_del)->delete(true);
+        }
+    }
+
     public static function getActions(): array {
         return [
 
@@ -708,8 +720,21 @@ class Enrollment extends Model {
                 'description'   => "Reset the enrollments prices fields values so they can be re-calculated.",
                 'policies'      => [],
                 'function'      => 'doResetCampEnrollmentsQty'
+            ],
+
+            'delete-lines' => [
+                'description'   => "Remove all enrollment lines.",
+                'policies'      => [],
+                'function'      => 'doDeleteLines'
             ]
 
         ];
+    }
+
+    public static function ondelete($self): void {
+        $self->do('delete-lines');
+        $self->do('reset-camp-enrollments-qty');
+
+        parent::ondelete($self);
     }
 }

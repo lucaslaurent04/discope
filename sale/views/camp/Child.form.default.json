@@ -152,7 +152,6 @@
                     {
                         "id": "section.skills",
                         "label": "Skills",
-                        "visible": ["state", "<>", "draft"],
                         "rows": [
                             {
                                 "columns": [
