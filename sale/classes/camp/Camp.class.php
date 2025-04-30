@@ -278,7 +278,7 @@ class Camp extends Model {
             }
 
             $result[$id] = sprintf(
-                '%s: %s -> %s (%d - %d)',
+                '%s | %s -> %s (%d - %d)',
                 $camp['short_name'],
                 date($date_format, $camp['date_from']),
                 date($date_format, $camp['date_to']),
