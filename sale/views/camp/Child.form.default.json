@@ -84,12 +84,17 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "licence_ffe",
+                                                "value": "has_license_ffe",
                                                 "width": "33%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "year_licence_ffe",
+                                                "value": "license_ffe",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "year_license_ffe",
                                                 "width": "33%"
                                             }
                                         ]
