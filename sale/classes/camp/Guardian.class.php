@@ -208,7 +208,9 @@ class Guardian extends Model {
 
         $CCVG_cities_normalized = array_map(
             function($city) {
-                return preg_replace("/[^a-zA-Z0-9]/", "", $city);
+                $city = preg_replace("/[^a-zA-Z0-9]/", "", $city);
+
+                return strtolower(preg_replace("/[^a-zA-Z0-9]/", "", $city));
             },
             $CCVG_cities
         );
@@ -221,6 +223,7 @@ class Guardian extends Model {
             }
 
             $city = preg_replace("/[^a-zA-Z0-9]/", "", $guardian['address_city']);
+            $city = strtolower($city);
             $result[$id] = in_array($city, $CCVG_cities_normalized);
         }
 
