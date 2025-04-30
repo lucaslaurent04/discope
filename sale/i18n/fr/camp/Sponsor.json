@@ -45,15 +45,14 @@
                 "commune": "Commune",
                 "community-of-communes": "Communauté de communes",
                 "department-caf": "CAF",
-                "department-msa": "MSA",
-                "ce": "Comité d'entreprise"
+                "department-msa": "MSA"
             },
             "description": "Type d'aide financière.",
             "help": ""
         },
         "code_ce": {
             "label": "Code CE",
-            "description": "Code du comité d'entreprise.",
+            "description": "Code du conseil d'entreprise.",
             "help": ""
         }
     },

@@ -76,7 +76,7 @@
         },
         "works_council_id": {
             "label": "Conseil d'entreprise",
-            "description": "Le comité d'entreprise qui va rehausser la classe du camp d'un niveau.",
+            "description": "Le conseil d'entreprise qui va rehausser la classe du camp d'un niveau.",
             "help": ""
         }
     },
