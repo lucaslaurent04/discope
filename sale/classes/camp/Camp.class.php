@@ -52,14 +52,20 @@ class Camp extends Model {
                 'type'              => 'date',
                 'description'       => "When the camp starts.",
                 'required'          => true,
-                'dependents'        => ['enrollments_ids' => ['date_from']]
+                'dependents'        => ['enrollments_ids' => ['date_from']],
+                'default'           => function() {
+                    return strtotime('next sunday');
+                }
             ],
 
             'date_to' => [
                 'type'              => 'date',
                 'description'       => "When the camp ends.",
                 'required'          => true,
-                'dependents'        => ['enrollments_ids' => ['date_to']]
+                'dependents'        => ['enrollments_ids' => ['date_to']],
+                'default'           => function() {
+                    return strtotime('next sunday +5 days');
+                }
             ],
 
             'product_id' => [

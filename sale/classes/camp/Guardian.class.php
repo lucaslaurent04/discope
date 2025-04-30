@@ -248,7 +248,7 @@ class Guardian extends Model {
         }
     }
 
-    public static function ondelete($self, $values): void {
+    public static function ondelete($self): void {
         $self->read(['children_ids' => ['main_guardian_id', 'guardians_ids']]);
 
         $map_del_guardian_ids = [];
@@ -270,6 +270,6 @@ class Guardian extends Model {
             }
         }
 
-        parent::ondelete($self, $values);
+        parent::ondelete($self);
     }
 }
