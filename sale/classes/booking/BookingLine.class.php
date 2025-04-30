@@ -346,6 +346,16 @@ class BookingLine extends Model {
                 'description'       => 'All Booking Activities this line relates to (non virtual activity and virtual activities).'
             ],
 
+            'booking_meals_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\booking\BookingMeal',
+                'foreign_field'     => 'booking_lines_ids',
+                'rel_table'         => 'sale_booking_line_rel_booking_meal',
+                'rel_foreign_key'   => 'booking_meal_id',
+                'rel_local_key'     => 'booking_line_id',
+                'description'       => "All booking meals that are linked the line (moment).",
+            ],
+
             'service_date' => [
                 'type'              => 'computed',
                 'result_type'       => 'date',
