@@ -43,7 +43,10 @@ class Child extends Model {
                 'type'              => 'date',
                 'description'       => "The child's birthdate.",
                 'required'          => true,
-                'onupdate'          => 'onupdateBirthdate'
+                'onupdate'          => 'onupdateBirthdate',
+                'default'           => function () {
+                    return strtotime('now -10 years');
+                }
             ],
 
             'gender' => [
@@ -140,7 +143,8 @@ class Child extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\camp\Enrollment',
                 'foreign_field'     => 'child_id',
-                'description'       => "Camp enrollments of child."
+                'description'       => "Camp enrollments of child.",
+                'ondetach'          => 'delete'
             ]
 
         ];
@@ -199,9 +203,9 @@ class Child extends Model {
     }
 
     public static function onupdateIsFoster($self) {
-        $self->read(['is_foster']);
+        $self->read(['is_foster', 'institution_id']);
         foreach($self as $id => $child) {
-            if(!$child['is_foster']) {
+            if(!$child['is_foster'] && !is_null($child['institution_id'])) {
                 self::id($id)->update(['institution_id' => null]);
             }
         }
@@ -210,9 +214,8 @@ class Child extends Model {
     public static function onupdateIsCpaNumber($self) {
         $self->read(['is_cpa_member', 'cpa_club']);
         foreach($self as $id => $child) {
-            if(!$child['is_cpa_member'] && !empty($child['cpa_club'])) {
-                self::id($id)
-                    ->update(['cpa_club' => null]);
+            if(!$child['is_cpa_member'] && !is_null($child['cpa_club'])) {
+                self::id($id)->update(['cpa_club' => null]);
             }
             if($child['is_cpa_member']) {
                 self::id($id)->update(['camp_class' => 'close-member']);
@@ -224,8 +227,7 @@ class Child extends Model {
         $self->read(['camp_class']);
         foreach($self as $id => $child) {
             if($child['camp_class'] === 'other') {
-                Child::id($id)
-                    ->update(['camp_class' => null]);
+                self::id($id)->update(['camp_class' => null]);
             }
         }
     }
@@ -233,8 +235,7 @@ class Child extends Model {
     public static function onupdateGuardiansIds($self) {
         $self->read(['main_guardian_id', 'guardians_ids']);
         foreach($self as $id => $child) {
-            Child::id($id)
-                ->update(['main_guardian_id' => $child['guardians_ids'][0] ?? null]);
+            self::id($id)->update(['main_guardian_id' => $child['guardians_ids'][0] ?? null]);
         }
     }
 }
