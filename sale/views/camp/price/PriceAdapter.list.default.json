@@ -39,15 +39,15 @@
             },
             {
                 "type": "field",
-                "value": "price_adapter_type",
-                "width": "20%",
+                "value": "value",
+                "width": "10%",
                 "sortable": false,
                 "readonly": true
             },
             {
                 "type": "field",
-                "value": "value",
-                "width": "20%",
+                "value": "price_adapter_type",
+                "width": "10%",
                 "sortable": false,
                 "readonly": true
             }
