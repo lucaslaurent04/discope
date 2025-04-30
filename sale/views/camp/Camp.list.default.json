@@ -4,8 +4,8 @@
         "items": [
             {
                 "type": "field",
-                "value": "name",
-                "width": "20%",
+                "value": "short_name",
+                "width": "33%",
                 "sortable": false,
                 "readonly": true
             },

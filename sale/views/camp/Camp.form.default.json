@@ -53,7 +53,8 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "name",
+                                                "value": "short_name",
+                                                "label": "Name",
                                                 "width": "80%",
                                                 "widget": {
                                                     "heading": true

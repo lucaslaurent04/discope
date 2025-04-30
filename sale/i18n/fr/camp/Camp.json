@@ -3,6 +3,11 @@
     "plural": "Camps",
     "description": "Camp d'activités.",
     "model": {
+        "short_name": {
+            "label": "Nom",
+            "description": "Nom court du camp.",
+            "help": ""
+        },
         "status": {
             "label": "Status",
             "description": "Status du camp.",

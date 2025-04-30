@@ -147,7 +147,9 @@
             "full": "Le camp est complet."
         },
         "child_id": {
-            "already_enrolled": "L'enfant est déjà inscrit à ce camp."
+            "already_enrolled": "L'enfant est déjà inscrit à ce camp.",
+            "already_enrolled_to_other_camp": "L'enfant est déjà inscrit à un autre camp pendant cette période.",
+            "missing_skill": "L'enfant n'a pas toutes les compétences requises pour ce camp."
         },
         "is_ase": {
             "too_many_ase_children": "Le quota d'enfants de cette catégorie est plein."

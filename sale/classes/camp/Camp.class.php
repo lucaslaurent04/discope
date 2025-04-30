@@ -8,6 +8,7 @@
 
 namespace sale\camp;
 
+use core\setting\Setting;
 use equal\orm\Model;
 
 class Camp extends Model {
@@ -20,9 +21,19 @@ class Camp extends Model {
         return [
 
             'name' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Name of the camp with dates and ages.",
+                'help'              => "Complete name of the camp to distinguish it from the others.",
+                'store'             => true,
+                'function'          => 'calcName'
+            ],
+
+            'short_name' => [
                 'type'              => 'string',
-                'description'       => "Name of the camp.",
-                'required'          => true
+                'description'       => "Short name of the camp.",
+                'required'          => true,
+                'dependents'        => ['name']
             ],
 
             'status' => [
@@ -52,7 +63,7 @@ class Camp extends Model {
                 'type'              => 'date',
                 'description'       => "When the camp starts.",
                 'required'          => true,
-                'dependents'        => ['enrollments_ids' => ['date_from']],
+                'dependents'        => ['name', 'enrollments_ids' => ['date_from']],
                 'default'           => function() {
                     return strtotime('next sunday');
                 }
@@ -62,7 +73,7 @@ class Camp extends Model {
                 'type'              => 'date',
                 'description'       => "When the camp ends.",
                 'required'          => true,
-                'dependents'        => ['enrollments_ids' => ['date_to']],
+                'dependents'        => ['name', 'enrollments_ids' => ['date_to']],
                 'default'           => function() {
                     return strtotime('next sunday +5 days');
                 }
@@ -106,13 +117,15 @@ class Camp extends Model {
             'min_age' => [
                 'type'              => 'integer',
                 'description'       => "Minimal age of the participants.",
-                'required'          => true
+                'default'           => 10,
+                'dependents'        => ['name']
             ],
 
             'max_age' => [
                 'type'              => 'integer',
                 'description'       => "Maximal age of the participants.",
-                'required'          => true
+                'default'           => 12,
+                'dependents'        => ['name']
             ],
 
             'employee_ratio' => [
@@ -253,6 +266,30 @@ class Camp extends Model {
         ];
     }
 
+    public static function calcName($self): array {
+        $result = [];
+        $self->read(['short_name', 'date_from', 'date_to', 'min_age', 'max_age']);
+
+        $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
+
+        foreach($self as $id => $camp) {
+            if(empty($camp['short_name'])) {
+                continue;
+            }
+
+            $result[$id] = sprintf(
+                '%s: %s -> %s (%d - %d)',
+                $camp['short_name'],
+                date($date_format, $camp['date_from']),
+                date($date_format, $camp['date_to']),
+                $camp['min_age'],
+                $camp['max_age']
+            );
+        }
+
+        return $result;
+    }
+
     public static function calcDefaultEmployeeRatio($self): array {
         $result = [];
         $self->read(['camp_model_id' => ['default_employee_ratio']]);
@@ -331,8 +368,8 @@ class Camp extends Model {
                 $result['need_license_ffe'] = $camp_model['need_license_ffe'];
                 $result['ase_quota'] = $camp_model['ase_quota'];
 
-                if(empty($values['name'])) {
-                    $result['name'] = $camp_model['name'];
+                if(empty($values['short_name'])) {
+                    $result['short_name'] = $camp_model['name'];
                 }
             }
         }
