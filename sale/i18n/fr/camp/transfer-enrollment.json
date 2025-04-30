@@ -11,5 +11,12 @@
             "description": "Le camp vers lequel transférer l'inscription.",
             "help": ""
         }
+    },
+    "error": {
+        "errors": {
+            "unknown_enrollment": "Inscription n'existe pas.",
+            "same_camp": "Transfer vers un camp identitque.",
+            "canceled_camp": "Camp annulé."
+        }
     }
 }
