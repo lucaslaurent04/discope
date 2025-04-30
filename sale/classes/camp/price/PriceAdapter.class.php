@@ -33,7 +33,8 @@ class PriceAdapter extends Model {
             'is_manual_discount' => [
                 'type'              => 'boolean',
                 'description'       => "Flag to set the adapter as manual or related to a discount.",
-                'default'           => true
+                'default'           => true,
+                'visible'           => ['sponsor_id', '=', null]
             ],
 
             'price_adapter_type' => [
@@ -69,7 +70,6 @@ class PriceAdapter extends Model {
 
             'value' => [
                 'type'              => 'float',
-                'usage'             => 'amount/money:4',
                 'description'       => "Amount/percentage to remove to the enrollment price.",
                 'onupdate'          => 'onupdateValue'
             ],

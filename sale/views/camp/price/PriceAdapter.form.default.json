@@ -13,12 +13,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "name",
-                                                "width": "66%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "enrollment_id",
+                                                "value": "sponsor_id",
                                                 "width": "33%"
                                             },
                                             {
@@ -28,8 +23,28 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "price_adapter_type",
+                                                "value": "origin_type",
                                                 "width": "33%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "name",
+                                                "width": "66%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "enrollment_id",
+                                                "width": "33%",
+                                                "readonly": true
                                             }
                                         ]
                                     },
@@ -37,13 +52,20 @@
                                         "width": "50%",
                                         "items": [
                                             {
-                                                "type": "field",
-                                                "value": "sponsor_id",
-                                                "width": "33%"
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "33%",
+                                                "visible": ["is_manual_discount", "=", true]
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "66%",
+                                                "visible": ["is_manual_discount", "=", false]
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "origin_type",
+                                                "value": "price_adapter_type",
                                                 "width": "33%"
                                             },
                                             {
