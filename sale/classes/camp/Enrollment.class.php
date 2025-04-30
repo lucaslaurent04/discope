@@ -521,8 +521,23 @@ class Enrollment extends Model {
             }
         }
 
-        // Check that child not already enrolled to camp
+        // Check that child has main guardian or institution + Check that child not already enrolled to camp
         if(isset($values['child_id'])) {
+            $child = Child::id($values['child_id'])
+                ->read(['main_guardian_id', 'is_foster', 'institution_id'])
+                ->first();
+
+            if($child['is_foster']) {
+                if(is_null($child['institution_id'])) {
+                    return ['child_id' => ['missing_institution' => "Missing institution."]];
+                }
+            }
+            else {
+                if(is_null($child['main_guardian_id'])) {
+                    return ['child_id' => ['missing_main_guardian' => "Missing main guardian."]];
+                }
+            }
+
             foreach($self as $enrollment) {
                 $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
                     ->read(['enrollments_ids' => ['child_id']])

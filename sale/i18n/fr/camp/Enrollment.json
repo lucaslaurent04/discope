@@ -147,6 +147,8 @@
             "full": "Le camp est complet."
         },
         "child_id": {
+            "missing_institution": "Institution manquante.",
+            "missing_main_guardian": "Tuteur principal manquant.",
             "already_enrolled": "L'enfant est déjà inscrit à ce camp.",
             "already_enrolled_to_other_camp": "L'enfant est déjà inscrit à un autre camp pendant cette période.",
             "missing_skill": "L'enfant n'a pas toutes les compétences requises pour ce camp."
