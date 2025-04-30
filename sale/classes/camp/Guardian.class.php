@@ -210,7 +210,7 @@ class Guardian extends Model {
             function($city) {
                 $city = preg_replace("/[^a-zA-Z0-9]/", "", $city);
 
-                return strtolower(preg_replace("/[^a-zA-Z0-9]/", "", $city));
+                return strtolower($city);
             },
             $CCVG_cities
         );
