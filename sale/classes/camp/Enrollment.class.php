@@ -560,12 +560,16 @@ class Enrollment extends Model {
         if(isset($values['camp_id']) || isset($values['child_id'])) {
             foreach($self as $enrollment) {
                 $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
-                    ->read(['product_id' => ['prices_ids' => ['camp_class']]])
+                    ->read(['need_license_ffe', 'product_id' => ['prices_ids' => ['camp_class']]])
                     ->first();
 
                 $child = Child::id($values['child_id'] ?? $enrollment['child_id'])
-                    ->read(['camp_class'])
+                    ->read(['has_license_ffe', 'camp_class'])
                     ->first();
+
+                if($camp['need_license_ffe'] && !$child['has_license_ffe']) {
+                    return ['child_id' => ['need_license_ffe' => "The child need a FFE license to enroll to the camp."]];
+                }
 
                 $camp_class_price = null;
                 foreach($camp['product_id']['prices_ids'] as $price) {
@@ -646,6 +650,8 @@ class Enrollment extends Model {
                 'qty'           => 1
             ]);
         }
+
+        $self->do('reset-camp-enrollments-qty');
     }
 
     /**
