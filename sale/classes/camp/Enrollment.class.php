@@ -588,16 +588,40 @@ class Enrollment extends Model {
         if(isset($values['camp_id']) || isset($values['child_id'])) {
             foreach($self as $enrollment) {
                 $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
-                    ->read(['date_from', 'date_to'])
+                    ->read([
+                        'required_skills_ids',
+                        'date_from',
+                        'date_to'
+                    ])
                     ->first();
 
                 $child = Child::id($values['child_id'] ?? $enrollment['child_id'])
-                    ->read(['enrollments_ids' => ['camp_id' => ['date_from', 'date_to']]])
+                    ->read([
+                        'skills_ids',
+                        'enrollments_ids' => [
+                            'status',
+                            'camp_id' => [
+                                'date_from',
+                                'date_to'
+                            ]
+                        ]
+                    ])
                     ->first();
 
+                foreach($camp['required_skills_ids'] as $required_skill_id) {
+                    if(!in_array($required_skill_id, $child['skills_ids'])){
+                        return ['child_id' => ['missing_skill' => "Child does not have the required skills for this camp."]];
+                    }
+                }
+
                 foreach($child['enrollments_ids'] as $en) {
-                    if($enrollment['id'] !== $en['id'] && $camp['date_from'] <= $en['camp_id']['date_to'] && $camp['date_to'] >= $en['camp_id']['date_from']) {
-                        return ['child_id' => ['child_already_enrolled_to_other_camp' => "Child has already been enrolled to another camp during this period."]];
+                    if(
+                        $enrollment['id'] !== $en['id']
+                        && $camp['date_from'] <= $en['camp_id']['date_to']
+                        && $camp['date_to'] >= $en['camp_id']['date_from']
+                        && in_array($en['status'], ['pending', 'confirmed'])
+                    ) {
+                        return ['child_id' => ['already_enrolled_to_other_camp' => "Child has already been enrolled to another camp during this period."]];
                     }
                 }
             }
