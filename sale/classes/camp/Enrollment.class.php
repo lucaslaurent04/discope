@@ -56,15 +56,33 @@ class Enrollment extends Model {
                 'onupdate'          => 'onupdateCampId'
             ],
 
+            'date_from' => [
+                'type'              => 'computed',
+                'result_type'       => 'date',
+                'description'       => "Start date of the camp.",
+                'store'             => true,
+                'relation'          => ['camp_id' => 'date_from']
+            ],
+
+            'date_to' => [
+                'type'              => 'computed',
+                'result_type'       => 'date',
+                'description'       => "End date of the camp.",
+                'store'             => true,
+                'relation'          => ['camp_id' => 'date_to']
+            ],
+
             'camp_class' => [
-                'type'              => 'string',
+                'type'              => 'computed',
+                'result_type'       => 'string',
                 'selection'         => [
                     'other',
                     'member',
                     'close-member'
                 ],
                 'description'       => "The camp class of the child for this enrollment, to know which price to apply.",
-                'default'           => 'other',
+                'store'             => true,
+                'function'          => 'calcCampClass',
                 'onupdate'          => 'onupdateCampClass'
             ],
 
@@ -116,6 +134,13 @@ class Enrollment extends Model {
                 'default'           => false
             ],
 
+            'works_council_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\WorksCouncil',
+                'description'       => "The works council that will enhance the camp class by one level.",
+                'dependents'        => ['camp_class']
+            ],
+
             'documents_ids' => [
                 'type'              => 'one2many',
                 'foreign_field'     => 'enrollment_id',
@@ -137,9 +162,93 @@ class Enrollment extends Model {
                 'foreign_object'    => 'sale\camp\price\PriceAdapter',
                 'description'       => "The adapters of price for reductions.",
                 'ondetach'          => 'delete'
+            ],
+
+            'sponsors_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\camp\Sponsor',
+                'foreign_field'     => 'enrollments_ids',
+                'rel_table'         => 'sale_rel_enrollment_sponsor',
+                'rel_foreign_key'   => 'sponsor_id',
+                'rel_local_key'     => 'enrollment_id',
+                'description'       => "Sponsors that reduce the price of the enrollment."
+            ],
+
+            'mails_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'core\Mail',
+                'foreign_field'     => 'object_id',
+                'description'       => "Mails related to the enrollment.",
+                'domain'            => ['object_class', '=', 'sale\camp\Enrollment']
             ]
 
         ];
+    }
+
+    public static function onchange($event, $values): array {
+        $result = [];
+        if(isset($event['child_id'])) {
+            $child = Child::id($event['child_id'])
+                ->read(['camp_class', 'birthdate'])
+                ->first();
+
+            $result['camp_class'] = $child['camp_class'];
+        }
+        elseif(isset($event['works_council_id']) && isset($values['child_id'])) {
+            $child = Child::id($values['child_id'])
+                ->read(['camp_class'])
+                ->first();
+
+            $camp_class = $child['camp_class'];
+            if($camp_class === 'other') {
+                $camp_class = 'member';
+            }
+            elseif($camp_class === 'member') {
+                $camp_class = 'close-member';
+            }
+
+            $result['camp_class'] = $camp_class;
+        }
+
+        if(
+            (isset($event['child_id']) && isset($values['camp_id']))
+            || (isset($event['camp_id']) && isset($values['child_id']))
+        ) {
+            $child_id = $event['child_id'] ?? $values['child_id'];
+            $child = Child::id($child_id)
+                ->read(['birthdate'])
+                ->first();
+
+            $camp_id = $event['camp_id'] ?? $values['camp_id'];
+            $camp = Camp::id($camp_id)
+                ->read(['date_from'])
+                ->first();
+
+            $birthdate = (new \DateTime())->setTimestamp($child['birthdate']);
+            $date_from = (new \DateTime())->setTimestamp($camp['date_from']);
+            $result['child_age'] = $birthdate->diff($date_from)->y;
+        }
+
+        return $result;
+    }
+
+    public static function calcCampClass($self): array {
+        $result = [];
+        $self->read(['works_council_id', 'child_id' => ['camp_class']]);
+        foreach($self as $id => $enrollment) {
+            $camp_class = $enrollment['child_id']['camp_class'];
+            if(!is_null($enrollment['works_council_id'])) {
+                if($camp_class === 'other') {
+                    $camp_class = 'member';
+                }
+                elseif($camp_class === 'member') {
+                    $camp_class = 'close-member';
+                }
+            }
+            $result[$id] = $camp_class;
+        }
+
+        return $result;
     }
 
     public static function calcChildAge($self): array {
@@ -149,6 +258,10 @@ class Enrollment extends Model {
             'child_id'  => ['birthdate']
         ]);
         foreach($self as $id => $enrollment) {
+            if(!isset($enrollment['camp_id']['date_from'], $enrollment['child_id']['birthdate'])) {
+                continue;
+            }
+
             $date_from = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from']);
             $birthdate = (new \DateTime())->setTimestamp($enrollment['child_id']['birthdate']);
             $result[$id] = $birthdate->diff($date_from)->y;
@@ -161,7 +274,7 @@ class Enrollment extends Model {
         $result = [];
         $self->read([
             'enrollment_lines_ids'  => ['total'],
-            'price_adapters_ids'    => ['amount']
+            'price_adapters_ids'    => ['price_adapter_type', 'value']
         ]);
         foreach($self as $id => $enrollment) {
             $total = 0.0;
@@ -170,8 +283,27 @@ class Enrollment extends Model {
             }
 
             foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-                $total -= $price_adapter['amount'];
+                if($price_adapter['price_adapter_type'] !== 'amount') {
+                    continue;
+                }
+                $total -= $price_adapter['value'];
             }
+            if($total < 0) {
+                $total = 0;
+            }
+
+            $percentage = 0;
+            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+                if($price_adapter['price_adapter_type'] !== 'percent') {
+                    continue;
+                }
+                $percentage += $price_adapter['value'];
+            }
+            if($percentage > 100) {
+                $percentage = 100;
+            }
+
+            $total -= $total / 100 * $percentage;
 
             $result[$id] = $total;
         }
@@ -183,7 +315,7 @@ class Enrollment extends Model {
         $result = [];
         $self->read([
             'enrollment_lines_ids'  => ['price'],
-            'price_adapters_ids'    => ['amount']
+            'price_adapters_ids'    => ['price_adapter_type', 'value']
         ]);
         foreach($self as $id => $enrollment) {
             $price = 0.0;
@@ -192,8 +324,27 @@ class Enrollment extends Model {
             }
 
             foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-                $price -= $price_adapter['amount'];
+                if($price_adapter['price_adapter_type'] !== 'amount') {
+                    continue;
+                }
+                $price -= $price_adapter['value'];
             }
+            if($price < 0) {
+                $price = 0;
+            }
+
+            $percentage = 0;
+            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+                if($price_adapter['price_adapter_type'] !== 'percent') {
+                    continue;
+                }
+                $percentage += $price_adapter['value'];
+            }
+            if($percentage > 100) {
+                $percentage = 100;
+            }
+
+            $price -= $price / 100 * $percentage;
 
             $result[$id] = $price;
         }
@@ -236,15 +387,35 @@ class Enrollment extends Model {
         ];
     }
 
+    public static function onafterPending($self) {
+        $self->update([
+            'is_locked' => false,
+            'status'    => 'pending'            // #todo - find why needed and fix error
+        ]);
+
+        $self->do('reset-camp-enrollments-qty');
+    }
+
     /**
      * Lock enrollment after status to confirm
      */
     public static function onafterConfirm($self) {
-        $self->update(['is_locked' => true]);
+        $self->update([
+            'is_locked' => true,
+            'status'    => 'confirmed'          // #todo - find why needed and fix error
+        ]);
+
+        $self->do('reset-camp-enrollments-qty');
     }
 
     public static function onafterCancel($self) {
-        $self->update(['cancellation_date' => time()]);
+        $self->update([
+            'is_locked'         => false,
+            'cancellation_date' => time(),
+            'status'            => 'canceled'   // #todo - find why needed and fix error
+        ]);
+
+        $self->do('reset-camp-enrollments-qty');
     }
 
     public static function getWorkflow(): array {
@@ -272,7 +443,8 @@ class Enrollment extends Model {
                     'pending' => [
                         'status'        => 'pending',
                         'description'   => "Remove from the waitlist.",
-                        'policies'      => ['remove-from-waitlist']
+                        'policies'      => ['remove-from-waitlist'],
+                        'onafter'       => 'onafterPending'
                     ],
                     'cancel' => [
                         'status'        => 'canceled',
@@ -301,79 +473,118 @@ class Enrollment extends Model {
     }
 
     public static function canupdate($self, $values): array {
-        $self->read([
-            'is_locked',
-            'child_id',
-            'camp_id' => [
-                'id',
-                'max_children',
-                'ase_quota',
-                'enrollments_ids' => [
-                    'status',
-                    'child_id',
-                    'is_ase'
-                ]
-            ]
-        ]);
+        $self->read(['is_locked', 'status', 'child_id', 'camp_id']);
 
+        // If is_locked cannot be modified
         foreach($self as $enrollment) {
             if($enrollment['is_locked']) {
-                return ['is_locked' => ['locked_enrollment' => "Cannot modify a locked enrollment."]];
-            }
-
-            $status = $values['status'] ?? $enrollment['status'];
-            if($status === 'pending') {
-                $pending_confirmed_enrollments_qty = 0;
-                foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
-                    if(in_array($en['status'], ['pending', 'confirmed'])) {
-                        $pending_confirmed_enrollments_qty++;
+                foreach(array_keys($values) as $column) {
+                    if(!in_array($column, ['is_locked', 'status', 'cancellation_date'])) {
+                        return ['is_locked' => ['locked_enrollment' => "Cannot modify a locked enrollment."]];
                     }
-                }
-
-                if($pending_confirmed_enrollments_qty >= $enrollment['camp_id']['max_children']) {
-                    return ['camp_id' => ['full' => "The camp is full."]];
-                }
-            }
-
-            foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
-                if($en['child_id'] === $values['child_id']) {
-                    return ['child_id' => ['already_enrolled' => "The child has already enrolled to this camp."]];
                 }
             }
         }
 
+        // Check that camp isn't canceled
+        if(isset($values['camp_id'])) {
+            $camp = Camp::id($values['camp_id'])
+                ->read(['status'])
+                ->first();
+
+            if($camp['status'] === 'canceled') {
+                return ['camp_id' => ['canceled_camp' => "Cannot enroll to a canceled camp."]];
+            }
+        }
+
+        // Check that camp is not already full and that child is not already enrolled
+        if(isset($values['camp_id']) || (isset($values['status']) && in_array($values['status'], ['pending', 'confirmed']))) {
+            foreach($self as $enrollment) {
+                $status = $values['status'] ?? $enrollment['status'];
+
+                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
+                    ->read(['max_children', 'enrollments_ids' => ['status']])
+                    ->first();
+
+                if(in_array($status, ['pending', 'confirmed'])) {
+                    $pending_confirmed_enrollments_qty = 0;
+
+                    foreach($camp['enrollments_ids'] as $en) {
+                        if(in_array($en['status'], ['pending', 'confirmed']) && $en['id'] !== $enrollment['id']) {
+                            $pending_confirmed_enrollments_qty++;
+                        }
+                    }
+                    if($pending_confirmed_enrollments_qty >= $camp['max_children']) {
+                        return ['camp_id' => ['full' => "The camp is full."]];
+                    }
+                }
+            }
+        }
+
+        // Check that child has main guardian or institution + Check that child not already enrolled to camp
+        if(isset($values['child_id'])) {
+            $child = Child::id($values['child_id'])
+                ->read(['main_guardian_id', 'is_foster', 'institution_id'])
+                ->first();
+
+            if($child['is_foster']) {
+                if(is_null($child['institution_id'])) {
+                    return ['child_id' => ['missing_institution' => "Missing institution."]];
+                }
+            }
+            else {
+                if(is_null($child['main_guardian_id'])) {
+                    return ['child_id' => ['missing_main_guardian' => "Missing main guardian."]];
+                }
+            }
+
+            foreach($self as $enrollment) {
+                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
+                    ->read(['enrollments_ids' => ['child_id']])
+                    ->first();
+
+                foreach($camp['enrollments_ids'] as $en) {
+                    if($en['child_id'] === $values['child_id'] && $en['id'] !== $enrollment['id']) {
+                        return ['child_id' => ['already_enrolled' => "The child is already enrolled in this camp."]];
+                    }
+                }
+            }
+        }
+
+        // Check max quota ase
         if(isset($values['is_ase']) && $values['is_ase']) {
             foreach($self as $enrollment) {
+                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
+                    ->read(['ase_quota', 'camp_group_qty', 'enrollments_ids' => ['is_ase']])
+                    ->first();
+
                 $ase_children_qty = 1;
-                foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
+                foreach($camp['enrollments_ids'] as $en) {
                     if($en['is_ase'] && $en['id'] !== $enrollment['id']) {
                         $ase_children_qty++;
                     }
                 }
 
-                if($ase_children_qty > $enrollment['camp_id']['ase_quota']) {
+                if($ase_children_qty > ($camp['ase_quota'] * $camp['camp_group_qty'])) {
                     return ['is_ase' => ['too_many_ase_children' => "The ase children quota is full."]];
                 }
             }
         }
 
+        // Check prices isn't missing for child specific camp_class
         if(isset($values['camp_id']) || isset($values['child_id'])) {
             foreach($self as $enrollment) {
-                $camp_id = $values['camp_id'] ?? $enrollment['camp_id']['id'];
-                $camp = Camp::id($camp_id)
-                    ->read([
-                        'product_id' => [
-                            'prices_ids' => [
-                                'camp_class'
-                            ]
-                        ]
-                    ])
+                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
+                    ->read(['need_license_ffe', 'product_id' => ['prices_ids' => ['camp_class']]])
                     ->first();
 
-                $child_id = $values['child_id'] ?? $enrollment['child_id'];
-                $child = Child::id($child_id)
-                    ->read(['camp_class'])
+                $child = Child::id($values['child_id'] ?? $enrollment['child_id'])
+                    ->read(['has_license_ffe', 'camp_class'])
                     ->first();
+
+                if($camp['need_license_ffe'] && !$child['has_license_ffe']) {
+                    return ['child_id' => ['need_license_ffe' => "The child need a FFE license to enroll to the camp."]];
+                }
 
                 $camp_class_price = null;
                 foreach($camp['product_id']['prices_ids'] as $price) {
@@ -388,6 +599,49 @@ class Enrollment extends Model {
             }
         }
 
+        // Check that child is not already enrolled to another camp at the same time
+        if(isset($values['camp_id']) || isset($values['child_id'])) {
+            foreach($self as $enrollment) {
+                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
+                    ->read([
+                        'required_skills_ids',
+                        'date_from',
+                        'date_to'
+                    ])
+                    ->first();
+
+                $child = Child::id($values['child_id'] ?? $enrollment['child_id'])
+                    ->read([
+                        'skills_ids',
+                        'enrollments_ids' => [
+                            'status',
+                            'camp_id' => [
+                                'date_from',
+                                'date_to'
+                            ]
+                        ]
+                    ])
+                    ->first();
+
+                foreach($camp['required_skills_ids'] as $required_skill_id) {
+                    if(!in_array($required_skill_id, $child['skills_ids'])){
+                        return ['child_id' => ['missing_skill' => "Child does not have the required skills for this camp."]];
+                    }
+                }
+
+                foreach($child['enrollments_ids'] as $en) {
+                    if(
+                        $enrollment['id'] !== $en['id']
+                        && $camp['date_from'] <= $en['camp_id']['date_to']
+                        && $camp['date_to'] >= $en['camp_id']['date_from']
+                        && in_array($en['status'], ['pending', 'confirmed'])
+                    ) {
+                        return ['child_id' => ['already_enrolled_to_other_camp' => "Child has already been enrolled to another camp during this period."]];
+                    }
+                }
+            }
+        }
+
         return parent::cancreate($self, $values);
     }
 
@@ -396,26 +650,34 @@ class Enrollment extends Model {
      */
     public static function onupdateCampId($self) {
         $self->read([
+            'enrollment_lines_ids',
             'child_id'  => [
                 'camp_class'
             ],
             'camp_id'   => [
+                'date_from',
+                'date_to',
                 'product_id' => [
                     'prices_ids' => [
-                        'camp_class'
+                        'camp_class',
+                        'price_list_id' => ['date_from', 'date_to']
                     ]
                 ]
             ]
         ]);
 
         foreach($self as $id => $enrollment) {
-            if(!isset($enrollment['camp_id']) || !isset($enrollment['child_id'])) {
+            if(!isset($enrollment['camp_id']) || !isset($enrollment['child_id']) || !empty($enrollment['enrollment_lines_ids'])) {
                 continue;
             }
 
             $camp_class_price = null;
             foreach($enrollment['camp_id']['product_id']['prices_ids'] as $price) {
-                if($enrollment['child_id']['camp_class'] === $price['camp_class']) {
+                if(
+                    $enrollment['child_id']['camp_class'] === $price['camp_class']
+                    && $enrollment['camp_id']['date_from'] >= $price['price_list_id']['date_from']
+                    && $enrollment['camp_id']['date_from'] <= $price['price_list_id']['date_to']
+                ) {
                     $camp_class_price = $price;
                 }
             }
@@ -423,10 +685,12 @@ class Enrollment extends Model {
             EnrollmentLine::create([
                 'enrollment_id' => $id,
                 'product_id'    => $enrollment['camp_id']['product_id']['id'],
-                'price_id'      => $camp_class_price['id'],
+                'price_id'      => $camp_class_price['id'] ?? null,
                 'qty'           => 1
             ]);
         }
+
+        $self->do('reset-camp-enrollments-qty');
     }
 
     /**
@@ -441,6 +705,10 @@ class Enrollment extends Model {
             ]
         ]);
         foreach($self as $enrollment) {
+            if(is_null($enrollment['camp_class'])) {
+                continue;
+            }
+
             foreach($enrollment['enrollment_lines_ids'] as $lid => $line) {
                 if(is_null($line['price_id']['camp_class']) || $line['price_id']['camp_class'] === $enrollment['camp_class']) {
                     continue;
@@ -459,5 +727,59 @@ class Enrollment extends Model {
                 }
             }
         }
+    }
+
+    public static function onupdate($self, $values) {
+        if(isset($values['status']) || (isset($values['state']) && $values['state'] === 'instance')) {
+            $self->do('reset-camp-enrollments-qty');
+        }
+    }
+
+    public static function doResetCampEnrollmentsQty($self) {
+        $self->read(['camp_id']);
+
+        $map_camps_ids = [];
+        foreach($self as $enrollment) {
+            $map_camps_ids[$enrollment['camp_id']] = true;
+        }
+
+        Camp::ids(array_keys($map_camps_ids))->update(['enrollments_qty' => null]);
+    }
+
+    public static function doDeleteLines($self) {
+        $lines_to_del = [];
+        $self->read(['enrollment_lines_ids']);
+        foreach($self as $enrollment) {
+            $lines_to_del = [...$lines_to_del, ...$enrollment['enrollment_lines_ids']];
+        }
+
+        if(!empty($lines_to_del)) {
+            EnrollmentLine::ids($lines_to_del)->delete(true);
+        }
+    }
+
+    public static function getActions(): array {
+        return [
+
+            'reset-camp-enrollments-qty' => [
+                'description'   => "Reset the enrollments prices fields values so they can be re-calculated.",
+                'policies'      => [],
+                'function'      => 'doResetCampEnrollmentsQty'
+            ],
+
+            'delete-lines' => [
+                'description'   => "Remove all enrollment lines.",
+                'policies'      => [],
+                'function'      => 'doDeleteLines'
+            ]
+
+        ];
+    }
+
+    public static function ondelete($self): void {
+        $self->do('delete-lines');
+        $self->do('reset-camp-enrollments-qty');
+
+        parent::ondelete($self);
     }
 }

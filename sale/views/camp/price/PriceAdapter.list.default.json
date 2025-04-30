@@ -18,7 +18,7 @@
             },
             {
                 "type": "field",
-                "value": "price_adapter_type",
+                "value": "origin_type",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
@@ -32,8 +32,22 @@
             },
             {
                 "type": "field",
-                "value": "amount",
+                "value": "sponsor_id",
                 "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "value",
+                "width": "10%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "price_adapter_type",
+                "width": "10%",
                 "sortable": false,
                 "readonly": true
             }

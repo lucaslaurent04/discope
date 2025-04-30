@@ -42,12 +42,17 @@
             "description": "Nom du 'centre plein air' dont l'enfant fait partie.",
             "help": ""
         },
-        "licence_ffe": {
-            "label": "Licence FFE",
-            "description": "Licence 'fédération française équitation'.",
+        "has_license_ffe": {
+            "label": "A une licence FFE",
+            "description": "L'enfant a une licence FFE (Fédération française équitation).",
             "help": ""
         },
-        "year_licence_ffe": {
+        "license_ffe": {
+            "label": "Licence FFE",
+            "description": "Licence (Fédération française équitation).",
+            "help": ""
+        },
+        "year_license_ffe": {
             "label": "Année licence FFE",
             "description": "Année d'acquisition de la licence FFE.",
             "help": ""

@@ -3,12 +3,18 @@
     "plural": "Camps",
     "description": "Camp d'activités.",
     "model": {
+        "short_name": {
+            "label": "Nom",
+            "description": "Nom court du camp.",
+            "help": ""
+        },
         "status": {
             "label": "Status",
             "description": "Status du camp.",
             "help": "",
             "selection": {
-                "pending": "En cours",
+                "draft": "Brouillon",
+                "published": "Publié",
                 "canceled": "Annulé"
             }
         },
@@ -42,18 +48,21 @@
             "description": "Type de camp.",
             "help": "",
             "selection": {
-                "week": "Semaine",
-                "weekend": "Week-end"
+                "sport": "Sport",
+                "circus": "Cirque",
+                "culture": "Culture",
+                "environment": "Environnement",
+                "horse-riding": "Équitation"
             }
+        },
+        "is_clsh": {
+            "label": "CLSH",
+            "description": "Centre loisir sans hébergement.",
+            "help": ""
         },
         "camp_model_id": {
             "label": "Modèle",
             "description": "Modèle qui a été utilisé pour créé le camp.",
-            "help": ""
-        },
-        "with_accommodation": {
-            "label": "Avec logement",
-            "description": "Est-ce que le camp le logement?",
             "help": ""
         },
         "min_age": {
@@ -76,14 +85,19 @@
             "description": "Quantité maximal d'enfants qui peuvent participés au camp.",
             "help": ""
         },
+        "enrollments_qty": {
+            "label": "Qté inscriptions",
+            "description": "La quanitités des inscriptions non annulées ou sur une liste d'attente.",
+            "help": ""
+        },
         "camp_group_qty": {
             "label": "Quantité de groupes",
             "description": "La quanitités des groupes d'enfants du camp.",
             "help": ""
         },
         "ase_quota": {
-            "label": "Quota ASE",
-            "description": "Max d'enfants \"Aide social à l'enfance\" pour ce camp.",
+            "label": "Quota ASE (par groupe)",
+            "description": "Max d'enfants ASE par groupe (Aide social à l'enfance).",
             "help": ""
         },
         "accounting_code": {
@@ -101,6 +115,14 @@
         "form.default": {
             "name": "Camp",
             "description": "",
+            "actions": {
+                "action.transition.publish": {
+                    "label": "Publier"
+                },
+                "action.transition.cancel": {
+                    "label": "Annuler"
+                }
+            },
             "layout": {
                 "section.descriptions": {
                     "label": "Descriptions"
@@ -128,5 +150,13 @@
             "layout": {}
         }
     },
-    "error": []
+    "error": {
+        "camp_groups_ids": {
+            "one_needed": "Un camp doit avoir au moins un groupe de camp.",
+            "too_many_children": "Il y a trop d'enfants inscrits dans les groupes de camp."
+        },
+        "employee_ratio": {
+            "too_many_children": "Il y a trop d'enfants inscrits au camp."
+        }
+    }
 }

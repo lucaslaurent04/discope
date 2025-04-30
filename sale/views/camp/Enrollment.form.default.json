@@ -24,7 +24,8 @@
                 "ids": []
             },
             "visible": [
-                ["status", "=", "waitlisted"]
+                ["status", "=", "waitlisted"],
+                ["state", "<>", "draft"]
             ]
         },
         {
@@ -37,7 +38,8 @@
                 "ids": []
             },
             "visible": [
-                ["status", "=", "pending"]
+                ["status", "=", "pending"],
+                ["state", "<>", "draft"]
             ]
         },
         {
@@ -50,7 +52,17 @@
                 "ids": []
             },
             "visible": [
-                ["status", "in", ["waitlisted", "pending", "confirm"]]
+                ["status", "in", ["waitlisted", "pending", "confirmed"]],
+                ["state", "<>", "draft"]
+            ]
+        },
+        {
+            "id": "action.transfer",
+            "label": "Transfer",
+            "controller": "sale_camp_transfer-enrollment",
+            "visible": [
+                ["status", "<>", "canceled"],
+                ["state", "<>", "draft"]
             ]
         }
     ],
@@ -68,17 +80,18 @@
                                             {
                                                 "type": "field",
                                                 "value": "child_id",
-                                                "width": "50%"
+                                                "width": "40%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "camp_id",
-                                                "width": "50%"
+                                                "width": "60%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "child_age",
-                                                "width": "33%"
+                                                "width": "33%",
+                                                "readonly": true
                                             },
                                             {
                                                 "type": "field",
@@ -87,13 +100,8 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "status",
-                                                "width": "33%",
-                                                "visible": ["state", "=", "draft"],
-                                                "selection": {
-                                                    "pending": "Pending",
-                                                    "waitlisted": "Waitlisted"
-                                                }
+                                                "value": "works_council_id",
+                                                "width": "33%"
                                             }
                                         ]
                                     },
@@ -101,9 +109,16 @@
                                         "width": "50%",
                                         "items": [
                                             {
-                                                "type": "field",
-                                                "value": "camp_class",
-                                                "width": "25%"
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "25%",
+                                                "visible": ["state", "<>", "draft"]
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "50%",
+                                                "visible": ["state", "=", "draft"]
                                             },
                                             {
                                                 "type": "field",
@@ -113,12 +128,20 @@
                                             {
                                                 "type": "field",
                                                 "value": "total",
-                                                "width": "25%"
+                                                "width": "25%",
+                                                "visible": ["state", "<>", "draft"]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "price",
-                                                "width": "25%"
+                                                "width": "25%",
+                                                "visible": ["state", "<>", "draft"]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "status",
+                                                "width": "25%",
+                                                "visible": ["state", "=", "draft"]
                                             }
                                         ]
                                     }
@@ -205,6 +228,27 @@
                                             {
                                                 "type": "field",
                                                 "value": "documents_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.mails",
+                        "label": "Mails",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "mails_ids",
                                                 "width": "100%"
                                             }
                                         ]

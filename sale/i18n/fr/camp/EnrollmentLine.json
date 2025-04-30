@@ -56,5 +56,9 @@
             "layout": []
         }
     },
-    "error": []
+    "error": {
+        "camp_id": {
+            "locked_enrollment": "Impossible de modifier une ligne d'une inscription verrouillée."
+        }
+    }
 }

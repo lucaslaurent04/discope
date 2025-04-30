@@ -270,6 +270,17 @@
                                 }
                             },
                             {
+                                "id": "sales.camp.enrollments",
+                                "type": "entry",
+                                "label": "Enrollments",
+                                "description": "",
+                                "icon": "app_registration",
+                                "context": {
+                                    "entity": "sale\\camp\\Enrollment",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
                                 "id": "sales.camp.people",
                                 "label": "People",
                                 "description": "",
@@ -368,6 +379,37 @@
                                         "icon": "task",
                                         "context": {
                                             "entity": "sale\\camp\\Document",
+                                            "view": "list.default"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "sales.camp.helps",
+                                "label": "Helpers",
+                                "description": "",
+                                "icon": "payments",
+                                "type": "parent",
+                                "children": [
+                                    {
+                                        "id": "sales.camp.helps.sponsors",
+                                        "type": "entry",
+                                        "label": "Sponsors",
+                                        "description": "",
+                                        "icon": "domain",
+                                        "context": {
+                                            "entity": "sale\\camp\\Sponsor",
+                                            "view": "list.default"
+                                        }
+                                    },
+                                    {
+                                        "id": "sales.camp.helps.works-council",
+                                        "type": "entry",
+                                        "label": "Works Council",
+                                        "description": "",
+                                        "icon": "work",
+                                        "context": {
+                                            "entity": "sale\\camp\\WorksCouncil",
                                             "view": "list.default"
                                         }
                                     }

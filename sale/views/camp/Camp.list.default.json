@@ -4,8 +4,8 @@
         "items": [
             {
                 "type": "field",
-                "value": "name",
-                "width": "20%",
+                "value": "short_name",
+                "width": "33%",
                 "sortable": false,
                 "readonly": true
             },
@@ -60,14 +60,6 @@
             },
             {
                 "type": "field",
-                "value": "with_accommodations",
-                "width": "20%",
-                "sortable": false,
-                "readonly": true,
-                "visible": false
-            },
-            {
-                "type": "field",
                 "value": "employee_ratio",
                 "width": "20%",
                 "sortable": false,
@@ -76,11 +68,19 @@
             },
             {
                 "type": "field",
+                "value": "enrollments_qty",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": true
+            },
+            {
+                "type": "field",
                 "value": "max_children",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true,
-                "visible": false
+                "visible": true
             },
             {
                 "type": "field",

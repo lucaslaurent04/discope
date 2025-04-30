@@ -1,5 +1,5 @@
 {
-    "name": "Price Adapter",
+    "name": "Sponsor",
     "layout": {
         "groups": [
             {
@@ -13,38 +13,31 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "sponsor_id",
-                                                "width": "33%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "is_manual_discount",
-                                                "width": "33%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "origin_type",
-                                                "width": "33%"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "columns": [
-                                    {
-                                        "width": "50%",
-                                        "items": [
-                                            {
-                                                "type": "field",
                                                 "value": "name",
-                                                "width": "66%"
+                                                "width": "60%",
+                                                "widget": {
+                                                    "heading": true
+                                                }
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "enrollment_id",
-                                                "width": "33%",
-                                                "readonly": true
+                                                "value": "complete_name",
+                                                "width": "80%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "sponsor_type",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "amount",
+                                                "width": "25%"
                                             }
                                         ]
                                     },
@@ -52,25 +45,23 @@
                                         "width": "50%",
                                         "items": [
                                             {
-                                                "type": "label",
-                                                "value": "",
-                                                "width": "33%",
-                                                "visible": ["is_manual_discount", "=", true]
-                                            },
-                                            {
-                                                "type": "label",
-                                                "value": "",
-                                                "width": "66%",
-                                                "visible": ["is_manual_discount", "=", false]
+                                                "type": "field",
+                                                "value": "address_street",
+                                                "width": "80%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "price_adapter_type",
-                                                "width": "33%"
+                                                "value": "address_dispatch",
+                                                "width": "80%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "value",
+                                                "value": "address_zip",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "address_city",
                                                 "width": "33%"
                                             }
                                         ]
@@ -84,18 +75,26 @@
             {
                 "sections": [
                     {
-                        "id": "section.description",
-                        "label": "description",
+                        "id": "section.enrollments",
+                        "label": "Enrollments",
+                        "visible": ["state", "<>", "draft"],
                         "rows": [
                             {
                                 "columns": [
                                     {
-                                        "width": "50%",
+                                        "width": "100%",
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "description",
-                                                "width": "100%"
+                                                "value": "enrollments_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
