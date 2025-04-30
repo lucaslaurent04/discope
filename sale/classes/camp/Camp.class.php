@@ -151,7 +151,7 @@ class Camp extends Model {
 
             'ase_quota' => [
                 'type'              => 'integer',
-                'description'       => "Max quantity of children, using financial help \"Aide sociale à l'enfance\", that can take part to the camp.",
+                'description'       => "Max quantity of children ASE per group (Aide sociale à l'enfance).",
                 'default'           => 4
             ],
 
