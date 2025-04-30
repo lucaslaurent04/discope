@@ -400,9 +400,8 @@ class BookingLineGroup extends Model {
     }
 
     public static function onupdateGroupType($om, $ids, $values, $lang) {
-        $groups = $om->read(self::getType(), $ids, ['group_type', 'booking_id'], $lang);
+        $groups = $om->read(self::getType(), $ids, ['group_type', 'booking_id', 'booking_activities_ids'], $lang);
         if($groups > 0) {
-            $map_booking_ids = [];
             foreach($groups as $id => $group) {
                 if($group['group_type'] == 'simple') {
                     $om->update(self::getType(), $id, ['is_sojourn' => false]);
@@ -415,23 +414,24 @@ class BookingLineGroup extends Model {
                 elseif($group['group_type'] == 'camp') {
                     $om->update(self::getType(), $id, ['is_sojourn' => false]);
                     $om->update(self::getType(), $id, ['is_event' => false]);
-                    $map_booking_ids[$group['booking_id']] = true;
                 }
                 elseif($group['group_type'] == 'event') {
                     $om->update(self::getType(), $id, ['is_sojourn' => false]);
                     $om->update(self::getType(), $id, ['is_event' => true]);
                 }
-            }
-
-            foreach(array_keys($map_booking_ids) as $booking_id) {
-                self::refreshActivityGroupNumber($booking_id);
+                self::resetActivityGroupNumber($group['booking_id']);
+                BookingActivity::ids($group['booking_activities_ids'])->update(['group_num' => null]);
             }
         }
     }
 
+    /**
+     * Force resetting other activities 'group_num'
+     */
     public static function onupdateActivityGroupNum($self) {
-        $self->read(['booking_activities_ids']);
+        $self->read(['booking_id', 'booking_activities_ids']);
         foreach($self as $group) {
+            self::resetActivityGroupNumber($group['booking_id']);
             BookingActivity::ids($group['booking_activities_ids'])->update(['group_num' => null]);
         }
     }
@@ -571,39 +571,33 @@ class BookingLineGroup extends Model {
     }
 
     public static function onupdateOrder($self) {
-        $self->read(['booking_id']);
-
-        $map_booking_ids = [];
-        foreach ($self as $group) {
-            $map_booking_ids[$group['booking_id']] = true;
-        }
-
-        $booking_ids = array_keys($map_booking_ids);
-
-        foreach ($booking_ids as $booking_id) {
-            self::refreshActivityGroupNumber($booking_id);
+        $self->read(['booking_id', 'booking_activities_ids']);
+        foreach($self as $group) {
+            self::resetActivityGroupNumber($group['booking_id']);
+            BookingActivity::ids($group['booking_activities_ids'])->update(['group_num' => null]);
         }
     }
 
-    public static function refreshActivityGroupNumber(int $booking_id) {
+    /**
+     * #todo - this should be changed to a refresh method on the Booking class level, using an ($orm, $id) signature
+     * #memo - this method is used in several `update-[...]` controllers (to be adapted in case of change)
+     */
+    public static function resetActivityGroupNumber($booking_id) {
         $booking = Booking::id($booking_id)
             ->read(['booking_lines_groups_ids' => ['order', 'group_type']])
             ->first();
 
-        $map_order_group_id = [];
+        $map_order_groups_ids = [];
         foreach($booking['booking_lines_groups_ids'] as $group) {
             if($group['group_type'] === 'camp') {
-                $map_order_group_id[$group['order']] = $group['id'];
+                $map_order_groups_ids[$group['order']] = $group['id'];
             }
         }
 
-        $group_ids = array_values($map_order_group_id);
+        $group_ids = array_values($map_order_groups_ids);
         foreach($group_ids as $index => $group_id) {
-            BookingLineGroup::id($group_id)
-                ->update(['activity_group_num' => $index + 1]);
+            self::id($group_id)->update(['activity_group_num' => $index + 1]);
         }
-
-        BookingActivity::search(['booking_line_group_id', 'in', $group_ids])->update(['group_num' => null]);
     }
 
     public static function onupdateDateFrom($om, $oids, $values, $lang) {
