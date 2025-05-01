@@ -102,6 +102,14 @@ $days_names = array_map(function($day) use ($params) {
     return $day[$params['lang']];
 }, $days_languages);
 
+$connection_languages = [
+    ['fr' => 'et', 'en' => 'and', 'nl' => 'en'],
+];
+
+$connection_names = array_map(function($item) use ($params) {
+    return $item[$params['lang']];
+}, $connection_languages);
+
 // #todo - this should be in the Customer class
 $lodgingBookingPrintBookingFormatMember = function($booking) {
     $customer_assignment = Setting::get_value('sale', 'organization', 'customer.number_assignment', 'id');
@@ -112,7 +120,7 @@ $lodgingBookingPrintBookingFormatMember = function($booking) {
     return $code . ' - ' . $booking['customer_id']['partner_identity_id']['display_name'];
 };
 
-$lodgingBookingPrintAgeRangesText = function($booking, $conection_names) {
+$lodgingBookingPrintAgeRangesText = function($booking, $connection_names) {
     $age_rang_maps = [];
 
     foreach ($booking['booking_lines_groups_ids'] as $booking_line_group) {
@@ -122,7 +130,7 @@ $lodgingBookingPrintAgeRangesText = function($booking, $conection_names) {
                 if (!isset($age_rang_maps[$age_range_assignment_code])) {
                     $age_rang_maps[$age_range_assignment_code] = [
                         'age_range' => $age_range_assignment['age_range_id']['name'],
-                        'qty' => 0
+                        'qty'       => 0
                     ];
                 }
                 $age_rang_maps[$age_range_assignment_code]['qty'] += $age_range_assignment['qty'];
@@ -132,7 +140,7 @@ $lodgingBookingPrintAgeRangesText = function($booking, $conection_names) {
 
     $parts = array_map(fn($item) => $item['qty'] . ' ' . strtolower($item['age_range']), $age_rang_maps);
     $last = array_pop($parts);
-    return count($parts) ? implode(', ', $parts) . ' ' . $conection_names[0] . ' ' . $last : $last;
+    return count($parts) ? implode(', ', $parts) . ' ' . $connection_names[0] . ' ' . $last : $last;
 };
 // read contract
 $fields = [
@@ -243,7 +251,7 @@ $fields = [
             'date_from',
             'date_to',
             'nb_pers',
-            'age_range_assignments_ids'=> ['id', 'age_range_id' =>['id', 'name'] ,'booking_line_group_id','qty'],
+            'age_range_assignments_ids'=> ['id', 'age_range_id' =>['id', 'name'], 'booking_line_group_id', 'qty'],
             'booking_lines_ids' => [
                 'name',
                 'is_activity',
@@ -565,7 +573,7 @@ if($booking['center_id']['template_category_id']) {
             $value = str_replace('{center}', $booking['center_id']['name'], $value);
             $value = str_replace('{customer}', $customer_name, $value);
 
-            $text_pers = $lodgingBookingPrintAgeRangesText($booking, $conection_names);
+            $text_pers = $lodgingBookingPrintAgeRangesText($booking, $connection_names);
             $value = str_replace('{nb_pers}', $text_pers, $value);
 
             $value = str_replace('{date_from}', $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']) , $value);
@@ -848,7 +856,7 @@ if($params['mode'] == 'grouped') {
             if (!isset($lines_map[$booking_line_group_id][$grouping_code][$product['id']])) {
                 $lines_map[$booking_line_group_id][$grouping_code][$product['id']] = [
                     'name'          => $booking_line['name'],
-                    'price'         => $null,
+                    'price'         => null,
                     'total'         => null,
                     'unit_price'    => null,
                     'vat_rate'      => null,
@@ -973,11 +981,11 @@ foreach($booking['fundings_ids'] as $funding) {
         $installment_amount = $funding['due_amount'];
     }
     $line = [
-        'name'          => (strlen($funding['payment_deadline_id']['name']))?$funding['payment_deadline_id']['name']:$funding['description'],
+        'name'          => (strlen($funding['payment_deadline_id']['name'] ?? '')) ? $funding['payment_deadline_id']['name'] : $funding['description'],
         'due_date'      => date('d/m/Y', $funding['due_date']),
         'due_amount'    => $funding['due_amount'],
         'is_paid'       => $funding['is_paid'],
-        'reference'     =>  DataFormatter::format($funding['payment_reference'], 'scor')
+        'reference'     => DataFormatter::format($funding['payment_reference'], 'scor')
     ];
     $values['fundings'][] = $line;
 }
