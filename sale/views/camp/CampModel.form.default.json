@@ -25,7 +25,7 @@
                                         "width": "50%",
                                         "items": [
                                             {
-                                                "type": "field",
+                                                "type": "label",
                                                 "value": "",
                                                 "width": "50%"
                                             },
@@ -47,11 +47,6 @@
                                             {
                                                 "type": "field",
                                                 "value": "ase_quota",
-                                                "width": "33%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "with_accommodation",
                                                 "width": "33%"
                                             },
                                             {

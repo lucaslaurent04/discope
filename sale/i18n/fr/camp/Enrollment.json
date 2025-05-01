@@ -23,6 +23,16 @@
             "description": "Camp auquel l'enfant s'inscrit.",
             "help": ""
         },
+        "date_from": {
+            "label": "Du",
+            "description": "Date de début du camp.",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "Date de fin du camp.",
+            "help": ""
+        },
         "camp_class": {
             "label": "Classe camp de l'enfant",
             "description": "La classe du camp de l'enfant pour l'inscription, pour savoir quel prix utiliser.",
@@ -63,22 +73,32 @@
             "label": "Verrouillée",
             "description": "Est-ce que l'inscription peut-être modifiée?",
             "help": ""
+        },
+        "works_council_id": {
+            "label": "Conseil d'entreprise",
+            "description": "Le conseil d'entreprise qui va rehausser la classe du camp d'un niveau.",
+            "help": ""
         }
     },
     "view": {
         "form.default": {
             "name": "Inscription",
             "description": "",
-            "layout": {
+            "actions": {
                 "action.transition.pending": {
                     "label": "En cours"
                 },
                 "action.transition.confirm": {
-                    "label": "Confirm"
+                    "label": "Confirmer"
                 },
                 "action.transition.cancel": {
                     "label": "Annuler"
                 },
+                "action.transfer": {
+                    "label": "Transférer"
+                }
+            },
+            "layout": {
                 "section.documents": {
                     "label": "Documents"
                 },
@@ -90,6 +110,25 @@
                 },
                 "section.child-remarks": {
                     "label": "Remarques enfant"
+                },
+                "section.mails": {
+                    "label": "E-mails"
+                }
+            }
+        },
+        "form.camp": {
+            "actions": {
+                "action.transition.pending": {
+                    "label": "En cours"
+                },
+                "action.transition.confirm": {
+                    "label": "Confirmer"
+                },
+                "action.transition.cancel": {
+                    "label": "Annuler"
+                },
+                "action.transfer": {
+                    "label": "Transférer"
                 }
             }
         },
@@ -99,5 +138,23 @@
             "layout": []
         }
     },
-    "error": []
+    "error": {
+        "is_locked": {
+            "locked_enrollment": "Impossible de modifier une inscription verrouillée."
+        },
+        "camp_id": {
+            "canceled_camp": "Inscription à un camp annulé impossible.",
+            "full": "Le camp est complet."
+        },
+        "child_id": {
+            "missing_institution": "Institution manquante.",
+            "missing_main_guardian": "Tuteur principal manquant.",
+            "already_enrolled": "L'enfant est déjà inscrit à ce camp.",
+            "already_enrolled_to_other_camp": "L'enfant est déjà inscrit à un autre camp pendant cette période.",
+            "missing_skill": "L'enfant n'a pas toutes les compétences requises pour ce camp."
+        },
+        "is_ase": {
+            "too_many_ase_children": "Le quota d'enfants de cette catégorie est plein."
+        }
+    }
 }

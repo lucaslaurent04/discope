@@ -1,32 +1,32 @@
 {
-    "name": "Camp Models",
+    "name": "Works Council",
     "layout": {
         "items": [
             {
                 "type": "field",
                 "value": "name",
-                "width": "20%",
+                "width": "25%",
                 "sortable": false,
                 "readonly": true
             },
             {
                 "type": "field",
-                "value": "camp_type",
-                "width": "20%",
+                "value": "code",
+                "width": "25%",
                 "sortable": false,
                 "readonly": true
             },
             {
                 "type": "field",
-                "value": "product_id",
-                "width": "20%",
+                "value": "address_zip",
+                "width": "25%",
                 "sortable": false,
                 "readonly": true
             },
             {
                 "type": "field",
-                "value": "employee_ratio",
-                "width": "20%",
+                "value": "address_city",
+                "width": "25%",
                 "sortable": false,
                 "readonly": true
             }

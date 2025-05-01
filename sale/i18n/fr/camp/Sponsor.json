@@ -1,0 +1,76 @@
+{
+    "name": "Sponsor",
+    "plural": "Sponsors",
+    "description": "Entité qui offre une aide financière aux enfants pour les camps d'été.",
+    "model": {
+        "name": {
+            "label": "Nom",
+            "description": "Nom court du sponsor pour affichage.",
+            "help": ""
+        },
+        "complete_name": {
+            "label": "Nom complet",
+            "description": "Nom complet du sponsor, utilisé pour l'adresse.",
+            "help": ""
+        },
+        "address_street": {
+            "label": "Adresse",
+            "description": "Rue et numéro du sponsor.",
+            "help": ""
+        },
+        "address_dispatch": {
+            "label": "Complément d'adresse",
+            "description": "Informations facultatives pour l'envoi du courrier (appartement, boîte, étage, ...).",
+            "help": ""
+        },
+        "address_zip": {
+            "label": "Code postal",
+            "description": "Code postal du sponsor.",
+            "help": ""
+        },
+        "address_city": {
+            "label": "Ville",
+            "description": "Ville du sponsor.",
+            "help": ""
+        },
+        "amount": {
+            "label": "Montant",
+            "description": "Montant sponsorisé qui est donné pour une inscription à un camp.",
+            "help": ""
+        },
+        "sponsor_type": {
+            "label": "Type",
+            "selection": {
+                "other": "Autres",
+                "commune": "Commune",
+                "community-of-communes": "Communauté de communes",
+                "department-caf": "CAF",
+                "department-msa": "MSA"
+            },
+            "description": "Type d'aide financière.",
+            "help": ""
+        },
+        "code_ce": {
+            "label": "Code CE",
+            "description": "Code du conseil d'entreprise.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Aide",
+            "description": "",
+            "layout": {
+                "section.enrollments": {
+                    "label": "Inscriptions"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Aides",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}

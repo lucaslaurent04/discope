@@ -48,13 +48,13 @@ class CampGroup extends Model {
 
     public static function calcName($self): array {
         $result = [];
-        $self->read(['state', 'camp_id' => ['name', 'camp_groups_ids']]);
+        $self->read(['state', 'camp_id' => ['short_name', 'camp_groups_ids']]);
         foreach($self as $id =>  $camp_group) {
-            $group_num = count($camp_group['camp_id']['camp_groups_ids']);
             if($camp_group['state'] === 'draft') {
-                $group_num++;
+                continue;
             }
-            $result[$id] = $camp_group['camp_id']['name'].' ('.$group_num.')';
+            $group_num = count($camp_group['camp_id']['camp_groups_ids']);
+            $result[$id] = $camp_group['camp_id']['short_name'].' ('.$group_num.')';
         }
 
         return $result;

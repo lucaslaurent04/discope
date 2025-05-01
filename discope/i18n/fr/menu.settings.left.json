@@ -46,6 +46,10 @@
             "label": "Camps",
             "help": ""
         },
+        "sales.camp.enrollments" : {
+            "label": "Inscriptions",
+            "help": ""
+        },
         "sales.camp.catalog" : {
             "label": "Catalogue",
             "help": ""
@@ -84,6 +88,18 @@
         },
         "sales.camp.requirements.documents": {
             "label": "Documents",
+            "help": ""
+        },
+        "sales.camp.helps": {
+            "label": "Aidants",
+            "help": ""
+        },
+        "sales.camp.helps.sponsors": {
+            "label": "Aides",
+            "help": ""
+        },
+        "sales.camp.helps.works-council": {
+            "label": "CEs",
             "help": ""
         },
         "sales.tour_operators": {

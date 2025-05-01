@@ -10,6 +10,7 @@ namespace sale\camp\price;
 
 use equal\orm\Model;
 use sale\camp\Enrollment;
+use sale\camp\Sponsor;
 
 class PriceAdapter extends Model {
 
@@ -29,7 +30,25 @@ class PriceAdapter extends Model {
                 'required'          => true
             ],
 
+            'is_manual_discount' => [
+                'type'              => 'boolean',
+                'description'       => "Flag to set the adapter as manual or related to a discount.",
+                'default'           => true,
+                'visible'           => ['sponsor_id', '=', null]
+            ],
+
             'price_adapter_type' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'percent',
+                    'amount'
+                ],
+                'description'       => "Type of manual discount (fixed amount or percentage of the price).",
+                'visible'           => ['is_manual_discount', '=', true],
+                'default'           => 'amount'
+            ],
+
+            'origin_type' => [
                 'type'              => 'string',
                 'selection'         => [
                     'other',
@@ -37,7 +56,6 @@ class PriceAdapter extends Model {
                     'help-community-of-communes',
                     'help-department-caf',
                     'help-department-msa',
-                    'holiday-voucher',
                     'loyalty-discount'
                 ],
                 'description'       => "Type of the price adapter.",
@@ -50,14 +68,41 @@ class PriceAdapter extends Model {
                 'description'       => "Additional information about the price adapter."
             ],
 
-            'amount' => [
+            'value' => [
                 'type'              => 'float',
-                'usage'             => 'amount/money:4',
-                'description'       => "Amount to remove to the enrollment price.",
-                'onupdate'          => 'onupdateAmount'
+                'description'       => "Amount/percentage to remove to the enrollment price.",
+                'onupdate'          => 'onupdateValue'
+            ],
+
+            'sponsor_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\Sponsor',
+                'description'       => "The origin of the price adapter."
             ]
 
         ];
+    }
+
+    /**
+     * Apply sponsor data to price adapter.
+     */
+    public static function onchange($event, $values): array {
+        $result = [];
+        if(isset($event['sponsor_id'])) {
+            $sponsor = Sponsor::id($event['sponsor_id'])
+                ->read(['name', 'amount', 'sponsor_type'])
+                ->first();
+
+            $result['value'] = $sponsor['amount'];
+            $result['origin_type'] = 'help-'.$sponsor['sponsor_type'];
+            $result['price_adapter_type'] = 'amount';
+            $result['is_manual_discount'] = false;
+            if(empty($values['name'])) {
+                $result['name'] = $sponsor['name'];
+            }
+        }
+
+        return $result;
     }
 
     public static function getActions(): array {
@@ -87,7 +132,7 @@ class PriceAdapter extends Model {
             ]);
     }
 
-    public static function onupdateAmount($self) {
+    public static function onupdateValue($self) {
         $self->do('reset-enrollments-prices');
     }
 }

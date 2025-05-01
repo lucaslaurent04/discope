@@ -18,14 +18,12 @@
             "description": "Type de camp.",
             "help": "",
             "selection": {
-                "week": "Semaine",
-                "weekend": "Week-end"
+                "sport": "Sport",
+                "circus": "Cirque",
+                "culture": "Culture",
+                "environment": "Environnement",
+                "horse-riding": "Équitation"
             }
-        },
-        "with_accommodation": {
-            "label": "Avec logement",
-            "description": "Est-ce que le camp le logement?",
-            "help": ""
         },
         "employee_ratio": {
             "label": "Ratio employé",
@@ -38,8 +36,8 @@
             "help": ""
         },
         "ase_quota": {
-            "label": "Quota ASE",
-            "description": "Max d'enfants \"Aide social à l'enfance\" pour ce camp.",
+            "label": "Quota ASE (par groupe)",
+            "description": "Max d'enfants ASE par groupe (Aide social à l'enfance).",
             "help": ""
         }
     },
