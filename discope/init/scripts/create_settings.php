@@ -35,6 +35,7 @@ Setting::assert_value('sale', 'features', 'ui.booking.accommodations_folded', tr
 Setting::assert_value('sale', 'features', 'ui.booking.meals_folded', true);
 Setting::assert_value('sale', 'features', 'templates.quote.consumption_table', true);
 Setting::assert_value('sale', 'features', 'templates.quote.activities', false);
+Setting::assert_value('sale', 'features', 'payment.remind.active.1', 1);
 // === discope.features ===
 Setting::assert_value('discope', 'features', 'has_custom_package', false);
 Setting::assert_value('discope', 'features', 'custom_package');
@@ -44,6 +45,12 @@ Setting::assert_value('sale', 'organization', 'customer.number_format', 'account
 Setting::assert_value('sale', 'organization', 'booking.channel_manager.client_domain', '');
 Setting::assert_value('sale', 'organization', 'booking.sequence_format', '%1d{center}%05d{sequence}');
 Setting::assert_value('sale', 'organization', 'booking.sequence', 1);
+Setting::assert_value('sale', 'organization', 'has_specific_city_tax_calculation', 0);
+Setting::assert_value('sale', 'organization', 'sku.city_tax');
+Setting::assert_value('sale', 'organization',  'booking.reference.code' , 150);
+Setting::assert_value('sale', 'organization',  'booking.reference.has_format' ,  1);
+Setting::assert_value('sale', 'organization',  'booking.reference.type' , 'name');
+Setting::assert_value('sale', 'organization', 'booking.reference.payment_format', '%3d%04d%03d%02d');
 // for compatibility when there are more than one center office
 Setting::assert_value('sale', 'organization', 'booking.sequence.1', 1);
 Setting::assert_value('sale', 'organization', 'booking.reference_type', 'VCS');
