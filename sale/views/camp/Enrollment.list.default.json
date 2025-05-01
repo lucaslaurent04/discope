@@ -1,5 +1,7 @@
 {
     "name": "Enrollments",
+    "order": "created",
+    "sort": "desc",
     "layout": {
         "items": [
             {
@@ -12,6 +14,20 @@
             {
                 "type": "field",
                 "value": "camp_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "date_from",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "date_to",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true

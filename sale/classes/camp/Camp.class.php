@@ -8,6 +8,7 @@
 
 namespace sale\camp;
 
+use core\setting\Setting;
 use equal\orm\Model;
 
 class Camp extends Model {
@@ -20,19 +21,30 @@ class Camp extends Model {
         return [
 
             'name' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Name of the camp with dates and ages.",
+                'help'              => "Complete name of the camp to distinguish it from the others.",
+                'store'             => true,
+                'function'          => 'calcName'
+            ],
+
+            'short_name' => [
                 'type'              => 'string',
-                'description'       => "Name of the camp.",
-                'required'          => true
+                'description'       => "Short name of the camp.",
+                'required'          => true,
+                'dependents'        => ['name']
             ],
 
             'status' => [
                 'type'              => 'string',
                 'selection'         => [
-                    'pending',
+                    'draft',
+                    'published',
                     'canceled'
                 ],
                 'description'       => "Status of the camp.",
-                'default'           => 'pending'
+                'default'           => 'draft'
             ],
 
             'remarks' => [
@@ -50,13 +62,21 @@ class Camp extends Model {
             'date_from' => [
                 'type'              => 'date',
                 'description'       => "When the camp starts.",
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['name', 'enrollments_ids' => ['date_from']],
+                'default'           => function() {
+                    return strtotime('next sunday');
+                }
             ],
 
             'date_to' => [
                 'type'              => 'date',
                 'description'       => "When the camp ends.",
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['name', 'enrollments_ids' => ['date_to']],
+                'default'           => function() {
+                    return strtotime('next sunday +5 days');
+                }
             ],
 
             'product_id' => [
@@ -70,36 +90,42 @@ class Camp extends Model {
             'camp_type' => [
                 'type'              => 'string',
                 'selection'         => [
-                    'week',
-                    'weekend'
+                    'sport',
+                    'circus',
+                    'culture',
+                    'environment',
+                    'horse-riding'
                 ],
                 'description'       => "Type of camp.",
-                'default'           => 'week'
+                'default'           => 'sport'
+            ],
+
+            'is_clsh' => [
+                'type'              => 'boolean',
+                'description'       => "Is \"Centre loisir sans hébergement\"",
+                'default'           => false
             ],
 
             'camp_model_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\CampModel',
                 'description'       => "Model that was used as a base to create this camp.",
-                'onupdate'          => 'onupdateCampModelId'
-            ],
-
-            'with_accommodation' => [
-                'type'              => 'boolean',
-                'description'       => "Does the camp include accommodation?",
-                'default'           => false
+                'onupdate'          => 'onupdateCampModelId',
+                'required'          => true
             ],
 
             'min_age' => [
                 'type'              => 'integer',
                 'description'       => "Minimal age of the participants.",
-                'required'          => true
+                'default'           => 10,
+                'dependents'        => ['name']
             ],
 
             'max_age' => [
                 'type'              => 'integer',
                 'description'       => "Maximal age of the participants.",
-                'required'          => true
+                'default'           => 12,
+                'dependents'        => ['name']
             ],
 
             'employee_ratio' => [
@@ -109,7 +135,7 @@ class Camp extends Model {
                 'description'       => "The quantity of children one employee can handle alone.",
                 'store'             => true,
                 'function'          => 'calcDefaultEmployeeRatio',
-                'dependencies'      => ['max_children'],
+                'dependents'        => ['max_children'],
                 'onupdate'          => 'onupdateEmployeeRatio'
             ],
 
@@ -121,24 +147,34 @@ class Camp extends Model {
                 'function'          => 'calcMaxChildren'
             ],
 
+            'enrollments_qty' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => "Quantity of enrollments that aren't canceled or waitlisted.",
+                'store'             => true,
+                'function'          => 'calcEnrollmentsQty'
+            ],
+
             'camp_group_qty' => [
                 'type'              => 'integer',
                 'description'       => "The quantity of camp groups.",
                 'default'           => 1,
-                'dependencies'      => ['max_children']
+                'dependents'        => ['max_children']
             ],
 
             'ase_quota' => [
                 'type'              => 'integer',
-                'description'       => "Max quantity of children, using financial help \"Aide sociale à l'enfance\", that can take part to the camp.",
+                'description'       => "Max quantity of children ASE per group (Aide sociale à l'enfance).",
                 'default'           => 4
             ],
 
             'accounting_code' => [
-                'type'              => 'string',
+                'type'              => 'computed',
+                'result_type'       => 'string',
                 'description'       => "Specific accounting code for the camp.",
                 'unique'            => true,
-                'required'          => true
+                'store'             => true,
+                'function'          => 'calcAccountingCode'
             ],
 
             'need_license_ffe' => [
@@ -196,6 +232,64 @@ class Camp extends Model {
         ];
     }
 
+    public static function getWorkflow(): array {
+        return [
+
+            'draft' => [
+                'description' => "The camp is still being configured.",
+                'transitions' => [
+                    'publish' => [
+                        'status'        => 'published',
+                        'description'   => "Publish the camp on the website."
+                    ],
+                    'cancel' => [
+                        'status'        => 'canceled',
+                        'description'   => "Cancel the camp."
+                    ]
+                ]
+            ],
+
+            'published' => [
+                'description' => "The camp is configured and published on the website.",
+                'transitions' => [
+                    'cancel' => [
+                        'status'        => 'canceled',
+                        'description'   => "Cancel the camp."
+                    ]
+                ]
+            ],
+
+            'canceled' => [
+                'description' => "The camp was canceled.",
+            ]
+
+        ];
+    }
+
+    public static function calcName($self): array {
+        $result = [];
+        $self->read(['short_name', 'date_from', 'date_to', 'min_age', 'max_age']);
+
+        $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
+
+        foreach($self as $id => $camp) {
+            if(empty($camp['short_name'])) {
+                continue;
+            }
+
+            $result[$id] = sprintf(
+                '%s | %s -> %s (%d - %d)',
+                $camp['short_name'],
+                date($date_format, $camp['date_from']),
+                date($date_format, $camp['date_to']),
+                $camp['min_age'],
+                $camp['max_age']
+            );
+        }
+
+        return $result;
+    }
+
     public static function calcDefaultEmployeeRatio($self): array {
         $result = [];
         $self->read(['camp_model_id' => ['default_employee_ratio']]);
@@ -216,6 +310,43 @@ class Camp extends Model {
         return $result;
     }
 
+    public static function calcEnrollmentsQty($self): array {
+        $result = [];
+        $self->read(['enrollments_ids' => ['status']]);
+        foreach($self as $id => $camp) {
+            $enrollment_qty = 0;
+            foreach($camp['enrollments_ids'] as $enrollment) {
+                if(!in_array($enrollment['status'], ['canceled', 'waitlisted'])) {
+                    $enrollment_qty++;
+                }
+            }
+            $result[$id] = $enrollment_qty;
+        }
+
+        return $result;
+    }
+
+    public static function calcAccountingCode($self): array {
+        $result = [];
+        $last_accounting_code = self::search([], ['sort' => ['created' => 'desc']])
+            ->read(['accounting_code'])
+            ->first();
+
+        $code = 0;
+        if(!is_null($last_accounting_code)) {
+            $code_array = explode('C', $last_accounting_code['accounting_code']);
+            if(isset($code_array[1])) {
+                $code = (int) $code_array[1];
+            }
+        }
+
+        foreach($self as $id => $camp) {
+            $result[$id] = '411C'.str_pad(++$code, 4, '0', STR_PAD_LEFT);
+        }
+
+        return $result;
+    }
+
     public static function onchange($event, $values) {
         $result = [];
         if(isset($event['camp_model_id'])) {
@@ -223,7 +354,6 @@ class Camp extends Model {
                 ->read([
                     'name',
                     'camp_type',
-                    'with_accommodation',
                     'employee_ratio',
                     'need_license_ffe',
                     'ase_quota',
@@ -233,27 +363,19 @@ class Camp extends Model {
 
             if(!is_null($camp_model)) {
                 $result['camp_type'] = $camp_model['camp_type'];
-                $result['with_accommodation'] = $camp_model['with_accommodation'];
                 $result['employee_ratio'] = $camp_model['employee_ratio'];
                 $result['product_id'] = $camp_model['product_id'];
                 $result['need_license_ffe'] = $camp_model['need_license_ffe'];
                 $result['ase_quota'] = $camp_model['ase_quota'];
 
-                if(empty($values['name'])) {
-                    $result['name'] = $camp_model['name'];
+                if(empty($values['short_name'])) {
+                    $result['short_name'] = $camp_model['name'];
                 }
             }
         }
         if(isset($event['date_from'])) {
-            if(isset($values['camp_type'])) {
-                $date_from = date('Y-m-d', $event['date_from']);
-                if($values['camp_type'] === 'week') {
-                    $result['date_to'] = strtotime($date_from.' +4 days');
-                }
-                if($values['camp_type'] === 'weekend') {
-                    $result['date_to'] = strtotime($date_from.' +1 days');
-                }
-            }
+            $date_from = date('Y-m-d', $event['date_from']);
+            $result['date_to'] = strtotime($date_from.' +5 days');
         }
 
         return $result;
@@ -342,11 +464,7 @@ class Camp extends Model {
                 }
                 $final_camp_group_ids = array_unique($final_camp_group_ids);
                 if(empty($final_camp_group_ids)) {
-                    return [
-                        'camp_groups_ids' => [
-                            'one_needed' => "A camp should have at least one camp group."
-                        ]
-                    ];
+                    return ['camp_groups_ids' => ['one_needed' => "A camp must have at least one camp group."]];
                 }
 
                 if($enrolled_children_qty === 0) {
@@ -363,11 +481,7 @@ class Camp extends Model {
                 }
 
                 if($enrolled_children_qty > $max_children) {
-                    return [
-                        'camp_groups_ids' => [
-                            'too_many_children' => "There is too many children enrolled in the camp groups."
-                        ]
-                    ];
+                    return ['camp_groups_ids' => ['too_many_children' => "There is too many children enrolled in the camp groups."]];
                 }
             }
         }
@@ -383,11 +497,7 @@ class Camp extends Model {
                 }
 
                 if($enrolled_children_qty > ($camp['camp_group_qty'] * $values['employee_ratio'])) {
-                    return [
-                        'employee_ratio' => [
-                            'too_many_children' => "There is too many children enrolled in the camp to modify the employee ratio to {$values['employee_ratio']}."
-                        ]
-                    ];
+                    return ['employee_ratio' => ['too_many_children' => "There is too many children enrolled in the camp."]];
                 }
             }
         }

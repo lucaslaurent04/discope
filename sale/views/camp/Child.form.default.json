@@ -23,7 +23,7 @@
                                                 "width": "40%"
                                             },
                                             {
-                                                "type": "field",
+                                                "type": "label",
                                                 "value": "",
                                                 "width": "20%"
                                             },
@@ -38,7 +38,7 @@
                                                 "width": "25%"
                                             },
                                             {
-                                                "type": "field",
+                                                "type": "label",
                                                 "value": "",
                                                 "width": "10%"
                                             },
@@ -63,7 +63,7 @@
                                                 "width": "50%"
                                             },
                                             {
-                                                "type": "field",
+                                                "type": "label",
                                                 "value": "",
                                                 "width": "100%"
                                             },
@@ -78,18 +78,23 @@
                                                 "width": "50%"
                                             },
                                             {
-                                                "type": "field",
+                                                "type": "label",
                                                 "value": "",
                                                 "width": "100%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "licence_ffe",
+                                                "value": "has_license_ffe",
                                                 "width": "33%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "year_licence_ffe",
+                                                "value": "license_ffe",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "year_license_ffe",
                                                 "width": "33%"
                                             }
                                         ]
@@ -152,7 +157,6 @@
                     {
                         "id": "section.skills",
                         "label": "Skills",
-                        "visible": ["state", "<>", "draft"],
                         "rows": [
                             {
                                 "columns": [
