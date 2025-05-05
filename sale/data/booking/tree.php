@@ -190,8 +190,9 @@ $tree = [
         ],
         'booking_meals_ids' => [
             'date',
-            'time_slot_id' => ['name', 'code'],
-            'meal_type_id' => ['name', 'code'],
+            'time_slot_id',
+            'is_self_provided',
+            'meal_type_id',
             'meal_place'
         ]
     ]

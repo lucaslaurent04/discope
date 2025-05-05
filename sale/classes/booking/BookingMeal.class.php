@@ -52,6 +52,12 @@ class BookingMeal extends Model {
                 'onupdate'          => 'onupdateTimeSlotId'
             ],
 
+            'is_self_provided' => [
+                'type'              => 'boolean',
+                'description'       => "Is the meal provided by the customer, not related to a booking line.",
+                'default'           => false
+            ],
+
             'meal_type_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\MealType',
@@ -61,7 +67,11 @@ class BookingMeal extends Model {
 
             'meal_place' => [   
                 'type'              => 'string',
-                'selection'         => ['indoor', 'outdoor', 'bbq_place'],
+                'selection'         => [
+                    'indoor',
+                    'outdoor',
+                    'bbq_place'
+                ],
                 'description'       => 'Place where the meal is served.',
                 'default'           => 'indoor'
             ]

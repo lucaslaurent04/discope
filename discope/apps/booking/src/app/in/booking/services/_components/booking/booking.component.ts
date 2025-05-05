@@ -13,6 +13,8 @@ import { BookingActivity } from './_models/booking_activity.model';
 import { BookingLine } from './_models/booking_line.model';
 import { BookingActivityDay } from './_components/group/_components/day-activities/day-activities.component';
 import { BookedServicesDisplaySettings } from '../../services.component';
+import { BookingMealDay } from './_components/group/_components/day-meals/day-meals.component';
+import { BookingMeal } from './_models/booking_meal.model';
 
 // declaration of the interface for the map associating relational Model fields with their components
 interface BookingComponentsMap {
@@ -57,7 +59,9 @@ export class BookingServicesBookingComponent
     public maximized_group_id: number = 0;
     public time_slots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[] = [];
     public sojourn_types: { id: number, name: 'GA'|'GG' }[] = [];
+    public meal_types: { id: number, name: string, code: string }[] = [];
     public mapGroupsIdsBookingActivitiesDays: {[key: number]: BookingActivityDay[]} = {};
+    public mapGroupsIdsBookingMealsDays: {[key: number]: BookingMealDay[]} = {};
     public mapGroupsIdsHasActivity: {[key: number]: boolean};
 
     constructor(
@@ -91,6 +95,7 @@ export class BookingServicesBookingComponent
     public async ngOnInit() {
         this.time_slots = await this.api.collect('sale\\booking\\TimeSlot', [], ['id', 'name', 'code']);
         this.sojourn_types = await this.api.collect('sale\\booking\\SojournType', [], ['id', 'name']);
+        this.meal_types = await this.api.collect('sale\\booking\\MealType', [], ['id', 'name', 'code']);
     }
 
     /**
@@ -107,6 +112,7 @@ export class BookingServicesBookingComponent
                     console.debug('received updated booking', result);
                     this.update(result);
                     this.initMapGroupsIdsBookingActivitiesDays(result);
+                    this.initMapGroupsIdsBookingMealsDays(result);
                     this.initMapGroupsIdsHasActivity(result);
                     this.loading = false;
                 }
@@ -293,6 +299,47 @@ export class BookingServicesBookingComponent
         }
 
         return bookingActivitiesDays;
+    }
+
+    private initMapGroupsIdsBookingMealsDays(booking: Booking) {
+        this.mapGroupsIdsBookingMealsDays = {};
+        for(let group of booking.booking_lines_groups_ids) {
+            this.mapGroupsIdsBookingMealsDays[group.id] = this.createGroupBookingMealsDays(group);
+        }
+    }
+
+    private createGroupBookingMealsDays(group: BookingLineGroup) {
+        const bookingMealsDays = [];
+        let date = new Date(group.date_from);
+        const dateTo = new Date(group.date_to);
+        while(date <= dateTo) {
+            const bookingMealDay: BookingMealDay = {
+                date: new Date(date),
+                B: null,
+                L: null,
+                D: null
+            };
+
+            for(let bookingMeal of group.booking_meals_ids as BookingMeal[]) {
+                let mealDate = new Date(bookingMeal.date).toISOString().split('T')[0];
+                if(mealDate !== date.toISOString().split('T')[0]) {
+                    continue;
+                }
+
+                const timeSlot = this.time_slots.find((timeSlot: any) => timeSlot.id === bookingMeal.time_slot_id);
+                if(!timeSlot || !['B', 'L', 'D'].includes(timeSlot.code)) {
+                    continue;
+                }
+
+                bookingMealDay[timeSlot.code as 'B'|'L'|'D'] = bookingMeal;
+            }
+
+            bookingMealsDays.push(bookingMealDay);
+
+            date.setDate(date.getDate() + 1);
+        }
+
+        return bookingMealsDays;
     }
 
     private initMapGroupsIdsHasActivity(booking: Booking) {

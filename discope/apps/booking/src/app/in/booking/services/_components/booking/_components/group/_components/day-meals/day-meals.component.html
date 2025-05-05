@@ -1,0 +1,67 @@
+<div class="day-date-cells-wrapper">
+    <div class="cell day-name-cell">
+        {{bookingMealDay.date | date: 'EEEE' | titlecase}}
+    </div>
+    <div class="cell date-cell">
+        {{bookingMealDay.date | date: 'dd/MM/YYYY'}}
+    </div>
+</div>
+<div class="booking-meals-container">
+    <div class="booking-meal-container">
+        <div *ngIf="!group.is_locked" class="booking-meal-remove">
+            <button mat-icon-button
+                    *ngIf="bookingMealDay?.B?.is_self_provided"
+                    (click)="ondeleteMeal(bookingMealDay.B?.id)">
+                <mat-icon>clear</mat-icon>
+            </button>
+        </div>
+        <booking-services-booking-group-day-meals-meal
+            *ngIf="bookingMealDay?.B"
+            [meal]="bookingMealDay.B"
+            [date]="bookingMealDay.date"
+            [timeSlot]="mapTimeSlotsCode['B']"
+            [mealTypes]="mealTypes"
+            [group]="group"
+            [booking]="booking"
+            (updated)="updated.emit()"
+        ></booking-services-booking-group-day-meals-meal>
+    </div>
+
+    <div class="booking-meal-container">
+        <div *ngIf="!group.is_locked" class="booking-meal-remove">
+            <button mat-icon-button
+                    *ngIf="bookingMealDay.L?.is_self_provided"
+                    (click)="ondeleteMeal(bookingMealDay.L?.id)">
+                <mat-icon>clear</mat-icon>
+            </button>
+        </div>
+        <booking-services-booking-group-day-meals-meal
+            *ngIf="bookingMealDay?.L"
+            [meal]="bookingMealDay.L"
+            [date]="bookingMealDay.date"
+            [timeSlot]="mapTimeSlotsCode['L']"
+            [mealTypes]="mealTypes"
+            [group]="group"
+            [booking]="booking"
+        ></booking-services-booking-group-day-meals-meal>
+    </div>
+
+    <div class="booking-meal-container">
+        <div *ngIf="!group.is_locked" class="booking-meal-remove">
+            <button mat-icon-button
+                    *ngIf="bookingMealDay.D?.is_self_provided"
+                    (click)="ondeleteMeal(bookingMealDay.D?.id)">
+                <mat-icon>clear</mat-icon>
+            </button>
+        </div>
+        <booking-services-booking-group-day-meals-meal
+            *ngIf="bookingMealDay?.D"
+            [meal]="bookingMealDay.D"
+            [date]="bookingMealDay.date"
+            [timeSlot]="mapTimeSlotsCode['D']"
+            [mealTypes]="mealTypes"
+            [group]="group"
+            [booking]="booking"
+        ></booking-services-booking-group-day-meals-meal>
+    </div>
+</div>
