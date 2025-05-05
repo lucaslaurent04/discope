@@ -1,6 +1,8 @@
 <div class="part" [class.hidden]="!ready">
     <div class="part-toggle">
-        <span>{{ mapTimeSlotCodeName?.[timeSlot?.code] || 'Inconnu' }}</span>
+        <span [style]="activity ? 'cursor: pointer;' : ''" (click)="openActivityDetails()">
+            {{ mapTimeSlotCodeName?.[timeSlot?.code] || 'Inconnu' }}
+        </span>
 
         <button mat-icon-button [disabled]="!activity || activity?.is_virtual" (click)="toggleOpen()">
             <mat-icon style="font-size: 15px;">
