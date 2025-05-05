@@ -659,6 +659,8 @@
                                     [group]="instance"
                                     [timeSlots]="timeSlots"
                                     [mealTypes]="mealTypes"
+                                    (loadStart)="loadStart.emit()"
+                                    (loadEnd)="loadEnd.emit()"
                                     (updated)="onupdateMeal()"
                                 ></booking-services-booking-group-day-meals>
                             </div>
