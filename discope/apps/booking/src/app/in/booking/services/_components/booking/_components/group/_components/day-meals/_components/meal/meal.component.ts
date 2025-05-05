@@ -73,7 +73,7 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
 
         this.vm = {
             is_self_provided: {
-                formControl: new FormControl(false),
+                formControl: isSelfProvidedFormControl,
                 change: () => this.isSelfProvidedChange()
             },
             meal_type_id: {
@@ -147,5 +147,22 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
 
     public toggleOpen() {
         this.opened ? this.close.emit() : this.open.emit();
+    }
+
+    public async addMeal() {
+        try {
+            await this.api.create('sale\\booking\\BookingMeal', {
+                booking_id: this.booking.id,
+                booking_line_group_id: this.group.id,
+                date: this.date,
+                time_slot_id: this.timeSlot.id,
+                is_self_provided: true
+            });
+            // relay change to parent component
+            this.updated.emit();
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
     }
 }
