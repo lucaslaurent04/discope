@@ -102,6 +102,8 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
             return;
         }
 
+        this.loadStart.emit();
+
         // notify back-end about the change
         try {
             await this.api.update('sale\\booking\\BookingMeal', [this.meal.id], {is_self_provided: this.vm.is_self_provided.formControl.value});
@@ -111,12 +113,16 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
         catch(response) {
             this.api.errorFeedback(response);
         }
+
+        this.loadEnd.emit();
     }
 
     private async mealTypeIdChange() {
         if(!this.meal?.meal_type_id || this.meal.meal_type_id == this.vm.meal_type_id.formControl.value) {
             return;
         }
+
+        this.loadStart.emit();
 
         // notify back-end about the change
         try {
@@ -127,12 +133,16 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
         catch(response) {
             this.api.errorFeedback(response);
         }
+
+        this.loadEnd.emit();
     }
 
     private async mealPlaceChange() {
         if(!this.meal?.meal_place || this.meal.meal_place == this.vm.meal_place.formControl.value) {
             return;
         }
+
+        this.loadStart.emit();
 
         // notify back-end about the change
         try {
@@ -143,6 +153,8 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
         catch(response) {
             this.api.errorFeedback(response);
         }
+
+        this.loadEnd.emit();
     }
 
     public toggleOpen() {
@@ -150,6 +162,8 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
     }
 
     public async addMeal() {
+        this.loadStart.emit();
+
         try {
             await this.api.create('sale\\booking\\BookingMeal', {
                 booking_id: this.booking.id,
@@ -164,5 +178,7 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
         catch(response) {
             this.api.errorFeedback(response);
         }
+
+        this.loadEnd.emit();
     }
 }

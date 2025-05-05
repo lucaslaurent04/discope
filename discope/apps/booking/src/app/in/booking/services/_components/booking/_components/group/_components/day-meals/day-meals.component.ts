@@ -24,6 +24,8 @@ export class BookingServicesBookingGroupDayMealsComponent implements OnInit {
     @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
     @Input() mealTypes: { id: number, name: string, code: string }[];
 
+    @Output() loadStart = new EventEmitter();
+    @Output() loadEnd = new EventEmitter();
     @Output() updated = new EventEmitter();
 
     public ready: boolean = false;
@@ -51,6 +53,8 @@ export class BookingServicesBookingGroupDayMealsComponent implements OnInit {
     }
 
     public async ondeleteMeal(mealId: number) {
+        this.loadStart.emit();
+
         try {
             await this.api.remove('sale\\booking\\BookingMeal', [mealId], true);
             // relay change to parent component
@@ -59,5 +63,7 @@ export class BookingServicesBookingGroupDayMealsComponent implements OnInit {
         catch(response) {
             this.api.errorFeedback(response);
         }
+
+        this.loadEnd.emit();
     }
 }
