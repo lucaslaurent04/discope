@@ -160,6 +160,9 @@ Booking::refreshPrice($orm, $group['booking_id']['id']);
 // #memo - if booking includes a price from an unpublished pricelist, it is marked as ToBeConfirmed (`is_price_tbc`)
 Booking::refreshIsTbc($orm, $group['booking_id']['id']);
 
+// update meals
+BookingLineGroup::refreshMeals($orm, $group['id']);
+
 // restore events in case this controller is chained with others
 $orm->enableEvents();
 
