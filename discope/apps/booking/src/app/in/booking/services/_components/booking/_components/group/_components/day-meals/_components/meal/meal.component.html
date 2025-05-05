@@ -11,7 +11,7 @@
     </div>
 
     <div class="part-container">
-        <div class="row row-first">
+        <div class="row row-first" *ngIf="meal">
             <div class="cell">
                 <mat-form-field>
                     <mat-label>Type</mat-label>
@@ -42,6 +42,12 @@
             </div>
             <!-- actions (empty: set in parent component) -->
             <div class="cell cell-actions"></div>
+        </div>
+
+        <div *ngIf="!meal">
+            <button mat-icon-button style="margin-left: 20px; margin-bottom: 15px;" (click)="addMeal()">
+                <mat-icon>add</mat-icon>
+            </button>
         </div>
     </div>
 </div>

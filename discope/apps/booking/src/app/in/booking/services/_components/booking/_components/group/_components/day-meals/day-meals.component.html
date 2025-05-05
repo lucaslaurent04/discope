@@ -16,7 +16,6 @@
             </button>
         </div>
         <booking-services-booking-group-day-meals-meal
-            *ngIf="bookingMealDay?.B"
             [meal]="bookingMealDay.B"
             [date]="bookingMealDay.date"
             [timeSlot]="mapTimeSlotsCode['B']"
@@ -36,13 +35,13 @@
             </button>
         </div>
         <booking-services-booking-group-day-meals-meal
-            *ngIf="bookingMealDay?.L"
             [meal]="bookingMealDay.L"
             [date]="bookingMealDay.date"
             [timeSlot]="mapTimeSlotsCode['L']"
             [mealTypes]="mealTypes"
             [group]="group"
             [booking]="booking"
+            (updated)="updated.emit()"
         ></booking-services-booking-group-day-meals-meal>
     </div>
 
@@ -55,13 +54,13 @@
             </button>
         </div>
         <booking-services-booking-group-day-meals-meal
-            *ngIf="bookingMealDay?.D"
             [meal]="bookingMealDay.D"
             [date]="bookingMealDay.date"
             [timeSlot]="mapTimeSlotsCode['D']"
             [mealTypes]="mealTypes"
             [group]="group"
             [booking]="booking"
+            (updated)="updated.emit()"
         ></booking-services-booking-group-day-meals-meal>
     </div>
 </div>

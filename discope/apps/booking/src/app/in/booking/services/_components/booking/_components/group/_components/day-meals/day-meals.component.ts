@@ -2,6 +2,7 @@ import { BookingMeal } from '../../../../_models/booking_meal.model';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { BookingLineGroup } from '../../../../_models/booking_line_group.model';
 import { Booking } from '../../../../_models/booking.model';
+import { ApiService } from 'sb-shared-lib';
 
 export interface BookingMealDay {
     date: Date,
@@ -24,7 +25,6 @@ export class BookingServicesBookingGroupDayMealsComponent implements OnInit {
     @Input() mealTypes: { id: number, name: string, code: string }[];
 
     @Output() updated = new EventEmitter();
-    @Output() deleteMeal = new EventEmitter();
 
     public ready: boolean = false;
 
@@ -37,6 +37,11 @@ export class BookingServicesBookingGroupDayMealsComponent implements OnInit {
         'EV': null
     };
 
+    constructor(
+        private api: ApiService
+    ) {
+    }
+
     public ngOnInit() {
         this.ready = true;
 
@@ -45,7 +50,14 @@ export class BookingServicesBookingGroupDayMealsComponent implements OnInit {
         }
     }
 
-    public ondeleteMeal(mealId: number) {
-        this.deleteMeal.emit(mealId);
+    public async ondeleteMeal(mealId: number) {
+        try {
+            await this.api.remove('sale\\booking\\BookingMeal', [mealId], true);
+            // relay change to parent component
+            this.updated.emit();
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
     }
 }
