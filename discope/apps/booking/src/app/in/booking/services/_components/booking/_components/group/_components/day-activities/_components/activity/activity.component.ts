@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ApiService } from 'sb-shared-lib';
 import { BookingLineGroup } from '../../../../../../_models/booking_line_group.model';
 import { FormControl, Validators } from '@angular/forms';
@@ -40,7 +40,7 @@ interface vmModel {
     templateUrl: 'activity.component.html',
     styleUrls: ['activity.component.scss']
 })
-export class BookingServicesBookingGroupDayActivitiesActivityComponent {
+export class BookingServicesBookingGroupDayActivitiesActivityComponent implements OnInit {
 
     @Input() activity: BookingActivity | null;
     @Input() date: Date;
