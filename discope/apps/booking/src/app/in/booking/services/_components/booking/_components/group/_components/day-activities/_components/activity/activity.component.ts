@@ -8,6 +8,7 @@ import { Booking } from '../../../../../../_models/booking.model';
 import { BookingActivity } from '../../../../../../_models/booking_activity.model';
 import { MatDialog } from '@angular/material/dialog';
 import { BookingServicesBookingGroupLinePriceDialogComponent } from '../../../line/_components/price.dialog/price.component';
+import { BookingServicesBookingGroupDayActivitiesActivityDetailsDialogComponent } from './_components/details/details.component';
 
 interface vmModel {
     product: {
@@ -356,6 +357,45 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
                 if(line.unit_price != result.unit_price || line.vat != result.vat_rate) {
                     try {
                         await this.api.update('sale\\booking\\BookingLine', [line.id], {unit_price: result.unit_price, vat_rate: result.vat_rate});
+                        // relay change to parent component
+                        this.updated.emit();
+                    }
+                    catch(response) {
+                        this.api.errorFeedback(response);
+                    }
+                }
+            }
+        });
+    }
+
+    public openActivityDetails() {
+        if(this.group.is_locked) {
+            return;
+        }
+
+        if(!this.activity) {
+            return;
+        }
+
+        const dialogRef = this.dialog.open(BookingServicesBookingGroupDayActivitiesActivityDetailsDialogComponent, {
+            width: '500px',
+            height: '500px',
+            data: { ...this.activity }
+        });
+
+        dialogRef.afterClosed().subscribe(async (result) => {
+            if(result) {
+                const scheduleFrom = result.vm.schedule_from.formControl.value;
+                const scheduleTo = result.vm.schedule_to.formControl.value;
+                const description = result.vm.description.formControl.value;
+
+                if(this.activity.schedule_from != scheduleFrom || this.activity.schedule_to != scheduleTo || this.activity.description != description) {
+                    try {
+                        await this.api.update('sale\\booking\\BookingActivity', [this.activity.id], {
+                            schedule_from: scheduleFrom,
+                            schedule_to: scheduleTo,
+                            description: description
+                        });
                         // relay change to parent component
                         this.updated.emit();
                     }

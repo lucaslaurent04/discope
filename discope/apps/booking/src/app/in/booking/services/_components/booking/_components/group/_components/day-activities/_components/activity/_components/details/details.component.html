@@ -1,0 +1,42 @@
+<h3 style="display: flex; border-bottom: solid 1px lightgrey; margin-bottom: 0;" mat-dialog-title>
+    Edition détails
+</h3>
+
+<div mat-dialog-content style="display: flex; flex-direction: column; padding-top: 15px">
+    <mat-form-field style="width: 150px; margin-bottom: 10px;">
+        <mat-label>De</mat-label>
+        <input type="text" matInput [formControl]="vm.schedule_from.formControl">
+        <mat-error *ngIf="vm.schedule_from.formControl.hasError('required')">
+            Heure de début requise
+        </mat-error>
+        <mat-error *ngIf="vm.schedule_from.formControl.hasError('pattern')">
+            Heure de début invalide
+        </mat-error>
+    </mat-form-field>
+
+    <mat-form-field style="width: 150px; margin-bottom: 10px;">
+        <mat-label>À</mat-label>
+        <input type="text" matInput [formControl]="vm.schedule_to.formControl">
+        <mat-error *ngIf="vm.schedule_to.formControl.hasError('required')">
+            Heure de fin requise
+        </mat-error>
+        <mat-error *ngIf="vm.schedule_to.formControl.hasError('pattern')">
+            Heure de fin invalide
+        </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>Description</mat-label>
+        <textarea matInput [formControl]="vm.description.formControl" rows="5"></textarea>
+    </mat-form-field>
+</div>
+
+<div mat-dialog-actions style="justify-content: flex-end; border-top: solid 1px lightgrey;">
+    <button mat-raised-button color="primary" style="float: right;" (click)="onClose()">
+        ANNULER
+    </button>
+
+    <button mat-raised-button color="primary" style="float: right;" (click)="onSave()">
+        SAUVER
+    </button>
+</div>
