@@ -7,6 +7,7 @@
 */
 
 use sale\booking\BookingLine;
+use sale\booking\BookingLineGroup;
 
 [$params, $providers] = eQual::announce([
     'description'	=> "Updates a Booking Line by changed its product. This script is meant to be called by the `booking/services` UI.",
@@ -72,8 +73,11 @@ BookingLine::id($line_id)->update(['product_id' => $params['product_id']]);
 // they need to be disabled here to prevent recursive cycles that could lead to deep cycling issues.
 $orm->disableEvents();
 
-// #todo
-// BookingLineGroup::refreshMeals($orm, $group['id']);
+$line = BookingLine::id($line_id)
+    ->read(['booking_line_group_id'])
+    ->first();
+
+BookingLineGroup::refreshMeals($orm, $line['booking_line_group_id']);
 
 // restore events in case this controller is chained with others
 $orm->enableEvents();

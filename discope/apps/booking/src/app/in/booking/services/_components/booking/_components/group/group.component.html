@@ -1,5 +1,5 @@
 <!-- template vars -->
-<div #vGroup="var" [var]="{identification: {folded: displaySettings.identification_folded}, products: {folded: displaySettings.products_folded}, activities: {show: displaySettings.activities_show, folded: displaySettings.activities_folded}, accommodations: {folded: displaySettings.accommodations_folded}, meals: {show: displaySettings.meals_show, folded: displaySettings.meals_folded}}"></div>
+<div #vGroup="var" [var]="{identification: {folded: displaySettings.identification_folded}, products: {folded: displaySettings.products_folded}, activities: {show: displaySettings.activities_show, folded: displaySettings.activities_folded}, booking_meals: {folded: displaySettings.booking_meals_folded}, accommodations: {folded: displaySettings.accommodations_folded}, meals: {show: displaySettings.meals_show, folded: displaySettings.meals_folded}}"></div>
 
 <div [class.hidden]="!ready">
 
@@ -570,7 +570,7 @@
                         <span>Activités ({{instance.booking_activities_ids.length}})</span>
                     </div>
                     <div class="row-activities-price" style="height: 50px;"><!-- activity price is included in services --></div>
-                    </div>
+                </div>
                 <div class="row" [class.hidden]="vGroup.activities.folded">
                     <div style="width: 100%;">
                         <div class="activities-header">
@@ -607,6 +607,62 @@
                                     (closeActivity)="onCloseActivity($event)"
                                     (openActivity)="onOpenActivity($event)"
                                 ></booking-services-booking-group-day-activities>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- meals -->
+        <div class="part" *ngIf="instance.group_type === 'sojourn'">
+            <div class="part-toggle" [class.highlight]="!vGroup.booking_meals.folded">
+                <button mat-icon-button *ngIf="!vGroup.booking_meals.folded" (click)="vGroup.booking_meals.folded = !vGroup.booking_meals.folded; sectionFold('booking_meals')">
+                    <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
+                </button>
+                <button mat-icon-button *ngIf="vGroup.booking_meals.folded" (click)="vGroup.booking_meals.folded = !vGroup.booking_meals.folded; sectionUnfold('booking_meals')">
+                    <mat-icon style="font-size: 15px;">keyboard_arrow_right</mat-icon>
+                </button>
+            </div>
+
+            <div class="part-container" [class.highlight]="!vGroup.booking_meals.folded">
+                <div class="row">
+                    <div class="row-booking-meals-title">
+                        Repas ({{providedMealsQty}})
+                    </div>
+                </div>
+                <div class="row" [class.hidden]="vGroup.booking_meals.folded">
+                    <div style="width: 100%;">
+                        <div class="booking-meals-header">
+                            <div style="display: flex; width: 100%; margin-bottom: 6px; padding-left: 1px;">
+                                <div class="day-date-cells-wrapper">
+                                    <div class="booking-meals-cell">Jour</div>
+                                    <div class="booking-meals-cell">Date</div>
+                                </div>
+                                <div class="booking-meals-cell moment-cell">Moment</div>
+                                <div class="meal-wrapper">
+                                    <div class="booking-meals-cell">Type</div>
+                                    <div class="booking-meals-cell">Place</div>
+                                    <div class="booking-meals-cell">Non fournis</div>
+                                    <!-- actions -->
+                                    <div class="booking-meals-cell"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="booking-meals-list">
+                            <!-- booking-meals -->
+                            <div class="booking-meal-item" *ngFor="let bookingMealDay of bookingMealsDays">
+                                <booking-services-booking-group-day-meals
+                                    *ngIf="instance.booking_meals_ids.length > 0"
+                                    [bookingMealDay]="bookingMealDay"
+                                    [booking]="booking"
+                                    [group]="instance"
+                                    [timeSlots]="timeSlots"
+                                    [mealTypes]="mealTypes"
+                                    (loadStart)="loadStart.emit()"
+                                    (loadEnd)="loadEnd.emit()"
+                                    (updated)="onupdateMeal()"
+                                ></booking-services-booking-group-day-meals>
                             </div>
                         </div>
                     </div>

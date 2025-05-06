@@ -185,14 +185,19 @@ $tree = [
             'is_virtual',
             'activity_date',
             'time_slot_id',
+            'schedule_from',
+            'schedule_to',
             'providers_ids',
-            'rental_unit_id'
+            'rental_unit_id',
+            'description'
         ],
         'booking_meals_ids' => [
             'date',
-            'time_slot_id' => ['name', 'code'],
-            'meal_type_id' => ['name', 'code'],
-            'meal_place'
+            'time_slot_id',
+            'is_self_provided',
+            'meal_type_id',
+            'meal_place',
+            'booking_lines_ids'
         ]
     ]
 ];

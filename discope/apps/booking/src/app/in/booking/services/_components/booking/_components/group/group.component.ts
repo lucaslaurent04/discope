@@ -20,6 +20,7 @@ import { MatAutocomplete } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
 import { BookingActivityDay } from './_components/day-activities/day-activities.component';
 import { BookedServicesDisplaySettings } from '../../../../services.component';
+import { BookingMealDay } from './_components/day-meals/day-meals.component';
 
 
 // declaration of the interface for the map associating relational Model fields with their components
@@ -98,7 +99,9 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     @Input() booking: Booking;
     @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
     @Input() sojournTypes: { id: number, name: 'GA'|'GG' }[] = [];
+    @Input() mealTypes: { id: number, name: string, code: string }[] = [];
     @Input() bookingActivitiesDays: BookingActivityDay[];
+    @Input() bookingMealsDays: BookingMealDay[];
     @Input() displaySettings: BookedServicesDisplaySettings;
 
     @Output() loadStart = new EventEmitter();
@@ -115,6 +118,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     public groupNbPersOpen: boolean = false;
     public groupDatesOpen: boolean = false;
     public openedActivityIds: number[] = [];
+    public providedMealsQty: number = 0;
 
     public action_in_progress: boolean = false;
 
@@ -262,6 +266,13 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         this.vm.price.value = this.instance.price;
         this.vm.sojourn_type.value = (this.instance.sojourn_type_id == 1)?'GA':'GG';
 
+        this.providedMealsQty = 0;
+        for(let bookingMeal of this.instance.booking_meals_ids) {
+            if(!bookingMeal.is_self_provided) {
+                this.providedMealsQty++;
+            }
+        }
+
         // #workaround - force age_ranges update (since it cannot be done in update())
         this.instance.age_range_assignments_ids = values.age_range_assignments_ids;
 
@@ -357,6 +368,11 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     }
 
     public onupdateActivity() {
+        // relay to parent
+        this.updated.emit();
+    }
+
+    public onupdateMeal() {
         // relay to parent
         this.updated.emit();
     }

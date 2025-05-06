@@ -18,6 +18,7 @@ export interface BookedServicesDisplaySettings {
     identification_folded: boolean;
     products_folded: boolean;
     activities_folded: boolean;
+    booking_meals_folded: boolean;
     accommodations_folded: boolean;
     meals_folded: boolean;
     activities_show: boolean;
@@ -39,6 +40,7 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
         identification_folded: true,
         products_folded: true,
         activities_folded: true,
+        booking_meals_folded: true,
         accommodations_folded: true,
         meals_folded: true,
         meals_show: true,
