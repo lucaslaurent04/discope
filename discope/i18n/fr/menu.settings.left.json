@@ -266,6 +266,10 @@
             "label": "Tranches horaires",
             "help": ""
         },
+        "sales.catalog.meal_types": {
+            "label": "Types de repas",
+            "help": ""
+        },
         "sales.catalog.groupingCode": {
             "label": "Regroupement",
             "help": ""
