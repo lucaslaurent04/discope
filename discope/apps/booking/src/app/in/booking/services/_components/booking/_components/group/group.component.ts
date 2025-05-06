@@ -118,6 +118,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     public groupNbPersOpen: boolean = false;
     public groupDatesOpen: boolean = false;
     public openedActivityIds: number[] = [];
+    public providedMealsQty: number = 0;
 
     public action_in_progress: boolean = false;
 
@@ -264,6 +265,13 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         this.vm.participants_count.formControl.setValue(this.instance.nb_pers);
         this.vm.price.value = this.instance.price;
         this.vm.sojourn_type.value = (this.instance.sojourn_type_id == 1)?'GA':'GG';
+
+        this.providedMealsQty = 0;
+        for(let bookingMeal of this.instance.booking_meals_ids) {
+            if(!bookingMeal.is_self_provided) {
+                this.providedMealsQty++;
+            }
+        }
 
         // #workaround - force age_ranges update (since it cannot be done in update())
         this.instance.age_range_assignments_ids = values.age_range_assignments_ids;
