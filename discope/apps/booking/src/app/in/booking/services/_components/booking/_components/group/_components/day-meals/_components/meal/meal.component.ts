@@ -68,12 +68,9 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
         private api: ApiService,
         public dialog: MatDialog
     ) {
-        const isSelfProvidedFormControl = new FormControl(false);
-        isSelfProvidedFormControl.disable();
-
         this.vm = {
             is_self_provided: {
-                formControl: isSelfProvidedFormControl,
+                formControl: new FormControl(false),
                 change: () => this.isSelfProvidedChange()
             },
             meal_type_id: {
@@ -91,6 +88,10 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
         this.ready = true;
 
         if(this.meal) {
+            if(this.meal.booking_lines_ids.length === 0) {
+                this.vm.is_self_provided.formControl.disable();
+            }
+
             this.vm.is_self_provided.formControl.setValue(this.meal.is_self_provided);
             this.vm.meal_type_id.formControl.setValue(this.meal.meal_type_id);
             this.vm.meal_place.formControl.setValue(this.meal.meal_place);

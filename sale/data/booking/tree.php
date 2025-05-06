@@ -196,7 +196,8 @@ $tree = [
             'time_slot_id',
             'is_self_provided',
             'meal_type_id',
-            'meal_place'
+            'meal_place',
+            'booking_lines_ids'
         ]
     ]
 ];

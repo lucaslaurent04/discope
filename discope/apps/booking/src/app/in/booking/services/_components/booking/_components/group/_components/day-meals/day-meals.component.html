@@ -8,10 +8,8 @@
 </div>
 <div class="booking-meals-container">
     <div class="booking-meal-container">
-        <div *ngIf="!group.is_locked" class="booking-meal-remove">
-            <button mat-icon-button
-                    *ngIf="bookingMealDay?.B?.is_self_provided"
-                    (click)="ondeleteMeal(bookingMealDay.B?.id)">
+        <div *ngIf="!group.is_locked && bookingMealDay?.B &&  bookingMealDay.B.booking_lines_ids.length === 0" class="booking-meal-remove">
+            <button mat-icon-button (click)="ondeleteMeal(bookingMealDay.B?.id)">
                 <mat-icon>clear</mat-icon>
             </button>
         </div>
