@@ -334,11 +334,13 @@ class Invoice extends Model {
             $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format', '%05d{sequence}');
             $fiscal_year = Setting::get_value('finance', 'accounting', 'fiscal_year');
             $year = date('Y', $invoice['date']);
-            $sequence = Setting::get_value('sale', 'accounting', 'invoice.sequence.'.$invoice['center_office_id.code']);
+
+            $sequence = Setting::fetch_and_add('sale', 'accounting', 'invoice.sequence.'.$invoice['center_office_id.code']);
+            if(!$sequence) {
+                throw new \Exception('APP::unable to retrieve sequence for invoice', EQ_ERROR_INVALID_CONFIG);
+            }
 
             if(intval($year) == intval($fiscal_year) && $sequence) {
-                Setting::set_value('sale', 'accounting', 'invoice.sequence.'.$invoice['center_office_id.code'], $sequence + 1);
-
                 $result[$id] = Setting::parse_format($format, [
                     'year'      => $year,
                     'office'    => $invoice['center_office_id.code'],
