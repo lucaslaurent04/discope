@@ -845,6 +845,17 @@
                                 ]
                             },
                             {
+                                "id": "sales.catalog.meal_types",
+                                "type": "entry",
+                                "icon": "restaurant",
+                                "label": "Meal Types",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\MealType",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
                                 "id": "sales.catalog.groupingCode",
                                 "type": "entry",
                                 "icon": "group",

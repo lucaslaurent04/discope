@@ -52,12 +52,6 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
         'D': 'Diner',
     };
 
-    public mapMealTypes: {[key: string]: string} = {
-        regular: 'Normal',
-        picnic: 'Pique-nique',
-        themed: 'À thème'
-    };
-
     public mealPlaces: { name: string, code: string }[] = [
         { name: "Intérieur", code: "indoor" },
         { name: "Extérieur", code: "outdoor" },
