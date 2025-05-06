@@ -17,7 +17,7 @@ export interface BookingActivityDay {
 })
 export class BookingServicesBookingGroupDayActivitiesComponent implements OnInit {
 
-    @Input() bookingActivityDay: BookingActivityDay
+    @Input() bookingActivityDay: BookingActivityDay;
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
     @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];

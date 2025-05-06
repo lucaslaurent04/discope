@@ -29,6 +29,12 @@ class BookingActivity extends Model {
                 'relation'          => ['activity_booking_line_id' => 'name']
             ],
 
+            'description' => [
+                'type'              => 'string',
+                'usage'             => 'text/plain',
+                'description'       => "Description of the activity."
+            ],
+
             'activity_booking_line_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingLine',

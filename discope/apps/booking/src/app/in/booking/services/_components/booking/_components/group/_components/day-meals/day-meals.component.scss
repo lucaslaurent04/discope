@@ -1,0 +1,48 @@
+:host {
+    display: flex;
+    width: 100%;
+
+    .day-date-cells-wrapper {
+        display: flex;
+        min-width: 210px;
+        max-width: 210px;
+
+        .cell {
+            margin-right: 15px;
+            padding: 15px 10px 0 10px;
+        }
+
+        .day-name-cell {
+            text-transform: uppercase;
+            text-align: left !important;
+            font-weight: bold;
+            min-width: 80px;
+            max-width: 80px;
+            font-size: 0.9rem;
+        }
+
+        .date-cell {
+            min-width: 100px;
+            max-width: 100px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+    }
+
+    .booking-meals-container {
+        margin-top: 4px;
+        width: 100%;
+
+        .booking-meal-container {
+            position: relative;
+            width: 100%;
+
+            .booking-meal-remove {
+                position: absolute;
+                right: 0;
+                top: 5px;
+                z-index: 2;
+            }
+        }
+    }
+}
