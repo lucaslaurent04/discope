@@ -3238,7 +3238,8 @@ class BookingLineGroup extends Model {
             }
 
             $from_day_index = 1 + $line['product_model_id.schedule_offset'];
-            $to_day_index = $line['product_model_id.schedule_offset'] + count(json_decode($line['qty_vars']));
+            $qty_vars = json_decode($line['qty_vars']);
+            $to_day_index = $line['product_model_id.schedule_offset'] + (is_array($qty_vars) ? count($qty_vars) : 0);
 
             $day_index = 1;
             for($date = $group['date_from']; $date <= $group['date_to']; $date += 86400) {
