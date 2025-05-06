@@ -3222,7 +3222,12 @@ class BookingLineGroup extends Model {
         }
         $group = reset($groups);
 
-        $lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], ['is_meal', 'time_slot_id']);
+        $lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], [
+            'is_meal',
+            'time_slot_id',
+            'qty_vars',
+            'product_model_id.schedule_offset'
+        ]);
         if($lines <= 0) {
             return;
         }
@@ -3230,10 +3235,24 @@ class BookingLineGroup extends Model {
             if(!$line['is_meal']) {
                 continue;
             }
+
+            $from_day_index = 1 + $line['product_model_id.schedule_offset'];
+            $to_day_index = $line['product_model_id.schedule_offset'] + count(json_decode($line['qty_vars']));
+
+            $day_index = 1;
             for($date = $group['date_from']; $date <= $group['date_to']; $date += 86400) {
+                $is_self_provided = $day_index < $from_day_index || $day_index > $to_day_index;
+                $day_index++;
+
                 $meals_ids = $om->search(BookingMeal::getType(), [['booking_line_group_id', '=', $id], ['time_slot_id', '=', $line['time_slot_id']], ['date', '=', $date]]);
                 if(!count($meals_ids)) {
-                    $meal_id = $om->create(BookingMeal::getType(), ['booking_id' => $group['booking_id'], 'booking_line_group_id' => $id, 'date' => $date, 'time_slot_id' => $line['time_slot_id']]);
+                    $meal_id = $om->create(BookingMeal::getType(), [
+                        'booking_id'            => $group['booking_id'],
+                        'booking_line_group_id' => $id,
+                        'date'                  => $date,
+                        'time_slot_id'          => $line['time_slot_id'],
+                        'is_self_provided'      => $is_self_provided
+                    ]);
                     if($meal_id > 0) {
                         $meals_ids = [$meal_id];
                     }
