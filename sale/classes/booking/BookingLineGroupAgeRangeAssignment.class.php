@@ -48,6 +48,13 @@ class BookingLineGroupAgeRangeAssignment extends Model {
                 'onupdate'          => 'onupdateQty'
             ],
 
+            'free_qty' => [
+                'type'              => 'integer',
+                'description'       => "Quantity of freebies for the booking lines with a product linked to this age range.",
+                'default'           => 0,
+                'onupdate'          => 'onupdateFreeQty'
+            ],
+
             'age_range_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\AgeRange',
@@ -75,6 +82,48 @@ class BookingLineGroupAgeRangeAssignment extends Model {
         ];
     }
 
+    public static function getActions(): array {
+        return [
+
+            'reset-booking-lines-free-qty' => [
+                'description'   => "Reset linked booking lines free_qty to force recompute.",
+                'policies'      => [],
+                'function'      => 'doResetBookingLinesFreeQty'
+            ]
+
+        ];
+    }
+
+    public static function doResetBookingLinesFreeQty($self) {
+        $self->read([
+            'age_range_id',
+            'booking_line_group_id' => [
+                'booking_lines_ids' => [
+                    'product_id' => [
+                        'age_range_id'
+                    ]
+                ]
+            ]
+        ]);
+        $lines_ids = [];
+        foreach($self as $assignment) {
+            foreach($assignment['booking_line_group_id']['booking_lines_ids'] as $line) {
+                if($assignment['age_range_id'] === $line['product_id']['age_range_id']) {
+                    $lines_ids[] = $line['id'];
+                }
+            }
+        }
+
+        if(empty($lines_ids)) {
+            return;
+        }
+
+        BookingLine::ids($lines_ids)
+            ->update(['free_qty' => null])
+            ->read(['free_qty'])
+            ->get();
+    }
+
     /**
      * Handler for qty updates.
      * Update parent sojourn nb_pers according to currently set age range assignments.
@@ -91,6 +140,10 @@ class BookingLineGroupAgeRangeAssignment extends Model {
                 }
             }
         }
+    }
+
+    public static function onupdateFreeQty($self) {
+        $self->do('reset-booking-lines-free-qty');
     }
 
     public static function onupdateAgeRangeId($om, $oids, $values, $lang) {

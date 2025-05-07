@@ -40,3 +40,13 @@
         <mat-error *ngIf="qtyFormControl.hasError('required')">Ne peut être vide.</mat-error>
     </mat-form-field>
 </div>
+
+<div class="cell" style="margin-right: 20px" *ngIf="ageRangeFreeQtyFeature">
+    <mat-form-field style="max-width: 100px;">
+        <mat-label>Gratuité</mat-label>
+        <input type="number" min="0" [max]="instance.qty" matInput (blur)="onupdateFreeQty()" [formControl]="freeQtyFormControl">
+        <mat-error *ngIf="freeQtyFormControl.hasError('min')">Min 0.</mat-error>
+        <mat-error *ngIf="freeQtyFormControl.hasError('max')">Max {{instance.qty}}.</mat-error>
+        <mat-error *ngIf="freeQtyFormControl.hasError('required')">Ne peut être vide.</mat-error>
+    </mat-form-field>
+</div>
