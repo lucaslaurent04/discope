@@ -8,6 +8,7 @@
 
 namespace sale\booking;
 
+use core\setting\Setting;
 use equal\orm\Collection;
 use equal\orm\Model;
 use sale\catalog\Product;
@@ -1522,7 +1523,26 @@ class BookingLine extends Model {
 
     public static function calcFreeQty($om, $oids, $lang) {
         $result = [];
-        $lines = $om->read(get_called_class(), $oids, ['qty', 'auto_discounts_ids','manual_discounts_ids']);
+        $lines = $om->read(get_called_class(), $oids, [
+            'qty',
+            'auto_discounts_ids',
+            'manual_discounts_ids',
+            'qty_accounting_method',
+            'is_accomodation',
+            'product_id.product_model_id.has_duration',
+            'product_id.product_model_id.duration',
+            'product_id.product_model_id.is_repeatable',
+            'product_id.product_model_id.capacity',
+            'product_id.product_model_id.is_repeatable',
+            'product_id.age_range_id',
+            'booking_line_group_id.is_sojourn',
+            'booking_line_group_id.is_event',
+            'booking_line_group_id.nb_nights',
+            'booking_line_group_id.age_range_assignments_ids.age_range_id',
+            'booking_line_group_id.age_range_assignments_ids.free_qty'
+        ]);
+
+        $age_range_freebies = Setting::get_value('sale', 'features', 'booking.age_range.freebies', false);
 
         foreach($lines as $oid => $odata) {
             $free_qty = 0;
@@ -1540,6 +1560,38 @@ class BookingLine extends Model {
                     $free_qty += $adata['value'];
                 }
             }
+
+            if($age_range_freebies) {
+                $nb_repeat = 1;
+                if($odata['product_id.product_model_id.has_duration']) {
+                    $nb_repeat = $odata['product_id.product_model_id.duration'];
+                }
+                elseif($odata['booking_line_group_id.is_sojourn']) {
+                    if($odata['product_id.product_model_id.is_repeatable']) {
+                        $nb_repeat = max(1, $odata['booking_line_group_id.nb_nights']);
+                    }
+                }
+                elseif($odata['booking_line_group_id.is_event']) {
+                    if($odata['product_id.product_model_id.is_repeatable']) {
+                        $nb_repeat = $odata['booking_line_group_id.nb_nights'] + 1;
+                    }
+                }
+
+                foreach($odata['booking_line_group_id.age_range_assignments_ids.age_range_id'] as $index => $assignment) {
+                    if($odata['product_id.age_range_id'] === $assignment['age_range_id']) {
+                        $free_qty += self::computeLineQty(
+                            $odata['qty_accounting_method'],
+                            $nb_repeat,
+                            $odata['booking_line_group_id.age_range_assignments_ids.free_qty'][$index]['free_qty'],
+                            $odata['product_id.product_model_id.is_repeatable'],
+                            $odata['is_accomodation'],
+                            $odata['product_id.product_model_id.capacity']
+                        );
+                        break;
+                    }
+                }
+            }
+
             $result[$oid] = min($free_qty, $odata['qty']);
         }
         return $result;

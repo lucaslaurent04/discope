@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, Input, EventEmitter, AfterViewInit } from '@angular/core';
-import { ApiService, TreeComponent } from 'sb-shared-lib';
+import { ApiService, EnvService, TreeComponent } from 'sb-shared-lib';
 import { FormControl, Validators } from '@angular/forms';
 import { BookingLineGroup } from '../../../../_models/booking_line_group.model';
 import { BookingAgeRangeAssignment } from '../../../../_models/booking_agerange_assignment.model';
@@ -31,15 +31,26 @@ export class BookingServicesBookingGroupAgeRangeComponent extends TreeComponent<
     public ageFromFormControl: FormControl;
     public ageToFormControl: FormControl;
     public qtyFormControl: FormControl;
+    public freeQtyFormControl: FormControl;
+
+    public ageRangeFreeQtyFeature = false;
 
     constructor(
-        private api: ApiService
+        private api: ApiService,
+        private env: EnvService
     ) {
         super( new BookingAgeRangeAssignment() );
+
+        this.env.getEnv().then((e: any) => {
+            if(e?.['sale.features.booking.age_range.freebies']) {
+                this.ageRangeFreeQtyFeature = true;
+            }
+        });
 
         this.ageFromFormControl = new FormControl('', [Validators.required, Validators.min(0), Validators.max(99)]);
         this.ageToFormControl = new FormControl('', [Validators.required, Validators.min(0), Validators.max(99)]);
         this.qtyFormControl = new FormControl('', [Validators.required, Validators.min(1)]);
+        this.freeQtyFormControl = new FormControl('', [Validators.required, Validators.min(0)]);
     }
 
     public ngAfterViewInit() {
@@ -47,6 +58,7 @@ export class BookingServicesBookingGroupAgeRangeComponent extends TreeComponent<
         this.ageFromFormControl.setValue(this.instance.age_from);
         this.ageToFormControl.setValue(this.instance.age_to);
         this.qtyFormControl.setValue(this.instance.qty);
+        this.freeQtyFormControl.setValue(this.instance.free_qty);
     }
 
     public ngOnInit() {
@@ -67,6 +79,8 @@ export class BookingServicesBookingGroupAgeRangeComponent extends TreeComponent<
         this.ageFromFormControl.setValue(this.instance.age_from);
         this.ageToFormControl.setValue(this.instance.age_to);
         this.qtyFormControl.setValue(this.instance.qty);
+        this.freeQtyFormControl.setValue(this.instance.free_qty);
+        this.freeQtyFormControl.setValidators([Validators.required, Validators.min(0), Validators.max(this.instance.qty)]);
     }
 
     public async onupdateAgeRange(age_range: any) {
@@ -110,7 +124,35 @@ export class BookingServicesBookingGroupAgeRangeComponent extends TreeComponent<
                 id: this.group.id,
                 age_range_id: this.age_range_id,
                 age_range_assignment_id: this.instance.id,
-                qty: this.qtyFormControl.value
+                qty: this.qtyFormControl.value,
+                free_qty: this.freeQtyFormControl.value
+            });
+
+            // relay change to parent component (update nb_pers)
+            this.updated.emit();
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+
+        this.updating.emit(false);
+    }
+
+    public async onupdateFreeQty() {
+        if(this.freeQtyFormControl.invalid || this.age_range_id <= 0) {
+            return;
+        }
+
+        this.updating.emit(true);
+
+        // notify back-end about the change
+        try {
+            await this.api.fetch('?do=sale_booking_update-sojourn-agerange-set', {
+                id: this.group.id,
+                age_range_id: this.age_range_id,
+                age_range_assignment_id: this.instance.id,
+                qty: this.qtyFormControl.value,
+                free_qty: this.freeQtyFormControl.value
             });
 
             // relay change to parent component (update nb_pers)
