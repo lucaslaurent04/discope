@@ -347,19 +347,40 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     }
 
     public async ondeleteLine(line_id:number) {
-        this.loading = true;
-        setTimeout( async () => {
-            try {
-                // #todo #refresh - this triggers onupdateBookingLinesIds, which triggers _resetPrices
-                await this.api.update(this.instance.entity, [this.instance.id], {booking_lines_ids: [-line_id]});
-                // relay to parent
-                this.updated.emit();
+        try {
+            if(this.instance.has_pack) {
+                const dialog = this.dialog.open(SbDialogConfirmDialog, {
+                    width: '33vw',
+                    data: {
+                        title: "Supression produit",
+                        message: "Ce produit est peut-être lié à un <b>pack</b>, êtes-vous certains de vouloir le supprimer ?",
+                        yes: 'Oui',
+                        no: 'Non'
+                    }
+                });
+
+                await new Promise( async(resolve, reject) => {
+                    dialog.afterClosed().subscribe( async (result) => (result) ? resolve(true) : reject() );
+                });
             }
-            catch(response) {
-                this.api.errorFeedback(response);
-            }
-            this.loading = false;
-        });
+
+            this.loading = true;
+            setTimeout( async () => {
+                try {
+                    // #todo #refresh - this triggers onupdateBookingLinesIds, which triggers _resetPrices
+                    await this.api.update(this.instance.entity, [this.instance.id], {booking_lines_ids: [-line_id]});
+                    // relay to parent
+                    this.updated.emit();
+                }
+                catch(response) {
+                    this.api.errorFeedback(response);
+                }
+                this.loading = false;
+            });
+        }
+        catch(e) {
+            // user discarded the dialog (selected 'no')
+        }
     }
 
     public onupdateLine() {
