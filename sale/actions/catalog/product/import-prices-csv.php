@@ -91,13 +91,21 @@ for($i = 1; $i < count($lines); $i++) {
         $rate_class_id = $map_rate_classes_name_id[$rate_class];
     }
 
+    $old_price = Price::search([
+        ['product_id', '=', $row[$map_col_pos['product_id']]],
+        ['accounting_rule_id', '<>', null]
+    ])
+        ->read(['accounting_rule_id'])
+        ->first();
+
     Price::create([
-        'price_list_id'     => $price_list['id'],
-        'product_id'        => $row[$map_col_pos['product_id']],
-        'price'             => $row[$map_col_pos['price']],
-        'vat_rate'          => isset($map_col_pos['vat_rate']) ? $row[$map_col_pos['vat_rate']] : 0,
-        'has_rate_class'    => !is_null($rate_class_id),
-        'rate_class_id'     => $rate_class_id
+        'price_list_id'         => $price_list['id'],
+        'product_id'            => $row[$map_col_pos['product_id']],
+        'price'                 => $row[$map_col_pos['price']],
+        'vat_rate'              => isset($map_col_pos['vat_rate']) ? $row[$map_col_pos['vat_rate']] : 0,
+        'has_rate_class'        => !is_null($rate_class_id),
+        'rate_class_id'         => $rate_class_id,
+        'accounting_rule_id'    => $old_price['accounting_rule_id'] ?? null
     ]);
 }
 
