@@ -1839,17 +1839,29 @@ class BookingLine extends Model {
 
     public static function calcTimeSlotId($self): array {
         $result = [];
-        $self->read(['product_model_id' => ['type', 'service_type', 'time_slot_id', 'time_slots_ids']]);
+        $self->read([
+            'is_activity',
+            'is_fullday',
+            'booking_activity_id'   => ['time_slot_id'],
+            'product_model_id'      => ['type', 'service_type', 'time_slot_id', 'time_slots_ids']
+        ]);
         foreach($self as $id => $booking_line) {
-            $product_model = $booking_line['product_model_id'];
-            if($product_model['type'] !== 'service' || $product_model['service_type'] !== 'schedulable') {
-                continue;
+            if($booking_line['is_activity']) {
+                if(!$booking_line['is_fullday']) {
+                    $result[$id] = $booking_line['booking_activity_id']['time_slot_id'];
+                }
             }
-            if($product_model['time_slot_id']) {
-                $result[$id] = $product_model['time_slot_id'];
-            }
-            elseif(!empty($product_model['time_slots_ids'])) {
-                $result[$id] = current($product_model['time_slots_ids']);
+            else {
+                $product_model = $booking_line['product_model_id'];
+                if($product_model['type'] !== 'service' || $product_model['service_type'] !== 'schedulable') {
+                    continue;
+                }
+                if($product_model['time_slot_id']) {
+                    $result[$id] = $product_model['time_slot_id'];
+                }
+                elseif(!empty($product_model['time_slots_ids'])) {
+                    $result[$id] = current($product_model['time_slots_ids']);
+                }
             }
         }
         return $result;
