@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, Renderer2  } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BookingApiService } from 'src/app/in/booking/_services/booking.api.service';
-import { ContextService, EqualUIService } from 'sb-shared-lib';
+import { ContextService, EqualUIService, EnvService } from 'sb-shared-lib';
 
 class Booking {
     constructor(
@@ -69,7 +69,8 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
         private route: ActivatedRoute,
         private context:ContextService,
         private eq:EqualUIService,
-        private renderer: Renderer2
+        private renderer: Renderer2,
+        private env: EnvService
     ) {}
 
     /**
@@ -163,8 +164,27 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
 
     private async loadDisplaySettings() {
         try {
-            // #todo - use EnvService from sb-shared-lib
-            this.display_settings = await this.api.fetch('?get=sale_booking_booked-services-settings');
+            const environment = await this.env.getEnv();
+
+            const settings: {[key: string]: string} = {
+                store_folded_settings: 'sale.features.ui.booking.store_folded_settings',
+                identification_folded: 'sale.features.ui.booking.identification_folded',
+                products_folded: 'sale.features.ui.booking.products_folded',
+                activities_folded: 'sale.features.ui.booking.activities_folded',
+                booking_meals_folded: 'sale.features.ui.booking.booking_meals_folded',
+                accommodations_folded: 'sale.features.ui.booking.accommodations_folded',
+                meals_folded: 'sale.features.ui.booking.meals_folded',
+                meals_show: 'sale.features.booking.meal',
+                activities_show: 'sale.features.booking.activity'
+            };
+
+            for(let setting of Object.keys(settings)) {
+                const settingName = settings[setting];
+                if(environment[settingName] !== undefined) {
+                    this.display_settings[setting as keyof BookedServicesDisplaySettings] = environment[settingName];
+                }
+            }
+
             if(this.display_settings.store_folded_settings) {
                 this.setDisplaySettingsFromLocalStorage();
             }
