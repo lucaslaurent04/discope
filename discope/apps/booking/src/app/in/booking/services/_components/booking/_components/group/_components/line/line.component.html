@@ -138,7 +138,7 @@
                     <input #descriptionInput type="text" matInput [formControl]="vm.description.formControl" (blur)="vm.description.change()">
                     <mat-hint>Texte descriptif de remplacement (facultatif)</mat-hint>
                 </mat-form-field>
-                <div *ngIf="instance.product_id.product_model_id.type === 'service' && instance.product_id.product_model_id.service_type === 'schedulable' && !instance.product_id.product_model_id.is_repeatable"
+                <div *ngIf="instance.product_id?.product_model_id.type === 'service' && instance.product_id?.product_model_id.service_type === 'schedulable' && !instance.product_id?.product_model_id.is_repeatable"
                      style="margin-top: 20px; display: flex; align-items: center; gap: 40px;"
                 >
                     <div>Date:</div>
@@ -147,18 +147,18 @@
                             <mat-option *ngFor="let date of getPossibleServiceDates()" [value]="date">{{ date | date:'dd/MM/YY' }}</mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <mat-form-field *ngIf="!instance.product_id.product_model_id.is_fullday" style="max-width: 120px;">
+                    <mat-form-field *ngIf="!instance.product_id?.product_model_id.is_fullday" style="max-width: 120px;">
                         <mat-select [formControl]="vm.time_slot_id.formControl" (selectionChange)="vm.time_slot_id.change()">
                             <mat-option *ngFor="let time_slot of getPossibleTimeSlots()" [value]="time_slot.id">
                                 {{ time_slot.name}}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <div *ngIf="instance.product_id.product_model_id.is_fullday">
+                    <div *ngIf="instance.product_id?.product_model_id.is_fullday">
                         Journée complète
                     </div>
                 </div>
-                <div *ngIf="instance.product_id.product_model_id.type === 'service' && instance.product_id.product_model_id.service_type === 'schedulable' && !instance.product_id.product_model_id.is_repeatable && instance.product_id.product_model_id.is_meal"
+                <div *ngIf="instance.product_id?.product_model_id.type === 'service' && instance.product_id?.product_model_id.service_type === 'schedulable' && !instance.product_id?.product_model_id.is_repeatable && instance.product_id?.product_model_id.is_meal"
                      style="display: flex; align-items: center; gap: 40px;"
                 >
                     <div>Emplacement:</div>
@@ -175,7 +175,7 @@
 
         <!-- 2) quantity variations -->
         <!--
-            #memo - visibility condition changed from "!vProduct.identification.folded && !group.is_locked && instance.qty_accounting_method == 'person' && (!instance.is_accomodation || instance.product_id.product_model_id.capacity == 1)"
+            #memo - visibility condition changed from "!vProduct.identification.folded && !group.is_locked && instance.qty_accounting_method == 'person' && (!instance.is_accomodation || instance.product_id?.product_model_id.capacity == 1)"
             (unsure why it was hidden for is_accomodation since a check is made on accounting_method)
         -->
         <div class="row row-first"
@@ -210,7 +210,7 @@
                             <div *ngFor="let delta of vm.qty_vars.values | keyvalue; let index = index;"
                                  style="display: flex; align-items: center; height: 38px;"
                             >
-                                <div *ngIf="instance.product_id.product_model_id.type !== 'service' || instance.product_id.product_model_id.service_type !== 'schedulable' || instance.product_id.product_model_id.is_repeatable"
+                                <div *ngIf="instance.product_id?.product_model_id.type !== 'service' || instance.product_id?.product_model_id.service_type !== 'schedulable' || instance.product_id?.product_model_id.is_repeatable"
                                      style="flex: 0 1 35%; display: flex; align-items: center;"
                                 >
                                     <span style="text-decoration: underline">
@@ -220,16 +220,16 @@
                                         ({{getOffsetDate(index + ((group.is_sojourn)?(instance.product_id?.product_model_id?.schedule_offset):0)) | date : 'EEE d LLL'}})
                                     </span>
                                 </div>
-                                <div *ngIf="instance.product_id.product_model_id.type === 'service' && instance.product_id.product_model_id.service_type === 'schedulable' && !instance.product_id.product_model_id.is_repeatable"
+                                <div *ngIf="instance.product_id?.product_model_id.type === 'service' && instance.product_id?.product_model_id.service_type === 'schedulable' && !instance.product_id?.product_model_id.is_repeatable"
                                      style="flex: 0 1 35%; display: flex; align-items: center;"
                                 >
                                     <div style="width: 100px">
                                         {{getDateAfterServiceDate(index) | date:'dd/MM/YY'}}
                                     </div>
-                                    <div *ngIf="!instance.product_id.product_model_id.is_fullday" style="margin-left: 20px; width: 100px;">
+                                    <div *ngIf="!instance.product_id?.product_model_id.is_fullday" style="margin-left: 20px; width: 100px;">
                                         {{getTimeSlotName()}}
                                     </div>
-                                    <div *ngIf="instance.product_id.product_model_id.is_fullday" style="margin-left: 20px; width: 100px;">
+                                    <div *ngIf="instance.product_id?.product_model_id.is_fullday" style="margin-left: 20px; width: 100px;">
                                         Journée complète
                                     </div>
                                 </div>
