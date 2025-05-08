@@ -16,6 +16,22 @@
             ]
         }
     },
+    "actions": [
+        {
+            "id": "action.export-prices-csv",
+            "label": "Export prices CSV",
+            "description": "Export the products prices in a CSV file.",
+            "controller": "sale_catalog_product_export-prices-csv",
+            "confirm": false
+        },
+        {
+            "id": "action.import-prices-csv",
+            "label": "Import prices CSV",
+            "description": "Import the products prices form a CSV file.",
+            "controller": "sale_catalog_product_import-prices-csv",
+            "confirm": false
+        }
+    ],
     "layout": {
         "items": [
             {
