@@ -4,53 +4,59 @@
         <a href="#/bookings">Réservations</a><span> › </span> <a href="#/booking/{{booking.id}}">Réservation <small>[{{booking.name}} - {{booking.id}}]</small></a> <span> › </span> Planning activités
     </div>
     <div class="booking-body">
-        <div class="selection-details">
-            <div class="moment-details">
-                <div *ngIf="selectedDay" class="day-date">
-                    <span class="day-name">{{ dayName(selectedDay) }}</span> <span class="time-slot-name">{{ timeSlotName(selectedTimeSlot) }}</span>
+        <div class="selection-details-wrapper">
+            <div class="selection-details">
+                <div class="moment-details">
+                    <div *ngIf="selectedDay" class="day-date">
+                        <span class="day-name">{{ dayName(selectedDay) }}</span> <span class="time-slot-name">{{ timeSlotName(selectedTimeSlot) }}</span>
+                    </div>
+                    <booking-activities-planning-activity-schedule
+                        *ngIf="selectedActivity"
+                        [activity]="selectedActivity"
+                        (scheduleFromChanged)="onScheduleFromChanged($event)"
+                        (scheduleToChanged)="onScheduleToChanged($event)"
+                    ></booking-activities-planning-activity-schedule>
                 </div>
-                <booking-activities-planning-activity-schedule *ngIf="selectedActivity"
-                                                               [activity]="selectedActivity"
-                                                               (scheduleFromChanged)="onScheduleFromChanged($event)"
-                                                               (scheduleToChanged)="onScheduleToChanged($event)"
-                ></booking-activities-planning-activity-schedule>
-            </div>
 
-            <div class="group-activity-details">
-                <booking-activities-planning-booking-group-details [group]="selectedGroup"
-                                                                   [mapGroupAgeRangeAssignment]="mapGroupAgeRangeAssignment"
-                                                                   (nbPersChanged)="onNbPersChanged($event)"
-                                                                   (ageFromChanged)="onAgeFromChanged($event)"
-                                                                   (ageToChanged)="onAgeToChanged($event)"
-                ></booking-activities-planning-booking-group-details>
+                <div class="group-activity-details">
+                    <booking-activities-planning-booking-group-details
+                        [group]="selectedGroup"
+                        [mapGroupAgeRangeAssignment]="mapGroupAgeRangeAssignment"
+                        (nbPersChanged)="onNbPersChanged($event)"
+                        (ageFromChanged)="onAgeFromChanged($event)"
+                        (ageToChanged)="onAgeToChanged($event)"
+                    ></booking-activities-planning-booking-group-details>
 
-                <booking-activities-planning-activity-details [activity]="selectedActivity"
-                                                              [booking]="booking"
-                                                              [timeSlot]="selectedTimeSlot"
-                                                              [group]="selectedGroup"
-                                                              [employees]="employees"
-                                                              [providers]="providers"
-                                                              (productSelected)="onProductSelected($event)"
-                                                              (activityDeleted)="onActivityDeleted()"
-                                                              (employeeChanged)="onEmployeeChanged($event)"
-                                                              (providersChanged)="onProvidersChanged($event)"
-                ></booking-activities-planning-activity-details>
+                    <booking-activities-planning-activity-details
+                        [activity]="selectedActivity"
+                        [booking]="booking"
+                        [timeSlot]="selectedTimeSlot"
+                        [group]="selectedGroup"
+                        [employees]="employees"
+                        [providers]="providers"
+                        (productSelected)="onProductSelected($event)"
+                        (activityDeleted)="onActivityDeleted()"
+                        (employeeChanged)="onEmployeeChanged($event)"
+                        (providersChanged)="onProvidersChanged($event)"
+                    ></booking-activities-planning-activity-details>
+                </div>
             </div>
         </div>
 
-        <booking-activities-planning-week-activities [startDate]="weekStartDate"
-                                                     [endDate]="weekEndDate"
-                                                     [booking]="booking"
-                                                     [mapDateTimeSlotGroupActivity]="planning"
-                                                     [groups]="activityGroups"
-                                                     [selectedDay]="selectedDay"
-                                                     [selectedTimeSlot]="selectedTimeSlot"
-                                                     [selectedGroup]="selectedGroup"
-                                                     [selectedActivity]="selectedActivity"
-                                                     (daySelected)="onDaySelected($event)"
-                                                     (timeSlotSelected)="onTimeSlotSelected($event)"
-                                                     (groupSelected)="onGroupSelected($event)"
-                                                     (activitySelected)="onActivitySelected($event)"
+        <booking-activities-planning-week-activities
+            [startDate]="weekStartDate"
+            [endDate]="weekEndDate"
+            [booking]="booking"
+            [mapDateTimeSlotGroupActivity]="planning"
+            [groups]="activityGroups"
+            [selectedDay]="selectedDay"
+            [selectedTimeSlot]="selectedTimeSlot"
+            [selectedGroup]="selectedGroup"
+            [selectedActivity]="selectedActivity"
+            (daySelected)="onDaySelected($event)"
+            (timeSlotSelected)="onTimeSlotSelected($event)"
+            (groupSelected)="onGroupSelected($event)"
+            (activitySelected)="onActivitySelected($event)"
         ></booking-activities-planning-week-activities>
 
         <div class="week-navigations">

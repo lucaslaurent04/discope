@@ -50,56 +50,68 @@
                 margin-bottom: 20px;
             }
 
+            &::-webkit-scrollbar {
+                width: 6px;
+                overflow-y: scroll;
+                background: transparent;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: var(--mdc-theme-primary, #6200ee);
+                border-radius: 10px;
+            }
+
             .sb-view-header-actions-view {
                 margin-left: 0 !important;
             }
-        }
 
-        .booking-body::-webkit-scrollbar {
-            width: 6px;
-            overflow-y: scroll;
-            background: transparent;
-        }
+            .selection-details-wrapper {
+                display: block;
+                min-width: 600px;
+                max-width: 900px;
+                margin-bottom: 20px;
+                margin-top: 20px;
+                margin-left: auto;
+                margin-right: auto;
 
-        .booking-body::-webkit-scrollbar-thumb {
-            background: var(--mdc-theme-primary, #6200ee);
-            border-radius: 10px;
-        }
-
-        .booking-body {
-            .selection-details {
-                display: flex;
-                width: 100%;
-                justify-content: center;
-                margin-bottom: 50px;
-                gap: 20px;
-
-                .moment-details {
+                .selection-details {
                     display: flex;
-                    flex-direction: column;
                     justify-content: center;
-                    align-items: center;
-                    gap: 5px;
+                    gap: 50px;
 
-                    .day-date {
+                    .moment-details {
                         display: flex;
-                        height: 60px;
+                        flex-direction: column;
+                        justify-content: flex-start;
                         align-items: center;
+                        gap: 5px;
+                        margin-top: 4px;
+                        width: 155px;
 
-                        .day-name {
-                            font-weight: 700;
-                            text-transform: uppercase;
-                        }
+                        .day-date {
+                            display: flex;
+                            height: 60px;
+                            align-items: center;
 
-                        .time-slot-name {
-                            margin-left: 10px;
-                            font-size: 0.9rem;
+                            .day-name {
+                                font-weight: 700;
+                                text-transform: uppercase;
+                            }
+
+                            .time-slot-name {
+                                margin-left: 10px;
+                                font-size: 0.9rem;
+                            }
                         }
                     }
-                }
 
-                .group-activity-details {
-                    min-width: 500px;
+                    .group-activity-details {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: flex-start;
+                        gap: 5px;
+                        flex: 1 70%;
+                    }
                 }
             }
 
@@ -107,6 +119,8 @@
                 display: flex;
                 padding: 10px;
             }
+
         }
+
     }
 }
