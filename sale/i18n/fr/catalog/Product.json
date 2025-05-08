@@ -152,6 +152,14 @@
         "list.default": {
             "name": "Produits",
             "description": "Liste des produits.",
+            "actions": {
+                "action.export-prices-csv": {
+                    "label": "Exporter prix CSV"
+                },
+                "action.import-prices-csv": {
+                    "label": "Importer prix CSV"
+                }
+            },
             "layout": {}
         }
     },
