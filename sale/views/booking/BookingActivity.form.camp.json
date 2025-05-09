@@ -17,11 +17,9 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "name",
-                                                "width": "100%",
-                                                "widget": {
-                                                    "heading": true
-                                                }
+                                                "label": "Product",
+                                                "value": "product_id",
+                                                "width": "80%"
                                             },
                                             {
                                                 "type": "field",

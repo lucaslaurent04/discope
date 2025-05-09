@@ -26,9 +26,9 @@ class BookingActivity extends Model {
             'name' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
-                'store'             => true,
                 'description'       => "The name of the booking activity.",
-                'relation'          => ['activity_booking_line_id' => 'name']
+                'store'             => true,
+                'function'          => 'calcName'
             ],
 
             'description' => [
@@ -100,15 +100,6 @@ class BookingActivity extends Model {
                 'domain'            => ['is_transport', '=', true]
             ],
 
-            'product_model_id' => [
-                'type'              => 'computed',
-                'result_type'       => 'many2one',
-                'foreign_object'    => 'sale\catalog\ProductModel',
-                'description'       => "The product model the activity relates to.",
-                'store'             => true,
-                'relation'          => ['activity_booking_line_id' => ['product_model_id']]
-            ],
-
             'total' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
@@ -135,6 +126,7 @@ class BookingActivity extends Model {
                 'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\camp\Camp',
                 'description'       => "Camp the activity is organised for.",
+                'store'             => true,
                 'relation'          => ['camp_group_id' => 'camp_id'],
                 'readonly'          => true
             ],
@@ -149,6 +141,28 @@ class BookingActivity extends Model {
             /**
              * Common
              */
+
+            'product_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\catalog\Product',
+                'description'       => "The product the activity relates to.",
+                'store'             => true,
+                'relation'          => ['activity_booking_line_id' => 'product_id'],
+                'domain'            => [
+                    ['is_activity', '=', true],
+                    ['can_sell', '=', true]
+                ]
+            ],
+
+            'product_model_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\catalog\ProductModel',
+                'description'       => "The product model the activity relates to.",
+                'store'             => true,
+                'relation'          => ['product_id' => 'product_model_id']
+            ],
 
             'providers_ids' => [
                 'type'              => 'many2many',
@@ -278,10 +292,10 @@ class BookingActivity extends Model {
 
     public static function calcName($self): array {
         $result = [];
-        $self->read(['activity_booking_line_id' => ['name']]);
+        $self->read(['product_id' => ['name']]);
         foreach($self as $id => $booking_activity) {
-            if(isset($booking_activity['activity_booking_line_id']['name'])) {
-                $result[$id] = $booking_activity['activity_booking_line_id']['name'];
+            if(isset($booking_activity['product_id']['name'])) {
+                $result[$id] = $booking_activity['product_id']['name'];
             }
         }
 
@@ -476,14 +490,14 @@ class BookingActivity extends Model {
             $camp_ids = array_keys($map_camp_ids);
 
             foreach($camp_ids as $camp_id) {
-                $map_activity_name_counter_total = [];
+                $map_activity_product_counter_total = [];
                 $map_activity_counter = [];
 
                 $camp_activities = BookingActivity::search(
                     ['camp_id', '=', $camp_id],
                     ['sort' => ['activity_date' => 'asc']]
                 )
-                    ->read(['name', 'activity_date', 'time_slot_id' => ['order']])
+                    ->read(['product_model_id', 'activity_date', 'time_slot_id' => ['order']])
                     ->get(true);
 
                 usort($camp_activities, function($a, $b) {
@@ -493,19 +507,19 @@ class BookingActivity extends Model {
                 });
 
                 foreach($camp_activities as $activity) {
-                    if(!isset($map_activity_name_counter_total[$activity['name']])) {
-                        $map_activity_name_counter_total[$activity['name']] = 0;
+                    if(!isset($map_activity_product_counter_total[$activity['product_model_id']])) {
+                        $map_activity_product_counter_total[$activity['product_model_id']] = 0;
                     }
 
-                    $map_activity_name_counter_total[$activity['name']] += 1;
-                    $map_activity_counter[$activity['id']] = $map_activity_name_counter_total[$activity['name']];
+                    $map_activity_product_counter_total[$activity['product_model_id']] += 1;
+                    $map_activity_counter[$activity['id']] = $map_activity_product_counter_total[$activity['product_model_id']];
                 }
 
                 foreach($camp_activities as $activity) {
                     BookingActivity::id($activity['id'])
                         ->update([
                             'counter'       => $map_activity_counter[$activity['id']],
-                            'counter_total' => $map_activity_name_counter_total[$activity['name']]
+                            'counter_total' => $map_activity_product_counter_total[$activity['product_model_id']]
                         ]);
                 }
             }
@@ -516,18 +530,21 @@ class BookingActivity extends Model {
         $self->read(['activity_booking_line_id', 'camp_group_id']);
         foreach($self as $booking_activity) {
             if(!isset($booking_activity['activity_booking_line_id']) && !isset($values['activity_booking_line_id']) && !isset($booking_activity['camp_group_id']) && !isset($values['camp_group_id'])) {
-                return ['activity_booking_line_id' => ['invalid_type' => "The activity needs to be related to a booking line or a to a camp."]];
+                return [
+                    'activity_booking_line_id'  => ['invalid_type' => "The activity needs to be related to a booking line or a to a camp."],
+                    'camp_group_id'             => ['invalid_type' => "The activity needs to be related to a booking line or a to a camp."],
+                ];
             }
         }
 
         $common_fields = [
             'name', 'description', 'providers_ids', 'counter', 'counter_total', 'employee_id', 'activity_date',
             'time_slot_id', 'schedule_from', 'schedule_to', 'rental_unit_id', 'has_staff_required', 'has_provider',
-            'group_num', 'partner_planning_mails_ids'
+            'group_num', 'partner_planning_mails_ids', 'product_id', 'product_model_id'
         ];
         $booking_fields = [
             'activity_booking_line_id', 'is_virtual', 'booking_lines_ids', 'booking_id', 'booking_line_group_id',
-            'supplies_booking_lines_ids', 'transports_booking_lines_ids', 'product_model_id', 'total', 'price'
+            'supplies_booking_lines_ids', 'transports_booking_lines_ids', 'total', 'price'
         ];
         $camp_fields = ['camp_id', 'camp_group_id'];
 
