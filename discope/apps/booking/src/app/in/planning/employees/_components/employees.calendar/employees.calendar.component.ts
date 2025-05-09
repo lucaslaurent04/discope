@@ -259,34 +259,42 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public getDescription(activity: any): string {
-        if(activity?.is_partner_event) {
-            return `<dt>${activity.name}</dt>` +
-                `<br />` +
-                (activity.description ? `<dt>${activity.description}</dt>` : '');
-        }
-
-        let group_details = `<dt>Groupe ${activity.group_num}`;
-        if(activity.age_range_assignments_ids.length === 1) {
-            const assign = activity.age_range_assignments_ids[0];
-            group_details += `, ${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</span></dt>`;
-        }
-        else if(activity.age_range_assignments_ids.length > 1) {
-            group_details += ':</dt>';
-            for(let assign of activity.age_range_assignments_ids) {
-                group_details += `<dd>${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</dd>`;
+        if(activity.booking_id) {
+            let group_details = `<dt>Groupe ${activity.group_num}`;
+            if(activity.age_range_assignments_ids.length === 1) {
+                const assign = activity.age_range_assignments_ids[0];
+                group_details += `, ${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</span></dt>`;
             }
+            else if(activity.age_range_assignments_ids.length > 1) {
+                group_details += ':</dt>';
+                for(let assign of activity.age_range_assignments_ids) {
+                    group_details += `<dd>${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</dd>`;
+                }
+            }
+
+            return '<dl>' +
+                `<dt>${activity.customer_id.name}</dt>` +
+                (activity.partner_identity_id?.address_city ? `<dt>${activity.partner_identity_id?.address_city}</dt>` : '') +
+                group_details +
+                `<dt>Handicap : <b>${activity.booking_line_group_id.has_person_with_disability ? 'oui' : 'non'}</b></dt>` +
+                `<dt>Séjour du ${activity.booking_id.date_from} au ${activity.booking_id.date_to}</dt>` +
+                `<dt>${activity.booking_id.nb_pers} personnes</dt>` +
+                `<br />` +
+                `<dt>Activité ${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
+                '</dl>';
         }
 
-        return '<dl>' +
-            `<dt>${activity.customer_id.name}</dt>` +
-            (activity.partner_identity_id?.address_city ? `<dt>${activity.partner_identity_id?.address_city}</dt>` : '') +
-            group_details +
-            `<dt>Handicap : <b>${activity.booking_line_group_id.has_person_with_disability ? 'oui' : 'non'}</b></dt>` +
-            `<dt>Séjour du ${activity.booking_id.date_from} au ${activity.booking_id.date_to}</dt>` +
-            `<dt>${activity.booking_id.nb_pers} personnes</dt>` +
+        if(activity.camp_id) {
+            return '<dl>' +
+                `<dt>${activity.camp_id.name}</dt>` +
+                `<br />` +
+                `<dt>Activité ${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
+                '</dl>';
+        }
+
+        return `<dt>${activity.name}</dt>` +
             `<br />` +
-            `<dt>Activité ${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
-            '</dl>';
+            (activity.description ? `<dt>${activity.description}</dt>` : '');
     }
 
     private async onFiltersChange() {

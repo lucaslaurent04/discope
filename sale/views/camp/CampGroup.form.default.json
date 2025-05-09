@@ -25,11 +25,6 @@
                                         "width": "50%",
                                         "items": [
                                             {
-                                                "type": "label",
-                                                "value": "",
-                                                "width": "33%"
-                                            },
-                                            {
                                                 "type": "field",
                                                 "value": "camp_id",
                                                 "width": "33%"
