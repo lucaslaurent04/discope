@@ -232,7 +232,12 @@
                                                 "value": "booking_activities_ids",
                                                 "width": "100%",
                                                 "widget": {
-                                                    "view": "list.camp"
+                                                    "view": "list.camp",
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
                                                 }
                                             }
                                         ]
