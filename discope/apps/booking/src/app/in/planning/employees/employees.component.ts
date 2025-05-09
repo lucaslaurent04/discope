@@ -147,49 +147,53 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
         });
     }
 
-    public onShowBooking(consumption: any) {
-        let descriptor: any;
+    public onShowBooking(activity: any) {
+        let descriptor: any = {
+            context_silent: true, // do not update sidebar
+            context: {
+                entity: 'sale\\booking\\Booking',
+                type: 'form',
+                name: 'default',
+                domain: ['id', '=', activity.booking_id.id],
+                mode: 'view',
+                purpose: 'view',
+                display_mode: 'popup',
+                callback: (data:any) => {
+                    // restart angular lifecycles
+                    this.cd.reattach();
+                    // force a refresh
+                    this.planningCalendar.onRefresh();
+                }
+            }
+        };
 
-        // switch depending on object type (booking or ooo)
-        if(consumption.type == 'ooo') {
-            descriptor = {
-                context_silent: true, // do not update sidebar
-                context: {
-                    entity: 'sale\\booking\\Repairing',
-                    type: 'form',
-                    name: 'default',
-                    domain: ['id', '=', consumption.repairing_id.id],
-                    mode: 'view',
-                    purpose: 'view',
-                    display_mode: 'popup',
-                    callback: (data:any) => {
-                        // restart angular lifecycles
-                        this.cd.reattach();
-                    }
-                }
-            };
+        if(this.fullscreen) {
+            descriptor.context['dom_container'] = '.planning-body';
         }
-        // 'book' or similar
-        else {
-            descriptor = {
-                context_silent: true, // do not update sidebar
-                context: {
-                    entity: 'sale\\booking\\Booking',
-                    type: 'form',
-                    name: 'default',
-                    domain: ['id', '=', consumption.booking_id.id],
-                    mode: 'view',
-                    purpose: 'view',
-                    display_mode: 'popup',
-                    callback: (data:any) => {
-                        // restart angular lifecycles
-                        this.cd.reattach();
-                        // force a refresh
-                        this.planningCalendar.onRefresh();
-                    }
+        // prevent angular lifecycles while a context is open
+        this.cd.detach();
+        this.context.change(descriptor);
+    }
+
+    public onShowCamp(activity: any) {
+        let descriptor: any = {
+            context_silent: true, // do not update sidebar
+            context: {
+                entity: 'sale\\camp\\Camp',
+                type: 'form',
+                name: 'default',
+                domain: ['id', '=', activity.camp_id.id],
+                mode: 'view',
+                purpose: 'view',
+                display_mode: 'popup',
+                callback: (data:any) => {
+                    // restart angular lifecycles
+                    this.cd.reattach();
+                    // force a refresh
+                    this.planningCalendar.onRefresh();
                 }
-            };
-        }
+            }
+        };
 
         if(this.fullscreen) {
             descriptor.context['dom_container'] = '.planning-body';

@@ -42,8 +42,8 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
     }
 
 
-    public onShowBooking(booking: any) {
-       this.selected.emit(booking);
+    public onShowBooking(activity: any) {
+       this.selected.emit(activity);
     }
 
     public onEnterActivity(activity:any) {

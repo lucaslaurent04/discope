@@ -111,7 +111,7 @@
                                             [activity]="activity"
                                             (hover)="onhoverActivity($event); onhoverDay(partner, day)"
                                             (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
-                                            (selected)="onSelectedBooking($event)"
+                                            (selected)="onSelectedActivity($event)"
                                             cdkDrag
                                             [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_event"
                                             (cdkDragStarted)="onDragStart(activity)"
@@ -146,7 +146,7 @@
                                             [activity]="activity"
                                             (hover)="onhoverActivity($event); onhoverDay(partner, day)"
                                             (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
-                                            (selected)="onSelectedBooking($event)"
+                                            (selected)="onSelectedActivity($event)"
                                             cdkDrag
                                             [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_event"
                                             (cdkDragStarted)="onDragStart(activity)">
@@ -181,7 +181,7 @@
                                             [activity]="activity"
                                             (hover)="onhoverActivity($event); onhoverDay(partner, day)"
                                             (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
-                                            (selected)="onSelectedBooking($event)"
+                                            (selected)="onSelectedActivity($event)"
                                             cdkDrag
                                             [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_event"
                                             (cdkDragStarted)="onDragStart(activity)">
