@@ -18,6 +18,13 @@
             },
             {
                 "type": "field",
+                "value": "activity_group_num",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
                 "value": "max_children",
                 "width": "20%",
                 "sortable": false,
