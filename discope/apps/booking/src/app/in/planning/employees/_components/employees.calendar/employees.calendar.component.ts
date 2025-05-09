@@ -66,6 +66,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     @Input() rowsHeight: number;
     @Output() filters = new EventEmitter<ChangeReservationArg>();
     @Output() showBooking = new EventEmitter();
+    @Output() showCamp = new EventEmitter();
     @Output() showPartner = new EventEmitter();
     @Output() showPartnerEvent = new EventEmitter();
 
@@ -457,13 +458,16 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         }, 500);
     }
 
-    public onSelectedBooking(event: any) {
+    public onSelectedActivity(activity: any) {
         clearTimeout(this.mousedownTimeout);
-        if(!event?.is_partner_event) {
-            this.showBooking.emit(event);
+        if(activity.is_partner_event) {
+            this.showPartnerEvent.emit(activity);
         }
-        else {
-            this.showPartnerEvent.emit(event);
+        else if(activity.booking_id) {
+            this.showBooking.emit(activity);
+        }
+        else if(activity.camp_id) {
+            this.showCamp.emit(activity);
         }
     }
 
