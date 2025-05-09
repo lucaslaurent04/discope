@@ -11,6 +11,8 @@ namespace sale\booking;
 use core\setting\Setting;
 use equal\orm\Model;
 use hr\employee\Employee;
+use sale\camp\Camp;
+use sale\camp\CampGroup;
 
 class BookingActivity extends Model {
 
@@ -35,14 +37,23 @@ class BookingActivity extends Model {
                 'description'       => "Description of the activity."
             ],
 
+            /**
+             * Booking line
+             */
+
             'activity_booking_line_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingLine',
                 'description'       => "Booking Line of the activity.",
-                'help'              => "Stays empty if the booking_line_id is the main activity.",
                 'readonly'          => true,
-                'required'          => true,
                 'dependents'        =>  ['time_slot_id', 'activity_date', 'product_model_id']
+            ],
+
+            'is_virtual' => [
+                'type'              => 'boolean',
+                'description'       => "Is the activity related to another for a fullday activity or an activity with a duration.",
+                'help'              => "If true the activity is 'virtual' and no booking_line has a direct link to it. This activity will be mainly used for the planning.",
+                'default'           => false
             ],
 
             'booking_lines_ids' => [
@@ -72,16 +83,6 @@ class BookingActivity extends Model {
                 'relation'          => ['activity_booking_line_id' => 'booking_line_group_id']
             ],
 
-            'providers_ids' => [
-                'type'              => 'many2many',
-                'foreign_object'    => 'sale\provider\Provider',
-                'foreign_field'     => 'booking_activities_ids',
-                'rel_table'         => 'sale_booking_bookingactivity_rel_sale_provider_providers',
-                'rel_foreign_key'   => 'provider_id',
-                'rel_local_key'     => 'booking_activity_id',
-                'description'       => 'The assigned providers for the activity, if required by product model.'
-            ],
-
             'supplies_booking_lines_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\BookingLine',
@@ -99,16 +100,13 @@ class BookingActivity extends Model {
                 'domain'            => ['is_transport', '=', true]
             ],
 
-            'counter' => [
-                'type'              => 'integer',
-                'description'       => "The place of the activity in the booking sojourn, is it the first or second or ... activity of the same type in the sojourn.",
-                'default'           => 1
-            ],
-
-            'counter_total' => [
-                'type'              => 'integer',
-                'description'       => "The total of this type of activity in the booking sojourn for the group.",
-                'default'           => 1
+            'product_model_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\catalog\ProductModel',
+                'description'       => "The product model the activity relates to.",
+                'store'             => true,
+                'relation'          => ['activity_booking_line_id' => ['product_model_id']]
             ],
 
             'total' => [
@@ -128,11 +126,50 @@ class BookingActivity extends Model {
                 'store'             => true
             ],
 
-            'is_virtual' => [
-                'type'              => 'boolean',
-                'description'       => "Is the activity related to another for a fullday activity or an activity with a duration.",
-                'help'              => "If true the activity is 'virtual' and no booking_line has a direct link to it. This activity will be mainly used for the planning.",
-                'default'           => false
+            /**
+             * Camp
+             */
+
+            'camp_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\camp\Camp',
+                'description'       => "Camp the activity is organised for.",
+                'relation'          => ['camp_group_id' => 'camp_id'],
+                'readonly'          => true
+            ],
+
+            'camp_group_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\CampGroup',
+                'description'       => "Camp group the activity is organised for.",
+                'readonly'          => true
+            ],
+
+            /**
+             * Common
+             */
+
+            'providers_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\provider\Provider',
+                'foreign_field'     => 'booking_activities_ids',
+                'rel_table'         => 'sale_booking_bookingactivity_rel_sale_provider_providers',
+                'rel_foreign_key'   => 'provider_id',
+                'rel_local_key'     => 'booking_activity_id',
+                'description'       => 'The assigned providers for the activity, if required by product model.'
+            ],
+
+            'counter' => [
+                'type'              => 'integer',
+                'description'       => "The place of the activity in the booking sojourn, is it the first or second or ... activity of the same type in the sojourn.",
+                'default'           => 1
+            ],
+
+            'counter_total' => [
+                'type'              => 'integer',
+                'description'       => "The total of this type of activity in the booking sojourn for the group.",
+                'default'           => 1
             ],
 
             'employee_id' => [
@@ -183,15 +220,6 @@ class BookingActivity extends Model {
                 'onupdate'          => 'onupdateRentalUnitId'
             ],
 
-            'product_model_id' => [
-                'type'              => 'computed',
-                'result_type'       => 'many2one',
-                'foreign_object'    => 'sale\catalog\ProductModel',
-                'description'       => "The product model the activity relates to.",
-                'store'             => true,
-                'relation'          => ['activity_booking_line_id' => ['product_model_id']]
-            ],
-
             'has_staff_required' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
@@ -214,7 +242,7 @@ class BookingActivity extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'integer',
                 'store'             => true,
-                'relation'          => ['booking_line_group_id' => ['activity_group_num']]
+                'function'          => 'calcGroupNum'
             ],
 
             'partner_planning_mails_ids' => [
@@ -232,16 +260,19 @@ class BookingActivity extends Model {
 
     public static function getActions(): array {
         return [
+
             'reset-prices' => [
                 'description'   => "Reset the prices fields values so they can be re-calculated.",
                 'policies'      => [],
                 'function'      => 'doResetPrices'
             ],
+
             'update-counters' => [
                 'description'   => "Re-calculate the activities counters by group.",
                 'policies'      => [],
                 'function'      => 'doUpdateCounters'
             ]
+
         ];
     }
 
@@ -261,7 +292,9 @@ class BookingActivity extends Model {
         $result = [];
         $self->read(['activity_booking_line_id' => ['booking_id']]);
         foreach($self as $id => $booking_activity) {
-            $result[$id] = $booking_activity['activity_booking_line_id']['booking_id'];
+            if(isset($booking_activity['activity_booking_line_id'])) {
+                $result[$id] = $booking_activity['activity_booking_line_id']['booking_id'];
+            }
         }
 
         return $result;
@@ -271,7 +304,9 @@ class BookingActivity extends Model {
         $result = [];
         $self->read(['activity_booking_line_id' => ['booking_line_group_id']]);
         foreach($self as $id => $booking_activity) {
-            $result[$id] = $booking_activity['activity_booking_line_id']['booking_line_group_id'];
+            if(isset($booking_activity['activity_booking_line_id'])) {
+                $result[$id] = $booking_activity['activity_booking_line_id']['booking_line_group_id'];
+            }
         }
 
         return $result;
@@ -329,6 +364,24 @@ class BookingActivity extends Model {
         return $result;
     }
 
+    public static function calcGroupNum($self): array {
+        $result = [];
+        $self->read([
+            'booking_line_group_id' => ['activity_group_num'],
+            'camp_group_id'         => ['activity_group_num']
+        ]);
+        foreach($self as $id => $booking_activity) {
+            if(isset($booking_activity['booking_line_group_id']['activity_group_num'])) {
+                $result[$id] = $booking_activity['booking_line_group_id']['activity_group_num'];
+            }
+            elseif(isset($booking_activity['camp_group_id']['activity_group_num'])) {
+                $result[$id] = $booking_activity['camp_group_id']['activity_group_num'];
+            }
+        }
+
+        return $result;
+    }
+
     public static function onupdateActivityDate($self) {
         $self->do('update-counters');
     }
@@ -351,55 +404,175 @@ class BookingActivity extends Model {
     }
 
     public static function doUpdateCounters($self) {
-        $self->read(['booking_line_group_id']);
+        $self->read(['activity_booking_line_id', 'camp_id']);
 
-        $mapBookingLineGroupIds = [];
+        $booking_activities_ids = [];
+        $camp_activities_ids = [];
         foreach($self as $booking_activity) {
-            $mapBookingLineGroupIds[$booking_activity['booking_line_group_id']] = true;
+            if(isset($booking_activity['activity_booking_line_id'])) {
+                $booking_activities_ids[] = $booking_activity['id'];
+            }
+            else {
+                $camp_activities_ids[] = $booking_activity['id'];
+            }
         }
-        $bookingLineGroupIds = array_keys($mapBookingLineGroupIds);
 
-        foreach($bookingLineGroupIds as $group_id) {
-            $map_activity_product_counter_total = [];
-            $map_activity_counter = [];
+        if(!empty($booking_activities_ids)) {
+            $activities = BookingActivity::ids($booking_activities_ids)
+                ->read(['booking_line_group_id'])
+                ->get();
 
-            $group_activities = BookingActivity::search(
-                ['booking_line_group_id', '=', $group_id],
-                ['sort' => ['activity_date' => 'asc']]
-            )
-                ->read(['product_model_id', 'activity_date', 'time_slot_id' => ['order']])
-                ->get(true);
+            $map_booking_line_group_ids = [];
+            foreach($activities as $activity) {
+                $map_booking_line_group_ids[$activity['booking_line_group_id']] = true;
+            }
+            $booking_line_group_ids = array_keys($map_booking_line_group_ids);
 
-            usort($group_activities, function($a, $b) {
-                $date_comp = $a['activity_date'] <=> $b['activity_date'];
+            foreach($booking_line_group_ids as $group_id) {
+                $map_activity_product_counter_total = [];
+                $map_activity_counter = [];
 
-                return $date_comp !== 0 ? $date_comp : $a['time_slot_id']['order'] <=> $b['time_slot_id']['order'];
-            });
+                $group_activities = BookingActivity::search(
+                    ['booking_line_group_id', '=', $group_id],
+                    ['sort' => ['activity_date' => 'asc']]
+                )
+                    ->read(['product_model_id', 'activity_date', 'time_slot_id' => ['order']])
+                    ->get(true);
 
-            foreach($group_activities as $booking_activity) {
-                if(!isset($map_activity_product_counter_total[$booking_activity['product_model_id']])) {
-                    $map_activity_product_counter_total[$booking_activity['product_model_id']] = 0;
+                usort($group_activities, function($a, $b) {
+                    $date_comp = $a['activity_date'] <=> $b['activity_date'];
+
+                    return $date_comp !== 0 ? $date_comp : $a['time_slot_id']['order'] <=> $b['time_slot_id']['order'];
+                });
+
+                foreach($group_activities as $activity) {
+                    if(!isset($map_activity_product_counter_total[$activity['product_model_id']])) {
+                        $map_activity_product_counter_total[$activity['product_model_id']] = 0;
+                    }
+
+                    $map_activity_product_counter_total[$activity['product_model_id']] += 1;
+                    $map_activity_counter[$activity['id']] = $map_activity_product_counter_total[$activity['product_model_id']];
                 }
 
-                $map_activity_product_counter_total[$booking_activity['product_model_id']] += 1;
-                $map_activity_counter[$booking_activity['id']] = $map_activity_product_counter_total[$booking_activity['product_model_id']];
+                foreach($group_activities as $activity) {
+                    BookingActivity::id($activity['id'])
+                        ->update([
+                            'counter'       => $map_activity_counter[$activity['id']],
+                            'counter_total' => $map_activity_product_counter_total[$activity['product_model_id']]
+                        ]);
+                }
             }
+        }
 
-            foreach($group_activities as $booking_activity) {
-                BookingActivity::id($booking_activity['id'])
-                    ->update([
-                        'counter'       => $map_activity_counter[$booking_activity['id']],
-                        'counter_total' => $map_activity_product_counter_total[$booking_activity['product_model_id']]
-                    ]);
+        if(!empty($camp_activities_ids)) {
+            $activities = BookingActivity::ids($camp_activities_ids)
+                ->read(['camp_id'])
+                ->get();
+
+            $map_camp_ids = [];
+            foreach($activities as $activity) {
+                $map_camp_ids[$activity['camp_id']] = true;
+            }
+            $camp_ids = array_keys($map_camp_ids);
+
+            foreach($camp_ids as $camp_id) {
+                $map_activity_name_counter_total = [];
+                $map_activity_counter = [];
+
+                $camp_activities = BookingActivity::search(
+                    ['camp_id', '=', $camp_id],
+                    ['sort' => ['activity_date' => 'asc']]
+                )
+                    ->read(['name', 'activity_date', 'time_slot_id' => ['order']])
+                    ->get(true);
+
+                usort($camp_activities, function($a, $b) {
+                    $date_comp = $a['activity_date'] <=> $b['activity_date'];
+
+                    return $date_comp !== 0 ? $date_comp : $a['time_slot_id']['order'] <=> $b['time_slot_id']['order'];
+                });
+
+                foreach($camp_activities as $activity) {
+                    if(!isset($map_activity_name_counter_total[$activity['name']])) {
+                        $map_activity_name_counter_total[$activity['name']] = 0;
+                    }
+
+                    $map_activity_name_counter_total[$activity['name']] += 1;
+                    $map_activity_counter[$activity['id']] = $map_activity_name_counter_total[$activity['name']];
+                }
+
+                foreach($camp_activities as $activity) {
+                    BookingActivity::id($activity['id'])
+                        ->update([
+                            'counter'       => $map_activity_counter[$activity['id']],
+                            'counter_total' => $map_activity_name_counter_total[$activity['name']]
+                        ]);
+                }
             }
         }
     }
 
     public static function canupdate($self, $values): array {
+        $self->read(['activity_booking_line_id', 'camp_group_id']);
+        foreach($self as $booking_activity) {
+            if(!isset($booking_activity['activity_booking_line_id']) && !isset($values['activity_booking_line_id']) && !isset($booking_activity['camp_group_id']) && !isset($values['camp_group_id'])) {
+                return ['activity_booking_line_id' => ['invalid_type' => "The activity needs to be related to a booking line or a to a camp."]];
+            }
+        }
+
+        $common_fields = [
+            'name', 'description', 'providers_ids', 'counter', 'counter_total', 'employee_id', 'activity_date',
+            'time_slot_id', 'schedule_from', 'schedule_to', 'rental_unit_id', 'has_staff_required', 'has_provider',
+            'group_num', 'partner_planning_mails_ids'
+        ];
+        $booking_fields = [
+            'activity_booking_line_id', 'is_virtual', 'booking_lines_ids', 'booking_id', 'booking_line_group_id',
+            'supplies_booking_lines_ids', 'transports_booking_lines_ids', 'product_model_id', 'total', 'price'
+        ];
+        $camp_fields = ['camp_id', 'camp_group_id'];
+
+        foreach($self as $booking_activity) {
+            $related_to = 'sale\booking\BookingLine';
+            if(isset($values['camp_group_id']) || isset($booking_activity['camp_group_id'])) {
+                $related_to = 'sale\camp\Camp';
+            }
+
+            if($related_to === 'sale\booking\BookingLine') {
+                // booking checks
+                $updatable_fields = array_merge($common_fields, $booking_fields);
+                foreach(array_keys($values) as $field) {
+                    if(!in_array($field, $updatable_fields)) {
+                        return [$field => ['not_updatable' => "This field is not updatable for an activity related to a booking line."]];
+                    }
+                }
+            }
+            else {
+                // camp checks
+                $updatable_fields = array_merge($common_fields, $camp_fields);
+                foreach(array_keys($values) as $field) {
+                    if(!in_array($field, $updatable_fields)) {
+                        return [$field => ['not_updatable' => "This field is not updatable for an activity related to a camp."]];
+                    }
+                }
+
+                $camp_group_id = $values['camp_group_id'] ?? $booking_activity['camp_group_id'];
+                $camp_group = CampGroup::id($camp_group_id)
+                    ->read(['camp_id' => ['date_from', 'date_to']])
+                    ->first();
+
+                if(isset($values['activity_date'])) {
+                    if($values['activity_date'] < $camp_group['camp_id']['date_from'] || $values['activity_date'] > $camp_group['camp_id']['date_to']) {
+                        return ['activity_date' => ['outside_camp_dates' => "The activity isn't inside the camp dates."]];
+                    }
+                }
+            }
+        }
+
         if(!isset($values['activity_date']) && !isset($values['time_slot_id']) && !isset($values['employee_id'])) {
             return parent::canupdate($self, $values);
         }
 
+        // Common checks
         $self->read(['activity_date', 'time_slot_id', 'employee_id', 'product_model_id']);
         foreach($self as $booking_activity) {
             $employee_id = array_key_exists('employee_id', $values) ? $values['employee_id'] : $booking_activity['employee_id'];
@@ -408,7 +581,7 @@ class BookingActivity extends Model {
                 continue;
             }
 
-            // check employee qualification for given activity
+            // check employee qualification for the given activity
             $activity_filter = Setting::get_value('sale', 'features', 'employee.activity_filter', false);
             if($activity_filter) {
                 $employee = Employee::id($employee_id)
@@ -425,10 +598,10 @@ class BookingActivity extends Model {
             $time_slot_id = $values['time_slot_id'] ?? $booking_activity['time_slot_id'];
 
             $activities_ids = BookingActivity::search([
-                    ['activity_date', '=', $activity_date],
-                    ['time_slot_id', '=', $time_slot_id],
-                    ['employee_id', '=', $employee_id]
-                ])
+                ['activity_date', '=', $activity_date],
+                ['time_slot_id', '=', $time_slot_id],
+                ['employee_id', '=', $employee_id]
+            ])
                 ->ids();
 
             if(!empty($activities_ids)) {
