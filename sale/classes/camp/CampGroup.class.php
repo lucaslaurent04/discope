@@ -41,6 +41,22 @@ class CampGroup extends Model {
                 'description'       => "Max quantity of children that can take part to the camp.",
                 'store'             => true,
                 'function'          => 'calcMaxChildren'
+            ],
+
+            'activity_group_num' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => "Identifier of the activity group in the booking.",
+                'store'             => true,
+                'instant'           => true,
+                'function'          => 'calcActivityGroupNum'
+            ],
+
+            'booking_activities_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\BookingActivity',
+                'foreign_field'     => 'camp_group_id',
+                'description'       => "All Booking Activities this camp group relates to."
             ]
 
         ];
@@ -48,13 +64,12 @@ class CampGroup extends Model {
 
     public static function calcName($self): array {
         $result = [];
-        $self->read(['state', 'camp_id' => ['short_name', 'camp_groups_ids']]);
+        $self->read(['state', 'activity_group_num', 'camp_id' => ['short_name', 'camp_groups_ids']]);
         foreach($self as $id =>  $camp_group) {
             if($camp_group['state'] === 'draft') {
                 continue;
             }
-            $group_num = count($camp_group['camp_id']['camp_groups_ids']);
-            $result[$id] = $camp_group['camp_id']['short_name'].' ('.$group_num.')';
+            $result[$id] = $camp_group['camp_id']['short_name'].' ('.$camp_group['activity_group_num'].')';
         }
 
         return $result;
@@ -65,6 +80,31 @@ class CampGroup extends Model {
         $self->read(['camp_id' => ['employee_ratio']]);
         foreach($self as $id => $camp) {
             $result[$id] = $camp['camp_id']['employee_ratio'];
+        }
+
+        return $result;
+    }
+
+    public static function calcActivityGroupNum($self): array {
+        $result = [];
+        $self->read(['state', 'camp_id']);
+        foreach($self as $id => $camp_group) {
+            if($camp_group['state'] === 'draft') {
+                continue;
+            }
+
+            $groups = CampGroup::search(['camp_id', '=', $camp_group['camp_id']], ['sort' => ['created' => 'asc']])
+                ->read(['created'])
+                ->get();
+
+            $num = 1;
+            foreach($groups as $group) {
+                if($group['id'] === $camp_group['id']) {
+                    $result[$id] = $num;
+                    break;
+                }
+                $num++;
+            }
         }
 
         return $result;

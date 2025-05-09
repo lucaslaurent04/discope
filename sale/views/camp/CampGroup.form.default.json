@@ -39,6 +39,39 @@
                                                 "value": "max_children",
                                                 "width": "33%",
                                                 "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "activity_group_num",
+                                                "width": "33%",
+                                                "readonly": true
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "sections": [
+                    {
+                        "id": "section.activities",
+                        "label": "Activities",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "booking_activities_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.camp"
+                                                }
                                             }
                                         ]
                                     }

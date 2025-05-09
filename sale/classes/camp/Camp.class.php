@@ -227,6 +227,13 @@ class Camp extends Model {
                 'foreign_field'     => 'camp_id',
                 'description'       => "All the enrollments linked to camp.",
                 'ondetach'          => 'delete'
+            ],
+
+            'booking_activities_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\BookingActivity',
+                'foreign_field'     => 'camp_id',
+                'description'       => "All Booking Activities this camp relates to."
             ]
 
         ];
