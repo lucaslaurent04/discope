@@ -7,6 +7,7 @@
 */
 namespace sale\booking;
 use core\setting\Setting;
+use equal\data\DataFormatter;
 use equal\orm\Model;
 use identity\CenterOffice;
 
@@ -763,18 +764,43 @@ class Booking extends Model {
         $self->read(['name', 'customer_identity_id' => ['name', 'id', 'accounting_account']]);
         foreach($self as $id => $booking) {
             // #memo - arbitrary value : used in the accounting software for identifying payments with a temporary account entry counterpart
-            $code_ref =  Setting::get_value('sale', 'organization',  'booking.reference.code' , 150);
-            $reference_type =  Setting::get_value('sale', 'organization',  'booking.reference.type' , 'name');
-            $has_format =  Setting::get_value('sale', 'organization',  'booking.reference.has_format' ,  1);
-            $reference_format = Setting::get_value('sale', 'organization', 'booking.reference.payment_format', '%3d%04d%03d%02d');
+            $code_ref =  Setting::get_value('sale', 'organization', 'booking.reference.code', 150);
+            $reference_type =  Setting::get_value('sale', 'organization', 'booking.reference.type', 'VCS');
 
-            if($has_format) {
-                $booking_code = intval($booking[$reference_type]);
-                $control = ((76*$code_ref) + $booking_code) % 97;
-                $control = ($control == 0)?97:$control;
-                $code_reference = sprintf($reference_format, $code_ref, $booking_code / 1000, $booking_code % 1000, $control);
-            } else {
-                $code_reference = $booking['customer_identity_id'][$reference_type];
+            $booking_code = intval($booking['name']);
+
+            switch($reference_type) {
+                // ISO-11649
+                case 'RF':
+                    // structure: RFcc nnn... (up to 25 alpha-num chars) (we omit the 'RF' part in the result)
+                    // build a numeric reference
+                    $ref_base = sprintf('%03d%07d', $code_ref, $booking_code);
+                    // append 'RF00' to compute the check
+                    $tmp = $ref_base . 'RF00';
+                    // replace letters with digits
+                    $converted = '';
+                    foreach(str_split($tmp) as $char) {
+                        // #memo - in ISO-11649 'A' = 10
+                        $converted .= ctype_alpha($char) ? (ord($char) - 55) : $char;
+                    }
+                    $mod97 = intval(bcmod($converted, '97'));
+                    $control = str_pad(98 - $mod97, 2, '0', STR_PAD_LEFT);
+                    $code_reference = $control . $ref_base;
+                    break;
+                // FR specific
+                case 'RN':
+                    // structure : RNccxxxxxxxxxxxxxxxxxxxx + key + up to 20 digits (we omit the 'RN' part in the result)
+                    $ref_body = sprintf('%013d%07d', $code_ref, $booking_code);
+                    $control = 97 - intval(bcmod($ref_body, '97'));
+                    $code_reference = str_pad($control, 2, '0', STR_PAD_LEFT) . $ref_body;
+                    break;
+                // BE specific
+                case 'VCS':
+                    // structure: +++xxx/xxxx/xxxcc+++ where cc is the control result (we omit the '+' and '/' chars in the result)
+                default:
+                    $control = ((76 * intval($code_ref)) + $booking_code) % 97;
+                    $control = ($control == 0) ? 97 : $control;
+                    $code_reference = sprintf('%3d%04d%03d%02d', $code_ref, $booking_code / 1000, $booking_code % 1000, $control);
             }
 
             $result[$id] = $code_reference;
@@ -785,9 +811,13 @@ class Booking extends Model {
     public static function calcDisplayPaymentReference($om, $ids, $lang) {
         $result = [];
         $bookings = $om->read(self::getType(), $ids, ['payment_reference'], $lang);
+        $reference_type = Setting::get_value('sale', 'organization', 'booking.reference.type', 'VCS');
         foreach($bookings as $id => $booking) {
             $reference = $booking['payment_reference'];
-            $result[$id] = '+++'.substr($reference, 0, 3).'/'.substr($reference, 4, 4).'/'.substr($reference, 8, 5).'+++';
+            if(in_array($reference, ['RN', 'RF', 'VCS'])) {
+                DataFormatter::format($booking['payment_reference'], $reference_type);
+            }
+            $result[$id] = $reference;
         }
         return $result;
     }
@@ -798,7 +828,7 @@ class Booking extends Model {
         foreach($bookings as $oid => $booking) {
             $result[$oid] = false;
             if(count($booking['contracts_ids'])) {
-                $contracts = $om->read(\sale\booking\Contract::getType(), $booking['contracts_ids'], ['is_locked', 'status'], $lang);
+                $contracts = $om->read(Contract::getType(), $booking['contracts_ids'], ['is_locked', 'status'], $lang);
                 foreach($contracts as $contract) {
                     if($contract['status'] != 'cancelled' && $contract['is_locked']) {
                         $result[$oid] = true;
