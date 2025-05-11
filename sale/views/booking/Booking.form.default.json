@@ -182,6 +182,16 @@
             "visible": [true, "=", "env.sale.features.booking.activity_schedule_table"]
         },
         {
+            "id": "item.booking.activities-program",
+            "label": "Print Activities program",
+            "description": "",
+            "icon": "view_week",
+            "route": "?get=sale_booking_print-booking-activity&id=object.id",
+            "target": "_blank",
+            "absolute": true,
+            "visible": [true, "=", "env.sale.features.booking.activity"]
+        },
+        {
             "id": "item.booking.composition",
             "label": "Hosts details",
             "description": "",

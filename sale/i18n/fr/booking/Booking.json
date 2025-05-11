@@ -321,6 +321,9 @@
                 },
                 "item.booking.activities-planning": {
                     "label": "Planning activités"
+                },
+                "item.booking.activities-program": {
+                    "label": "Voir le programme"
                 }
             },
             "layout": {
