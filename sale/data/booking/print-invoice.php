@@ -761,11 +761,13 @@ if(isset($invoice['funding_id']['payment_reference'])) {
     $invoice['payment_reference'] = $invoice['funding_id']['payment_reference'];
 }
 
+$reference_type = Setting::get_value('sale', 'organization', 'booking.reference.type', 'VCS');
+
 try {
     if(!isset($invoice['payment_reference'])) {
         throw new Exception('no payment ref');
     }
-    $values['payment_reference'] = DataFormatter::format($invoice['payment_reference'], 'scor');
+    $values['payment_reference'] = DataFormatter::format($invoice['payment_reference'], $reference_type);
     $paymentData = Data::create()
         ->setServiceTag('BCD')
         ->setIdentification('SCT')
