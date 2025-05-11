@@ -47,13 +47,10 @@ Setting::assert_value('sale', 'organization', 'booking.sequence_format', '%1d{ce
 Setting::assert_value('sale', 'organization', 'booking.sequence', 1);
 Setting::assert_value('sale', 'organization', 'has_specific_city_tax_calculation', 0);
 Setting::assert_value('sale', 'organization', 'sku.city_tax');
-Setting::assert_value('sale', 'organization', 'booking.reference.code' , 150);                         // code de référence de paiement (préfixe)
-Setting::assert_value('sale', 'organization', 'booking.reference.has_format' ,  1);                    // La référence de paiement a un format défini
-Setting::assert_value('sale', 'organization', 'booking.reference.type' , 'name');                      // Le champ de la réservation pour la référence de paiement.
-Setting::assert_value('sale', 'organization', 'booking.reference.payment_format', '%3d%04d%03d%02d');   // Le format de référence de paiement
+Setting::assert_value('sale', 'organization', 'booking.reference.code', 150);
+Setting::assert_value('sale', 'organization', 'booking.reference.type', 'VCS');
 // for compatibility when there are more than one center office
 Setting::assert_value('sale', 'organization', 'booking.sequence.1', 1);
-Setting::assert_value('sale', 'organization', 'booking.reference_type', 'VCS');
 Setting::assert_value('sale', 'organization', 'sku.downpayment.1', 'ACPTE-A');
 Setting::assert_value('sale', 'organization', 'sku.bed_linens');
 Setting::assert_value('sale', 'organization', 'sku.make_beds');
