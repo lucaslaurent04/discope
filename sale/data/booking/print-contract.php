@@ -707,6 +707,8 @@ if(!$output) {
     $installment_amount = 0;
     $installment_ref = '';
 
+    $reference_type = Setting::get_value('sale', 'organization', 'booking.reference.type', 'VCS');
+
     foreach($booking['fundings_ids'] as $funding) {
 
         if($funding['due_date'] < $installment_date && !$funding['is_paid']) {
@@ -719,7 +721,7 @@ if(!$output) {
             'due_date'      => date('d/m/Y', $funding['due_date']),
             'due_amount'    => $funding['due_amount'],
             'is_paid'       => $funding['is_paid'],
-            'reference'     =>  DataFormatter::format($funding['payment_reference'], 'scor')
+            'reference'     =>  DataFormatter::format($funding['payment_reference'], $reference_type)
         ];
         $values['fundings'][] = $line;
     }
@@ -732,7 +734,7 @@ if(!$output) {
     else if ($installment_amount > 0) {
         $values['installment_date'] = date('d/m/Y', $installment_date);
         $values['installment_amount'] = (float) $installment_amount;
-        $values['installment_reference'] = DataFormatter::format($installment_ref, 'scor');
+        $values['installment_reference'] = DataFormatter::format($installment_ref, $reference_type);
 
         // generate a QR code
         try {
