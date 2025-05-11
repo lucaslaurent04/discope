@@ -107,7 +107,7 @@ hr {
 
 
 {% if activities_map | length > 0 %}
-    <h3> {{ i18n['activity_schedule']|upper }}</h3>
+    <h3> {{ i18n['activity_schedule'] | upper }}</h3>
     {% for group_id, group in activities_map %}
         <div style="position: relative; margin-top: 30px; margin-bottom: 30px; page-break-inside: avoid;">
             <table style="border: solid 1px black; border-collapse: collapse; width: 100%;" border="1">
@@ -124,7 +124,7 @@ hr {
                 <tr>
                     {% for slot in time_slots_activities %}
                         <th style="text-align: center; width: 25%;">
-                            {{ slot.name }} ({{ slot.schedule_from|date('H:i') }} - {{ slot.schedule_to|date('H:i') }})
+                            {{ slot.name }}
                         </th>
                     {% endfor %}
                 </tr>
@@ -134,17 +134,19 @@ hr {
                         <td style="text-align: center; width: 5%; height: 100px;">
                             <div style="display: flex; align-items: center; justify-content: center; ">
                                 <span style="display: inline-block; transform: rotate(-90deg); white-space: nowrap;">
-                                    {{ date|split(' ')[0] }}<br>{{ date|split(' ', 2)[1] }}
+                                    {{ date | split(' ')[0] }}<br>{{ date | split(' ', 2)[1] }}
                                 </span>
                             </div>
                         </td>
                         {% for slot in time_slots_activities %}
                             {% set slot_code = slot.code %}
-                            <td style="text-align: left;">
-                                {% set data = details.time_slots[slot_code]|default({}) %}
-                                <strong>{{ data['activity']|default('')|raw }}</strong><br>
-                                {{ data['description']|default('')|raw }}<br>
-                                {{ data['product']|default('')|raw }}
+                            <td style="text-align: left; vertical-align: top;">
+                                {% set data = details.time_slots[slot_code] | default({}) %}
+                                <strong>{{ data['activity'] | default('') | raw }}</strong><br />
+                                <strong>({{ data['schedule_from'] | date('H:i') }} - {{ data['schedule_to'] | date('H:i') }})</strong><br />
+                                {{ data['service_description'] | default('') | raw }}<br />
+                                {{ data['product_description'] | default('') | raw }}<br />
+                                {{ data['activity_description'] | default('') | raw }}
                             </td>
                         {% endfor %}
                     </tr>

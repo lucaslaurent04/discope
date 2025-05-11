@@ -28,6 +28,15 @@ export class BookingServicesBookingGroupDayActivitiesActivityDetailsDialogCompon
         this.onSave();
     }
 
+    public quillCustomModules = {
+        toolbar: [
+            ['bold', 'italic', 'underline'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            [{ 'color': <any>[] }, { 'background': <any>[] }],
+            ['link']
+        ]
+    };
+
     constructor(
         public dialogRef: MatDialogRef<BookingServicesBookingGroupDayActivitiesActivityDetailsDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any
@@ -49,6 +58,15 @@ export class BookingServicesBookingGroupDayActivitiesActivityDetailsDialogCompon
                 formControl: new FormControl(this.data.description)
             }
         };
+    }
+
+    // prevent closing dialog when enter key is pressed within editor
+    public onEditorReady(quill: any) {
+        quill.root.addEventListener('keydown', (e: KeyboardEvent) => {
+            if (e.key === 'Enter') {
+                e.stopPropagation();
+            }
+        });
     }
 
     public onClose(): void {
