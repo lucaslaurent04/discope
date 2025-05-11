@@ -255,10 +255,10 @@ usort($booking_activities, function ($a, $b) {
         ?: $a['activity_date'] <=> $b['activity_date'];
 });
 
-foreach ($booking_activities as $activity) {
+foreach($booking_activities as $activity) {
     $group = $activity['booking_line_group_id']['id'];
 
-    if (!isset($activities_map[$group])) {
+    if(!isset($activities_map[$group])) {
         $activities_map[$group] = [
             'info' => [
                 'name' => $activity['booking_line_group_id']['name'],
@@ -270,24 +270,24 @@ foreach ($booking_activities as $activity) {
     }
 
     $date = date('d/m/Y', $activity['activity_date']) . ' ' . $days_names[date('w', $activity['activity_date'])];
-    if (!isset($activities_map[$group]['dates'][$date])) {
+    if(!isset($activities_map[$group]['dates'][$date])) {
         $activities_map[$group]['dates'][$date] = [
             'time_slots' => []
         ];
 
-        foreach ($time_slots_activities as $time_slot) {
+        foreach($time_slots_activities as $time_slot) {
             $activities_map[$group]['dates'][$date]['time_slots'][$time_slot['code']] = [];
         }
     }
 
     $time_slot_name = $activity['time_slot_id']['code'];
-    if (isset($activities_map[$group]['dates'][$date]['time_slots'][$time_slot_name])) {
+    if(isset($activities_map[$group]['dates'][$date]['time_slots'][$time_slot_name])) {
         $activities_map[$group]['dates'][$date]['time_slots'][$time_slot_name] = [
             'activity'              => $activity['product_model_id']['name'],
             'schedule_from'         => $activity['schedule_from'],
             'schedule_to'           => $activity['schedule_to'],
             'product_description'   => $activity['activity_booking_line_id']['product_id']['description'],
-            'activity_description'  => $activity['activity']['description'],
+            'activity_description'  => $activity['description'],
             'service_description'   => $activity['activity_booking_line_id']['description']
         ];
     }
