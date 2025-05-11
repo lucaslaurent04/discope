@@ -185,8 +185,8 @@
             "id": "item.booking.activities-program",
             "label": "Print Activities program",
             "description": "",
-            "icon": "view_week",
-            "route": "?get=sale_booking_print-booking-activity&id=object.id",
+            "icon": "list_alt",
+            "route": "/?get=sale_booking_print-booking-activity&id=object.id",
             "target": "_blank",
             "absolute": true,
             "visible": [true, "=", "env.sale.features.booking.activity"]
