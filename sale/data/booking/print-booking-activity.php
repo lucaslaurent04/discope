@@ -226,7 +226,7 @@ $days_names = array_map(function($day) use ($params) {
 
 $activities_map = [];
 
-$time_slots_activities = TimeSlot::search(["is_meal", "=", false])->read(['id', 'name','code', 'order' ,'schedule_from', 'schedule_to'], $params['lang'])->get();
+$time_slots_activities = TimeSlot::search(["is_meal", "=", false])->read(['id', 'name','code', 'order'], $params['lang'])->get();
 usort($time_slots_activities, function ($a, $b) {
     return $a['order'] <=> $b['order'];
 });
@@ -239,7 +239,10 @@ $booking_activities = BookingActivity::search(['booking_id', '=', $booking['id']
     ->read([
         'id',
         'name',
+        'description',
         'activity_date',
+        'schedule_from', 'schedule_to',
+        'product_model_id' => ['name'],
         'activity_booking_line_id' => ['id', 'description', 'product_id' => ['id','name', 'description'] ],
         'booking_line_group_id' => ['id', 'name', 'nb_pers', 'nb_children'],
         'time_slot_id' => ['id', 'code','name'],
@@ -266,7 +269,7 @@ foreach ($booking_activities as $activity) {
         ];
     }
 
-    $date = date('d/m/Y', $activity['activity_date']) . ' (' . $days_names[date('w', $activity['activity_date'])] . ')';
+    $date = date('d/m/Y', $activity['activity_date']) . ' ' . $days_names[date('w', $activity['activity_date'])];
     if (!isset($activities_map[$group]['dates'][$date])) {
         $activities_map[$group]['dates'][$date] = [
             'time_slots' => []
@@ -280,9 +283,12 @@ foreach ($booking_activities as $activity) {
     $time_slot_name = $activity['time_slot_id']['code'];
     if (isset($activities_map[$group]['dates'][$date]['time_slots'][$time_slot_name])) {
         $activities_map[$group]['dates'][$date]['time_slots'][$time_slot_name] = [
-            'activity' => $activity['name'],
-            'description' => $activity['activity_booking_line_id']['description'],
-            'product' => $activity['activity_booking_line_id']['product_id']['description']
+            'activity'              => $activity['product_model_id']['name'],
+            'schedule_from'         => $activity['schedule_from'],
+            'schedule_to'           => $activity['schedule_to'],
+            'product_description'   => $activity['activity_booking_line_id']['product_id']['description'],
+            'activity_description'  => $activity['activity']['description'],
+            'service_description'   => $activity['activity_booking_line_id']['description']
         ];
     }
 }
@@ -290,22 +296,22 @@ foreach ($booking_activities as $activity) {
 $values['activities_map'] = $activities_map;
 
 try {
-    $loader = new TwigFilesystemLoader(QN_BASEDIR."/packages/{$package}/views/");
+    $loader = new TwigFilesystemLoader(EQ_BASEDIR . "/packages/{$package}/views/");
 
     $twig = new TwigEnvironment($loader);
     /**  @var ExtensionInterface **/
     $extension  = new IntlExtension();
     $twig->addExtension($extension);
     $filter = new \Twig\TwigFilter('format_money', function ($value) {
-        return number_format((float)($value),2,",",".").' €';
+        return number_format((float)($value), 2, ",", ".") . ' €';
     });
     $twig->addFilter($filter);
     $template = $twig->load("{$class_path}.{$params['view_id']}.html");
     $html = $template->render($values);
 }
 catch(Exception $e) {
-    trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
-    throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
+    trigger_error("ORM::error while parsing template - ".$e->getMessage(), EQ_REPORT_DEBUG);
+    throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
 }
 
 if($params['output'] == 'html') {
