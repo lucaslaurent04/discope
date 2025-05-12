@@ -125,8 +125,6 @@ if(!empty($domain)) {
     $activities_ids = $orm->search(BookingActivity::getType(), $domain);
 }
 
-file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', json_encode($activities_ids).PHP_EOL, FILE_APPEND | LOCK_EX);
-
 // #memo - we use the ORM to prevent recursion and bypass permission check
 $activities = $orm->read(BookingActivity::getType(), $activities_ids, [
         'id',
@@ -302,8 +300,6 @@ if(!empty($activity_partner_activities_ids)) {
         ]);
     }
 }
-
-file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', json_encode($result).PHP_EOL, FILE_APPEND | LOCK_EX);
 
 $context->httpResponse()
         ->body($result)
