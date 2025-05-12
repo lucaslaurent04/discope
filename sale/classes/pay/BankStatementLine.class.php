@@ -178,41 +178,38 @@ class BankStatementLine extends Model {
      * These tests come in addition to the unique constraints return by method `getUnique()`.
      * Checks wheter the sum of the fundings of each booking remains lower than the price of the booking itself.
      *
-     * @param  \equal\orm\ObjectManager     $om         ObjectManager instance.
-     * @param  array                        $oids       List of objects identifiers.
-     * @param  array                        $values     Associative array holding the new values to be assigned.
-     * @param  string                       $lang       Language in which multilang fields are being updated.
      * @return array            Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be updated.
      */
-    public static function canupdate($om, $ids, $values, $lang) {
-        if(isset($values['payments_ids'])) {
-            $new_payments_ids = array_map(function ($a) {return abs($a);}, $values['payments_ids']);
-            $new_payments = $om->read(Payment::getType(), $new_payments_ids, ['amount'], $lang);
-
-            $new_payments_diff = 0.0;
-            foreach(array_unique($values['payments_ids']) as $pid) {
-                if($pid < 0) {
-                    $new_payments_diff -= $new_payments[abs($pid)]['amount'];
-                }
+    public static function canupdate($self, $values) {
+        $self->read(['bank_statement_id' => ['status'], 'payments_ids', 'amount', 'remaining_amount']);
+        foreach($self as $id => $statementLine) {
+            if($statementLine['bank_statement_id']['status'] === 'reconciled') {
+                    return ['status' => ['not_allowed' => "Line from reconciled statement cannot be modified."]];
             }
+            elseif(isset($values['payments_ids'])) {
+                $new_payments_ids = array_map(function ($a) {return abs($a);}, $values['payments_ids']);
+                $new_payments = Payment::ids($new_payments_ids)->read(['amount'])->get();
 
-            $lines = $om->read(self::getType(), $ids, ['payments_ids', 'amount', 'remaining_amount'], $lang);
-
-            if($lines > 0) {
-                foreach($lines as $lid => $line) {
-                    $payments = $om->read(Payment::getType(), $line['payments_ids'], ['amount'], $lang);
-                    $payments_sum = 0;
-                    foreach($payments as $pid => $payment) {
-                        $payments_sum += $payment['amount'];
-                    }
-
-                    if(abs($payments_sum+$new_payments_diff) > abs($line['amount'])) {
-                        return ['amount' => ['exceeded_price' => "Sum of the payments cannot be higher than the line total."]];
+                $new_payments_diff = 0.0;
+                foreach(array_unique($values['payments_ids']) as $pid) {
+                    if($pid < 0) {
+                        $new_payments_diff -= $new_payments[abs($pid)]['amount'];
                     }
                 }
+
+                $payments = Payment::ids($statementLine['payments_ids'])->read(['amount']);
+                $payments_sum = 0;
+                foreach($payments as $pid => $payment) {
+                    $payments_sum += $payment['amount'];
+                }
+
+                if(abs($payments_sum + $new_payments_diff) > abs($statementLine['amount'])) {
+                    return ['amount' => ['exceeded_price' => "Sum of the payments cannot be higher than the line total."]];
+                }
             }
-            return parent::canupdate($om, $ids, $values, $lang);
         }
+
+        return [];
     }
 
 }
