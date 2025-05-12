@@ -722,9 +722,9 @@ class BookingLineGroup extends Model {
     public static function onupdateRateClassId($om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangeRateClassId", QN_REPORT_DEBUG);
         $groups = $om->read(self::getType(), $oids, ['booking_id', 'rate_class_id.name'], $lang);
-        // #todo - add support for assigning an optional booking_type_id to each rate_class
+        // #todo #kaleo - add support for assigning an optional booking_type_id to each rate_class
         foreach($groups as $gid => $group) {
-            // if model of chosen product has a non-generic booking type, update the booking of the group accordingly
+            // #kaleo - if model of chosen product has a non-generic booking type, update the booking of the group accordingly
             if($group['rate_class_id.name'] == 'T5' || $group['rate_class_id.name'] == 'T7') {
                 $om->update(Booking::getType(), $group['booking_id'], ['type_id' => 4]);
             }
@@ -779,6 +779,7 @@ class BookingLineGroup extends Model {
             $om->callonce(Booking::getType(), 'updateAutosaleProducts', $bookings_ids, [], $lang);
 
             foreach($groups as $group) {
+                // #kaleo - specific rate classes
                 if($group['is_sojourn'] && $group['rate_class_id.name'] == 'T4') {
                     if($group['nb_pers'] >= 10) {
                         // booking type 'TPG' (tout public / groupe) is for booking with 10 pers. or more
