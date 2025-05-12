@@ -287,8 +287,9 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
         if(activity.camp_id) {
             return '<dl>' +
-                `<dt>${activity.camp_id.name}</dt>` +
+                `<dt>${activity.camp_id.short_name}</dt>` +
                 `<dt>Groupe ${activity.group_num}, ${activity.camp_id.enrollments_qty} personne${activity.camp_id.enrollments_qty > 1 ? 's' : ''} (${activity.camp_id.min_age} - ${activity.camp_id.max_age})</dt>` +
+                `<dt>Camp du ${activity.camp_id.date_from} au ${activity.camp_id.date_to}</dt>` +
                 `<br />` +
                 `<dt>Activité ${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
                 '</dl>';
