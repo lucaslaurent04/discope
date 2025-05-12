@@ -116,6 +116,39 @@ class CampGroup extends Model {
         return $result;
     }
 
+    public static function canupdate($self, $values): array {
+        if(isset($values['employee_id'])) {
+            $self->read(['camp_id' => ['date_from', 'date_to']]);
+
+            foreach($self as $id => $camp_group) {
+                $camps = Camp::search([
+                    ['date_to', '>=', $camp_group['camp_id']['date_from']],
+                    ['date_from', '<=', $camp_group['camp_id']['date_to']]
+                ])
+                    ->read(['id'])
+                    ->get(true);
+
+                $camps_ids = array_column($camps, 'id');
+
+                if(!empty($camps)) {
+                    $group = CampGroup::search([
+                        ['camp_id', 'in', $camps_ids],
+                        ['employee_id', '=', $values['employee_id']],
+                        ['id', '<>', $id]
+                    ])
+                        ->read(['id'])
+                        ->first();
+
+                    if(!is_null($group)) {
+                        return ['employee_id' => ['already_assigned' => "The employee is already assigned to another camp group for this period."]];
+                    }
+                }
+            }
+        }
+
+        return parent::canupdate($self, $values);
+    }
+
     public static function onupdate($self) {
         $self->read([
             'camp_id' => [
@@ -143,29 +176,6 @@ class CampGroup extends Model {
                 Camp::id($camp_id)
                     ->update(['camp_group_qty' => $new_qty]);
             }
-        }
-    }
-
-    public static function ondelete($self) {
-        $self->read([
-            'camp_id' => [
-                'id',
-                'camp_groups_ids',
-                'camp_group_qty'
-            ]
-        ]);
-
-        $map_camp_camp_group_qty = [];
-        foreach($self as $camp_group) {
-            if(!isset($map_camp_camp_group_qty[$camp_group['camp_id']['id']])) {
-                $map_camp_camp_group_qty[$camp_group['camp_id']['id']] = count($camp_group['camp_id']['camp_groups_ids']);
-            }
-            $map_camp_camp_group_qty[$camp_group['camp_id']['id']]--;
-        }
-
-        foreach($map_camp_camp_group_qty as $camp_id => $qty) {
-            Camp::id($camp_id)
-                ->update(['camp_group_qty' => $qty]);
         }
     }
 
@@ -207,5 +217,28 @@ class CampGroup extends Model {
         }
 
         return parent::candelete($self);
+    }
+
+    public static function ondelete($self) {
+        $self->read([
+            'camp_id' => [
+                'id',
+                'camp_groups_ids',
+                'camp_group_qty'
+            ]
+        ]);
+
+        $map_camp_camp_group_qty = [];
+        foreach($self as $camp_group) {
+            if(!isset($map_camp_camp_group_qty[$camp_group['camp_id']['id']])) {
+                $map_camp_camp_group_qty[$camp_group['camp_id']['id']] = count($camp_group['camp_id']['camp_groups_ids']);
+            }
+            $map_camp_camp_group_qty[$camp_group['camp_id']['id']]--;
+        }
+
+        foreach($map_camp_camp_group_qty as $camp_id => $qty) {
+            Camp::id($camp_id)
+                ->update(['camp_group_qty' => $qty]);
+        }
     }
 }
