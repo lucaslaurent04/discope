@@ -1,0 +1,146 @@
+{
+    "name": "Activité",
+    "plural": "Activités",
+    "description": "Lien entre une activité booking_line et ses fournitures booking_lines et transport booking_line.",
+    "model": {
+        "description": {
+            "label": "Description",
+            "description": "Description de l'activité.",
+            "help": ""
+        },
+        "activity_booking_line_id": {
+            "label": "Ligne de réservation",
+            "description": "Ligne de réservation de l'activité.",
+            "help": ""
+        },
+        "is_virtual": {
+            "label": "Est virtuelle",
+            "description": "L'activité est-elle liée à une autre pour une activité d'une journée complète ou une activité d'une durée déterminée.",
+            "help": "Si la valeur est 'vrai', l'activité est 'virtuelle' et aucune ligne de réservation ne lui est directement liée. Cette activité sera principalement utilisée pour la planification."
+        },
+        "booking_id": {
+            "label": "Réservation",
+            "description": "La réservation de l'activité concerne.",
+            "help": ""
+        },
+        "booking_line_group_id": {
+            "label": "Groupe",
+            "description": "Groupe de lignes de réservation auquel l'activité se rapporte.",
+            "help": ""
+        },
+        "total": {
+            "label": "Prix (TTC)",
+            "description": "Prix total hors taxes pour toutes les lignes.",
+            "help": ""
+        },
+        "price": {
+            "label": "Prix (TVAC)",
+            "description": "Prix final TTC pour toutes les lignes.",
+            "help": ""
+        },
+        "camp_id": {
+            "label": "Camp",
+            "description": "Le camp pour lequel l'activité est organisée.",
+            "help": ""
+        },
+        "camp_group_id": {
+            "label": "Groupe",
+            "description": "Groupe de camp pour lequel l'activité est organisée.",
+            "help": ""
+        },
+        "product_id": {
+            "label": "Produit",
+            "description": "Le produit auquel l’activité se rapporte.",
+            "help": ""
+        },
+        "product_model_id": {
+            "label": "Modèle de produit",
+            "description": "Le modèle de produit auquel l’activité se rapporte.",
+            "help": ""
+        },
+        "counter": {
+            "label": "Numéro",
+            "description": "Le numéro de l'activité dans le séjour réservé, est-ce la première ou la deuxième ou ... activité du même type dans le séjour.",
+            "help": ""
+        },
+        "counter_total": {
+            "label": "Total activité",
+            "description": "Le total de ce type d'activité dans le séjour de réservation pour le groupe.",
+            "help": ""
+        },
+        "employee_id": {
+            "label": "Employé",
+            "description": "Employé affecté à la supervision de l'activité.",
+            "help": ""
+        },
+        "activity_date": {
+            "label": "Date",
+            "description": "Date précise à laquelle le service est fourni.",
+            "help": ""
+        },
+        "time_slot_id": {
+            "label": "Tranche horaire",
+            "description": "Plage horaire précise du jour où la prestation est délivrée.",
+            "help": ""
+        },
+        "schedule_from": {
+            "label": "Début",
+            "description": "Heure à laquelle l'activité commence (incluse).",
+            "help": ""
+        },
+        "schedule_to": {
+            "label": "Fin",
+            "description": "Heure à laquelle l'activité se termine (exclue).",
+            "help": ""
+        },
+        "rental_unit_id": {
+            "label": "Unité locative",
+            "description": "L'unité de location nécessaire au déroulement de l'activité.",
+            "help": ""
+        },
+        "has_staff_required": {
+            "label": "Nécessite du personnel",
+            "description": "L'activité nécessite-t-elle qu'un employé lui soit affecté ?",
+            "help": ""
+        },
+        "has_provider": {
+            "label": "Prestataire nécessaire",
+            "description": "L'activité nécessite-t-elle qu'un ou plusieurs prestataires lui soient affectés ?",
+            "help": ""
+        },
+        "group_num": {
+            "label": "Numéro groupe",
+            "description": "Numéro du groupe.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Activité",
+            "description": "",
+            "layout": {
+                "section.details": {
+                    "label": "Détails"
+                },
+                "section.booking-lines": {
+                    "label": "Lignes réservation"
+                },
+                "section.supplies": {
+                    "label": "Fournitures"
+                },
+                "section.transports": {
+                    "label": "Lignes réservation transport"
+                },
+                "section.providers": {
+                    "label": "Prestataires"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Activités",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}
