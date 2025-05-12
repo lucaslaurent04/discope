@@ -593,7 +593,7 @@ class BookingActivity extends Model {
         }
 
         // Common checks
-        $self->read(['activity_date', 'time_slot_id', 'employee_id', 'product_model_id']);
+        $self->read(['activity_date', 'time_slot_id', 'employee_id', 'product_model_id', 'group_num']);
         foreach($self as $booking_activity) {
             $employee_id = array_key_exists('employee_id', $values) ? $values['employee_id'] : $booking_activity['employee_id'];
 
@@ -626,6 +626,22 @@ class BookingActivity extends Model {
 
             if(!empty($activities_ids)) {
                 return ['employee_id' => ['already_assigned' => "An activity is already assigned to this user for that moment."]];
+            }
+
+            if(isset($booking_activity['camp_group_id'])) {
+                // camp check that a group doesn't have two activities at the same time (check done in BookingLine for booking)
+                $book_act = BookingActivity::search([
+                    ['activity_date', '=', $values['activity_date'] ?? $booking_activity['activity_date']],
+                    ['time_slot_id', '=', $values['time_slot_id'] ?? $booking_activity['time_slot_id']],
+                    ['group_num', '=', $values['group_num'] ?? $booking_activity['group_num']],
+                    ['id', '<>', $booking_activity['id']]
+                ])
+                    ->read(['id'])
+                    ->first();
+
+                if(!is_null($book_act)) {
+                    return ['group_num' => ['group_has_activity' => "The group already has an activity for this date and time slot."]];
+                }
             }
         }
 
