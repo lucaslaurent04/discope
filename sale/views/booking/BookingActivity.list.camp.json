@@ -4,6 +4,9 @@
     "access": {
         "groups": ["booking.default.user"]
     },
+    "order": "activity_date,time_slot_order",
+    "sort": "asc",
+    "group_by": ["activity_date"],
     "layout": {
         "items": [
             {
