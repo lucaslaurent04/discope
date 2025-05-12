@@ -443,7 +443,7 @@ class BookingActivity extends Model {
             $booking_line_group_ids = array_keys($map_booking_line_group_ids);
 
             foreach($booking_line_group_ids as $group_id) {
-                $map_activity_product_counter_total = [];
+                $map_product_counter_total = [];
                 $map_activity_counter = [];
 
                 $group_activities = BookingActivity::search(
@@ -460,19 +460,19 @@ class BookingActivity extends Model {
                 });
 
                 foreach($group_activities as $activity) {
-                    if(!isset($map_activity_product_counter_total[$activity['product_model_id']])) {
-                        $map_activity_product_counter_total[$activity['product_model_id']] = 0;
+                    if(!isset($map_product_counter_total[$activity['product_model_id']])) {
+                        $map_product_counter_total[$activity['product_model_id']] = 0;
                     }
 
-                    $map_activity_product_counter_total[$activity['product_model_id']] += 1;
-                    $map_activity_counter[$activity['id']] = $map_activity_product_counter_total[$activity['product_model_id']];
+                    $map_product_counter_total[$activity['product_model_id']] += 1;
+                    $map_activity_counter[$activity['id']] = $map_product_counter_total[$activity['product_model_id']];
                 }
 
                 foreach($group_activities as $activity) {
                     BookingActivity::id($activity['id'])
                         ->update([
                             'counter'       => $map_activity_counter[$activity['id']],
-                            'counter_total' => $map_activity_product_counter_total[$activity['product_model_id']]
+                            'counter_total' => $map_product_counter_total[$activity['product_model_id']]
                         ]);
                 }
             }
@@ -490,14 +490,14 @@ class BookingActivity extends Model {
             $camp_ids = array_keys($map_camp_ids);
 
             foreach($camp_ids as $camp_id) {
-                $map_activity_product_counter_total = [];
+                $map_product_group_counter_total = [];
                 $map_activity_counter = [];
 
                 $camp_activities = BookingActivity::search(
                     ['camp_id', '=', $camp_id],
                     ['sort' => ['activity_date' => 'asc']]
                 )
-                    ->read(['product_model_id', 'activity_date', 'time_slot_id' => ['order']])
+                    ->read(['product_model_id', 'activity_date', 'time_slot_id' => ['order'], 'group_num'])
                     ->get(true);
 
                 usort($camp_activities, function($a, $b) {
@@ -507,19 +507,22 @@ class BookingActivity extends Model {
                 });
 
                 foreach($camp_activities as $activity) {
-                    if(!isset($map_activity_product_counter_total[$activity['product_model_id']])) {
-                        $map_activity_product_counter_total[$activity['product_model_id']] = 0;
+                    if(!isset($map_product_group_counter_total[$activity['product_model_id']])) {
+                        $map_product_group_counter_total[$activity['product_model_id']] = [];
+                    }
+                    if(!isset($map_product_group_counter_total[$activity['product_model_id']][$activity['group_num']])) {
+                        $map_product_group_counter_total[$activity['product_model_id']][$activity['group_num']] = 0;
                     }
 
-                    $map_activity_product_counter_total[$activity['product_model_id']] += 1;
-                    $map_activity_counter[$activity['id']] = $map_activity_product_counter_total[$activity['product_model_id']];
+                    $map_product_group_counter_total[$activity['product_model_id']][$activity['group_num']] += 1;
+                    $map_activity_counter[$activity['id']] = $map_product_group_counter_total[$activity['product_model_id']][$activity['group_num']];
                 }
 
                 foreach($camp_activities as $activity) {
                     BookingActivity::id($activity['id'])
                         ->update([
                             'counter'       => $map_activity_counter[$activity['id']],
-                            'counter_total' => $map_activity_product_counter_total[$activity['product_model_id']]
+                            'counter_total' => $map_product_group_counter_total[$activity['product_model_id']][$activity['group_num']]
                         ]);
                 }
             }
