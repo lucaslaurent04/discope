@@ -264,7 +264,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             let group_details = `<dt>Groupe ${activity.group_num}`;
             if(activity.age_range_assignments_ids.length === 1) {
                 const assign = activity.age_range_assignments_ids[0];
-                group_details += `, ${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</span></dt>`;
+                group_details += `, ${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</dt>`;
             }
             else if(activity.age_range_assignments_ids.length > 1) {
                 group_details += ':</dt>';
@@ -288,6 +288,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         if(activity.camp_id) {
             return '<dl>' +
                 `<dt>${activity.camp_id.name}</dt>` +
+                `<dt>Groupe ${activity.group_num}, ${activity.camp_id.enrollments_qty} personne${activity.camp_id.enrollments_qty > 1 ? 's' : ''} (${activity.camp_id.min_age} - ${activity.camp_id.max_age})</dt>` +
                 `<br />` +
                 `<dt>Activité ${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
                 '</dl>';
