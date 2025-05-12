@@ -17,7 +17,7 @@ use sale\camp\CampGroup;
 class BookingActivity extends Model {
 
     public static function getDescription(): string {
-        return "Link between an activity booking_line and its supplies booking_lines and transport booking_line.";
+        return "For booking, it is the link between an activity booking_line and its supplies booking_lines and transport booking_line. Can also be a camp activity.";
     }
 
     public static function getColumns(): array {
