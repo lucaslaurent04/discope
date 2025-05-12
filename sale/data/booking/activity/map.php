@@ -198,12 +198,12 @@ foreach($activities as $id => $activity) {
 
     // common
     $product_model = isset($activity['product_model_id'], $product_models[$activity['product_model_id']]) ? $product_models[$activity['product_model_id']]->toArray() : null;
-    $customer = null;
-    $identity = null;
 
     // booking
     $booking = null;
     $booking_group = null;
+    $customer = null;
+    $identity = null;
     $group_age_range_assignments = [];
 
     // camp
