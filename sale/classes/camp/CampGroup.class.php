@@ -35,6 +35,12 @@ class CampGroup extends Model {
                 'readonly'          => true
             ],
 
+            'employee_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'hr\employee\Employee',
+                'description'       => "Employee responsible of the group during the camp.",
+            ],
+
             'max_children' => [
                 'type'              => 'computed',
                 'result_type'       => 'integer',
