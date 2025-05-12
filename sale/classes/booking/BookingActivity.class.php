@@ -208,7 +208,17 @@ class BookingActivity extends Model {
                 'description'       => "Specific day time slot on which the service is delivered.",
                 'store'             => true,
                 'relation'          => ['activity_booking_line_id' => 'time_slot_id'],
-                'onupdate'          => 'onupdateTimeSlotId'
+                'onupdate'          => 'onupdateTimeSlotId',
+                'dependents'        => ['time_slot_order']
+            ],
+
+            'time_slot_order' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => "Order of the time slot, used to sort activities.",
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['time_slot_id' => 'order']
             ],
 
             'schedule_from' => [
