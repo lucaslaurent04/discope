@@ -176,7 +176,7 @@ class BookingActivity extends Model {
 
             'counter' => [
                 'type'              => 'integer',
-                'description'       => "The place of the activity in the booking sojourn, is it the first or second or ... activity of the same type in the sojourn.",
+                'description'       => "The number of the activity in the booking sojourn, is it the first or second or ... activity of the same type in the sojourn.",
                 'default'           => 1
             ],
 
@@ -255,6 +255,8 @@ class BookingActivity extends Model {
             'group_num' => [
                 'type'              => 'computed',
                 'result_type'       => 'integer',
+                'description'       => "Number of the group.",
+                'help'              => "For booking it is the order of the activity group, for camp it is the num of the camp group.",
                 'store'             => true,
                 'function'          => 'calcGroupNum'
             ],
