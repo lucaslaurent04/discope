@@ -483,7 +483,6 @@ try {
                     'booking_id'            => $params['id'],
                     'center_office_id'      => $booking['center_id']['center_office_id'],
                     'due_amount'            => $remaining_amount,
-                    'is_paid'               => false,
                     'type'                  => 'installment',
                     'order'                 => 1,
                     'due_date'              => $booking['date_from'],
@@ -513,7 +512,6 @@ try {
                     'booking_id'            => $params['id'],
                     'center_office_id'      => $booking['center_id']['center_office_id'],
                     'due_amount'            => $funding_amount,
-                    'is_paid'               => false,
                     'type'                  => 'installment',
                     'order'                 => $funding_order,
                     'description'           => $deadline['name']
