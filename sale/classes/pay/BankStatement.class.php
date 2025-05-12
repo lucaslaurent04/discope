@@ -166,6 +166,15 @@ class BankStatement extends Model {
         return trim(sprintf("BE%02d%s", $control, $account_number));
     }
 
+    public static function canupdate($self) {
+        $self->read(['status']);
+        foreach($self as $id => $statement) {
+            if($statement['status'] === 'reconciled') {
+                return ['status' => ['not_allowed' => 'Reconciled statement cannot be modified.']];
+            }
+        }
+        return [];
+    }
 
     public function getUnique() {
         return [
