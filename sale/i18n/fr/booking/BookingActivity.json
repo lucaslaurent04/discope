@@ -1,7 +1,7 @@
 {
     "name": "Activité",
     "plural": "Activités",
-    "description": "Lien entre une activité booking_line et ses fournitures booking_lines et transport booking_line.",
+    "description": "Pour la réservation, il s'agit du lien entre une ligne de réservation d'activité et ses lignes de réservation de fournitures et de transport. Il peut également s'agir d'une activité de camp.",
     "model": {
         "description": {
             "label": "Description",
