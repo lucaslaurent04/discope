@@ -18,6 +18,11 @@
                                                 "widget": {
                                                     "heading": true
                                                 }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "employee_id",
+                                                "width": "33%"
                                             }
                                         ]
                                     },

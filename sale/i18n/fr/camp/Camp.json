@@ -136,9 +136,6 @@
                 "section.enrollments": {
                     "label": "Inscriptions"
                 },
-                "section.employees": {
-                    "label": "Employés"
-                },
                 "section.required-skills": {
                     "label": "Compétences requises"
                 },
