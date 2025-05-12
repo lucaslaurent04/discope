@@ -6,6 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use core\setting\Setting;
 use sale\booking\Booking;
 use sale\booking\BookingLine;
 use sale\booking\BookingType;
@@ -334,7 +335,8 @@ catch(Exception $e) {
 */
 
 // set rate class default to 'general public'
-$rate_class_id = 4;
+// #kaleo - default here is meant for Kaleo - make sure instance defines its own default value
+$rate_class_id = Setting::get_value('sale', 'organization', 'rate_class_default', 4);
 
 if($booking['customer_id']['rate_class_id']) {
     $rate_class_id = $booking['customer_id']['rate_class_id'];

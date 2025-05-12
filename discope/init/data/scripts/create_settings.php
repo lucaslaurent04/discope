@@ -61,6 +61,7 @@ Setting::assert_value('sale', 'organization', 'quote.output_level_default');
 Setting::assert_value('sale', 'organization', 'option.output_level_default');
 Setting::assert_value('sale', 'organization', 'contract.output_level_default');
 Setting::assert_value('sale', 'organization', 'invoice.output_level_default');
+Setting::assert_value('sale', 'organization', 'rate_class_default', 1);
 Setting::assert_value('identity', 'organization', 'country_default', 'BE');
 Setting::assert_value('identity', 'organization', 'identity_type_default', 1);
 // === finance.accounting ===
