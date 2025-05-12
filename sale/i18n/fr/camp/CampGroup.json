@@ -23,7 +23,11 @@
         "form.default": {
             "name": "",
             "description": "",
-            "layout": []
+            "layout": {
+                "section.activities": {
+                    "label": "Activités"
+                }
+            }
         },
         "list.default": {
             "name": "",

@@ -219,34 +219,6 @@
                         ]
                     },
                     {
-                        "id": "section.activities",
-                        "label": "Activities",
-                        "rows": [
-                            {
-                                "columns": [
-                                    {
-                                        "width": "100%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "booking_activities_ids",
-                                                "width": "100%",
-                                                "widget": {
-                                                    "view": "list.camp",
-                                                    "header": {
-                                                        "actions": {
-                                                            "ACTION.CREATE": false
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
                         "id": "section.enrollments",
                         "label": "Enrollments",
                         "visible": ["state", "<>", "draft"],
