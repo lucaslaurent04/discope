@@ -3588,7 +3588,7 @@ class BookingLineGroup extends Model {
 				if($autosale['scope'] != 'group') {
 					continue;
 				}
-				// do not apply city tax for school sojourns
+				// #kaleo - do not apply city tax for school sojourns
 				if( $group['has_pack']
 					&& isset($group['pack_id.product_model_id.booking_type_id.code'])
 					&& $group['pack_id.product_model_id.booking_type_id.code'] == 'SEJ'
