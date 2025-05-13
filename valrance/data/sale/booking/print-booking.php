@@ -250,14 +250,14 @@ $fields = [
                 'id',
                 'label' ,
                 'age_range_id',
-                'grouping_code_id' => ['id', 'name'],
-                'product_model_id' => ['id', 'name', 'grouping_code_id' => ['id', 'name']]
+                'grouping_code_id' => ['id', 'code', 'name'],
+                'product_model_id' => ['id', 'name', 'grouping_code_id' => ['id', 'code', 'name']]
             ],
             'booking_activity_id' => [
-                    'id', 'name', 'total', 'price',
-                    'supplies_booking_lines_ids' => ['id', 'qty', 'total', 'price'],
-                    'transports_booking_lines_ids' => ['id', 'qty', 'total', 'price']
-                    ],
+                'id', 'name', 'total', 'price',
+                'supplies_booking_lines_ids' => ['id', 'qty', 'total', 'price'],
+                'transports_booking_lines_ids' => ['id', 'qty', 'total', 'price']
+            ],
             'description',
             'is_accomodation',
             'qty',
@@ -731,10 +731,23 @@ if($params['mode'] == 'grouped') {
             $booking_line_group_id = $booking_line_group['id'];
             $product = $booking_line['product_id'];
 
-            $grouping_code = isset($product['grouping_code_id']['name'])
-                ? $product['grouping_code_id']['name']
-                : ($product['product_model_id']['grouping_code_id']['name']
-                ?? (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['product_id']['label']);
+            $grouping_code = $booking_line['product_id']['label'];
+
+            if(isset($product['grouping_code_id']['name'])) {
+                if($product['grouping_code_id']['code'] === 'invisible') {
+                    continue;
+                }
+                $grouping_code = $product['grouping_code_id']['name'];
+            }
+            elseif(isset($product['product_model_id']['grouping_code_id']['name'])) {
+                if($product['product_model_id']['grouping_code_id']['code'] === 'invisible') {
+                    continue;
+                }
+                $grouping_code = $product['product_model_id']['grouping_code_id']['name'];
+            }
+            elseif(strlen($booking_line['description']) > 0) {
+                $grouping_code = $booking_line['description'];
+            }
 
             if (!isset($lines_map[$booking_line_group_id])) {
                 $lines_map[$booking_line_group_id] = [];
