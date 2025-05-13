@@ -9,6 +9,7 @@
 namespace sale\camp;
 
 use equal\orm\Model;
+use sale\booking\BookingActivity;
 
 class CampGroup extends Model {
 
@@ -62,7 +63,8 @@ class CampGroup extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\BookingActivity',
                 'foreign_field'     => 'camp_group_id',
-                'description'       => "All Booking Activities this camp group relates to."
+                'description'       => "All Booking Activities this camp group relates to.",
+                'ondetach'          => 'delete'
             ]
 
         ];
@@ -228,6 +230,7 @@ class CampGroup extends Model {
             ]
         ]);
 
+        // update camp group quantity
         $map_camp_camp_group_qty = [];
         foreach($self as $camp_group) {
             if(!isset($map_camp_camp_group_qty[$camp_group['camp_id']['id']])) {
@@ -240,5 +243,13 @@ class CampGroup extends Model {
             Camp::id($camp_id)
                 ->update(['camp_group_qty' => $qty]);
         }
+
+        // remove the activities linked to the groups
+        $camp_groups_ids = [];
+        foreach($self as $id => $camp_group) {
+            $camp_groups_ids[] = $id;
+        }
+
+        BookingActivity::search(['camp_group_id', 'in', $camp_groups_ids])->delete(true);
     }
 }
