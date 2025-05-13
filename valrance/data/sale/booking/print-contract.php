@@ -621,8 +621,6 @@ if($booking['center_id']['template_category_id']) {
             $values['contract_approved_html'] = $part['value'] . $values['center_signature'];
         }
         elseif($part['name'] == 'contract_authorization') {
-            $value = str_replace('{center}', $booking['center_id']['name'], $value);
-
             $values['contract_authorization_html'] = $value;
         }
     }
