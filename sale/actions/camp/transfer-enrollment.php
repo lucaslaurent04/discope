@@ -37,6 +37,9 @@ use sale\camp\Enrollment;
     'providers'     => ['context']
 ]);
 
+/**
+ * @var \equal\php\Context $context
+ */
 ['context' => $context] = $providers;
 
 $enrollment = Enrollment::id($params['id'])
