@@ -141,8 +141,8 @@ hr {
                         {% for slot in time_slots_activities %}
                             {% set slot_code = slot.code %}
                             <td style="text-align: left; vertical-align: top; padding: 4px;">
-                                {% if data.activity is not empty %}
-                                    {% set data = details.time_slots[slot_code] | default({}) %}
+                                {% set data = details.time_slots[slot_code] | default({}) %}
+                                {% if data.activity is defined and data.activity | trim != '' %}
                                     <strong>{{ data['activity'] | default('') | raw }}</strong><br />
                                     <strong>({{ data['schedule_from'] | date('H:i') }} - {{ data['schedule_to'] | date('H:i') }})</strong><br />
                                     {{ data['service_description'] | default('') | raw }}<br />
