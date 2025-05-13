@@ -410,10 +410,36 @@ class BookingActivity extends Model {
 
     public static function onupdateActivityDate($self) {
         $self->do('update-counters');
+
+        $self->read(['camp_group_id']);
+        $map_camp_group_ids = [];
+        foreach($self as $booking_activity) {
+            if(isset($booking_activity['camp_group_id'])) {
+                $map_camp_group_ids[$booking_activity['camp_group_id']] = true;
+            }
+        }
+        if(!empty($map_camp_group_ids)) {
+            $camp_groups_ids = array_keys($map_camp_group_ids);
+
+            CampGroup::ids($camp_groups_ids)->do('refresh-partner-events');
+        }
     }
 
     public static function onupdateTimeSlotId($self) {
         $self->do('update-counters');
+
+        $self->read(['camp_group_id']);
+        $map_camp_group_ids = [];
+        foreach($self as $booking_activity) {
+            if(isset($booking_activity['camp_group_id'])) {
+                $map_camp_group_ids[$booking_activity['camp_group_id']] = true;
+            }
+        }
+        if(!empty($map_camp_group_ids)) {
+            $camp_groups_ids = array_keys($map_camp_group_ids);
+
+            CampGroup::ids($camp_groups_ids)->do('refresh-partner-events');
+        }
     }
 
     public static function onupdateRentalUnitId($self) {
@@ -661,7 +687,11 @@ class BookingActivity extends Model {
     }
 
     public static function ondelete($self): void {
-        $self->read(['booking_line_group_id', 'booking_lines_ids']);
+        $self->read([
+            'booking_line_group_id',
+            'booking_lines_ids',
+            'camp_group_id'
+        ]);
         foreach($self as $booking_activity) {
             if(!empty($booking_activity['booking_lines_ids'])) {
                 $booking_lines_ids_remove = array_map(
@@ -671,6 +701,9 @@ class BookingActivity extends Model {
 
                 BookingLineGroup::id($booking_activity['booking_line_group_id'])
                     ->update(['booking_lines_ids' => $booking_lines_ids_remove]);
+            }
+            if(!is_null($booking_activity['camp_group_id'])) {
+                PartnerEvent::search(['booking_activity_id', '=', $booking_activity['id']])->delete(true);
             }
         }
     }
