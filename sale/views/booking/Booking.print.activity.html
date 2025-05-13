@@ -140,13 +140,15 @@ hr {
                         </td>
                         {% for slot in time_slots_activities %}
                             {% set slot_code = slot.code %}
-                            <td style="text-align: left; vertical-align: top;">
-                                {% set data = details.time_slots[slot_code] | default({}) %}
-                                <strong>{{ data['activity'] | default('') | raw }}</strong><br />
-                                <strong>({{ data['schedule_from'] | date('H:i') }} - {{ data['schedule_to'] | date('H:i') }})</strong><br />
-                                {{ data['service_description'] | default('') | raw }}<br />
-                                {{ data['product_description'] | default('') | raw }}<br />
-                                {{ data['activity_description'] | default('') | raw }}
+                            <td style="text-align: left; vertical-align: top; padding: 4px;">
+                                {% if data.activity is not empty %}
+                                    {% set data = details.time_slots[slot_code] | default({}) %}
+                                    <strong>{{ data['activity'] | default('') | raw }}</strong><br />
+                                    <strong>({{ data['schedule_from'] | date('H:i') }} - {{ data['schedule_to'] | date('H:i') }})</strong><br />
+                                    {{ data['service_description'] | default('') | raw }}<br />
+                                    {{ data['product_description'] | default('') | raw }}<br />
+                                    {{ data['activity_description'] | default('') | raw }}
+                                {% endif %}
                             </td>
                         {% endfor %}
                     </tr>
