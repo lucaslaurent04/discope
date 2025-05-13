@@ -127,7 +127,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     private mousedownTimeout: any;
     private environment: any;
 
-    // duration history as hint for refreshing cell width
+    // duration history as a hint for refreshing cell width
     private previous_duration: number;
 
     public emptyEmployee = new Employee();
@@ -164,12 +164,13 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
         this.productModelCategories = [
             { id: 0, name: 'TOUTES' },
-            ...await this.api.collect(
-                'sale\\catalog\\Category',
-                [],
-                Object.getOwnPropertyNames(new ProductModelCategory()),
-                'name', 'asc', 0, 500
-            )
+            ...await this.api.fetch('?get=sale_booking_activity_collect-categories', {
+                fields: Object.getOwnPropertyNames(new ProductModelCategory()),
+                order: 'name',
+                sort: 'asc',
+                start: 0,
+                limit: 500
+            })
         ];
 
         this.productModels = await this.api.collect(
@@ -183,7 +184,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     /**
-     * After refreshing the view with new content, adapt header and relay new cell_width, if changed
+     * After refreshing the view with new content, adapt the header and relay new cell_width, if changed
      */
     public async ngAfterViewChecked() {
 
