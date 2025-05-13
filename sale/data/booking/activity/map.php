@@ -15,6 +15,7 @@ use sale\booking\BookingLineGroupAgeRangeAssignment;
 use sale\booking\PartnerEvent;
 use sale\booking\channelmanager\BookingLineGroup;
 use sale\camp\Camp;
+use sale\camp\CampGroup;
 use sale\catalog\ProductModel;
 use sale\customer\Customer;
 use sale\provider\Provider;
@@ -281,17 +282,45 @@ if(!empty($params['partners_ids'])) {
 $activity_partner_activities_ids = $orm->search(PartnerEvent::getType(), $domain);
 
 if(!empty($activity_partner_activities_ids)) {
-    $partner_activities = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'description', 'partner_id', 'event_date', 'time_slot_id']);
+    $partner_activities = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'description', 'partner_id', 'event_date', 'time_slot_id', 'camp_group_id']);
+
+    $map_camp_groups = [];
+    // retrieve all foreign objects identifiers
+    foreach($partner_activities as $id => $activity) {
+        if(isset($activity['camp_group_id'])) {
+            $map_camp_groups[$activity['camp_group_id']] = true;
+        }
+    }
+    $camp_groups = $orm->read(CampGroup::getType(), array_keys($map_camp_groups), ['id', 'name', 'camp_id']);
+
+    $map_camps = [];
+    // retrieve all foreign objects identifiers
+    foreach($camp_groups as $id => $camp_group) {
+        if(isset($camp_group['camp_id'])) {
+            $map_camps[$camp_group['camp_id']] = true;
+        }
+    }
+    $camps = $orm->read(Camp::getType(), array_keys($map_camps), ['id', 'name', 'short_name', 'date_from', 'date_to', 'min_age', 'max_age', 'enrollments_qty', 'employee_ratio']);
 
     foreach($partner_activities as $partner_activity) {
         $date_index = date('Y-m-d', $partner_activity['event_date']);
         $time_slot = [1 => 'AM', 3 => 'PM', 6 => 'EV'][$partner_activity['time_slot_id']];
 
+        $camp = null;
+        if(isset($partner_activity['camp_group_id'], $camp_groups[$partner_activity['camp_group_id']])) {
+            $camp_group = $camp_groups[$partner_activity['camp_group_id']]->toArray();
+            if(isset($camp_group, $camps[$camp_group['camp_id']])) {
+                $camp = $camps[$camp_group['camp_id']]->toArray();
+                $camp['date_from'] = date('d/m/y', $camp['date_from']);
+                $camp['date_to'] = date('d/m/y', $camp['date_to']);
+            }
+        }
+
         $result[$partner_activity['partner_id']][$date_index][$time_slot][] = array_merge($partner_activity->toArray(), [
             'is_partner_event'          => true,
             'booking_id'                => null,
             'booking_line_group_id'     => null,
-            'camp_id'                   => null,
+            'camp_id'                   => $camp,
             'product_model_id'          => null,
             'customer_id'               => null,
             'partner_identity_id'       => null,

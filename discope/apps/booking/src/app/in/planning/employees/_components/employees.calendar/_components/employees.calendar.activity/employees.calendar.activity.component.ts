@@ -64,12 +64,12 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
             red: '#c80651',
             grey: '#988a7d',
             dark_grey: '#655c58',
-            brown: '#554941',
+            light_grey: '#baa9a2',
             purple: '#7733aa'
         };
 
         if(this.activity.is_partner_event){
-            return colors['dark_grey'];
+            return colors['light_grey'];
         }
         else if(this.activity.type == 'ooo') {
             return colors['red'];
@@ -94,7 +94,7 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
             return colors['grey'];
         }
         else if(this.activity.camp_id) {
-            return colors['brown'];
+            return colors['dark_grey'];
         }
 
         // invoiced and beyond

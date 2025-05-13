@@ -286,7 +286,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 '</dl>';
         }
 
-        if(activity.camp_id) {
+        if(activity.camp_id && !activity.is_partner_event) {
             return '<dl>' +
                 `<dt>${activity.camp_id.short_name}</dt>` +
                 `<dt>Groupe ${activity.group_num}, ${activity.camp_id.enrollments_qty} personne${activity.camp_id.enrollments_qty > 1 ? 's' : ''} (${activity.camp_id.min_age} - ${activity.camp_id.max_age})</dt>` +
@@ -296,9 +296,14 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 '</dl>';
         }
 
-        return `<dt>${activity.name}</dt>` +
+        return '<dl>' +
+            (activity.camp_id ? `<dt>${activity.camp_id.short_name}</dt>` : '') +
+            (activity.camp_id ? `<dt>Camp du ${activity.camp_id.date_from} au ${activity.camp_id.date_to}</dt>` : '') +
+            (activity.camp_id ? `<br />` : '') +
+            `<dt>${activity.name}</dt>` +
             `<br />` +
-            (activity.description ? `<dt>${activity.description}</dt>` : '');
+            (activity.description ? `<dt>${activity.description}</dt>` : '') +
+            '</dl>';
     }
 
     private async onFiltersChange() {
