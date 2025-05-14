@@ -1,6 +1,6 @@
 <div>
     <planning-employees-calendar-navbar
-        [partner]="hovered_partner"
+        [partner]="hovered_activity_partner"
         [activity]="hovered_activity"
         [holidays]="hovered_holidays"
         [productModelCategories]="productModelCategories"
@@ -67,19 +67,19 @@
                         (dragstart)="preventDrag($event)">
 
                     <td class="cell-room partner"
-                        (mouseenter)="onhoverPartner(partner); hover_row_index = index"
-                        (mouseleave)="onhoverPartner(null); hover_row_index = -1"
+                        (mouseenter)="onhoverPartner(partner); hover_row_index = index;"
+                        (mouseleave)="onhoverPartner(null); hover_row_index = -1;"
                         [style.background]="partner?.color"
                         (click)="onSelectedPartner(partner)"
                     >
-                        <span class="partner-name">{{ partner.name }} </span>
+                        <span class="partner-name">{{ partner.name }}</span>
                         <span *ngIf="partner == hovered_partner" class="cell-hint">
                             <span>
                                 <ng-container *ngIf="partner.relationship === 'employee'">
                                     <dt>{{partner.name}} (Employé)</dt>
                                     <br />
-                                    <dt *ngFor="let id of partner.activity_product_models_ids">
-                                        {{getProductModelName(id)}}
+                                    <dt *ngFor="let productModelName of createProductModelsNames(partner.activity_product_models_ids)">
+                                        {{productModelName}}
                                     </dt>
                                 </ng-container>
                                 <ng-container *ngIf="partner.relationship === 'provider'">

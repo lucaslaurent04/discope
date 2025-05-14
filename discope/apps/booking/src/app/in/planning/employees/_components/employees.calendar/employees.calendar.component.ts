@@ -101,6 +101,9 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     private hoveredActivityTimeout: any = null;
 
     public hovered_partner: any;
+    private hoveredPartnerTimeout: any = null;
+    public hovered_activity_partner: any;
+
     public hovered_holidays: any;
 
     public hover_row_index = -1;
@@ -224,7 +227,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 this.loading = false;
                 this.cd.detectChanges();
 
-            }, 1000);
+            }, 100);
         }
     }
 
@@ -495,7 +498,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public onhoverDay(employee: any, day:Date) {
-        this.hovered_partner = employee;
+        this.hovered_activity_partner = employee;
 
         if(day) {
             let date_index:string = this.calcDateIndex(day);
@@ -509,7 +512,19 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public onhoverPartner(employee: any) {
-        this.hovered_partner = employee;
+        if(this.hoveredPartnerTimeout === null && employee) {
+            this.hovered_partner = employee;
+            this.hovered_activity_partner = employee;
+        }
+        else {
+            clearTimeout(this.hoveredPartnerTimeout);
+            this.hoveredPartnerTimeout = setTimeout(() => {
+                this.hovered_partner = employee;
+                this.hovered_activity_partner = employee;
+                this.hoveredPartnerTimeout = null;
+                this.cd.detectChanges();
+            }, 100);
+        }
     }
 
     public preventDrag($event: any = null) {
@@ -679,9 +694,15 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return activity.id; // Assurez-vous que chaque activité a un ID unique
     }
 
-    public getProductModelName(productModelId: string) {
-        const productModel = this.productModels.find(p => p.id === +productModelId);
+    public createProductModelsNames(productModelsIds: number[]) {
+        const productModelsNames: string[] = [];
+        for(let productModelId of productModelsIds) {
+            const productModel = this.productModels.find(p => p.id === +productModelId);
+            if(productModel !== undefined && !productModelsNames.includes(productModel.name)) {
+                productModelsNames.push(productModel.name);
+            }
+        }
 
-        return productModel?.name ?? '';
+        return productModelsNames.sort();
     }
 }
