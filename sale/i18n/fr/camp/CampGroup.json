@@ -8,6 +8,11 @@
             "description": "Le camp dont le groupe fait partie.",
             "help": ""
         },
+        "employee_id": {
+            "label": "Animateur",
+            "description": "L'animateur responsable du groupe durant le camp.",
+            "help": ""
+        },
         "max_children": {
             "label": "Max enfants",
             "description": "Quantité maximal d'enfants qui peuvent faire partie du groupe.",
@@ -18,7 +23,11 @@
         "form.default": {
             "name": "",
             "description": "",
-            "layout": []
+            "layout": {
+                "section.activities": {
+                    "label": "Activités"
+                }
+            }
         },
         "list.default": {
             "name": "",

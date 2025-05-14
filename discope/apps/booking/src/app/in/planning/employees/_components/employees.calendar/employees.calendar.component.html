@@ -1,6 +1,6 @@
 <div>
     <planning-employees-calendar-navbar
-        [partner]="hovered_partner"
+        [partner]="hovered_activity_partner"
         [activity]="hovered_activity"
         [holidays]="hovered_holidays"
         [productModelCategories]="productModelCategories"
@@ -67,19 +67,19 @@
                         (dragstart)="preventDrag($event)">
 
                     <td class="cell-room partner"
-                        (mouseenter)="onhoverPartner(partner); hover_row_index = index"
-                        (mouseleave)="onhoverPartner(null); hover_row_index = -1"
+                        (mouseenter)="onhoverPartner(partner); hover_row_index = index;"
+                        (mouseleave)="onhoverPartner(null); hover_row_index = -1;"
                         [style.background]="partner?.color"
                         (click)="onSelectedPartner(partner)"
                     >
-                        <span class="partner-name">{{ partner.name }} </span>
+                        <span class="partner-name">{{ partner.name }}</span>
                         <span *ngIf="partner == hovered_partner" class="cell-hint">
                             <span>
                                 <ng-container *ngIf="partner.relationship === 'employee'">
                                     <dt>{{partner.name}} (Employé)</dt>
                                     <br />
-                                    <dt *ngFor="let id of partner.activity_product_models_ids">
-                                        {{getProductModelName(id)}}
+                                    <dt *ngFor="let productModelName of createProductModelsNames(partner.activity_product_models_ids)">
+                                        {{productModelName}}
                                     </dt>
                                 </ng-container>
                                 <ng-container *ngIf="partner.relationship === 'provider'">
@@ -96,6 +96,7 @@
                                 (dragstart)="preventDrag($event)"
                                 (mouseenter)="onmouseenterTableCell($event, index, partner, headers.days_indexes[i], 'AM')"
                                 (mouseleave)="onmouseleaveTableCell($event)"
+                                (dblclick)="ondoubleclickTableCell(day, partner, 'AM')"
                                 cdkDropList
                                 (cdkDropListDropped)="onDrop($event, index, partner, headers.days_indexes[i], 'AM')">
 
@@ -111,13 +112,20 @@
                                             [activity]="activity"
                                             (hover)="onhoverActivity($event); onhoverDay(partner, day)"
                                             (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
-                                            (selected)="onSelectedBooking($event)"
+                                            (selected)="onSelectedActivity($event)"
                                             cdkDrag
                                             [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_event"
                                             (cdkDragStarted)="onDragStart(activity)"
                                         ></planning-employees-calendar-activity>
 
-                                        <div *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(16px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                        <div *ngIf="hovered_activity == activity"
+                                             class="cell-hint"
+                                             [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -274) + 'px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'"
+                                             #vDescription="var"
+                                             [var]="{value: getDescription(activity)}"
+                                             (mouseenter)="onhoverActivity(activity)"
+                                             (mouseleave)="onhoverActivity(null)"
+                                        >
                                             <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
                                         </div>
                                     </ng-container>
@@ -130,6 +138,7 @@
                                 (dragstart)="preventDrag($event)"
                                 (mouseenter)="onmouseenterTableCell($event, index, partner, headers.days_indexes[i], 'PM')"
                                 (mouseleave)="onmouseleaveTableCell($event)"
+                                (dblclick)="ondoubleclickTableCell(day, partner, 'PM')"
                                 cdkDropList
                                 (cdkDropListDropped)="onDrop($event, index, partner, headers.days_indexes[i], 'PM')">
 
@@ -146,7 +155,7 @@
                                             [activity]="activity"
                                             (hover)="onhoverActivity($event); onhoverDay(partner, day)"
                                             (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
-                                            (selected)="onSelectedBooking($event)"
+                                            (selected)="onSelectedActivity($event)"
                                             cdkDrag
                                             [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_event"
                                             (cdkDragStarted)="onDragStart(activity)">
@@ -165,6 +174,7 @@
                                 (dragstart)="preventDrag($event)"
                                 (mouseenter)="onmouseenterTableCell($event, index, partner, headers.days_indexes[i], 'EV')"
                                 (mouseleave)="onmouseleaveTableCell($event)"
+                                (dblclick)="ondoubleclickTableCell(day, partner, 'EV')"
                                 cdkDropList
                                 (cdkDropListDropped)="onDrop($event, index, partner, headers.days_indexes[i], 'EV')">
 
@@ -181,7 +191,7 @@
                                             [activity]="activity"
                                             (hover)="onhoverActivity($event); onhoverDay(partner, day)"
                                             (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
-                                            (selected)="onSelectedBooking($event)"
+                                            (selected)="onSelectedActivity($event)"
                                             cdkDrag
                                             [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_event"
                                             (cdkDragStarted)="onDragStart(activity)">
