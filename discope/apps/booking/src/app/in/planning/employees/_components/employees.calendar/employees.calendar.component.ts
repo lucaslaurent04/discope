@@ -282,7 +282,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<dt>Séjour du ${activity.booking_id.date_from} au ${activity.booking_id.date_to}</dt>` +
                 `<dt>${activity.booking_id.nb_pers} personnes</dt>` +
                 `<br />` +
-                `<dt>Activité ${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
+                `<dt>${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
                 '</dl>';
         }
 
@@ -292,12 +292,13 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<dt>Groupe ${activity.group_num}, ${activity.camp_id.enrollments_qty} personne${activity.camp_id.enrollments_qty > 1 ? 's' : ''} (${activity.camp_id.min_age} - ${activity.camp_id.max_age})</dt>` +
                 `<dt>Camp du ${activity.camp_id.date_from} au ${activity.camp_id.date_to}</dt>` +
                 `<br />` +
-                `<dt>Activité ${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
+                `<dt>${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
                 '</dl>';
         }
 
         return '<dl>' +
             (activity.camp_id ? `<dt>${activity.camp_id.short_name}</dt>` : '') +
+            (activity.camp_id ? `<dt>Groupe ${activity.group_num}, ${activity.camp_id.enrollments_qty} personne${activity.camp_id.enrollments_qty > 1 ? 's' : ''} (${activity.camp_id.min_age} - ${activity.camp_id.max_age})</dt>` : '') +
             (activity.camp_id ? `<dt>Camp du ${activity.camp_id.date_from} au ${activity.camp_id.date_to}</dt>` : '') +
             (activity.camp_id ? `<br />` : '') +
             `<dt>${activity.name}</dt>` +
