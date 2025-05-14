@@ -8,19 +8,39 @@
         (mouseleave)="onLeaveActivity(activity)"
     >
         <div (click)="onShowBooking(activity)" >
-            <div class="activity-booking" *ngIf="!activity?.is_partner_event">
-                <!-- #memo - this part is discarded if available height is less than 28px -->
-                <div style="flex: 0 1 20%;">{{activity.group_num ? activity.group_num + ' - ' : ''}}{{activity.name}}</div>
-                <div style="margin-left: auto">
-                    <span class="material-icons">{{getIcon()}}</span>
+            <!-- Booking or camp activity -->
+            <ng-container *ngIf="!activity?.is_partner_event">
+                <div class="activity-booking">
+                    <!-- #memo - this part is discarded if available height is less than 28px -->
+                    <div style="flex: 0 1 20%;">{{activity.group_num ? activity.group_num + ' - ' : ''}}{{activity.name}}</div>
+                    <div style="margin-left: auto">
+                        <span class="material-icons">{{getIcon()}}</span>
+                    </div>
                 </div>
-            </div>
-            <div class="activity-customer" *ngIf="!activity?.is_partner_event">
-                <div class="activity-customer-details">{{activity.customer_id?.name}}</div>
-            </div>
-            <div class="activity-partner-event" *ngIf="activity?.is_partner_event">
-                {{activity.name}}
-            </div>
+                <div class="activity-customer" *ngIf="activity.customer_id?.name || activity.camp_id?.short_name">
+                    <!-- Booking -->
+                    <div class="activity-customer-details" *ngIf="activity.customer_id?.name">
+                        {{activity.customer_id.name}}
+                    </div>
+
+                    <!-- Camp -->
+                    <div class="activity-camp-details" *ngIf="activity.camp_id?.short_name">
+                        {{activity.camp_id.short_name}}
+                    </div>
+                </div>
+            </ng-container>
+
+            <!-- Partner event -->
+            <ng-container *ngIf="activity?.is_partner_event">
+                <div class="activity-partner-event">
+                    {{activity.group_num ? activity.group_num + ' - ' : ''}}{{activity.name}}
+                </div>
+
+                <!-- Camp -->
+                <div class="activity-camp" *ngIf="activity?.camp_id?.short_name">
+                    <div class="activity-camp-details">{{activity.camp_id.short_name}}</div>
+                </div>
+            </ng-container>
         </div>
     </div>
 </div>

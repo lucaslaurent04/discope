@@ -67,6 +67,10 @@
                 display: flex;
             }
 
+            .activity-camp {
+                display: flex;
+            }
+
             .activity-partner-event {
                 margin-top: 2px;
             }
@@ -76,6 +80,11 @@
             }
 
             .activity-customer-details {
+                flex: 0 1 20%;
+                margin-top: -4px;
+            }
+
+            .activity-camp-details {
                 flex: 0 1 20%;
                 margin-top: -4px;
             }
