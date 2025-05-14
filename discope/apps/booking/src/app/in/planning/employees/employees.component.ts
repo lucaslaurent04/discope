@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef, OnInit, AfterViewInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 
-import { ContextService } from 'sb-shared-lib';
+import { ApiService, ContextService } from 'sb-shared-lib';
 import { PlanningEmployeesCalendarParamService } from './_services/employees.calendar.param.service';
 import { PlanningEmployeesCalendarComponent } from './_components/employees.calendar/employees.calendar.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import * as screenfull from 'screenfull';
 import { PlanningEmployeesLegendDialogComponent } from './_components/legend.dialog/legend.component';
 import { PlanningEmployeesPreferencesDialogComponent } from './_components/preferences.dialog/preferences.component';
+import { TimeSlot } from '../../booking/activities-planning/_models/time-slot.model';
 
 interface DateRange {
   from: Date,
@@ -34,11 +35,14 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
     // interval for refreshing the data
     private refreshTimeout: any;
 
+    private mapTimeSlotIdCode: {[key: string]: {id: number, name: string, code: 'AM'|'PM'|'EV'}} = {};
+
     constructor(
         private context: ContextService,
         private params: PlanningEmployeesCalendarParamService,
         private cd: ChangeDetectorRef,
-        public dialog: MatDialog
+        public dialog: MatDialog,
+        private api: ApiService
     ) {
         this.centers_ids = [];
     }
@@ -84,6 +88,8 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
             }
         }, true);
 
+        this.loadTimeSlots();
+
         // retrieve rowsHeight from local storage
         let rows_height = localStorage.getItem('planning_rows_height');
         if(rows_height) {
@@ -96,6 +102,22 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
             },
             // refresh every 5 minutes
             5*60*1000);
+    }
+
+    private async loadTimeSlots() {
+        try {
+            const domain = ['code', 'in', ['AM', 'PM', 'EV']];
+
+            const timeSlots: TimeSlot[] = await this.api.collect('sale\\booking\\TimeSlot', domain, ['id', 'name', 'code']);
+            for(let timeSlot of timeSlots) {
+                this.mapTimeSlotIdCode[timeSlot.code] = timeSlot;
+            }
+        }
+        catch(response) {
+            console.log('unexpected error', response);
+        }
+
+        console.log(this.mapTimeSlotIdCode);
     }
 
     private retrieveSettings() {
@@ -243,6 +265,35 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
                 purpose: 'view',
                 display_mode: 'popup',
                 callback: (data:any) => {
+                    // restart angular lifecycles
+                    this.cd.reattach();
+                    // force a refresh
+                    this.planningCalendar.onRefresh();
+                }
+            }
+        };
+
+        // prevent angular lifecycles while a context is open
+        this.cd.detach();
+        this.context.change(descriptor);
+    }
+
+    public onCreatePartnerEvent(data: { partnerId: number, eventDate: Date, timeSlotCode: 'AM'|'PM'|'EV' }) {
+        let descriptor: any = {
+            context_silent: true, // do not update sidebar
+            context: {
+                entity: 'sale\\booking\\PartnerEvent',
+                type: 'form',
+                name: 'default',
+                domain: [
+                    ['partner_id', '=', data.partnerId],
+                    ['event_date', '=', Math.floor(data.eventDate.getTime() / 1000)],
+                    ['time_slot_id', '=', this.mapTimeSlotIdCode[data.timeSlotCode].id]
+                ],
+                mode: 'edit',
+                purpose: 'create',
+                display_mode: 'popup',
+                callback: (data: any) => {
                     // restart angular lifecycles
                     this.cd.reattach();
                     // force a refresh
