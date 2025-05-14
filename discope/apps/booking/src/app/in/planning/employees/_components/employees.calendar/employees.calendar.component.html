@@ -96,6 +96,7 @@
                                 (dragstart)="preventDrag($event)"
                                 (mouseenter)="onmouseenterTableCell($event, index, partner, headers.days_indexes[i], 'AM')"
                                 (mouseleave)="onmouseleaveTableCell($event)"
+                                (dblclick)="ondoubleclickTableCell(day, partner, 'AM')"
                                 cdkDropList
                                 (cdkDropListDropped)="onDrop($event, index, partner, headers.days_indexes[i], 'AM')">
 
@@ -130,6 +131,7 @@
                                 (dragstart)="preventDrag($event)"
                                 (mouseenter)="onmouseenterTableCell($event, index, partner, headers.days_indexes[i], 'PM')"
                                 (mouseleave)="onmouseleaveTableCell($event)"
+                                (dblclick)="ondoubleclickTableCell(day, partner, 'PM')"
                                 cdkDropList
                                 (cdkDropListDropped)="onDrop($event, index, partner, headers.days_indexes[i], 'PM')">
 
@@ -165,6 +167,7 @@
                                 (dragstart)="preventDrag($event)"
                                 (mouseenter)="onmouseenterTableCell($event, index, partner, headers.days_indexes[i], 'EV')"
                                 (mouseleave)="onmouseleaveTableCell($event)"
+                                (dblclick)="ondoubleclickTableCell(day, partner, 'EV')"
                                 cdkDropList
                                 (cdkDropListDropped)="onDrop($event, index, partner, headers.days_indexes[i], 'EV')">
 
