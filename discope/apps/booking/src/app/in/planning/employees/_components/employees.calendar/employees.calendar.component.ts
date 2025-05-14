@@ -69,6 +69,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     @Output() showCamp = new EventEmitter();
     @Output() showPartner = new EventEmitter();
     @Output() showPartnerEvent = new EventEmitter();
+    @Output() createPartnerEvent = new EventEmitter();
 
     @Output() openLegendDialog = new EventEmitter();
     @Output() openPrefDialog = new EventEmitter();
@@ -436,6 +437,14 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         this.hover_row_index = -1;
         const element = event.target as HTMLElement;
         element.style.setProperty('background-color', '');
+    }
+
+    public ondoubleclickTableCell(day: Date, partner: any, timeSlotCode: 'AM'|'PM'|'EV') {
+        this.createPartnerEvent.emit({
+            eventDate: day,
+            partnerId: partner.id,
+            timeSlotCode
+        });
     }
 
     public onhoverActivity(activity: any) {
