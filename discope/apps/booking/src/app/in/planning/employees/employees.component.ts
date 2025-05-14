@@ -116,8 +116,6 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
         catch(response) {
             console.log('unexpected error', response);
         }
-
-        console.log(this.mapTimeSlotIdCode);
     }
 
     private retrieveSettings() {

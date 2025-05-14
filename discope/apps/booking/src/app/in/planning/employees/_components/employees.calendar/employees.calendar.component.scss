@@ -344,7 +344,7 @@
             display: block;
             position: fixed;
             z-index: 100;
-            transform: translateX(16px) translateY(calc(var(--rows_height) + 10px));
+            transform: translateX(16px) translateY(calc(var(--rows_height) + 1px));
 
             span {
                 display: block;
@@ -407,17 +407,6 @@
                 padding-left: 5px !important;
                 font-size: calc(8px + (var(--rows_height) / 4));
             }
-
-            .cell-hint {
-                display: none;
-            }
-
-            &:hover {
-                .cell-hint {
-                    display: block;
-                }
-            }
-
         }
 
 
