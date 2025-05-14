@@ -211,22 +211,19 @@ class Camp extends Model {
                 'description'       => "Documents needed to participate to the camp."
             ],
 
-            'employees_ids' => [
-                'type'              => 'many2many',
-                'foreign_object'    => 'hr\employee\Employee',
-                'foreign_field'     => 'camps_ids',
-                'rel_table'         => 'sale_hr_rel_camp_employee',
-                'rel_foreign_key'   => 'employee_id',
-                'rel_local_key'     => 'camp_id',
-                'description'       => "Employees that will take care of the children during the camp."
-            ],
-
             'enrollments_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\camp\Enrollment',
                 'foreign_field'     => 'camp_id',
                 'description'       => "All the enrollments linked to camp.",
                 'ondetach'          => 'delete'
+            ],
+
+            'booking_activities_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\BookingActivity',
+                'foreign_field'     => 'camp_id',
+                'description'       => "All Booking Activities this camp relates to."
             ]
 
         ];

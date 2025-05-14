@@ -94,7 +94,9 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
                 }
                 this.vm.show_only_transport.setValue(this.params.show_only_transport);
 
-                this.selectedProductCategory = this.productModelCategories.find((cat) => cat.id === this.params.product_category_id);
+                if(this.productModelCategories.length > 0) {
+                    this.selectedProductCategory = this.productModelCategories.find((cat) => cat.id === this.params.product_category_id);
+                }
             });
 
         // use user centers_ids to filter displayed employees
