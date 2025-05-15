@@ -145,6 +145,81 @@ class Enrollment extends Model {
                 'onupdate'          => 'onupdatePresentDay'
             ],
 
+            'daycare_day_1' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'none',
+                    'am',
+                    'pm',
+                    'full'
+                ],
+                'default'           => 'none',
+                'visible'           => [
+                    ['is_clsh', '=', true],
+                    ['present_day_1', '=', true]
+                ]
+            ],
+
+            'daycare_day_2' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'none',
+                    'am',
+                    'pm',
+                    'full'
+                ],
+                'default'           => 'none',
+                'visible'           => [
+                    ['is_clsh', '=', true],
+                    ['present_day_2', '=', true]
+                ]
+            ],
+
+            'daycare_day_3' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'none',
+                    'am',
+                    'pm',
+                    'full'
+                ],
+                'default'           => 'none',
+                'visible'           => [
+                    ['is_clsh', '=', true],
+                    ['present_day_3', '=', true]
+                ]
+            ],
+
+            'daycare_day_4' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'none',
+                    'am',
+                    'pm',
+                    'full'
+                ],
+                'default'           => 'none',
+                'visible'           => [
+                    ['is_clsh', '=', true],
+                    ['present_day_4', '=', true]
+                ]
+            ],
+
+            'daycare_day_5' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'none',
+                    'am',
+                    'pm',
+                    'full'
+                ],
+                'default'           => 'none',
+                'visible'           => [
+                    ['is_clsh', '=', true],
+                    ['present_day_5', '=', true]
+                ]
+            ],
+
             'camp_class' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',

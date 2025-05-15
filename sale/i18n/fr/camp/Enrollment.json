@@ -67,6 +67,56 @@
             "label": "Présent jour 5",
             "description": "Enfant présent le 5ème jour du camp."
         },
+        "daycare_day_1": {
+            "label": "Guarderie jour 1",
+            "description": "Guarderie de l'enfant pour le 1er jour.",
+            "selection": {
+                "none": "Aucune",
+                "am": "Matin",
+                "pm": "Soir",
+                "full": "Matin et soir"
+            }
+        },
+        "daycare_day_2": {
+            "label": "Guarderie jour 2",
+            "description": "Guarderie de l'enfant pour le 2ème jour.",
+            "selection": {
+                "none": "Aucune",
+                "am": "Matin",
+                "pm": "Soir",
+                "full": "Matin et soir"
+            }
+        },
+        "daycare_day_3": {
+            "label": "Guarderie jour 3",
+            "description": "Guarderie de l'enfant pour le 3ème jour.",
+            "selection": {
+                "none": "Aucune",
+                "am": "Matin",
+                "pm": "Soir",
+                "full": "Matin et soir"
+            }
+        },
+        "daycare_day_4": {
+            "label": "Guarderie jour 4",
+            "description": "Guarderie de l'enfant pour le 4ème jour.",
+            "selection": {
+                "none": "Aucune",
+                "am": "Matin",
+                "pm": "Soir",
+                "full": "Matin et soir"
+            }
+        },
+        "daycare_day_5": {
+            "label": "Guarderie jour 5",
+            "description": "Guarderie de l'enfant pour le 5ème jour.",
+            "selection": {
+                "none": "Aucune",
+                "am": "Matin",
+                "pm": "Soir",
+                "full": "Matin et soir"
+            }
+        },
         "camp_class": {
             "label": "Classe camp de l'enfant",
             "description": "La classe du camp de l'enfant pour l'inscription, pour savoir quel prix utiliser.",
@@ -139,8 +189,11 @@
                 "section.lines": {
                     "label": "Lignes"
                 },
-                "section.price-adapters": {
+                "section.reductions": {
                     "label": "Réductions"
+                },
+                "section.daycare": {
+                    "label": "Guarderie"
                 },
                 "section.child-remarks": {
                     "label": "Remarques enfant"
