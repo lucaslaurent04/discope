@@ -102,8 +102,28 @@ class Camp extends Model {
 
             'is_clsh' => [
                 'type'              => 'boolean',
-                'description'       => "Is \"Centre loisir sans hébergement\"",
+                'description'       => "Is \"Centre loisir sans hébergement\".",
+                'help'              => "If CLSH, the enrollments are per day.",
                 'default'           => false
+            ],
+
+            'clsh_type' => [
+                'type'              => 'string',
+                'selection'         => [
+                    '5-days',
+                    '4-days'
+                ],
+                'description'       => "Is it a camp of 5 or 4 days duration.",
+                'default'           => '5-days',
+                'visible'           => ['is_clsh', '=', true]
+            ],
+
+            'day_product_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\catalog\Product',
+                'description'       => 'The product targeted by the line.',
+                'domain'            => ['is_camp', '=', true],
+                'visible'           => ['is_clsh', '=', true]
             ],
 
             'camp_model_id' => [
@@ -224,6 +244,13 @@ class Camp extends Model {
                 'foreign_object'    => 'sale\booking\BookingActivity',
                 'foreign_field'     => 'camp_id',
                 'description'       => "All Booking Activities this camp relates to."
+            ],
+
+            'presences_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\camp\Presence',
+                'foreign_field'     => 'camp_id',
+                'description'       => "The child day presences for this camp."
             ]
 
         ];
@@ -420,10 +447,23 @@ class Camp extends Model {
 
     public static function canupdate($self, $values): array {
         $self->read([
+            'is_clsh',
+            'clsh_type',
+            'day_product_id',
+            'date_from',
+            'date_to',
             'camp_groups_ids',
             'camp_group_qty',
             'enrollments_ids' => ['status']
         ]);
+
+        foreach($self as $camp) {
+            $is_clsh = $values['is_clsh'] ?? $camp['is_clsh'];
+            $day_product_id = $values['day_product_id'] ?? $camp['day_product_id'];
+            if($is_clsh && is_null($day_product_id)) {
+                return ['day_product_id' => ['required' => "Day product required if CLSH camp."]];
+            }
+        }
 
         // Checks that modification of camp groups still allows enough enrollments
         if(isset($values['camp_groups_ids'])) {
@@ -483,7 +523,7 @@ class Camp extends Model {
             }
         }
 
-        // Checks that modification of employee ratio still allows enough enrollments
+        // Checks that modification of employee's ratio still allows enough enrollments
         if(isset($values['employee_ratio'])) {
             foreach($self as $camp) {
                 $enrolled_children_qty = 0;
@@ -495,6 +535,32 @@ class Camp extends Model {
 
                 if($enrolled_children_qty > ($camp['camp_group_qty'] * $values['employee_ratio'])) {
                     return ['employee_ratio' => ['too_many_children' => "There is too many children enrolled in the camp."]];
+                }
+            }
+        }
+
+        // Checks the camp duration validity if CLSH camp
+        if(isset($values['is_clsh']) || isset($values['clsh_type']) || isset($values['date_from']) || isset($values['date_to'])) {
+            foreach($self as $camp) {
+                $is_clsh = $values['is_clsh'] ?? $camp['is_clsh'];
+                if(!$is_clsh) {
+                    continue;
+                }
+
+                $date_from = $values['date_from'] ?? $camp['date_from'];
+                $date_to = $values['date_to'] ?? $camp['date_to'];
+
+                $day_diff = (($date_to - $date_from) / 86400) + 1;
+                if(!in_array($day_diff, [4, 5])) {
+                    return ['date_to' => ['wrong_duration' => "A CLSH camp must have a duration of 4 or 5 days."]];
+                }
+
+                $clsh_type = $values['clsh_type'] ?? $camp['clsh_type'];
+                if($day_diff === 4 && $clsh_type === '5-days') {
+                    return ['date_to' => ['not_long_enough' => "A 5 days CLSH camp must have a duration of 5 days."]];
+                }
+                if($day_diff === 5 && $clsh_type === '4-days') {
+                    return ['date_to' => ['too_long_enough' => "A 4 days CLSH camp must have a duration of 4 days."]];
                 }
             }
         }

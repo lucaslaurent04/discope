@@ -102,6 +102,60 @@
                                                 "type": "field",
                                                 "value": "works_council_id",
                                                 "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "family_quotient",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_clsh",
+                                                "width": "33%",
+                                                "visible": true,
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "clsh_type",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "date_from",
+                                                "width": "33%",
+                                                "visible": ["is_clsh", "=", false]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "date_to",
+                                                "width": "33%",
+                                                "visible": ["is_clsh", "=", false]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "present_day_1",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "present_day_2",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "present_day_3",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "present_day_4",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "present_day_5",
+                                                "width": "33%"
                                             }
                                         ]
                                     },

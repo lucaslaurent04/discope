@@ -34,6 +34,24 @@ class Price extends \sale\price\Price {
                 ],
                 'description'       => "The class of the price, to know which price to use depending on data given for child enrollment factors.",
                 'default'           => 'other'
+            ],
+
+            'is_clsh' => [
+                'type'              => 'boolean',
+                'description'       => "Is it related to CLSH camps \"Centre loisir sans hébergement\".",
+                'default'           => false
+            ],
+
+            'family_quotient_min' => [
+                'type'              => 'integer',
+                'description'       => "Min family quotient to apply the price to CLSH camp enrolment.",
+                'visible'           => ['is_clsh', '=', true]
+            ],
+
+            'family_quotient_max' => [
+                'type'              => 'integer',
+                'description'       => "Max family quotient to apply the price to CLSH camp enrolment.",
+                'visible'           => ['is_clsh', '=', true]
             ]
 
         ];
