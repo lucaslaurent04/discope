@@ -33,6 +33,40 @@
             "description": "Date de fin du camp.",
             "help": ""
         },
+        "is_clsh": {
+            "label": "CLSH",
+            "description": "Centre loisir sans hébergement.",
+            "help": ""
+        },
+        "clsh_type": {
+            "label": "Durée",
+            "description": "Type de camp CLSH.",
+            "help": "",
+            "selection": {
+                "5-days": "5 jours",
+                "4-days": "4 jours"
+            }
+        },
+        "present_day_1": {
+            "label": "Présent jour 1",
+            "description": "Enfant présent le 1er jour du camp."
+        },
+        "present_day_2": {
+            "label": "Présent jour 2",
+            "description": "Enfant présent le 2ème jour du camp."
+        },
+        "present_day_3": {
+            "label": "Présent jour 3",
+            "description": "Enfant présent le 3ème jour du camp."
+        },
+        "present_day_4": {
+            "label": "Présent jour 4",
+            "description": "Enfant présent le 4ème jour du camp."
+        },
+        "present_day_5": {
+            "label": "Présent jour 5",
+            "description": "Enfant présent le 5ème jour du camp."
+        },
         "camp_class": {
             "label": "Classe camp de l'enfant",
             "description": "La classe du camp de l'enfant pour l'inscription, pour savoir quel prix utiliser.",

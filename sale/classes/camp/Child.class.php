@@ -153,6 +153,13 @@ class Child extends Model {
                 'foreign_field'     => 'child_id',
                 'description'       => "Camp enrollments of child.",
                 'ondetach'          => 'delete'
+            ],
+
+            'presences_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\camp\Presence',
+                'foreign_field'     => 'child_id',
+                'description'       => "The day presences of the child to camps."
             ]
 
         ];
