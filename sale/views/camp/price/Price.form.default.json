@@ -42,6 +42,21 @@
                                                 "type": "field",
                                                 "value": "camp_class",
                                                 "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_clsh",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "family_quotient_min",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "family_quotient_max",
+                                                "width": "33%"
                                             }
                                         ]
                                     },

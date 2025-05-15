@@ -18,6 +18,27 @@
             },
             {
                 "type": "field",
+                "value": "is_clsh",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "family_quotient_min",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "family_quotient_max",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
                 "value": "price",
                 "width": "20%",
                 "sortable": false,

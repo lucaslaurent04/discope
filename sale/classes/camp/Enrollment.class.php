@@ -48,6 +48,15 @@ class Enrollment extends Model {
                 'function'          => 'calcChildAge'
             ],
 
+            'family_quotient' => [
+                'type'              => 'integer',
+                'usage'             => 'number/integer{0,5000}',
+                'description'       => "Indicator for measuring the child's family monthly resources.",
+                'help'              => "Used to select the price to pay for a CLSH camp.",
+                'default'           => 0,
+                'onupdate'          => 'onupdateFamilyQuotient'
+            ],
+
             'camp_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Camp',
@@ -70,6 +79,70 @@ class Enrollment extends Model {
                 'description'       => "End date of the camp.",
                 'store'             => true,
                 'relation'          => ['camp_id' => 'date_to']
+            ],
+
+            'is_clsh' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => "",
+                'store'             => true,
+                'relation'          => ['camp_id' => 'is_clsh'],
+            ],
+
+            'clsh_type' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'selection'         => [
+                    '5-days',
+                    '4-days'
+                ],
+                'description'       => "Is it a camp of 5 or 4 days duration.",
+                'store'             => true,
+                'relation'          => ['camp_id' => 'clsh_type'],
+                'visible'           => ['is_clsh', '=', true]
+            ],
+
+            'present_day_1' => [
+                'type'              => 'boolean',
+                'description'       => "Will the child be present on the first day of the day of the camp.",
+                'default'           => false,
+                'visible'           => ['is_clsh', '=', true],
+                'onupdate'          => 'onupdatePresentDay'
+            ],
+
+            'present_day_2' => [
+                'type'              => 'boolean',
+                'description'       => "Will the child be present on the second day of the day of the camp.",
+                'default'           => false,
+                'visible'           => ['is_clsh', '=', true],
+                'onupdate'          => 'onupdatePresentDay'
+            ],
+
+            'present_day_3' => [
+                'type'              => 'boolean',
+                'description'       => "Will the child be present on the third day of the day of the camp.",
+                'default'           => false,
+                'visible'           => ['is_clsh', '=', true],
+                'onupdate'          => 'onupdatePresentDay'
+            ],
+
+            'present_day_4' => [
+                'type'              => 'boolean',
+                'description'       => "Will the child be present on the fourth day of the day of the camp.",
+                'default'           => false,
+                'visible'           => ['is_clsh', '=', true],
+                'onupdate'          => 'onupdatePresentDay'
+            ],
+
+            'present_day_5' => [
+                'type'              => 'boolean',
+                'description'       => "Will the child be present on the fifth day of the day of the camp.",
+                'default'           => false,
+                'visible'           => [
+                    ['is_clsh', '=', true],
+                    ['clsh_type', '=', '5-days']
+                ],
+                'onupdate'          => 'onupdatePresentDay'
             ],
 
             'camp_class' => [
@@ -138,7 +211,8 @@ class Enrollment extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\WorksCouncil',
                 'description'       => "The works council that will enhance the camp class by one level.",
-                'dependents'        => ['camp_class']
+                'dependents'        => ['camp_class'],
+                'visible'           => ['is_clsh', '=', false]
             ],
 
             'documents_ids' => [
@@ -187,27 +261,43 @@ class Enrollment extends Model {
 
     public static function onchange($event, $values): array {
         $result = [];
-        if(isset($event['child_id'])) {
-            $child = Child::id($event['child_id'])
-                ->read(['camp_class', 'birthdate'])
-                ->first();
+        if($values['is_clsh']) {
+            if(isset($event['child_id'])) {
+                $child = Child::id($event['child_id'])
+                    ->read(['main_guardian_id' => ['is_ccvg']])
+                    ->first();
 
-            $result['camp_class'] = $child['camp_class'];
+                if($child['main_guardian_id']['is_ccvg']) {
+                    $result['camp_class'] = 'close-member';
+                }
+                else {
+                    $result['camp_class'] = 'other';
+                }
+            }
         }
-        elseif(isset($event['works_council_id']) && isset($values['child_id'])) {
-            $child = Child::id($values['child_id'])
-                ->read(['camp_class'])
-                ->first();
+        else {
+            if(isset($event['child_id'])) {
+                $child = Child::id($event['child_id'])
+                    ->read(['camp_class'])
+                    ->first();
 
-            $camp_class = $child['camp_class'];
-            if($camp_class === 'other') {
-                $camp_class = 'member';
+                $result['camp_class'] = $child['camp_class'];
             }
-            elseif($camp_class === 'member') {
-                $camp_class = 'close-member';
-            }
+            elseif(isset($event['works_council_id']) && isset($values['child_id'])) {
+                $child = Child::id($values['child_id'])
+                    ->read(['camp_class'])
+                    ->first();
 
-            $result['camp_class'] = $camp_class;
+                $camp_class = $child['camp_class'];
+                if($camp_class === 'other') {
+                    $camp_class = 'member';
+                }
+                elseif($camp_class === 'member') {
+                    $camp_class = 'close-member';
+                }
+
+                $result['camp_class'] = $camp_class;
+            }
         }
 
         if(
@@ -234,15 +324,25 @@ class Enrollment extends Model {
 
     public static function calcCampClass($self): array {
         $result = [];
-        $self->read(['works_council_id', 'child_id' => ['camp_class']]);
+        $self->read(['is_clsh', 'works_council_id', 'child_id' => ['camp_class', 'main_guardian_id' => ['is_ccvg']]]);
         foreach($self as $id => $enrollment) {
             $camp_class = $enrollment['child_id']['camp_class'];
-            if(!is_null($enrollment['works_council_id'])) {
-                if($camp_class === 'other') {
-                    $camp_class = 'member';
-                }
-                elseif($camp_class === 'member') {
+            if($enrollment['is_clsh']) {
+                if($enrollment['main_guardian_id']['is_ccvg']) {
                     $camp_class = 'close-member';
+                }
+                else {
+                    $camp_class = 'other';
+                }
+            }
+            else {
+                if(!is_null($enrollment['works_council_id'])) {
+                    if($camp_class === 'other') {
+                        $camp_class = 'member';
+                    }
+                    elseif($camp_class === 'member') {
+                        $camp_class = 'close-member';
+                    }
                 }
             }
             $result[$id] = $camp_class;
@@ -406,6 +506,7 @@ class Enrollment extends Model {
         ]);
 
         $self->do('reset-camp-enrollments-qty');
+        $self->do('generate-presences');
     }
 
     public static function onafterCancel($self) {
@@ -416,6 +517,7 @@ class Enrollment extends Model {
         ]);
 
         $self->do('reset-camp-enrollments-qty');
+        $self->do('remove-presences');
     }
 
     public static function getWorkflow(): array {
@@ -571,7 +673,7 @@ class Enrollment extends Model {
             }
         }
 
-        // Check prices isn't missing for child specific camp_class
+        // Check prices aren't missing for a child's specific camp_class
         if(isset($values['camp_id']) || isset($values['child_id'])) {
             foreach($self as $enrollment) {
                 $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
@@ -599,7 +701,7 @@ class Enrollment extends Model {
             }
         }
 
-        // Check that child is not already enrolled to another camp at the same time
+        // Check that the child is not already enrolled to another camp at the same time
         if(isset($values['camp_id']) || isset($values['child_id'])) {
             foreach($self as $enrollment) {
                 $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
@@ -642,91 +744,46 @@ class Enrollment extends Model {
             }
         }
 
-        return parent::cancreate($self, $values);
-    }
-
-    /**
-     * Creates the first enrollment line with the camp product.
-     */
-    public static function onupdateCampId($self) {
-        $self->read([
-            'enrollment_lines_ids',
-            'child_id'  => [
-                'camp_class'
-            ],
-            'camp_id'   => [
-                'date_from',
-                'date_to',
-                'product_id' => [
-                    'prices_ids' => [
-                        'camp_class',
-                        'price_list_id' => ['date_from', 'date_to']
-                    ]
-                ]
-            ]
-        ]);
-
-        foreach($self as $id => $enrollment) {
-            if(!isset($enrollment['camp_id']) || !isset($enrollment['child_id']) || !empty($enrollment['enrollment_lines_ids'])) {
-                continue;
-            }
-
-            $camp_class_price = null;
-            foreach($enrollment['camp_id']['product_id']['prices_ids'] as $price) {
-                if(
-                    $enrollment['child_id']['camp_class'] === $price['camp_class']
-                    && $enrollment['camp_id']['date_from'] >= $price['price_list_id']['date_from']
-                    && $enrollment['camp_id']['date_from'] <= $price['price_list_id']['date_to']
-                ) {
-                    $camp_class_price = $price;
-                }
-            }
-
-            EnrollmentLine::create([
-                'enrollment_id' => $id,
-                'product_id'    => $enrollment['camp_id']['product_id']['id'],
-                'price_id'      => $camp_class_price['id'] ?? null,
-                'qty'           => 1
-            ]);
-        }
-
-        $self->do('reset-camp-enrollments-qty');
-    }
-
-    /**
-     * Adapts the lines prices to the new camp_class.
-     */
-    public static function onupdateCampClass($self) {
-        $self->read([
-            'camp_class',
-            'enrollment_lines_ids' => [
-                'product_id',
-                'price_id' => ['camp_class']
-            ]
-        ]);
-        foreach($self as $enrollment) {
-            if(is_null($enrollment['camp_class'])) {
-                continue;
-            }
-
-            foreach($enrollment['enrollment_lines_ids'] as $lid => $line) {
-                if(is_null($line['price_id']['camp_class']) || $line['price_id']['camp_class'] === $enrollment['camp_class']) {
+        // Check that if clsh the child needs to be present at least one day
+        if(isset($values['present_day_1']) || isset($values['present_day_2']) || isset($values['present_day_3']) || isset($values['present_day_4']) || isset($values['present_day_5'])) {
+            $self->read(['is_clsh', 'present_day_1', 'present_day_2', 'present_day_3', 'present_day_4', 'present_day_5']);
+            foreach($self as $enrollment) {
+                if(!$enrollment['is_clsh']) {
                     continue;
                 }
 
-                $price = Price::search([
-                    ['product_id', '=', $line['product_id']],
-                    ['camp_class', '=', $enrollment['camp_class']]
-                ])
-                    ->read(['id'])
-                    ->first();
+                $present_days = [
+                    $values['present_day_1'] ?? $enrollment['present_day_1'],
+                    $values['present_day_2'] ?? $enrollment['present_day_2'],
+                    $values['present_day_3'] ?? $enrollment['present_day_3'],
+                    $values['present_day_4'] ?? $enrollment['present_day_4'],
+                    $values['present_day_5'] ?? $enrollment['present_day_5']
+                ];
 
-                if(!is_null($price)) {
-                    EnrollmentLine::id($lid)
-                        ->update(['price_id' => $price['id']]);
+                if(!in_array(true, $present_days)) {
+                    return ['is_clsh' => ['needs_at_least_one_present_day' => "The child need at least one present day."]];
                 }
             }
         }
+
+        return parent::cancreate($self, $values);
+    }
+
+    public static function onupdateCampId($self) {
+        $self->do('refresh-camp-product-line');
+        $self->do('reset-camp-enrollments-qty');
+    }
+
+    public static function onupdateFamilyQuotient($self) {
+        $self->do('refresh-camp-product-line');
+    }
+
+    public static function onupdatePresentDay($self) {
+        $self->do('refresh-camp-product-line');
+    }
+
+    public static function onupdateCampClass($self) {
+        $self->do('refresh-camp-product-line');
     }
 
     public static function onupdate($self, $values) {
@@ -758,6 +815,196 @@ class Enrollment extends Model {
         }
     }
 
+    public static function doGeneratePresences($self) {
+        $self->read(['is_clsh', 'camp_id', 'child_id', 'date_from', 'date_to', 'present_day_1', 'present_day_2', 'present_day_3', 'present_day_4', 'present_day_5']);
+        foreach($self as $enrollment) {
+            $day_index = 1;
+            $date = $enrollment['date_from'];
+            while($date <= $enrollment['date_to']) {
+                if(!$enrollment['is_clsh'] || $enrollment['present_day_'.$day_index]) {
+                    Presence::create([
+                        'presence_date' => $date,
+                        'camp_id'       => $enrollment['camp_id'],
+                        'child_id'      => $enrollment['child_id']
+                    ]);
+                }
+
+                $day_index++;
+                $date += 60 * 60 * 24;
+            }
+        }
+    }
+
+    public static function doRemovePresences($self) {
+        $self->read(['camp_id', 'child_id']);
+        foreach($self as $enrollment) {
+            Presence::search([
+                ['camp_id', '=', $enrollment['camp_id']],
+                ['child_id', '=', $enrollment['child_id']]
+            ])
+                ->delete(true);
+        }
+    }
+
+    public static function doRefreshCampProductLine($self) {
+        $self->read([
+            'is_clsh',
+            'clsh_type',
+            'present_day_1',
+            'present_day_2',
+            'present_day_3',
+            'present_day_4',
+            'present_day_5',
+            'family_quotient',
+            'camp_class',
+            'child_id',
+            'camp_id'   => [
+                'date_from',
+                'date_to',
+                'product_id' => [
+                    'prices_ids' => [
+                        'camp_class',
+                        'family_quotient_min',
+                        'family_quotient_max',
+                        'price_list_id' => ['date_from', 'date_to']
+                    ]
+                ],
+                'day_product_id' => [
+                    'prices_ids' => [
+                        'camp_class',
+                        'family_quotient_min',
+                        'family_quotient_max',
+                        'price_list_id' => ['date_from', 'date_to']
+                    ]
+                ],
+            ]
+        ]);
+        foreach($self as $id => $enrollment) {
+            if(is_null($enrollment['camp_class']) || is_null($enrollment['child_id'])) {
+                continue;
+            }
+
+            if($enrollment['is_clsh']) {
+                $present_days = [
+                    $enrollment['present_day_1'],
+                    $enrollment['present_day_2'],
+                    $enrollment['present_day_3'],
+                    $enrollment['present_day_4'],
+                    $enrollment['present_day_5']
+                ];
+
+                $is_present_whole_camp = false;
+                if($enrollment['clsh_type'] === '4-days' && $present_days[0] && $present_days[1] && $present_days[2] && $present_days[3]) {
+                    $is_present_whole_camp = true;
+                }
+                elseif($enrollment['clsh_type'] === '5-days' && $present_days[0] && $present_days[1] && $present_days[2] && $present_days[3] && $present_days[4]) {
+                    $is_present_whole_camp = true;
+                }
+
+                $product = $enrollment['camp_id']['product_id'];
+                $qty = 1;
+                if(!$is_present_whole_camp) {
+                    $product = $enrollment['camp_id']['day_product_id'];
+
+                    $qty = 0;
+                    foreach($present_days as $present_day) {
+                        if($present_day) {
+                            $qty++;
+                        }
+                    }
+                }
+
+                $camp_classes = ['other'];
+                if($enrollment['camp_class'] === 'close-member') {
+                    $camp_classes = ['close-member', 'member', 'other'];
+                }
+                elseif($enrollment['camp_class'] === 'member') {
+                    $camp_classes = ['member', 'other'];
+                }
+
+                $camp_price = null;
+                foreach($camp_classes as $camp_class) {
+                    foreach($product['prices_ids'] as $price) {
+                        if(
+                            $camp_class === $price['camp_class']
+                            && $enrollment['camp_id']['date_from'] >= $price['price_list_id']['date_from']
+                            && $enrollment['camp_id']['date_from'] <= $price['price_list_id']['date_to']
+                            && $enrollment['family_quotient'] >= $price['family_quotient_min']
+                            && $enrollment['family_quotient'] <= $price['family_quotient_max']
+                        ) {
+                            $camp_price = $price;
+                            break 2;
+                        }
+                    }
+                }
+
+                if(!is_null($camp_price)) {
+                    $camp_product_line = EnrollmentLine::search(['product_id', '=', $product['id']])
+                        ->read(['id'])
+                        ->first();
+
+                    if(is_null($camp_product_line)) {
+                        EnrollmentLine::create([
+                            'enrollment_id' => $id,
+                            'product_id'    => $product['id'],
+                            'price_id'      => $camp_price['id'],
+                            'qty'           => $qty
+                        ]);
+                    }
+                    else {
+                        EnrollmentLine::id($camp_product_line['id'])
+                            ->update([
+                                'price_id'  => $camp_price['id'],
+                                'qty'       => $qty
+                            ]);
+                    }
+                }
+            }
+            else {
+                $camp_classes = ['other'];
+                if($enrollment['camp_class'] === 'close-member') {
+                    $camp_classes = ['close-member', 'member', 'other'];
+                }
+                elseif($enrollment['camp_class'] === 'member') {
+                    $camp_classes = ['member', 'other'];
+                }
+
+                $camp_price = null;
+                foreach($camp_classes as $camp_class) {
+                    foreach($enrollment['camp_id']['product_id']['prices_ids'] as $price) {
+                        if(
+                            $camp_class === $price['camp_class']
+                            && $enrollment['camp_id']['date_from'] >= $price['price_list_id']['date_from']
+                            && $enrollment['camp_id']['date_from'] <= $price['price_list_id']['date_to']
+                        ) {
+                            $camp_price = $price;
+                            break;
+                        }
+                    }
+                }
+
+                if(!is_null($camp_price)) {
+                    $camp_product_line = EnrollmentLine::search(['product_id', '=', $enrollment['camp_id']['product_id']['id']])
+                        ->read(['id'])
+                        ->first();
+
+                    if(is_null($camp_product_line)) {
+                        EnrollmentLine::create([
+                            'enrollment_id' => $id,
+                            'product_id'    => $enrollment['camp_id']['product_id']['id'],
+                            'price_id'      => $camp_price['id'] ?? null,
+                            'qty'           => 1
+                        ]);
+                    }
+                    else {
+                        EnrollmentLine::id($camp_product_line['id'])
+                            ->update(['price_id' => $camp_price['id']]);
+                    }
+                }
+            }
+        }
+    }
+
     public static function getActions(): array {
         return [
 
@@ -771,6 +1018,24 @@ class Enrollment extends Model {
                 'description'   => "Remove all enrollment lines.",
                 'policies'      => [],
                 'function'      => 'doDeleteLines'
+            ],
+
+            'generate-presences' => [
+                'description'   => "Generate the child day presences to the camp.",
+                'policies'      => [],
+                'function'      => 'doGeneratePresences'
+            ],
+
+            'remove-presences' => [
+                'description'   => "Remove the child day presences to the camp.",
+                'policies'      => [],
+                'function'      => 'doRemovePresences'
+            ],
+
+            'refresh-camp-product-line' => [
+                'description'   => "Creates/updates the enrollment line that concerns the product_id or day_product_id.",
+                'policies'      => [],
+                'function'      => 'doRefreshCampProductLine'
             ]
 
         ];

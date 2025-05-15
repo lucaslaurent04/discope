@@ -155,6 +155,40 @@
                         ]
                     },
                     {
+                        "id": "section.presences",
+                        "label": "Presences",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "presences_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.child",
+                                                    "header": {
+                                                        "selection": {
+                                                            "default": false
+                                                        },
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.EDIT": false
+                                                        }
+                                                    }
+                                                },
+                                                "actions": false
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "id": "section.skills",
                         "label": "Skills",
                         "rows": [

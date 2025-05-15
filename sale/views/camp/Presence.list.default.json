@@ -1,0 +1,29 @@
+{
+    "name": "Presences",
+    "description": "Child presences to camps.",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "25%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "presence_date",
+                "width": "25%"
+            },
+            {
+                "type": "field",
+                "value": "child_id",
+                "width": "25%"
+            },
+            {
+                "type": "field",
+                "value": "camp_id",
+                "width": "25%"
+            }
+        ]
+    }
+}

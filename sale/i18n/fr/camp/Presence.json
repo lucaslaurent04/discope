@@ -1,0 +1,35 @@
+{
+    "name": "Présence",
+    "plural": "Présences",
+    "description": "Un jour de présence d'un enfant à un camp.",
+    "model": {
+        "presence_date": {
+            "label": "Date",
+            "description": "La date de présence.",
+            "help": ""
+        },
+        "child_id": {
+            "label": "Enfant",
+            "description": "L'enfant concerné par la présence.",
+            "help": ""
+        },
+        "camp_id": {
+            "label": "Camp",
+            "description": "Le camp auquel l'enfant participe à cette date.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "",
+            "description": "",
+            "layout": []
+        },
+        "list.default": {
+            "name": "",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}
