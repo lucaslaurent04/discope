@@ -339,7 +339,7 @@ class BookingLineGroup extends Model {
 
             'activity_group_num' => [
                 'type'              => 'integer',
-                'description'       => "Identifier of the activity group in the booking.",
+                'description'       => "Number of the activity group in the booking.",
                 'onupdate'          => 'onupdateActivityGroupNum'
             ],
 

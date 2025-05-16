@@ -38,6 +38,18 @@
             "visible": [
                 ["status", "in", ["draft", "published"]]
             ]
+        },
+        {
+            "id": "action.clone-group",
+            "label": "Clone group",
+            "controller": "sale_camp_clone-group",
+            "params": {
+                "id": "object.id"
+            },
+            "visible": [
+                ["status", "in", ["draft", "published"]],
+                ["camp_group_qty", ">", 0]
+            ]
         }
     ],
     "layout": {
@@ -235,27 +247,6 @@
                                                 "widget": {
                                                     "view": "list.camp"
                                                 }
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "section.employees",
-                        "label": "Employees",
-                        "visible": ["state", "<>", "draft"],
-                        "rows": [
-                            {
-                                "columns": [
-                                    {
-                                        "width": "100%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "employees_ids",
-                                                "width": "100%"
                                             }
                                         ]
                                     }
