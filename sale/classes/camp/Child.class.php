@@ -165,6 +165,19 @@ class Child extends Model {
         ];
     }
 
+    public static function canupdate($self, $values): array {
+        if(isset($values['main_guardian_id'])) {
+            $self->read(['guardians_ids']);
+            foreach($self as $child) {
+                if(!in_array($values['main_guardian_id'], $child['guardians_ids'])) {
+                    return ['main_guardian_id' => ['invalid' => "This guardian is not linked to this child."]];
+                }
+            }
+        }
+
+        return parent::canupdate($self);
+    }
+
     public static function calcName($self): array {
         $result = [];
         $self->read(['firstname', 'lastname']);
@@ -198,7 +211,7 @@ class Child extends Model {
     }
 
     /**
-     * Reset child age of not locked enrollments of children
+     * Reset child age of not locked enrollments
      */
     public static function onupdateBirthdate($self) {
         $reset_age_enrollments_ids = [];
