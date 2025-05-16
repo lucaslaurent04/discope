@@ -254,7 +254,7 @@
             "too_many_ase_children": "Le quota d'enfants de cette catégorie est plein."
         },
         "is_clsh": {
-            "needs_at_least_one_present_day": "L'enfant a besoin d'au moins un cadeau."
+            "needs_at_least_one_present_day": "L'enfant doit être présent à un jour du camp."
         }
     }
 }
