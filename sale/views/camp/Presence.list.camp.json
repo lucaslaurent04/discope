@@ -8,13 +8,14 @@
             {
                 "type": "field",
                 "value": "id",
-                "width": "25%",
+                "width": "5%",
                 "visible": false
             },
             {
                 "type": "field",
                 "value": "presence_date",
-                "width": "25%"
+                "width": "25%",
+                "visible": false
             },
             {
                 "type": "field",
