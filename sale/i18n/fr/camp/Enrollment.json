@@ -18,18 +18,23 @@
             "description": "Age de l'enfant au moment du camp.",
             "help": ""
         },
+        "family_quotient": {
+            "label": "Quotient familial",
+            "description": "Indicateur de mesure des ressources mensuelles de la famille de l'enfant.",
+            "help": "Utilisé pour sélectionner le prix à payer pour un camp CLSH."
+        },
         "camp_id": {
             "label": "Camp",
             "description": "Camp auquel l'enfant s'inscrit.",
             "help": ""
         },
         "date_from": {
-            "label": "Du",
+            "label": "Début camp",
             "description": "Date de début du camp.",
             "help": ""
         },
         "date_to": {
-            "label": "Au",
+            "label": "Fin camp",
             "description": "Date de fin du camp.",
             "help": ""
         },
