@@ -132,17 +132,17 @@
                                             {
                                                 "type": "label",
                                                 "value": "",
-                                                "width": "25%"
+                                                "width": "10%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "is_clsh",
-                                                "width": "25%"
+                                                "width": "20%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "clsh_type",
-                                                "width": "25%"
+                                                "width": "20%"
                                             }
                                         ]
                                     },
