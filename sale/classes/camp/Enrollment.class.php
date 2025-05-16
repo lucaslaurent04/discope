@@ -54,7 +54,8 @@ class Enrollment extends Model {
                 'description'       => "Indicator for measuring the child's family monthly resources.",
                 'help'              => "Used to select the price to pay for a CLSH camp.",
                 'default'           => 0,
-                'onupdate'          => 'onupdateFamilyQuotient'
+                'onupdate'          => 'onupdateFamilyQuotient',
+                'visible'           => ['is_clsh', '=', true]
             ],
 
             'camp_id' => [
