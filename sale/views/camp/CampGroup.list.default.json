@@ -4,6 +4,14 @@
         "items": [
             {
                 "type": "field",
+                "value": "id",
+                "width": "5%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
                 "value": "name",
                 "width": "40%",
                 "sortable": false,
