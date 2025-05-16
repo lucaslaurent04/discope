@@ -128,7 +128,7 @@ class BankStatement extends Model {
                         break;
                     }
                 }
-                $result[$sid] = ($is_reconciled)?'reconciled':'pending';
+                $result[$sid] = ($is_reconciled) ? 'reconciled' : 'pending';
             }
         }
         return $result;
