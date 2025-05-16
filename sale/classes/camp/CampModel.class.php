@@ -34,7 +34,7 @@ class CampModel extends Model {
             'product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
-                'description'       => 'The product targeted by the line.',
+                'description'       => "The product targeted by the line.",
                 'required'          => true,
                 'domain'            => ['is_camp', '=', true]
             ],
@@ -50,6 +50,32 @@ class CampModel extends Model {
                 ],
                 'description'       => "Type of camp.",
                 'default'           => 'sport'
+            ],
+
+            'is_clsh' => [
+                'type'              => 'boolean',
+                'description'       => "Is \"Centre loisir sans hébergement\".",
+                'help'              => "If CLSH, the enrollments are per day.",
+                'default'           => false
+            ],
+
+            'clsh_type' => [
+                'type'              => 'string',
+                'selection'         => [
+                    '5-days',
+                    '4-days'
+                ],
+                'description'       => "Is it a camp of 5 or 4 days duration.",
+                'default'           => '5-days',
+                'visible'           => ["is_clsh", "=", true]
+            ],
+
+            'day_product_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\catalog\Product',
+                'description'       => "The product targeted by the line.",
+                'domain'            => ['is_camp', '=', true],
+                'visible'           => ['is_clsh', '=', true]
             ],
 
             'employee_ratio' => [
