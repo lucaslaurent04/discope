@@ -1,5 +1,17 @@
 {
     "name": "Camps",
+    "operations": {
+        "total": {
+            "enrollments_qty": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "max_children": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            }
+        }
+    },
     "layout": {
         "items": [
             {
