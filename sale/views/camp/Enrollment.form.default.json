@@ -203,27 +203,27 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "present_day_1",
+                                                "value": "presence_day_1",
                                                 "width": "20%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "present_day_2",
+                                                "value": "presence_day_2",
                                                 "width": "20%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "present_day_3",
+                                                "value": "presence_day_3",
                                                 "width": "20%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "present_day_4",
+                                                "value": "presence_day_4",
                                                 "width": "20%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "present_day_5",
+                                                "value": "presence_day_5",
                                                 "width": "20%"
                                             }
                                         ]
