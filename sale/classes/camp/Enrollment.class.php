@@ -990,6 +990,7 @@ class Enrollment extends Model {
     }
 
     public static function doRefreshCampProductLine($self) {
+        file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', 'doRefreshCampProductLine'.PHP_EOL, FILE_APPEND | LOCK_EX);
         $self->read([
             'is_clsh',
             'clsh_type',
@@ -1082,7 +1083,10 @@ class Enrollment extends Model {
                 }
 
                 if(!is_null($camp_price)) {
-                    $camp_product_line = EnrollmentLine::search(['product_id', '=', $product['id']])
+                    $camp_product_line = EnrollmentLine::search([
+                        ['product_id', '=', $product['id']],
+                        ['enrollment_id', '=', $id]
+                    ])
                         ->read(['id'])
                         ->first();
 
@@ -1127,7 +1131,10 @@ class Enrollment extends Model {
                 }
 
                 if(!is_null($camp_price)) {
-                    $camp_product_line = EnrollmentLine::search(['product_id', '=', $enrollment['camp_id']['product_id']['id']])
+                    $camp_product_line = EnrollmentLine::search([
+                        ['product_id', '=', $enrollment['camp_id']['product_id']['id']],
+                        ['enrollment_id', '=', $id]
+                    ])
                         ->read(['id'])
                         ->first();
 
