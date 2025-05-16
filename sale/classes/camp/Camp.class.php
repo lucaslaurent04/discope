@@ -398,8 +398,31 @@ class Camp extends Model {
             }
         }
         if(isset($event['date_from'])) {
-            $date_from = date('Y-m-d', $event['date_from']);
-            $result['date_to'] = strtotime($date_from.' +5 days');
+            if($values['is_clsh']) {
+                $camp_duration = $values['clsh_type'] === '5-days' ? 4 : 3;
+                $date_from = date('Y-m-d', $event['date_from']);
+                $result['date_to'] = strtotime($date_from.' +'.$camp_duration.' days');
+            }
+            else {
+                $date_from = date('Y-m-d', $event['date_from']);
+                $result['date_to'] = strtotime($date_from.' +5 days');
+            }
+        }
+        if(isset($event['is_clsh'])) {
+            if($event['is_clsh']) {
+                $camp_duration = $values['clsh_type'] === '5-days' ? 4 : 3;
+                $date_from = date('Y-m-d', $values['date_from']);
+                $result['date_to'] = strtotime($date_from.' +'.$camp_duration.' days');
+            }
+            else {
+                $date_from = date('Y-m-d', $values['date_from']);
+                $result['date_to'] = strtotime($date_from.' +5 days');
+            }
+        }
+        if(isset($event['clsh_type'])) {
+            $camp_duration = $event['clsh_type'] === '5-days' ? 4 : 3;
+            $date_from = date('Y-m-d', $values['date_from']);
+            $result['date_to'] = strtotime($date_from.' +'.$camp_duration.' days');
         }
 
         return $result;
