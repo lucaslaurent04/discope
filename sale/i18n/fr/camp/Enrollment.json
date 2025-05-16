@@ -236,7 +236,12 @@
         },
         "camp_id": {
             "canceled_camp": "Inscription à un camp annulé impossible.",
-            "full": "Le camp est complet."
+            "full": "Le camp est complet.",
+            "day_1_full": "Le 1er jour du camp est complet.",
+            "day_2_full": "Le 2ème jour du camp est complet.",
+            "day_3_full": "Le 3ème jour du camp est complet.",
+            "day_4_full": "Le 4ème jour du camp est complet.",
+            "day_5_full": "Le 5ème jour du camp est complet."
         },
         "child_id": {
             "missing_institution": "Institution manquante.",

@@ -651,7 +651,10 @@ class Enrollment extends Model {
     }
 
     public static function canupdate($self, $values): array {
-        $self->read(['is_locked', 'status', 'child_id', 'camp_id']);
+        $self->read([
+            'is_locked', 'status', 'child_id', 'camp_id',
+            'present_day_1', 'present_day_2', 'present_day_3', 'present_day_4', 'present_day_5'
+        ]);
 
         // If is_locked cannot be modified
         foreach($self as $enrollment) {
@@ -675,25 +678,82 @@ class Enrollment extends Model {
             }
         }
 
-        // Check that camp is not already full and that child is not already enrolled
+        // Check that camp is not already full and that the child hasn't been enrolled yet
         if(isset($values['camp_id']) || (isset($values['status']) && in_array($values['status'], ['pending', 'confirmed']))) {
             foreach($self as $enrollment) {
                 $status = $values['status'] ?? $enrollment['status'];
 
-                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
-                    ->read(['max_children', 'enrollments_ids' => ['status']])
-                    ->first();
-
                 if(in_array($status, ['pending', 'confirmed'])) {
-                    $pending_confirmed_enrollments_qty = 0;
+                    $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
+                        ->read([
+                            'is_clsh',
+                            'clsh_type',
+                            'max_children',
+                            'enrollments_ids' => [
+                                'status',
+                                'present_day_1',
+                                'present_day_2',
+                                'present_day_3',
+                                'present_day_4',
+                                'present_day_5'
+                            ]
+                        ])
+                        ->first();
 
-                    foreach($camp['enrollments_ids'] as $en) {
-                        if(in_array($en['status'], ['pending', 'confirmed']) && $en['id'] !== $enrollment['id']) {
-                            $pending_confirmed_enrollments_qty++;
+                    if($camp['is_clsh']) {
+                        $days = $camp['clsh_type'] === '5-days' ? [1, 2, 3, 4, 5] : [1, 2, 3, 4];
+
+                        $present_days = [
+                            1 => $values['present_day_1'] ?? $enrollment['present_day_1'],
+                            2 => $values['present_day_2'] ?? $enrollment['present_day_2'],
+                            3 => $values['present_day_3'] ?? $enrollment['present_day_3'],
+                            4 => $values['present_day_4'] ?? $enrollment['present_day_4'],
+                            5 => $values['present_day_5'] ?? $enrollment['present_day_5']
+                        ];
+
+                        foreach($days as $day) {
+                            if(!$present_days[$day]) {
+                                continue;
+                            }
+
+                            $day_pending_confirmed_enrollments_qty = 0;
+
+                            foreach($camp['enrollments_ids'] as $en) {
+                                if($en['present_day_'.$day] && in_array($en['status'], ['pending', 'confirmed']) && $en['id'] !== $enrollment['id']) {
+                                    $day_pending_confirmed_enrollments_qty++;
+                                }
+                            }
+
+                            if($day_pending_confirmed_enrollments_qty >= $camp['max_children']) {
+                                if($day === 1){
+                                    return ['camp_id' => ['day_1_full' => "The 1st day of the camp is full."]];
+                                }
+                                elseif($day === 2){
+                                    return ['camp_id' => ['day_2_full' => "The 2nd day of the camp is full."]];
+                                }
+                                elseif($day === 3){
+                                    return ['camp_id' => ['day_3_full' => "The 3rd day of the camp is full."]];
+                                }
+                                elseif($day === 4){
+                                    return ['camp_id' => ['day_4_full' => "The 4th day of the camp is full."]];
+                                }
+                                else{
+                                    return ['camp_id' => ['day_5_full' => "The 5th day of the camp is full."]];
+                                }
+                            }
                         }
                     }
-                    if($pending_confirmed_enrollments_qty >= $camp['max_children']) {
-                        return ['camp_id' => ['full' => "The camp is full."]];
+                    else {
+                        $pending_confirmed_enrollments_qty = 0;
+
+                        foreach($camp['enrollments_ids'] as $en) {
+                            if(in_array($en['status'], ['pending', 'confirmed']) && $en['id'] !== $enrollment['id']) {
+                                $pending_confirmed_enrollments_qty++;
+                            }
+                        }
+                        if($pending_confirmed_enrollments_qty >= $camp['max_children']) {
+                            return ['camp_id' => ['full' => "The camp is full."]];
+                        }
                     }
                 }
             }
@@ -749,33 +809,24 @@ class Enrollment extends Model {
             }
         }
 
-        // Check prices aren't missing for a child's specific camp_class
+        // Check that the child has license ffe if needed
         if(isset($values['camp_id']) || isset($values['child_id'])) {
             foreach($self as $enrollment) {
                 $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
-                    ->read(['need_license_ffe', 'product_id' => ['prices_ids' => ['camp_class']]])
+                    ->read(['need_license_ffe'])
                     ->first();
 
                 $child = Child::id($values['child_id'] ?? $enrollment['child_id'])
-                    ->read(['has_license_ffe', 'camp_class'])
+                    ->read(['has_license_ffe'])
                     ->first();
 
                 if($camp['need_license_ffe'] && !$child['has_license_ffe']) {
                     return ['child_id' => ['need_license_ffe' => "The child need a FFE license to enroll to the camp."]];
                 }
-
-                $camp_class_price = null;
-                foreach($camp['product_id']['prices_ids'] as $price) {
-                    if($child['camp_class'] === $price['camp_class']) {
-                        $camp_class_price = $price;
-                    }
-                }
-
-                if(is_null($camp_class_price)) {
-                    return ['child_id' => ['camp_class_price_missing' => "The price for the child camp class is missing."]];
-                }
             }
         }
+
+        // TODO: Check prices aren't missing for a child's specific camp_class
 
         // Check that the child is not already enrolled to another camp at the same time
         if(isset($values['camp_id']) || isset($values['child_id'])) {
