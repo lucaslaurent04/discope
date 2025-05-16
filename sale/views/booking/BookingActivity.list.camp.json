@@ -11,12 +11,12 @@
         "items": [
             {
                 "type": "field",
-                "value": "name",
+                "value": "activity_date",
                 "width": "20%"
             },
             {
                 "type": "field",
-                "value": "activity_date",
+                "value": "name",
                 "width": "20%"
             },
             {
