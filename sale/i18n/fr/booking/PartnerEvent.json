@@ -27,6 +27,11 @@
             "label": "Créneau horaire",
             "description": "",
             "help": ""
+        },
+        "camp_group_id": {
+            "label": "Groupe camp",
+            "description": "",
+            "help": ""
         }
     },
     "view": {

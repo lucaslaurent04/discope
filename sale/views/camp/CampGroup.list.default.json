@@ -11,7 +11,21 @@
             },
             {
                 "type": "field",
+                "value": "employee_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
                 "value": "camp_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "activity_group_num",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true

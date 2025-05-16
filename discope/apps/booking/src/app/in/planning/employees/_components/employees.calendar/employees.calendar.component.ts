@@ -66,8 +66,10 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     @Input() rowsHeight: number;
     @Output() filters = new EventEmitter<ChangeReservationArg>();
     @Output() showBooking = new EventEmitter();
+    @Output() showCamp = new EventEmitter();
     @Output() showPartner = new EventEmitter();
     @Output() showPartnerEvent = new EventEmitter();
+    @Output() createPartnerEvent = new EventEmitter();
 
     @Output() openLegendDialog = new EventEmitter();
     @Output() openPrefDialog = new EventEmitter();
@@ -99,6 +101,9 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     private hoveredActivityTimeout: any = null;
 
     public hovered_partner: any;
+    private hoveredPartnerTimeout: any = null;
+    public hovered_activity_partner: any;
+
     public hovered_holidays: any;
 
     public hover_row_index = -1;
@@ -126,7 +131,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     private mousedownTimeout: any;
     private environment: any;
 
-    // duration history as hint for refreshing cell width
+    // duration history as a hint for refreshing cell width
     private previous_duration: number;
 
     public emptyEmployee = new Employee();
@@ -163,12 +168,13 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
         this.productModelCategories = [
             { id: 0, name: 'TOUTES' },
-            ...await this.api.collect(
-                'sale\\catalog\\Category',
-                [],
-                Object.getOwnPropertyNames(new ProductModelCategory()),
-                'name', 'asc', 0, 500
-            )
+            ...await this.api.fetch('?get=sale_booking_activity_collect-categories', {
+                fields: Object.getOwnPropertyNames(new ProductModelCategory()),
+                order: 'name',
+                sort: 'asc',
+                start: 0,
+                limit: 500
+            })
         ];
 
         this.productModels = await this.api.collect(
@@ -182,7 +188,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     /**
-     * After refreshing the view with new content, adapt header and relay new cell_width, if changed
+     * After refreshing the view with new content, adapt the header and relay new cell_width, if changed
      */
     public async ngAfterViewChecked() {
 
@@ -221,7 +227,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 this.loading = false;
                 this.cd.detectChanges();
 
-            }, 1000);
+            }, 100);
         }
     }
 
@@ -259,33 +265,49 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public getDescription(activity: any): string {
-        if(activity?.is_partner_event) {
-            return `<dt>${activity.name}</dt>` +
+        if(activity.booking_id) {
+            let group_details = `<dt>Groupe ${activity.group_num}`;
+            if(activity.age_range_assignments_ids.length === 1) {
+                const assign = activity.age_range_assignments_ids[0];
+                group_details += `, ${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</dt>`;
+            }
+            else if(activity.age_range_assignments_ids.length > 1) {
+                group_details += ':</dt>';
+                for(let assign of activity.age_range_assignments_ids) {
+                    group_details += `<dd>${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</dd>`;
+                }
+            }
+
+            return '<dl>' +
+                `<dt>${activity.customer_id.name}</dt>` +
+                (activity.partner_identity_id?.address_city ? `<dt>${activity.partner_identity_id?.address_city}</dt>` : '') +
+                group_details +
+                `<dt>Handicap : <b>${activity.booking_line_group_id.has_person_with_disability ? 'oui' : 'non'}</b></dt>` +
+                `<dt>Séjour du ${activity.booking_id.date_from} au ${activity.booking_id.date_to}</dt>` +
+                `<dt>${activity.booking_id.nb_pers} personnes</dt>` +
                 `<br />` +
-                (activity.description ? `<dt>${activity.description}</dt>` : '');
+                `<dt>${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
+                '</dl>';
         }
 
-        let group_details = `<dt>Groupe ${activity.group_num}`;
-        if(activity.age_range_assignments_ids.length === 1) {
-            const assign = activity.age_range_assignments_ids[0];
-            group_details += `, ${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</span></dt>`;
-        }
-        else if(activity.age_range_assignments_ids.length > 1) {
-            group_details += ':</dt>';
-            for(let assign of activity.age_range_assignments_ids) {
-                group_details += `<dd>${assign.qty} personne${assign.qty > 1 ? 's' : ''} (${assign.age_from} - ${assign.age_to})</dd>`;
-            }
+        if(activity.camp_id && !activity.is_partner_event) {
+            return '<dl>' +
+                `<dt>${activity.camp_id.short_name}</dt>` +
+                `<dt>Groupe ${activity.group_num}, ${activity.camp_id.enrollments_qty} personne${activity.camp_id.enrollments_qty > 1 ? 's' : ''} (${activity.camp_id.min_age} - ${activity.camp_id.max_age})</dt>` +
+                `<dt>Camp du ${activity.camp_id.date_from} au ${activity.camp_id.date_to}</dt>` +
+                `<br />` +
+                `<dt>${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
+                '</dl>';
         }
 
         return '<dl>' +
-            `<dt>${activity.customer_id.name}</dt>` +
-            (activity.partner_identity_id?.address_city ? `<dt>${activity.partner_identity_id?.address_city}</dt>` : '') +
-            group_details +
-            `<dt>Handicap : <b>${activity.booking_line_group_id.has_person_with_disability ? 'oui' : 'non'}</b></dt>` +
-            `<dt>Séjour du ${activity.booking_id.date_from} au ${activity.booking_id.date_to}</dt>` +
-            `<dt>${activity.booking_id.nb_pers} personnes</dt>` +
+            (activity.camp_id ? `<dt>${activity.camp_id.short_name}</dt>` : '') +
+            (activity.camp_id ? `<dt>Groupe ${activity.group_num}, ${activity.camp_id.enrollments_qty} personne${activity.camp_id.enrollments_qty > 1 ? 's' : ''} (${activity.camp_id.min_age} - ${activity.camp_id.max_age})</dt>` : '') +
+            (activity.camp_id ? `<dt>Camp du ${activity.camp_id.date_from} au ${activity.camp_id.date_to}</dt>` : '') +
+            (activity.camp_id ? `<br />` : '') +
+            `<dt>${activity.name}</dt>` +
             `<br />` +
-            `<dt>Activité ${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
+            (activity.description ? `<dt>${activity.description}</dt>` : '') +
             '</dl>';
     }
 
@@ -420,6 +442,20 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         element.style.setProperty('background-color', '');
     }
 
+    public ondoubleclickTableCell(day: Date, partner: any, timeSlotCode: 'AM'|'PM'|'EV') {
+        // remove timezone offset
+        const eventDate = new Date();
+        eventDate.setFullYear(day.getFullYear());
+        eventDate.setMonth(day.getMonth());
+        eventDate.setDate(day.getDate());
+
+        this.createPartnerEvent.emit({
+            eventDate,
+            partnerId: partner.id,
+            timeSlotCode
+        });
+    }
+
     public onhoverActivity(activity: any) {
         if(this.hoveredActivityTimeout === null && activity) {
             this.hovered_activity = activity;
@@ -449,13 +485,16 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         }, 500);
     }
 
-    public onSelectedBooking(event: any) {
+    public onSelectedActivity(activity: any) {
         clearTimeout(this.mousedownTimeout);
-        if(!event?.is_partner_event) {
-            this.showBooking.emit(event);
+        if(activity.is_partner_event) {
+            this.showPartnerEvent.emit(activity);
         }
-        else {
-            this.showPartnerEvent.emit(event);
+        else if(activity.booking_id) {
+            this.showBooking.emit(activity);
+        }
+        else if(activity.camp_id) {
+            this.showCamp.emit(activity);
         }
     }
 
@@ -465,7 +504,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public onhoverDay(employee: any, day:Date) {
-        this.hovered_partner = employee;
+        this.hovered_activity_partner = employee;
 
         if(day) {
             let date_index:string = this.calcDateIndex(day);
@@ -479,7 +518,19 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public onhoverPartner(employee: any) {
-        this.hovered_partner = employee;
+        if(this.hoveredPartnerTimeout === null && employee) {
+            this.hovered_partner = employee;
+            this.hovered_activity_partner = employee;
+        }
+        else {
+            clearTimeout(this.hoveredPartnerTimeout);
+            this.hoveredPartnerTimeout = setTimeout(() => {
+                this.hovered_partner = employee;
+                this.hovered_activity_partner = employee;
+                this.hoveredPartnerTimeout = null;
+                this.cd.detectChanges();
+            }, 100);
+        }
     }
 
     public preventDrag($event: any = null) {
@@ -649,9 +700,15 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return activity.id; // Assurez-vous que chaque activité a un ID unique
     }
 
-    public getProductModelName(productModelId: string) {
-        const productModel = this.productModels.find(p => p.id === +productModelId);
+    public createProductModelsNames(productModelsIds: number[]) {
+        const productModelsNames: string[] = [];
+        for(let productModelId of productModelsIds) {
+            const productModel = this.productModels.find(p => p.id === +productModelId);
+            if(productModel !== undefined && !productModelsNames.includes(productModel.name)) {
+                productModelsNames.push(productModel.name);
+            }
+        }
 
-        return productModel?.name ?? '';
+        return productModelsNames.sort();
     }
 }

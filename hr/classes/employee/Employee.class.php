@@ -79,13 +79,11 @@ class Employee extends \identity\Partner {
                 'domain'            => ['object_class', '=', 'hr\employee\Employee']
             ],
 
-            'camps_ids' => [
-                'type'              => 'many2many',
-                'foreign_object'    => 'sale\camp\Camp',
-                'foreign_field'     => 'employees_ids',
-                'rel_table'         => 'sale_hr_rel_camp_employee',
-                'rel_foreign_key'   => 'camp_id',
-                'rel_local_key'     => 'employee_id'
+            'camp_groups_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\camp\CampGroup',
+                'foreign_field'     => 'employee_id',
+                'description'       => "Camps groups the employee is responsible of."
             ]
 
         ];
