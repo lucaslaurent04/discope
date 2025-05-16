@@ -37,6 +37,18 @@ class Presence extends Model {
                 'foreign_object'    => 'sale\camp\Camp',
                 'description'       => "The camp the child is attending that day.",
                 'required'          => true
+            ],
+
+            'am_daycare' => [
+                'type'              => 'boolean',
+                'description'       => "Is the child being taken care of at the morning daycare?",
+                'default'           => false
+            ],
+
+            'pm_daycare' => [
+                'type'              => 'boolean',
+                'description'       => "Is the child being taken care of at the afternoon daycare?",
+                'default'           => false
             ]
 
         ];

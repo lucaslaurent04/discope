@@ -891,16 +891,34 @@ class Enrollment extends Model {
     }
 
     public static function doGeneratePresences($self) {
-        $self->read(['is_clsh', 'camp_id', 'child_id', 'date_from', 'date_to', 'present_day_1', 'present_day_2', 'present_day_3', 'present_day_4', 'present_day_5']);
+        $self->read([
+            'is_clsh', 'camp_id', 'child_id', 'date_from', 'date_to',
+            'present_day_1', 'present_day_2', 'present_day_3', 'present_day_4', 'present_day_5',
+            'daycare_day_1', 'daycare_day_2', 'daycare_day_3', 'daycare_day_4', 'daycare_day_5'
+        ]);
         foreach($self as $enrollment) {
             $day_index = 1;
             $date = $enrollment['date_from'];
             while($date <= $enrollment['date_to']) {
                 if(!$enrollment['is_clsh'] || $enrollment['present_day_'.$day_index]) {
+                    $am_daycare = false;
+                    $pm_daycare = false;
+                    if($enrollment['is_clsh']) {
+                        $daycare_day = $enrollment['daycare_day_'.$day_index];
+                        if($daycare_day === 'am' || $daycare_day === 'full') {
+                            $am_daycare = true;
+                        }
+                        if($daycare_day === 'pm' || $daycare_day === 'full') {
+                            $pm_daycare = true;
+                        }
+                    }
+
                     Presence::create([
                         'presence_date' => $date,
                         'camp_id'       => $enrollment['camp_id'],
-                        'child_id'      => $enrollment['child_id']
+                        'child_id'      => $enrollment['child_id'],
+                        'am_daycare'    => $am_daycare,
+                        'pm_daycare'    => $pm_daycare
                     ]);
                 }
 
