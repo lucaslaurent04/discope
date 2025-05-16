@@ -34,6 +34,46 @@
             },
             {
                 "type": "field",
+                "value": "presence_day_1",
+                "width": "15%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "presence_day_2",
+                "width": "15%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "presence_day_3",
+                "width": "15%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "presence_day_4",
+                "width": "15%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "presence_day_5",
+                "width": "15%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
                 "value": "price",
                 "width": "20%",
                 "sortable": false,
