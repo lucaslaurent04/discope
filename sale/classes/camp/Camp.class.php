@@ -82,7 +82,7 @@ class Camp extends Model {
             'product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
-                'description'       => 'The product targeted by the line.',
+                'description'       => "The product targeted by the line.",
                 'required'          => true,
                 'domain'            => ['is_camp', '=', true]
             ],
@@ -121,7 +121,7 @@ class Camp extends Model {
             'day_product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
-                'description'       => 'The product targeted by the line.',
+                'description'       => "The product targeted by the line.",
                 'domain'            => ['is_camp', '=', true],
                 'visible'           => ['is_clsh', '=', true]
             ],
@@ -378,10 +378,13 @@ class Camp extends Model {
                 ->read([
                     'name',
                     'camp_type',
+                    'is_clsh',
+                    'clsh_type',
                     'employee_ratio',
                     'need_license_ffe',
                     'ase_quota',
-                    'product_id' => ['id', 'name']
+                    'product_id'        => ['id', 'name'],
+                    'day_product_id'    => ['id', 'name']
                 ])
                 ->first(true);
 
@@ -391,6 +394,15 @@ class Camp extends Model {
                 $result['product_id'] = $camp_model['product_id'];
                 $result['need_license_ffe'] = $camp_model['need_license_ffe'];
                 $result['ase_quota'] = $camp_model['ase_quota'];
+                $result['is_clsh'] = $camp_model['is_clsh'];
+
+                if($camp_model['is_clsh']) {
+                    $result['clsh_type'] = $camp_model['clsh_type'];
+                    $result['day_product_id'] = $camp_model['day_product_id'];
+                }
+                else {
+                    $result['day_product_id'] = null;
+                }
 
                 if(empty($values['short_name'])) {
                     $result['short_name'] = $camp_model['name'];

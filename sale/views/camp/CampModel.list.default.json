@@ -26,7 +26,21 @@
             },
             {
                 "type": "field",
+                "value": "is_clsh",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
                 "value": "product_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "day_product_id",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
