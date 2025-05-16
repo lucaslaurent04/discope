@@ -50,6 +50,10 @@
             "label": "Inscriptions",
             "help": ""
         },
+        "sales.camp.presences" : {
+            "label": "Présences",
+            "help": ""
+        },
         "sales.camp.catalog" : {
             "label": "Catalogue",
             "help": ""
