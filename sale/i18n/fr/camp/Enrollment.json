@@ -52,23 +52,23 @@
                 "4-days": "4 jours"
             }
         },
-        "present_day_1": {
+        "presence_day_1": {
             "label": "Présent jour 1",
             "description": "Enfant présent le 1er jour du camp."
         },
-        "present_day_2": {
+        "presence_day_2": {
             "label": "Présent jour 2",
             "description": "Enfant présent le 2ème jour du camp."
         },
-        "present_day_3": {
+        "presence_day_3": {
             "label": "Présent jour 3",
             "description": "Enfant présent le 3ème jour du camp."
         },
-        "present_day_4": {
+        "presence_day_4": {
             "label": "Présent jour 4",
             "description": "Enfant présent le 4ème jour du camp."
         },
-        "present_day_5": {
+        "presence_day_5": {
             "label": "Présent jour 5",
             "description": "Enfant présent le 5ème jour du camp."
         },
