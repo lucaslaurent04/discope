@@ -103,7 +103,7 @@ class Enrollment extends Model {
                 'visible'           => ['is_clsh', '=', true]
             ],
 
-            'present_day_1' => [
+            'presence_day_1' => [
                 'type'              => 'boolean',
                 'description'       => "Will the child be present on the first day of the day of the camp.",
                 'default'           => false,
@@ -111,7 +111,7 @@ class Enrollment extends Model {
                 'onupdate'          => 'onupdatePresentDay'
             ],
 
-            'present_day_2' => [
+            'presence_day_2' => [
                 'type'              => 'boolean',
                 'description'       => "Will the child be present on the second day of the day of the camp.",
                 'default'           => false,
@@ -119,7 +119,7 @@ class Enrollment extends Model {
                 'onupdate'          => 'onupdatePresentDay'
             ],
 
-            'present_day_3' => [
+            'presence_day_3' => [
                 'type'              => 'boolean',
                 'description'       => "Will the child be present on the third day of the day of the camp.",
                 'default'           => false,
@@ -127,7 +127,7 @@ class Enrollment extends Model {
                 'onupdate'          => 'onupdatePresentDay'
             ],
 
-            'present_day_4' => [
+            'presence_day_4' => [
                 'type'              => 'boolean',
                 'description'       => "Will the child be present on the fourth day of the day of the camp.",
                 'default'           => false,
@@ -135,7 +135,7 @@ class Enrollment extends Model {
                 'onupdate'          => 'onupdatePresentDay'
             ],
 
-            'present_day_5' => [
+            'presence_day_5' => [
                 'type'              => 'boolean',
                 'description'       => "Will the child be present on the fifth day of the day of the camp.",
                 'default'           => false,
@@ -157,7 +157,7 @@ class Enrollment extends Model {
                 'default'           => 'none',
                 'visible'           => [
                     ['is_clsh', '=', true],
-                    ['present_day_1', '=', true]
+                    ['presence_day_1', '=', true]
                 ]
             ],
 
@@ -172,7 +172,7 @@ class Enrollment extends Model {
                 'default'           => 'none',
                 'visible'           => [
                     ['is_clsh', '=', true],
-                    ['present_day_2', '=', true]
+                    ['presence_day_2', '=', true]
                 ]
             ],
 
@@ -187,7 +187,7 @@ class Enrollment extends Model {
                 'default'           => 'none',
                 'visible'           => [
                     ['is_clsh', '=', true],
-                    ['present_day_3', '=', true]
+                    ['presence_day_3', '=', true]
                 ]
             ],
 
@@ -202,7 +202,7 @@ class Enrollment extends Model {
                 'default'           => 'none',
                 'visible'           => [
                     ['is_clsh', '=', true],
-                    ['present_day_4', '=', true]
+                    ['presence_day_4', '=', true]
                 ]
             ],
 
@@ -217,7 +217,7 @@ class Enrollment extends Model {
                 'default'           => 'none',
                 'visible'           => [
                     ['is_clsh', '=', true],
-                    ['present_day_5', '=', true]
+                    ['presence_day_5', '=', true]
                 ]
             ],
 
@@ -653,7 +653,7 @@ class Enrollment extends Model {
     public static function canupdate($self, $values): array {
         $self->read([
             'is_locked', 'status', 'child_id', 'camp_id',
-            'present_day_1', 'present_day_2', 'present_day_3', 'present_day_4', 'present_day_5'
+            'presence_day_1', 'presence_day_2', 'presence_day_3', 'presence_day_4', 'presence_day_5'
         ]);
 
         // If is_locked cannot be modified
@@ -682,11 +682,11 @@ class Enrollment extends Model {
         if(
             isset($values['camp_id'])
             || (isset($values['status']) && in_array($values['status'], ['pending', 'confirmed']))
-            || isset($values['present_day_1'])
-            || isset($values['present_day_2'])
-            || isset($values['present_day_3'])
-            || isset($values['present_day_4'])
-            || isset($values['present_day_5'])
+            || isset($values['presence_day_1'])
+            || isset($values['presence_day_2'])
+            || isset($values['presence_day_3'])
+            || isset($values['presence_day_4'])
+            || isset($values['presence_day_5'])
         ) {
             foreach($self as $enrollment) {
                 $status = $values['status'] ?? $enrollment['status'];
@@ -699,11 +699,11 @@ class Enrollment extends Model {
                             'max_children',
                             'enrollments_ids' => [
                                 'status',
-                                'present_day_1',
-                                'present_day_2',
-                                'present_day_3',
-                                'present_day_4',
-                                'present_day_5'
+                                'presence_day_1',
+                                'presence_day_2',
+                                'presence_day_3',
+                                'presence_day_4',
+                                'presence_day_5'
                             ]
                         ])
                         ->first();
@@ -712,11 +712,11 @@ class Enrollment extends Model {
                         $days = $camp['clsh_type'] === '5-days' ? [1, 2, 3, 4, 5] : [1, 2, 3, 4];
 
                         $present_days = [
-                            1 => $values['present_day_1'] ?? $enrollment['present_day_1'],
-                            2 => $values['present_day_2'] ?? $enrollment['present_day_2'],
-                            3 => $values['present_day_3'] ?? $enrollment['present_day_3'],
-                            4 => $values['present_day_4'] ?? $enrollment['present_day_4'],
-                            5 => $values['present_day_5'] ?? $enrollment['present_day_5']
+                            1 => $values['presence_day_1'] ?? $enrollment['presence_day_1'],
+                            2 => $values['presence_day_2'] ?? $enrollment['presence_day_2'],
+                            3 => $values['presence_day_3'] ?? $enrollment['presence_day_3'],
+                            4 => $values['presence_day_4'] ?? $enrollment['presence_day_4'],
+                            5 => $values['presence_day_5'] ?? $enrollment['presence_day_5']
                         ];
 
                         foreach($days as $day) {
@@ -878,19 +878,19 @@ class Enrollment extends Model {
         }
 
         // Check that if clsh the child needs to be present at least one day
-        if(isset($values['present_day_1']) || isset($values['present_day_2']) || isset($values['present_day_3']) || isset($values['present_day_4']) || isset($values['present_day_5'])) {
-            $self->read(['is_clsh', 'present_day_1', 'present_day_2', 'present_day_3', 'present_day_4', 'present_day_5']);
+        if(isset($values['presence_day_1']) || isset($values['presence_day_2']) || isset($values['presence_day_3']) || isset($values['presence_day_4']) || isset($values['presence_day_5'])) {
+            $self->read(['is_clsh', 'presence_day_1', 'presence_day_2', 'presence_day_3', 'presence_day_4', 'presence_day_5']);
             foreach($self as $enrollment) {
                 if(!$enrollment['is_clsh']) {
                     continue;
                 }
 
                 $present_days = [
-                    $values['present_day_1'] ?? $enrollment['present_day_1'],
-                    $values['present_day_2'] ?? $enrollment['present_day_2'],
-                    $values['present_day_3'] ?? $enrollment['present_day_3'],
-                    $values['present_day_4'] ?? $enrollment['present_day_4'],
-                    $values['present_day_5'] ?? $enrollment['present_day_5']
+                    $values['presence_day_1'] ?? $enrollment['presence_day_1'],
+                    $values['presence_day_2'] ?? $enrollment['presence_day_2'],
+                    $values['presence_day_3'] ?? $enrollment['presence_day_3'],
+                    $values['presence_day_4'] ?? $enrollment['presence_day_4'],
+                    $values['presence_day_5'] ?? $enrollment['presence_day_5']
                 ];
 
                 if(!in_array(true, $present_days)) {
@@ -951,7 +951,7 @@ class Enrollment extends Model {
     public static function doGeneratePresences($self) {
         $self->read([
             'is_clsh', 'camp_id', 'child_id', 'date_from', 'date_to',
-            'present_day_1', 'present_day_2', 'present_day_3', 'present_day_4', 'present_day_5',
+            'presence_day_1', 'presence_day_2', 'presence_day_3', 'presence_day_4', 'presence_day_5',
             'daycare_day_1', 'daycare_day_2', 'daycare_day_3', 'daycare_day_4', 'daycare_day_5'
         ]);
         foreach($self as $enrollment) {
@@ -1002,11 +1002,11 @@ class Enrollment extends Model {
         $self->read([
             'is_clsh',
             'clsh_type',
-            'present_day_1',
-            'present_day_2',
-            'present_day_3',
-            'present_day_4',
-            'present_day_5',
+            'presence_day_1',
+            'presence_day_2',
+            'presence_day_3',
+            'presence_day_4',
+            'presence_day_5',
             'family_quotient',
             'camp_class',
             'child_id',
@@ -1038,11 +1038,11 @@ class Enrollment extends Model {
 
             if($enrollment['is_clsh']) {
                 $present_days = [
-                    $enrollment['present_day_1'],
-                    $enrollment['present_day_2'],
-                    $enrollment['present_day_3'],
-                    $enrollment['present_day_4'],
-                    $enrollment['present_day_5']
+                    $enrollment['presence_day_1'],
+                    $enrollment['presence_day_2'],
+                    $enrollment['presence_day_3'],
+                    $enrollment['presence_day_4'],
+                    $enrollment['presence_day_5']
                 ];
 
                 $is_present_whole_camp = false;
