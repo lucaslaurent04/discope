@@ -69,7 +69,8 @@ class BankStatementLine extends Model {
                 'description'       => 'Amount that still needs to be assigned to payments.',
                 'help'              => 'This value is meant to be used in tests when payments are involved, to make sure the sum of payments never exceeds the amount of the line.',
                 'function'          => 'calcRemainingAmount',
-                'store'             => false
+                'store'             => false,
+                'instant'           => true
             ],
 
             'account_iban' => [
@@ -123,7 +124,7 @@ class BankStatementLine extends Model {
                     $sum += $payment['amount'];
                 }
                 $status = 'pending';
-                if($sum == $line['amount']) {
+                if(round($sum, 2) === round($line['amount'], 2)) {
                     $status = 'reconciled';
                 }
                 $om->update(self::getType(), $lid, ['status' => $status, 'remaining_amount' => null]);
