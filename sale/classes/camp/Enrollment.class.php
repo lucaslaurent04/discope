@@ -727,7 +727,7 @@ class Enrollment extends Model {
                             $day_pending_confirmed_enrollments_qty = 0;
 
                             foreach($camp['enrollments_ids'] as $en) {
-                                if($en['present_day_'.$day] && in_array($en['status'], ['pending', 'confirmed']) && $en['id'] !== $enrollment['id']) {
+                                if($en['presence_day_'.$day] && in_array($en['status'], ['pending', 'confirmed']) && $en['id'] !== $enrollment['id']) {
                                     $day_pending_confirmed_enrollments_qty++;
                                 }
                             }
@@ -958,7 +958,7 @@ class Enrollment extends Model {
             $day_index = 1;
             $date = $enrollment['date_from'];
             while($date <= $enrollment['date_to']) {
-                if(!$enrollment['is_clsh'] || $enrollment['present_day_'.$day_index]) {
+                if(!$enrollment['is_clsh'] || $enrollment['presence_day_'.$day_index]) {
                     $am_daycare = false;
                     $pm_daycare = false;
                     if($enrollment['is_clsh']) {
