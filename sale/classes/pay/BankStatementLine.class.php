@@ -69,7 +69,7 @@ class BankStatementLine extends Model {
                 'description'       => 'Amount that still needs to be assigned to payments.',
                 'help'              => 'This value is meant to be used in tests when payments are involved, to make sure the sum of payments never exceeds the amount of the line.',
                 'function'          => 'calcRemainingAmount',
-                'store'             => false,
+                'store'             => true,
                 'instant'           => true
             ],
 
