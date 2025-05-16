@@ -12,7 +12,8 @@
             {
                 "type": "field",
                 "value": "activity_date",
-                "width": "20%"
+                "width": "20%",
+                "visible": false
             },
             {
                 "type": "field",
