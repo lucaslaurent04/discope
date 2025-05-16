@@ -826,8 +826,6 @@ class Enrollment extends Model {
             }
         }
 
-        // TODO: Check prices aren't missing for a child's specific camp_class
-
         // Check that the child is not already enrolled to another camp at the same time
         if(isset($values['camp_id']) || isset($values['child_id'])) {
             foreach($self as $enrollment) {
