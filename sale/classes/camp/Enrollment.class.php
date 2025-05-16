@@ -679,7 +679,15 @@ class Enrollment extends Model {
         }
 
         // Check that camp is not already full and that the child hasn't been enrolled yet
-        if(isset($values['camp_id']) || (isset($values['status']) && in_array($values['status'], ['pending', 'confirmed']))) {
+        if(
+            isset($values['camp_id'])
+            || (isset($values['status']) && in_array($values['status'], ['pending', 'confirmed']))
+            || isset($values['present_day_1'])
+            || isset($values['present_day_2'])
+            || isset($values['present_day_3'])
+            || isset($values['present_day_4'])
+            || isset($values['present_day_5'])
+        ) {
             foreach($self as $enrollment) {
                 $status = $values['status'] ?? $enrollment['status'];
 
