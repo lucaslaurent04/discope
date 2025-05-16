@@ -2,7 +2,7 @@
     "name": "Presences",
     "description": "Child presences to camps.",
     "group_by": ["presence_date"],
-    "order": ["presence_date"],
+    "order": "presence_date",
     "layout": {
         "items": [
             {
