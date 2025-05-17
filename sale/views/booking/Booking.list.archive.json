@@ -28,8 +28,6 @@
                     "description": "overload form to use for booking creation"
                 }
             ]
-        },
-        "layout": {
         }
     },
     "layout": {
