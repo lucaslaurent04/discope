@@ -5,8 +5,26 @@
         "items": [
             {
                 "type": "field",
+                "value": "order",
+                "width": "10%",
+                "sortable": true
+            },
+            {
+                "type": "field",
                 "value": "name",
                 "width": "20%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "description",
+                "width": "20%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "excerpt",
+                "width": "30%",
                 "sortable": true
             },
             {
@@ -14,8 +32,8 @@
                 "label": "Template",
                 "value": "template_id",
                 "width": "20%",
-                "sortable": true                
-            }            
+                "sortable": true
+            }
         ]
     }
 }
