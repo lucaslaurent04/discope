@@ -148,6 +148,9 @@ BookingLineGroup::refreshPrice($orm, $group['id']);
 // #memo - new lines have been added, that could be rental units relating to a product model set as schedulable service with its own schedule
 BookingLineGroup::refreshTime($orm, $group['id']);
 
+// update meals
+BookingLineGroup::refreshMeals($orm, $group['id']);
+
 // recompute time (could be based on product associated with pack or based on product associated with lines)
 Booking::refreshTime($orm, $group['booking_id']['id']);
 
@@ -159,9 +162,6 @@ Booking::refreshPrice($orm, $group['booking_id']['id']);
 
 // #memo - if booking includes a price from an unpublished pricelist, it is marked as ToBeConfirmed (`is_price_tbc`)
 Booking::refreshIsTbc($orm, $group['booking_id']['id']);
-
-// update meals
-BookingLineGroup::refreshMeals($orm, $group['id']);
 
 // restore events in case this controller is chained with others
 $orm->enableEvents();
