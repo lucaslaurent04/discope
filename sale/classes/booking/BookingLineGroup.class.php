@@ -3225,6 +3225,7 @@ class BookingLineGroup extends Model {
 
         $lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], [
             'is_meal',
+            'is_snack',
             'time_slot_id',
             'qty_vars',
             'product_model_id.schedule_offset'
@@ -3233,7 +3234,7 @@ class BookingLineGroup extends Model {
             return;
         }
         foreach($lines as $line_id => $line) {
-            if(!$line['is_meal']) {
+            if(!$line['is_meal'] && !$line['is_snack']) {
                 continue;
             }
 
@@ -3255,12 +3256,8 @@ class BookingLineGroup extends Model {
                         'time_slot_id'          => $line['time_slot_id'],
                         'is_self_provided'      => $is_self_provided
                     ]);
-                    if($meal_id > 0) {
-                        $meals_ids = [$meal_id];
-                    }
+                    $om->update(BookingMeal::getType(), $meal_id, ['booking_lines_ids' => [$line_id]]);
                 }
-                // create a new relation
-                $om->update(BookingLine::getType(), $line_id, ['booking_meals_ids' => $meals_ids]);
             }
         }
     }
