@@ -107,19 +107,20 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
                 this.booking_id = <number> params['booking_id'];
 
                 try {
-                    // load booking object
-                    await this.load( Object.getOwnPropertyNames(new Booking()) );
-
                     // relay change to context (to display sidemenu panes according to current object)
                     this.context.change({
                         context_only: true,   // do not change the view
                         context: {
                             entity: 'sale\\booking\\Booking',
                             type: 'form',
+                            name: 'services',   // specific view with actions only (required for the Actions button)
                             purpose: 'view',
                             domain: ['id', '=', this.booking_id]
                         }
                     });
+
+                    // load booking object
+                    await this.load( Object.getOwnPropertyNames(new Booking()) );
                 }
                 catch(response) {
                     console.warn(response);
@@ -130,8 +131,11 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
         this.loadDisplaySettings();
     }
 
+    /**
+     * #memo - in cas new actions and routes are added to Booking form, remind to update form.services accordingly.
+     */
     private async refreshActionButton() {
-        let $button = await this.eq.getActionButton('sale\\booking\\Booking', 'form.default', ['id', '=', this.booking_id]);
+        let $button = await this.eq.getActionButton('sale\\booking\\Booking', 'form.services', ['id', '=', this.booking_id]);
         // remove previous button, if any
         for (let child of this.actionButtonContainer.nativeElement.children) {
             this.renderer.removeChild(this.actionButtonContainer.nativeElement, child);
