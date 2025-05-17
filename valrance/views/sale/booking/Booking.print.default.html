@@ -82,7 +82,7 @@ div.inner .wrapper table tr:last-child td {
     border-bottom: solid 1px black;
 }
 
-div.inner .intro {
+div.inner .heading {
     margin-top: 20px;
     margin-bottom: 40px;
 }
@@ -245,12 +245,13 @@ hr {
 </div>
 
 <div class="inner">
-    <div class="intro">
+    <div class="heading">
         {{ header_html | raw }}
     </div>
-    <div class="intro">
+    <div class="heading">
         {{ service_html | raw }}
     </div>
+    <hr />
     <div class="wrapper">
         <table width="100%" cellpadding="4" cellspacing="0">
             <thead style="border: solid 1px black; border-left: 0px; border-right: 0px;">
