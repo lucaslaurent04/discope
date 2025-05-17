@@ -544,7 +544,6 @@
                                                 "value": "contacts_ids",
                                                 "width": "100%",
                                                 "widget": {
-                                                    "view": "list.create",
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": [ {
