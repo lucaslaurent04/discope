@@ -1,6 +1,8 @@
 {
     "name": "Template Parts",
     "description": "This view is intented for displaying the list of template parts.",
+    "order": "order",
+    "sort": "asc",
     "layout": {
         "items": [
             {
