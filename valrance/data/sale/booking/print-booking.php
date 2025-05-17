@@ -348,6 +348,7 @@ $values = [
     'postal_address'             => sprintf("%s - %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
     'price'                      => $booking['price'],
     'agreement_html'             => '',
+    'signature_html'             => '',
     'footer_html'                => '',
     'header_html'                => '',
     'service_html'               => '',
@@ -590,8 +591,11 @@ if($booking['center_id']['template_category_id']) {
         }
         elseif($part['name'] == 'footer') {
             $values['has_footer'] = 1;
-            $values['footer_html'] = $part['value'] . $values['center_signature'];
+            $values['footer_html'] = $part['value'];
             $hasFooter = true;
+        }
+        elseif($part['name'] == 'signature') {
+            $values['signature_html'] = $part['value'] . $values['center_signature'] . $values['signature'];
         }
     }
 
