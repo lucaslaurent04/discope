@@ -65,7 +65,7 @@ class BookingMeal extends Model {
                 'default'           => 1
             ],
 
-            'meal_place' => [   
+            'meal_place' => [
                 'type'              => 'string',
                 'selection'         => [
                     'indoor',
