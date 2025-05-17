@@ -352,7 +352,7 @@ $values = [
     'footer_html'                => '',
     'header_html'                => '',
     'service_html'               => '',
-    'signature'                  => $booking['center_id']['organisation_id']['signature'] ?? '',
+    'stamp'                      => $booking['center_id']['organisation_id']['signature'] ?? '',
     'status'                     => $booking['status'],
     'tax_lines'                  => [],
     'total'                      => $booking['total'],
@@ -595,7 +595,7 @@ if($booking['center_id']['template_category_id']) {
             $hasFooter = true;
         }
         elseif($part['name'] == 'signature') {
-            $values['signature_html'] = $part['value'] . $values['center_signature'] . $values['signature'];
+            $values['signature_html'] = $part['value'] . $values['center_signature'];
         }
     }
 
