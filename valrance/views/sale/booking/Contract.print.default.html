@@ -82,7 +82,7 @@ div.inner .wrapper table tr:last-child td {
     border-bottom: solid 1px black;
 }
 
-div.inner .intro {
+div.inner .heading {
     margin-top: 20px;
 }
 
@@ -231,10 +231,10 @@ hr {
 </div>
 
 <div class="inner">
-    <div class="intro">
+    <div class="heading">
         {{ contract_header_html | raw }}
     </div>
-    <div class="intro">
+    <div class="heading">
         {{ contract_service_html | raw }}
         <ul>
             <li >{{ service_beds }}</li>
@@ -569,9 +569,8 @@ hr {
 {% endif %}
 
 <div class="page-break"></div>
-<div class="intro">{{ contract_notice_html | raw }}</div>
-
-<div class="intro">{{ contract_payment_html | raw }}</div>
+<div class="heading">{{ contract_notice_html | raw }}</div>
+<div class="heading">{{ contract_payment_html | raw }}</div>
 
 {% if installment_amount > 0 %}
 <div style="position: relative; margin-top: 40px; border: solid 2px black; height: 180px; page-break-inside: avoid;">
@@ -593,10 +592,10 @@ hr {
 </div>
 {% endif %}
 
-
-<div class="intro">{{ contract_cancellation_html | raw }}</div>
-
-<div class="page-break">
+<div class="page-break"></div>
+<div class="heading">{{ contract_withdrawal_html | raw }}</div>
+<div class="heading">{{ contract_cancellation_html | raw }}</div>
+<div class="heading">
     {{ contract_authorization_html|raw }}
 </div>
 
