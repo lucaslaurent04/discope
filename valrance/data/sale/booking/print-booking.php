@@ -21,6 +21,7 @@ use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use sale\booking\BookingLineGroupAgeRangeAssignment;
+use sale\booking\BookingMeal;
 
 list($params, $providers) = announce([
     'description'   => "Render a booking quote as a PDF document, given its id.",
@@ -484,8 +485,36 @@ if($booking['center_id']['template_category_id']) {
         if($part['name'] == 'header') {
             $value = $part['value'];
             $value = str_replace('{center}', $booking['center_id']['name'], $value);
-            $value = str_replace('{date_from}', $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']) , $value);
-            $value = str_replace('{date_to}',  $days_names[date('w', $booking['date_to'])] . ' '. date('d/m/Y', $booking['date_to']) , $value);
+
+            $date_from = $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']);
+            $date_to = $days_names[date('w', $booking['date_to'])] . ' '. date('d/m/Y', $booking['date_to']);
+            $lunch = false;
+            $snack = false;
+
+            $meals = BookingMeal::search([['booking_id', '=', $booking['id']], ['date', '=', $booking['date_from']]])->read(['time_slot_id' => ['code'], 'is_self_provided']);
+            foreach($meals as $meal_id => $meal) {
+                if($meal['time_slot_id']['code'] === 'L' && !$meal['is_self_provided']) {
+                    $lunch = true;
+                }
+                if($meal['time_slot_id']['code'] === 'PM' && !$meal['is_self_provided']) {
+                    $snack = true;
+                }
+            }
+
+            if($lunch) {
+                $date_from .= ' (avant le repas du midi)';
+            }
+            else {
+                if(!$snack) {
+                    $date_from .= ' (avec un pic-nic et un gouter amenés par vos soins)';
+                }
+                else {
+                    $date_from .= ' (avec un pic-nic apporté par vos soins)';
+                }
+            }
+
+            $value = str_replace('{date_from}', $date_from, $value);
+            $value = str_replace('{date_to}', $date_to, $value);
 
             $text_pers = $lodgingBookingPrintAgeRangesText($booking, $conection_names);
             $value = str_replace('{nb_pers}', $text_pers, $value);
