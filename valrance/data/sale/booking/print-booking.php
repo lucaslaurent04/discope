@@ -584,7 +584,7 @@ if($booking['center_id']['template_category_id']) {
             }
             $values['service_html'] = $value;
         }
-        elseif($part['name'] == 'agreement') {
+        elseif($part['name'] == 'agreement_notice') {
             $values['is_agreement_html'] = 1;
             $values['agreement_html'] = $part['value'];
         }
