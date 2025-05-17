@@ -23,16 +23,6 @@
                                                 "width": "50%"
                                             },
                                             {
-                                                "type": "label",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "is_direct_contact",
-                                                "width": "0%",
-                                                "visible": false
-                                            },
-                                            {
                                                 "type": "field",
                                                 "value": "name",
                                                 "width": "50%"
@@ -40,6 +30,11 @@
                                             {
                                                 "type": "field",
                                                 "value": "email",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "phone",
                                                 "width": "50%"
                                             },
                                             {
@@ -52,7 +47,7 @@
                                                     "=",
                                                     "I"
                                                 ],
-                                                "visible": ["is_direct_contact", "=", false]
+                                                "visible": false
                                             },
                                             {
                                                 "type": "field",
@@ -81,14 +76,14 @@
                                             {
                                                 "type": "field",
                                                 "value": "relationship",
-                                                "visible": false,
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "visible": false
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "partner_organisation_id",
-                                                "visible": false,
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "visible": false
                                             },
                                             {
                                                 "type": "label",
@@ -97,8 +92,8 @@
                                             {
                                                 "type": "field",
                                                 "value": "partner_position",
-                                                "visible": false,
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "visible": false
                                             }
                                         ]
                                     }
