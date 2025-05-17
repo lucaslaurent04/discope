@@ -28,21 +28,10 @@ class Contact extends \identity\Partner {
 
             'name' => [
                 'type'              => 'computed',
-                'function'          => 'calcName',
                 'result_type'       => 'string',
+                'relation'          => ['partner_identity_id' => 'name'],
                 'store'             => true,
-                'description'       => 'The display name of the partner (related organisation name).',
-                "visible"           => ["is_direct_contact", "=", true]
-            ],
-
-            'email' => [
-                'type'              => 'computed',
-                'function'          => 'calcEmail',
-                'result_type'       => 'string',
-                'usage'             => 'email',
-                'store'             => true,
-                'description'       => 'Email of the contact (from Identity).',
-                "visible"           => ["is_direct_contact", "=", true]
+                'description'       => 'The display name of the partner (related organisation name).'
             ],
 
             'owner_identity_id' => [
@@ -56,7 +45,8 @@ class Contact extends \identity\Partner {
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Identity',
                 'description'       => 'The targeted identity (the partner).',
-                'onupdate'          => 'identity\Partner::onupdatePartnerIdentityId'
+                'onupdate'          => 'onupdatePartnerIdentityId',
+                'dependents'        => ['name', 'title', 'email', 'phone', 'mobile']
             ],
 
             'booking_id' => [
@@ -110,28 +100,6 @@ class Contact extends \identity\Partner {
         }
         if(isset($event['is_direct_contact'])) {
             $result['partner_identity_id'] = null;
-        }
-        return $result;
-    }
-
-    public static function calcName($om, $oids, $lang) {
-        $result = [];
-        $contacts = $om->read(self::getType(), $oids, ['partner_identity_id.name'], $lang);
-        foreach($contacts as $oid => $contact) {
-            if(isset($contact['partner_identity_id.name'])) {
-                $result[$oid] = $contact['partner_identity_id.name'];
-            }
-        }
-        return $result;
-    }
-
-    public static function calcEmail($om, $oids, $lang) {
-        $result = [];
-        $contacts = $om->read(get_called_class(), $oids, ['partner_identity_id.email'], $lang);
-        foreach($contacts as $oid => $contact) {
-            if(isset($contact['partner_identity_id.email'])) {
-                $result[$oid] = $contact['partner_identity_id.email'];
-            }
         }
         return $result;
     }
