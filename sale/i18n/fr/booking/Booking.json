@@ -356,6 +356,111 @@
                 }
             }
         },
+        "form.services": {
+            "name": "Réservation",
+            "description": "Formulaire d'édition d'une réservation",
+            "actions": {
+                "action.quote": {
+                    "label": "Repasser en devis",
+                    "description": "Les unités locatives ne seront plus réservées et pourront être occupées pour d'autres réservation. Les services liées à la réservation pourront à nouveau être modifiés."
+                },
+                "action.option": {
+                    "label": "Placer une option",
+                    "description": "Les unités locatives seront réservées pendant une courte période. Aucun paiement ne sera demandé."
+                },
+                "action.option-confirm": {
+                    "label": "Confirmer",
+                    "description": "Les unités locatives seront réservées, un contrat sera créé et une facture proforma sera éditée."
+                },
+                "action.confirm": {
+                    "label": "Confirmer",
+                    "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré."
+                },
+                "action.checkin": {
+                    "label": "Check in",
+                    "description": "L'hôte occupe désormais l'hébergement: les unités locatives seront marquées comme occupées."
+                },
+                "action.checkout": {
+                    "label": "Checkout client",
+                    "description": "L'hôte quitte l'hébergement: les unités locatives seront marquées pour le nettoyage."
+                },
+                "action.invoice": {
+                    "label": "Facturer le solde",
+                    "description": "L'unité locative a été vérifiée et les services complémentaires ont été ajoutés. Une facture pro-forma sera créée. (Si une facture de solde proforma existe, elle sera réinitialisée.)"
+                },
+                "action.invoice_direct": {
+                    "label": "Facturer le solde",
+                    "description": "L'unité locative a été vérifiée et les services complémentaires ont été ajoutés. Une facture pro-forma sera créée. (Si une facture de solde proforma existe, elle sera réinitialisée.)"
+                },
+                "action.invoice-back": {
+                    "label": "Repasser en Terminée",
+                    "description": "Des adaptations sont encore nécessaire et la facture proforma devra être regénérée."
+                },
+                "action.cancel": {
+                    "label": "Annuler",
+                    "description": "La réservation sera annulée et les unités locatives seront libérées. Les éventuels frais d'annulation seront appliqués."
+                },
+                "action.import-contacts": {
+                    "label": "Importer les contacts",
+                    "description": "Les contacts du client sélectionné seront (ré)importés dans les contacts de la réservations."
+                },
+                "action.release-rentalunits": {
+                    "label": "Libérer les unités loc.",
+                    "description": "Ceci supprimera les consommations précédemment créés. Les éventuelles unités locatives bloquées seront libérées."
+                },
+                "action.reimbursed": {
+                    "label": "Marquer comme remboursé",
+                    "description": "La réservation sera cloturée et marquée comme balancée (le montant déjà payé par le client a été remboursé)."
+                },
+                "action.update-status": {
+                    "label": "Mettre à jour le statut",
+                    "description": "Le statut de la réservation sera adapté selon les statuts de ses financements."
+                },
+                "action.pay_instant": {
+                    "label": "Paiement rapide",
+                    "description": "La réservation sera marquée comme payée via un paiement par carte bancaire.\n\nATTENTION: Lorsqu'elle aboutit à la clôture de la réservation, cette action ne peut plus être annulée."
+                },
+                "action.invoice_instant": {
+                    "label": "Facture rapide",
+                    "description": "Une facture de solde sera émise et le financement correspondant sera généré. Lorsque les paiements ont déjà été reçus, cette action aboutit à la clôture de la réservation.\n\nATTENTION: En cas d'erreur, la facture ne pourra être annulée que via une note de crédit."
+                }
+            },
+            "routes": {
+                "item.booking.file": {
+                    "label": "Fiche de réservation"
+                },
+                "item.booking.edit": {
+                    "label": "Services réservés"
+                },
+                "item.booking.composition": {
+                    "label": "Composition"
+                },
+                "item.booking.composition_invite": {
+                    "label": "Invitation liste d'hôtes"
+                },
+                "item.booking.contract": {
+                    "label": "Envoyer le contrat"
+                },
+                "item.booking.quote": {
+                    "label": "Envoi du devis"
+                },
+                "item.booking.option": {
+                    "label": "Envoi devis d'option"
+                },
+                "item.booking.consumptions": {
+                    "label": "Consommations"
+                },
+                "item.booking.payments": {
+                    "label": "Paiements"
+                },
+                "item.booking.activities-planning": {
+                    "label": "Planning activités"
+                },
+                "item.booking.activities-program": {
+                    "label": "Voir le programme"
+                }
+            }
+        },
         "form.planning": {
             "name": "Réservation",
             "description": "Formulaire de visualisation d'une réservation via le Planning",

@@ -1,0 +1,305 @@
+{
+    "name": "Booking",
+    "description": "Basic view used by custom UI /booking/:id/services, holding only available actions & routes (should remain synced with form.default).",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "actions": [
+        {
+            "id": "action.quote",
+            "label": "Revert to Quote",
+            "description": "Rental units will no longer be reserved and will be available for other bookings.",
+            "controller": "sale_booking_do-quote",
+            "confirm": true,
+            "visible": [ ["status", "in", ["option", "confirmed", "validated"]], ["is_from_channelmanager", "=", false] ]
+        },
+        {
+            "id": "action.option",
+            "label": "Set as Option",
+            "description": "Rental units will be reserved but no funding will be claimed yet.",
+            "controller": "sale_booking_do-option",
+            "confirm": true,
+            "visible": ["status", "=", "quote"]
+        },
+        {
+            "id": "action.option-confirm",
+            "label": "Confirm Booking",
+            "description": "Rental units will be reserved and the invoicing plan will be set up.",
+            "controller": "sale_booking_do-option-confirm",
+            "confirm": true,
+            "visible": [["status", "=", "quote"], ["is_price_tbc", "=", false]]
+        },
+        {
+            "id": "action.confirm",
+            "label": "Confirm Booking",
+            "description": "Rental units will be reserved and the invoicing plan will be set up.",
+            "controller": "sale_booking_do-confirm",
+            "confirm": true,
+            "visible": [["status", "=", "option"], ["is_price_tbc", "=", false]]
+        },
+        {
+            "id": "action.checkin",
+            "label": "Check In",
+            "description": "The host has arrived: the rental units will be marked as occupied.",
+            "controller": "sale_booking_do-checkin",
+            "confirm": true,
+            "visible": ["status", "in", ["confirmed", "validated"]]
+        },
+        {
+            "id": "action.checkout",
+            "label": "Check Out",
+            "description": "The host is leaving: the rental units will be marked for cleaning.",
+            "controller": "sale_booking_do-checkout",
+            "confirm": true,
+            "visible": ["status", "in", ["checkedin"]]
+        },
+        {
+            "id": "action.invoice",
+            "label": "Invoice",
+            "description": "All additional consumptions have been added. A proforma invoice will be generated.",
+            "controller": "sale_booking_do-invoice",
+            "confirm": true,
+            "visible": [["status", "=", "checkedout"], ["is_from_channelmanager", "=", false] ]
+        },
+        {
+            "id": "action.invoice_direct",
+            "label": "Invoice",
+            "description": "Everything will be invoiced to the booking customer (no alternate payer). A proforma invoice will be generated.",
+            "controller": "sale_booking_do-invoice-direct",
+            "confirm": true,
+            "visible": [["status", "=", "checkedout"], ["is_from_channelmanager", "=", true] ]
+        },
+        {
+            "id": "action.invoice_instant",
+            "label": "Instant invoice",
+            "description": "This will complete the fundings with a manual payment (card) and fundings will be marked as paid.",
+            "controller": "sale_booking_do-invoice-instant",
+            "confirm": true,
+            "visible": [
+                [ ["status", "=", "checkedout"], ["is_from_channelmanager", "=", true] ],
+                [ ["status", "=", "checkedout"], ["nb_pers", "<=", 9] ]
+            ]
+        },
+        {
+            "id": "action.invoice-back",
+            "label": "Back to Check Out",
+            "description": "Adaptations are still required and the proforma invoice will have to be regenerated.",
+            "controller": "sale_booking_do-checkout",
+            "confirm": true,
+            "visible": [["is_invoiced", "=", false], ["status", "in", ["invoiced", "debit_balance", "credit_balance", "balanced"]]]
+        },
+        {
+            "id": "action.cancel",
+            "label": "Cancel",
+            "description": "The booking will be cancelled and rental units will be freed. Possible cancellation fee will be applied.",
+            "controller": "sale_booking_do-cancel",
+            "params": {
+                "id": "object.id"
+            },
+            "confirm": true,
+            "visible": [ ["status", "not in", ["invoiced", "debit_balance", "credit_balance", "balanced"]], ["is_from_channelmanager", "=", false] ]
+        },
+        {
+            "id": "action.release-rentalunits",
+            "label": "Release rental units",
+            "description": "Rental units will be released if they haven't been yet.",
+            "controller": "sale_booking_release-rentalunits",
+            "confirm": true,
+            "visible": ["status", "=", "quote"]
+        },
+        {
+            "id": "action.pay_instant",
+            "label": "Instant payment",
+            "description": "This will complete the fundings with a manual payment (card) and fundings will be marked as paid.",
+            "controller": "sale_booking_do-pay-instant",
+            "confirm": true,
+            "visible": [ ["status", "in", ["debit_balance", "credit_balance"]] ]
+        },
+        {
+            "id": "action.reimbursed",
+            "label": "Mark as reimbursed",
+            "description": "The booking will be closed and marked as balanced (the amount already paid by the customer has been reimbursed).",
+            "controller": "sale_booking_reimbursed",
+            "visible": ["status", "=", "credit_balance"]
+        },
+        {
+            "id": "action.update-status",
+            "label": "Update status",
+            "description": "The status of the booking will be adapted according to the status of its fundings.",
+            "controller": "sale_booking_update-status",
+            "visible": [ ["status", "in", ["invoiced", "debit_balance", "credit_balance"]] ]
+        },
+        {
+            "id": "action.import-contacts",
+            "label": "Import contacts",
+            "description": "The contacts from the selected customer will be (re) imported to the booking.",
+            "controller": "sale_booking_import-contacts",
+            "params": {
+                "id": "object.id"
+            },
+            "confirm": true
+        }
+    ],
+    "routes": [
+        {
+            "id": "item.booking.file",
+            "label": "Booking form",
+            "description": "",
+            "icon": "library_books",
+            "route": "/booking/object.id",
+            "context": {
+                "entity": "sale\\booking\\Booking",
+                "view": "form.default",
+                "domain": ["id", "=", "object.id"],
+                "reset": true
+            }
+        },
+        {
+            "id": "item.booking.edit",
+            "label": "Booked services",
+            "description": "",
+            "icon": "room_service",
+            "route": "/booking/object.id/services"
+        },
+        {
+            "id": "item.booking.activities-planning",
+            "label": "Activities planning",
+            "description": "",
+            "icon": "view_week",
+            "route": "/booking/object.id/activities-planning",
+            "visible": [true, "=", "env.sale.features.booking.activity_schedule_table"]
+        },
+        {
+            "id": "item.booking.activities-program",
+            "label": "Print Activities program",
+            "description": "",
+            "icon": "list_alt",
+            "route": "/?get=sale_booking_print-booking-activity&id=object.id",
+            "target": "_blank",
+            "absolute": true,
+            "visible": [true, "=", "env.sale.features.booking.activity"]
+        },
+        {
+            "id": "item.booking.composition",
+            "label": "Hosts details",
+            "description": "",
+            "icon": "view_list",
+            "route": "/booking/object.id/composition",
+            "visible": ["status", "not in", ["quote", "option"]]
+        },
+        {
+            "id": "item.booking.composition_invite",
+            "label": "Guests list invite",
+            "description": "",
+            "icon": "view_list",
+            "route": "/booking/object.id/composition/invite",
+            "visible": ["status", "in", ["confirmed", "validated"]]
+        },
+        {
+            "id": "item.booking.contract",
+            "label": "Send contract",
+            "description": "",
+            "icon": "drive_file_rename_outline",
+            "route": "/booking/object.id/contract",
+            "visible": [["has_contract", "=", true], ["status", "=", "confirmed"]]
+        },
+        {
+            "id": "item.booking.quote",
+            "label": "Send quote",
+            "description": "",
+            "icon": "drive_file_rename_outline",
+            "route": "/booking/object.id/quote",
+            "visible": ["status", "in", ["quote"]]
+        },
+        {
+            "id": "item.booking.option",
+            "label": "Send option",
+            "description": "",
+            "icon": "drive_file_rename_outline",
+            "route": "/booking/object.id/option",
+            "visible": ["status", "in", ["option"]]
+        },
+        {
+            "id": "item.booking.consumptions",
+            "label": "Consumptions",
+            "description": "",
+            "icon": "calendar_today",
+            "route": "/booking/object.id",
+            "context": {
+                "entity": "sale\\booking\\Consumption",
+                "view": "list.default",
+                "domain": ["booking_id", "=", "object.id"],
+                "target_entity": "sale\\booking\\Booking",
+                "target_view": "form.default"
+            },
+            "visible": ["status", "<>", "quote"]
+        }
+    ],
+    "layout": {
+        "groups": [
+            {
+                "sections": [
+                    {
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "center_office_id",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "organisation_id",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "customer_id",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_invoiced",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "paid_amount",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Reference",
+                                                "value": "status",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "status",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_contract",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "nb_pers",
+                                                "visible": false
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

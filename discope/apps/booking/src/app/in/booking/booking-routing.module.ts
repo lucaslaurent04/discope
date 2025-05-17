@@ -47,9 +47,10 @@ const routes: Routes = [
         path: 'contract/:contract_id',
         loadChildren: () => import(`./contract/contract.module`).then(m => m.AppInBookingContractModule)
     },
-    // wildcard route (accept root and any sub route that does not match any of the routes above)
+    // single booking (to be loaded only when URL points exactly to /booking/:booking_id without sub route)
     {
-        path: '**',
+        path: '',
+        pathMatch: 'full',
         component: BookingComponent
     }
 ];
