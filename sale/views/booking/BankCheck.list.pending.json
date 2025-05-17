@@ -17,9 +17,7 @@
                 }
             ]
         },
-        "actions": {},
-        "layout": {
-        }
+        "actions": {}
     },
     "domain" : ["status" , "=" , "pending"],
     "layout": {

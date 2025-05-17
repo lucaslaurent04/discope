@@ -17,8 +17,6 @@
         },
         "actions": {
             "ACTION.CREATE" : false
-        },
-        "layout": {
         }
     },
     "layout": {
