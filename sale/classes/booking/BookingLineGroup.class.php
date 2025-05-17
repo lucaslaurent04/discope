@@ -3247,17 +3247,20 @@ class BookingLineGroup extends Model {
                 $is_self_provided = $day_index < $from_day_index || $day_index > $to_day_index;
                 $day_index++;
 
-                $meals_ids = $om->search(BookingMeal::getType(), [['booking_line_group_id', '=', $id], ['time_slot_id', '=', $line['time_slot_id']], ['date', '=', $date]]);
-                if(!count($meals_ids)) {
-                    $meal_id = $om->create(BookingMeal::getType(), [
+                $values = [
                         'booking_id'            => $group['booking_id'],
                         'booking_line_group_id' => $id,
+                        'booking_lines_ids'     => [$line_id],
                         'date'                  => $date,
                         'time_slot_id'          => $line['time_slot_id'],
                         'is_self_provided'      => $is_self_provided
-                    ]);
-                    $om->update(BookingMeal::getType(), $meal_id, ['booking_lines_ids' => [$line_id]]);
+                    ];
+
+                $meals_ids = $om->search(BookingMeal::getType(), [['booking_line_group_id', '=', $id], ['time_slot_id', '=', $line['time_slot_id']], ['date', '=', $date]]);
+                if(!count($meals_ids)) {
+                    $meals_ids[] = $om->create(BookingMeal::getType());
                 }
+                $om->update(BookingMeal::getType(), $meals_ids, $values);
             }
         }
     }
