@@ -402,7 +402,7 @@ $values = [
     'contract_payment_html'       => '',
     'contract_withdrawal_html'    => '',
     'contract_cancellation_html'  => '',
-    'contract_misc_provisions'    => '',
+    'contract_misc_provisions_html'=> '',
     'customer_address1'           => $booking['customer_id']['partner_identity_id']['address_street'],
     'customer_address2'           => $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'].(($booking['customer_id']['partner_identity_id']['address_country'] != 'BE')?(' - '.$booking['customer_id']['partner_identity_id']['address_country']):''),
     'customer_address_dispatch'   => $booking['customer_id']['partner_identity_id']['address_dispatch'],
@@ -624,6 +624,9 @@ if($booking['center_id']['template_category_id']) {
         }
         elseif($part['name'] == 'contract_authorization') {
             $values['contract_authorization_html'] = $value;
+        }
+        elseif($part['name'] == 'contract_misc_provisions') {
+            $values['contract_misc_provisions_html'] = $value;
         }
     }
 }
