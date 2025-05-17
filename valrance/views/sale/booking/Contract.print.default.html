@@ -127,8 +127,8 @@ hr {
     border: 0;
 }
 .page-break {
-    /* #memo - avoid forcing page breaks since it might lead to (almost) empty pages */
-    /* page-break-before: always; */
+    /* #memo - keep in mind that forcing page breaks might lead to (almost) empty pages */
+    page-break-before: always;
 }
 </style>
 
@@ -245,7 +245,8 @@ hr {
             </ul>
         {% endif %}
     </div>
-    <div class="page-break">
+    <div class="page-break"></div>
+    <div>
         {{ contract_engage_html | raw }}
     </div>
     <div class="wrapper">
@@ -567,8 +568,9 @@ hr {
     {% endif %}
 {% endif %}
 
-
+<div class="page-break"></div>
 <div class="intro">{{ contract_notice_html | raw }}</div>
+
 <div class="intro">{{ contract_payment_html | raw }}</div>
 
 {% if installment_amount > 0 %}
