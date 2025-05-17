@@ -400,6 +400,7 @@ $values = [
     'contract_engage_html'        => '',
     'contract_notice_html'        => '',
     'contract_payment_html'       => '',
+    'contract_withdrawal_html'    => '',
     'contract_cancellation_html'  => '',
     'customer_address1'           => $booking['customer_id']['partner_identity_id']['address_street'],
     'customer_address2'           => $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'].(($booking['customer_id']['partner_identity_id']['address_country'] != 'BE')?(' - '.$booking['customer_id']['partner_identity_id']['address_country']):''),
