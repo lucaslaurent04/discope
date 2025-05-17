@@ -10,7 +10,7 @@ use sale\booking\Booking;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 
 // announce script and fetch parameters values
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'	=>	'Provide a fully loaded tree for a given booking.',
     'params' 		=>	[
         'id' => [
