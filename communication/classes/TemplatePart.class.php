@@ -59,16 +59,16 @@ class TemplatePart extends Model {
     public static function calcExcerpt($self) {
         $result = [];
         $self->read(['value']);
-        foreach($self as $id => $part) {
-            $suffix = '';
-            $excerpt = substr($part['value'], 0, 500);
 
-            if(strlen($excerpt) > 255) {
-                $suffix = '[...]';
-            }
-            $excerpt = substr(trim(strip_tags($excerpt)), 0, 255) . $suffix;
-            $result[$id] = $part['value'];
+        foreach ($self as $id => $part) {
+            $html = $part['value'];
+            $text = strip_tags($html);
+            $text = preg_replace('/\s+/u', ' ', $text);
+            $excerpt = mb_substr(trim($text), 0, 255);
+            $suffix = (mb_strlen($text) > 255) ? ' […]' : '';
+            $result[$id] = $excerpt . $suffix;
         }
+
         return $result;
     }
 
