@@ -8,7 +8,7 @@
 </div>
 <div class="booking-meals-container">
     <div class="booking-meal-container">
-        <div *ngIf="!group.is_locked && bookingMealDay?.B &&  bookingMealDay.B.booking_lines_ids.length === 0" class="booking-meal-remove">
+        <div *ngIf="!group.is_locked && bookingMealDay?.B && bookingMealDay.B.booking_lines_ids.length === 0" class="booking-meal-remove">
             <button mat-icon-button (click)="ondeleteMeal(bookingMealDay.B?.id)">
                 <mat-icon>clear</mat-icon>
             </button>
@@ -18,6 +18,28 @@
             [date]="bookingMealDay.date"
             [timeSlot]="mapTimeSlotsCode['B']"
             [mealTypes]="mealTypes"
+            [mealPlaces]="mealPlaces"
+            [group]="group"
+            [booking]="booking"
+            (loadStart)="loadStart.emit()"
+            (loadEnd)="loadEnd.emit()"
+            (updated)="updated.emit()"
+        ></booking-services-booking-group-day-meals-meal>
+    </div>
+
+    <!-- morning - for snacks -->
+    <div class="booking-meal-container" *ngIf="mealsShowSnack">
+        <div *ngIf="!group.is_locked && bookingMealDay?.AM && bookingMealDay.AM.booking_lines_ids.length === 0" class="booking-meal-remove">
+            <button mat-icon-button (click)="ondeleteMeal(bookingMealDay.AM?.id)">
+                <mat-icon>clear</mat-icon>
+            </button>
+        </div>
+        <booking-services-booking-group-day-meals-meal
+            [meal]="bookingMealDay.AM"
+            [date]="bookingMealDay.date"
+            [timeSlot]="mapTimeSlotsCode['AM']"
+            [mealTypes]="mealTypes"
+            [mealPlaces]="mealPlaces"
             [group]="group"
             [booking]="booking"
             (loadStart)="loadStart.emit()"
@@ -27,7 +49,7 @@
     </div>
 
     <div class="booking-meal-container">
-        <div *ngIf="!group.is_locked && bookingMealDay?.L &&  bookingMealDay.L.booking_lines_ids.length === 0" class="booking-meal-remove">
+        <div *ngIf="!group.is_locked && bookingMealDay?.L && bookingMealDay.L.booking_lines_ids.length === 0" class="booking-meal-remove">
             <button mat-icon-button (click)="ondeleteMeal(bookingMealDay.L?.id)">
                 <mat-icon>clear</mat-icon>
             </button>
@@ -37,6 +59,28 @@
             [date]="bookingMealDay.date"
             [timeSlot]="mapTimeSlotsCode['L']"
             [mealTypes]="mealTypes"
+            [mealPlaces]="mealPlaces"
+            [group]="group"
+            [booking]="booking"
+            (loadStart)="loadStart.emit()"
+            (loadEnd)="loadEnd.emit()"
+            (updated)="updated.emit()"
+        ></booking-services-booking-group-day-meals-meal>
+    </div>
+
+    <!-- afternoon - for snacks -->
+    <div class="booking-meal-container" *ngIf="mealsShowSnack">
+        <div *ngIf="!group.is_locked && bookingMealDay?.PM && bookingMealDay.PM.booking_lines_ids.length === 0" class="booking-meal-remove">
+            <button mat-icon-button (click)="ondeleteMeal(bookingMealDay.PM?.id)">
+                <mat-icon>clear</mat-icon>
+            </button>
+        </div>
+        <booking-services-booking-group-day-meals-meal
+            [meal]="bookingMealDay.PM"
+            [date]="bookingMealDay.date"
+            [timeSlot]="mapTimeSlotsCode['PM']"
+            [mealTypes]="mealTypes"
+            [mealPlaces]="mealPlaces"
             [group]="group"
             [booking]="booking"
             (loadStart)="loadStart.emit()"
@@ -46,7 +90,7 @@
     </div>
 
     <div class="booking-meal-container">
-        <div *ngIf="!group.is_locked && bookingMealDay?.D &&  bookingMealDay.D.booking_lines_ids.length === 0" class="booking-meal-remove">
+        <div *ngIf="!group.is_locked && bookingMealDay?.D && bookingMealDay.D.booking_lines_ids.length === 0" class="booking-meal-remove">
             <button mat-icon-button (click)="ondeleteMeal(bookingMealDay.D?.id)">
                 <mat-icon>clear</mat-icon>
             </button>
@@ -56,6 +100,7 @@
             [date]="bookingMealDay.date"
             [timeSlot]="mapTimeSlotsCode['D']"
             [mealTypes]="mealTypes"
+            [mealPlaces]="mealPlaces"
             [group]="group"
             [booking]="booking"
             (loadStart)="loadStart.emit()"

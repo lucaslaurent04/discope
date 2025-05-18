@@ -32,6 +32,7 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
     @Input() date: Date;
     @Input() timeSlot: any;
     @Input() mealTypes: { id: number, name: string, code: string }[];
+    @Input() mealPlaces: { id: number, name: string, code: string }[];
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
     @Input() opened: boolean = false;
@@ -47,16 +48,12 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
     public vm: vmModel;
 
     public mapTimeSlotCodeName: any = {
-        'B': 'Petit déjeuner',
-        'L': 'Déjeuner',
-        'D': 'Diner',
+        'B':  'Petit déjeuner',
+        'AM': 'Collation matin',
+        'L':  'Déjeuner',
+        'PM': 'Collation aprèm',
+        'D':  'Diner',
     };
-
-    public mealPlaces: { name: string, code: string }[] = [
-        { name: "Intérieur", code: "indoor" },
-        { name: "Extérieur", code: "outdoor" },
-        { name: "BBQ", code: "bbq_place" }
-    ];
 
     constructor(
         private api: ApiService,

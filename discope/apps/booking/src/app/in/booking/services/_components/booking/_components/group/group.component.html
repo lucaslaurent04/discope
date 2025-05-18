@@ -627,9 +627,15 @@
 
             <div class="part-container" [class.highlight]="!vGroup.booking_meals.folded">
                 <div class="row">
-                    <div class="row-booking-meals-title">
+                    <div class="row-booking-meals-title" style="flex: 0 1 150px;">
                         Repas ({{providedMealsQty}})
                     </div>
+                    <mat-slide-toggle
+                            [(ngModel)]="mealsShowSnack"
+                            style="margin-left: 20px; transform: scale(0.8);">
+                        {{ mealsShowSnack ? 'Masquer les collations' : 'Montrer les collations' }}
+                    </mat-slide-toggle>
+
                 </div>
                 <div class="row" [class.hidden]="vGroup.booking_meals.folded">
                     <div style="width: 100%;">
@@ -643,7 +649,7 @@
                                 <div class="meal-wrapper">
                                     <div class="booking-meals-cell">Type</div>
                                     <div class="booking-meals-cell">Lieu</div>
-                                    <div class="booking-meals-cell">Non fournis</div>
+                                    <div class="booking-meals-cell">Non fourni</div>
                                     <!-- actions -->
                                     <div class="booking-meals-cell"></div>
                                 </div>
@@ -659,6 +665,8 @@
                                     [group]="instance"
                                     [timeSlots]="timeSlots"
                                     [mealTypes]="mealTypes"
+                                    [mealPlaces]="mealPlaces"
+                                    [mealsShowSnack]="mealsShowSnack"
                                     (loadStart)="loadStart.emit()"
                                     (loadEnd)="loadEnd.emit()"
                                     (updated)="onupdateMeal()"

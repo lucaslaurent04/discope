@@ -7,7 +7,9 @@ import { ApiService } from 'sb-shared-lib';
 export interface BookingMealDay {
     date: Date,
     B: BookingMeal | null,
+    AM: BookingMeal | null,
     L: BookingMeal | null,
+    PM: BookingMeal | null,
     D: BookingMeal | null,
 }
 
@@ -23,6 +25,8 @@ export class BookingServicesBookingGroupDayMealsComponent implements OnInit {
     @Input() booking: Booking;
     @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
     @Input() mealTypes: { id: number, name: string, code: string }[];
+    @Input() mealPlaces: { id: number, name: string, code: string }[] = [];
+    @Input() mealsShowSnack: boolean;
 
     @Output() loadStart = new EventEmitter();
     @Output() loadEnd = new EventEmitter();
