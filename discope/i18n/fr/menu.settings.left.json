@@ -270,6 +270,10 @@
             "label": "Types de repas",
             "help": ""
         },
+        "sales.catalog.meal_places": {
+            "label": "Lieux des repas",
+            "help": ""
+        },
         "sales.catalog.groupingCode": {
             "label": "Regroupement",
             "help": ""

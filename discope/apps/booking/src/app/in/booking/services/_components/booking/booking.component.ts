@@ -56,10 +56,13 @@ export class BookingServicesBookingComponent
 
     public ready: boolean = false;
     public loading: boolean = true;
+    private loadingStartTime: number;
+
     public maximized_group_id: number = 0;
     public time_slots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[] = [];
     public sojourn_types: { id: number, name: 'GA'|'GG' }[] = [];
     public meal_types: { id: number, name: string, code: string }[] = [];
+    public meal_places: { id: number, name: string, code: string }[] = [];
     public mapGroupsIdsBookingActivitiesDays: {[key: number]: BookingActivityDay[]} = {};
     public mapGroupsIdsBookingMealsDays: {[key: number]: BookingMealDay[]} = {};
     public mapGroupsIdsHasActivity: {[key: number]: boolean};
@@ -96,6 +99,7 @@ export class BookingServicesBookingComponent
         this.time_slots = await this.api.collect('sale\\booking\\TimeSlot', [], ['id', 'name', 'code']);
         this.sojourn_types = await this.api.collect('sale\\booking\\SojournType', [], ['id', 'name']);
         this.meal_types = await this.api.collect('sale\\booking\\MealType', [], ['id', 'name', 'code']);
+        this.meal_places = await this.api.collect('sale\\booking\\MealPlace', [], ['id', 'name', 'code']);
     }
 
     /**
@@ -116,7 +120,6 @@ export class BookingServicesBookingComponent
                     this.initMapGroupsIdsHasActivity(result);
                     this.loading = false;
                 }
-
             })
             .catch(response => {
                 console.warn(response);
@@ -234,12 +237,28 @@ export class BookingServicesBookingComponent
         }
     }
 
+    /**
+     * handle loading from sub components
+     */
     public onLoadStartGroup() {
         this.loading = true;
+        this.loadingStartTime = Date.now();
     }
 
+    /**
+     * enact loading end from sub components while forcing a minimum duration
+     */
     public onLoadEndGroup() {
-        this.loading = false;
+        const elapsed = Date.now() - this.loadingStartTime;
+        const minDuration = 250;
+        const remaining = minDuration - elapsed;
+
+        if (remaining > 0) {
+            setTimeout(() => this.loading = false, remaining);
+        }
+        else {
+            this.loading = false;
+        }
     }
 
     private initMapGroupsIdsBookingActivitiesDays(booking: Booking) {
@@ -316,7 +335,9 @@ export class BookingServicesBookingComponent
             const bookingMealDay: BookingMealDay = {
                 date: new Date(date),
                 B: null,
+                AM: null,
                 L: null,
+                PM: null,
                 D: null
             };
 
@@ -327,11 +348,11 @@ export class BookingServicesBookingComponent
                 }
 
                 const timeSlot = this.time_slots.find((timeSlot: any) => timeSlot.id === bookingMeal.time_slot_id);
-                if(!timeSlot || !['B', 'L', 'D'].includes(timeSlot.code)) {
+                if(!timeSlot || !['B', 'AM', 'L', 'PM', 'D'].includes(timeSlot.code)) {
                     continue;
                 }
 
-                bookingMealDay[timeSlot.code as 'B'|'L'|'D'] = bookingMeal;
+                bookingMealDay[timeSlot.code as 'B'|'AM'|'L'|'PM'|'D'] = bookingMeal;
             }
 
             bookingMealsDays.push(bookingMealDay);

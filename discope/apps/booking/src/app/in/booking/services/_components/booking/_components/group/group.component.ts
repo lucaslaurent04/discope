@@ -100,6 +100,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
     @Input() sojournTypes: { id: number, name: 'GA'|'GG' }[] = [];
     @Input() mealTypes: { id: number, name: string, code: string }[] = [];
+    @Input() mealPlaces: { id: number, name: string, code: string }[] = [];
     @Input() bookingActivitiesDays: BookingActivityDay[];
     @Input() bookingMealsDays: BookingMealDay[];
     @Input() displaySettings: BookedServicesDisplaySettings;
@@ -112,13 +113,14 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
 
     public user: UserClass = null;
 
-    public folded:boolean = true;
-    public groupSummaryOpen:boolean = false;
-    public groupTypeOpen:boolean = false;
+    public folded: boolean = true;
+    public groupSummaryOpen: boolean = false;
+    public groupTypeOpen: boolean = false;
     public groupNbPersOpen: boolean = false;
     public groupDatesOpen: boolean = false;
     public openedActivityIds: number[] = [];
     public providedMealsQty: number = 0;
+    public mealsShowSnack: boolean = false;
 
     public action_in_progress: boolean = false;
 

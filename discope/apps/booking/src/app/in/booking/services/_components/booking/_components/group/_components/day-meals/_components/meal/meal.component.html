@@ -15,7 +15,9 @@
             <div class="cell">
                 <mat-form-field>
                     <mat-label>Type</mat-label>
-                    <mat-select [formControl]="vm.meal_type_id.formControl" (selectionChange)="vm.meal_type_id.change()">
+                    <mat-select [formControl]="vm.meal_type_id.formControl"
+                            [disabled]="timeSlot?.code === 'AM' || timeSlot?.code === 'PM'"
+                            (selectionChange)="vm.meal_type_id.change()">
                         <mat-option *ngFor="let mealType of mealTypes" [value]="mealType.id">
                             {{ mealType.name }}
                         </mat-option>
@@ -33,11 +35,12 @@
                 </mat-form-field>
             </div>
             <div class="cell cell-self-provided">
-                <mat-slide-toggle [formControl]="vm.is_self_provided.formControl"
-                                  (change)="vm.is_self_provided.change()"
-                                  style="margin-left: 20px; transform: scale(0.8);"
-                >
-                    Non fournis
+                <mat-slide-toggle
+                        [formControl]="vm.is_self_provided.formControl"
+                        [disabled]="meal?.booking_lines_ids?.length !== 0"
+                        (change)="vm.is_self_provided.change()"
+                        style="margin-left: 20px; transform: scale(0.8);">
+                    {{ vm.is_self_provided.formControl.value ? 'Non fourni' : 'Inclu' }}
                 </mat-slide-toggle>
             </div>
             <!-- actions (empty: set in parent component) -->
