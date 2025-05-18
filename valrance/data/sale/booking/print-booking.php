@@ -20,10 +20,9 @@ use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
-use sale\booking\BookingLineGroupAgeRangeAssignment;
 use sale\booking\BookingMeal;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Render a booking quote as a PDF document, given its id.",
     'params'        => [
         'id' => [
@@ -494,7 +493,9 @@ if($booking['center_id']['template_category_id']) {
             $lunch = false;
             $snack = false;
 
-            $meals = BookingMeal::search([['booking_id', '=', $booking['id']], ['date', '=', $booking['date_from']]])->read(['time_slot_id' => ['code'], 'is_self_provided', 'meal_place']);
+            $meals = BookingMeal::search([['booking_id', '=', $booking['id']], ['date', '=', $booking['date_from']]])
+                ->read(['time_slot_id' => ['code'], 'is_self_provided']);
+
             foreach($meals as $meal_id => $meal) {
                 if($meal['time_slot_id']['code'] === 'L' && !$meal['is_self_provided']) {
                     $lunch = true;
@@ -524,15 +525,17 @@ if($booking['center_id']['template_category_id']) {
             $lunch_onsite = false;
             $snack_onsite = false;
 
-            $meals = BookingMeal::search([['booking_id', '=', $booking['id']], ['date', '=', $booking['date_to']]])->read(['time_slot_id' => ['code'], 'is_self_provided', 'meal_place']);
+            $meals = BookingMeal::search([['booking_id', '=', $booking['id']], ['date', '=', $booking['date_to']]])
+                ->read(['time_slot_id' => ['code'], 'is_self_provided', 'meal_place_id' => ['place_type']]);
+
             foreach($meals as $meal_id => $meal) {
                 if($meal['time_slot_id']['code'] === 'L' && !$meal['is_self_provided']) {
                     $lunch = true;
-                    $lunch_onsite = ($meal['meal_place'] === 'indoor');
+                    $lunch_onsite = ($meal['meal_place_id']['place_type'] === 'onsite');
                 }
                 if($meal['time_slot_id']['code'] === 'PM' && !$meal['is_self_provided']) {
                     $snack = true;
-                    $snack_onsite = ($meal['meal_place'] === 'indoor');
+                    $snack_onsite = ($meal['meal_place_id']['place_type'] === 'onsite');
                 }
             }
 

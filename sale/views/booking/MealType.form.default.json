@@ -28,8 +28,8 @@
                                         "width": "50%",
                                         "items": [
                                             {
-                                                "type": "field",
-                                                "value": "name",
+                                                "type": "label",
+                                                "value": "",
                                                 "width": "60%"
                                             },
                                             {

@@ -15,7 +15,7 @@ interface vmModel {
         formControl: FormControl,
         change: () => void
     },
-    meal_place: {
+    meal_place_id: {
         formControl: FormControl,
         change: () => void
     }
@@ -31,7 +31,7 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
     @Input() meal: BookingMeal | null;
     @Input() date: Date;
     @Input() timeSlot: any;
-    @Input() mealTypes: { id: number, name: string, code: string }[];
+    @Input() mealTypes:  { id: number, name: string, code: string }[];
     @Input() mealPlaces: { id: number, name: string, code: string }[];
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
@@ -68,9 +68,9 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
                 formControl: new FormControl(1),
                 change: () => this.mealTypeIdChange()
             },
-            meal_place: {
-                formControl: new FormControl('indoor'),
-                change: () => this.mealPlaceChange()
+            meal_place_id: {
+                formControl: new FormControl(1),
+                change: () => this.mealPlaceIdChange()
             }
         };
     }
@@ -85,7 +85,7 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
 
             this.vm.is_self_provided.formControl.setValue(this.meal.is_self_provided);
             this.vm.meal_type_id.formControl.setValue(this.meal.meal_type_id);
-            this.vm.meal_place.formControl.setValue(this.meal.meal_place);
+            this.vm.meal_place_id.formControl.setValue(this.meal.meal_place_id);
         }
     }
 
@@ -129,8 +129,8 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
         this.loadEnd.emit();
     }
 
-    private async mealPlaceChange() {
-        if(!this.meal?.meal_place || this.meal.meal_place == this.vm.meal_place.formControl.value) {
+    private async mealPlaceIdChange() {
+        if(!this.meal?.meal_place_id || this.meal.meal_place_id == this.vm.meal_place_id.formControl.value) {
             return;
         }
 
@@ -138,7 +138,7 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
 
         // notify back-end about the change
         try {
-            await this.api.update('sale\\booking\\BookingMeal', [this.meal.id], {meal_place: this.vm.meal_place.formControl.value});
+            await this.api.update('sale\\booking\\BookingMeal', [this.meal.id], {meal_place_id: this.vm.meal_place_id.formControl.value});
             // relay change to parent component
             this.updated.emit();
         }

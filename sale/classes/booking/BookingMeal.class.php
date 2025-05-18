@@ -65,15 +65,11 @@ class BookingMeal extends Model {
                 'default'           => 1
             ],
 
-            'meal_place' => [
-                'type'              => 'string',
-                'selection'         => [
-                    'indoor',
-                    'outdoor',
-                    'bbq_place'
-                ],
+            'meal_place_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\booking\MealPlace',
                 'description'       => 'Place where the meal is served.',
-                'default'           => 'indoor'
+                'default'           => 1
             ]
 
         ];
