@@ -5,6 +5,7 @@ Setting::assert_value('sale', 'features', 'booking.channel_manager', false);
 Setting::assert_value('sale', 'features', 'booking.activity', false);
 Setting::assert_value('sale', 'features', 'booking.activity_schedule_table', false);
 Setting::assert_value('sale', 'features', 'booking.meal', false);
+Setting::assert_value('sale', 'features', 'booking.meal_preferences', false);
 Setting::assert_value('sale', 'features', 'booking.checkin.default', 14*3600);
 Setting::assert_value('sale', 'features', 'booking.checkout.default', 10*3600);
 Setting::assert_value('sale', 'features', 'booking.employee_planning', false);
@@ -33,6 +34,7 @@ Setting::assert_value('sale', 'features', 'ui.booking.products_folded', true);
 Setting::assert_value('sale', 'features', 'ui.booking.activities_folded', true);
 Setting::assert_value('sale', 'features', 'ui.booking.accommodations_folded', true);
 Setting::assert_value('sale', 'features', 'ui.booking.meals_folded', true);
+Setting::assert_value('sale', 'features', 'ui.booking.meal_preferences_folded', true);
 Setting::assert_value('sale', 'features', 'templates.quote.consumption_table', true);
 Setting::assert_value('sale', 'features', 'templates.quote.activities', false);
 Setting::assert_value('sale', 'features', 'payment.remind.active.1', 1);                                // Rappel de paiement actif
