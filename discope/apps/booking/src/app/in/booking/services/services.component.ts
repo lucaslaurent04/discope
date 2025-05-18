@@ -18,11 +18,12 @@ export interface BookedServicesDisplaySettings {
     identification_folded: boolean;
     products_folded: boolean;
     activities_folded: boolean;
-    booking_meals_folded: boolean;
-    accommodations_folded: boolean;
     meals_folded: boolean;
-    activities_show: boolean;
     meals_show: boolean;
+    accommodations_folded: boolean;
+    meals_prefs_folded: boolean;
+    meals_prefs_show: boolean;
+    activities_show: boolean;
 }
 
 @Component({
@@ -40,10 +41,11 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
         identification_folded: true,
         products_folded: true,
         activities_folded: true,
-        booking_meals_folded: true,
-        accommodations_folded: true,
         meals_folded: true,
         meals_show: true,
+        accommodations_folded: true,
+        meals_prefs_folded: true,
+        meals_prefs_show: true,
         activities_show: true
     };
 
@@ -174,12 +176,13 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
                 store_folded_settings: 'sale.features.ui.booking.store_folded_settings',
                 identification_folded: 'sale.features.ui.booking.identification_folded',
                 products_folded: 'sale.features.ui.booking.products_folded',
-                activities_folded: 'sale.features.ui.booking.activities_folded',
-                booking_meals_folded: 'sale.features.ui.booking.booking_meals_folded',
                 accommodations_folded: 'sale.features.ui.booking.accommodations_folded',
+                activities_folded: 'sale.features.ui.booking.activities_folded',
+                activities_show: 'sale.features.booking.activity',
                 meals_folded: 'sale.features.ui.booking.meals_folded',
                 meals_show: 'sale.features.booking.meal',
-                activities_show: 'sale.features.booking.activity'
+                meals_prefs_folded: 'sale.features.ui.booking.meal_preferences_folded',
+                meals_prefs_show: 'sale.features.booking.meal_preferences'
             };
 
             for(let setting of Object.keys(settings)) {
