@@ -856,6 +856,17 @@
                                 }
                             },
                             {
+                                "id": "sales.catalog.meal_places",
+                                "type": "entry",
+                                "icon": "restaurant",
+                                "label": "Meal Places",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\MealPlace",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
                                 "id": "sales.catalog.groupingCode",
                                 "type": "entry",
                                 "icon": "group",
