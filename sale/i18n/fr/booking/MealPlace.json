@@ -16,7 +16,12 @@
         "place_type ": {
             "label": "Type",
             "description": "Type de lieu (sur site, hors site).",
-            "help": ""
+            "help": "",
+            "selection": {
+                "onsite": "sur place",
+                "offsite": "hors-site",
+                "mobile": "itinérant"
+            }
         }
 
     },
