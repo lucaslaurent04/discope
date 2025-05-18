@@ -1,0 +1,28 @@
+{
+    "name": "Lieu de Repas",
+    "plural": "Lieux des Repas",
+    "description": "",
+    "model": {
+        "name": {
+            "label": "Name",
+            "description": "Nom du lieu de repas.",
+            "help": ""
+        },
+        "description": {
+            "label": "Description",
+            "description": "Détails sur le lieu de repas.",
+            "help": ""
+        },
+        "place_type ": {
+            "label": "Type",
+            "description": "Type de lieu (sur site, hors site).",
+            "help": ""
+        }
+
+    },
+    "view": {
+
+    },
+    "error": {
+    }
+}

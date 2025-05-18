@@ -1,0 +1,28 @@
+{
+    "name": "Type de Repas",
+    "plural": "Types de Repas",
+    "description": "",
+    "model": {
+        "name": {
+            "label": "Name",
+            "description": "Nom du type de repas.",
+            "help": ""
+        },
+        "description": {
+            "label": "Description",
+            "description": "Détails sur le type de repas.",
+            "help": ""
+        },
+        "code": {
+            "label": "Code",
+            "description": "Le code unique identifiant le type de repas.",
+            "help": ""
+        }
+
+    },
+    "view": {
+
+    },
+    "error": {
+    }
+}

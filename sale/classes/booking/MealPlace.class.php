@@ -8,10 +8,10 @@
 namespace sale\booking;
 use equal\orm\Model;
 
-class MealType extends Model {
+class MealPlace extends Model {
 
     public static function getName() {
-        return "Meal Type";
+        return "Meal Place";
     }
 
     public static function getColumns() {
@@ -20,29 +20,33 @@ class MealType extends Model {
 
             'name' => [
                 'type'              => 'string',
-                'multilang'         => true,
-                'description'       => 'Name of the Meal Type.'
+                'description'       => 'Name of the Meal Place.'
             ],
 
             'code' => [
                 'type'              => 'string',
-                'description'       => 'Text identifier of the meal type.',
+                'description'       => 'Text identifier of the meal place.',
                 'unique'            => true
+            ],
+
+            'place_type' => [
+                'type'              => 'string',
+                'description'       => 'Type of meal place.',
+                'selection'         => [
+                    'onsite',
+                    'offsite',
+                    'mobile'
+                ],
+                'default'           => 'onsite'
             ],
 
             'description' => [
                 'type'              => 'string',
                 'usage'             => 'text/plain',
                 'multilang'         => true,
-                'description'       => 'Short description of the meal type.'
-            ],
-
-            'default_meal_place_id' => [
-                'type'              => 'many2one',
-                'foreign_object'    => 'sale\booking\MealPlace',
-                'description'       => 'Default place where the meal is expected to be taken.',
-                'default'           => 1
+                'description'       => 'Short description of the meal place.'
             ]
+
         ];
     }
 
