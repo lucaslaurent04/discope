@@ -27,8 +27,10 @@
             <div class="cell">
                 <mat-form-field>
                     <mat-label>Lieu</mat-label>
-                    <mat-select [formControl]="vm.meal_place.formControl" (selectionChange)="vm.meal_place.change()">
-                        <mat-option *ngFor="let mealPlace of mealPlaces" [value]="mealPlace.code">
+                    <mat-select
+                            [formControl]="vm.meal_place_id.formControl"
+                            (selectionChange)="vm.meal_place_id.change()">
+                        <mat-option *ngFor="let mealPlace of mealPlaces" [value]="mealPlace.id">
                             {{ mealPlace.name }}
                         </mat-option>
                     </mat-select>
