@@ -111,8 +111,8 @@
                                 Toutes <span style="font-size: 0.8rem;">({{selectedRentalUnits.length}}/{{filteredRentalUnits.length}})</span>
                             </mat-checkbox>
                             <input class="rentalunit-filter" [value]="filterBy" (keyup)="leftFilterBy($event)" type="text" placeholder="Filtrer">
-                            <mat-slide-toggle [checked]="showOnlyParents" (change)="leftShowOnlyParents($event.checked)" style="margin-left: 20px; transform: scale(0.8);">Parents</mat-slide-toggle>
-                            <mat-slide-toggle [checked]="showOnlyChildren" (change)="leftShowOnlyChildren($event.checked)" style="transform: scale(0.8);">Enfants</mat-slide-toggle>
+                            <mat-slide-toggle [checked]="showOnlyParents" (change)="leftShowOnlyParents($event.checked)" style="margin-left: 20px; transform: scale(0.8);">Unités Parentes</mat-slide-toggle>
+                            <mat-slide-toggle [checked]="showOnlyChildren" (change)="leftShowOnlyChildren($event.checked)" style="transform: scale(0.8);">Unités Enfants</mat-slide-toggle>
                         </div>
                     </div>
                     <div class="list" cdkDropList cdkDropListSortingDisabled style="flex-grow: 1; border: solid 1px darkgrey;">
