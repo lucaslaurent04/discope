@@ -595,7 +595,7 @@ class Camp extends Model {
                     return ['date_to' => ['not_long_enough' => "A 5 days CLSH camp must have a duration of 5 days."]];
                 }
                 if($day_diff === 5 && $clsh_type === '4-days') {
-                    return ['date_to' => ['too_long_enough' => "A 4 days CLSH camp must have a duration of 4 days."]];
+                    return ['date_to' => ['too_long' => "A 4 days CLSH camp must have a duration of 4 days."]];
                 }
             }
         }
