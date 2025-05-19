@@ -99,9 +99,21 @@
                                                 "width": "33%"
                                             },
                                             {
-                                                "type": "field",
-                                                "value": "works_council_id",
+                                                "type": "label",
+                                                "value": "",
                                                 "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "date_from",
+                                                "width": "33%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "date_to",
+                                                "width": "33%",
+                                                "readonly":  true
                                             }
                                         ]
                                     },
@@ -111,19 +123,28 @@
                                             {
                                                 "type": "label",
                                                 "value": "",
-                                                "width": "25%",
-                                                "visible": ["state", "<>", "draft"]
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "camp_class",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "works_council_id",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "family_quotient",
+                                                "width": "33%"
                                             },
                                             {
                                                 "type": "label",
                                                 "value": "",
                                                 "width": "50%",
-                                                "visible": ["state", "=", "draft"]
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "camp_class",
-                                                "width": "25%"
+                                                "visible": ["state", "<>", "draft"]
                                             },
                                             {
                                                 "type": "field",
@@ -138,10 +159,72 @@
                                                 "visible": ["state", "<>", "draft"]
                                             },
                                             {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "75%",
+                                                "visible": ["state", "=", "draft"]
+                                            },
+                                            {
                                                 "type": "field",
                                                 "value": "status",
                                                 "width": "25%",
                                                 "visible": ["state", "=", "draft"]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "is_clsh",
+                                                "width": "33%",
+                                                "readonly": true,
+                                                "visible": ["is_clsh", "=", true]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "clsh_type",
+                                                "readonly": true,
+                                                "visible": false
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "presence_day_1",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "presence_day_2",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "presence_day_3",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "presence_day_4",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "presence_day_5",
+                                                "width": "20%"
                                             }
                                         ]
                                     }
@@ -188,6 +271,47 @@
                                                 "type": "field",
                                                 "value": "price_adapters_ids",
                                                 "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.daycare",
+                        "label": "Daycare",
+                        "visible": ["is_clsh", "=", true],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "daycare_day_1",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "daycare_day_2",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "daycare_day_3",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "daycare_day_4",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "daycare_day_5",
+                                                "width": "20%"
                                             }
                                         ]
                                     }

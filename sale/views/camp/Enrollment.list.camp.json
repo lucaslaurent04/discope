@@ -4,6 +4,14 @@
         "items": [
             {
                 "type": "field",
+                "value": "id",
+                "width": "5%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
                 "value": "child_id",
                 "width": "20%",
                 "sortable": false,
@@ -20,6 +28,46 @@
                 "type": "field",
                 "value": "is_ase",
                 "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "presence_day_1",
+                "width": "15%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "presence_day_2",
+                "width": "15%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "presence_day_3",
+                "width": "15%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "presence_day_4",
+                "width": "15%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "presence_day_5",
+                "width": "15%",
                 "sortable": false,
                 "readonly": true,
                 "visible": false

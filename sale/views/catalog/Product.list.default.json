@@ -75,6 +75,42 @@
                 "type": "field",
                 "value": "family_id",
                 "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "is_meal",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "is_snack",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "is_activity",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "is_transport",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "is_supply",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "is_camp",
+                "width": "10%",
+                "visible": false
             }
         ]
     }

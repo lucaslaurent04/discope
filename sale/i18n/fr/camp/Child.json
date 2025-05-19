@@ -91,6 +91,9 @@
                 },
                 "section.enrollments": {
                     "label": "Inscriptions"
+                },
+                "section.presences": {
+                    "label": "Présences"
                 }
             }
         },

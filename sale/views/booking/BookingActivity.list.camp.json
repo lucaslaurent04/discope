@@ -11,12 +11,13 @@
         "items": [
             {
                 "type": "field",
-                "value": "name",
-                "width": "20%"
+                "value": "activity_date",
+                "width": "20%",
+                "visible": false
             },
             {
                 "type": "field",
-                "value": "activity_date",
+                "value": "name",
                 "width": "20%"
             },
             {

@@ -153,9 +153,29 @@ class Child extends Model {
                 'foreign_field'     => 'child_id',
                 'description'       => "Camp enrollments of child.",
                 'ondetach'          => 'delete'
+            ],
+
+            'presences_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\camp\Presence',
+                'foreign_field'     => 'child_id',
+                'description'       => "The day presences of the child to camps."
             ]
 
         ];
+    }
+
+    public static function canupdate($self, $values): array {
+        if(isset($values['main_guardian_id'])) {
+            $self->read(['guardians_ids']);
+            foreach($self as $child) {
+                if(!in_array($values['main_guardian_id'], $child['guardians_ids'])) {
+                    return ['main_guardian_id' => ['invalid' => "This guardian is not linked to this child."]];
+                }
+            }
+        }
+
+        return parent::canupdate($self);
     }
 
     public static function calcName($self): array {
@@ -191,7 +211,7 @@ class Child extends Model {
     }
 
     /**
-     * Reset child age of not locked enrollments of children
+     * Reset child age of not locked enrollments
      */
     public static function onupdateBirthdate($self) {
         $reset_age_enrollments_ids = [];

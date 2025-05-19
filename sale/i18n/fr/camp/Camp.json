@@ -40,7 +40,7 @@
         },
         "product_id": {
             "label": "Produit",
-            "description": "Le produit de vente du camp.",
+            "description": "Le produit de vente du camp à la semaine.",
             "help": ""
         },
         "camp_type": {
@@ -58,6 +58,20 @@
         "is_clsh": {
             "label": "CLSH",
             "description": "Centre loisir sans hébergement.",
+            "help": ""
+        },
+        "clsh_type": {
+            "label": "Durée",
+            "description": "Type de camp CLSH.",
+            "help": "",
+            "selection": {
+                "5-days": "5 jours",
+                "4-days": "4 jours"
+            }
+        },
+        "day_product_id": {
+            "label": "Produit à la journée",
+            "description": "Le produit de vente du camp CLSH à la journée.",
             "help": ""
         },
         "camp_model_id": {
@@ -136,6 +150,9 @@
                 "section.enrollments": {
                     "label": "Inscriptions"
                 },
+                "section.presences": {
+                    "label": "Présences"
+                },
                 "section.required-skills": {
                     "label": "Compétences requises"
                 },
@@ -151,12 +168,20 @@
         }
     },
     "error": {
+        "day_product_id": {
+            "required": "Produit de jour requis si camp CLSH."
+        },
         "camp_groups_ids": {
             "one_needed": "Un camp doit avoir au moins un groupe de camp.",
             "too_many_children": "Il y a trop d'enfants inscrits dans les groupes de camp."
         },
         "employee_ratio": {
             "too_many_children": "Il y a trop d'enfants inscrits au camp."
+        },
+        "date_to": {
+            "wrong_duration": "Un camp CLSH doit avoir une durée de 4 ou 5 jours.",
+            "not_long_enough": "Un camp CLSH de 5 jours doit avoir une durée de 5 jours.",
+            "too_long": "Un camp CLSH de 4 jours doit avoir une durée de 4 jours."
         }
     }
 }
