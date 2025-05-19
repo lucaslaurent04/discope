@@ -107,6 +107,26 @@
             "label": "Code de regroupement",
             "description": "Code de regroupement spécifique auquel ce modèle de produit est associé, le cas échéant.",
             "help": ""
+        },
+        "is_transport": {
+            "label": "Est un transport",
+            "description": "Le produit est-il un service de transport ?",
+            "help": "Le produit est-il un service de transport ? (ceci inclut les transferts entre lieux, les navettes, etc.)"
+        },
+        "is_supply": {
+            "label": "Est un matériel",
+            "description": "Le produit est-il un service de location de matériel ?",
+            "help": ""
+        },
+        "is_camp": {
+            "label": "Est un camp",
+            "description": "Le produit est-il un camp ?",
+            "help": ""
+        },
+        "is_activity": {
+            "label": "Est une activité",
+            "description": "Le produit est-il une activité ?",
+            "help": "Le produit est-il une activité ? (cela inclut des activités comme des jeux, des ateliers, etc.)"
         }
     },
     "view": {
