@@ -181,7 +181,7 @@
         "date_to": {
             "wrong_duration": "Un camp CLSH doit avoir une durée de 4 ou 5 jours.",
             "not_long_enough": "Un camp CLSH de 5 jours doit avoir une durée de 5 jours.",
-            "too_long_enough": "Un camp CLSH de 4 jours doit avoir une durée de 4 jours."
+            "too_long": "Un camp CLSH de 4 jours doit avoir une durée de 4 jours."
         }
     }
 }

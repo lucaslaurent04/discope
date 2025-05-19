@@ -67,7 +67,7 @@ class CampModel extends Model {
                 ],
                 'description'       => "Is it a camp of 5 or 4 days duration.",
                 'default'           => '5-days',
-                'visible'           => ["is_clsh", "=", true]
+                'visible'           => ['is_clsh', '=', true]
             ],
 
             'day_product_id' => [

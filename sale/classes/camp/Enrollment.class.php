@@ -733,19 +733,19 @@ class Enrollment extends Model {
                             }
 
                             if($day_pending_confirmed_enrollments_qty >= $camp['max_children']) {
-                                if($day === 1){
+                                if($day === 1) {
                                     return ['camp_id' => ['day_1_full' => "The 1st day of the camp is full."]];
                                 }
-                                elseif($day === 2){
+                                elseif($day === 2) {
                                     return ['camp_id' => ['day_2_full' => "The 2nd day of the camp is full."]];
                                 }
-                                elseif($day === 3){
+                                elseif($day === 3) {
                                     return ['camp_id' => ['day_3_full' => "The 3rd day of the camp is full."]];
                                 }
-                                elseif($day === 4){
+                                elseif($day === 4) {
                                     return ['camp_id' => ['day_4_full' => "The 4th day of the camp is full."]];
                                 }
-                                else{
+                                else {
                                     return ['camp_id' => ['day_5_full' => "The 5th day of the camp is full."]];
                                 }
                             }
