@@ -18,6 +18,21 @@
                                                 "widget": {
                                                     "heading": true
                                                 }
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_clsh",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "clsh_type",
+                                                "width": "20%"
                                             }
                                         ]
                                     },
@@ -27,11 +42,17 @@
                                             {
                                                 "type": "label",
                                                 "value": "",
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "visible": ["is_clsh", "=", false]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "product_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "day_product_id",
                                                 "width": "50%"
                                             },
                                             {

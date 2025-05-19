@@ -127,12 +127,22 @@
                                             {
                                                 "type": "field",
                                                 "value": "accounting_code",
-                                                "width": "50%"
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "10%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "is_clsh",
-                                                "width": "33"
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "clsh_type",
+                                                "width": "20%"
                                             }
                                         ]
                                     },
@@ -145,8 +155,19 @@
                                                 "width": "50%"
                                             },
                                             {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "50%",
+                                                "visible": ["is_clsh", "=", true]
+                                            },
+                                            {
                                                 "type": "field",
                                                 "value": "product_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "day_product_id",
                                                 "width": "50%"
                                             },
                                             {
@@ -247,6 +268,40 @@
                                                 "widget": {
                                                     "view": "list.camp"
                                                 }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.presences",
+                        "label": "Presences",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "presences_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.camp",
+                                                    "header": {
+                                                        "selection": {
+                                                            "default": false
+                                                        },
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.EDIT": false
+                                                        }
+                                                    }
+                                                },
+                                                "actions": false
                                             }
                                         ]
                                     }

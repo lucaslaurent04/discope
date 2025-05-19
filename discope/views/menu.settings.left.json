@@ -281,6 +281,17 @@
                                 }
                             },
                             {
+                                "id": "sales.camp.presences",
+                                "type": "entry",
+                                "label": "Presences",
+                                "description": "",
+                                "icon": "calendar_month",
+                                "context": {
+                                    "entity": "sale\\camp\\Presence",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
                                 "id": "sales.camp.people",
                                 "label": "People",
                                 "description": "",
