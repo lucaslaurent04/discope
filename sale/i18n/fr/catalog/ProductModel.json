@@ -250,6 +250,11 @@
             "description": "Le produit est-il un service de location de matériel ?",
             "help": ""
         },
+        "is_camp": {
+            "label": "Est un camp",
+            "description": "Le produit est-il un camp ?",
+            "help": ""
+        },
         "is_activity": {
             "label": "Est une activité",
             "description": "Le produit est-il une activité ?",
