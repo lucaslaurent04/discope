@@ -12,6 +12,18 @@
                 "member": "Membre",
                 "close-member": "Membre proche"
             }
+        },
+        "is_clsh": {
+            "label": "CLSH",
+            "description": "Est-ce lié aux camps CLSH \"Centre loisir sans hébergement\"."
+        },
+        "family_quotient_min": {
+            "label": "Quotient familial",
+            "description": "Quotient familial minimum pour appliquer le prix à l'inscription au camp CLSH."
+        },
+        "family_quotient_max": {
+            "label": "Quotient familial",
+            "description": "Quotient familial maximum pour appliquer le prix à l'inscription au camp CLSH."
         }
     },
     "view": {
