@@ -268,16 +268,22 @@ class Camp extends Model {
     public static function getActions(): array {
         return [
 
-            'create-meals' => [
-                'description'   => "Create the meals for the camp.",
+            'generate-meals' => [
+                'description'   => "Generates the camp's meals.",
                 'policies'      => [],
-                'function'      => 'doCreateMeals'
+                'function'      => 'doGenerateMeals'
+            ],
+
+            'remove-meals' => [
+                'description'   => "Removes the camp's meals.",
+                'policies'      => [],
+                'function'      => 'doRemoveMeals'
             ]
 
         ];
     }
 
-    public static function doCreateMeals($self) {
+    public static function doGenerateMeals($self) {
         $self->read(['is_clsh', 'date_from', 'date_to']);
 
         $time_slots = TimeSlot::search([])
@@ -314,8 +320,19 @@ class Camp extends Model {
         }
     }
 
+    public static function doRemoveMeals($self) {
+        $self->read(['camp_id', 'child_id']);
+        foreach($self as $id => $camp) {
+            BookingMeal::search(['camp_id', '=', $id])->delete(true);
+        }
+    }
+
     public static function onafterPublish($self) {
-        $self->do('create-meals');
+        $self->do('generate-meals');
+    }
+
+    public static function onafterCancel($self) {
+        $self->do('remove-meals');
     }
 
     public static function getWorkflow(): array {
@@ -331,7 +348,8 @@ class Camp extends Model {
                     ],
                     'cancel' => [
                         'status'        => 'canceled',
-                        'description'   => "Cancel the camp."
+                        'description'   => "Cancel the camp.",
+                        'onafter'       => 'onafterCancel'
                     ]
                 ]
             ],
@@ -341,7 +359,8 @@ class Camp extends Model {
                 'transitions' => [
                     'cancel' => [
                         'status'        => 'canceled',
-                        'description'   => "Cancel the camp."
+                        'description'   => "Cancel the camp.",
+                        'onafter'       => 'onafterCancel'
                     ]
                 ]
             ],
