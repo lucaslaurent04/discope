@@ -30,13 +30,15 @@ class Child extends Model {
             'firstname' => [
                 'type'              => 'string',
                 'description'       => "First name of the parent of the child.",
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['name']
             ],
 
             'lastname' => [
                 'type'              => 'string',
                 'description'       => "Last name of the parent of the child.",
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['name']
             ],
 
             'birthdate' => [
