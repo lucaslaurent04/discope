@@ -1,0 +1,64 @@
+{
+    "name": "Repas",
+    "plural": "Repas",
+    "description": "Repas lié à une réservation ou à un camp.",
+    "model": {
+        "booking_id": {
+            "label": "Réservation",
+            "description": "La réservation Booking the meal relates to.",
+            "help": ""
+        },
+        "booking_line_group_id": {
+            "label": "Groupe réservation",
+            "description": "Groupe de lignes de réservation auquel le repas se rapporte.",
+            "help": ""
+        },
+        "camp_id": {
+            "label": "Camp",
+            "description": "Le camp auquel le repas se rapporte.",
+            "help": ""
+        },
+        "date": {
+            "label": "Date",
+            "description": "Date du repas.",
+            "help": ""
+        },
+        "time_slot_id": {
+            "label": "Tranche horaire",
+            "description": "Plage horaire précise du jour où le service est fourni.",
+            "help": ""
+        },
+        "is_self_provided": {
+            "label": "Fourni par client",
+            "description": "Le repas est-il fourni par le client, sans lien avec une ligne de réservation ?.",
+            "help": ""
+        },
+        "meal_type_id": {
+            "label": "Type",
+            "description": "Type de repas servi.",
+            "help": ""
+        },
+        "meal_place_id": {
+            "label": "Place",
+            "description": "Lieu où le repas est servi.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "",
+            "description": "",
+            "layout": {
+                "section.booking-lines": {
+                    "label": "Lignes de réservation"
+                }
+            }
+        },
+        "list.default": {
+            "name": "",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}

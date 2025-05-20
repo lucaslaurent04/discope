@@ -1,0 +1,65 @@
+{
+    "name": "Booking meals",
+    "description": "List view for Booking meals.",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "10%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "booking_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "booking_line_group_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "date",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "time_slot_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "is_self_provided",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "meal_type_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "meal_place_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            }
+        ]
+    }
+}
