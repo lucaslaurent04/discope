@@ -67,9 +67,7 @@ class Sponsor extends Model {
                 'selection'         => [
                     'other',
                     'commune',
-                    'community-of-communes',
-                    'department-caf',
-                    'department-msa'
+                    'community-of-communes'
                 ],
                 'description'       => "Type of the sponsor.",
                 'default'           => 'other'
