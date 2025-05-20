@@ -59,8 +59,8 @@
             "name": "Aide",
             "description": "",
             "layout": {
-                "section.enrollments": {
-                    "label": "Inscriptions"
+                "section.price-adapters": {
+                    "label": "Réductions"
                 }
             }
         },
