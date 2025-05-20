@@ -75,6 +75,15 @@ class BookingMeal extends Model {
                 'description'       => "Specific day time slot on which the service is delivered.",
             ],
 
+            'time_slot_order' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => "Order of the time slot, used to sort meals.",
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['time_slot_id' => 'order']
+            ],
+
             'meal_type_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\MealType',
