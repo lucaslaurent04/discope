@@ -31,21 +31,24 @@ class Presence extends Model {
             'presence_date' => [
                 'type'              => 'date',
                 'description'       => "Date of the presence.",
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['name']
             ],
 
             'child_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Child',
                 'description'       => "The child concerned by the presence.",
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['name']
             ],
 
             'camp_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Camp',
                 'description'       => "The camp the child is attending that day.",
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['name']
             ],
 
             'am_daycare' => [
