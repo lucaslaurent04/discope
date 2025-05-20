@@ -259,7 +259,8 @@ class Camp extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\BookingMeal',
                 'foreign_field'     => 'camp_id',
-                'description'       => "The children's meals for this camp."
+                'description'       => "The children's meals for this camp.",
+                'ondetach'          => 'delete'
             ]
 
         ];
