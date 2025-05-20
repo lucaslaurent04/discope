@@ -8,6 +8,7 @@
 
 namespace sale\camp;
 
+use core\setting\Setting;
 use equal\orm\Model;
 
 class Presence extends Model {
@@ -19,24 +20,35 @@ class Presence extends Model {
     public static function getColumns(): array {
         return [
 
+            'name' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Name of the presence.",
+                'store'             => true,
+                'function'          => 'calcName'
+            ],
+
             'presence_date' => [
                 'type'              => 'date',
                 'description'       => "Date of the presence.",
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['name']
             ],
 
             'child_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Child',
                 'description'       => "The child concerned by the presence.",
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['name']
             ],
 
             'camp_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Camp',
                 'description'       => "The camp the child is attending that day.",
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['name']
             ],
 
             'am_daycare' => [
@@ -52,5 +64,24 @@ class Presence extends Model {
             ]
 
         ];
+    }
+
+    public static function calcName($self): array {
+        $result = [];
+        $self->read([
+            'presence_date',
+            'child_id'      => ['name'],
+            'camp_id'       => ['short_name']
+        ]);
+        $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
+        foreach($self as $id => $presence) {
+            $result[$id] = sprintf('%s - %s | %s',
+                date($date_format, $presence['presence_date']),
+                $presence['child_id']['name'],
+                $presence['camp_id']['short_name']
+            );
+        }
+
+        return $result;
     }
 }

@@ -3,11 +3,6 @@
     "plural": "Types de Repas",
     "description": "",
     "model": {
-        "name": {
-            "label": "Name",
-            "description": "Nom du type de repas.",
-            "help": ""
-        },
         "description": {
             "label": "Description",
             "description": "Détails sur le type de repas.",
@@ -17,11 +12,14 @@
             "label": "Code",
             "description": "Le code unique identifiant le type de repas.",
             "help": ""
+        },
+        "default_meal_place_id": {
+            "label": "Lieu par défaut",
+            "description": "Le lieu par défaut ou le repas prend place.",
+            "help": ""
         }
-
     },
     "view": {
-
     },
     "error": {
     }

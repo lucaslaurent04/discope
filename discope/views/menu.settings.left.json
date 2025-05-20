@@ -292,6 +292,17 @@
                                 }
                             },
                             {
+                                "id": "sales.camp.meals",
+                                "type": "entry",
+                                "label": "Meals",
+                                "description": "",
+                                "icon": "restaurant",
+                                "context": {
+                                    "entity": "sale\\booking\\BookingMeal",
+                                    "view": "list.camp"
+                                }
+                            },
+                            {
                                 "id": "sales.camp.people",
                                 "label": "People",
                                 "description": "",

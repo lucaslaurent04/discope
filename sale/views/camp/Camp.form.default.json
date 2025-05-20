@@ -310,6 +310,30 @@
                         ]
                     },
                     {
+                        "id": "section.meals",
+                        "label": "Meals",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "booking_meals_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.camp"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "id": "section.required-skills",
                         "label": "Required skills",
                         "visible": ["state", "<>", "draft"],
