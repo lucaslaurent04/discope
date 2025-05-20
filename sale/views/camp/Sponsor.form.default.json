@@ -75,8 +75,8 @@
             {
                 "sections": [
                     {
-                        "id": "section.enrollments",
-                        "label": "Enrollments",
+                        "id": "section.price-adapters",
+                        "label": "Price adapters",
                         "visible": ["state", "<>", "draft"],
                         "rows": [
                             {
@@ -86,7 +86,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "enrollments_ids",
+                                                "value": "price_adapters_ids",
                                                 "width": "100%",
                                                 "widget": {
                                                     "header": {
