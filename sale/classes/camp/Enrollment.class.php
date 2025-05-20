@@ -9,7 +9,6 @@
 namespace sale\camp;
 
 use equal\orm\Model;
-use sale\camp\price\Price;
 
 class Enrollment extends Model {
 
@@ -85,7 +84,7 @@ class Enrollment extends Model {
             'is_clsh' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
-                'description'       => "",
+                'description'       => "Is the enrollment for a CLSH camp?",
                 'store'             => true,
                 'relation'          => ['camp_id' => 'is_clsh'],
             ],
@@ -998,7 +997,6 @@ class Enrollment extends Model {
     }
 
     public static function doRefreshCampProductLine($self) {
-        file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', 'doRefreshCampProductLine'.PHP_EOL, FILE_APPEND | LOCK_EX);
         $self->read([
             'is_clsh',
             'clsh_type',
