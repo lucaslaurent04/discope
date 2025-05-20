@@ -298,7 +298,10 @@ class Camp extends Model {
         foreach($self as $id => $camp) {
             for($date = $camp['date_from']; $date <= $camp['date_to']; $date += 86400) {
                 foreach(['B', 'L', 'D'] as $time_slot_code) {
-                    if($camp['is_clsh'] && in_array($time_slot_code, ['B', 'D'])) {
+                    if(
+                        ($camp['is_clsh'] && in_array($time_slot_code, ['B', 'D']))
+                        || (!$camp['is_clsh'] && $date === $camp['date_from'] && in_array($time_slot_code, ['B', 'L']))
+                    ) {
                         continue;
                     }
 
