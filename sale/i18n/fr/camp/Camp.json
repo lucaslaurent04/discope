@@ -153,6 +153,9 @@
                 "section.presences": {
                     "label": "Présences"
                 },
+                "section.meals": {
+                     "label": "Repas"
+                },
                 "section.required-skills": {
                     "label": "Compétences requises"
                 },

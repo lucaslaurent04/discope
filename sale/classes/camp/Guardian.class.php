@@ -30,13 +30,15 @@ class Guardian extends Model {
             'firstname' => [
                 'type'              => 'string',
                 'description'       => "First name of the guardian of the child.",
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['name']
             ],
 
             'lastname' => [
                 'type'              => 'string',
                 'description'       => "Last name of the guardian of the child.",
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['name']
             ],
 
             'email' => [

@@ -10,6 +10,8 @@ namespace sale\camp;
 
 use core\setting\Setting;
 use equal\orm\Model;
+use sale\booking\BookingMeal;
+use sale\booking\TimeSlot;
 
 class Camp extends Model {
 
@@ -250,10 +252,91 @@ class Camp extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\camp\Presence',
                 'foreign_field'     => 'camp_id',
-                'description'       => "The child day presences for this camp."
+                'description'       => "The children's days of presences for this camp."
+            ],
+
+            'booking_meals_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\BookingMeal',
+                'foreign_field'     => 'camp_id',
+                'description'       => "The children's meals for this camp.",
+                'ondetach'          => 'delete'
             ]
 
         ];
+    }
+
+    public static function getActions(): array {
+        return [
+
+            'generate-meals' => [
+                'description'   => "Generates the camp's meals.",
+                'policies'      => [],
+                'function'      => 'doGenerateMeals'
+            ],
+
+            'remove-meals' => [
+                'description'   => "Removes the camp's meals.",
+                'policies'      => [],
+                'function'      => 'doRemoveMeals'
+            ]
+
+        ];
+    }
+
+    public static function doGenerateMeals($self) {
+        $self->read(['is_clsh', 'date_from', 'date_to']);
+
+        $time_slots = TimeSlot::search([])
+            ->read(['id', 'code'])
+            ->get();
+        $map_time_slots = [];
+        foreach($time_slots as $time_slot) {
+            $map_time_slots[$time_slot['code']] = $time_slot;
+        }
+
+        foreach($self as $id => $camp) {
+            for($date = $camp['date_from']; $date <= $camp['date_to']; $date += 86400) {
+                foreach(['B', 'L', 'D'] as $time_slot_code) {
+                    if(
+                        ($camp['is_clsh'] && in_array($time_slot_code, ['B', 'D']))
+                        || (!$camp['is_clsh'] && $date === $camp['date_from'] && in_array($time_slot_code, ['B', 'L']))
+                    ) {
+                        continue;
+                    }
+
+                    $meals_ids = BookingMeal::search([
+                        ['camp_id', '=', $id],
+                        ['date', '=', $date],
+                        ['time_slot_id', '=', $map_time_slots[$time_slot_code]['id']]
+                    ])
+                        ->ids();
+
+                    if(count($meals_ids) === 0) {
+                        BookingMeal::create([
+                            'camp_id'       => $id,
+                            'date'          => $date,
+                            'time_slot_id'  => $map_time_slots[$time_slot_code]['id']
+                        ]);
+                    }
+                }
+            }
+        }
+    }
+
+    public static function doRemoveMeals($self) {
+        $self->read(['camp_id', 'child_id']);
+        foreach($self as $id => $camp) {
+            BookingMeal::search(['camp_id', '=', $id])->delete(true);
+        }
+    }
+
+    public static function onafterPublish($self) {
+        $self->do('generate-meals');
+    }
+
+    public static function onafterCancel($self) {
+        $self->do('remove-meals');
     }
 
     public static function getWorkflow(): array {
@@ -264,11 +347,13 @@ class Camp extends Model {
                 'transitions' => [
                     'publish' => [
                         'status'        => 'published',
-                        'description'   => "Publish the camp on the website."
+                        'description'   => "Publish the camp on the website.",
+                        'onafter'       => 'onafterPublish'
                     ],
                     'cancel' => [
                         'status'        => 'canceled',
-                        'description'   => "Cancel the camp."
+                        'description'   => "Cancel the camp.",
+                        'onafter'       => 'onafterCancel'
                     ]
                 ]
             ],
@@ -278,7 +363,8 @@ class Camp extends Model {
                 'transitions' => [
                     'cancel' => [
                         'status'        => 'canceled',
-                        'description'   => "Cancel the camp."
+                        'description'   => "Cancel the camp.",
+                        'onafter'       => 'onafterCancel'
                     ]
                 ]
             ],
@@ -464,7 +550,7 @@ class Camp extends Model {
     }
 
     /**
-     * Creates first camp group that is necessary.
+     * Creates the first camp group that is necessary.
      */
     public static function onupdate($self, $values) {
         $self->read(['camp_groups_ids']);
