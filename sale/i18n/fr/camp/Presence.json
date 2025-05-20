@@ -31,14 +31,14 @@
     },
     "view": {
         "form.default": {
-            "name": "",
+            "name": "Présence",
             "description": "",
-            "layout": []
+            "layout": {}
         },
         "list.default": {
-            "name": "",
+            "name": "Présences",
             "description": "",
-            "layout": []
+            "layout": {}
         }
     },
     "error": []

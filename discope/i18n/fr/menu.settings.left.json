@@ -54,6 +54,10 @@
             "label": "Présences",
             "help": ""
         },
+        "sales.camp.meals": {
+            "label": "Repas",
+            "help": ""
+        },
         "sales.camp.catalog" : {
             "label": "Catalogue",
             "help": ""
