@@ -58,6 +58,10 @@
             "label": "Repas",
             "help": ""
         },
+        "sales.camp.price-adapters": {
+            "label": "Réductions",
+            "help": ""
+        },
         "sales.camp.catalog" : {
             "label": "Catalogue",
             "help": ""
