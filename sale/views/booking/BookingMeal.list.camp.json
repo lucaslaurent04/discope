@@ -45,13 +45,6 @@
             },
             {
                 "type": "field",
-                "value": "is_self_provided",
-                "width": "20%",
-                "sortable": false,
-                "readonly": true
-            },
-            {
-                "type": "field",
                 "value": "meal_type_id",
                 "width": "20%",
                 "sortable": false,
