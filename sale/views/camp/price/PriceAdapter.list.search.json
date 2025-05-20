@@ -1,0 +1,59 @@
+{
+    "name": "Price adapters",
+    "description": "This view is intended for displaying the list of sponsors' price adapters.",
+    "controller": "sale_camp_price_collect-price-adapters",
+    "group_by": [{"field": "sponsor_id", "operation": ["SUM", "object.value"]}],
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "enrollment_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "origin_type",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "description",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "sponsor_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "value",
+                "width": "10%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "price_adapter_type",
+                "width": "10%",
+                "sortable": false,
+                "readonly": true
+            }
+        ]
+    }
+}
