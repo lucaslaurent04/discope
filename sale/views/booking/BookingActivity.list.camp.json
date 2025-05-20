@@ -17,6 +17,12 @@
             },
             {
                 "type": "field",
+                "value": "time_slot_order",
+                "width": "20%",
+                "visible": false
+            },
+            {
+                "type": "field",
                 "value": "name",
                 "width": "20%"
             },
