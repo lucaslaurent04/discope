@@ -43,9 +43,7 @@
             "selection": {
                 "other": "Autres",
                 "commune": "Commune",
-                "community-of-communes": "Communauté de communes",
-                "department-caf": "CAF",
-                "department-msa": "MSA"
+                "community-of-communes": "Communauté de communes"
             },
             "description": "Type d'aide financière.",
             "help": ""
