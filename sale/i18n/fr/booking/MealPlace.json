@@ -3,30 +3,28 @@
     "plural": "Lieux des Repas",
     "description": "",
     "model": {
-        "name": {
-            "label": "Name",
-            "description": "Nom du lieu de repas.",
-            "help": ""
-        },
         "description": {
             "label": "Description",
             "description": "Détails sur le lieu de repas.",
             "help": ""
         },
-        "place_type ": {
+        "code": {
+            "label": "Code",
+            "description": "Le code unique identifiant le lieu de repas.",
+            "help": ""
+        },
+        "place_type": {
             "label": "Type",
             "description": "Type de lieu (sur site, hors site).",
             "help": "",
             "selection": {
-                "onsite": "sur place",
-                "offsite": "hors-site",
-                "mobile": "itinérant"
+                "onsite": "Sur place",
+                "offsite": "Hors-site",
+                "mobile": "Itinérant"
             }
         }
-
     },
     "view": {
-
     },
     "error": {
     }

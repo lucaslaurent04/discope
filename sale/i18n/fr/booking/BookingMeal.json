@@ -46,7 +46,7 @@
     },
     "view": {
         "form.default": {
-            "name": "",
+            "name": "Repas",
             "description": "",
             "layout": {
                 "section.booking-lines": {
@@ -55,10 +55,14 @@
             }
         },
         "list.default": {
-            "name": "",
+            "name": "Repas",
             "description": "",
             "layout": []
         }
     },
-    "error": []
+    "error": {
+        "booking_id": {
+            "already_booked": "Un repas a déjà été réservé pour cette heure."
+        }
+    }
 }
