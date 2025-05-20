@@ -73,6 +73,7 @@ class BookingMeal extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\TimeSlot',
                 'description'       => "Specific day time slot on which the service is delivered.",
+                'dependents'        => ['time_slot_order']
             ],
 
             'time_slot_order' => [
@@ -102,7 +103,7 @@ class BookingMeal extends Model {
     }
 
     public static function canupdate($self, $values): array {
-        $self->read(['booking_id', 'camp_id']);
+        $self->read(['booking_id', 'camp_id', 'time_slot_id', 'date']);
         if(isset($values['booking_id']) || isset($values['booking_line_group_id']) || isset($values['booking_lines_ids'])) {
             foreach($self as $booking_meal) {
                 if(isset($booking_meal['camp_id'])) {
@@ -114,6 +115,39 @@ class BookingMeal extends Model {
             foreach($self as $booking_meal) {
                 if(isset($booking_meal['booking_id'])) {
                     return ['camp_id' => ['booking_meal' => "The meal is already related to a booking."]];
+                }
+            }
+        }
+
+        foreach($self as $id => $booking_meal) {
+            $time_slot_id = $values['time_slot_id'] ??  $booking_meal['time_slot_id'];
+            $date = $values['date'] ??  $booking_meal['date'];
+            $booking_id = array_key_exists('booking_id', $values) ? $values['booking_id'] : $booking_meal['booking_id'];
+            $camp_id = array_key_exists('camp_id', $values) ? $values['camp_id'] : $booking_meal['camp_id'];
+            if(!is_null($booking_id)) {
+                $meals_ids = self::search([
+                    ['time_slot_id', '=', $time_slot_id],
+                    ['date', '=', $date],
+                    ['booking_id', '=', $booking_id],
+                    ['id', '<>', $id]
+                ])
+                    ->ids();
+
+                if(!empty($meals_ids)) {
+                    return ['booking_id' => ['already_booked' => "A meal has already been booked for this time."]];
+                }
+            }
+            elseif(!is_null($camp_id)) {
+                $meals_ids = self::search([
+                    ['time_slot_id', '=', $time_slot_id],
+                    ['date', '=', $date],
+                    ['camp_id', '=', $camp_id],
+                    ['id', '<>', $id]
+                ])
+                    ->ids();
+
+                if(!empty($meals_ids)) {
+                    return ['camp_id' => ['already_booked' => "A meal has already been booked for this time."]];
                 }
             }
         }
