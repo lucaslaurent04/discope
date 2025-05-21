@@ -303,6 +303,17 @@
                                 }
                             },
                             {
+                                "id": "sales.camp.price-adapters",
+                                "type": "entry",
+                                "label": "Price adapters",
+                                "description": "",
+                                "icon": "money",
+                                "context": {
+                                    "entity": "sale\\camp\\price\\PriceAdapter",
+                                    "view": "list.search"
+                                }
+                            },
+                            {
                                 "id": "sales.camp.people",
                                 "label": "People",
                                 "description": "",

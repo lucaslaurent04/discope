@@ -315,16 +315,6 @@ class Enrollment extends Model {
                 'ondetach'          => 'delete'
             ],
 
-            'sponsors_ids' => [
-                'type'              => 'many2many',
-                'foreign_object'    => 'sale\camp\Sponsor',
-                'foreign_field'     => 'enrollments_ids',
-                'rel_table'         => 'sale_rel_enrollment_sponsor',
-                'rel_foreign_key'   => 'sponsor_id',
-                'rel_local_key'     => 'enrollment_id',
-                'description'       => "Sponsors that reduce the price of the enrollment."
-            ],
-
             'mails_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'core\Mail',

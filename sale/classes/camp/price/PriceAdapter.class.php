@@ -52,10 +52,10 @@ class PriceAdapter extends Model {
                 'type'              => 'string',
                 'selection'         => [
                     'other',
-                    'help-commune',
-                    'help-community-of-communes',
-                    'help-department-caf',
-                    'help-department-msa',
+                    'commune',
+                    'community-of-communes',
+                    'department-caf',
+                    'department-msa',
                     'loyalty-discount'
                 ],
                 'description'       => "Type of the price adapter.",
@@ -94,7 +94,7 @@ class PriceAdapter extends Model {
                 ->first();
 
             $result['value'] = $sponsor['amount'];
-            $result['origin_type'] = 'help-'.$sponsor['sponsor_type'];
+            $result['origin_type'] = $sponsor['sponsor_type'];
             $result['price_adapter_type'] = 'amount';
             $result['is_manual_discount'] = false;
             if(empty($values['name'])) {
@@ -134,5 +134,39 @@ class PriceAdapter extends Model {
 
     public static function onupdateValue($self) {
         $self->do('reset-enrollments-prices');
+    }
+
+    public static function canupdate($self, $values) {
+        $self->read(['sponsor_id', 'price_adapter_type', 'is_manual_discount', 'origin_type']);
+
+        if(isset($values['sponsor_id']) || isset($values['price_adapter_type']) || isset($values['is_manual_discount']) || isset($values['origin_type'])) {
+            foreach($self as $price_adapter) {
+                $sponsor_id = array_key_exists('sponsor_id', $values) ? $values['sponsor_id'] : $price_adapter['sponsor_id'];
+                if(is_null($sponsor_id)) {
+                    continue;
+                }
+
+                $price_adapter_type = $values['price_adapter_type'] ?? $price_adapter['price_adapter_type'];
+                if($price_adapter_type !== 'amount') {
+                    return ['price_adapter_type' => ['must_be_amount' => "Must be amount when from a sponsor."]];
+                }
+
+                $is_manual_discount = $values['is_manual_discount'] ?? $price_adapter['is_manual_discount'];
+                if($is_manual_discount !== false) {
+                    return ['is_manual_discount' => ['cannot_be_manual' => "A price adapter from a sponsor cannot be manual."]];
+                }
+
+                $sponsor = Sponsor::id($sponsor_id)
+                    ->read(['sponsor_type'])
+                    ->first();
+
+                $origin_type = $values['origin_type'] ?? $price_adapter['origin_type'];
+                if($origin_type !== $sponsor['sponsor_type']) {
+                    return ['origin_type' => ['same_as_sponsor' => "Type must be the same as the linked sponsor."]];
+                }
+            }
+        }
+
+        return parent::canupdate($self, $values);
     }
 }
