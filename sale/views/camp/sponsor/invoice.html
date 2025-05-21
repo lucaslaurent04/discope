@@ -5,9 +5,11 @@
     <tr>
         <td>{{ sponsor.address_street }}</td>
     </tr>
+    {% if sponsor.address_dispatch != '' %}
     <tr>
         <td>{{ sponsor.address_dispatch }}</td>
     </tr>
+    {% endif %}
     <tr>
         <td>{{ sponsor.address_zip }}, {{ sponsor.address_city }}</td>
     </tr>
