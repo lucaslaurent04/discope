@@ -58,9 +58,17 @@
         "form.default": {
             "name": "Aide",
             "description": "",
+            "actions": {
+                "action.invoice": {
+                    "label": "Facturer"
+                }
+            },
             "layout": {
                 "section.price-adapters": {
                     "label": "Réductions"
+                },
+                "action.invoice-selected": {
+                    "label": "Facturer"
                 }
             }
         },

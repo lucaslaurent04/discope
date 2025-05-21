@@ -55,12 +55,17 @@
         "form.default": {
             "name": "Réduction",
             "description": "",
-            "layout": []
+            "layout": {}
         },
         "list.default": {
             "name": "Réductions",
             "description": "",
-            "layout": []
+            "header": {
+                "action.invoice-sponsor": {
+                    "label": "Facturer aidant"
+                }
+            },
+            "layout": {}
         }
     },
     "error": {
