@@ -310,7 +310,18 @@
                                 "icon": "money",
                                 "context": {
                                     "entity": "sale\\camp\\price\\PriceAdapter",
-                                    "view": "list.search"
+                                    "view": "list.sponsor-search"
+                                }
+                            },
+                            {
+                                "id": "sales.camp.ce-enrollments",
+                                "type": "entry",
+                                "label": "Work councils enrollments",
+                                "description": "",
+                                "icon": "money",
+                                "context": {
+                                    "entity": "sale\\camp\\Enrollment",
+                                    "view": "list.work-council-search"
                                 }
                             },
                             {
