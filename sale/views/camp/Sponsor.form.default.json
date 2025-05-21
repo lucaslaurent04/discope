@@ -1,5 +1,13 @@
 {
     "name": "Sponsor",
+    "description": "Form view for sponsor.",
+    "actions": [
+        {
+            "id": "action.invoice",
+            "label": "Invoice",
+            "controller": "sale_camp_sponsor_invoice"
+        }
+    ],
     "layout": {
         "groups": [
             {
@@ -92,6 +100,16 @@
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": false
+                                                        },
+                                                        "selection": {
+                                                            "default": false,
+                                                            "actions": [
+                                                                {
+                                                                    "id": "action.invoice-selected",
+                                                                    "label": "Invoice",
+                                                                    "controller": "sale_camp_sponsor_generate-invoice-pdf"
+                                                                }
+                                                            ]
                                                         }
                                                     }
                                                 }
