@@ -28,10 +28,10 @@
             "help": "",
             "selection": {
                 "other": "Autre",
-                "help-commune": "Aide commune",
-                "help-community-of-communes": "Aide communauté de communes",
-                "help-department-caf": "Aide CAF",
-                "help-department-msa": "Aide MSA",
+                "commune": "Aide commune",
+                "community-of-communes": "Aide communauté de communes",
+                "department-caf": "Aide CAF",
+                "department-msa": "Aide MSA",
                 "loyalty-discount": "Réduction fidélité"
             }
         },
@@ -55,13 +55,28 @@
         "form.default": {
             "name": "Réduction",
             "description": "",
-            "layout": []
+            "layout": {}
         },
         "list.default": {
             "name": "Réductions",
             "description": "",
-            "layout": []
+            "header": {
+                "action.invoice-sponsor": {
+                    "label": "Facturer aidant"
+                }
+            },
+            "layout": {}
         }
     },
-    "error": []
+    "error": {
+        "price_adapter_type": {
+            "must_be_amount": "Doit être un montant quand liée à une aide."
+        },
+        "is_manual_discount": {
+            "cannot_be_manual": "Ne peut pas être manuelle quand liée à une aide."
+        },
+        "origin_type": {
+            "same_as_sponsor": "Doit avoir le même type que l'aide liée."
+        }
+    }
 }
