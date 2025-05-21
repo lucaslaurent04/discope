@@ -16,26 +16,12 @@ use sale\camp\Camp;
         'entity' =>  [
             'type'              => 'string',
             'description'       => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
-            'default'           => 'sale\camp\price\PriceAdapter'
+            'default'           => 'sale\camp\Enrollment'
         ],
-        'sponsor_id' => [
+        'works_council_id' => [
             'type'              => 'many2one',
-            'foreign_object'    => 'sale\camp\Sponsor',
-            'description'       => "Sponsor that is concerned by the price adapter."
-        ],
-        'origin_type' => [
-            'type'              => 'string',
-            'description'       => "Type of price adapter.",
-            'selection'         => [
-                'all',
-                'other',
-                'commune',
-                'community-of-communes',
-                'department-caf',
-                'department-msa',
-                'loyalty-discount'
-            ],
-            'default' => 'all'
+            'foreign_object'    => 'sale\camp\WorksCouncil',
+            'description'       => "Works council that is concerned by the enrollment."
         ],
         'date_from' => [
             'type'              => 'date',
@@ -63,19 +49,9 @@ $result = [];
 
 $domain = new Domain($params['domain']);
 
-$domain->addCondition(
-    new DomainCondition('price_adapter_type', '=', 'amount')
-);
-
-if(isset($params['sponsor_id'])) {
+if(isset($params['works_council_id'])) {
     $domain->addCondition(
-        new DomainCondition('sponsor_id', '=', $params['sponsor_id'])
-    );
-}
-
-if($params['origin_type'] !== 'all') {
-    $domain->addCondition(
-        new DomainCondition('origin_type', '=', $params['origin_type'])
+        new DomainCondition('works_council_id', '=', $params['works_council_id'])
     );
 }
 
@@ -98,7 +74,7 @@ if(isset($params['date_from']) || isset($params['date_to'])) {
     }
 
     $domain->addCondition(
-        new DomainCondition('enrollment_id', 'in', $enrollments_ids)
+        new DomainCondition('id', 'in', $enrollments_ids)
     );
 }
 
