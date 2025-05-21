@@ -1,0 +1,23 @@
+{
+    "name": "Réduction",
+    "plural": "Réductions",
+    "description": "Reductions d'aides.",
+    "model": {
+        "works_council_id": {
+            "label": "CE",
+            "description": ""
+        },
+        "date_from": {
+            "label": "Du",
+            "description": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": ""
+        }
+    },
+    "view": {
+    },
+    "error": {
+    }
+}
