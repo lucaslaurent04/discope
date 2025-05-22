@@ -3,14 +3,15 @@ import { ApiService, EnvService, AuthService, ContextService } from 'sb-shared-l
 import { UserClass } from 'sb-shared-lib/lib/classes/user.class';
 import { FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import {debounceTime} from "rxjs/operators";
 
 class Enrollment {
     constructor(
         public id: number = 0,
         public name: string = '',
         public child_id: number = 0,
-        public camp_id: number = 0
+        public camp_id: number = 0,
+        public total: number = 0,
+        public price: number = 0
     ) {
     }
 }
@@ -19,6 +20,8 @@ class Child {
     constructor(
         public id: number = 0,
         public name: string = '',
+        public firstname: string = '',
+        public lastname: string = '',
         public main_guardian_id: number = 0,
         public guardians_ids: number[] = []
     ) {
@@ -42,7 +45,10 @@ class Camp {
         public id: number = 0,
         public name: string = '',
         public short_name: string = '',
-        public center_id: number = 0
+        public center_id: number = 0,
+        public date_from: Date = new Date(),
+        public date_to: Date = new Date(),
+        public accounting_code: string = ''
     ) {
     }
 }
@@ -82,6 +88,28 @@ class Language {
         public id: number = 0,
         public code: string = '',
         public name: string = ''
+    ) {
+    }
+}
+
+class Template {
+    constructor(
+        public id: number = 0,
+        public name: string = '',
+        public category_id: number = 0,
+        public type: 'quote' | 'option' | 'contract' | 'funding' | 'invoice' | 'guest' | 'planning' | 'camp' = 'camp',
+        public code: string = '',
+        public parts_ids: number[] = [],
+        public attachments_ids: number[] = []
+    ) {
+    }
+}
+
+class TemplatePart {
+    constructor(
+        public id: number = 0,
+        public name: string = '',
+        public value: string = ''
     ) {
     }
 }
@@ -185,6 +213,7 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
                         const enrollmentId = parseInt(params['enrollment_id'], 10);
                         await this.loadEnrollment(enrollmentId);
                         this.refreshSenderAddresses();
+                        this.refreshTemplates();
 
                         this.context.change({
                             context_only: true,
@@ -339,11 +368,104 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
         });
     }
 
-    private refreshTemplates() {
+    private async refreshTemplates() {
         console.log('re-fetch templates');
 
-        // TODO: set title
-        // TODO: set message
+        try {
+            const templates: Template[] = await this.api.collect(
+                "communication\\Template",
+                [
+                    ['category_id', '=', this.center.template_category_id],
+                    ['type', '=', 'camp'],
+                    ['code', '=', 'preregistration']
+                ],
+                Object.getOwnPropertyNames(new Template()),
+                'id', 'asc', 0, 1, this.selectedLanguage.code
+            );
+
+            if(templates.length > 0) {
+                const template = templates[0];
+
+                const parts = await this.api.collect(
+                    "communication\\TemplatePart",
+                    ['id', 'in', template.parts_ids],
+                    Object.getOwnPropertyNames(new TemplatePart()),
+                    'id', 'asc', 0, 10, this.selectedLanguage.code
+                );
+
+                let subjectPart: TemplatePart = null;
+                let bodyPart: TemplatePart = null;
+                for(let part of parts) {
+                    if(part.name === 'subject') {
+                        subjectPart = part;
+                    }
+                    else if(part.name == 'body') {
+                        bodyPart = part;
+                    }
+                }
+
+                const dateFrom = new Date(this.camp.date_from);
+                const dateTo = new Date(this.camp.date_to);
+
+                let strDateFrom = dateFrom.getDate().toString().padStart(2, '0') + '/' + (dateFrom.getMonth()+1).toString().padStart(2, '0') + '/' + dateFrom.getFullYear();
+                let strDateTo = dateTo.getDate().toString().padStart(2, '0') + '/' + (dateTo.getMonth()+1).toString().padStart(2, '0') + '/' + dateTo.getFullYear();
+
+                const dateDeadline = new Date(this.camp.date_from);
+                dateDeadline.setMonth(dateDeadline.getMonth() - 1);
+                if (dateDeadline.getDate() !== dateFrom.getDate()) {
+                    dateDeadline.setDate(0);
+                }
+                let strDateDeadline = dateDeadline.getDate().toString().padStart(2, '0') + '/' + (dateDeadline.getMonth()+1).toString().padStart(2, '0') + '/' + dateDeadline.getFullYear();
+
+                let accounting_code = this.camp.accounting_code;
+                if(accounting_code && accounting_code.length >= 4) {
+                    accounting_code = (parseInt(accounting_code.slice(-4), 10)).toString();
+                }
+
+                const mapKeyValue: {[key: string]: string} = {
+                    total: this.enrollment.total.toString(),
+                    price: this.enrollment.price.toString(),
+                    camp: this.camp.short_name,
+                    date_from: strDateFrom,
+                    date_to: strDateTo,
+                    date_deadline: strDateDeadline,
+                    accounting_code: accounting_code,
+                    child: this.child.name,
+                    child_firstname: this.child.firstname,
+                    child_lastname: this.child.lastname.toUpperCase()
+                };
+
+                if(subjectPart) {
+                    let title = '';
+                    if(subjectPart.value && subjectPart.value.length > 0) {
+                        // strip html nodes
+                        title = subjectPart.value.replace(/<[^>]*>?/gm, '');
+                    }
+
+                    for(let key in mapKeyValue) {
+                        title = title.replace(`{${key}}`, mapKeyValue[key]);
+                    }
+
+                    this.vm.title.formControl.setValue(title);
+                }
+
+                if(bodyPart) {
+                    let body = '';
+                    for(let key in mapKeyValue) {
+                        body = bodyPart.value.replace(`{${key}}`, mapKeyValue[key]);
+                    }
+
+                    for(let key in mapKeyValue) {
+                        body = body.replace(`{${key}}`, mapKeyValue[key]);
+                    }
+
+                    this.vm.message.formControl.setValue(body);
+                }
+            }
+        }
+        catch(error) {
+            console.log(error);
+        }
     }
 
     public onclickEnrollment() {
