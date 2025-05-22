@@ -114,6 +114,14 @@ class TemplatePart {
     }
 }
 
+class Document {
+    constructor(
+        public id: number = 0,
+        public name: string = ''
+    ) {
+    }
+}
+
 interface vModel {
     lang: {
         formControl: FormControl,
@@ -135,6 +143,12 @@ interface vModel {
     recipients: {
         addresses: string[],
         formControl: FormControl
+    },
+    attachments: {
+        items: any[]
+    },
+    documents: {
+        items: any[]
     }
 }
 
@@ -178,10 +192,10 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
                 formControl: new FormControl('fr'),
             },
             title: {
-                formControl:    new FormControl('', Validators.required)
+                formControl: new FormControl('', Validators.required)
             },
             message: {
-                formControl:    new FormControl('', Validators.required),
+                formControl: new FormControl('', Validators.required),
             },
             sender: {
                 addresses: [],
@@ -194,6 +208,12 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
             recipients: {
                 addresses: [],
                 formControl: new FormControl()
+            },
+            attachments: {
+                items: []
+            },
+            documents: {
+                items: []
             }
         };
     }
@@ -412,7 +432,7 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
 
                 const dateDeadline = new Date(this.camp.date_from);
                 dateDeadline.setMonth(dateDeadline.getMonth() - 1);
-                if (dateDeadline.getDate() !== dateFrom.getDate()) {
+                if(dateDeadline.getDate() !== dateFrom.getDate()) {
                     dateDeadline.setDate(0);
                 }
                 let strDateDeadline = dateDeadline.getDate().toString().padStart(2, '0') + '/' + (dateDeadline.getMonth()+1).toString().padStart(2, '0') + '/' + dateDeadline.getFullYear();
@@ -460,6 +480,21 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
                     }
 
                     this.vm.message.formControl.setValue(body);
+                }
+
+                // reset attachments list
+                this.vm.attachments.items.splice(0, this.vm.attachments.items.length);
+                const attachments = await this.api.collect(
+                    "communication\\TemplateAttachment",
+                    [
+                        ['id', 'in', template['attachments_ids']],
+                        ['lang_id', '=', this.selectedLanguage.id]
+                    ],
+                    ['name', 'document_id.name', 'document_id.hash'],
+                    'id', 'asc', 0, 20, this.selectedLanguage.code
+                );
+                for(let attachment of attachments) {
+                    this.vm.attachments.items.push(attachment)
                 }
             }
         }
@@ -535,5 +570,22 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
         // prevent angular lifecycles while a context is open
         this.cd.detach();
         this.context.change(descriptor);
+    }
+
+    public onRemoveAttachment(index: number) {
+        this.vm.attachments.items.splice(index, 1);
+    }
+
+    public onselectDocuments(item: any, index: number) {
+        const document = item as Document;
+        this.vm.documents.items.splice(index, 1, document);
+    }
+
+    public addDocument(){
+        this.vm.documents.items.push(new Document());
+    }
+
+    public onRemoveDocument(index: number) {
+        this.vm.documents.items.splice(index, 1);
     }
 }
