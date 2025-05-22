@@ -111,9 +111,9 @@
 
         <div class="row" style="margin-top: 30px;">
             <div class="column" style="width: 100%; flex-direction: column;">
-                <div style="display: flex;"><mat-icon>attach_file</mat-icon> Pièces jointes ({{center.name}})</div>
+                <div style="display: flex; margin-bottom: 10px;"><mat-icon>attach_file</mat-icon> Pièces jointes ({{center.name}})</div>
 
-                <div *ngFor="let attachment of vm.attachments.items; let index = index" style="margin-left: 10px; display: flex; align-items: center;">
+                <div *ngFor="let attachment of vm.attachments.items; let index = index" style="margin-left: 20px; display: flex; align-items: center;">
                     <div><b>{{attachment.name}}</b> ({{attachment.document_id.name}})</div>
                     <button mat-icon-button (click)="onRemoveAttachment(index)">
                         <mat-icon>delete</mat-icon>
@@ -125,7 +125,7 @@
                     </a>
                 </div>
 
-                <div style="margin-left: 10px;">
+                <div style="margin-left: 20px;">
                     <div *ngFor="let document of vm.documents.items; let index = index" style="display: flex; width: 100%;">
                         <sb-m2o-select style="min-width: 70%"
                                        [id]="document.id"
