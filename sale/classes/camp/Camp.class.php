@@ -31,6 +31,13 @@ class Camp extends Model {
                 'function'          => 'calcName'
             ],
 
+            'center_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\Center',
+                'description'       => "The center to which the booking relates to.",
+                'default'           => 1
+            ],
+
             'short_name' => [
                 'type'              => 'string',
                 'description'       => "Short name of the camp.",
