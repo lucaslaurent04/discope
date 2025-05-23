@@ -137,7 +137,7 @@ class PriceAdapter extends Model {
     }
 
     public static function canupdate($self, $values) {
-        $self->read(['sponsor_id', 'price_adapter_type', 'is_manual_discount', 'origin_type']);
+        $self->read(['sponsor_id', 'price_adapter_type', 'is_manual_discount', 'origin_type', 'enrollment_id']);
 
         if(isset($values['sponsor_id']) || isset($values['price_adapter_type']) || isset($values['is_manual_discount']) || isset($values['origin_type'])) {
             foreach($self as $price_adapter) {
@@ -167,6 +167,28 @@ class PriceAdapter extends Model {
             }
         }
 
+        if(isset($values['price_adapter_type']) && $values['price_adapter_type'] === 'percent') {
+            foreach($self as $id => $price_adapter) {
+                $enrollment_id = $values['enrollment_id'] ?? $price_adapter['enrollment_id'];
+
+                $other_percent_adapter = PriceAdapter::search([
+                    ['enrollment_id', '=', $enrollment_id],
+                    ['price_adapter_type', '=', 'percent'],
+                    ['id', '<>', $id]
+                ])
+                    ->read(['id'])
+                    ->first();
+
+                if(!is_null($other_percent_adapter)) {
+                    return ['price_adapter_type' => ['already_percent' => "Only one 'percent' price adapter is allowed for an enrollment."]];
+                }
+            }
+        }
+
         return parent::canupdate($self, $values);
+    }
+
+    public static function ondelete($self) {
+        $self->do('reset-enrollments-prices');
     }
 }

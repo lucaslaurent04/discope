@@ -240,14 +240,12 @@
                             </tr>
                         {% endif %}
                     {% endfor %}
-                    {% for price_adapter in price_adapters_ids %}
-                        {% if price_adapter.price_adapter_type == 'percent' %}
-                            <tr>
-                                <td style="width: 70%;">{{ price_adapter.name }}</td>
-                                <td style="text-align: right;">{{ price_adapter.value }}%</td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
+                    {% if percent_price_adapter != null %}
+                        <tr>
+                            <td style="width: 70%;">{{ percent_price_adapter.name }}</td>
+                            <td style="text-align: right;">{{ percent_price_adapter.value|format_money() }}</td>
+                        </tr>
+                    {% endif %}
                     <tr style="background-color: #cfcfcf;">
                         <td style="width: 70%;">Reste total à payer</td>
                         <td style="text-align: right;">{{ price|format_money() }}</td>
