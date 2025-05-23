@@ -58,6 +58,11 @@
             "label": "Quota ASE (par groupe)",
             "description": "Max d'enfants ASE par groupe (Aide social à l'enfance).",
             "help": ""
+        },
+        "accounting_code": {
+            "label": "Code comptable",
+            "description": "Code comptable du camp.",
+            "help": ""
         }
     },
     "view": {
