@@ -70,7 +70,8 @@
     },
     "error": {
         "price_adapter_type": {
-            "must_be_amount": "Doit être un montant quand liée à une aide."
+            "must_be_amount": "Doit être un montant quand liée à une aide.",
+            "already_percent": "Une seule réduction de prix 'Pourcentage' est autorisé pour une inscription."
         },
         "is_manual_discount": {
             "cannot_be_manual": "Ne peut pas être manuelle quand liée à une aide."
