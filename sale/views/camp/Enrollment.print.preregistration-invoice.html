@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+    <title>{{i18n['booking_contract']}}</title>
+
+    <style type="text/css">
+        @page {
+            margin: 1cm;
+        }
+
+        body {
+            width: 100%;
+            margin: 0 0 35px;
+            padding: 0;
+            text-align: justify;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 0.7em;
+        }
+
+        h2 {
+            margin-top: 8px;
+            margin-bottom: 0;
+            font-size: 21px;
+        }
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 0;
+            font-size: 15px;
+        }
+
+        div, table, table tr td {
+            font-family: Helvetica, Arial, sans-serif;
+        }
+
+        div.footer {
+            box-sizing: border-box;
+            border: 0;
+            margin: 0;
+            padding: 0;
+            position: fixed;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .table-date-refs {
+            margin-top: 10px;
+            margin-left: 45px;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+
+        .table-date-refs td {
+            padding: 2px 7px;
+            border: solid 1px #cccccc;
+        }
+
+        .table-address {
+            width: 300px;
+            margin-top: 75px;
+            margin-left: 10px;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            border: solid 1px #cccccc;
+        }
+
+        .table-address td {
+            padding: 4px 10px;
+        }
+
+        div.footer {
+            text-align: center;
+            bottom: 0;
+            left: 0;
+            height: 30px;
+            overflow: visible;
+            z-index: 200;
+            font-size: 0.9em !important;
+        }
+
+        hr {
+            page-break-after: always;
+            border: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 50%;">
+                <div style="font-size: 1rem; font-weight: 500; text-align: center;">
+                    <div>CPA LATHUS</div>
+                    <div>La Voulzie</div>
+                    <div>C.S. 40005</div>
+                    <div>86390 Lathus Saint-Rémy</div>
+                </div>
+
+                <div style="margin-top: 10px; margin-left: 100px;">
+                    <div>05.49.91.72.60</div>
+                    <div>Service réservations des camps</div>
+                </div>
+
+                <div style="margin-top: 20px; margin-left: 35px;">
+                    <div>
+                        <div>Association loi 1901 - RNA N°W862000036</div>
+                        <div>SIRET 331 320 507 000 14 - APE 9312 Z</div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <div>IBAN: FR76 1027 8364 1200 0100 1050 374</div>
+                        <div>BIC: CMCIFR2A</div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <div>N° d'agrément permanent C.V. - DRDJS : 086 120 003</div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <div>N° d'agrément C.V. juillet :</div>
+                        <div>N° d'agrément C.V. août :</div>
+                    </div>
+                </div>
+            </td>
+            <td style="width: 50%;">
+                <table class="table-date-refs">
+                    <tr>
+                        <td style="text-align: center">Date</td>
+                        <td style="text-align: center">Réf. enfant</td>
+                        <td style="text-align: center">Réf. camp</td>
+                    </tr>
+                    <tr>
+                        <td>{{ date | format_date() }}</td>
+                        <td></td>
+                        <td>{{ camp_id.accounting_code }}</td>
+                    </tr>
+                </table>
+
+                <table class="table-address">
+                    <tr>
+                        <td colspan="2" style="padding-top: 10px">
+                            {{ child_id.main_guardian_id.lastname|upper }} {{ child_id.main_guardian_id.firstname }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">{{ child_id.main_guardian_id.address_street }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            {% if child_id.main_guardian_id.address_dispatch|length > 0 %}
+                            {{ child_id.main_guardian_id.address_dispatch }}
+                            {% else %}
+                            &nbsp;
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40px; padding-bottom: 10px">{{ child_id.main_guardian_id.address_zip }}</td>
+                        <td style="padding-bottom: 10px;">{{ child_id.main_guardian_id.address_city }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <table style="width: 100%; margin: 60px 0;">
+        <tr>
+            <td style="width: 20px;"></td>
+            <td style="width: 20px; border-top: 1px solid #cccccc;"></td>
+            <td style="text-align: center; padding-top: 10px; font-size: 1.5rem;text-transform: uppercase;">
+                Mémoire
+            </td>
+            <td style="width: 20px; border-top: 1px solid #cccccc;"></td>
+            <td style="width: 20px;"></td>
+        </tr>
+    </table>
+
+    <div class="footer">
+        <p>
+            Les informations présentes dans ce document font l'objet d'un traitement informatique et sont destinées au Centre de Plein Air de Lathus. Conformément à la loi
+            "Informatique et libertés" du 6 janvier 1978, vous bénéficiez d'un droit d'accès et de rectification aux informations qui vous concernent.
+        </p>
+    </div>
+</body>

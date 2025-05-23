@@ -19,6 +19,17 @@
     </div>
 
     <div class="body">
+        <div class="body-actions" style="display: flex;">
+            <div class="actions-std">
+            </div>
+            <div class="actions-view">
+                <a target="_blank" [attr.href]="'/?get=sale_camp_enrollment_preregistration_print-invoice&lang=' + selectedLanguage.code + '&id=' + enrollment.id">
+                    <button mat-stroked-button>Voir facture</button>
+                </a>
+                <button mat-flat-button color="accent" (click)="onSend()">Envoyer</button>
+            </div>
+        </div>
+
         <div class="row">
             <div class="column">
                 <div class="cell title">Inscription</div>
