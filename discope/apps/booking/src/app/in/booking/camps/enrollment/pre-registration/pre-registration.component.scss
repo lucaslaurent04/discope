@@ -81,6 +81,33 @@
             overflow-x: hidden;
             padding: 12px;
 
+            .body-actions {
+                display: flex;
+                margin-left: 12px;
+                max-height: 56px;
+                padding-top: 10px;
+
+                .actions-std {
+                    flex: 0 1 50%;
+                }
+
+                .actions-view {
+                    margin-left: auto;
+                    min-width: 300px;
+                    text-align: right;
+
+                    .print-mode-selector {
+                        width: auto;
+                        margin-top: -20px;
+                    }
+                }
+
+                button {
+                    text-transform: uppercase;
+                    margin-left: 12px;
+                }
+            }
+
             .row {
                 display: flex;
             }
