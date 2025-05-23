@@ -45,6 +45,16 @@ class Camp extends Model {
                 'dependents'        => ['name']
             ],
 
+            'sojourn_number' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => "Sojourn number to distinguish camps.",
+                'help'              => "Is handle by the setting sequence 'sale.organization.camp.sequence{center_id.center_office_id.code}'.",
+                'store'             => true,
+                'instant'           => true,
+                'function'          => 'calcSojournNumber'
+            ],
+
             'status' => [
                 'type'              => 'string',
                 'selection'         => [
@@ -201,9 +211,8 @@ class Camp extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'string',
                 'description'       => "Specific accounting code for the camp.",
-                'unique'            => true,
                 'store'             => true,
-                'function'          => 'calcAccountingCode'
+                'relation'          => ['camp_model_id' => 'accounting_code'],
             ],
 
             'need_license_ffe' => [
@@ -407,6 +416,22 @@ class Camp extends Model {
         return $result;
     }
 
+    public static function calcSojournNumber($self): array {
+        $result = [];
+        $self->read(['center_id' => ['center_office_id' => ['code']]]);
+
+        foreach($self as $id => $camp) {
+            $sequence_name = 'camp.sequence'.$camp['center_id']['center_office_id']['code'];
+            Setting::assert_sequence('sale', 'organization', $sequence_name);
+
+            $sequence = Setting::fetch_and_add('sale', 'organization', $sequence_name);
+
+            $result[$id] = $sequence;
+        }
+
+        return $result;
+    }
+
     public static function calcDefaultEmployeeRatio($self): array {
         $result = [];
         $self->read(['camp_model_id' => ['default_employee_ratio']]);
@@ -443,27 +468,6 @@ class Camp extends Model {
         return $result;
     }
 
-    public static function calcAccountingCode($self): array {
-        $result = [];
-        $last_accounting_code = self::search([], ['sort' => ['created' => 'desc']])
-            ->read(['accounting_code'])
-            ->first();
-
-        $code = 0;
-        if(!is_null($last_accounting_code)) {
-            $code_array = explode('C', $last_accounting_code['accounting_code']);
-            if(isset($code_array[1])) {
-                $code = (int) $code_array[1];
-            }
-        }
-
-        foreach($self as $id => $camp) {
-            $result[$id] = '411C'.str_pad(++$code, 4, '0', STR_PAD_LEFT);
-        }
-
-        return $result;
-    }
-
     public static function onchange($event, $values) {
         $result = [];
         if(isset($event['camp_model_id'])) {
@@ -476,6 +480,7 @@ class Camp extends Model {
                     'employee_ratio',
                     'need_license_ffe',
                     'ase_quota',
+                    'accounting_code',
                     'product_id'        => ['id', 'name'],
                     'day_product_id'    => ['id', 'name']
                 ])
@@ -488,6 +493,7 @@ class Camp extends Model {
                 $result['need_license_ffe'] = $camp_model['need_license_ffe'];
                 $result['ase_quota'] = $camp_model['ase_quota'];
                 $result['is_clsh'] = $camp_model['is_clsh'];
+                $result['accounting_code'] = $camp_model['accounting_code'];
 
                 if($camp_model['is_clsh']) {
                     $result['clsh_type'] = $camp_model['clsh_type'];

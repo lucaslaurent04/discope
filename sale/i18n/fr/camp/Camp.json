@@ -8,6 +8,11 @@
             "description": "Nom court du camp.",
             "help": ""
         },
+        "sojourn_number": {
+            "label": "N° séjour",
+            "description": "Numéro de séjour du camp.",
+            "help": "Est géré par le setting sequence 'sale.organization.camp.sequence{center_id.center_office_id.code}'."
+        },
         "status": {
             "label": "Status",
             "description": "Status du camp.",

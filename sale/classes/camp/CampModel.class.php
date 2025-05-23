@@ -97,6 +97,12 @@ class CampModel extends Model {
                 'default'           => 4
             ],
 
+            'accounting_code' => [
+                'type'              => 'string',
+                'description'       => "Specific accounting code for the camp.",
+                'required'          => true
+            ],
+
             'required_skills_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\camp\Skill',
