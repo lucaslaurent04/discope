@@ -125,11 +125,33 @@ foreach($enrollment['enrollment_lines_ids'] as $line) {
     $total_amount += $line['price'];
 }
 
+$percent_price_adapter = null;
+foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+    if($price_adapter['price_adapter_type'] === 'percent') {
+        $percent_price_adapter = $price_adapter;
+        break;
+    }
+}
+if(!is_null($percent_price_adapter)) {
+    $percent_on_amount = $total_amount;
+    foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+        if($price_adapter['price_adapter_type'] === 'amount') {
+            $percent_on_amount -= $price_adapter['value'];
+        }
+    }
+
+    if(strpos($percent_price_adapter['name'], '%') === false) {
+        $percent_price_adapter['name'] .= ' ('.$percent_price_adapter['value'].'%)';
+    }
+    $percent_price_adapter['value'] = $percent_price_adapter['value'] / 100 * $percent_on_amount;
+}
+
 $values = [
     ...$enrollment,
     'date'                  => strtotime('now'),
     'camp_enrollment_line'  => $camp_enrollment_line,
-    'total_amount'          => $total_amount
+    'total_amount'          => $total_amount,
+    'percent_price_adapter' => $percent_price_adapter
 ];
 
 $entity = 'sale\camp\Enrollment';
