@@ -75,8 +75,7 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "symbiose:build",
-            "proxyConfig": "proxy.conf.json"
+            "browserTarget": "symbiose:build"
           },
           "configurations": {
             "production": {
