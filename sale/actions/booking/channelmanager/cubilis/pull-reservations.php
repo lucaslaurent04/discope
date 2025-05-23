@@ -327,16 +327,24 @@ try {
                                         'has_tour_operator' => true,
                                         'tour_operator_ref' => '(Cubilis)'
                                     ];
+
+                                if(!empty($reservation['partner_reservation_id']) && $reservation['partner_reservation_id'] !== '0' && $reservation['partner_reservation_id'] !== 0) {
+                                    $values['tour_operator_ref'] = (string) $reservation['partner_reservation_id'];
+                                }
+
                                 // booking.com
                                 if($reservation['partner_id'] == 4) {
                                     $values['tour_operator_id'] = 24594;
-                                    $values['tour_operator_ref'] = $reservation['partner_reservation_id'];
                                 }
                                 // expedia
                                 elseif($reservation['partner_id'] == 5) {
                                     $values['tour_operator_id'] = 18717;
-                                    $values['tour_operator_ref'] = $reservation['partner_reservation_id'];
                                 }
+                                // HostelWorld - #todo - to be confirmed
+                                elseif($reservation['partner_id'] == 757) {
+                                    $values['tour_operator_id'] = 24596;
+                                }
+
                                 // #todo #channelmanager - AirBnB
                                 Booking::id($booking['id'])->update($values);
                             }
