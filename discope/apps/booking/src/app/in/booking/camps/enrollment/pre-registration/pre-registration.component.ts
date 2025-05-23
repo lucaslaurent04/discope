@@ -3,6 +3,7 @@ import { ApiService, EnvService, AuthService, ContextService } from 'sb-shared-l
 import { UserClass } from 'sb-shared-lib/lib/classes/user.class';
 import { FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 class Enrollment {
     constructor(
@@ -176,6 +177,7 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
     public selectedLanguage: Language = null;
 
     public loading = true;
+    public isSent = false;
 
     public vm: vModel;
 
@@ -185,7 +187,8 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
         private auth: AuthService,
         private context: ContextService,
         private route: ActivatedRoute,
-        private cd: ChangeDetectorRef
+        private cd: ChangeDetectorRef,
+        private snack: MatSnackBar
     ) {
         this.vm = {
             lang: {
@@ -503,8 +506,68 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
         }
     }
 
-    public onSend() {
-        console.log('send');
+    public async onSend() {
+        /*
+            Validate values (otherwise mark fields as invalid)
+        */
+
+        let hasError = false;
+        if(this.vm.title.formControl.invalid) {
+            this.vm.title.formControl.markAsTouched();
+            hasError = true;
+        }
+        if(this.vm.message.formControl.invalid) {
+            this.vm.message.formControl.markAsTouched();
+            hasError = true;
+        }
+        if(this.vm.sender.formControl.invalid) {
+            this.vm.sender.formControl.markAsTouched();
+            hasError = true;
+        }
+        if(this.vm.recipient.formControl.invalid) {
+            this.vm.recipient.formControl.markAsTouched();
+            hasError = true;
+        }
+
+        if(hasError) {
+            return;
+        }
+
+        try {
+            this.loading = true;
+            await this.api.call('?do=sale_camp_enrollment_send-preregistration', {
+                enrollment_id: this.enrollment.id,
+                sender_email: this.vm.sender.formControl.value,
+                recipient_email: this.vm.recipient.formControl.value,
+                recipients_emails: this.vm.recipients.formControl.value,
+                title: this.vm.title.formControl.value,
+                message: this.vm.message.formControl.value,
+                lang: this.vm.lang.formControl.value,
+                attachments_ids: this.vm.attachments.items.filter((a: any) => a?.id).map((a: any) => a.id),
+                documents_ids: this.vm.documents.items.filter((d: any) => d?.id).map((d: any) => d.id),
+            });
+
+            this.isSent = true;
+            this.snack.open("Confirmation de pré-inscription envoyée avec succès.");
+            this.loading = false;
+        }
+        catch(response: any) {
+            let message: string = 'Erreur inconnue';
+            if(response.error && response.error.errors) {
+                const codes = Object.keys(response.error.errors);
+                if(codes.length) {
+                    switch(codes[0]) {
+                        case 'NOT_ALLOWED':
+                            message = 'Opération non autorisée';
+                            break;
+                    }
+                }
+            }
+            setTimeout( () => {
+                this.loading = false;
+                this.snack.open(message, "Erreur");
+            }, 500);
+        }
     }
 
     public onclickEnrollment() {
