@@ -93,6 +93,11 @@ $enrollment = Enrollment::id($params['id'])
             'enrollment_lines_ids' => [
                 'product_id' => ['label'],
                 'price'
+            ],
+            'price_adapters_ids' => [
+                'name',
+                'price_adapter_type',
+                'value'
             ]
         ],
         $params['lang']
@@ -115,10 +120,16 @@ foreach($enrollment['enrollment_lines_ids'] as $line) {
     }
 }
 
+$total_amount = 0;
+foreach($enrollment['enrollment_lines_ids'] as $line) {
+    $total_amount += $line['price'];
+}
+
 $values = [
     ...$enrollment,
     'date'                  => strtotime('now'),
-    'camp_enrollment_line'  => $camp_enrollment_line
+    'camp_enrollment_line'  => $camp_enrollment_line,
+    'total_amount'          => $total_amount
 ];
 
 $entity = 'sale\camp\Enrollment';

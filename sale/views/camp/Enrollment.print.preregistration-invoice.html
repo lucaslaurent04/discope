@@ -70,6 +70,18 @@
             padding: 4px 10px;
         }
 
+        .table-prices {
+            width: 350px;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+
+        .table-prices td {
+            padding: 2px 7px;
+            border: solid 1px black;
+            border-collapse: collapse;
+        }
+
         div.footer {
             text-align: center;
             bottom: 0;
@@ -205,6 +217,54 @@
                 </tr>
             {% endif %}
         {% endfor %}
+    </table>
+
+    <table style="width: 100%; margin-top: 80px;">
+        <tr>
+            <td style="width: 44%; text-align: right; vertical-align: bottom;">
+                {% if price == 0 %}
+                    <i style="margin-right: 20px;">Facture acquittée. Merci</i>
+                {% endif %}
+            </td>
+            <td style="width: 56%;">
+                <table class="table-prices">
+                    <tr style="background-color: #cfcfcf;">
+                        <td style="width: 70%;">Total des séjours</td>
+                        <td style="text-align: right;">{{ total_amount|format_money() }}</td>
+                    </tr>
+                    {% for price_adapter in price_adapters_ids %}
+                        {% if price_adapter.price_adapter_type == 'amount' %}
+                            <tr>
+                                <td style="width: 70%;">{{ price_adapter.name }}</td>
+                                <td style="text-align: right;">{{ price_adapter.value|format_money() }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    {% for price_adapter in price_adapters_ids %}
+                        {% if price_adapter.price_adapter_type == 'percent' %}
+                            <tr>
+                                <td style="width: 70%;">{{ price_adapter.name }}</td>
+                                <td style="text-align: right;">{{ price_adapter.value }}%</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    <tr style="background-color: #cfcfcf;">
+                        <td style="width: 70%;">Reste total à payer</td>
+                        <td style="text-align: right;">{{ price|format_money() }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding-top: 5px;" colspan="2">
+                <i style="margin-left: 170px;">Aucun escompte ne sera accordé pour paiememnt anticipé</i>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding-top: 5px;" colspan="2">
+                <i style="margin-left: 170px;">Exonération de TVA selon Art. 261-7-1° du C.G.I. et 293B du C.G.I.</i>
+            </td>
+        </tr>
     </table>
 
     <div class="footer">
