@@ -64,9 +64,12 @@ $enrollment = Enrollment::id($params['id'])
             ],
             'camp_id' => [
                 'short_name',
+                'sojourn_number',
                 'date_from',
                 'date_to',
                 'accounting_code',
+                'product_id',
+                'day_product_id',
                 'center_id' => [
                     'address_street',
                     'address_dispatch',
@@ -86,6 +89,10 @@ $enrollment = Enrollment::id($params['id'])
                     'address_zip',
                     'address_city'
                 ]
+            ],
+            'enrollment_lines_ids' => [
+                'product_id' => ['label'],
+                'price'
             ]
         ],
         $params['lang']
@@ -100,9 +107,18 @@ if(is_null($enrollment)) {
  * Create HTML *
  ***************/
 
+$camp_enrollment_line = null;
+foreach($enrollment['enrollment_lines_ids'] as $line) {
+    if(in_array($line['product_id']['id'], [$enrollment['camp_id']['product_id'], $enrollment['camp_id']['day_product_id']])) {
+        $camp_enrollment_line = $line;
+        break;
+    }
+}
+
 $values = [
     ...$enrollment,
-    'date' => strtotime('now')
+    'date'                  => strtotime('now'),
+    'camp_enrollment_line'  => $camp_enrollment_line
 ];
 
 $entity = 'sale\camp\Enrollment';
@@ -134,7 +150,7 @@ try {
 
     $template = $twig->load("$class_path.print.preregistration-invoice.html");
 
-    $html = $template->render($enrollment);
+    $html = $template->render($values);
 }
 catch(Exception $e) {
     trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);

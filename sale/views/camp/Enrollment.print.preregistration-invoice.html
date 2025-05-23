@@ -129,7 +129,7 @@
                         <td style="text-align: center">Réf. camp</td>
                     </tr>
                     <tr>
-                        <td>{{ date | format_date() }}</td>
+                        <td>{{ date|format_date() }}</td>
                         <td></td>
                         <td>{{ camp_id.accounting_code }}</td>
                     </tr>
@@ -172,6 +172,39 @@
             <td style="width: 20px; border-top: 1px solid #cccccc;"></td>
             <td style="width: 20px;"></td>
         </tr>
+    </table>
+
+    <table style="font-size: 0.8rem; margin-left: 40px;">
+        <tr>
+            <td>Séjour n°{{ camp_id.sojourn_number }}, intitulé '{{ camp_id.short_name }}'</td>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <td>Au CPA Lathus</td>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <td>du {{ camp_id.date_from|format_date() }} au {{ camp_id.date_to|format_date() }}</td>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <td>concernant <span style="margin-left: 10px;">{{ child_id.firstname }} {{ child_id.lastname|upper }}</span></td>
+            <td>......................................................................................</td>
+            <td style="width: 100px; text-align: right;">
+                <span style="margin-right: 35px;">{{ camp_enrollment_line.price|format_money() }}</span>
+            </td>
+        </tr>
+        {% for enrollment_line in enrollment_lines_ids %}
+            {% if enrollment_line.id != camp_enrollment_line.id %}
+                <tr>
+                    <td>{{ enrollment_line.product_id.label }}</td>
+                    <td>......................................................................................</td>
+                    <td style="width: 100px; text-align: right;">
+                        <span style="margin-right: 35px;">{{ enrollment_line.price|format_money() }}</span>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
     </table>
 
     <div class="footer">
