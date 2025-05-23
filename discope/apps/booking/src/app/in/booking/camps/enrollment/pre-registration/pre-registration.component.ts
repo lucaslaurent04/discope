@@ -503,6 +503,10 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
         }
     }
 
+    public onSend() {
+        console.log('send');
+    }
+
     public onclickEnrollment() {
         let descriptor:any = {
             context_silent: true,
