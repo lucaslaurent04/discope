@@ -80,25 +80,40 @@ $domain->addCondition(new DomainCondition('can_sell', '=', true));
 
 // 2) reduce domain to products referenced by prices matching the given constraints (center, dates & status)
 $products_ids = Product::search($domain->toArray())->ids();
-$price_lists_ids = PriceList::search(
-        [
-            ['price_list_category_id', '=', $center['price_list_category_id']],
-            ['date_from', '<=', $params['date_from']],
-            ['date_to', '>=', $params['date_from']],
-            ['status', 'in', ['published', 'pending']]
-        ],
-        ['duration' => 'asc']
-    )
-    ->ids();
 
-$prices = Price::search([
-            ['price_list_id', 'in', $price_lists_ids],
-            ['product_id', 'in', $products_ids],
-        ])
-        ->read(['product_id'])
-        ->get(true);
+$has_pack_clause = false;
 
-$products_ids = array_map(fn ($a) => $a['product_id'], $prices);
+foreach($domain->getClauses() as $clause) {
+    foreach($clause->getConditions() as $condition) {
+        if($condition->getOperand() === 'is_pack') {
+            $has_pack_clause = true;
+            break;
+        }
+    }
+}
+
+// for non-pack products, limit to the ones having a price set for the given date range
+if(!$has_pack_clause) {
+    $price_lists_ids = PriceList::search(
+            [
+                ['price_list_category_id', '=', $center['price_list_category_id']],
+                ['date_from', '<=', $params['date_from']],
+                ['date_to', '>=', $params['date_from']],
+                ['status', 'in', ['published', 'pending']]
+            ],
+            ['duration' => 'asc']
+        )
+        ->ids();
+
+    $prices = Price::search([
+                ['price_list_id', 'in', $price_lists_ids],
+                ['product_id', 'in', $products_ids],
+            ])
+            ->read(['product_id'])
+            ->get(true);
+
+    $products_ids = array_map(fn ($a) => $a['product_id'], $prices);
+}
 
 // 3) read products
 $products = Product::ids($products_ids)
