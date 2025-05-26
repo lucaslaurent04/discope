@@ -802,7 +802,7 @@ try {
                         // 5) add contacts
 
                         // add main contact : use the customer as default contact (@see Booking class)
-                        $orm->callonce(Booking::getType(), 'createContacts', $booking['id']);
+                        Booking::id($booking['id'])->do('import_contacts');
 
                         if(count($reservation['contacts'])) {
                             $map_identities = [];
