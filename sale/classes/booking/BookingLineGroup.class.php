@@ -3258,7 +3258,7 @@ class BookingLineGroup extends Model {
 
                 $meals_ids = $om->search(BookingMeal::getType(), [['booking_line_group_id', '=', $id], ['time_slot_id', '=', $line['time_slot_id']], ['date', '=', $date]]);
                 if(!count($meals_ids)) {
-                    $meals_ids[] = $om->create(BookingMeal::getType());
+                    $meals_ids[] = $om->create(BookingMeal::getType(), []);
                 }
                 $om->update(BookingMeal::getType(), $meals_ids, $values);
             }
