@@ -440,13 +440,19 @@ class Enrollment extends Model {
     public static function calcTotal($self): array {
         $result = [];
         $self->read([
-            'enrollment_lines_ids'  => ['total'],
+            'camp_id'               => ['product_id', 'day_product_id'],
+            'enrollment_lines_ids'  => ['product_id', 'total'],
             'price_adapters_ids'    => ['price_adapter_type', 'value']
         ]);
         foreach($self as $id => $enrollment) {
             $total = 0.0;
+            $camp_product_line = null;
             foreach($enrollment['enrollment_lines_ids'] as $enrollment_line) {
                 $total += $enrollment_line['total'];
+
+                if(in_array($enrollment_line['product_id'], [$enrollment['camp_id']['product_id'], $enrollment['camp_id']['day_product_id']])) {
+                    $camp_product_line = $enrollment_line;
+                }
             }
 
             foreach($enrollment['price_adapters_ids'] as $price_adapter) {
@@ -459,18 +465,24 @@ class Enrollment extends Model {
                 $total = 0;
             }
 
-            $percentage = 0;
-            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-                if($price_adapter['price_adapter_type'] !== 'percent') {
-                    continue;
+            // # memo - the percentage price-adapter only applies on camp price
+            if(!is_null($camp_product_line)) {
+                $percent_price_adapter = null;
+                foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+                    if ($price_adapter['price_adapter_type'] === 'percent') {
+                        $percent_price_adapter = $price_adapter;
+                        break;
+                    }
                 }
-                $percentage += $price_adapter['value'];
-            }
-            if($percentage > 100) {
-                $percentage = 100;
+
+                if(!is_null($percent_price_adapter)) {
+                    $total -= ($camp_product_line['total'] / 100 * $percent_price_adapter['value']);
+                }
+                if($total < 0) {
+                    $total = 0;
+                }
             }
 
-            $total -= $total / 100 * $percentage;
 
             $result[$id] = $total;
         }
@@ -481,13 +493,19 @@ class Enrollment extends Model {
     public static function calcPrice($self): array {
         $result = [];
         $self->read([
-            'enrollment_lines_ids'  => ['price'],
+            'camp_id'               => ['product_id', 'day_product_id'],
+            'enrollment_lines_ids'  => ['product_id', 'price'],
             'price_adapters_ids'    => ['price_adapter_type', 'value']
         ]);
         foreach($self as $id => $enrollment) {
             $price = 0.0;
+            $camp_product_line = null;
             foreach($enrollment['enrollment_lines_ids'] as $enrollment_line) {
                 $price += $enrollment_line['price'];
+
+                if(in_array($enrollment_line['product_id'], [$enrollment['camp_id']['product_id'], $enrollment['camp_id']['day_product_id']])) {
+                    $camp_product_line = $enrollment_line;
+                }
             }
 
             foreach($enrollment['price_adapters_ids'] as $price_adapter) {
@@ -500,18 +518,23 @@ class Enrollment extends Model {
                 $price = 0;
             }
 
-            $percentage = 0;
-            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-                if($price_adapter['price_adapter_type'] !== 'percent') {
-                    continue;
+            // # memo - the percentage price-adapter only applies on camp price
+            if(!is_null($camp_product_line)) {
+                $percent_price_adapter = null;
+                foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+                    if ($price_adapter['price_adapter_type'] === 'percent') {
+                        $percent_price_adapter = $price_adapter;
+                        break;
+                    }
                 }
-                $percentage += $price_adapter['value'];
-            }
-            if($percentage > 100) {
-                $percentage = 100;
-            }
 
-            $price -= $price / 100 * $percentage;
+                if(!is_null($percent_price_adapter)) {
+                    $price -= ($camp_product_line['price'] / 100 * $percent_price_adapter['value']);
+                }
+                if($price < 0) {
+                    $price = 0;
+                }
+            }
 
             $result[$id] = $price;
         }
