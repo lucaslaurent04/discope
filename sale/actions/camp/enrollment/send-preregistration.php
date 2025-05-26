@@ -175,7 +175,7 @@ foreach($attachments as $attachment) {
 }
 
 // queue message
-Mail::queue($message, 'sale\booking\Booking', $enrollment['id']);
+Mail::send($message, 'sale\camp\Enrollment', $enrollment['id']);
 
 $context->httpResponse()
         ->status(204)
