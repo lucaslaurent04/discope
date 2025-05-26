@@ -101,6 +101,9 @@ $orm->update(Booking::getType(), $booking_id, [
         'tour_operator_ref'     => $params['fields']['tour_operator_ref']
     ]);
 
+// re-create contacts
+Booking::id($booking['id'])->do('import_contacts');
+
 // restore events in case this controller is chained with others
 $orm->enableEvents();
 
