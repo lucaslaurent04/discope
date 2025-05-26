@@ -9,6 +9,7 @@ namespace sale\booking;
 use core\setting\Setting;
 use equal\data\DataFormatter;
 use equal\orm\Model;
+use identity\Center;
 use identity\CenterOffice;
 
 class Booking extends Model {
@@ -86,24 +87,32 @@ class Booking extends Model {
                 'required'          => true
             ],
 
-            'organisation_id' => [
-                'type'              => 'many2one',
-                'foreign_object'    => 'identity\Identity',
-                'description'       => "The organisation the establishment belongs to."
-            ],
-
             'center_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Center',
                 'description'       => "The center to which the booking relates to.",
                 'required'          => true,
-                'onupdate'          => 'onupdateCenterId'
+                'dependents'        => ['organisation_id', 'center_office_id']
+            ],
+
+            'organisation_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'identity\Identity',
+                'description'       => "The organisation the establishment belongs to.",
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['center_id' => 'organisation_id']
             ],
 
             'center_office_id' => [
-                'type'              => 'many2one',
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
                 'foreign_object'    => 'identity\CenterOffice',
                 'description'       => 'Office the invoice relates to (for center management).',
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['center_id' => 'center_office_id']
             ],
 
             'total' => [
@@ -277,8 +286,8 @@ class Booking extends Model {
 
             'payment_status' => [
                 'type'              => 'computed',
-                'usage'             => 'icon',
                 'result_type'       => 'string',
+                'usage'             => 'icon',
                 'selection'         => [
                     'due',
                     'paid'
@@ -1225,24 +1234,7 @@ class Booking extends Model {
         $bookings = $om->read(self::getType(), $oids, ['is_invoiced', 'booking_lines_ids']);
         foreach($bookings as $id => $booking) {
             // update all booking lines accordingly to their parent booking
-            $om->update(\sale\booking\BookingLine::getType(), $booking['booking_lines_ids'], ['is_invoiced' => $booking['is_invoiced']]);
-        }
-    }
-
-    public static function onupdateCenterId($om, $oids, $values, $lang) {
-        $bookings = $om->read(self::getType(), $oids, ['booking_lines_ids', 'center_id.center_office_id']);
-
-        if($bookings > 0) {
-            foreach($bookings as $bid => $booking) {
-                $booking_lines_ids = $booking['booking_lines_ids'];
-                if($booking_lines_ids > 0 && count($booking_lines_ids)) {
-                    $om->callonce('sale\booking\BookingLine', 'updatePriceId', $booking_lines_ids, [], $lang);
-                }
-                $center_offices = $om->read(CenterOffice::getType(), $booking['center_id.center_office_id'], ['id', 'organisation_id']);
-                $center_office = reset($center_offices);
-                $om->update(self::getType(), $bid, ['center_office_id' => $booking['center_id.center_office_id'],
-                                                    'organisation_id' => $center_office['organisation_id'] ?? null]);
-            }
+            $om->update(BookingLine::getType(), $booking['booking_lines_ids'], ['is_invoiced' => $booking['is_invoiced']]);
         }
     }
 
@@ -1263,6 +1255,15 @@ class Booking extends Model {
                 $result['date_to'] = $event['date_from'];
             }
         }
+        // try to retrieve nature from an identity
+        if(isset($event['center_id'])) {
+            $center = Center::id($event['center_id'])->read(['organisation_id' => ['id', 'name'], 'center_office_id' => ['id', 'name']])->first();
+            if($center) {
+                $result['organisation_id'] = ['id' => $center['organisation_id']['id'], 'name' => $center['organisation_id']['name']];
+                $result['center_office_id'] = ['id' => $center['center_office_id']['id'], 'name' => $center['center_office_id']['name']];
+            }
+        }
+
         // try to retrieve nature from an identity
         if(isset($event['customer_identity_id'])) {
             // search for a partner that relates to this identity, if any
@@ -1306,11 +1307,14 @@ class Booking extends Model {
      */
     public static function canupdate($om, $oids, $values, $lang) {
 
-        $bookings = $om->read(self::getType(), $oids, ['status', 'customer_id', 'customer_identity_id', 'center_id', 'booking_lines_ids'], $lang);
+        $bookings = $om->read(self::getType(), $oids, ['state', 'status', 'customer_id', 'customer_identity_id', 'center_id', 'booking_lines_ids'], $lang);
 
         // fields that can always be updated
         $allowed_fields = ['status', 'description', 'is_invoiced', 'payment_status'];
 
+        if(isset($values['state']) && $values['state'] === 'draft') {
+            return [];
+        }
 
         if(isset($values['center_id'])) {
             $has_booking_lines = false;
@@ -1378,6 +1382,9 @@ class Booking extends Model {
 
         // check for accepted changes based on status
         foreach($bookings as $id => $booking) {
+            if($booking['state'] === 'draft') {
+                continue;
+            }
             if(in_array($booking['status'], ['invoiced', 'debit_balance', 'credit_balance', 'balanced'])) {
                 if(count(array_diff(array_keys($values), $allowed_fields))) {
                     return ['status' => ['non_editable' => 'Invoiced bookings edition is limited.']];
