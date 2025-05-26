@@ -107,7 +107,8 @@
             "controller": "core_model_do",
             "params": {
                 "entity": "sale\\booking\\Booking",
-                "action": "import_contacts"
+                "action": "import_contacts",
+                "ids": []
             },
             "confirm": true
         },
