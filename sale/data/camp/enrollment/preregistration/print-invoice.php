@@ -132,18 +132,12 @@ foreach($enrollment['price_adapters_ids'] as $price_adapter) {
         break;
     }
 }
-if(!is_null($percent_price_adapter)) {
-    $percent_on_amount = $total_amount;
-    foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-        if($price_adapter['price_adapter_type'] === 'amount') {
-            $percent_on_amount -= $price_adapter['value'];
-        }
-    }
-
+if(!is_null($percent_price_adapter) && !is_null($camp_enrollment_line)) {
     if(strpos($percent_price_adapter['name'], '%') === false) {
         $percent_price_adapter['name'] .= ' ('.$percent_price_adapter['value'].'%)';
     }
-    $percent_price_adapter['value'] = $percent_price_adapter['value'] / 100 * $percent_on_amount;
+
+    $percent_price_adapter['value'] = $percent_price_adapter['value'] / 100 * $camp_enrollment_line['price'];
 }
 
 $values = [
