@@ -209,7 +209,7 @@
         {% for enrollment_line in enrollment_lines_ids %}
             {% if enrollment_line.id != camp_enrollment_line.id %}
                 <tr>
-                    <td>{{ enrollment_line.product_id.label }}</td>
+                    <td><span style="margin-left: 30px">{{ enrollment_line.product_id.label }}</span></td>
                     <td>......................................................................................</td>
                     <td style="width: 100px; text-align: right;">
                         <span style="margin-right: 35px;">{{ enrollment_line.price|format_money() }}</span>
