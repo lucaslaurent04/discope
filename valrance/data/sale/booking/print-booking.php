@@ -843,7 +843,7 @@ if($params['mode'] == 'grouped') {
             if (!isset($lines_map[$booking_line_group_id][$grouping_code][$product['id']])) {
                 $lines_map[$booking_line_group_id][$grouping_code][$product['id']] = [
                     'name'          => $booking_line['name'],
-                    'price'         => $null,
+                    'price'         => null,
                     'total'         => null,
                     'unit_price'    => null,
                     'vat_rate'      => null,
