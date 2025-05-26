@@ -128,16 +128,6 @@
             "description": "The status of the booking will be adapted according to the status of its fundings.",
             "controller": "sale_booking_update-status",
             "visible": [ ["status", "in", ["invoiced", "debit_balance", "credit_balance"]] ]
-        },
-        {
-            "id": "action.import-contacts",
-            "label": "Import contacts",
-            "description": "The contacts from the selected customer will be (re) imported to the booking.",
-            "controller": "sale_booking_import-contacts",
-            "params": {
-                "id": "object.id"
-            },
-            "confirm": true
         }
     ],
     "routes": [

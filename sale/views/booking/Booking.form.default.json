@@ -145,9 +145,10 @@
             "id": "action.import-contacts",
             "label": "Import contacts",
             "description": "The contacts from the selected customer will be (re) imported to the booking.",
-            "controller": "sale_booking_import-contacts",
+            "controller": "core_model_do",
             "params": {
-                "id": "object.id"
+                "entity": "sale\\booking\\Booking",
+                "action": "import_contacts"
             },
             "confirm": true
         }

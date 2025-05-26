@@ -520,6 +520,15 @@ class Booking extends Model {
         ];
     }
 
+    public static function getActions() {
+        return [
+            'import_contacts' => [
+                'description'   => 'Import contacts from customer identity.',
+                'policies'      => [],
+                'function'      => 'doImportContacts'
+            ]
+        ];
+    }
 
     public static function calcName($om, $oids, $lang) {
         $result = [];
@@ -1191,72 +1200,66 @@ class Booking extends Model {
                 }
                 $om->update(self::getType(), $oid, $values);
             }
-            // import contacts from customer identity
-            $om->callonce(self::getType(), 'createContacts', $oids, [], $lang);
+
         }
     }
 
-    public static function createContacts($om, $oids, $values, $lang) {
-        $bookings = $om->read(self::getType(), $oids, [
-            'customer_identity_id',
-            'contacts_ids'
-        ], $lang);
+    public static function doImportContacts($self, $om) {
+        $self->read(['customer_identity_id', 'contacts_ids']);
 
-        if($bookings > 0) {
-            foreach($bookings as $bid => $booking) {
-                if(is_null($booking['customer_identity_id']) || $booking['customer_identity_id'] <= 0) {
+        foreach($self as $id => $booking) {
+            if(is_null($booking['customer_identity_id']) || $booking['customer_identity_id'] <= 0) {
+                continue;
+            }
+            // ignore special case where customer is the organisation itself
+            if($booking['customer_identity_id'] == 1) {
+                continue;
+            }
+
+            // remove all previously auto created contacts
+            $previous_contacts_ids = $om->search(\sale\booking\Contact::getType(), [ ['booking_id', '=', $id], ['origin', '=', 'auto'] ] );
+            if($previous_contacts_ids > 0) {
+                $om->delete(\sale\booking\Contact::getType(), $previous_contacts_ids, true);
+            }
+
+            $partners_ids = [];
+            $existing_partners_ids = [];
+            // read all contacts (to prevent importing contacts twice)
+            if($booking['contacts_ids'] && count($booking['contacts_ids'] )) {
+                // #memo - we don't remove previously added contacts to keep user's work
+                // $om->delete(Contact::getType(), $booking['contacts_ids'], true);
+                $contacts = $om->read(\sale\booking\Contact::getType(), $booking['contacts_ids'], ['partner_identity_id']);
+                $existing_partners_ids = array_map(function($a) { return $a['partner_identity_id'];}, $contacts);
+            }
+            // if customer has contacts assigned to its identity, import those
+            $identity_contacts_ids = $om->search(\identity\Contact::getType(), [
+                ['owner_identity_id', '=', $booking['customer_identity_id']],
+                ['relationship', '=', 'contact']
+            ]);
+            if($identity_contacts_ids > 0 && count($identity_contacts_ids) > 0) {
+                $contacts = $om->read(\identity\Contact::getType(), $identity_contacts_ids, ['partner_identity_id']);
+                foreach($contacts as $cid => $contact) {
+                    if($contact['partner_identity_id']) {
+                        $partners_ids[] = $contact['partner_identity_id'];
+                    }
+                }
+            }
+            // append customer identity's own contact
+            $partners_ids[] = $booking['customer_identity_id'];
+            // keep only partners_ids not present yet - limit to max 5 contacts
+            // #todo - store MAX value in Settings
+            $partners_ids = array_slice(array_diff($partners_ids, $existing_partners_ids), 0, 5);
+            // create booking contacts
+            foreach($partners_ids as $partner_id) {
+                if(!$partner_id) {
                     continue;
                 }
-                // ignore special case where customer is the organisation itself
-                if($booking['customer_identity_id'] == 1) {
-                    continue;
-                }
-
-                // remove all previously auto created contacts
-                $previous_contacts_ids = $om->search(\sale\booking\Contact::getType(), [ ['booking_id', '=', $bid], ['origin', '=', 'auto'] ] );
-                if($previous_contacts_ids > 0) {
-                    $om->delete(\sale\booking\Contact::getType(), $previous_contacts_ids, true);
-                }
-
-                $partners_ids = [];
-                $existing_partners_ids = [];
-                // read all contacts (to prevent importing contacts twice)
-                if($booking['contacts_ids'] && count($booking['contacts_ids'] )) {
-                    // #memo - we don't remove previously added contacts to keep user's work
-                    // $om->delete(Contact::getType(), $booking['contacts_ids'], true);
-                    $contacts = $om->read(\sale\booking\Contact::getType(), $booking['contacts_ids'], ['partner_identity_id']);
-                    $existing_partners_ids = array_map(function($a) { return $a['partner_identity_id'];}, $contacts);
-                }
-                // if customer has contacts assigned to its identity, import those
-                $identity_contacts_ids = $om->search(\identity\Contact::getType(), [
-                    ['owner_identity_id', '=', $booking['customer_identity_id']],
-                    ['relationship', '=', 'contact']
+                $om->create(\sale\booking\Contact::getType(), [
+                    'booking_id'            => $id,
+                    'owner_identity_id'     => $booking['customer_identity_id'],
+                    'partner_identity_id'   => $partner_id,
+                    'origin'                => 'auto'
                 ]);
-                if($identity_contacts_ids > 0 && count($identity_contacts_ids) > 0) {
-                    $contacts = $om->read(\identity\Contact::getType(), $identity_contacts_ids, ['partner_identity_id']);
-                    foreach($contacts as $cid => $contact) {
-                        if($contact['partner_identity_id']) {
-                            $partners_ids[] = $contact['partner_identity_id'];
-                        }
-                    }
-                }
-                // append customer identity's own contact
-                $partners_ids[] = $booking['customer_identity_id'];
-                // keep only partners_ids not present yet - limit to max 5 contacts
-                // #todo - store MAX value in Settings
-                $partners_ids = array_slice(array_diff($partners_ids, $existing_partners_ids), 0, 5);
-                // create booking contacts
-                foreach($partners_ids as $partner_id) {
-                    if(!$partner_id) {
-                        continue;
-                    }
-                    $om->create(\sale\booking\Contact::getType(), [
-                        'booking_id'            => $bid,
-                        'owner_identity_id'     => $booking['customer_identity_id'],
-                        'partner_identity_id'   => $partner_id,
-                        'origin'                => 'auto'
-                    ]);
-                }
             }
         }
     }
