@@ -46,7 +46,8 @@ class BookingActivity extends Model {
                 'foreign_object'    => 'sale\booking\BookingLine',
                 'description'       => "Booking Line of the activity.",
                 'readonly'          => true,
-                'dependents'        =>  ['time_slot_id', 'activity_date', 'product_model_id']
+                'dependents'        => ['time_slot_id', 'activity_date', 'product_model_id'],
+                'ondelete'          => 'cascade'
             ],
 
             'is_virtual' => [
