@@ -1437,30 +1437,26 @@ class BookingLine extends Model {
      * @param  array                        $oids       List of objects identifiers.
      * @return void
      */
-    public static function ondelete($om, $oids) {
-        $lines = $om->read(self::getType(), $oids, ['booking_line_group_id', 'product_id.product_model_id.is_activity']);
-        if($lines > 0) {
-            $map_groups_ids = [];
-            foreach($lines as $oid => $odata) {
-                $map_groups_ids[$odata['booking_line_group_id']] = true;
+    public static function onbeforedelete($self, $om, $ids) {
+        $self->read(['booking_line_group_id', 'product_id' => ['product_model_id' => ['is_activity']]]);
 
-                if($odata['product_id.product_model_id.is_activity']) {
-                    BookingActivity::search(['activity_booking_line_id', '=', $oid])->delete(true);
-
-                    $booking_activity = BookingActivity::search(['booking_line_group_id', '=', $odata['booking_line_group_id']])
-                        ->read(['id'])
-                        ->first();
-
-                    if(!is_null($booking_activity)) {
-                        BookingActivity::id($booking_activity['id'])->do('update-counters');
-                    }
-                }
+        $map_groups_ids = [];
+        foreach($self as $id => $bookingLine) {
+            if($bookingLine['booking_line_group_id']) {
+                $map_groups_ids[$bookingLine['booking_line_group_id']] = true;
             }
 
-            $om->callonce(BookingLineGroup::getType(), 'updateBedLinensAndMakeBeds', array_keys($map_groups_ids), ['ignored_lines_ids' => array_keys($lines)]);
+            if($bookingLine['product_id']['product_model_id']['is_activity'] ?? false) {
+                BookingActivity::search(['booking_line_group_id', '=', $bookingLine['booking_line_group_id']])
+                    ->do('update-counters');
+            }
         }
 
-        $om->callonce(self::getType(), 'updateSPM', $oids, ['deleted' => $oids]);
+        if(count($map_groups_ids)) {
+            $om->callonce(BookingLineGroup::getType(), 'updateBedLinensAndMakeBeds', array_keys($map_groups_ids), ['ignored_lines_ids' => $self->ids()]);
+        }
+
+        $om->callonce(self::getType(), 'updateSPM', $ids, ['deleted' => $ids]);
     }
 
     /**
