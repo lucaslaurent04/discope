@@ -3211,7 +3211,7 @@ class BookingLineGroup extends Model {
      */
     public static function refreshMeals($om, $id) {
         /*
-        For all bookingLines of type meal (is_meal), we check if a bookingMeal exists for this group (for this reservation) and for the corresponding time_slot, for each date of the stay.
+        For all bookingLines of type meal (is_meal & is_snack), we check if a bookingMeal exists for this group (for this reservation) and for the corresponding time_slot, for each date of the stay.
             If not yet: we create a bookingMeal
             (the line is linked to the bookingMeal via the booking_meals_ids relation)
             (there can be multiple meal products for the same time slot, as variations of the same model [variation based on age group or other criteria])
@@ -3258,9 +3258,11 @@ class BookingLineGroup extends Model {
 
                 $meals_ids = $om->search(BookingMeal::getType(), [['booking_line_group_id', '=', $id], ['time_slot_id', '=', $line['time_slot_id']], ['date', '=', $date]]);
                 if(!count($meals_ids)) {
-                    $meals_ids[] = $om->create(BookingMeal::getType(), []);
+                    $om->create(BookingMeal::getType(), $values);
                 }
-                $om->update(BookingMeal::getType(), $meals_ids, $values);
+                else {
+                    $om->update(BookingMeal::getType(), $meals_ids, $values);
+                }
             }
         }
     }
