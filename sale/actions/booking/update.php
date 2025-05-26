@@ -102,7 +102,7 @@ $orm->update(Booking::getType(), $booking_id, [
     ]);
 
 // re-create contacts
-Booking::id($booking['id'])->do('import_contacts');
+Booking::id($booking_id)->do('import_contacts');
 
 // restore events in case this controller is chained with others
 $orm->enableEvents();
