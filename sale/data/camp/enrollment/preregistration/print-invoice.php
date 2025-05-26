@@ -177,6 +177,9 @@ try {
 
     $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
     $date_filter = new TwigFilter('format_date', function($value) use($date_format) {
+        if($value instanceof DateTime) {
+            return $value->format($date_format);
+        }
         return date($date_format, $value);
     });
     $twig->addFilter($date_filter);

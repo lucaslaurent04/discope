@@ -253,11 +253,19 @@
                 </table>
             </td>
         </tr>
-        <tr>
-            <td style="padding-top: 5px;" colspan="2">
-                <i style="margin-left: 170px;">Aucun escompte ne sera accordé pour paiememnt anticipé</i>
-            </td>
-        </tr>
+        {% if price > 0 %}
+            <tr>
+                <td style="padding-top: 5px;" colspan="2">
+                    <i style="margin-left: 170px;">Facture à échéance le {{ camp_id.date_from|date_modify("-1 month")|format_date() }}</i>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td style="padding-top: 5px;" colspan="2">
+                    <i style="margin-left: 170px;">Aucun escompte ne sera accordé pour paiememnt anticipé</i>
+                </td>
+            </tr>
+        {% endif %}
         <tr>
             <td style="padding-top: 5px;" colspan="2">
                 <i style="margin-left: 170px;">Exonération de TVA selon Art. 261-7-1° du C.G.I. et 293B du C.G.I.</i>
