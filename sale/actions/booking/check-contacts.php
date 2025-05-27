@@ -35,7 +35,7 @@ list($context, $dispatch) = [ $providers['context'], $providers['dispatch']];
 // ensure booking object exists and is readable
 $booking = Booking::id($params['id'])
         ->read([
-                'id', 'center_office_id', 'status', 'contacts_ids' => ['id','phone','mobile']
+            'id', 'is_from_channelmanager', 'center_office_id', 'status', 'contacts_ids' => ['id','phone','mobile']
         ])
         ->first(true);
 
@@ -64,7 +64,7 @@ $result = [];
 $httpResponse = $context->httpResponse()->status(200);
 
 
-if($count_phone == 0) {
+if(!$booking['is_from_channelmanager'] && $count_phone == 0) {
     $result[] = $booking['id'];
 
     $dispatch->dispatch('lodging.booking.confirm', 'sale\booking\Booking', $params['id'], 'warning', 'sale_booking_check-contacts', ['id' => $params['id']], [], null, $booking['center_office_id']);

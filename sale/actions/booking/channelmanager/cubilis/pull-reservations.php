@@ -592,6 +592,8 @@ try {
                                         ->first(true);
 
                                     if(!$service) {
+                                        ++$result['errors'];
+                                        $result['logs'][] = "ERR - Service extra inconnu:  {$extra_service['inventory_code']} pour property {$property['id']} ({$extra_service['comments']} {$extra_service['total']['amount']})";
                                         throw new Exception('unknown_extra_service', QN_ERROR_UNKNOWN_OBJECT);
                                     }
 
