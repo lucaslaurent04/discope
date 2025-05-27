@@ -186,13 +186,16 @@
         </tr>
     </table>
 
-    {% for child in children %}
-        {% for enrollment in child.enrollments_ids %}
-            <table style="font-size: 0.8rem; margin-left: 40px;">
+
+    <table style="font-size: 0.8rem; margin-left: 40px;">
+        {% for child in children %}
+            {% for enrollment in child.enrollments_ids %}
                 {% for enrollment_line in enrollment.enrollment_lines_ids %}
                     {% if enrollment_line.product_id.id == enrollment.camp_id.product_id or enrollment_line.product_id.id == enrollment.camp_id.day_product_id %}
                         <tr>
-                            <td>Séjour n°{{ enrollment.camp_id.sojourn_number }}, intitulé '{{ enrollment.camp_id.short_name }}'</td>
+                            <td style="white-space: nowrap; {{ (loop.parent.loop.index > 1 or loop.parent.loop.parent.loop.index > 1) ? 'padding-top: 40px;' : '' }}">
+                                Séjour n°{{ enrollment.camp_id.sojourn_number }}, intitulé '{{ enrollment.camp_id.short_name }}'
+                            </td>
                             <td colspan="2"></td>
                         </tr>
                         <tr>
@@ -205,24 +208,25 @@
                         </tr>
                         <tr>
                             <td>concernant <span style="margin-left: 10px;">{{ child.firstname }} {{ child.lastname|upper }}</span></td>
-                            <td>......................................................................................</td>
-                            <td style="width: 100px; text-align: right;">
-                                <span style="margin-right: 35px;">{{ enrollment_line.price|format_money() }}</span>
+                            <td>..............................................................................................</td>
+                            <td style="width: 60px; text-align: right;">
+                                <span>{{ enrollment_line.price|format_money() }}</span>
                             </td>
                         </tr>
                     {% else %}
                         <tr>
                             <td><span style="margin-left: 30px">{{ enrollment_line.product_id.label }}</span></td>
-                            <td>......................................................................................</td>
-                            <td style="width: 100px; text-align: right;">
-                                <span style="margin-right: 35px;">{{ enrollment_line.price|format_money() }}</span>
+                            <td>..............................................................................................</td>
+                            <td style="width: 60px; text-align: right;">
+                                <span>{{ enrollment_line.price|format_money() }}</span>
                             </td>
                         </tr>
                     {% endif %}
                 {% endfor %}
-            </table>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
+    </table>
+
 
     <table style="width: 100%; margin-top: 80px;">
         <tr>
