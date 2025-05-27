@@ -1723,7 +1723,9 @@ class BookingLine extends Model {
         ]);
         if($lines > 0 && count($lines)) {
             foreach($lines as $oid => $odata) {
-                $result[$oid] = $odata['product_id.product_model_id.is_meal'];
+                if(isset($odata['product_id.product_model_id.is_meal'])) {
+                    $result[$oid] = $odata['product_id.product_model_id.is_meal'];
+                }
             }
         }
         return $result;
