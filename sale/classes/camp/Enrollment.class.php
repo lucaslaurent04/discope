@@ -1345,6 +1345,7 @@ class Enrollment extends Model {
     public static function ondelete($self): void {
         $self->do('delete-lines');
         $self->do('reset-camp-enrollments-qty');
+        $self->do('remove-presences');
 
         parent::ondelete($self);
     }
