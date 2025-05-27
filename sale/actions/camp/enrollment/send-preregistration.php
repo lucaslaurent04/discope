@@ -225,8 +225,9 @@ foreach($attachments as $attachment) {
 }
 
 // queue message
-$mail_id = Mail::queue($message);
+$mail_id = Mail::queue($message, 'sale\camp\Enrollment', $enrollments_ids[0]);
 
+// create enrollment mail to link the email sent to multiple enrollments
 EnrollmentMail::create([
     'mail_id'           => $mail_id,
     'mail_type'         => 'pre-registration',
