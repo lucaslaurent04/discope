@@ -129,7 +129,10 @@ interface vModel {
     },
     center: {
         formControl: FormControl,
-    }
+    },
+    children: {
+        formControl: FormControl,
+    },
     title: {
         formControl: FormControl
     },
@@ -167,6 +170,7 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
 
     public enrollments: Enrollment[] = [];
     public mainGuardian: Guardian = new Guardian();
+    public mainGuardianChildren: Child[] = [];
     public guardians: Guardian[] = [];
 
     public camps: Camp[] = [];
@@ -183,6 +187,8 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
 
     public loading = true;
     public isSent = false;
+
+    public printInvoiceUrl: string = null;
 
     public vm: vModel;
 
@@ -201,6 +207,9 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
             },
             center: {
                 formControl: new FormControl(1),
+            },
+            children: {
+                formControl: new FormControl([], Validators.required),
             },
             title: {
                 formControl: new FormControl('', Validators.required)
@@ -243,8 +252,10 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
                     if(params.hasOwnProperty('child_id')) {
                         const childId = parseInt(params['child_id'], 10);
                         await this.loadChild(childId);
+
                         this.refreshSenderAddresses();
                         this.refreshTemplates();
+                        this.refreshPrintInvoiceUrl();
 
                         this.context.change({
                             context_only: true,
@@ -282,6 +293,8 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
             const child = children[0];
 
             this.child = child;
+            this.vm.children.formControl.setValue([this.child.id]);
+
             await this.loadEnrollments(child.id);
             await this.loadGuardians(child.guardians_ids, child.main_guardian_id);
         }
@@ -311,10 +324,19 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
             for(let guardian of guardians) {
                 if(guardian.id === mainGuardianId) {
                     this.mainGuardian = guardian;
+                    await this.loadOtherChildrenOfMainGuardian(guardian.id);
                     break;
                 }
             }
             this.refreshRecipientAddresses();
+        }
+    }
+
+    private async loadOtherChildrenOfMainGuardian(guardianId: number) {
+        const domain = ['main_guardian_id', '=', guardianId];
+        const children: Child[] = await this.api.collect("sale\\camp\\Child", domain, Object.getOwnPropertyNames(new Child()));
+        if(children.length > 1) {
+            this.mainGuardianChildren = children;
         }
     }
 
@@ -403,6 +425,7 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
         this.vm.lang.formControl.valueChanges.subscribe((languageCode: string) => {
             this.selectedLanguage = this.mapLanguages[languageCode];
             this.refreshTemplates();
+            this.refreshPrintInvoiceUrl();
         });
 
         this.vm.center.formControl.valueChanges.subscribe((centerId: number) => {
@@ -410,9 +433,14 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
                 if(center.id === centerId) {
                     this.selectedCenter = center;
                     this.refreshTemplates();
+                    this.refreshPrintInvoiceUrl();
                 }
             }
         });
+
+        this.vm.children.formControl.valueChanges.subscribe((childrenIds: number[]) => {
+            this.refreshPrintInvoiceUrl();
+        })
     }
 
     private async refreshTemplates() {
@@ -533,12 +561,27 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
         }
     }
 
+    public refreshPrintInvoiceUrl() {
+        console.log('refreshPrintInvoiceUrl');
+        const childrenIds = this.vm.children.formControl.value;
+        if(this.selectedCenter.id === 0 || this.selectedLanguage.id === 0 || childrenIds.length < 1) {
+            this.printInvoiceUrl = null;
+            return;
+        }
+
+        this.printInvoiceUrl = '/?get=sale_camp_enrollment_preregistration_print-invoice&center_id=' + this.selectedCenter.id + '&lang=' + this.selectedLanguage.code + '&ids=[' + childrenIds.join(',') + ']';
+    }
+
     public async onSend() {
         /*
             Validate values (otherwise mark fields as invalid)
         */
 
         let hasError = false;
+        if(this.vm.children.formControl.invalid) {
+            this.vm.children.formControl.markAsTouched();
+            hasError = true;
+        }
         if(this.vm.title.formControl.invalid) {
             this.vm.title.formControl.markAsTouched();
             hasError = true;
@@ -562,8 +605,9 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
 
         try {
             this.loading = true;
-            await this.api.call('?do=sale_camp_child_send-preregistration', {
-                child_id: this.child.id,
+            await this.api.call('?do=sale_camp_enrollment_send-preregistration', {
+                children_ids: this.vm.children.formControl.value,
+                center_id: this.vm.center.formControl.value,
                 sender_email: this.vm.sender.formControl.value,
                 recipient_email: this.vm.recipient.formControl.value,
                 recipients_emails: this.vm.recipients.formControl.value,
