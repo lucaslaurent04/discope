@@ -493,7 +493,7 @@ class BookingLine extends Model {
                 if($product['product_model_id']['is_fullday']) {
                     foreach($self as $id => $line) {
                         if(!in_array($line['time_slot_id'], $AM_PM_time_slot_ids)) {
-                            
+
                             // #todo - this should be done by the front-end with a distinct call (`canupdate` should not perform any data update)
                             // remove empty line because cannot set to activity
                             self::id($id)->delete(true);
@@ -504,7 +504,7 @@ class BookingLine extends Model {
                 }
 
                 foreach($self as $id => $line) {
-                    $activities_to_check = self::generateLineActivities(
+                    $activities_to_check = self::computeLineActivities(
                         $line['service_date'],
                         $line['time_slot_id'],
                         $product['product_model_id']['is_fullday'],
@@ -526,10 +526,10 @@ class BookingLine extends Model {
                         }
 
                         $activity = BookingActivity::search([
-                            ['booking_line_group_id', '=',  $line['booking_line_group_id']['id']],
-                            ['activity_date', '=', $activity_to_check['activity_date']],
-                            ['time_slot_id', '=', $activity_to_check['time_slot_id']]
-                        ])
+                                ['booking_line_group_id', '=',  $line['booking_line_group_id']['id']],
+                                ['activity_date', '=', $activity_to_check['activity_date']],
+                                ['time_slot_id', '=', $activity_to_check['time_slot_id']]
+                            ])
                             ->read(['id'])
                             ->first();
 
@@ -575,11 +575,11 @@ class BookingLine extends Model {
                     }
 
                     $existing_activity = BookingActivity::search([
-                        ['booking_line_group_id', '=', $line['booking_line_group_id']['id']],
-                        ['activity_date', '=', $activity_date],
-                        ['time_slot_id', '=', ($values['time_slot_id'] ?? $booking_activity['time_slot_id'])],
-                        ['activity_booking_line_id', '<>', $line['id']]
-                    ])
+                            ['booking_line_group_id', '=', $line['booking_line_group_id']['id']],
+                            ['activity_date', '=', $activity_date],
+                            ['time_slot_id', '=', ($values['time_slot_id'] ?? $booking_activity['time_slot_id'])],
+                            ['activity_booking_line_id', '<>', $line['id']]
+                        ])
                         ->read(['id'])
                         ->first();
 
@@ -650,6 +650,7 @@ class BookingLine extends Model {
             'product_id.product_model_id.activity_rental_units_ids',
             'product_id.has_age_range',
             'product_id.age_range_id',
+            'product_id.description',
             'booking_id',
             'booking_id.center_id',
             'booking_id.date_from',
@@ -703,12 +704,13 @@ class BookingLine extends Model {
             }
 
             if($line['product_id.product_model_id.is_activity']) {
-                $booking_activities = self::generateLineActivities(
+                $booking_activities = self::computeLineActivities(
                     $line['service_date'],
                     $line['time_slot_id'],
                     $line['product_id.product_model_id.is_fullday'],
                     $line['product_id.product_model_id.has_duration'],
-                    $line['product_id.product_model_id.duration']
+                    $line['product_id.product_model_id.duration'],
+                    $line['product_id.description']
                 );
 
                 $main_activity_id = null;
@@ -778,13 +780,13 @@ class BookingLine extends Model {
                         }
 
                         $booking_line = self::create([
-                            'order'                 => ++$line_order,
-                            'booking_id'            => $line['booking_id'],
-                            'booking_line_group_id' => $line['booking_line_group_id'],
-                            'service_date'          => $line['service_date'],
-                            'time_slot_id'          => $line['time_slot_id'],
-                            'booking_activity_id'   => $main_activity_id
-                        ])
+                                'order'                 => ++$line_order,
+                                'booking_id'            => $line['booking_id'],
+                                'booking_line_group_id' => $line['booking_line_group_id'],
+                                'service_date'          => $line['service_date'],
+                                'time_slot_id'          => $line['time_slot_id'],
+                                'booking_activity_id'   => $main_activity_id
+                            ])
                             ->read(['id'])
                             ->first();
 
@@ -936,11 +938,12 @@ class BookingLine extends Model {
         $om->callonce(self::getType(), '_resetPrices', $oids, [], $lang);
     }
 
-    private static function generateLineActivities(int $service_date, int $time_slot_id, bool $is_fullday, bool $has_duration, int $duration): array {
+    private static function computeLineActivities(int $service_date, int $time_slot_id, bool $is_fullday, bool $has_duration, int $duration, string $description=''): array {
         $booking_activities = [
             [
                 'activity_date' => $service_date,
                 'time_slot_id'  => $time_slot_id,
+                'description'   => $description,
                 'is_virtual'    => false
             ]
         ];
@@ -958,6 +961,7 @@ class BookingLine extends Model {
             $booking_activities[] = [
                 'activity_date' => $service_date,
                 'time_slot_id'  => $map_codes_time_slot_ids['AM'] === $time_slot_id ? $map_codes_time_slot_ids['PM'] : $map_codes_time_slot_ids['AM'],
+                'description'   => $description,
                 'is_virtual'    => true
             ];
         }
@@ -969,6 +973,7 @@ class BookingLine extends Model {
                 $booking_activities[] = [
                     'activity_date' => $service_date + $i * 86400,
                     'time_slot_id'  => $time_slot_id,
+                    'description'   => $description,
                     'is_virtual'    => true
                 ];
 
@@ -976,6 +981,7 @@ class BookingLine extends Model {
                     $booking_activities[] = [
                         'activity_date' => $service_date + $i * 86400,
                         'time_slot_id'  => $map_codes_time_slot_ids['AM'] === $time_slot_id ? $map_codes_time_slot_ids['PM'] : $map_codes_time_slot_ids['AM'],
+                        'description'   => $description,
                         'is_virtual'    => true
                     ];
                 }

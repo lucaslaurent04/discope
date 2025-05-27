@@ -145,8 +145,10 @@ hr {
                                 {% if data.activity is defined and data.activity | trim != '' %}
                                     <strong>{{ data['activity'] | default('') | raw }}</strong><br />
                                     <strong>({{ data['schedule_from'] | date('H:i') }} - {{ data['schedule_to'] | date('H:i') }})</strong><br />
+                                    <!--
                                     {{ data['service_description'] | default('') | raw }}<br />
                                     {{ data['product_description'] | default('') | raw }}<br />
+                                    -->
                                     {{ data['activity_description'] | default('') | raw }}
                                 {% endif %}
                             </td>
