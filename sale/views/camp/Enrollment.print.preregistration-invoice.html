@@ -143,31 +143,31 @@
                     <tr>
                         <td>{{ date|format_date() }}</td>
                         <td></td>
-                        <td>{{ camp_id.accounting_code }}</td>
+                        <td>{{ children[0].enrollments_ids[0].camp_id.accounting_code }}</td>
                     </tr>
                 </table>
 
                 <table class="table-address">
                     <tr>
                         <td colspan="2" style="padding-top: 10px">
-                            {{ child_id.main_guardian_id.lastname|upper }} {{ child_id.main_guardian_id.firstname }}
+                            {{ main_guardian.lastname|upper }} {{ main_guardian.firstname }}
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="2">{{ child_id.main_guardian_id.address_street }}</td>
+                        <td colspan="2">{{ main_guardian.address_street }}</td>
                     </tr>
                     <tr>
                         <td colspan="2">
-                            {% if child_id.main_guardian_id.address_dispatch|length > 0 %}
-                            {{ child_id.main_guardian_id.address_dispatch }}
+                            {% if main_guardian.address_dispatch|length > 0 %}
+                                {{ main_guardian.address_dispatch }}
                             {% else %}
-                            &nbsp;
+                                &nbsp;
                             {% endif %}
                         </td>
                     </tr>
                     <tr>
-                        <td style="width: 40px; padding-bottom: 10px">{{ child_id.main_guardian_id.address_zip }}</td>
-                        <td style="padding-bottom: 10px;">{{ child_id.main_guardian_id.address_city }}</td>
+                        <td style="width: 40px; padding-bottom: 10px">{{ main_guardian.address_zip }}</td>
+                        <td style="padding-bottom: 10px;">{{ main_guardian.address_city }}</td>
                     </tr>
                 </table>
             </td>
@@ -186,43 +186,48 @@
         </tr>
     </table>
 
-    <table style="font-size: 0.8rem; margin-left: 40px;">
-        <tr>
-            <td>Séjour n°{{ camp_id.sojourn_number }}, intitulé '{{ camp_id.short_name }}'</td>
-            <td colspan="2"></td>
-        </tr>
-        <tr>
-            <td>Au CPA Lathus</td>
-            <td colspan="2"></td>
-        </tr>
-        <tr>
-            <td>du {{ camp_id.date_from|format_date() }} au {{ camp_id.date_to|format_date() }}</td>
-            <td colspan="2"></td>
-        </tr>
-        <tr>
-            <td>concernant <span style="margin-left: 10px;">{{ child_id.firstname }} {{ child_id.lastname|upper }}</span></td>
-            <td>......................................................................................</td>
-            <td style="width: 100px; text-align: right;">
-                <span style="margin-right: 35px;">{{ camp_enrollment_line.price|format_money() }}</span>
-            </td>
-        </tr>
-        {% for enrollment_line in enrollment_lines_ids %}
-            {% if enrollment_line.id != camp_enrollment_line.id %}
-                <tr>
-                    <td><span style="margin-left: 30px">{{ enrollment_line.product_id.label }}</span></td>
-                    <td>......................................................................................</td>
-                    <td style="width: 100px; text-align: right;">
-                        <span style="margin-right: 35px;">{{ enrollment_line.price|format_money() }}</span>
-                    </td>
-                </tr>
-            {% endif %}
+    {% for child in children %}
+        {% for enrollment in child.enrollments_ids %}
+            <table style="font-size: 0.8rem; margin-left: 40px;">
+                {% for enrollment_line in enrollment.enrollment_lines_ids %}
+                    {% if enrollment_line.product_id.id == enrollment.camp_id.product_id or enrollment_line.product_id.id == enrollment.camp_id.day_product_id %}
+                        <tr>
+                            <td>Séjour n°{{ enrollment.camp_id.sojourn_number }}, intitulé '{{ enrollment.camp_id.short_name }}'</td>
+                            <td colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td>Au CPA Lathus</td>
+                            <td colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td>du {{ enrollment.camp_id.date_from|format_date() }} au {{ enrollment.camp_id.date_to|format_date() }}</td>
+                            <td colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td>concernant <span style="margin-left: 10px;">{{ child.firstname }} {{ child.lastname|upper }}</span></td>
+                            <td>......................................................................................</td>
+                            <td style="width: 100px; text-align: right;">
+                                <span style="margin-right: 35px;">{{ enrollment_line.price|format_money() }}</span>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td><span style="margin-left: 30px">{{ enrollment_line.product_id.label }}</span></td>
+                            <td>......................................................................................</td>
+                            <td style="width: 100px; text-align: right;">
+                                <span style="margin-right: 35px;">{{ enrollment_line.price|format_money() }}</span>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
         {% endfor %}
-    </table>
+    {% endfor %}
 
     <table style="width: 100%; margin-top: 80px;">
         <tr>
             <td style="width: 44%; text-align: right; vertical-align: bottom;">
-                {% if price == 0 %}
+                {% if remaining_amount == 0 %}
                     <i style="margin-right: 20px;">Facture acquittée. Merci</i>
                 {% endif %}
             </td>
@@ -232,31 +237,37 @@
                         <td style="width: 70%;">Total des séjours</td>
                         <td style="text-align: right;">{{ total_amount|format_money() }}</td>
                     </tr>
-                    {% for price_adapter in price_adapters_ids %}
-                        {% if price_adapter.price_adapter_type == 'amount' %}
-                            <tr>
-                                <td style="width: 70%;">{{ price_adapter.name }}</td>
-                                <td style="text-align: right;">{{ price_adapter.value|format_money() }}</td>
-                            </tr>
-                        {% endif %}
+                    {% for child in children %}
+                        {% for enrollment in child.enrollments_ids%}
+                            {% for price_adapter in enrollment.price_adapters_ids %}
+                                {% if price_adapter.price_adapter_type == 'amount' %}
+                                    <tr>
+                                        <td style="width: 70%;">{{ price_adapter.name }}</td>
+                                        <td style="text-align: right;">{{ price_adapter.value|format_money() }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if map_enrollment_percent_price_adapter[enrollment.id] is defined %}
+                                <tr>
+                                    <td style="width: 70%;">{{ map_enrollment_percent_price_adapter[enrollment.id].name }}</td>
+                                    <td style="text-align: right;">{{ map_enrollment_percent_price_adapter[enrollment.id].value|format_money() }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
                     {% endfor %}
-                    {% if percent_price_adapter != null %}
-                        <tr>
-                            <td style="width: 70%;">{{ percent_price_adapter.name }}</td>
-                            <td style="text-align: right;">{{ percent_price_adapter.value|format_money() }}</td>
-                        </tr>
-                    {% endif %}
+
                     <tr style="background-color: #cfcfcf;">
                         <td style="width: 70%;">Reste total à payer</td>
-                        <td style="text-align: right;">{{ price|format_money() }}</td>
+                        <td style="text-align: right;">{{ remaining_amount|format_money() }}</td>
                     </tr>
                 </table>
             </td>
         </tr>
-        {% if price > 0 %}
+        {% if remaining_amount > 0 %}
             <tr>
                 <td style="padding-top: 5px;" colspan="2">
-                    <i style="margin-left: 170px;">Facture à échéance le {{ camp_id.date_from|date_modify("-1 month")|format_date() }}</i>
+                    <i style="margin-left: 170px;">Facture à échéance le {{ children[0].enrollments_ids[0].camp_id.date_from|date_modify("-1 month")|format_date() }}</i>
                 </td>
             </tr>
         {% else %}
