@@ -5,18 +5,6 @@ import { FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-class Enrollment {
-    constructor(
-        public id: number = 0,
-        public name: string = '',
-        public child_id: number = 0,
-        public camp_id: number = 0,
-        public total: number = 0,
-        public price: number = 0
-    ) {
-    }
-}
-
 class Child {
     constructor(
         public id: number = 0,
@@ -25,6 +13,18 @@ class Child {
         public lastname: string = '',
         public main_guardian_id: number = 0,
         public guardians_ids: number[] = []
+    ) {
+    }
+}
+
+class Enrollment {
+    constructor(
+        public id: number = 0,
+        public name: string = '',
+        public child_id: number = 0,
+        public camp_id: number = 0,
+        public total: number = 0,
+        public price: number = 0
     ) {
     }
 }
@@ -127,6 +127,9 @@ interface vModel {
     lang: {
         formControl: FormControl,
     },
+    center: {
+        formControl: FormControl,
+    }
     title: {
         formControl: FormControl
     },
@@ -158,16 +161,18 @@ interface vModel {
     templateUrl: 'pre-registration.component.html',
     styleUrls: ['pre-registration.component.scss']
 })
-export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, AfterContentInit {
-
-    public enrollment: Enrollment = new Enrollment();
+export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterContentInit {
 
     public child: Child = new Child();
+
+    public enrollments: Enrollment[] = [];
     public mainGuardian: Guardian = new Guardian();
     public guardians: Guardian[] = [];
 
-    public camp: Camp = new Camp();
-    public center: Center = new Center();
+    public camps: Camp[] = [];
+    public centers: Center[] = [];
+
+    public selectedCenter: Center = new Center();
     public office: CenterOffice = new CenterOffice();
     public organisation: Organisation = new Organisation();
 
@@ -193,6 +198,9 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
         this.vm = {
             lang: {
                 formControl: new FormControl('fr'),
+            },
+            center: {
+                formControl: new FormControl(1),
             },
             title: {
                 formControl: new FormControl('', Validators.required)
@@ -232,19 +240,19 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
         this.route.params.subscribe(async (params) => {
             if(params) {
                 try {
-                    if(params.hasOwnProperty('enrollment_id')) {
-                        const enrollmentId = parseInt(params['enrollment_id'], 10);
-                        await this.loadEnrollment(enrollmentId);
+                    if(params.hasOwnProperty('child_id')) {
+                        const childId = parseInt(params['child_id'], 10);
+                        await this.loadChild(childId);
                         this.refreshSenderAddresses();
                         this.refreshTemplates();
 
                         this.context.change({
                             context_only: true,
                             context: {
-                                entity: 'sale\\camp\\Enrollment',
+                                entity: 'sale\\camp\\Child',
                                 type: 'form',
                                 purpose: 'view',
-                                domain: ['id', '=', this.enrollment.id]
+                                domain: ['id', '=', this.child.id]
                             }
                         });
                     }
@@ -268,25 +276,31 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
             }
         }
     }
-
-    private async loadEnrollment(enrollmentId: number) {
-        const enrollments: Enrollment[] = await this.api.read("sale\\camp\\Enrollment", [enrollmentId], Object.getOwnPropertyNames(new Enrollment()));
-        if(enrollments.length > 0) {
-            const enrollment  = enrollments[0];
-
-            this.enrollment = enrollment;
-            await this.loadChild(enrollment.child_id);
-            await this.loadCamp(enrollment.camp_id);
-        }
-    }
-
     private async loadChild(childId: number) {
         const children: Child[] = await this.api.read("sale\\camp\\Child", [childId], Object.getOwnPropertyNames(new Child()));
         if(children.length > 0) {
             const child = children[0];
 
             this.child = child;
+            await this.loadEnrollments(child.id);
             await this.loadGuardians(child.guardians_ids, child.main_guardian_id);
+        }
+    }
+
+    private async loadEnrollments(childId: number) {
+        const startYearDate = new Date(new Date().getFullYear(), 0, 1);
+        const endYearDate = new Date(new Date().getFullYear(), 11, 31);
+
+        const domain = [
+            ['child_id', '=', childId],
+            ['date_from', '>=', startYearDate.getTime() / 1000],
+            ['date_from', '<=', endYearDate.getTime() / 1000]
+        ];
+        this.enrollments = await this.api.collect("sale\\camp\\Enrollment", domain, Object.getOwnPropertyNames(new Enrollment()));
+
+        const campsIds = this.enrollments.map(e => e.camp_id);
+        if(campsIds.length > 0) {
+            await this.loadCamps(campsIds);
         }
     }
 
@@ -304,22 +318,23 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
         }
     }
 
-    private async loadCamp(campId: number) {
-        const camps: Camp[] = await this.api.read("sale\\camp\\Camp", [campId], Object.getOwnPropertyNames(new Camp()));
-        if(camps.length > 0) {
-            const camp = camps[0];
+    private async loadCamps(campsIds: number[]) {
+        this.camps = await this.api.read("sale\\camp\\Camp", campsIds, Object.getOwnPropertyNames(new Camp()));
 
-            this.camp = camp;
-            await this.loadCenter(camp.center_id);
+        const centersIds = this.camps.map(e => e.center_id);
+        if(centersIds.length > 0) {
+            await this.loadCenters(centersIds);
         }
     }
 
-    private async loadCenter(centerId: number) {
-        const centers: Center[] = await this.api.read("identity\\Center", [centerId], Object.getOwnPropertyNames(new Center()));
+    private async loadCenters(centersIds: number[]) {
+        const centers: Center[] = await this.api.read("identity\\Center", centersIds, Object.getOwnPropertyNames(new Center()));
         if(centers.length > 0) {
             const center = centers[0];
 
-            this.center = center;
+            this.centers = centers;
+            this.selectedCenter = center;
+
             await this.loadCenterOffice(center.center_office_id);
             await this.loadCenterOrganisation(center.organisation_id);
         }
@@ -343,11 +358,11 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
         this.vm.sender.addresses = [];
         this.vm.sender.formControl.reset();
 
-        const emails = [
+        const emails: string[] = [
             this?.office?.email ?? '',
             this?.office?.email_alt ?? '',
             this?.organisation?.email ?? '',
-            this?.center?.email ?? '',
+            this?.selectedCenter?.email ?? '',
             this?.user?.login ?? ''
         ];
 
@@ -389,6 +404,15 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
             this.selectedLanguage = this.mapLanguages[languageCode];
             this.refreshTemplates();
         });
+
+        this.vm.center.formControl.valueChanges.subscribe((centerId: number) => {
+            for(let center of this.centers) {
+                if(center.id === centerId) {
+                    this.selectedCenter = center;
+                    this.refreshTemplates();
+                }
+            }
+        });
     }
 
     private async refreshTemplates() {
@@ -398,7 +422,7 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
             const templates: Template[] = await this.api.collect(
                 "communication\\Template",
                 [
-                    ['category_id', '=', this.center.template_category_id],
+                    ['category_id', '=', this.selectedCenter.template_category_id],
                     ['type', '=', 'camp'],
                     ['code', '=', 'preregistration']
                 ],
@@ -427,28 +451,31 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
                     }
                 }
 
-                const dateFrom = new Date(this.camp.date_from);
-                const dateTo = new Date(this.camp.date_to);
+                const camp = this.camps[0];
+                const enrollment = this.enrollments[0];
+
+                const dateFrom = new Date(camp.date_from);
+                const dateTo = new Date(camp.date_to);
 
                 let strDateFrom = dateFrom.getDate().toString().padStart(2, '0') + '/' + (dateFrom.getMonth()+1).toString().padStart(2, '0') + '/' + dateFrom.getFullYear();
                 let strDateTo = dateTo.getDate().toString().padStart(2, '0') + '/' + (dateTo.getMonth()+1).toString().padStart(2, '0') + '/' + dateTo.getFullYear();
 
-                const dateDeadline = new Date(this.camp.date_from);
+                const dateDeadline = new Date(camp.date_from);
                 dateDeadline.setMonth(dateDeadline.getMonth() - 1);
                 if(dateDeadline.getDate() !== dateFrom.getDate()) {
                     dateDeadline.setDate(0);
                 }
                 let strDateDeadline = dateDeadline.getDate().toString().padStart(2, '0') + '/' + (dateDeadline.getMonth()+1).toString().padStart(2, '0') + '/' + dateDeadline.getFullYear();
 
-                let accounting_code = this.camp.accounting_code;
+                let accounting_code = camp.accounting_code;
                 if(accounting_code && accounting_code.length >= 4) {
                     accounting_code = (parseInt(accounting_code.slice(-4), 10)).toString();
                 }
 
                 const mapKeyValue: {[key: string]: string} = {
-                    total: this.enrollment.total.toString(),
-                    price: this.enrollment.price.toString(),
-                    camp: this.camp.short_name,
+                    total: enrollment.total.toString(),
+                    price: enrollment.price.toString(),
+                    camp: camp.short_name,
                     date_from: strDateFrom,
                     date_to: strDateTo,
                     date_deadline: strDateDeadline,
@@ -535,8 +562,8 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
 
         try {
             this.loading = true;
-            await this.api.call('?do=sale_camp_enrollment_send-preregistration', {
-                enrollment_id: this.enrollment.id,
+            await this.api.call('?do=sale_camp_child_send-preregistration', {
+                child_id: this.child.id,
                 sender_email: this.vm.sender.formControl.value,
                 recipient_email: this.vm.recipient.formControl.value,
                 recipients_emails: this.vm.recipients.formControl.value,
@@ -570,37 +597,14 @@ export class BookingCampsEnrollmentPreRegistrationComponent implements OnInit, A
         }
     }
 
-    public onclickEnrollment() {
+    public onclickChild() {
         let descriptor:any = {
             context_silent: true,
             context: {
-                entity: 'sale\\camp\\Enrollment',
+                entity: 'sale\\camp\\Child',
                 type: 'form',
                 name: 'default',
-                domain: ['id', '=', this.enrollment.id],
-                mode: 'view',
-                purpose: 'view',
-                display_mode: 'popup',
-                callback: (data: any) => {
-                    // restart angular lifecycles
-                    this.cd.reattach();
-                }
-            }
-        };
-
-        // prevent angular lifecycles while a context is open
-        this.cd.detach();
-        this.context.change(descriptor);
-    }
-
-    public onclickCamp() {
-        let descriptor:any = {
-            context_silent: true,
-            context: {
-                entity: 'sale\\camp\\Camp',
-                type: 'form',
-                name: 'default',
-                domain: ['id', '=', this.camp.id],
+                domain: ['id', '=', this.child.id],
                 mode: 'view',
                 purpose: 'view',
                 display_mode: 'popup',
