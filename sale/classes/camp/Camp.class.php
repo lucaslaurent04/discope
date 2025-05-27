@@ -497,8 +497,10 @@ class Camp extends Model {
                     'need_license_ffe',
                     'ase_quota',
                     'accounting_code',
-                    'product_id'        => ['id', 'name'],
-                    'day_product_id'    => ['id', 'name']
+                    'product_id'                    => ['id', 'name'],
+                    'day_product_id'                => ['id', 'name'],
+                    'weekend_product_id'            => ['id', 'name'],
+                    'saturday_morning_product_id'   => ['id', 'name']
                 ])
                 ->first(true);
 
@@ -517,6 +519,8 @@ class Camp extends Model {
                 }
                 else {
                     $result['day_product_id'] = null;
+                    $result['weekend_product_id'] = $camp_model['weekend_product_id'];
+                    $result['saturday_morning_product_id'] = $camp_model['saturday_morning_product_id'];
                 }
 
                 if(empty($values['short_name'])) {
