@@ -23,10 +23,10 @@
             <div class="actions-std">
             </div>
             <div class="actions-view">
-                <a *ngIf="selectedCenter && selectedLanguage && child" target="_blank" [attr.href]="'/?get=sale_camp_child_preregistration_print-invoice&center_id=' + selectedCenter.id + '&lang=' + selectedLanguage.code + '&id=' + child.id">
-                    <button mat-stroked-button>Voir facture</button>
+                <a target="_blank" [attr.href]="printInvoiceUrl">
+                    <button mat-stroked-button [disabled]="printInvoiceUrl === null">Voir facture</button>
                 </a>
-                <button mat-flat-button color="accent" (click)="onSend()">Envoyer</button>
+                <button mat-flat-button color="accent" [disabled]="isSent" (click)="onSend()">Envoyer</button>
             </div>
         </div>
 
@@ -38,7 +38,7 @@
                 <div class="cell">
                     <mat-form-field>
                         <mat-label>Centre</mat-label>
-                        <mat-select [formControl]="vm.sender.formControl">
+                        <mat-select [formControl]="vm.center.formControl">
                             <mat-option *ngFor="let center of centers" [value]="center.id">{{center.name}}</mat-option>
                         </mat-select>
                     </mat-form-field>
@@ -47,10 +47,25 @@
         </div>
 
         <div class="row">
-            <div class="column">
+            <div *ngIf="mainGuardianChildren.length < 2" class="column">
                 <div class="cell title">Enfant</div>
                 <div class="cell">
                     <a (click)="onclickChild()">{{ child.name }}</a>
+                </div>
+            </div>
+
+            <div *ngIf="mainGuardianChildren.length >= 2" class="column">
+                <div class="cell title">Enfants</div>
+                <div class="cell">
+                    <mat-form-field>
+                        <mat-label>Enfants</mat-label>
+                        <mat-select  multiple [formControl]="vm.children.formControl">
+                            <mat-option *ngFor="let child of mainGuardianChildren" [value]="child.id">{{child.name}}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="vm.sender.formControl.invalid">
+                            Ne peut être vide.
+                        </mat-error>
+                    </mat-form-field>
                 </div>
             </div>
 
