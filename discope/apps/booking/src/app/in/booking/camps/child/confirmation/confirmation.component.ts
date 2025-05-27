@@ -5,6 +5,6 @@ import { Component } from '@angular/core';
     templateUrl: 'confirmation.component.html',
     styleUrls: ['confirmation.component.scss']
 })
-export class BookingCampsEnrollmentConfirmationComponent {
+export class BookingCampsChildConfirmationComponent {
 
 }
