@@ -178,6 +178,16 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "weekend_product_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "saturday_morning_product_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "camp_type",
                                                 "width": "33%"
                                             },
