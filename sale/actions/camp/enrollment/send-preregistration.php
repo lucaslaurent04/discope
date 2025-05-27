@@ -10,6 +10,8 @@ use communication\TemplateAttachment;
 use core\Mail;
 use equal\email\Email;
 use equal\email\EmailAttachment;
+use identity\Center;
+use sale\camp\Child;
 use sale\camp\document\Document;
 use sale\camp\Enrollment;
 
@@ -17,9 +19,16 @@ use sale\camp\Enrollment;
     'description'   => "Send an instant enrollment pre-registration email with the given details and 'invoice'.",
     'params'        => [
 
-        'enrollment_id' => [
+        'children_ids' => [
+            'type'          => 'array',
+            'description'   => "Identifier of the children we want to send the email for.",
+            'help'          => "They should have the same main guardian.",
+            'required'      => true
+        ],
+
+        'center_id' => [
             'type'          => 'integer',
-            'description'   => "Identifier of the enrollment related to the sending of the email.",
+            'description'   => "The center for which we want send the children's pre-registration confirmation.",
             'required'      => true
         ],
 
@@ -94,24 +103,49 @@ use sale\camp\Enrollment;
  */
 ['context' => $context] = $providers;
 
-$enrollment = Enrollment::id($params['enrollment_id'])
-    ->read(['center_id' => ['center_office_id' => ['email_bcc']]])
-    ->first(true);
 
-if(is_null($enrollment)) {
-    throw new Exception("unknown_enrollment", EQ_ERROR_UNKNOWN_OBJECT);
+$center = Center::id($params['center_id'])
+    ->read(['center_office_id' => ['email_bcc']])
+    ->first();
+
+if(is_null($center)) {
+    throw new Exception("unknown_center", EQ_ERROR_UNKNOWN_OBJECT);
+}
+
+if(empty($params['children_ids'])) {
+    throw new Exception("empty_children_ids", EQ_ERROR_INVALID_PARAM);
+}
+
+$children = Child::ids($params['children_ids'])
+    ->read(['main_guardian_id'])
+    ->get();
+
+if(count($params['children_ids']) !== count($children)) {
+    throw new Exception("unknown_children", EQ_ERROR_UNKNOWN_OBJECT);
+}
+
+$main_guardian_id = null;
+foreach($children as $child) {
+    if(is_null($main_guardian_id)) {
+        $main_guardian_id = $child['main_guardian_id'];
+    }
+
+    if($child['main_guardian_id'] !== $main_guardian_id) {
+        throw new Exception("not_same_main_guardian", EQ_ERROR_INVALID_PARAM);
+    }
 }
 
 $attachment = eQual::run('get', 'sale_camp_enrollment_preregistration_print-invoice', [
-    'id'    => $enrollment['id'],
-    'lang'  => $params['lang']
+    'ids'       => $params['children_ids'],
+    'center_id' => $center['id'],
+    'lang'      => $params['lang']
 ]);
 
 // generate signature
 $signature = '';
 try {
     $data = eQual::run('get', 'identity_center-signature', [
-        'center_id'     => $enrollment['center_id']['id'],
+        'center_id'     => $center['id'],
         'lang'          => $params['lang']
     ]);
     $signature = (isset($data['signature']))?$data['signature']:'';
@@ -175,7 +209,7 @@ foreach($attachments as $attachment) {
 }
 
 // queue message
-Mail::send($message, 'sale\camp\Enrollment', $enrollment['id']);
+Mail::queue($message);
 
 $context->httpResponse()
         ->status(204)

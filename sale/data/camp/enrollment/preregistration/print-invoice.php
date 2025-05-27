@@ -24,20 +24,20 @@ use Twig\TwigFilter;
 
         'id' => [
             'type'          => 'integer',
-            'description'   => "Identifier of the child for which we need to print the pre-registration invoice.",
-            'required'      => true
+            'description'   => "Identifier of the child for which we need to print the pre-registration invoice."
+        ],
+
+        'ids' => [
+            'type'          => 'array',
+            'description'   => "Identifiers of the children for which we need to print the pre-registration invoice.",
+            'help'          => "All children must have the same main guardian.",
+            'default'       => []
         ],
 
         'center_id' => [
             'type'          => 'integer',
-            'description'   => "The center for which we want to confirm the children enrollments.",
+            'description'   => "The center for which we want to confirm the children pre-registration.",
             'required'      => true
-        ],
-
-        'family' => [
-            'type'          => 'boolean',
-            'description'   => "Show all children that have the same main guardian as the given child for param 'id'.",
-            'default'       => false
         ],
 
         'lang' =>  [
@@ -71,6 +71,19 @@ use Twig\TwigFilter;
  */
 ['context' => $context] = $providers;
 
+if(isset($params['id'])  && !empty($params['ids'])) {
+    throw new Exception("only_one_id_param_allowed", EQ_ERROR_INVALID_PARAM);
+}
+
+if(!isset($params['id']) && empty($params['ids'])) {
+    throw new Exception("one_id_param_required", EQ_ERROR_INVALID_PARAM);
+}
+
+$ids = $params['ids'];
+if(empty($ids)) {
+    $ids[] = $params['id'];
+}
+
 $center = Center::id($params['center_id'])
     ->read([
         'name',
@@ -86,114 +99,63 @@ if(is_null($center)) {
     throw new Exception("unknown_center", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-$main_guardian = null;
-
-$child_fields = [
-    'firstname',
-    'lastname',
-    'enrollments_ids' => [
-        'price',
-        'price_adapters' => [
-            'price_adapter_type',
-            'origin_type',
-            'value'
-        ],
-        'camp_id' => [
-            'short_name',
-            'sojourn_number',
-            'date_from',
-            'date_to',
-            'accounting_code',
-            'product_id',
-            'day_product_id',
-            'center_id'
-        ],
-        'enrollment_lines_ids' => [
-            'product_id' => ['label'],
-            'price'
-        ],
-        'price_adapters_ids' => [
-            'name',
-            'price_adapter_type',
-            'value'
+$children = Child::ids($ids)
+    ->read([
+        'firstname',
+        'lastname',
+        'main_guardian_id',
+        'enrollments_ids' => [
+            'price',
+            'price_adapters' => [
+                'price_adapter_type',
+                'origin_type',
+                'value'
+            ],
+            'camp_id' => [
+                'short_name',
+                'sojourn_number',
+                'date_from',
+                'date_to',
+                'accounting_code',
+                'product_id',
+                'day_product_id',
+                'center_id'
+            ],
+            'enrollment_lines_ids' => [
+                'product_id' => ['label'],
+                'price'
+            ],
+            'price_adapters_ids' => [
+                'name',
+                'price_adapter_type',
+                'value'
+            ]
         ]
-    ]
-];
+    ])
+    ->get(true);
 
-$children = [];
-if($params['family']) {
-    $child = Child::id($params['id'])
-        ->read(['main_guardian_id'])
-        ->first();
-
-    if(is_null($child)) {
-        throw new Exception("unknown_child", EQ_ERROR_UNKNOWN_OBJECT);
-    }
-
-    if(is_null($child['main_guardian_id'])) {
-        throw new Exception("no_main_guardian_configured", EQ_ERROR_INVALID_PARAM);
-    }
-
-    $main_guardian = Guardian::id($child['main_guardian_id'])
-        ->read(['firstname', 'lastname', 'address_street', 'address_dispatch', 'address_zip', 'address_city'])
-        ->first(true);
-
-    if(is_null($main_guardian)) {
-        throw new Exception("unknown_guardian", EQ_ERROR_UNKNOWN_OBJECT);
-    }
-
-    $children = Child::search(['main_guardian_id', '=', $main_guardian['id']])
-        ->read($child_fields)
-        ->first(true);
-
-    foreach($children as $child) {
-        $child['enrollments_ids'] = array_filter($child['enrollments_ids'], function($enrollment) use($center) {
-            return $enrollment['camp_id']['center_id'] === $center['id']
-                && date('Y', $enrollment['camp_id']['date_from']) === date('Y');
-        });
-    }
-
-    $children = array_filter($children, function($child) {
-        return !empty($child['enrollments_ids']);
-    });
-
-    if(empty($children)) {
-        throw new Exception("no_enrollments", EQ_ERROR_INVALID_PARAM);
-    }
+if(count($ids) !== count($children)) {
+    throw new Exception("unknown_children", EQ_ERROR_UNKNOWN_OBJECT);
 }
-else {
-    $child = Child::id($params['id'])
-        ->read(array_merge($child_fields, ['main_guardian_id']))
-        ->first(true);
 
-    if(is_null($child)) {
-        throw new Exception("unknown_child", EQ_ERROR_UNKNOWN_OBJECT);
-    }
-
-    if(is_null($child['main_guardian_id'])) {
-        throw new Exception("no_main_guardian_configured", EQ_ERROR_INVALID_PARAM);
-    }
-
-    $main_guardian = Guardian::id($child['main_guardian_id'])
-        ->read(['firstname', 'lastname', 'address_street', 'address_dispatch', 'address_zip', 'address_city'])
-        ->first(true);
-
-    if(is_null($main_guardian)) {
-        throw new Exception("unknown_guardian", EQ_ERROR_UNKNOWN_OBJECT);
-    }
-
-
-    $child['enrollments_ids'] = array_filter($child['enrollments_ids'], function($enrollment) use($center) {
+foreach($children as $child) {
+    $child['enrollments_ids'] = array_filter($child['enrollments_ids'] ?? [], function($enrollment) use($center) {
         return $enrollment['camp_id']['center_id'] === $center['id']
             && date('Y', $enrollment['camp_id']['date_from']) === date('Y');
     });
-
-    if(empty($child['enrollments_ids'])) {
-        throw new Exception("no_enrollments", EQ_ERROR_INVALID_PARAM);
-    }
-
-    $children[] = $child;
 }
+
+$children = array_filter($children, function($child) {
+    return !empty($child['enrollments_ids']);
+});
+
+if(empty($children)) {
+    throw new Exception("no_enrollments", EQ_ERROR_INVALID_PARAM);
+}
+
+$main_guardian = Guardian::id($children[0]['main_guardian_id'])
+    ->read(['lastname', 'firstname', 'address_street', 'address_dispatch', 'address_zip', 'address_city'])
+    ->first();
 
 /***************
  * Create HTML *
