@@ -203,6 +203,11 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "value": "weekend_extra",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "presence_day_1",
                                                 "width": "20%"
                                             },

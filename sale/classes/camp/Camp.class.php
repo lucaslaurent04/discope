@@ -101,7 +101,7 @@ class Camp extends Model {
             'product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
-                'description'       => "The product targeted by the line.",
+                'description'       => "The product that will be added to the enrollment lines if the child enroll for the full camp.",
                 'required'          => true,
                 'domain'            => ['is_camp', '=', true]
             ],
@@ -140,9 +140,25 @@ class Camp extends Model {
             'day_product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
-                'description'       => "The product targeted by the line.",
+                'description'       => "The product that will be added to the enrollment lines if the child enroll for specific days of the camp.",
                 'domain'            => ['is_camp', '=', true],
                 'visible'           => ['is_clsh', '=', true]
+            ],
+
+            'weekend_product_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\catalog\Product',
+                'description'       => "The product that will be added to the enrollment lines if the child stays the weekend after the camp.",
+                'domain'            => ['is_camp', '=', true],
+                'visible'           => ['is_clsh', '=', false]
+            ],
+
+            'saturday_morning_product_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\catalog\Product',
+                'description'       => "The product that will be added to the enrollment lines if the child stays the until Saturday morning after the camp.",
+                'domain'            => ['is_camp', '=', true],
+                'visible'           => ['is_clsh', '=', false]
             ],
 
             'camp_model_id' => [

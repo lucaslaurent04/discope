@@ -9,6 +9,7 @@
 namespace sale\camp;
 
 use equal\orm\Model;
+use sale\camp\catalog\Product;
 
 class Enrollment extends Model {
 
@@ -81,6 +82,20 @@ class Enrollment extends Model {
                 'description'       => "End date of the camp.",
                 'store'             => true,
                 'relation'          => ['camp_id' => 'date_to']
+            ],
+
+            'weekend_extra' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'none',
+                    'full',
+                    'saturday-morning'
+                ],
+                'description'       => "Does the child stays the weekend after the camp.",
+                'help'              => "If child stays full weekend it usually means that he is enrolled to another camp the following week. If child stays saturday morning it means that its guardian cannot pick him/her up on Friday.",
+                'default'           => 'none',
+                'onupdate'          => 'onupdateWeekendExtra',
+                'visible'           => ['is_clsh', '=', false]
             ],
 
             'is_clsh' => [
@@ -925,6 +940,101 @@ class Enrollment extends Model {
         $self->do('refresh-camp-product-line');
     }
 
+    public static function onupdateWeekendExtra($self) {
+        $self->read([
+            'weekend_extra',
+            'camp_id'               => ['weekend_product_id', 'saturday_morning_product_id', 'date_from', 'date_to'],
+            'enrollment_lines_ids'  => ['product_id']
+        ]);
+        foreach($self as $id => $enrollment) {
+            switch($enrollment['weekend_extra']) {
+                case 'none':
+                    EnrollmentLine::search([
+                        ['enrollment_id', '=', $id],
+                        ['product_id', 'in', [$enrollment['camp_id']['weekend_product_id'], $enrollment['camp_id']['saturday_morning_product_id']]]
+                    ])
+                        ->delete(true);
+                    break;
+                case 'full':
+                    EnrollmentLine::search([
+                        ['enrollment_id', '=', $id],
+                        ['product_id', '=', $enrollment['camp_id']['saturday_morning_product_id']]
+                    ])
+                        ->delete(true);
+
+                    $we_lines_ids = EnrollmentLine::search([
+                        ['enrollment_id', '=', $id],
+                        ['product_id', '=', $enrollment['camp_id']['weekend_product_id']]
+                    ])
+                        ->ids();
+
+                    if(empty($we_lines_ids)) {
+                        $we_product = Product::id($enrollment['camp_id']['weekend_product_id'])
+                            ->read(['prices_ids' => ['price_list_id' => ['date_from', 'date_to']]])
+                            ->first();
+
+                        $product_price = null;
+                        foreach($we_product['prices_ids'] as $price) {
+                            if(
+                                $enrollment['camp_id']['date_from'] >= $price['price_list_id']['date_from']
+                                && $enrollment['camp_id']['date_from'] <= $price['price_list_id']['date_to']
+                            ) {
+                                $product_price = $price;
+                                break;
+                            }
+                        }
+
+                        if(!is_null($product_price)) {
+                            EnrollmentLine::create([
+                                'enrollment_id' => $id,
+                                'product_id'    => $enrollment['camp_id']['weekend_product_id'],
+                                'price_id'      => $product_price['id']
+                            ]);
+                        }
+                    }
+                    break;
+                case 'saturday-morning':
+                    EnrollmentLine::search([
+                        ['enrollment_id', '=', $id],
+                        ['product_id', '=', $enrollment['camp_id']['weekend_product_id']]
+                    ])
+                        ->delete(true);
+
+                    $sat_lines_ids = EnrollmentLine::search([
+                        ['enrollment_id', '=', $id],
+                        ['product_id', '=', $enrollment['camp_id']['saturday_morning_product_id']]
+                    ])
+                        ->ids();
+
+                    if(empty($sat_lines_ids)) {
+                        $sat_product = Product::id($enrollment['camp_id']['saturday_morning_product_id'])
+                            ->read(['prices_ids' => ['price_list_id' => ['date_from', 'date_to']]])
+                            ->first();
+
+                        $product_price = null;
+                        foreach($sat_product['prices_ids'] as $price) {
+                            if(
+                                $enrollment['camp_id']['date_from'] >= $price['price_list_id']['date_from']
+                                && $enrollment['camp_id']['date_from'] <= $price['price_list_id']['date_to']
+                            ) {
+                                $product_price = $price;
+                                break;
+                            }
+                        }
+
+                        if(!is_null($product_price)) {
+                            EnrollmentLine::create([
+                                'enrollment_id' => $id,
+                                'product_id'    => $enrollment['camp_id']['saturday_morning_product_id'],
+                                'price_id'      => $product_price['id']
+                            ]);
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+
     public static function onupdatePresentDay($self) {
         $self->do('refresh-camp-product-line');
     }
@@ -964,7 +1074,7 @@ class Enrollment extends Model {
 
     public static function doGeneratePresences($self) {
         $self->read([
-            'is_clsh', 'camp_id', 'child_id', 'date_from', 'date_to',
+            'is_clsh', 'camp_id', 'child_id', 'date_from', 'date_to', 'weekend_extra',
             'presence_day_1', 'presence_day_2', 'presence_day_3', 'presence_day_4', 'presence_day_5',
             'daycare_day_1', 'daycare_day_2', 'daycare_day_3', 'daycare_day_4', 'daycare_day_5'
         ]);
@@ -996,6 +1106,26 @@ class Enrollment extends Model {
 
                 $day_index++;
                 $date += 60 * 60 * 24;
+            }
+
+            if(!$enrollment['is_clsh'] && $enrollment['weekend_extra'] !== 'none') {
+                // add Saturday presence
+                Presence::create([
+                    'presence_date' => $date,
+                    'camp_id'       => $enrollment['camp_id'],
+                    'child_id'      => $enrollment['child_id']
+                ]);
+
+                if($enrollment['weekend_extra'] === 'full') {
+                    $date += 60 * 60 * 24;
+
+                    // add Sunday presence
+                    Presence::create([
+                        'presence_date' => $date,
+                        'camp_id'       => $enrollment['camp_id'],
+                        'child_id'      => $enrollment['child_id']
+                    ]);
+                }
             }
         }
     }
