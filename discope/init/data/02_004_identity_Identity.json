@@ -8,9 +8,7 @@
                 "type_id": 3,
                 "legal_name": "Your company name Inc.",
                 "short_name": "Your company",
-                "has_parent": false,
-                "is_organisation": true,
-                "organisation_id": 1
+                "has_parent": false
             },
             {
                 "id": 2,
