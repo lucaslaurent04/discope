@@ -13,7 +13,7 @@ use equal\email\EmailAttachment;
 use identity\Center;
 use sale\camp\Child;
 use sale\camp\document\Document;
-use sale\camp\Enrollment;
+use sale\camp\EnrollmentMail;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Send an instant enrollment pre-registration email with the given details and 'invoice'.",
@@ -117,11 +117,27 @@ if(empty($params['children_ids'])) {
 }
 
 $children = Child::ids($params['children_ids'])
-    ->read(['main_guardian_id'])
+    ->read(['main_guardian_id', 'enrollments_ids' => ['camp_id' => ['center_id', 'date_from']]])
     ->get();
 
 if(count($params['children_ids']) !== count($children)) {
     throw new Exception("unknown_children", EQ_ERROR_UNKNOWN_OBJECT);
+}
+
+$enrollments_ids = [];
+foreach($children as $child) {
+    foreach($child['enrollments_ids'] as $enrollment) {
+        if(
+            $enrollment['camp_id']['center_id'] === $center['id']
+            && date('Y', $enrollment['camp_id']['date_from']) === date('Y')
+        ) {
+            $enrollments_ids[] = $enrollment['id'];
+        }
+    }
+}
+
+if(empty($enrollments_ids)) {
+    throw new Exception("no_enrollments", EQ_ERROR_INVALID_PARAM);
 }
 
 $main_guardian_id = null;
@@ -209,7 +225,13 @@ foreach($attachments as $attachment) {
 }
 
 // queue message
-Mail::queue($message);
+$mail_id = Mail::queue($message);
+
+EnrollmentMail::create([
+    'mail_id'           => $mail_id,
+    'mail_type'         => 'pre-registration',
+    'enrollments_ids'   => $enrollments_ids
+]);
 
 $context->httpResponse()
         ->status(204)

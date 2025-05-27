@@ -1,0 +1,38 @@
+{
+    "name": "E-mail",
+    "plural": "E-mails",
+    "description": "E-mails qui sont envoyés pour les confirmations d'inscription.",
+    "model": {
+        "mail_id": {
+            "label": "E-mail",
+            "description": "E-mail qui a été envoyé.",
+            "help": ""
+        },
+        "mail_type": {
+            "label": "Type",
+            "description": "Le type de e-mail.",
+            "help": "",
+            "selection": {
+                "pre-registration": "Pré-inscription",
+                "confirmation": "Confirmation"
+            }
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "E-mail",
+            "description": "",
+            "layout": {
+                "section.enrollments": {
+                    "label": "Inscriptions"
+                }
+            }
+        },
+        "list.default": {
+            "name": "E-mails",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}
