@@ -131,7 +131,9 @@ class Price extends Model {
 
         if($prices > 0 && count($prices)) {
             foreach($prices as $pid => $price) {
-                $result[$pid] = $price['accounting_rule_id.vat_rule_id.rate'];
+                if(isset($price['accounting_rule_id.vat_rule_id.rate'])) {
+                    $result[$pid] = $price['accounting_rule_id.vat_rule_id.rate'];
+                }
             }
         }
         return $result;
