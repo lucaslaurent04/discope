@@ -377,7 +377,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "mails_ids",
+                                                "value": "enrollment_mails_ids",
                                                 "width": "100%"
                                             }
                                         ]

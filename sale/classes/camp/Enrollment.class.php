@@ -330,12 +330,14 @@ class Enrollment extends Model {
                 'ondetach'          => 'delete'
             ],
 
-            'mails_ids' => [
-                'type'              => 'one2many',
-                'foreign_object'    => 'core\Mail',
-                'foreign_field'     => 'object_id',
-                'description'       => "Mails related to the enrollment.",
-                'domain'            => ['object_class', '=', 'sale\camp\Enrollment']
+            'enrollment_mails_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\camp\EnrollmentMail',
+                'foreign_field'     => 'enrollments_ids',
+                'rel_table'         => 'sale_camp_rel_enrollment_mail',
+                'rel_foreign_key'   => 'enrollment_mail_id',
+                'rel_local_key'     => 'enrollment_id',
+                'description'       => "The mails that are linked to this enrollment."
             ]
 
         ];
