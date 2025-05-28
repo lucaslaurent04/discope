@@ -482,35 +482,10 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
                 const camp = this.camps[0];
                 const enrollment = this.enrollments[0];
 
-                const dateFrom = new Date(camp.date_from);
-                const dateTo = new Date(camp.date_to);
-
-                let strDateFrom = dateFrom.getDate().toString().padStart(2, '0') + '/' + (dateFrom.getMonth()+1).toString().padStart(2, '0') + '/' + dateFrom.getFullYear();
-                let strDateTo = dateTo.getDate().toString().padStart(2, '0') + '/' + (dateTo.getMonth()+1).toString().padStart(2, '0') + '/' + dateTo.getFullYear();
-
-                const dateDeadline = new Date(camp.date_from);
-                dateDeadline.setMonth(dateDeadline.getMonth() - 1);
-                if(dateDeadline.getDate() !== dateFrom.getDate()) {
-                    dateDeadline.setDate(0);
-                }
-                let strDateDeadline = dateDeadline.getDate().toString().padStart(2, '0') + '/' + (dateDeadline.getMonth()+1).toString().padStart(2, '0') + '/' + dateDeadline.getFullYear();
-
-                let accounting_code = camp.accounting_code;
-                if(accounting_code && accounting_code.length >= 4) {
-                    accounting_code = (parseInt(accounting_code.slice(-4), 10)).toString();
-                }
-
                 const mapKeyValue: {[key: string]: string} = {
                     total: enrollment.total.toString(),
                     price: enrollment.price.toString(),
-                    camp: camp.short_name,
-                    date_from: strDateFrom,
-                    date_to: strDateTo,
-                    date_deadline: strDateDeadline,
-                    accounting_code: accounting_code,
-                    child: this.child.name,
-                    child_firstname: this.child.firstname,
-                    child_lastname: this.child.lastname.toUpperCase()
+                    camp: camp.short_name
                 };
 
                 if(subjectPart) {
@@ -518,10 +493,6 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
                     if(subjectPart.value && subjectPart.value.length > 0) {
                         // strip html nodes
                         title = subjectPart.value.replace(/<[^>]*>?/gm, '');
-                    }
-
-                    for(let key in mapKeyValue) {
-                        title = title.replace(`{${key}}`, mapKeyValue[key]);
                     }
 
                     this.vm.title.formControl.setValue(title);
