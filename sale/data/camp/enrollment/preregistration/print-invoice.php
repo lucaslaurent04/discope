@@ -19,7 +19,7 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\TwigFilter;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Render a pre-registration given its ID as a PDF document.",
+    'description'   => "Render children's pre-registration given their IDs as a PDF document.",
     'params'        => [
 
         'id' => [
