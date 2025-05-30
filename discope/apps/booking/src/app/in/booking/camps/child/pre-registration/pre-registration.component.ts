@@ -592,7 +592,7 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
                 message: this.vm.message.formControl.value,
                 lang: this.vm.lang.formControl.value,
                 attachments_ids: this.vm.attachments.items.filter((a: any) => a?.id).map((a: any) => a.id),
-                documents_ids: this.vm.documents.items.filter((d: any) => d?.id).map((d: any) => d.id),
+                documents_ids: this.vm.documents.items.filter((d: any) => d?.id).map((d: any) => d.id)
             });
 
             this.isSent = true;
