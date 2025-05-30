@@ -42,22 +42,6 @@
             "label": "Modèles",
             "help": ""
         },
-        "sales.camp.camps" : {
-            "label": "Camps",
-            "help": ""
-        },
-        "sales.camp.enrollments" : {
-            "label": "Inscriptions",
-            "help": ""
-        },
-        "sales.camp.presences" : {
-            "label": "Présences",
-            "help": ""
-        },
-        "sales.camp.meals": {
-            "label": "Repas",
-            "help": ""
-        },
         "sales.camp.price-adapters": {
             "label": "Réductions",
             "help": ""
@@ -76,22 +60,6 @@
         },
         "sales.camp.catalog.product-models" : {
             "label": "Modèles",
-            "help": ""
-        },
-        "sales.camp.people" : {
-            "label": "Participants",
-            "help": ""
-        },
-        "sales.camp.people.children" : {
-            "label": "Enfants",
-            "help": ""
-        },
-        "sales.camp.people.guardians" : {
-            "label": "Tuteurs",
-            "help": ""
-        },
-        "sales.camp.people.institutes" : {
-            "label": "Institutions",
             "help": ""
         },
         "sales.camp.requirements": {

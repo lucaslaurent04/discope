@@ -1,0 +1,96 @@
+{
+    "name": "Camp menu",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "layout": {
+        "items": [
+            {
+                "id": "camps",
+                "type": "entry",
+                "label": "Camps",
+                "description": "",
+                "icon": "holiday_village",
+                "context": {
+                    "entity": "sale\\camp\\Camp",
+                    "view": "list.default"
+                }
+            },
+            {
+                "id": "enrollments",
+                "type": "entry",
+                "label": "Enrollments",
+                "description": "",
+                "icon": "app_registration",
+                "context": {
+                    "entity": "sale\\camp\\Enrollment",
+                    "view": "list.default"
+                }
+            },
+            {
+                "id": "presences",
+                "type": "entry",
+                "label": "Presences",
+                "description": "",
+                "icon": "calendar_month",
+                "context": {
+                    "entity": "sale\\camp\\Presence",
+                    "view": "list.default"
+                }
+            },
+            {
+                "id": "meals",
+                "type": "entry",
+                "label": "Meals",
+                "description": "",
+                "icon": "restaurant",
+                "context": {
+                    "entity": "sale\\booking\\BookingMeal",
+                    "view": "list.camp"
+                }
+            },
+            {
+                "id": "people",
+                "label": "People",
+                "description": "",
+                "icon": "family_restroom",
+                "type": "parent",
+                "children": [
+                    {
+                        "id": "people.children",
+                        "type": "entry",
+                        "label": "Children",
+                        "description": "",
+                        "icon": "boy",
+                        "context": {
+                            "entity": "sale\\camp\\Child",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "people.guardians",
+                        "type": "entry",
+                        "label": "Guardians",
+                        "description": "",
+                        "icon": "escalator_warning",
+                        "context": {
+                            "entity": "sale\\camp\\Guardian",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "people.institutes",
+                        "type": "entry",
+                        "label": "Institutions",
+                        "description": "",
+                        "icon": "supervisor_account",
+                        "context": {
+                            "entity": "sale\\camp\\Institution",
+                            "view": "list.default"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

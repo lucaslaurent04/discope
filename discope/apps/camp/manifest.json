@@ -1,0 +1,14 @@
+{
+    "name": "APPS_APP_CAMP",
+    "description": "",
+    "url": "/camp",
+    "icon": "holiday_village",
+    "color": "#690c75",
+    "access": {
+        "groups": [
+            "booking.default.user",
+            "booking.default.administrator"
+        ]
+    },
+    "show_in_apps": true
+}

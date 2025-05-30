@@ -259,50 +259,6 @@
                                 }
                             },
                             {
-                                "id": "sales.camp.camps",
-                                "type": "entry",
-                                "label": "Camps",
-                                "description": "",
-                                "icon": "holiday_village",
-                                "context": {
-                                    "entity": "sale\\camp\\Camp",
-                                    "view": "list.default"
-                                }
-                            },
-                            {
-                                "id": "sales.camp.enrollments",
-                                "type": "entry",
-                                "label": "Enrollments",
-                                "description": "",
-                                "icon": "app_registration",
-                                "context": {
-                                    "entity": "sale\\camp\\Enrollment",
-                                    "view": "list.default"
-                                }
-                            },
-                            {
-                                "id": "sales.camp.presences",
-                                "type": "entry",
-                                "label": "Presences",
-                                "description": "",
-                                "icon": "calendar_month",
-                                "context": {
-                                    "entity": "sale\\camp\\Presence",
-                                    "view": "list.default"
-                                }
-                            },
-                            {
-                                "id": "sales.camp.meals",
-                                "type": "entry",
-                                "label": "Meals",
-                                "description": "",
-                                "icon": "restaurant",
-                                "context": {
-                                    "entity": "sale\\booking\\BookingMeal",
-                                    "view": "list.camp"
-                                }
-                            },
-                            {
                                 "id": "sales.camp.price-adapters",
                                 "type": "entry",
                                 "label": "Price adapters",
@@ -323,48 +279,6 @@
                                     "entity": "sale\\camp\\Enrollment",
                                     "view": "list.work-council-search"
                                 }
-                            },
-                            {
-                                "id": "sales.camp.people",
-                                "label": "People",
-                                "description": "",
-                                "icon": "family_restroom",
-                                "type": "parent",
-                                "children": [
-                                    {
-                                        "id": "sales.camp.people.children",
-                                        "type": "entry",
-                                        "label": "Children",
-                                        "description": "",
-                                        "icon": "boy",
-                                        "context": {
-                                            "entity": "sale\\camp\\Child",
-                                            "view": "list.default"
-                                        }
-                                    },
-                                    {
-                                        "id": "sales.camp.people.guardians",
-                                        "type": "entry",
-                                        "label": "Guardians",
-                                        "description": "",
-                                        "icon": "escalator_warning",
-                                        "context": {
-                                            "entity": "sale\\camp\\Guardian",
-                                            "view": "list.default"
-                                        }
-                                    },
-                                    {
-                                        "id": "sales.camp.people.institutes",
-                                        "type": "entry",
-                                        "label": "Institutions",
-                                        "description": "",
-                                        "icon": "supervisor_account",
-                                        "context": {
-                                            "entity": "sale\\camp\\Institution",
-                                            "view": "list.default"
-                                        }
-                                    }
-                                ]
                             },
                             {
                                 "id": "sales.camp.catalog",
