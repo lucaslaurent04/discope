@@ -38,6 +38,16 @@
             "description": "Date de fin du camp.",
             "help": ""
         },
+        "weekend_extra": {
+            "label": "Week-end extra",
+            "selection": {
+                "none": "Aucun",
+                "full": "Hébergement tout le weekend",
+                "saturday-morning": "Hébergement jusqu'à samedi matin"
+            },
+            "description": "L'enfant reste tout le week-end ou une partie du week-end.",
+            "help": ""
+        },
         "is_clsh": {
             "label": "CLSH",
             "description": "Centre loisir sans hébergement.",

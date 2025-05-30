@@ -1,6 +1,24 @@
 {
     "name": "Enrollment",
     "description": "Form view for Enrollment.",
+    "routes": [
+        {
+            "id": "item.preregistration.send",
+            "label": "Envoi pré-inscription",
+            "description": "Envoyer la confirmation de pré-inscription.",
+            "icon": "email",
+            "route": "/booking/camps/child/object.child_id/preregistration",
+            "visible": ["status", "=", "pending"]
+        },
+        {
+            "id": "item.confirmation.send",
+            "label": "Envoi confirmation",
+            "description": "Envoyer la confirmation d'inscription.",
+            "icon": "email",
+            "route": "/booking/camps/enrollment/object.id/confirmation",
+            "visible": ["status", "=", "confirmed"]
+        }
+    ],
     "header": {
         "actions": {
             "ACTION.SAVE": [
@@ -203,6 +221,11 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "value": "weekend_extra",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "presence_day_1",
                                                 "width": "20%"
                                             },
@@ -372,7 +395,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "mails_ids",
+                                                "value": "enrollment_mails_ids",
                                                 "width": "100%"
                                             }
                                         ]

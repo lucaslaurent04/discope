@@ -213,13 +213,15 @@ try {
     $extension  = new IntlExtension();
     $twig->addExtension($extension);
 
-    $format_money_filter = new TwigFilter('format_money', function($value) {
-        return number_format((float) $value, 2, ',', '.').' €';
+    $currency = Setting::get_value('core', 'locale', 'currency', '€');
+    $format_money_filter = new TwigFilter('format_money', function($value) use($currency) {
+        return number_format((float) $value, 2, ',', '.').' '.$currency;
     });
     $twig->addFilter($format_money_filter);
 
-    $date_filter = new TwigFilter('format_date', function($value) {
-        return date('d/m/y', $value);
+    $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
+    $date_filter = new TwigFilter('format_date', function($value) use($date_format) {
+        return date($date_format, $value);
     });
     $twig->addFilter($date_filter);
 

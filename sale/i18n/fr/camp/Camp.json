@@ -8,6 +8,11 @@
             "description": "Nom court du camp.",
             "help": ""
         },
+        "sojourn_number": {
+            "label": "N° séjour",
+            "description": "Numéro de séjour du camp.",
+            "help": "Est géré par le setting sequence 'sale.organization.camp.sequence{center_id.center_office_id.code}'."
+        },
         "status": {
             "label": "Status",
             "description": "Status du camp.",
@@ -72,6 +77,16 @@
         "day_product_id": {
             "label": "Produit à la journée",
             "description": "Le produit de vente du camp CLSH à la journée.",
+            "help": ""
+        },
+        "weekend_product_id": {
+            "label": "Produit weekend",
+            "description": "Le produit de vente de l'hébergement le weekend après le camp.",
+            "help": ""
+        },
+        "saturday_morning_product_id": {
+            "label": "Produit samedi matin",
+            "description": "Le produit de vente de l'hébergement jusqu'au samedi matin après le camp.",
             "help": ""
         },
         "camp_model_id": {

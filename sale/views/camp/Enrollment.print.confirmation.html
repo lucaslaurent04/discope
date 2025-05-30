@@ -1,0 +1,220 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+    <title>Confirmation inscription</title>
+
+    <style type="text/css">
+        @page {
+            margin: 1cm;
+        }
+
+        body {
+            width: 100%;
+            margin: 0 0 35px;
+            padding: 0;
+            text-align: justify;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 0.7em;
+        }
+
+        h2 {
+            margin-top: 8px;
+            margin-bottom: 0;
+            font-size: 21px;
+        }
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 0;
+            font-size: 15px;
+        }
+
+        div, table, table tr td {
+            font-family: Helvetica, Arial, sans-serif;
+        }
+
+        div.footer {
+            box-sizing: border-box;
+            border: 0;
+            margin: 0;
+            padding: 0;
+            position: fixed;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .table-address {
+            width: 300px;
+            margin-top: 75px;
+            margin-left: 10px;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            border: solid 1px #cccccc;
+        }
+
+        .table-address td {
+            padding: 4px 10px;
+        }
+
+        .message-signature p,
+        .camp-start-info p,
+        .camp-end-info p {
+            margin: 0;
+        }
+
+        div.footer {
+            text-align: center;
+            bottom: 0;
+            left: 0;
+            height: 30px;
+            overflow: visible;
+            z-index: 200;
+            font-size: 0.9em !important;
+        }
+
+        hr {
+            page-break-after: always;
+            border: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 50%;">
+                <div style="font-size: 1rem; font-weight: 500; text-align: center;">
+                    <div>CPA LATHUS</div>
+                    <div>B.P 30005</div>
+                    <div>86390 Lathus</div>
+                </div>
+
+                <div style="margin-top: 10px; margin-left: 100px;">
+                    <div>05.49.91.72.60 (réservation camps)</div>
+                    <div>05.49.91.87.11 (comptabilité)</div>
+                    <div>05.49.91.36.72 (fax)</div>
+                </div>
+
+                <div style="margin-top: 20px; margin-left: 35px;">
+                    <div>
+                        <div>Association loi 1901</div>
+                        <div>SIRET 331 320 507 000 14 - APE 9312 Z</div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <div>R.I.B. : 10278 36412 00010010503 74</div>
+                        <div style="margin-left: 38px;">C.M. Montmorillon</div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <div>N° d'agrément permanent C.V. - DRDJS : 086 120 003</div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <div>N° d'agrément C.V. juillet :</div>
+                        <div>N° d'agrément C.V. août :</div>
+                    </div>
+                </div>
+            </td>
+            <td style="width: 50%;">
+                <p style="margin-bottom: 10px; margin-left: 30px; font-size: 0.9rem;">
+                    Lathus, le {{ date|format_date() }}
+                </p>
+
+                <table class="table-address">
+                    <tr>
+                        <td colspan="2" style="padding-top: 10px">
+                            {{ main_guardian.lastname|upper }} {{ main_guardian.firstname }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">{{ main_guardian.address_street }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            {% if main_guardian.address_dispatch|length > 0 %}
+                                {{ main_guardian.address_dispatch }}
+                            {% else %}
+                                &nbsp;
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40px; padding-bottom: 10px">{{ main_guardian.address_zip }}</td>
+                        <td style="padding-bottom: 10px;">{{ main_guardian.address_city }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <table style="width: 100%; margin-top: 60px;">
+        <tr>
+            <td style="width: 20px;"></td>
+            <td style="width: 20px; border-top: 1px solid #cccccc;"></td>
+            <td style="text-align: center; padding-top: 10px; font-size: 1.5rem;"></td>
+            <td style="width: 20px; border-top: 1px solid #cccccc;"></td>
+            <td style="width: 20px;"></td>
+        </tr>
+    </table>
+
+    <div style="padding: 0 80px; font-size: 0.8rem; line-height: 1.2rem;">
+        <div>
+            {{ map_parts.message|raw }}
+
+            <div class="message-signature" style="width: 100%; text-align: right;">
+                {{ map_parts.message_signature|raw }}
+            </div>
+        </div>
+
+        <div style="width: 100%; margin-top: 40px; border: 2px dashed #dfdfdf;">
+            <table>
+                <tr>
+                    <td style="width: 80px; vertical-align: top;">
+                        <span style="text-transform: uppercase;">Accueil :</span>
+                    </td>
+                    <td class="camp-start-info" style="vertical-align: top;">
+                        {{ map_parts.start_date|raw }}
+                        <div style="font-style: italic;">{{ map_parts.start_location|raw }}</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="width: 100%; margin-top: 10px; border: 2px dashed #dfdfdf;">
+            <table>
+                <tr>
+                    <td style="width: 80px; vertical-align: top;">
+                        <span style="text-transform: uppercase;">Départ :</span>
+                    </td>
+                    <td class="camp-end-info" style="vertical-align: top;">
+                        {% if enrollment.weekend_extra == 'full' %}
+                            {{ map_parts.weekend_info|raw }}
+                        {% else %}
+                            {{ map_parts.end_date|raw }}
+                            <div style="font-style: italic;">{{ map_parts.end_location|raw }}</div>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        {% if map_parts.additional_info is defined and map_parts.additional_info != '' %}
+            <div style="width: 100%; margin-top: 40px; text-align: center;">
+                <b>- Informations complémentaires -</b>
+
+                <div style="margin-top: 15px; border: 2px dashed #dfdfdf; padding: 5px;">
+                    <div style="border: 2px dashed #dfdfdf; padding: 0 20px;">
+                        {{ map_parts.additional_info|raw }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        <p>
+            Les informations présentes dans ce document font l'objet d'un traitement informatique et sont destinées au Centre de Plein Air de Lathus. Conformément à la loi
+            "Informatique et libertés" du 6 janvier 1978, vous bénéficiez d'un droit d'accès et de rectification aux informations qui vous concernent.
+        </p>
+    </div>
+</body>

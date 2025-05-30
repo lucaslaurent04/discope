@@ -1,0 +1,30 @@
+{
+    "name": "Enrollment Mails",
+    "description": "List view for Enrollment Mails.",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "10%",
+                "sortable": true,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "mail_id",
+                "width": "50%",
+                "sortable": true,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "mail_type",
+                "width": "50%",
+                "sortable": true,
+                "readonly": true
+            }
+        ]
+    }
+}
