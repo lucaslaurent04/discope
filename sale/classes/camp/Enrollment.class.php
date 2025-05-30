@@ -691,7 +691,7 @@ class Enrollment extends Model {
         foreach($self as $enrollment) {
             if($enrollment['is_locked']) {
                 foreach(array_keys($values) as $column) {
-                    if(!in_array($column, ['is_locked', 'status', 'cancellation_date'])) {
+                    if(!in_array($column, ['is_locked', 'status', 'cancellation_date', 'enrollment_mails_ids'])) {
                         return ['is_locked' => ['locked_enrollment' => "Cannot modify a locked enrollment."]];
                     }
                 }
