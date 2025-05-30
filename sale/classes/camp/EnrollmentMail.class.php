@@ -43,7 +43,7 @@ class EnrollmentMail extends Model {
                 'rel_table'         => 'sale_camp_rel_enrollment_mail',
                 'rel_foreign_key'   => 'enrollment_id',
                 'rel_local_key'     => 'enrollment_mail_id',
-                'description'       => "The enrollments that are linked to this mail."
+                'description'       => "The enrollment mails that are linked to this mail."
             ]
 
         ];
