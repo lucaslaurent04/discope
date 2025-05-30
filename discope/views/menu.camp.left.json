@@ -11,6 +11,7 @@
                 "label": "Camps",
                 "description": "",
                 "icon": "holiday_village",
+                "route": "/camps",
                 "context": {
                     "entity": "sale\\camp\\Camp",
                     "view": "list.default"
@@ -22,6 +23,7 @@
                 "label": "Enrollments",
                 "description": "",
                 "icon": "app_registration",
+                "route": "/camps",
                 "context": {
                     "entity": "sale\\camp\\Enrollment",
                     "view": "list.default"
@@ -33,6 +35,7 @@
                 "label": "Presences",
                 "description": "",
                 "icon": "calendar_month",
+                "route": "/camps",
                 "context": {
                     "entity": "sale\\camp\\Presence",
                     "view": "list.default"
@@ -44,6 +47,7 @@
                 "label": "Meals",
                 "description": "",
                 "icon": "restaurant",
+                "route": "/camps",
                 "context": {
                     "entity": "sale\\booking\\BookingMeal",
                     "view": "list.camp"
@@ -62,6 +66,7 @@
                         "label": "Children",
                         "description": "",
                         "icon": "boy",
+                        "route": "/camps",
                         "context": {
                             "entity": "sale\\camp\\Child",
                             "view": "list.default"
@@ -73,6 +78,7 @@
                         "label": "Guardians",
                         "description": "",
                         "icon": "escalator_warning",
+                        "route": "/camps",
                         "context": {
                             "entity": "sale\\camp\\Guardian",
                             "view": "list.default"
@@ -84,6 +90,7 @@
                         "label": "Institutions",
                         "description": "",
                         "icon": "supervisor_account",
+                        "route": "/camps",
                         "context": {
                             "entity": "sale\\camp\\Institution",
                             "view": "list.default"
