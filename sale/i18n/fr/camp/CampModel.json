@@ -44,6 +44,16 @@
             "description": "Le produit de vente du camp CLSH à la journée.",
             "help": ""
         },
+        "weekend_product_id": {
+            "label": "Produit weekend",
+            "description": "Le produit de vente de l'hébergement le weekend après le camp.",
+            "help": ""
+        },
+        "saturday_morning_product_id": {
+            "label": "Produit samedi matin",
+            "description": "Le produit de vente de l'hébergement jusqu'au samedi matin après le camp.",
+            "help": ""
+        },
         "employee_ratio": {
             "label": "Ratio employé",
             "description": "La quantité d'enfants qu'un employé peut géré seul.",
@@ -57,6 +67,11 @@
         "ase_quota": {
             "label": "Quota ASE (par groupe)",
             "description": "Max d'enfants ASE par groupe (Aide social à l'enfance).",
+            "help": ""
+        },
+        "accounting_code": {
+            "label": "Code comptable",
+            "description": "Code comptable du camp.",
             "help": ""
         }
     },

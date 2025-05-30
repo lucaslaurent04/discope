@@ -22,7 +22,8 @@
                 "invoice": "facture",
                 "funding": "financement",
                 "option": "option",
-                "planning": "planning"
+                "planning": "planning",
+                "camp": "camp"
             },
             "help": ""
         }
