@@ -8,11 +8,11 @@
 
 use communication\TemplateAttachment;
 use core\Mail;
+use documents\Document;
 use equal\email\Email;
 use equal\email\EmailAttachment;
 use identity\Center;
 use sale\camp\Child;
-use sale\camp\document\Document;
 use sale\camp\EnrollmentMail;
 
 [$params, $providers] = eQual::announce([

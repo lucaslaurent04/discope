@@ -10,7 +10,7 @@ use communication\TemplateAttachment;
 use core\Mail;
 use equal\email\Email;
 use equal\email\EmailAttachment;
-use sale\camp\document\Document;
+use documents\Document;
 use sale\camp\Enrollment;
 use sale\camp\EnrollmentMail;
 

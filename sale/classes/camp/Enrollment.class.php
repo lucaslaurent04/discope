@@ -307,13 +307,6 @@ class Enrollment extends Model {
                 'visible'           => ['is_clsh', '=', false]
             ],
 
-            'documents_ids' => [
-                'type'              => 'one2many',
-                'foreign_field'     => 'enrollment_id',
-                'foreign_object'    => 'sale\camp\document\Document',
-                'description'       => "The documents needed for the child to enroll to the camp."
-            ],
-
             'enrollment_lines_ids' => [
                 'type'              => 'one2many',
                 'foreign_field'     => 'enrollment_id',
