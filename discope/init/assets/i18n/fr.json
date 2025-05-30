@@ -136,6 +136,7 @@
     "AUTH_ERROR_SERVER_ERROR": "Une erreur s'est produite au niveau du serveur. Veuillez réessayer dans quelques minutes.",
 
     "APPS_APP_BOOKING": "Réservations",
+    "APPS_APP_CAMP": "Camps",
     "APPS_APP_PLANNING": "Planning",
     "APPS_APP_POS": "Point de vente",
     "APPS_APP_ACCOUNTING": "Compta",

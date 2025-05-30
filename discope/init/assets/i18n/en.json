@@ -136,6 +136,7 @@
     "AUTH_ERROR_SERVER_ERROR": "A server error occurred. Please try later or contact support.",
 
     "APPS_APP_BOOKING": "Bookings",
+    "APPS_APP_CAMP": "Camps",
     "APPS_APP_POS": "Point of Sale",
     "APPS_APP_ACCOUNTING": "Accounting",
     "APPS_APP_SALES": "Sales",
