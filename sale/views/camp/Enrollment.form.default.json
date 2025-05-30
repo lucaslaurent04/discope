@@ -7,7 +7,7 @@
             "label": "Envoi pré-inscription",
             "description": "Envoyer la confirmation de pré-inscription.",
             "icon": "email",
-            "route": "/booking/camps/child/object.child_id/preregistration",
+            "route": "/child/object.child_id/preregistration",
             "visible": ["status", "=", "pending"]
         },
         {
@@ -15,7 +15,7 @@
             "label": "Envoi confirmation",
             "description": "Envoyer la confirmation d'inscription.",
             "icon": "email",
-            "route": "/booking/camps/enrollment/object.id/confirmation",
+            "route": "/enrollment/object.id/confirmation",
             "visible": ["status", "=", "confirmed"]
         }
     ],
@@ -354,27 +354,6 @@
                                             {
                                                 "type": "field",
                                                 "value": "child_remarks",
-                                                "width": "100%"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "section.documents",
-                        "label": "Documents",
-                        "visible": ["state", "<>", "draft"],
-                        "rows": [
-                            {
-                                "columns": [
-                                    {
-                                        "width": "100%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "documents_ids",
                                                 "width": "100%"
                                             }
                                         ]
