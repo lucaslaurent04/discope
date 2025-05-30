@@ -259,6 +259,17 @@
                                 }
                             },
                             {
+                                "id": "sales.camp.camps",
+                                "type": "entry",
+                                "label": "Camps",
+                                "description": "",
+                                "icon": "holiday_village",
+                                "context": {
+                                    "entity": "sale\\camp\\Camp",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
                                 "id": "sales.camp.price-adapters",
                                 "type": "entry",
                                 "label": "Price adapters",
