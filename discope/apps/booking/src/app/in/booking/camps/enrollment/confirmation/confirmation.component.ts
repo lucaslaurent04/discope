@@ -1,21 +1,9 @@
 import { AfterContentInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ApiService, EnvService, AuthService, ContextService } from 'sb-shared-lib'
-import { UserClass } from 'sb-shared-lib/lib/classes/user.class';
 import { FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-
-class Child {
-    constructor(
-        public id: number = 0,
-        public name: string = '',
-        public firstname: string = '',
-        public lastname: string = '',
-        public main_guardian_id: number = 0,
-        public guardians_ids: number[] = []
-    ) {
-    }
-}
+import { ApiService, EnvService, AuthService, ContextService } from 'sb-shared-lib';
+import { UserClass } from 'sb-shared-lib/lib/classes/user.class';
 
 class Enrollment {
     constructor(
@@ -25,6 +13,18 @@ class Enrollment {
         public camp_id: number = 0,
         public total: number = 0,
         public price: number = 0
+    ) {
+    }
+}
+
+class Child {
+    constructor(
+        public id: number = 0,
+        public name: string = '',
+        public firstname: string = '',
+        public lastname: string = '',
+        public main_guardian_id: number = 0,
+        public guardians_ids: number[] = []
     ) {
     }
 }
@@ -46,6 +46,7 @@ class Camp {
         public id: number = 0,
         public name: string = '',
         public short_name: string = '',
+        public sojourn_number: number = 0,
         public center_id: number = 0,
         public date_from: Date = new Date(),
         public date_to: Date = new Date(),
@@ -127,12 +128,6 @@ interface vModel {
     lang: {
         formControl: FormControl,
     },
-    center: {
-        formControl: FormControl,
-    },
-    children: {
-        formControl: FormControl,
-    },
     title: {
         formControl: FormControl
     },
@@ -160,25 +155,20 @@ interface vModel {
 }
 
 @Component({
-    selector: 'booking-camps-enrollment-pre-registration',
-    templateUrl: 'pre-registration.component.html',
-    styleUrls: ['pre-registration.component.scss']
+    selector: 'booking-camps-enrollment-confirmation',
+    templateUrl: 'confirmation.component.html',
+    styleUrls: ['confirmation.component.scss']
 })
-export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterContentInit {
+export class BookingCampsEnrollmentConfirmationComponent implements OnInit, AfterContentInit {
 
+    public enrollment: Enrollment = new Enrollment();
+
+    public camp: Camp = new Camp();
     public child: Child = new Child();
-
-    public enrollments: Enrollment[] = [];
     public mainGuardian: Guardian = new Guardian();
-    public mainGuardianChildren: Child[] = [];
     public guardians: Guardian[] = [];
 
-    public camps: Camp[] = [];
-    public centers: Center[] = [];
-    public offices: CenterOffice[] = [];
-    public organisations: Organisation[] = [];
-
-    public selectedCenter: Center = new Center();
+    public center: Center = new Center();
     public office: CenterOffice = new CenterOffice();
     public organisation: Organisation = new Organisation();
 
@@ -190,7 +180,7 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
     public loading = true;
     public isSent = false;
 
-    public printInvoiceUrl: string = null;
+    public printConfirmationUrl: string = null;
 
     public vm: vModel;
 
@@ -206,12 +196,6 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
         this.vm = {
             lang: {
                 formControl: new FormControl('fr'),
-            },
-            center: {
-                formControl: new FormControl(1),
-            },
-            children: {
-                formControl: new FormControl([], Validators.required),
             },
             title: {
                 formControl: new FormControl('', Validators.required)
@@ -254,24 +238,24 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
             }
 
             try {
-                if(!params.hasOwnProperty('child_id')) {
+                if(!params.hasOwnProperty('enrollment_id')) {
                     return;
                 }
 
-                const childId = parseInt(params['child_id'], 10);
-                await this.loadChild(childId);
+                const enrollmentId = parseInt(params['enrollment_id'], 10);
+                await this.loadEnrollment(enrollmentId);
 
                 this.refreshSenderAddresses();
                 this.refreshTemplates();
-                this.refreshPrintInvoiceUrl();
+                this.refreshPrintConfirmationUrl();
 
                 this.context.change({
                     context_only: true,
                     context: {
-                        entity: 'sale\\camp\\Child',
+                        entity: 'sale\\camp\\Enrollment',
                         type: 'form',
                         purpose: 'view',
-                        domain: ['id', '=', this.child.id]
+                        domain: ['id', '=', this.enrollment.id]
                     }
                 });
 
@@ -293,33 +277,38 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
             }
         }
     }
+
+    private async loadEnrollment(enrollmentId: number) {
+        const enrollments: Enrollment[] = await this.api.read("sale\\camp\\Enrollment", [enrollmentId], Object.getOwnPropertyNames(new Enrollment()));
+        if(enrollments.length > 0) {
+            const enrollment = enrollments[0];
+
+            this.enrollment = enrollment;
+
+            await this.loadCamp(enrollment.camp_id);
+            await this.loadChild(enrollment.child_id);
+        }
+    }
+
+    private async loadCamp(campId: number) {
+        const camps: Camp[] = await this.api.read("sale\\camp\\Camp", [campId], Object.getOwnPropertyNames(new Camp()))
+        if(camps.length > 0) {
+            const camp = camps[0];
+
+            this.camp = camp;
+
+            await this.loadCenter(camp.center_id);
+        }
+    }
+
     private async loadChild(childId: number) {
         const children: Child[] = await this.api.read("sale\\camp\\Child", [childId], Object.getOwnPropertyNames(new Child()));
         if(children.length > 0) {
             const child = children[0];
 
             this.child = child;
-            this.vm.children.formControl.setValue([this.child.id]);
 
-            await this.loadEnrollments(child.id);
             await this.loadGuardians(child.guardians_ids, child.main_guardian_id);
-        }
-    }
-
-    private async loadEnrollments(childId: number) {
-        const startYearDate = new Date(new Date().getFullYear(), 0, 1);
-        const endYearDate = new Date(new Date().getFullYear(), 11, 31);
-
-        const domain = [
-            ['child_id', '=', childId],
-            ['date_from', '>=', startYearDate.getTime() / 1000],
-            ['date_from', '<=', endYearDate.getTime() / 1000]
-        ];
-        this.enrollments = await this.api.collect("sale\\camp\\Enrollment", domain, Object.getOwnPropertyNames(new Enrollment()));
-
-        const campsIds = this.enrollments.map(e => e.camp_id);
-        if(campsIds.length > 0) {
-            await this.loadCamps(campsIds);
         }
     }
 
@@ -330,7 +319,6 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
             for(let guardian of guardians) {
                 if(guardian.id === mainGuardianId) {
                     this.mainGuardian = guardian;
-                    await this.loadOtherChildrenOfMainGuardian(guardian.id);
                     break;
                 }
             }
@@ -338,45 +326,30 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
         }
     }
 
-    private async loadOtherChildrenOfMainGuardian(guardianId: number) {
-        const domain = ['main_guardian_id', '=', guardianId];
-        const children: Child[] = await this.api.collect("sale\\camp\\Child", domain, Object.getOwnPropertyNames(new Child()));
-        if(children.length > 1) {
-            this.mainGuardianChildren = children;
-        }
-    }
-
-    private async loadCamps(campsIds: number[]) {
-        this.camps = await this.api.read("sale\\camp\\Camp", campsIds, Object.getOwnPropertyNames(new Camp()));
-
-        const centersIds = this.camps.map(e => e.center_id);
-        if(centersIds.length > 0) {
-            await this.loadCenters(centersIds);
-        }
-    }
-
-    private async loadCenters(centersIds: number[]) {
-        const centers: Center[] = await this.api.read("identity\\Center", centersIds, Object.getOwnPropertyNames(new Center()));
+    private async loadCenter(centerId: number) {
+        const centers: Center[] = await this.api.read("identity\\Center", [centerId], Object.getOwnPropertyNames(new Center()));
         if(centers.length > 0) {
             const center = centers[0];
 
-            this.centers = centers;
-            this.selectedCenter = center;
+            this.center = center;
 
-            await this.loadCenterOffices(centers.map(c => c.center_office_id));
-            this.office = this.offices.find(o => o.id === this.selectedCenter.center_office_id);
-
-            await this.loadCenterOrganisations(centers.map(c => c.organisation_id));
-            this.organisation = this.organisations.find(o => o.id === this.selectedCenter.organisation_id);
+            await this.loadCenterOffice(center.center_office_id);
+            await this.loadOrganisation(center.organisation_id);
         }
     }
 
-    private async loadCenterOffices(officesIds: number[]) {
-        this.offices = await this.api.read("identity\\CenterOffice", officesIds, Object.getOwnPropertyNames(new CenterOffice()));
+    private async loadCenterOffice(officeId: number) {
+        const centerOffices = await this.api.read("identity\\CenterOffice", [officeId], Object.getOwnPropertyNames(new CenterOffice()));;
+        if(centerOffices.length > 0) {
+            this.office = centerOffices[0];
+        }
     }
 
-    private async loadCenterOrganisations(organisationsIds: number[]) {
-        this.organisations = await this.api.read("identity\\Identity", organisationsIds, Object.getOwnPropertyNames(new Organisation()));
+    private async loadOrganisation(organisationId: number) {
+        const organisations = await this.api.read("identity\\Identity", [organisationId], Object.getOwnPropertyNames(new Organisation()));
+        if(organisations.length > 0) {
+            this.organisation = organisations[0];
+        }
     }
 
     private refreshSenderAddresses() {
@@ -387,7 +360,7 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
             this?.office?.email ?? '',
             this?.office?.email_alt ?? '',
             this?.organisation?.email ?? '',
-            this?.selectedCenter?.email ?? '',
+            this?.center?.email ?? '',
             this?.user?.login ?? ''
         ];
 
@@ -428,25 +401,8 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
         this.vm.lang.formControl.valueChanges.subscribe((languageCode: string) => {
             this.selectedLanguage = this.mapLanguages[languageCode];
             this.refreshTemplates();
-            this.refreshPrintInvoiceUrl();
+            this.refreshPrintConfirmationUrl();
         });
-
-        this.vm.center.formControl.valueChanges.subscribe((centerId: number) => {
-            for(let center of this.centers) {
-                if(center.id === centerId) {
-                    this.selectedCenter = center;
-                    this.office = this.offices.find(o => o.id === center.center_office_id);
-                    this.organisation = this.organisations.find(o => o.id === center.organisation_id);
-
-                    this.refreshTemplates();
-                    this.refreshPrintInvoiceUrl();
-                }
-            }
-        });
-
-        this.vm.children.formControl.valueChanges.subscribe((childrenIds: number[]) => {
-            this.refreshPrintInvoiceUrl();
-        })
     }
 
     private async refreshTemplates() {
@@ -456,9 +412,9 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
             const templates: Template[] = await this.api.collect(
                 "communication\\Template",
                 [
-                    ['category_id', '=', this.selectedCenter.template_category_id],
+                    ['category_id', '=', this.center.template_category_id],
                     ['type', '=', 'camp'],
-                    ['code', '=', 'preregistration']
+                    ['code', '=', 'confirmation']
                 ],
                 Object.getOwnPropertyNames(new Template()),
                 'id', 'asc', 0, 1, this.selectedLanguage.code
@@ -485,13 +441,23 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
                     }
                 }
 
-                const camp = this.camps[0];
-                const enrollment = this.enrollments[0];
+                const dateFrom = new Date(this.camp.date_from);
+                const dateTo = new Date(this.camp.date_to);
+
+                let strDateFrom = dateFrom.getDate().toString().padStart(2, '0') + '/' + (dateFrom.getMonth()+1).toString().padStart(2, '0') + '/' + dateFrom.getFullYear();
+                let strDateTo = dateTo.getDate().toString().padStart(2, '0') + '/' + (dateTo.getMonth()+1).toString().padStart(2, '0') + '/' + dateTo.getFullYear();
 
                 const mapKeyValue: {[key: string]: string} = {
-                    total: enrollment.total.toString(),
-                    price: enrollment.price.toString(),
-                    camp: camp.short_name
+                    total: this.enrollment.total.toString(),
+                    price: this.enrollment.price.toString(),
+                    camp: this.camp.short_name,
+                    sojourn_number: this.camp.sojourn_number.toString(),
+                    accounting_code: this.camp.accounting_code,
+                    date_from: strDateFrom,
+                    date_to: strDateTo,
+                    child: this.child.name,
+                    firstname: this.child.firstname,
+                    lastname: this.child.lastname.toUpperCase()
                 };
 
                 if(subjectPart) {
@@ -538,87 +504,21 @@ export class BookingCampsChildPreRegistrationComponent implements OnInit, AfterC
         }
     }
 
-    public refreshPrintInvoiceUrl() {
-        console.log('refreshPrintInvoiceUrl');
-        const childrenIds = this.vm.children.formControl.value;
-        if(this.selectedCenter.id === 0 || this.selectedLanguage.id === 0 || childrenIds.length < 1) {
-            this.printInvoiceUrl = null;
+    public refreshPrintConfirmationUrl() {
+        console.log('refreshPrintConfirmationUrl');
+        if(this.selectedLanguage.id === 0 || this.enrollment.id === 0) {
+            this.printConfirmationUrl = null;
             return;
         }
 
-        this.printInvoiceUrl = '/?get=sale_camp_enrollment_preregistration_print-invoice&center_id=' + this.selectedCenter.id + '&lang=' + this.selectedLanguage.code + '&ids=[' + childrenIds.join(',') + ']';
+        this.printConfirmationUrl = '/?get=sale_camp_enrollment_confirmation_print-confirmation&lang=' + this.selectedLanguage.code + '&id='+ this.enrollment.id;
     }
 
     public async onSend() {
-        /*
-            Validate values (otherwise mark fields as invalid)
-        */
-
-        let hasError = false;
-        if(this.vm.children.formControl.invalid) {
-            this.vm.children.formControl.markAsTouched();
-            hasError = true;
-        }
-        if(this.vm.title.formControl.invalid) {
-            this.vm.title.formControl.markAsTouched();
-            hasError = true;
-        }
-        if(this.vm.message.formControl.invalid) {
-            this.vm.message.formControl.markAsTouched();
-            hasError = true;
-        }
-        if(this.vm.sender.formControl.invalid) {
-            this.vm.sender.formControl.markAsTouched();
-            hasError = true;
-        }
-        if(this.vm.recipient.formControl.invalid) {
-            this.vm.recipient.formControl.markAsTouched();
-            hasError = true;
-        }
-
-        if(hasError) {
-            return;
-        }
-
-        try {
-            this.loading = true;
-            await this.api.call('?do=sale_camp_enrollment_send-preregistration', {
-                children_ids: this.vm.children.formControl.value,
-                center_id: this.vm.center.formControl.value,
-                sender_email: this.vm.sender.formControl.value,
-                recipient_email: this.vm.recipient.formControl.value,
-                recipients_emails: this.vm.recipients.formControl.value,
-                title: this.vm.title.formControl.value,
-                message: this.vm.message.formControl.value,
-                lang: this.vm.lang.formControl.value,
-                attachments_ids: this.vm.attachments.items.filter((a: any) => a?.id).map((a: any) => a.id),
-                documents_ids: this.vm.documents.items.filter((d: any) => d?.id).map((d: any) => d.id),
-            });
-
-            this.isSent = true;
-            this.snack.open("Confirmation de pré-inscription envoyée avec succès.");
-            this.loading = false;
-        }
-        catch(response: any) {
-            let message: string = 'Erreur inconnue';
-            if(response.error && response.error.errors) {
-                const codes = Object.keys(response.error.errors);
-                if(codes.length) {
-                    switch(codes[0]) {
-                        case 'NOT_ALLOWED':
-                            message = 'Opération non autorisée';
-                            break;
-                    }
-                }
-            }
-            setTimeout( () => {
-                this.loading = false;
-                this.snack.open(message, "Erreur");
-            }, 500);
-        }
+        console.log('send');
     }
 
-    public onclickChild() {
+    public async onclickChild() {
         let descriptor:any = {
             context_silent: true,
             context: {

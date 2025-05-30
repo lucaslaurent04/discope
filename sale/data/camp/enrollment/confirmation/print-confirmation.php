@@ -67,6 +67,7 @@ $enrollment = Enrollment::id($params['id'])
         'camp_id' => [
             'short_name',
             'sojourn_number',
+            'accounting_code',
             'price',
             'date_from',
             'date_to',
@@ -160,9 +161,11 @@ while($date <= $camp['date_to']) {
 }
 
 $template_values = [
+    'name'              => $child['name'],
     'firstname'         => $child['firstname'],
-    'lastname'          => $child['lastname'],
+    'lastname'          => strtoupper($child['lastname']),
     'sojourn_number'    => $camp['sojourn_number'],
+    'accounting_code'   => $camp['accounting_code'],
     'camp'              => $camp['short_name'],
     'date_from'         => date($date_format, $camp['date_from']),
     'date_to'           => date($date_format, $camp['date_to']),

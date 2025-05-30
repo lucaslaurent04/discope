@@ -4,20 +4,20 @@ import { Platform } from '@angular/cdk/platform';
 
 import { SharedLibModule, CustomDateAdapter } from 'sb-shared-lib';
 
-import { BookingCampsChildRoutingModule } from './child-routing.module';
+import { BookingCampsEnrollmentRoutingModule } from './enrollment-routing.module';
 
-import { BookingCampsChildPreRegistrationComponent } from './pre-registration/pre-registration.component';
+import { BookingCampsEnrollmentConfirmationComponent } from './confirmation/confirmation.component';
 
 @NgModule({
     imports: [
         SharedLibModule,
-        BookingCampsChildRoutingModule
+        BookingCampsEnrollmentRoutingModule
     ],
     declarations: [
-        BookingCampsChildPreRegistrationComponent
+        BookingCampsEnrollmentConfirmationComponent
     ],
     providers: [
         { provide: DateAdapter, useClass: CustomDateAdapter, deps: [MAT_DATE_LOCALE, Platform] }
     ]
 })
-export class AppInBookingCampsChildModule {}
+export class AppInBookingCampsEnrollmentModule {}
