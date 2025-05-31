@@ -39,12 +39,6 @@
             },
             {
                 "type": "field",
-                "value": "is_pack",
-                "width": "10%",
-                "sortable": true
-            },
-            {
-                "type": "field",
                 "value": "can_sell",
                 "width": "10%",
                 "sortable": true
@@ -59,6 +53,30 @@
                 "type": "field",
                 "value": "family_id",
                 "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "is_pack",
+                "width": "10%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "is_rental_unit",
+                "width": "10%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "is_meal",
+                "width": "10%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "is_snack",
+                "width": "10%",
+                "sortable": true
             }
         ]
     }
