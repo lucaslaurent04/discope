@@ -448,7 +448,7 @@
                     {
                         "label": "TimeSlots",
                         "id": "section.time-slots",
-                        "visible": [ ["type", "=", "service"], ["service_type", "=", "schedulable"] ],
+                        "visible": [ ["type", "=", "service"], ["service_type", "=", "schedulable"], ["is_activity", "=", true] ],
                         "rows": [
                             {
                                 "columns": [
