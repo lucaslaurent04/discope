@@ -43,6 +43,21 @@
             "description": "Contient d'autres produits.",
             "help": ""
         },
+        "is_meal": {
+            "label": "Est un repas",
+            "description": "Le produit est-il un repas ?",
+            "help": "Le produit est-il un repas ? (les repas peuvent faire partie de la pension / services inclus du séjour)."
+        },
+        "is_snack": {
+            "label": "Est une collation",
+            "description": "Le produit est-il une collation ?",
+            "help": "Le produit est-il une collation ?"
+        },
+        "is_rental_unit": {
+            "label": "Unité Locative",
+            "description": "Le produit doit être associé à une ou plusieurs unités locatives.",
+            "help": ""
+        },
         "has_own_price": {
             "label": "A son propre prix",
             "description": "Pack avec prix propre.",
@@ -104,7 +119,7 @@
             "help": "Si cette proprété est désactivée, les adaptations de prix (avantages) liées aux catégories tarifaires ne sont pas appliquées sur les produits du pack."
         },
         "grouping_code_id": {
-            "label": "Code de regroupement",
+            "label": "Regroupement",
             "description": "Code de regroupement spécifique auquel ce modèle de produit est associé, le cas échéant.",
             "help": ""
         },

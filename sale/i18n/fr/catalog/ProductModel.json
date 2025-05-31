@@ -185,16 +185,6 @@
             "description": "Capacité impliquée par le service.",
             "help": "Capacité impliquée par le service (utilisées pour trouver des logements locatifs correspondants)."
         },
-        "is_repeatable": {
-            "label": "Est répétable",
-            "description": "Le produit se répète-t-il chaque jour du séjour ?",
-            "help": "Les produits répétables sont comptabilisés en fonction du nombre de nuits (séjour) ou de jours (événement)."
-        },
-        "is_meal": {
-            "label": "Est un repas",
-            "description": "Le produit est-il un repas ?",
-            "help": "Le produit est-il un repas ? (les repas peuvent faire partie de la pension / services inclus du séjour)."
-        },
         "nutritional_coefficient": {
             "label": "Coefficient nutritionnel",
             "description": "Le coefficient nutritionnel du repas.",
@@ -210,21 +200,6 @@
                 "takeaway": "À emporter"
             }
         },
-        "is_snack": {
-            "label": "Est une collation",
-            "description": "Le produit est-il une collation ?",
-            "help": "Le produit est-il une collation ?"
-        },
-        "is_accomodation": {
-            "label": "Est un logement",
-            "description": "Le produit est associé à une unité locative de type logement.",
-            "help": ""
-        },
-        "is_rental_unit": {
-            "label": "Unité Locative",
-            "description": "Le produit doit être associé à une ou plusieurs unités locatives.",
-            "help": ""
-        },
         "rental_unit_category_id": {
             "label": "Catégorie d'unité locative",
             "description": "Catégorie d'unités locatives assignables aux produits.",
@@ -239,6 +214,31 @@
             "label": "Prix adaptables",
             "description": "Le pack est-il candidat aux adaptations de prix (catégories tarifaires).",
             "help": "Si cette proprété est désactivée, les adaptations de prix (avantages) liées aux catégories tarifaires ne sont pas appliquées sur les produits du pack."
+        },
+        "is_repeatable": {
+            "label": "Est répétable",
+            "description": "Le produit se répète-t-il chaque jour du séjour ?",
+            "help": "Les produits répétables sont comptabilisés en fonction du nombre de nuits (séjour) ou de jours (événement)."
+        },
+        "is_meal": {
+            "label": "Est un repas",
+            "description": "Le produit est-il un repas ?",
+            "help": "Le produit est-il un repas ? (les repas peuvent faire partie de la pension / services inclus du séjour)."
+        },
+        "is_snack": {
+            "label": "Est une collation",
+            "description": "Le produit est-il une collation ?",
+            "help": "Le produit est-il une collation ?"
+        },
+        "is_accomodation": {
+            "label": "Est un logement",
+            "description": "Le produit est associé à une unité locative de type logement.",
+            "help": ""
+        },
+        "is_rental_unit": {
+            "label": "Unité Locative",
+            "description": "Le produit doit être associé à une ou plusieurs unités locatives.",
+            "help": ""
         },
         "is_transport": {
             "label": "Est un transport",
