@@ -55,12 +55,6 @@
             },
             {
                 "type": "field",
-                "value": "is_pack",
-                "width": "10%",
-                "sortable": true
-            },
-            {
-                "type": "field",
                 "value": "can_sell",
                 "width": "10%",
                 "sortable": true
@@ -78,37 +72,25 @@
             },
             {
                 "type": "field",
+                "value": "is_pack",
+                "width": "10%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "value": "is_rental_unit",
+                "width": "10%",
+                "sortable": true
+            },
+            {
+                "type": "field",
                 "value": "is_meal",
                 "width": "10%",
-                "visible": false
+                "sortable": true
             },
             {
                 "type": "field",
                 "value": "is_snack",
-                "width": "10%",
-                "visible": false
-            },
-            {
-                "type": "field",
-                "value": "is_activity",
-                "width": "10%",
-                "visible": false
-            },
-            {
-                "type": "field",
-                "value": "is_transport",
-                "width": "10%",
-                "visible": false
-            },
-            {
-                "type": "field",
-                "value": "is_supply",
-                "width": "10%",
-                "visible": false
-            },
-            {
-                "type": "field",
-                "value": "is_camp",
                 "width": "10%",
                 "visible": false
             }
