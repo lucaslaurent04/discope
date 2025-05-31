@@ -83,12 +83,14 @@
                                             {
                                                 "type": "field",
                                                 "value": "schedule_type",
-                                                "width": "25%"
+                                                "width": "25%",
+                                                "visible": false
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "schedule_default_value",
-                                                "width": "25%"
+                                                "width": "25%",
+                                                "visible": false
                                             },
                                             {
                                                 "type": "field",
