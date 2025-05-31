@@ -40,7 +40,7 @@ const routes: Routes = [
             1) load necessary info
             2) ask for permissions (and store choices)
             3) redirect to applicable page (/auth/sign or /in)
-            */
+         */
         path: '',
         component: AppComponent
     }

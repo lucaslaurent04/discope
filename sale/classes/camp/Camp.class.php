@@ -31,11 +31,28 @@ class Camp extends Model {
                 'function'          => 'calcName'
             ],
 
+            'center_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\Center',
+                'description'       => "The center to which the booking relates to.",
+                'default'           => 1
+            ],
+
             'short_name' => [
                 'type'              => 'string',
                 'description'       => "Short name of the camp.",
                 'required'          => true,
                 'dependents'        => ['name']
+            ],
+
+            'sojourn_number' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => "Sojourn number to distinguish camps.",
+                'help'              => "Is handle by the setting sequence 'sale.organization.camp.sequence{center_id.center_office_id.code}'.",
+                'store'             => true,
+                'instant'           => true,
+                'function'          => 'calcSojournNumber'
             ],
 
             'status' => [
@@ -84,7 +101,7 @@ class Camp extends Model {
             'product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
-                'description'       => "The product targeted by the line.",
+                'description'       => "The product that will be added to the enrollment lines if the child enroll for the full camp.",
                 'required'          => true,
                 'domain'            => ['is_camp', '=', true]
             ],
@@ -123,9 +140,25 @@ class Camp extends Model {
             'day_product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
-                'description'       => "The product targeted by the line.",
+                'description'       => "The product that will be added to the enrollment lines if the child enroll for specific days of the camp.",
                 'domain'            => ['is_camp', '=', true],
                 'visible'           => ['is_clsh', '=', true]
+            ],
+
+            'weekend_product_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\catalog\Product',
+                'description'       => "The product that will be added to the enrollment lines if the child stays the weekend after the camp.",
+                'domain'            => ['is_camp', '=', true],
+                'visible'           => ['is_clsh', '=', false]
+            ],
+
+            'saturday_morning_product_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\catalog\Product',
+                'description'       => "The product that will be added to the enrollment lines if the child stays the until Saturday morning after the camp.",
+                'domain'            => ['is_camp', '=', true],
+                'visible'           => ['is_clsh', '=', false]
             ],
 
             'camp_model_id' => [
@@ -194,9 +227,8 @@ class Camp extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'string',
                 'description'       => "Specific accounting code for the camp.",
-                'unique'            => true,
                 'store'             => true,
-                'function'          => 'calcAccountingCode'
+                'relation'          => ['camp_model_id' => 'accounting_code'],
             ],
 
             'need_license_ffe' => [
@@ -400,6 +432,22 @@ class Camp extends Model {
         return $result;
     }
 
+    public static function calcSojournNumber($self): array {
+        $result = [];
+        $self->read(['center_id' => ['center_office_id' => ['code']]]);
+
+        foreach($self as $id => $camp) {
+            $sequence_name = 'camp.sequence'.$camp['center_id']['center_office_id']['code'];
+            Setting::assert_sequence('sale', 'organization', $sequence_name);
+
+            $sequence = Setting::fetch_and_add('sale', 'organization', $sequence_name);
+
+            $result[$id] = $sequence;
+        }
+
+        return $result;
+    }
+
     public static function calcDefaultEmployeeRatio($self): array {
         $result = [];
         $self->read(['camp_model_id' => ['default_employee_ratio']]);
@@ -436,27 +484,6 @@ class Camp extends Model {
         return $result;
     }
 
-    public static function calcAccountingCode($self): array {
-        $result = [];
-        $last_accounting_code = self::search([], ['sort' => ['created' => 'desc']])
-            ->read(['accounting_code'])
-            ->first();
-
-        $code = 0;
-        if(!is_null($last_accounting_code)) {
-            $code_array = explode('C', $last_accounting_code['accounting_code']);
-            if(isset($code_array[1])) {
-                $code = (int) $code_array[1];
-            }
-        }
-
-        foreach($self as $id => $camp) {
-            $result[$id] = '411C'.str_pad(++$code, 4, '0', STR_PAD_LEFT);
-        }
-
-        return $result;
-    }
-
     public static function onchange($event, $values) {
         $result = [];
         if(isset($event['camp_model_id'])) {
@@ -469,8 +496,11 @@ class Camp extends Model {
                     'employee_ratio',
                     'need_license_ffe',
                     'ase_quota',
-                    'product_id'        => ['id', 'name'],
-                    'day_product_id'    => ['id', 'name']
+                    'accounting_code',
+                    'product_id'                    => ['id', 'name'],
+                    'day_product_id'                => ['id', 'name'],
+                    'weekend_product_id'            => ['id', 'name'],
+                    'saturday_morning_product_id'   => ['id', 'name']
                 ])
                 ->first(true);
 
@@ -481,6 +511,7 @@ class Camp extends Model {
                 $result['need_license_ffe'] = $camp_model['need_license_ffe'];
                 $result['ase_quota'] = $camp_model['ase_quota'];
                 $result['is_clsh'] = $camp_model['is_clsh'];
+                $result['accounting_code'] = $camp_model['accounting_code'];
 
                 if($camp_model['is_clsh']) {
                     $result['clsh_type'] = $camp_model['clsh_type'];
@@ -488,6 +519,8 @@ class Camp extends Model {
                 }
                 else {
                     $result['day_product_id'] = null;
+                    $result['weekend_product_id'] = $camp_model['weekend_product_id'];
+                    $result['saturday_morning_product_id'] = $camp_model['saturday_morning_product_id'];
                 }
 
                 if(empty($values['short_name'])) {

@@ -10,6 +10,7 @@
     ],
     "apps": [
         "booking",
+        "camp",
         "discope_settings"
     ]
 }
