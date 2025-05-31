@@ -1,0 +1,103 @@
+{
+    "name": "Camp menu",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "layout": {
+        "items": [
+            {
+                "id": "camps",
+                "type": "entry",
+                "label": "Camps",
+                "description": "",
+                "icon": "holiday_village",
+                "route": "/camps",
+                "context": {
+                    "entity": "sale\\camp\\Camp",
+                    "view": "list.default"
+                }
+            },
+            {
+                "id": "enrollments",
+                "type": "entry",
+                "label": "Enrollments",
+                "description": "",
+                "icon": "app_registration",
+                "route": "/camps",
+                "context": {
+                    "entity": "sale\\camp\\Enrollment",
+                    "view": "list.default"
+                }
+            },
+            {
+                "id": "presences",
+                "type": "entry",
+                "label": "Presences",
+                "description": "",
+                "icon": "calendar_month",
+                "route": "/camps",
+                "context": {
+                    "entity": "sale\\camp\\Presence",
+                    "view": "list.default"
+                }
+            },
+            {
+                "id": "meals",
+                "type": "entry",
+                "label": "Meals",
+                "description": "",
+                "icon": "restaurant",
+                "route": "/camps",
+                "context": {
+                    "entity": "sale\\booking\\BookingMeal",
+                    "view": "list.camp"
+                }
+            },
+            {
+                "id": "people",
+                "label": "People",
+                "description": "",
+                "icon": "family_restroom",
+                "type": "parent",
+                "children": [
+                    {
+                        "id": "people.children",
+                        "type": "entry",
+                        "label": "Children",
+                        "description": "",
+                        "icon": "boy",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\camp\\Child",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "people.guardians",
+                        "type": "entry",
+                        "label": "Guardians",
+                        "description": "",
+                        "icon": "escalator_warning",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\camp\\Guardian",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "people.institutes",
+                        "type": "entry",
+                        "label": "Institutions",
+                        "description": "",
+                        "icon": "supervisor_account",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\camp\\Institution",
+                            "view": "list.default"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}
