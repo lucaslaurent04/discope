@@ -13,6 +13,7 @@ Setting::assert_value('sale', 'features', 'booking.loyalty_points', false);
 Setting::assert_value('sale', 'features', 'booking.consumption_meters', false);
 Setting::assert_value('sale', 'features', 'booking.archive_delay', 60);
 Setting::assert_value('sale', 'features', 'booking.tasks_table', false);
+Setting::assert_value('sale', 'features', 'booking.age_range.freebies', false);
 Setting::assert_value('sale', 'features', 'employee.activity_filter', false);
 Setting::assert_value('sale', 'features', 'quote.validity_delay', 10);
 Setting::assert_value('sale', 'features', 'quote.remind_auto', false);
