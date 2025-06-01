@@ -72,6 +72,12 @@
                                                 "width": "50%"
                                             },
                                             {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "50%",
+                                                "visible": ["has_age_range", "=", false]
+                                            },
+                                            {
                                                 "type": "field",
                                                 "label": "Age range",
                                                 "value": "age_range_id",
@@ -81,6 +87,12 @@
                                                 "type": "field",
                                                 "value": "has_rate_class",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "50%",
+                                                "visible": ["has_rate_class", "=", false]
                                             },
                                             {
                                                 "type": "field",
