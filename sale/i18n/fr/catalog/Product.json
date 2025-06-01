@@ -25,12 +25,12 @@
         },
         "description": {
             "label": "Description",
-            "description": "Description du produit variant (spécificités).",
+            "description": "Description de la variante de produit (spécificités).",
             "help": ""
         },
         "product_model_id": {
             "label": "Modèle de produit",
-            "description": "Modèle de produit du variant.",
+            "description": "Modèle de produit de la variante.",
             "help": ""
         },
         "prices_ids": {
@@ -42,16 +42,6 @@
             "label": "Pack",
             "description": "Contient d'autres produits.",
             "help": ""
-        },
-        "is_meal": {
-            "label": "Est un repas",
-            "description": "Le produit est-il un repas ?",
-            "help": "Le produit est-il un repas ? (les repas peuvent faire partie de la pension / services inclus du séjour)."
-        },
-        "is_snack": {
-            "label": "Est une collation",
-            "description": "Le produit est-il une collation ?",
-            "help": "Le produit est-il une collation ?"
         },
         "is_rental_unit": {
             "label": "Unité Locative",
@@ -104,7 +94,17 @@
             "help": ""
         },
         "age_range_id": {
-            "label": "Age (tranche)",
+            "label": "Tranche d'âge",
+            "description": "Tranche d'âge à laquelle est limité le produit.",
+            "help": ""
+        },
+        "has_rate_class": {
+            "label": "Catégorie tarifaire?",
+            "description": "Catégorie tarifaire spécifique.",
+            "help": ""
+        },
+        "rate_class_id": {
+            "label": "Catégorie tarifaire",
             "description": "Tranche d'âge cible du produit.",
             "help": ""
         },

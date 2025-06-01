@@ -250,6 +250,20 @@ class Product extends Model {
                 'visible'           => [ ['has_age_range', '=', true] ]
             ],
 
+            'has_rate_class' => [
+                'type'              => 'boolean',
+                'description'       => "Applies on a specific rate class?",
+                'default'           => false
+            ],
+
+            'rate_class_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\customer\RateClass',
+                'description'       => 'Customers rate class the product is intended for.',
+                'onupdate'          => 'onupdateRateClassId',
+                'visible'           => [ ['has_rate_class', '=', true] ]
+            ],
+
             'grouping_code_id' => [
                 'type'              => 'computed',
                 'result_type'       => 'many2one',
@@ -317,12 +331,17 @@ class Product extends Model {
         }
     }
 
-    public static function onupdateAgeRangeId($om, $ids, $values, $lang) {
-        $products = $om->read(self::getType(), $ids, ['age_range_id']);
-        if($products > 0 && count($products)) {
-            foreach($products as $id => $product) {
-                $om->update(self::getType(), $id, ['has_age_range' => boolval($product['age_range_id'])], $lang);
-            }
+    public static function onupdateAgeRangeId($self) {
+        $self->read(['age_range_id']);
+        foreach($self as $id => $product) {
+            self::id($id)->update(['has_age_range' => boolval($product['age_range_id'])]);
+        }
+    }
+
+    public static function onupdateRateClassId($self) {
+        $self->read(['rate_class_id']);
+        foreach($self as $id => $product) {
+            self::id($id)->update(['has_rate_class' => boolval($product['rate_class_id'])]);
         }
     }
 

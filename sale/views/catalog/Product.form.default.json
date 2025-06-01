@@ -69,16 +69,26 @@
                                             {
                                                 "type": "field",
                                                 "value": "has_age_range",
-                                                "width": "100%"
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
                                                 "label": "Age range",
                                                 "value": "age_range_id",
-                                                "width": "100%"
+                                                "width": "50%"
                                             },
                                             {
-
+                                                "type": "field",
+                                                "value": "has_rate_class",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Rate class",
+                                                "value": "rate_class_id",
+                                                "width": "50%"
+                                            },
+                                            {
                                                 "type": "field",
                                                 "value": "grouping_code_id",
                                                 "width": "100%"
