@@ -3393,24 +3393,58 @@ class BookingLineGroup extends Model {
                 ];
 
                 // handle products with no age_range (group must have only one line for those)
+                $product_id = null;
                 $has_single_range = false;
                 $age_range_id = $age_assignment['age_range_id'];
 
-                // search for a product matching model and age_range (there should be 1 or 0)
-                $products_ids = $om->search('sale\catalog\Product', [ ['product_model_id', '=', $pack_line['child_product_model_id']], ['age_range_id', '=', $age_range_id], ['can_sell', '=', true] ]);
-                // if no product for a specific age_range, use "all age" product and use range.qty
-                if($products_ids < 0 || !count($products_ids)) {
-                    $products_ids = $om->search('sale\catalog\Product', [ ['product_model_id', '=', $pack_line['child_product_model_id']], ['has_age_range', '=', false], ['can_sell', '=', true] ]);
-                    if($products_ids < 0 || !count($products_ids)) {
-                        // issue a warning : no product match for line
-                        trigger_error("ORM::no match for age range {$age_range_id} and no 'all ages' product found for model {$pack_line['child_product_model_id']}", QN_REPORT_WARNING);
-                        // skip the line (no age range found)
-                        continue 2;
+                $base_domain = [
+                    ['product_model_id', '=', $pack_line['child_product_model_id']],
+                    ['can_sell', '=', true],
+                ];
+
+                // build list of domains to try, ordered by priority
+                $domains_to_try = [];
+
+                // a) product with specific age range AND matching rate class
+                $domains_to_try[] = array_merge($base_domain, [
+                        ['age_range_id', '=', $age_range_id],
+                        ['rate_class_id', '=', $group['rate_class_id']]
+                    ]);
+
+                // b) product with specific age range but no rate class requirement
+                $domains_to_try[] = array_merge($base_domain, [
+                        ['age_range_id', '=', $age_range_id],
+                    ]);
+
+                // c) product without age range AND matching rate class
+                $domains_to_try[] = array_merge($base_domain, [
+                        ['has_age_range', '=', false],
+                        ['rate_class_id', '=', $group['rate_class_id']]
+                    ]);
+
+                // d) product without age range and no rate class requirement
+                $domains_to_try[] = array_merge($base_domain, [
+                        ['has_age_range', '=', false]
+                    ]);
+
+                // try each domain until a matching product is found
+                foreach($domains_to_try as $domain) {
+                    $products_ids = $om->search('sale\catalog\Product', $domain);
+                    if(is_array($products_ids) && count($products_ids)) {
+                        $product_id = reset($products_ids);
+                        // Check if fallback to "all ages" product was used
+                        if (in_array(['has_age_range', '=', false], $domain)) {
+                            $has_single_range = true;
+                        }
+                        break;
                     }
-                    $has_single_range = true;
                 }
 
-                $product_id = reset($products_ids);
+                // no product found: issue a warning and skip
+                if(!$product_id) {
+                    trigger_error("ORM::no match for age range {$age_range_id} and no 'all ages' product found for model {$pack_line['child_product_model_id']}", QN_REPORT_WARNING);
+                    continue 2;
+                }
 
                 // create a booking line with found product
                 $line['product_id'] = $product_id;
@@ -3440,6 +3474,7 @@ class BookingLineGroup extends Model {
                         $map_prices[$pack_line['child_product_model_id']] = $line['price_id'];
                     }
                 }
+                // do not loop to other age ranges
                 if($has_single_range) {
                     break;
                 }
