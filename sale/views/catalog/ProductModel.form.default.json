@@ -30,8 +30,8 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "type",
-                                                "width": "33%"
+                                                "value": "stat_section_id",
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
@@ -67,8 +67,8 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "stat_section_id",
-                                                "width": "50%"
+                                                "value": "type",
+                                                "width": "33%"
                                             },
                                             {
                                                 "type": "field",
