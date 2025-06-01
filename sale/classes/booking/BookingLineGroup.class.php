@@ -3774,6 +3774,7 @@ class BookingLineGroup extends Model {
 
         foreach($group['booking_lines_ids'] as $line_id) {
             BookingLine::refreshPriceId($om, $line_id);
+            BookingLine::refreshFreeQty($om, $line_id);
             BookingLine::refreshQty($om, $line_id);
             BookingLine::refreshPrice($om, $line_id);
         }
