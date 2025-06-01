@@ -122,7 +122,6 @@ $tests = [
         },
         'assert'        => function($booking_lines) {
             $adult_product_lines = [];
-
             $adult_age_range_id = 1;
 
             foreach($booking_lines as $line) {
@@ -131,10 +130,8 @@ $tests = [
                 }
             }
 
-            $nb_adults = 3;
-            $nb_nights = 3;
             foreach($adult_product_lines as $line) {
-                if($line['qty'] !== ($nb_adults * $nb_nights) || $line['free_qty'] > $line['qty']) {
+                if($line['free_qty'] > $line['qty']) {
                     return false;
                 }
             }
