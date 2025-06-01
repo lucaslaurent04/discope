@@ -1894,6 +1894,10 @@ class BookingLine extends Model {
         ];
     }
 
+    public static function refreshFreeQty($om, $id) {
+        $om->update(self::getType(), $id, ['free_qty' => null]);
+    }
+
     public static function refreshPrice($om, $id) {
         $lines = $om->read(self::getType(), $id, ['has_manual_unit_price']);
 

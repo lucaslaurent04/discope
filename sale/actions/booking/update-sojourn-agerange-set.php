@@ -147,8 +147,7 @@ BookingLineGroupAgeRangeAssignment::id($params['age_range_assignment_id'])
         'qty'           => $params['qty'],
         'free_qty'      => $params['free_qty'],
         'age_range_id'  => $params['age_range_id']
-    ])
-    ->do('reset_booking_lines_free_qty');
+    ]);
 
 BookingLineGroup::refreshNbPers($orm, $group['id']);
 BookingLineGroup::refreshNbChildren($orm, $group['id']);
