@@ -169,11 +169,12 @@ class BookingLineGroup extends Model {
             ],
 
             'nb_pers' => [
-                'type'              => 'integer',
+                'type'              => 'computed',
+                'result_type'       => 'integer',
                 'description'       => 'Amount of persons this group is about.',
-                'default'           => 1,
+                'function'          => 'calcNbPers',
                 'onupdate'          => 'onupdateNbPers',
-                'dependents'        => ['nb_children']
+                'store'             => true
             ],
 
             'nb_children' => [
@@ -371,6 +372,18 @@ class BookingLineGroup extends Model {
             ]
 
         ];
+    }
+
+    public static function calcNbPers($self) {
+        $result = [];
+        $self->read(['age_range_assignments_ids' => ['qty']]);
+        foreach($self as $id => $bookingLineGroup) {
+            $result[$id] = 0;
+            foreach($bookingLineGroup['age_range_assignments_ids'] as $ageRangeAssignment) {
+                $result[$id] += $ageRangeAssignment['qty'];
+            }
+        }
+        return $result;
     }
 
     /**
@@ -759,10 +772,6 @@ class BookingLineGroup extends Model {
         // 1) invalidate prices
         $om->callonce(self::getType(), '_resetPrices', $ids, [], $lang);
 
-        // 2) invalidate nb children
-        // #memo - nb_children is amongst nb_pers dependents
-        // $om->callonce(self::getType(), '_resetNbChildren', $ids, [], $lang);
-
         $groups = $om->read(self::getType(), $ids, [
             'booking_id',
             'nb_pers',
@@ -796,7 +805,10 @@ class BookingLineGroup extends Model {
         // 4) update agerange assignments (for single assignment)
         if($groups > 0) {
             $booking_lines_ids = [];
-            foreach($groups as $group) {
+            foreach($groups as $group_id => $group) {
+                // invalidate nb children
+                self::refreshNbChildren($om, $group_id);
+
                 if($group['is_sojourn'] && count($group['age_range_assignments_ids']) == 1) {
                     $age_range_assignment_id = current($group['age_range_assignments_ids']);
                     $om->update(BookingLineGroupAgeRangeAssignment::getType(), $age_range_assignment_id, ['qty' => $group['nb_pers']]);
@@ -805,8 +817,8 @@ class BookingLineGroup extends Model {
                 // trigger sibling groups nb_pers update (this is necessary since the nb_pers is based on the booking total participants)
             }
             // re-compute bookinglines quantities
-            $om->update(\sale\booking\BookingLine::getType(), $booking_lines_ids, ['qty_vars' => null], $lang);
-            $om->callonce(\sale\booking\BookingLine::getType(), 'updateQty', $booking_lines_ids, [], $lang);
+            $om->update(BookingLine::getType(), $booking_lines_ids, ['qty_vars' => null], $lang);
+            $om->callonce(BookingLine::getType(), 'updateQty', $booking_lines_ids, [], $lang);
         }
 
         // 5) update dependencies
@@ -816,17 +828,12 @@ class BookingLineGroup extends Model {
         $om->callonce(self::getType(), 'updateMealPreferences', $ids, [], $lang);
     }
 
-    /**
-     * Reset the quantity of children for calculation when needed
-     *
-     * @param \equal\orm\ObjectManager  $om
-     * @param int[]                     $oids
-     * @param array                     $values
-     * @param string                    $lang
-     * @return void
-     */
-    public static function _resetNbChildren($om, $oids, $values, $lang) {
-        $om->update(__CLASS__, $oids, ['nb_children' => null]);
+    public static function refreshNbPers($om, $id) {
+        $om->update(self::getType(), $id, ['nb_pers' => null]);
+    }
+
+    public static function refreshNbChildren($om, $id) {
+        $om->update(self::getType(), $id, ['nb_children' => null]);
     }
 
     /**
