@@ -1247,21 +1247,21 @@ class BookingLine extends Model {
                     $prices_ids = $om->search(\sale\price\Price::getType(), [
                         ['price_list_id', '=', $price_list_id],
                         ['product_id', '=', $product_id],
-                        [ 'has_rate_class' , '=', true],
-                        ['rate_class_id', '=', $line['booking_line_group_id.rate_class_id']],
+                        ['has_rate_class' , '=', true],
+                        ['rate_class_id', '=', $line['booking_line_group_id.rate_class_id']]
                     ]);
 
-                    if (!empty($prices_ids)) {
+                    if(!empty($prices_ids)) {
                         $result[$line_id] = reset($prices_ids);
                         break;
                     }
 
                     $prices_ids = $om->search(\sale\price\Price::getType(), [
                         ['price_list_id', '=', $price_list_id],
-                        ['product_id', '=', $product_id],
+                        ['product_id', '=', $product_id]
                     ]);
 
-                    if (!empty($prices_ids)) {
+                    if(!empty($prices_ids)) {
                         $result[$line_id] = reset($prices_ids);
                         break;
                     }
