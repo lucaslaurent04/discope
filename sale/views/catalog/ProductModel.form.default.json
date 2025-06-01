@@ -137,9 +137,19 @@
                                                 "width": "100%"
                                             }
                                         ]
-                                    },
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Specifics",
+                        "id": "section.specifics",
+                        "rows": [
+                            {
+                                "columns": [
                                     {
-                                        "width": "25%",
+                                        "width": "33%",
                                         "items": [
                                             {
                                                 "type": "field",
@@ -169,7 +179,7 @@
                                         ]
                                     },
                                     {
-                                        "width": "25%",
+                                        "width": "33%",
                                         "items": [
                                             {
                                                 "type": "field",
@@ -232,7 +242,7 @@
                                         ]
                                     },
                                     {
-                                        "width": "25%",
+                                        "width": "33%",
                                         "items": [
                                             {
                                                 "type": "field",
@@ -447,7 +457,7 @@
                     },
                     {
                         "label": "TimeSlots",
-                        "id": "section.time-slots",
+                        "id": "section.time_slots",
                         "visible": [ ["type", "=", "service"], ["service_type", "=", "schedulable"], ["is_activity", "=", true] ],
                         "rows": [
                             {
@@ -498,7 +508,7 @@
                     },
                     {
                         "label": "Groups",
-                        "id": "section.groups_section",
+                        "id": "section.groups",
                         "rows": [
                             {
                                 "columns": [
@@ -518,7 +528,7 @@
                     },
                     {
                         "label": "Categories",
-                        "id": "section.categories_section",
+                        "id": "section.categories",
                         "rows": [
                             {
                                 "columns": [
