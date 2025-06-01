@@ -1590,6 +1590,8 @@ class BookingLine extends Model {
                             $line['is_accomodation'],
                             $line['product_id.product_model_id.capacity']
                         );
+                    }
+                    if($line['product_id.age_range_id'] === $assignment['age_range_id']) {
                         break;
                     }
                 }
@@ -1658,9 +1660,9 @@ class BookingLine extends Model {
      * Get total tax-excluded price of the line, with all discounts applied.
      *
      */
-    public static function calcTotal($om, $oids, $lang) {
+    public static function calcTotal($om, $ids, $lang) {
         $result = [];
-        $lines = $om->read(get_called_class(), $oids, [
+        $lines = $om->read(self::getType(), $ids, [
                     'qty',
                     'unit_price',
                     'free_qty',
@@ -1668,14 +1670,14 @@ class BookingLine extends Model {
                     'payment_mode'
                 ]);
         if($lines > 0) {
-            foreach($lines as $oid => $line) {
+            foreach($lines as $id => $line) {
 
                 if($line['payment_mode'] == 'free') {
-                    $result[$oid] = 0.0;
+                    $result[$id] = 0.0;
                     continue;
                 }
                 $qty = max(0, $line['qty'] - $line['free_qty']);
-                $result[$oid] = round($line['unit_price'] * (1.0 - $line['discount']) * ($qty), 4);
+                $result[$id] = round($line['unit_price'] * (1.0 - $line['discount']) * ($qty), 4);
             }
         }
 
