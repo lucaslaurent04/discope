@@ -177,7 +177,7 @@
         },
         "duration": {
             "label": "Durée",
-            "description": "Durée du service (en jours), utilisée pour le planning.",
+            "description": "Nombre de répétitions ou durée (en jours).",
             "help": "Durée du service, exprimée en jours, utilisée à des fins de planification."
         },
         "capacity": {
@@ -348,38 +348,26 @@
                 "section.product_model": {
                     "label": "Infos Génerales"
                 },
-                "section.products_section": {
-                    "label": "Produits"
+                "section.specifics": {
+                    "label": "Spécificités"
                 },
-                "section.groups_section": {
-                    "label": "Groupes"
-                },
-                "section.categories_section": {
-                    "label": "Catégories"
-                },
-                "section.pack_lines": {
-                    "label": "Lignes de pack"
-                },
-                "description.delivery": {
-                    "label": "Pour les ventes"
-                },
-                "description.receipt": {
-                    "label": "Pour les achats"
+                "section.description": {
+                    "label": "Description"
                 },
                 "section.activity": {
                     "label": "Activité"
                 },
-                "section.age-ranges": {
-                    "label": "Tranche d'âges"
-                },
-                "section.time-slots": {
+                "section.time_slots": {
                     "label": "Tranches horaires"
                 },
-                "section.supliers": {
-                    "label": "Fournitures"
+                "section.products": {
+                    "label": "Produits"
                 },
-                "section.providers": {
-                    "label": "Prestataires"
+                "section.groups": {
+                    "label": "Groupes"
+                },
+                "section.categories": {
+                    "label": "Catégories"
                 }
             }
         },
