@@ -3278,7 +3278,7 @@ class BookingLineGroup extends Model {
      * This method is called by `update-sojourn-[...]` controllers.
      * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
      *
-     * Resets lines according to PackLines assigned to it, according to `pack_id`.
+     * Resets lines according to PackLines related to assigned pack_id, according to `pack_id`.
      * This only applies to groups marked as Pack (`has_pack`).
      */
     public static function refreshPack($om, $id) {
@@ -3290,6 +3290,7 @@ class BookingLineGroup extends Model {
             'age_range_assignments_ids',
             'nb_pers',
             'has_pack',
+            'rate_class_id',
             'pack_id.is_locked',
             'pack_id.has_age_range',
             'pack_id.age_range_id',
@@ -3371,6 +3372,7 @@ class BookingLineGroup extends Model {
                 }
             }
         }
+
         $new_lines_ids = [];
         // associative array mapping product_model_id with price_id
         $map_prices = [];
@@ -3407,6 +3409,7 @@ class BookingLineGroup extends Model {
                     }
                     $has_single_range = true;
                 }
+
                 $product_id = reset($products_ids);
 
                 // create a booking line with found product
@@ -3643,7 +3646,7 @@ class BookingLineGroup extends Model {
 			$operands['nb_pers'] = $group['nb_pers'];
 			$operands['nb_nights'] = $group['nb_nights'];
             $operands['nb_adults'] = $group['nb_pers'] - $group['nb_children'];
-            
+
             $autosales = $om->read('sale\autosale\AutosaleLine', $autosale_list['autosale_lines_ids'], [
 				'product_id.id',
 				'product_id.name',
