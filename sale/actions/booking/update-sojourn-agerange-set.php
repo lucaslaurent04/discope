@@ -83,17 +83,11 @@ if(!in_array($group['booking_id']['status'], ['quote', 'checkedout']) && !$group
     throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
-// read Age range  object
-$age_range = AgeRange::id($params['age_range_id'])
-    ->read([
-        'id'
-    ])
-    ->first(true);
-
+// check Age range object
+$age_range = AgeRange::id($params['age_range_id'])->first(true);
 if(!$age_range) {
     throw new Exception("unknown_age_range", EQ_ERROR_UNKNOWN_OBJECT);
 }
-
 
 // read Age range assignment object
 $age_range_assignment = BookingLineGroupAgeRangeAssignment::id($params['age_range_assignment_id'])
@@ -123,14 +117,10 @@ BookingLineGroupAgeRangeAssignment::id($params['age_range_assignment_id'])
         'free_qty'      => $params['free_qty'],
         'age_range_id'  => $params['age_range_id']
     ])
-    ->do('reset-booking-lines-free-qty');
+    ->do('reset_booking_lines_free_qty');
 
-$delta = $params['qty'] - $age_range_assignment['qty'];
-
-BookingLineGroup::id($group['id'])
-    ->update([
-        'nb_pers' => $group['nb_pers'] + $delta
-    ]);
+BookingLineGroup::refreshNbPers($orm, $group['id']);
+BookingLineGroup::refreshNbChildren($orm, $group['id']);
 
 // #memo - this impacts autosales at booking level
 Booking::refreshNbPers($orm, $group['booking_id']['id']);

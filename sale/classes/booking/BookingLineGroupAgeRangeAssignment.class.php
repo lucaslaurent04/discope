@@ -85,7 +85,7 @@ class BookingLineGroupAgeRangeAssignment extends Model {
     public static function getActions(): array {
         return [
 
-            'reset-booking-lines-free-qty' => [
+            'reset_booking_lines_free_qty' => [
                 'description'   => "Reset linked booking lines free_qty to force recompute.",
                 'policies'      => [],
                 'function'      => 'doResetBookingLinesFreeQty'
@@ -143,7 +143,7 @@ class BookingLineGroupAgeRangeAssignment extends Model {
     }
 
     public static function onupdateFreeQty($self) {
-        $self->do('reset-booking-lines-free-qty');
+        $self->do('reset_booking_lines_free_qty');
     }
 
     public static function onupdateAgeRangeId($om, $oids, $values, $lang) {
