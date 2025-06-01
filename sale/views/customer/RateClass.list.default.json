@@ -3,16 +3,16 @@
     "description": "This view is intended for displaying the list of rate classes.",
     "access": {
         "groups": ["sale.default.user", "booking.default.user"]
-     },
+    },
     "layout": {
         "items": [
             {
-                "type": "field",            
-                "value": "name",
+                "type": "field",
+                "value": "code",
                 "width": "20%"
-            }, 
+            },
             {
-                "type": "field",            
+                "type": "field",
                 "value": "description",
                 "width": "80%"
             }

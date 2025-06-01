@@ -21,17 +21,39 @@ class RateClass extends Model {
     public static function getColumns() {
         return [
             'name' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'function'          => 'calcName',
+                'store'             => true
+            ],
+
+            'code' => [
                 'type'              => 'string',
                 'required'          => true,
-                'unique'            => true
+                'unique'            => true,
+                'dependents'        => ['name']
             ],
 
             'description' => [
                 'type'              => 'string',
                 'description'       => "Short description of the rate class.",
-                'multilang'         => true
+                'multilang'         => true,
+                'default'           => '',
+                'dependents'        => ['name']
             ]
         ];
+    }
+
+    public static function calcName($self) {
+        $result = [];
+        $self->read(['code', 'description']);
+        foreach($self as $id => $rateClass) {
+            $result[$id] = $rateClass['code'];
+            if(strlen($rateClass['description']) > 0) {
+                $result[$id] .= " - {$rateClass['description']}";
+            }
+        }
+        return $result;
     }
 
 }
