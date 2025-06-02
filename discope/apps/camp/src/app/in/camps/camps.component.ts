@@ -23,7 +23,7 @@ export class CampsComponent implements OnInit, AfterViewInit, OnDestroy {
     private default_descriptor: any = {
         // route is current ng route
         context: {
-            entity: 'sale\\camp\\Enrollment',
+            entity: 'sale\\camp\\Camp',
             view: "list.default",
             order: "id",
             sort: "desc"

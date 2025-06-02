@@ -49,7 +49,7 @@ class Document extends Model {
                 'rel_foreign_key'   => 'camp_id',
                 'rel_local_key'     => 'document_id',
                 'description'       => "Camps that requires the document."
-            ],
+            ]
 
         ];
     }

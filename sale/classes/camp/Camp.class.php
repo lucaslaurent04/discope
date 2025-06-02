@@ -353,6 +353,23 @@ class Camp extends Model {
                     }
                 }
             }
+
+            if(!$camp['is_clsh']) {
+                // create meals for the weekend if the camp isn't CLSH, in case some children stay
+                foreach(['B', 'L', 'D'] as $time_slot_code) {
+                    BookingMeal::create([
+                        'camp_id'       => $id,
+                        'date'          => $date,
+                        'time_slot_id'  => $map_time_slots[$time_slot_code]['id']
+                    ]);
+
+                    BookingMeal::create([
+                        'camp_id'       => $id,
+                        'date'          => $date + 86400,
+                        'time_slot_id'  => $map_time_slots[$time_slot_code]['id']
+                    ]);
+                }
+            }
         }
     }
 
@@ -369,6 +386,13 @@ class Camp extends Model {
 
     public static function onafterCancel($self) {
         $self->do('remove-meals');
+
+        $enrollments_ids = [];
+        $self->read(['enrollments_ids']);
+        foreach($self as $camp) {
+            $enrollments_ids = array_merge($enrollments_ids, $camp['enrollments_ids']);
+        }
+        Enrollment::ids($enrollments_ids)->do('remove-presences');
     }
 
     public static function getWorkflow(): array {
@@ -697,24 +721,33 @@ class Camp extends Model {
         if(isset($values['is_clsh']) || isset($values['clsh_type']) || isset($values['date_from']) || isset($values['date_to'])) {
             foreach($self as $camp) {
                 $is_clsh = $values['is_clsh'] ?? $camp['is_clsh'];
-                if(!$is_clsh) {
-                    continue;
-                }
-
                 $date_from = $values['date_from'] ?? $camp['date_from'];
                 $date_to = $values['date_to'] ?? $camp['date_to'];
 
-                $day_diff = (($date_to - $date_from) / 86400) + 1;
-                if(!in_array($day_diff, [4, 5])) {
-                    return ['date_to' => ['wrong_duration' => "A CLSH camp must have a duration of 4 or 5 days."]];
-                }
+                if($is_clsh) {
+                    $date_from = $values['date_from'] ?? $camp['date_from'];
+                    $date_to = $values['date_to'] ?? $camp['date_to'];
 
-                $clsh_type = $values['clsh_type'] ?? $camp['clsh_type'];
-                if($day_diff === 4 && $clsh_type === '5-days') {
-                    return ['date_to' => ['not_long_enough' => "A 5 days CLSH camp must have a duration of 5 days."]];
+                    $day_diff = (($date_to - $date_from) / 86400) + 1;
+                    if(!in_array($day_diff, [4, 5])) {
+                        return ['date_to' => ['wrong_duration' => "A CLSH camp must have a duration of 4 or 5 days."]];
+                    }
+
+                    $clsh_type = $values['clsh_type'] ?? $camp['clsh_type'];
+                    if($day_diff === 4 && $clsh_type === '5-days') {
+                        return ['date_to' => ['not_long_enough' => "A 5 days CLSH camp must have a duration of 5 days."]];
+                    }
+                    if($day_diff === 5 && $clsh_type === '4-days') {
+                        return ['date_to' => ['too_long' => "A 4 days CLSH camp must have a duration of 4 days."]];
+                    }
                 }
-                if($day_diff === 5 && $clsh_type === '4-days') {
-                    return ['date_to' => ['too_long' => "A 4 days CLSH camp must have a duration of 4 days."]];
+                else {
+                    if(date('w', $date_from) != 0) {
+                        return ['date_from' => ['must_start_sunday' => "A camp that isn't CLSH must start Sunday."]];
+                    }
+                    if(date('w', $date_to) != 5) {
+                        return ['date_to' => ['must_end_friday' => "A camp that isn't CLSH must end Friday."]];
+                    }
                 }
             }
         }

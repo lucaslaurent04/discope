@@ -1,0 +1,22 @@
+{
+    "name": "Document d'inscription",
+    "plural": "Documents d'inscription",
+    "description": "Documents requis pour la confirmation de l'inscription.",
+    "model": {
+        "enrollment_id": {
+            "label": "Inscription",
+            "description": "L'inscription concernée.",
+            "help": ""
+        },
+        "document_id": {
+            "label": "Document",
+            "description": "Le type de document requis.",
+            "help": ""
+        },
+        "received": {
+            "label": "Reçu",
+            "description": "Est-ce que le document a bien été reçu.",
+            "help": ""
+        }
+    }
+}
