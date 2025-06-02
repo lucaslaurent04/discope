@@ -395,7 +395,10 @@
                                             {
                                                 "type": "field",
                                                 "value": "enrollment_documents_ids",
-                                                "width": "100%"
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.enrollment"
+                                                }
                                             }
                                         ]
                                     }
