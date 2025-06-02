@@ -597,12 +597,42 @@ class Enrollment extends Model {
         return $result;
     }
 
+    public static function policyConfirm($self): array {
+        $result = [];
+        $self->read([
+            'enrollment_documents_ids'  => ['document_id', 'received'],
+            'camp_id'                   => ['required_documents_ids']
+        ]);
+        foreach($self as $enrollment) {
+            foreach($enrollment['camp_id']['required_documents_ids'] as $required_documents_id) {
+                $doc_received = false;
+                foreach($enrollment['enrollment_documents_ids'] as $en_doc) {
+                    if($en_doc['document_id'] === $required_documents_id && $en_doc['received']) {
+                        $doc_received = true;
+                        break;
+                    }
+                }
+
+                if(!$doc_received) {
+                    return ['camp_id' => ['missing_document' => "At least one document is missing for the enrollment to this camp."]];
+                }
+            }
+        }
+
+        return $result;
+    }
+
     public static function getPolicies(): array {
         return [
 
             'remove-from-waitlist' => [
-                'description' => "Check if the camp isn't full yet.",
-                'function'    => 'policyRemoveFromWaitlist'
+                'description'   => "Checks if the camp isn't full yet.",
+                'function'      => 'policyRemoveFromWaitlist'
+            ],
+
+            'confirm' => [
+                'description'   => "Checks if the enrollment can be confirmed, if the required documents have already been received.",
+                'function'      => "policyConfirm"
             ]
 
         ];
@@ -650,6 +680,7 @@ class Enrollment extends Model {
                     'confirm' => [
                         'status'        => 'confirmed',
                         'description'   => "Confirm the pending enrollment.",
+                        'policies'      => ['confirm'],
                         'onafter'       => 'onafterConfirm'
                     ],
                     'cancel' => [
