@@ -982,6 +982,17 @@ class Enrollment extends Model {
         $self->do('refresh-camp-product-line');
         $self->do('reset-camp-enrollments-qty');
         $self->do('refresh-required-documents');
+
+        // remove previously generated presences of confirmed enrollment
+        $self->read(['status', 'child_id']);
+        foreach($self as $enrollment) {
+            if($enrollment['status'] !== 'confirmed') {
+                continue;
+            }
+
+            Child::id($enrollment['child_id'])->do('remove-unnecessary-presences');
+            Enrollment::id($enrollment['id'])->do('generate-presences');
+        }
     }
 
     public static function onupdateFamilyQuotient($self) {

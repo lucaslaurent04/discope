@@ -268,4 +268,32 @@ class Child extends Model {
             self::id($id)->update(['main_guardian_id' => $child['guardians_ids'][0] ?? null]);
         }
     }
+
+    public static function doRemoveUnnecessaryPresences($self) {
+        $self->read(['enrollments_ids' => ['camp_id']]);
+        foreach($self as $child) {
+            if(empty($child['enrollments_ids'])) {
+                continue;
+            }
+
+            $camps_ids = [];
+            foreach($child['enrollments_ids'] as $enrollment) {
+                $camps_ids[] = $enrollment['camp_id'];
+            }
+
+            Presence::search(['camp_id', 'not in', $camps_ids])->delete(true);
+        }
+    }
+
+    public static function getActions(): array {
+        return [
+
+            'remove-unnecessary-presences' => [
+                'description'   => "Deletes the presences of a child to a camp he/she isn't enrolled to anymore, it can happen when an enrollment is transferred to another camp.",
+                'policies'      => [],
+                'function'      => 'doRemoveUnnecessaryPresences'
+            ]
+
+        ];
+    }
 }

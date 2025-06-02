@@ -386,6 +386,13 @@ class Camp extends Model {
 
     public static function onafterCancel($self) {
         $self->do('remove-meals');
+
+        $enrollments_ids = [];
+        $self->read(['enrollments_ids']);
+        foreach($self as $camp) {
+            $enrollments_ids = array_merge($enrollments_ids, $camp['enrollments_ids']);
+        }
+        Enrollment::ids($enrollments_ids)->do('remove-presences');
     }
 
     public static function getWorkflow(): array {
