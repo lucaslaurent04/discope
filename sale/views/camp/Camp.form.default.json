@@ -84,6 +84,11 @@
                                                 "visible": false
                                             },
                                             {
+                                                "type": "field",
+                                                "value": "camp_group_qty",
+                                                "visible": false
+                                            },
+                                            {
                                                 "type": "label",
                                                 "value": "",
                                                 "width": "25%"
