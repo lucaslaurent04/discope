@@ -14,7 +14,11 @@
                 "route": "/camps",
                 "context": {
                     "entity": "sale\\camp\\Camp",
-                    "view": "list.default"
+                    "view": "list.default",
+                    "domain": [
+                        ["date_from", ">=", "date.this.year.first"],
+                        ["date_from", "<=", "date.this.year.last"]
+                    ]
                 }
             },
             {

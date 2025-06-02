@@ -331,6 +331,14 @@ class Enrollment extends Model {
                 'rel_foreign_key'   => 'enrollment_mail_id',
                 'rel_local_key'     => 'enrollment_id',
                 'description'       => "The mails that are linked to this enrollment."
+            ],
+
+            'enrollment_documents_ids' => [
+                'type'              => 'one2many',
+                'foreign_field'     => 'enrollment_id',
+                'foreign_object'    => 'sale\camp\EnrollmentDocument',
+                'description'       => "The documents that have been received.",
+                'ondetach'          => 'delete'
             ]
 
         ];
@@ -338,42 +346,55 @@ class Enrollment extends Model {
 
     public static function onchange($event, $values): array {
         $result = [];
-        if($values['is_clsh']) {
-            if(isset($event['child_id'])) {
-                $child = Child::id($event['child_id'])
-                    ->read(['main_guardian_id' => ['is_ccvg']])
-                    ->first();
+        $is_clsh = null;
+        if(isset($event['camp_id']) || isset($values['camp_id'])) {
+            $camp_id = $event['camp_id'] ?? $values['camp_id'];
+            $camp = Camp::id($camp_id)
+                ->read(['is_clsh'])
+                ->first();
 
-                if($child['main_guardian_id']['is_ccvg']) {
-                    $result['camp_class'] = 'close-member';
-                }
-                else {
-                    $result['camp_class'] = 'other';
-                }
-            }
+            $result['is_clsh'] = $camp['is_clsh'];
+            $is_clsh = $camp['is_clsh'];
         }
-        else {
-            if(isset($event['child_id'])) {
-                $child = Child::id($event['child_id'])
-                    ->read(['camp_class'])
-                    ->first();
 
-                $result['camp_class'] = $child['camp_class'];
+        if(!is_null($is_clsh)) {
+            if($is_clsh) {
+                if(isset($event['child_id']) || (isset($values['child_id']) && !isset($values['camp_class']))) {
+                    $child = Child::id($event['child_id'] ?? $values['child_id'])
+                        ->read(['main_guardian_id' => ['is_ccvg']])
+                        ->first();
+
+                    if($child['main_guardian_id']['is_ccvg']) {
+                        $result['camp_class'] = 'close-member';
+                    }
+                    else {
+                        $result['camp_class'] = 'other';
+                    }
+                }
             }
-            elseif(isset($event['works_council_id']) && isset($values['child_id'])) {
-                $child = Child::id($values['child_id'])
-                    ->read(['camp_class'])
-                    ->first();
+            else {
+                if(isset($event['child_id'])|| (isset($values['child_id']) && !isset($values['camp_class']))) {
+                    $child = Child::id($event['child_id'] ?? $values['child_id'])
+                        ->read(['camp_class'])
+                        ->first();
 
-                $camp_class = $child['camp_class'];
-                if($camp_class === 'other') {
-                    $camp_class = 'member';
+                    $result['camp_class'] = $child['camp_class'];
                 }
-                elseif($camp_class === 'member') {
-                    $camp_class = 'close-member';
-                }
+                elseif(isset($event['works_council_id']) && isset($values['child_id'])) {
+                    $child = Child::id($values['child_id'])
+                        ->read(['camp_class'])
+                        ->first();
 
-                $result['camp_class'] = $camp_class;
+                    $camp_class = $child['camp_class'];
+                    if($camp_class === 'other') {
+                        $camp_class = 'member';
+                    }
+                    elseif($camp_class === 'member') {
+                        $camp_class = 'close-member';
+                    }
+
+                    $result['camp_class'] = $camp_class;
+                }
             }
         }
 
@@ -576,12 +597,42 @@ class Enrollment extends Model {
         return $result;
     }
 
+    public static function policyConfirm($self): array {
+        $result = [];
+        $self->read([
+            'enrollment_documents_ids'  => ['document_id', 'received'],
+            'camp_id'                   => ['required_documents_ids']
+        ]);
+        foreach($self as $enrollment) {
+            foreach($enrollment['camp_id']['required_documents_ids'] as $required_documents_id) {
+                $doc_received = false;
+                foreach($enrollment['enrollment_documents_ids'] as $en_doc) {
+                    if($en_doc['document_id'] === $required_documents_id && $en_doc['received']) {
+                        $doc_received = true;
+                        break;
+                    }
+                }
+
+                if(!$doc_received) {
+                    return ['camp_id' => ['missing_document' => "At least one document is missing for the enrollment to this camp."]];
+                }
+            }
+        }
+
+        return $result;
+    }
+
     public static function getPolicies(): array {
         return [
 
             'remove-from-waitlist' => [
-                'description' => "Check if the camp isn't full yet.",
-                'function'    => 'policyRemoveFromWaitlist'
+                'description'   => "Checks if the camp isn't full yet.",
+                'function'      => 'policyRemoveFromWaitlist'
+            ],
+
+            'confirm' => [
+                'description'   => "Checks if the enrollment can be confirmed, if the required documents have already been received.",
+                'function'      => "policyConfirm"
             ]
 
         ];
@@ -629,6 +680,7 @@ class Enrollment extends Model {
                     'confirm' => [
                         'status'        => 'confirmed',
                         'description'   => "Confirm the pending enrollment.",
+                        'policies'      => ['confirm'],
                         'onafter'       => 'onafterConfirm'
                     ],
                     'cancel' => [
@@ -929,6 +981,18 @@ class Enrollment extends Model {
     public static function onupdateCampId($self) {
         $self->do('refresh-camp-product-line');
         $self->do('reset-camp-enrollments-qty');
+        $self->do('refresh-required-documents');
+
+        // remove previously generated presences of confirmed enrollment
+        $self->read(['status', 'child_id']);
+        foreach($self as $enrollment) {
+            if($enrollment['status'] !== 'confirmed') {
+                continue;
+            }
+
+            Child::id($enrollment['child_id'])->do('remove-unnecessary-presences');
+            Enrollment::id($enrollment['id'])->do('generate-presences');
+        }
     }
 
     public static function onupdateFamilyQuotient($self) {
@@ -1301,6 +1365,37 @@ class Enrollment extends Model {
         }
     }
 
+    public static function doRefreshRequiredDocuments($self) {
+        $self->read([
+            'enrollment_documents_ids'  => ['document_id'],
+            'camp_id'                   => ['required_documents_ids']
+        ]);
+
+        foreach($self as $id => $enrollment) {
+            $needed_documents_ids = [];
+            foreach($enrollment['camp_id']['required_documents_ids'] as $required_document_id) {
+                $already_added = false;
+                foreach($enrollment['enrollment_documents_ids'] as $enrollment_document) {
+                    if($enrollment_document['document_id'] === $required_document_id) {
+                        $already_added = true;
+                        break;
+                    }
+                }
+
+                if(!$already_added) {
+                    $needed_documents_ids[] = $required_document_id;
+                }
+            }
+
+            foreach($needed_documents_ids as $document_id) {
+                EnrollmentDocument::create([
+                    'enrollment_id' => $id,
+                    'document_id'   => $document_id
+                ]);
+            }
+        }
+    }
+
     public static function getActions(): array {
         return [
 
@@ -1332,6 +1427,12 @@ class Enrollment extends Model {
                 'description'   => "Creates/updates the enrollment line that concerns the product_id or day_product_id.",
                 'policies'      => [],
                 'function'      => 'doRefreshCampProductLine'
+            ],
+
+            'refresh-required-documents' => [
+                'description'   => "Creates/updates the enrollment documents that are required depending on the camp.",
+                'policies'      => [],
+                'function'      => 'doRefreshRequiredDocuments'
             ]
 
         ];

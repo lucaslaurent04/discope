@@ -42,6 +42,10 @@
             "label": "Modèles",
             "help": ""
         },
+        "sales.camp.camps": {
+            "label": "Camps",
+            "help": ""
+        },
         "sales.camp.price-adapters": {
             "label": "Réductions",
             "help": ""
