@@ -125,13 +125,15 @@
                                                 "type": "field",
                                                 "value": "date_from",
                                                 "width": "33%",
-                                                "readonly": true
+                                                "readonly": true,
+                                                "visible": ["state", "<>", "draft"]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "date_to",
                                                 "width": "33%",
-                                                "readonly":  true
+                                                "readonly":  true,
+                                                "visible": ["state", "<>", "draft"]
                                             }
                                         ]
                                     },
@@ -141,22 +143,40 @@
                                             {
                                                 "type": "label",
                                                 "value": "",
-                                                "width": "33%"
+                                                "width": "33%",
+                                                "visible": [
+                                                    ["child_id", "<>", null],
+                                                    ["camp_id", "<>", null]
+                                                ]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "camp_class",
-                                                "width": "33%"
+                                                "width": "33%",
+                                                "visible": [
+                                                    ["child_id", "<>", null],
+                                                    ["camp_id", "<>", null]
+                                                ]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "works_council_id",
-                                                "width": "33%"
+                                                "width": "33%",
+                                                "visible": [
+                                                    ["child_id", "<>", null],
+                                                    ["camp_id", "<>", null],
+                                                    ["is_clsh", "=", false]
+                                                ]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "family_quotient",
-                                                "width": "33%"
+                                                "width": "33%",
+                                                "visible": [
+                                                    ["child_id", "<>", null],
+                                                    ["camp_id", "<>", null],
+                                                    ["is_clsh", "=", true]
+                                                ]
                                             },
                                             {
                                                 "type": "label",
@@ -354,6 +374,27 @@
                                             {
                                                 "type": "field",
                                                 "value": "child_remarks",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.documents",
+                        "label": "Documents",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "enrollment_documents_ids",
                                                 "width": "100%"
                                             }
                                         ]
