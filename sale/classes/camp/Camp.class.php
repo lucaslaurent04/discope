@@ -353,6 +353,23 @@ class Camp extends Model {
                     }
                 }
             }
+
+            if(!$camp['is_clsh']) {
+                // create meals for the weekend if the camp isn't CLSH, in case some children stay
+                foreach(['B', 'L', 'D'] as $time_slot_code) {
+                    BookingMeal::create([
+                        'camp_id'       => $id,
+                        'date'          => $date,
+                        'time_slot_id'  => $map_time_slots[$time_slot_code]['id']
+                    ]);
+
+                    BookingMeal::create([
+                        'camp_id'       => $id,
+                        'date'          => $date + 86400,
+                        'time_slot_id'  => $map_time_slots[$time_slot_code]['id']
+                    ]);
+                }
+            }
         }
     }
 
