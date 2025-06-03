@@ -39,7 +39,7 @@ use sale\catalog\ProductModelCategory;
 $categories_ids = [];
 
 // #memo - table sale_product_rel_productmodel_category is used as m2m, so ProductModelCategory can be filled with non-valid objects
-$products_models = ProductModel::search(['is_activity', '=', true])->read(['categories_ids']);
+$productModels = ProductModel::search(['is_activity', '=', true])->read(['categories_ids']);
 
 $map_categories_ids = [];
 foreach($productModels as $id => $productModel) {
