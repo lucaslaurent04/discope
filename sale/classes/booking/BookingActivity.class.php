@@ -38,13 +38,14 @@ class BookingActivity extends Model {
             ],
 
             /**
-             * Booking line
+             * Booking
              */
 
             'activity_booking_line_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingLine',
                 'description'       => "Booking Line of the activity.",
+                'help'              => "A free activity can be linked to a booking line group without being linked directly to a booking line.",
                 'readonly'          => true,
                 'dependents'        => ['time_slot_id', 'activity_date', 'product_model_id'],
                 'ondelete'          => 'cascade'
@@ -173,6 +174,15 @@ class BookingActivity extends Model {
                 'rel_foreign_key'   => 'provider_id',
                 'rel_local_key'     => 'booking_activity_id',
                 'description'       => 'The assigned providers for the activity, if required by product model.'
+            ],
+
+            'qty' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => "The quantity of groups for this activity.",
+                'help'              => "It is used to know the quantity of providers that need to be assigned to it.",
+                'store'             => true,
+                'function'          => 'calcQty'
             ],
 
             'counter' => [
@@ -362,6 +372,21 @@ class BookingActivity extends Model {
                 $price += $line['price'];
             }
             $result[$id] = $price;
+        }
+
+        return $result;
+    }
+
+    public static function calcQty($self): array {
+        $result = [];
+        $self->read(['activity_booking_line_id' => ['qty_accounting_method', 'qty']]);
+        foreach($self as $id => $booking_activity) {
+            $qty = 1;
+            if(($booking_activity['activity_booking_line_id']['qty_accounting_method'] ?? null) === 'unit') {
+                $qty = $booking_activity['activity_booking_line_id']['qty'];
+            }
+
+            $result[$id] = $qty;
         }
 
         return $result;
@@ -568,13 +593,56 @@ class BookingActivity extends Model {
         }
     }
 
-    public static function canupdate($self, $values): array {
-        $self->read(['activity_booking_line_id', 'camp_group_id']);
-        foreach($self as $booking_activity) {
-            if(!isset($booking_activity['activity_booking_line_id']) && !isset($values['activity_booking_line_id']) && !isset($booking_activity['camp_group_id']) && !isset($values['camp_group_id'])) {
+    public static function cancreate($orm, $values, $lang): array {
+        if(!isset($values['activity_booking_line_id']) && !isset($values['booking_line_group_id']) && !isset($values['camp_group_id'])) {
+            // an activity should be linked to either a line, a booking line group or a camp group
+            return [
+                'activity_booking_line_id'  => ['missing_line_id' => "The activity must be linked to a booking line."],
+                'booking_line_group_id'     => ['missing_group_id' => "The activity must be linked to a booking group."],
+                'camp_group_id'             => ['missing_group_id' => "The activity must be linked to a camp group."]
+            ];
+        }
+
+        // checks if the moment of the activity is free (if activity_booking_line_id the check is done in BookingLine)
+        if(isset($values['booking_line_group_id']) || isset($values['camp_group_id'])) {
+            $domain = [
+                ['activity_date', '=', $values['activity_date']],
+                ['time_slot_id', '=', $values['time_slot_id']]
+            ];
+            if(isset($values['booking_line_group_id'])) {
+                $domain[] = ['booking_line_group_id', '=', $values['booking_line_group_id']];
+            }
+            else {
+                $domain[] = ['camp_group_id', '=', $values['camp_group_id']];
+            }
+
+            $activity = BookingActivity::search($domain)
+                ->read(['id'])
+                ->first();
+
+            if(!is_null($activity)) {
                 return [
-                    'activity_booking_line_id'  => ['invalid_type' => "The activity needs to be related to a booking line or a to a camp."],
-                    'camp_group_id'             => ['invalid_type' => "The activity needs to be related to a booking line or a to a camp."],
+                    'booking_line_group_id' => ['group_has_activity' => "The group already has an activity for this date and time slot."],
+                    'camp_group_id'         => ['group_has_activity' => "The group already has an activity for this date and time slot."]
+                ];
+            }
+        }
+
+        return parent::cancreate($orm, $values, $lang);
+    }
+
+    public static function canupdate($self, $values): array {
+        $self->read(['activity_booking_line_id', 'booking_line_group_id', 'camp_group_id']);
+        foreach($self as $booking_activity) {
+            $activity_booking_line_id = $values['activity_booking_line_id'] ?? $booking_activity['activity_booking_line_id'];
+            $booking_line_group_id = $values['booking_line_group_id'] ?? $booking_activity['booking_line_group_id'];
+            $camp_group_id = $values['camp_group_id'] ?? $booking_activity['camp_group_id'];
+
+            if(!isset($activity_booking_line_id) && !isset($booking_line_group_id) && !isset($camp_group_id)) {
+                return [
+                    'activity_booking_line_id'  => ['invalid' => "The activity needs to be related to a booking line."],
+                    'booking_line_group_id'     => ['invalid' => "The activity needs to be related to a booking group."],
+                    'camp_group_id'             => ['invalid' => "The activity needs to be related to a camp group."]
                 ];
             }
         }
@@ -582,35 +650,40 @@ class BookingActivity extends Model {
         $common_fields = [
             'name', 'description', 'providers_ids', 'counter', 'counter_total', 'employee_id', 'activity_date',
             'time_slot_id', 'schedule_from', 'schedule_to', 'rental_unit_id', 'has_staff_required', 'has_provider',
-            'group_num', 'partner_planning_mails_ids', 'product_id', 'product_model_id'
+            'group_num', 'partner_planning_mails_ids', 'product_id', 'product_model_id', 'qty'
         ];
-        $booking_fields = [
+        $booking_line_fields = [
             'activity_booking_line_id', 'is_virtual', 'booking_lines_ids', 'booking_id', 'booking_line_group_id',
             'supplies_booking_lines_ids', 'transports_booking_lines_ids', 'total', 'price'
         ];
+        $booking_fields = ['booking_id', 'booking_line_group_id'];
         $camp_fields = ['camp_id', 'camp_group_id'];
 
         foreach($self as $booking_activity) {
-            $related_to = 'sale\booking\BookingLine';
-            if(isset($values['camp_group_id']) || isset($booking_activity['camp_group_id'])) {
-                $related_to = 'sale\camp\Camp';
-            }
-
-            if($related_to === 'sale\booking\BookingLine') {
-                // booking checks
-                $updatable_fields = array_merge($common_fields, $booking_fields);
+            if(isset($booking_activity['activity_booking_line_id'])) {
+                // booking line checks
+                $updatable_fields = array_merge($common_fields, $booking_line_fields);
                 foreach(array_keys($values) as $field) {
                     if(!in_array($field, $updatable_fields)) {
                         return [$field => ['not_updatable' => "This field is not updatable for an activity related to a booking line."]];
                     }
                 }
             }
+            elseif(isset($booking_activity['booking_line_group_id'])) {
+                // booking group checks
+                $updatable_fields = array_merge($common_fields, $booking_fields);
+                foreach(array_keys($values) as $field) {
+                    if(!in_array($field, $updatable_fields)) {
+                        return [$field => ['not_updatable' => "This field is not updatable for an activity related to a booking group."]];
+                    }
+                }
+            }
             else {
-                // camp checks
+                // camp group checks
                 $updatable_fields = array_merge($common_fields, $camp_fields);
                 foreach(array_keys($values) as $field) {
                     if(!in_array($field, $updatable_fields)) {
-                        return [$field => ['not_updatable' => "This field is not updatable for an activity related to a camp."]];
+                        return [$field => ['not_updatable' => "This field is not updatable for an activity related to a camp group."]];
                     }
                 }
 
@@ -632,7 +705,7 @@ class BookingActivity extends Model {
         }
 
         // Common checks
-        $self->read(['activity_date', 'time_slot_id', 'employee_id', 'product_model_id', 'group_num']);
+        $self->read(['activity_booking_line_id', 'booking_line_group_id', 'camp_group_id', 'activity_date', 'time_slot_id', 'employee_id', 'product_model_id', 'group_num']);
         foreach($self as $booking_activity) {
             $employee_id = array_key_exists('employee_id', $values) ? $values['employee_id'] : $booking_activity['employee_id'];
 
@@ -667,19 +740,33 @@ class BookingActivity extends Model {
                 return ['employee_id' => ['already_assigned' => "An activity is already assigned to this user for that moment."]];
             }
 
-            if(isset($booking_activity['camp_group_id'])) {
-                // camp check that a group doesn't have two activities at the same time (check done in BookingLine for booking)
-                $book_act = BookingActivity::search([
+            // check that a group doesn't have two activities at the same time (check done in BookingLine if linked to one)
+            if(
+                isset($booking_activity['camp_group_id'])
+                || (isset($booking_activity['booking_line_group_id']) && !isset($booking_activity['activity_booking_line_id']))
+            ) {
+                $domain = [
                     ['activity_date', '=', $values['activity_date'] ?? $booking_activity['activity_date']],
                     ['time_slot_id', '=', $values['time_slot_id'] ?? $booking_activity['time_slot_id']],
-                    ['group_num', '=', $values['group_num'] ?? $booking_activity['group_num']],
                     ['id', '<>', $booking_activity['id']]
-                ])
+                ];
+
+                if(isset($booking_activity['camp_group_id'])) {
+                    $domain[] = ['camp_group_id', '=', $booking_activity['camp_group_id']];
+                }
+                else {
+                    $domain[] = ['booking_line_group_id', '=', $booking_activity['booking_line_group_id']];
+                }
+
+                $activity = BookingActivity::search($domain)
                     ->read(['id'])
                     ->first();
 
-                if(!is_null($book_act)) {
-                    return ['group_num' => ['group_has_activity' => "The group already has an activity for this date and time slot."]];
+                if(!is_null($activity)) {
+                    return [
+                        'camp_group_id'         => ['group_has_activity' => "The group already has an activity for this date and time slot."],
+                        'booking_line_group_id' => ['group_has_activity' => "The group already has an activity for this date and time slot."],
+                    ];
                 }
             }
         }

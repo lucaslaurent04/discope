@@ -68,8 +68,6 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         'EV': 'Soir',
     };
 
-    public providersQty: number = 1;
-
     constructor(
         private api: ApiService,
         public dialog: MatDialog
@@ -118,16 +116,19 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
             return;
         }
 
-        this.vm.product.name = this.activity.activity_booking_line_id.product_id.name;
-        this.vm.qty.formControl.setValue(this.activity.activity_booking_line_id.qty);
+        this.vm.product.name = this.activity.product_id.name;
+        this.vm.qty.formControl.setValue(this.activity.qty);
 
-        this.providersQty = this.activity.activity_booking_line_id.qty_accounting_method === 'unit' ? this.activity.activity_booking_line_id.qty : 1;
-        for(let i = 0; i < this.providersQty; i++) {
+        for(let i = 0; i < this.activity.qty; i++) {
             let providerId: number | null = null;
             if(this.activity.providers_ids[i]) {
                 providerId = parseInt(this.activity?.providers_ids[i]);
             }
             this.vm.providers.formControls.push(new FormControl(providerId));
+        }
+
+        if(!this.activity.activity_booking_line_id) {
+            this.vm.qty.formControl.disable();
         }
 
         if(this.activity.rental_unit_id) {

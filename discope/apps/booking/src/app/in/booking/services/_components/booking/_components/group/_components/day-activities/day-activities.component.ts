@@ -27,6 +27,7 @@ export class BookingServicesBookingGroupDayActivitiesComponent implements OnInit
     @Output() loadEnd = new EventEmitter();
     @Output() updated = new EventEmitter();
     @Output() deleteLine = new EventEmitter();
+    @Output() deleteActivity = new EventEmitter();
     @Output() openActivity = new EventEmitter();
     @Output() closeActivity = new EventEmitter();
 
@@ -49,7 +50,12 @@ export class BookingServicesBookingGroupDayActivitiesComponent implements OnInit
         }
     }
 
-    public ondeleteActivity(lineId: number) {
-        this.deleteLine.emit(lineId);
+    public ondeleteActivity(activity: BookingActivity) {
+        if(activity.activity_booking_line_id) {
+            this.deleteLine.emit(activity.activity_booking_line_id.id);
+        }
+        else {
+            this.deleteActivity.emit(activity.id);
+        }
     }
 }
