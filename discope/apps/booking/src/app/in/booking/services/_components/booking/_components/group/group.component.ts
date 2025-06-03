@@ -348,6 +348,21 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         }
     }
 
+    public async ondeleteActivity(activity_id: number) {
+        this.loading = true;
+        setTimeout( async () => {
+            try {
+                await this.api.remove('sale\\booking\\BookingActivity', [activity_id]);
+                // relay to parent
+                this.updated.emit();
+            }
+            catch(response) {
+                this.api.errorFeedback(response);
+            }
+            this.loading = false;
+        });
+    }
+
     public async ondeleteLine(line_id:number) {
         try {
             if(this.instance.has_pack) {
