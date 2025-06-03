@@ -75,7 +75,7 @@ class Customer extends \identity\Partner {
             'ref_account' => [
                 'type'              => 'string',
                 'usage'             => 'uri/urn.iban',
-                'description'       => 'Arbitrary reference account number for identifying the customer in external accounting softwares.',
+                'description'       => 'Bank account number for identifying the customer in external accounting softwares.',
                 'readonly'          => true
             ],
 
