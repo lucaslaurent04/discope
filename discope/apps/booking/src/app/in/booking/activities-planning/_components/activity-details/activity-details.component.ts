@@ -117,12 +117,9 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
         let filtered: any[] = [];
         try {
             let domain = [
-                ['is_activity', '=', true]
+                ['is_activity', '=', true],
+                ['is_fullday', '=', false]
             ];
-
-            if(this.timeSlot === 'EV') {
-                domain.push(['is_fullday', '=', false]);
-            }
 
             if(name && name.length) {
                 domain.push(['name', 'ilike', `%${name}%`]);
