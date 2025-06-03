@@ -12,6 +12,7 @@ export class Activity {
         public schedule_to: string = '',
         public group_num: number = 0,
         public is_virtual: boolean = false,
+        public qty: number = 1,
         public has_staff_required: boolean = false,
         public employee_id: number = 0,
         public has_provider: boolean = false,

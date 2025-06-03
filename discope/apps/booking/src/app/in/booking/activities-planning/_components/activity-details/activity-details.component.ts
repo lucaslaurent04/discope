@@ -101,8 +101,7 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
                 }
 
                 const providersFormControls = [];
-                const providersQty = this.activity.activity_booking_line_id.qty_accounting_method === 'unit' ? this.activity.activity_booking_line_id.qty : 1;
-                for(let i = 0; i < providersQty; i++) {
+                for(let i = 0; i < this.activity.qty; i++) {
                     let providerId: number | null = null;
                     if(this.activity?.providers_ids?.[i]) {
                         providerId = +this.activity.providers_ids[i];

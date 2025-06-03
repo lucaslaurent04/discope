@@ -182,6 +182,7 @@ $tree = [
             'counter',
             'total',
             'price',
+            'qty',
             'is_virtual',
             'activity_date',
             'time_slot_id',
@@ -189,7 +190,11 @@ $tree = [
             'schedule_to',
             'providers_ids',
             'rental_unit_id',
-            'description'
+            'description',
+            'product_id' => [
+                'name',
+                'sku'
+            ],
         ],
         'booking_meals_ids' => [
             'date',
