@@ -36,15 +36,18 @@ use sale\catalog\ProductModelCategory;
  */
 ['context' => $context] = $providers;
 
-$products_models_ids = ProductModel::search(['is_activity', '=', true])->ids();
+$categories_ids = [];
 
-$product_models_categories = ProductModelCategory::search(['productmodel_id', 'in', $products_models_ids])
-    ->read(['category_id'])
-    ->get(true);
+// #memo - table sale_product_rel_productmodel_category is used as m2m, so ProductModelCategory can be filled with non-valid objects
+$products_models = ProductModel::search(['is_activity', '=', true])->read(['categories_ids']);
 
-$categories_ids = array_unique(
-    array_column($product_models_categories, 'category_id')
-);
+$map_categories_ids = [];
+foreach($productModels as $id => $productModel) {
+    foreach($productModel['categories_ids'] as $category_id) {
+        $map_categories_ids[$category_id] = true;
+    }
+}
+$categories_ids = array_keys($map_categories_ids);
 
 $domain = new Domain($params['domain']);
 $domain->addCondition(new DomainCondition('id', 'in', $categories_ids));
