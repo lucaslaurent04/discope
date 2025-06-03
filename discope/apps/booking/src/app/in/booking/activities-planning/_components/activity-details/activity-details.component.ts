@@ -101,10 +101,9 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
                 }
 
                 const providersFormControls = [];
-                const providersQty = this.activity.activity_booking_line_id.qty_accounting_method === 'unit' ? this.activity.activity_booking_line_id.qty : 1;
-                for(let i = 0; i < providersQty; i++) {
+                for(let i = 0; i < this.activity.qty; i++) {
                     let providerId: number | null = null;
-                    if(this.activity?.providers_ids?.[i]) {
+                    if(this.activity.providers_ids?.[i]) {
                         providerId = +this.activity.providers_ids[i];
                     }
                     providersFormControls.push(new FormControl(providerId));
@@ -118,12 +117,9 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
         let filtered: any[] = [];
         try {
             let domain = [
-                ['is_activity', '=', true]
+                ['is_activity', '=', true],
+                ['is_fullday', '=', false]
             ];
-
-            if(this.timeSlot === 'EV') {
-                domain.push(['is_fullday', '=', false]);
-            }
 
             if(name && name.length) {
                 domain.push(['name', 'ilike', `%${name}%`]);
