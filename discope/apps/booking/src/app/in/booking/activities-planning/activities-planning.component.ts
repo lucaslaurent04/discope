@@ -102,7 +102,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
 
                 await this.loadWeekActivities();
 
-                if(this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num]) {
+                if(this.planning?.[this.selectedDay]?.[this.selectedTimeSlot]?.[this.selectedGroup.activity_group_num]) {
                     this.selectedActivity = this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num];
                 }
 
