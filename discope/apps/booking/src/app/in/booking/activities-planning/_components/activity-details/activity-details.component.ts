@@ -103,7 +103,7 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
                 const providersFormControls = [];
                 for(let i = 0; i < this.activity.qty; i++) {
                     let providerId: number | null = null;
-                    if(this.activity?.providers_ids?.[i]) {
+                    if(this.activity.providers_ids?.[i]) {
                         providerId = +this.activity.providers_ids[i];
                     }
                     providersFormControls.push(new FormControl(providerId));
