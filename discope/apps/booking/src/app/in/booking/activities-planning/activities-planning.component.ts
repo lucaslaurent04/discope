@@ -102,7 +102,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
 
                 await this.loadWeekActivities();
 
-                if(this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num]) {
+                if(this.planning?.[this.selectedDay]?.[this.selectedTimeSlot]?.[this.selectedGroup.activity_group_num]) {
                     this.selectedActivity = this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num];
                 }
 
@@ -437,9 +437,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
     public async onProductSelected(product: Product) {
         this.loading = true;
 
-        let newLine: any = null;
-
-        // notify back-end about the change
+        // notify backend about the change
         try {
             let timeSlotId: number = null;
             for(let [id, code] of Object.entries(this.mapTimeSlotIdCode)) {
@@ -448,21 +446,12 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                 }
             }
 
-            const domain = [
-                ['booking_line_group_id', '=', this.selectedGroup.id]
-            ];
-            const bookingLines = await this.api.collect('sale\\booking\\BookingLine', domain, ['id']);
-
-            newLine = await this.api.create('sale\\booking\\BookingLine', {
-                order: bookingLines.length + 1,
+            await this.api.create('sale\\booking\\BookingActivity', {
                 booking_id: this.booking.id,
                 booking_line_group_id: this.selectedGroup.id,
-                service_date: (new Date(this.selectedDay)).getTime() / 1000,
+                product_id: product.id,
+                activity_date: (new Date(this.selectedDay)).getTime() / 1000,
                 time_slot_id: timeSlotId
-            });
-            await this.api.call('?do=sale_booking_update-bookingline-product', {
-                id: newLine.id,
-                product_id: product.id
             });
 
             await this.loadWeekActivities();
@@ -472,9 +461,6 @@ export class BookingActivitiesPlanningComponent implements OnInit {
             }
         }
         catch(response: any) {
-            if(newLine) {
-                // this.deleteLine.emit(newLine.id);
-            }
             this.api.errorFeedback(response);
         }
 
@@ -485,7 +471,12 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         this.loading = true;
 
         try {
-            await this.api.update('sale\\booking\\BookingLineGroup', [this.selectedGroup.id], {booking_lines_ids: [-this.selectedActivity.activity_booking_line_id.id]});
+            if(this.selectedActivity.activity_booking_line_id) {
+                await this.api.update('sale\\booking\\BookingLineGroup', [this.selectedGroup.id], {booking_lines_ids: [-this.selectedActivity.activity_booking_line_id.id]});
+            }
+            else {
+                await this.api.remove('sale\\booking\\BookingActivity', [this.selectedActivity.id], true);
+            }
 
             await this.loadWeekActivities();
 

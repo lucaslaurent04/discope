@@ -142,5 +142,22 @@
             "layout": []
         }
     },
-    "error": []
+    "error": {
+        "booking_line_group_id": {
+            "invalid_type": "L'activité doit être liée à une réservation ou à un camp.",
+            "group_has_activity": "Le groupe a déjà une activité pour cette date et ce créneau horaire.",
+            "missing_group_id": "L'activité doit être liée à un groupe de réservation."
+        },
+        "camp_group_id": {
+            "invalid_type": "L'activité doit être liée à une réservation ou à un camp.",
+            "group_has_activity": "Le groupe a déjà une activité pour cette date et ce créneau horaire.",
+            "missing_group_id": "L'activité doit être liée à un groupe de camp."
+        },
+        "activity_date": {
+            "outside_camp_dates": "L'activité n'est pas incluse dans les dates du camp."
+        },
+        "activity_booking_line_id": {
+            "missing_line_id": "L'activité doit être liée à une ligne de réservation."
+        }
+    }
 }
