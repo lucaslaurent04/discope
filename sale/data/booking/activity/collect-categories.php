@@ -36,11 +36,7 @@ use sale\catalog\ProductModelCategory;
  */
 ['context' => $context] = $providers;
 
-$products_models = ProductModel::search(['is_activity', '=', true])
-    ->read(['id'])
-    ->get(true);
-
-$products_models_ids = array_column($products_models, 'id');
+$products_models_ids = ProductModel::search(['is_activity', '=', true])->ids();
 
 $product_models_categories = ProductModelCategory::search(['productmodel_id', 'in', $products_models_ids])
     ->read(['category_id'])
