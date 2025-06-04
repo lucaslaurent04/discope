@@ -183,7 +183,7 @@ jobs:
       # create an empty database
       - run: php run.php --do=init_db
       # initialize database with demo data
-      - run: php run.php --do=init_package --package=discope
+      - run: php run.php --do=init_package --package=discope --ignore_platform=true
       # run test units
       - run: php run.php --do=test_package --package=core
       - run: php run.php --do=test_package --package=discope
