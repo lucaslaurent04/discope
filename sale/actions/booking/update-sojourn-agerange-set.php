@@ -107,26 +107,38 @@ if($params['qty'] < 0) {
     throw new Exception("negative_value", EQ_ERROR_INVALID_PARAM);
 }
 
+
+/*
+    #todo #temp #kaleo - remember BookingLines with specific days having qty manually assigned through qty_vars
+    #memo - qty_vars only applies for booking lines with accounting_method == 'person'
+    For each line, remember initial resulting qty_vars (independent from nb_pers and qty), false means "no change"
+*/
+$map_booking_lines_qty_vars = [];
+$bookingLineGroup = BookingLineGroup::id($params['id'])->read(['nb_pers', 'booking_lines_ids' => ['qty_accounting_method', 'qty', 'qty_vars']])->first();
+foreach($bookingLineGroup['booking_lines_ids'] as $booking_line_id => $bookingLine) {
+    if($bookingLine['qty_accounting_method'] !== 'person') {
+        continue;
+    }
+    $qty_vars = json_decode($bookingLine['qty_vars']);
+    foreach($qty_vars as $i => $qty_var) {
+        $qty_var = intval($qty_var);
+        if($qty_var === 0) {
+            $qty_vars[$i] = false;
+        }
+        else {
+            $qty_vars[$i] = $bookingLineGroup['nb_pers'] + $qty_var;
+        }
+    }
+    $map_booking_lines_qty_vars[$booking_line_id] = $qty_vars;
+}
+/**/
+
+
 // Callbacks are defined on Booking, BookingLine, and BookingLineGroup to ensure consistency across these entities.
 // While these callbacks are useful for maintaining data integrity (they and are used in tests),
 // they need to be disabled here to prevent recursive cycles that could lead to deep cycling issues.
 $orm->disableEvents();
 
-
-/*
-    #todo #temp #kaleo - remember BookingLines with specific days having qty manually set to 0 through qty_vars
-    For each line, remember initial qty_vars : convert to 0/1 (0 meaning "qty of zero for that day" & 1 meaning "leave as is")
-*/
-    $map_booking_lines_qty_vars = [];
-    $bookingLineGroup = BookingLineGroup::id($params['id'])->read(['booking_lines_ids' => ['qty', 'qty_vars']])->first();
-    foreach($bookingLineGroup['booking_lines_ids'] as $booking_line_id => $bookingLine) {
-        $qty_vars = json_decode($bookingLine['qty_vars']);
-        foreach($qty_vars as $i => $qty_var) {
-            $qty_vars[$i] = intval(($bookingLine['qty'] + $qty_var) === 0);
-        }
-        $map_booking_lines_qty_vars[$booking_line_id] = $qty_vars;
-    }
-/**/
 
 BookingLineGroupAgeRangeAssignment::id($params['age_range_assignment_id'])
     ->update([
@@ -172,25 +184,32 @@ BookingLineGroup::refreshPrice($orm, $group['id']);
 Booking::refreshPrice($orm, $group['booking_id']['id']);
 
 
-/*
-    #todo #temp #kaleo - remember BookingLines with specific days having qty manually set to 0 through qty_vars
-    For each line, force specific days previously manually set to 0
-*/
-    $bookingLineGroup = BookingLineGroup::id($params['id'])->read(['booking_lines_ids' => ['qty', 'qty_vars']])->first();
-    foreach($bookingLineGroup['booking_lines_ids'] as $booking_line_id => $bookingLine) {
-        $new_qty_vars = json_decode($bookingLine['qty_vars']);
-        $qty_vars = $map_booking_lines_qty_vars[$booking_line_id];
-        foreach($qty_vars as $i => $qty_var) {
-            if($qty_var === 0) {
-                $new_qty_vars[$i] = -$bookingLine['qty'];
-            }
-        }
-        BookingLine::id($booking_line_id)->update(['qty_vars' => json_encode($new_qty_vars)]);
-    }
-/**/
-
 // restore events in case this controller is chained with others
 $orm->enableEvents();
+
+
+/*
+    #todo #temp #kaleo - remember BookingLines with specific days having qty manually assigned through qty_vars
+    #memo - qty_vars only applies for booking lines with accounting_method == 'person'
+    For each line, force specific days to previously manually set value, if any
+*/
+$bookingLineGroup = BookingLineGroup::id($params['id'])->read(['nb_pers', 'booking_lines_ids' => ['qty', 'qty_vars']])->first();
+foreach($bookingLineGroup['booking_lines_ids'] as $booking_line_id => $bookingLine) {
+    if(!isset($map_booking_lines_qty_vars[$booking_line_id])) {
+        continue;
+    }
+    $new_qty_vars = json_decode($bookingLine['qty_vars']);
+    $qty_vars = $map_booking_lines_qty_vars[$booking_line_id];
+    foreach($qty_vars as $i => $qty_var) {
+        $new_qty_var = $new_qty_vars[$i];
+        if($qty_var !== false) {
+            $new_qty_vars[$i] = $qty_var - $bookingLineGroup['nb_pers'];
+        }
+    }
+    BookingLine::id($booking_line_id)->update(['qty_vars' => json_encode($new_qty_vars)]);
+}
+/**/
+
 
 $context->httpResponse()
         ->status(204)
