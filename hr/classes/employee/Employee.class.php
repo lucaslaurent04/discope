@@ -79,6 +79,25 @@ class Employee extends \identity\Partner {
                 'domain'            => ['object_class', '=', 'hr\employee\Employee']
             ],
 
+            'extref_employee' => [
+                'type'              => 'string',
+                'default'           => 'employee',
+                'description'       => 'External reference of the Employee.'
+            ],
+
+            'description' => [
+                'type'              => 'string',
+                'usage'             => 'text/plain',
+                'default'           => 'employee',
+                'description'       => 'Short description of the Employee (diplomas).'
+            ],
+
+            'activity_type' => [
+                'type'              => 'string',
+                'default'           => 'employee',
+                'description'       => 'Activity assigned to the employee.'
+            ],
+
             'camp_groups_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\camp\CampGroup',
