@@ -290,7 +290,7 @@ export class BookingServicesBookingComponent
                     (bookingLine: BookingLine) => bookingLine.id === bookingActivity.activity_booking_line_id
                 );
 
-                if(activityBookingLine === undefined || !activityBookingLine.service_date) {
+                if(activityBookingLine && !activityBookingLine.service_date) {
                     continue;
                 }
 
@@ -302,7 +302,7 @@ export class BookingServicesBookingComponent
                 bookingActivityDay[timeSlot.code as 'AM'|'PM'|'EV'] = {
                     ...bookingActivity,
                     entity: 'sale\\booking\\BookingActivity',
-                    activity_booking_line_id: activityBookingLine,
+                    activity_booking_line_id: activityBookingLine ?? null,
                     transports_booking_lines_ids: group.booking_lines_ids.filter(
                         (bookingLine: BookingLine) => bookingActivity.transports_booking_lines_ids.map(Number).includes(bookingLine.id)
                     ),
