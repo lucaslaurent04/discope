@@ -760,22 +760,27 @@ class Identity extends Model {
         $self->read(['id','name']);
         foreach($self as $id => $identity) {
             $prefix_account = Setting::get_value('identity', 'accounting', 'customer_account.prefix', '411');
-            $sequence_account = Setting::get_value('identity', 'accounting', 'customer_account.sequence', 1);
             $format = Setting::get_value('identity', 'accounting', 'customer_account.sequence_format', '%3d{prefix}%05d{sequence}');
 
-            do {
-                Setting::set_value('identity', 'accounting', 'customer_account.sequence', $sequence_account + 1);
-
-                $accounting_account = Setting::parse_format($format, [
-                        'prefix'    => $prefix_account,
-                        'sequence'  => $sequence_account
-                    ]);
-
-                $existingIdentity = Identity::search(['accounting_account', '=', $accounting_account])->first();
-                ++$sequence_account;
+            $sequence_account = Setting::get_value('identity', 'accounting', 'customer_account.sequence', 1);
+            // #todo - #kaleo - this is an exception to follow Kaleo specific logic that could be configured in a standard way
+            if($sequence_account <= 1) {
+                $result[$id] = (string) $id;
             }
-            while($existingIdentity);
+            else {
+                do {
+                    Setting::set_value('identity', 'accounting', 'customer_account.sequence', $sequence_account + 1);
 
+                    $accounting_account = Setting::parse_format($format, [
+                            'prefix'    => $prefix_account,
+                            'sequence'  => $sequence_account
+                        ]);
+
+                    $existingIdentity = Identity::search(['accounting_account', '=', $accounting_account])->first();
+                    ++$sequence_account;
+                }
+                while($existingIdentity);
+            }
             $result[$id] = $accounting_account;
         }
         return $result;
