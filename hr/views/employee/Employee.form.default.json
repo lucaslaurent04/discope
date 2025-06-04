@@ -35,6 +35,16 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "date_end",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "role_id",
                                                 "width": "33%"
                                             },
