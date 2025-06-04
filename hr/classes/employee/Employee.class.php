@@ -81,20 +81,17 @@ class Employee extends \identity\Partner {
 
             'extref_employee' => [
                 'type'              => 'string',
-                'default'           => 'employee',
                 'description'       => 'External reference of the Employee.'
             ],
 
             'description' => [
                 'type'              => 'string',
                 'usage'             => 'text/plain',
-                'default'           => 'employee',
                 'description'       => 'Short description of the Employee (diplomas).'
             ],
 
             'activity_type' => [
                 'type'              => 'string',
-                'default'           => 'employee',
                 'description'       => 'Activity assigned to the employee.'
             ],
 
