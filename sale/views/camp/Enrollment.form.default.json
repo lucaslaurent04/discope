@@ -313,10 +313,7 @@
                                             {
                                                 "type": "field",
                                                 "value": "price_adapters_ids",
-                                                "width": "100%",
-                                                "widget": {
-                                                    "domain": ["amount", ">", 0]
-                                                }
+                                                "width": "100%"
                                             }
                                         ]
                                     }
