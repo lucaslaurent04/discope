@@ -117,7 +117,6 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         }
 
         this.vm.product.name = this.activity.product_id.name;
-        this.vm.qty.formControl.setValue(this.activity.qty);
 
         for(let i = 0; i < this.activity.qty; i++) {
             let providerId: number | null = null;
@@ -128,7 +127,11 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         }
 
         if(!this.activity.activity_booking_line_id) {
+            this.vm.qty.formControl.setValue(this.activity.qty);
             this.vm.qty.formControl.disable();
+        }
+        else {
+            this.vm.qty.formControl.setValue(this.activity.activity_booking_line_id.qty);
         }
 
         if(this.activity.rental_unit_id) {
