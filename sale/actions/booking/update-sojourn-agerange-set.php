@@ -186,10 +186,13 @@ $orm->enableEvents();
 /*
     #todo #temp #kaleo - remember BookingLines with specific days having qty manually assigned through qty_vars
     #memo - qty_vars only applies for booking lines with accounting_method == 'person'
-    For each line, force specific days previously manually set
+    For each line, force specific days to previously manually set value, if any
 */
 $bookingLineGroup = BookingLineGroup::id($params['id'])->read(['nb_pers', 'booking_lines_ids' => ['qty', 'qty_vars']])->first();
 foreach($bookingLineGroup['booking_lines_ids'] as $booking_line_id => $bookingLine) {
+    if(!isset($map_booking_lines_qty_vars[$booking_line_id])) {
+        continue;
+    }
     $new_qty_vars = json_decode($bookingLine['qty_vars']);
     $qty_vars = $map_booking_lines_qty_vars[$booking_line_id];
     foreach($qty_vars as $i => $qty_var) {
