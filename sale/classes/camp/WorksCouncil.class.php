@@ -28,8 +28,7 @@ class WorksCouncil extends Model {
             'code' => [
                 'type'              => 'string',
                 'description'       => "Code of the works council.",
-                'required'          => true,
-                'unique'            => true
+                'required'          => true
             ],
 
             'address_street' => [
