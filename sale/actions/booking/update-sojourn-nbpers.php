@@ -172,7 +172,7 @@ foreach($bookingLineGroup['booking_lines_ids'] as $booking_line_id => $bookingLi
     foreach($qty_vars as $i => $qty_var) {
         $new_qty_var = $new_qty_vars[$i];
         if($qty_var !== false) {
-            $new_qty_vars[$i] = $qty_var - $bookingLine['qty'];
+            $new_qty_vars[$i] = $qty_var - $bookingLineGroup['nb_pers'];
         }
     }
     BookingLine::id($booking_line_id)->update(['qty_vars' => json_encode($new_qty_vars)]);
