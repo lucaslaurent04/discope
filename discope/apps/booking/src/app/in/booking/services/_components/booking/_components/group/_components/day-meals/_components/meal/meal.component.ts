@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { BookingMeal } from '../../../../../../_models/booking_meal.model';
 import { BookingLineGroup } from '../../../../../../_models/booking_line_group.model';
 import { Booking } from '../../../../../../_models/booking.model';
@@ -26,7 +26,7 @@ interface vmModel {
     templateUrl: 'meal.component.html',
     styleUrls: ['meal.component.scss']
 })
-export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
+export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit, OnChanges {
 
     @Input() meal: BookingMeal | null;
     @Input() date: Date;
@@ -86,6 +86,26 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit{
             this.vm.is_self_provided.formControl.setValue(this.meal.is_self_provided);
             this.vm.meal_type_id.formControl.setValue(this.meal.meal_type_id);
             this.vm.meal_place_id.formControl.setValue(this.meal.meal_place_id);
+        }
+    }
+
+    public ngOnChanges(changes: SimpleChanges) {
+        if(changes.timeSlot) {
+            if(!this.timeSlot || ['AM', 'PM'].includes(this.timeSlot.code)) {
+                this.vm.meal_type_id.formControl.disable();
+            }
+            else {
+                this.vm.meal_type_id.formControl.enable();
+            }
+        }
+
+        if(changes.meal) {
+            if(this.meal?.booking_lines_ids?.length !== 0) {
+                this.vm.is_self_provided.formControl.disable();
+            }
+            else {
+                this.vm.is_self_provided.formControl.enable();
+            }
         }
     }
 
