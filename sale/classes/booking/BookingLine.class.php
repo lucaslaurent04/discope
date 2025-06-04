@@ -1008,14 +1008,17 @@ class BookingLine extends Model {
         ]);
         if($lines > 0) {
             foreach($lines as $line) {
+                $booking_activity_updates = ['qty' => null];
                 if($line['product_id.product_model_id.has_provider'] && count($line['booking_activity_id.providers_ids']) > $line['qty']) {
                     $providers_ids_to_remove = [];
                     for($i = count($line['booking_activity_id.providers_ids']) - 1; $i >= $line['qty']; $i--) {
                         $providers_ids_to_remove[] = -$line['booking_activity_id.providers_ids'][$i];
                     }
 
-                    BookingActivity::id($line['booking_activity_id'])->update(['providers_ids' => $providers_ids_to_remove]);
+                    $booking_activity_updates['providers_ids'] = $providers_ids_to_remove;
                 }
+
+                BookingActivity::id($line['booking_activity_id'])->update($booking_activity_updates);
             }
         }
 
