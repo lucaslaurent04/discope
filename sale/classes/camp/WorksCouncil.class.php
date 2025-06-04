@@ -34,8 +34,7 @@ class WorksCouncil extends Model {
 
             'address_street' => [
                 'type'              => 'string',
-                'description'       => "Street and number of the works council.",
-                'required'          => true
+                'description'       => "Street and number of the works council."
             ],
 
             'address_dispatch' => [
@@ -46,13 +45,11 @@ class WorksCouncil extends Model {
             'address_zip' => [
                 'type'              => 'string',
                 'description'       => "Zip code of the works council.",
-                'required'          => true
             ],
 
             'address_city' => [
                 'type'              => 'string',
-                'description'       => "City of the works council.",
-                'required'          => true
+                'description'       => "City of the works council."
             ],
 
             'enrollments_ids' => [
