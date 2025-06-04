@@ -6,6 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 use sale\booking\Booking;
+use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 
 // announce script and fetch parameters values
@@ -70,6 +71,21 @@ if(in_array($group['booking_id']['status'], ['invoiced', 'debit_balance', 'credi
 $orm->disableEvents();
 
 
+/*
+    #todo #temp #kaleo - remember BookingLines with specific days having qty manually set to 0 through qty_vars
+    For each line, remember initial qty_vars : convert to 0/1 (0 meaning "qty of zero for that day" & 1 meaning "leave as is")
+*/
+    $map_booking_lines_qty_vars = [];
+    $bookingLineGroup = BookingLineGroup::id($params['id'])->read(['booking_lines_ids' => ['qty', 'qty_vars']])->first();
+    foreach($bookingLineGroup['booking_lines_ids'] as $booking_line_id => $bookingLine) {
+        $qty_vars = json_decode($bookingLine['qty_vars']);
+        foreach($qty_vars as $i => $qty_var) {
+            $qty_vars[$i] = intval(($bookingLine['qty'] + $qty_var) === 0);
+        }
+        $map_booking_lines_qty_vars[$booking_line_id] = $qty_vars;
+    }
+/**/
+
 // a) special case for booking which price in not impacted by `nb_pers`
 if($group['booking_id']['status'] != 'quote') {
     // #memo - for GG, the number of persons does not impact the booking (GG only has pricing by_accomodation), so we allow change of nb_pers under specific circumstances
@@ -130,6 +146,24 @@ else {
     Booking::refreshPrice($orm, $group['booking_id']['id']);
     Booking::refreshNbPers($orm, $group['booking_id']['id']);
 }
+
+
+/*
+    #todo #temp #kaleo - remember BookingLines with specific days having qty manually set to 0 through qty_vars
+    For each line, force specific days previously manually set to 0
+*/
+    $bookingLineGroup = BookingLineGroup::id($params['id'])->read(['booking_lines_ids' => ['qty', 'qty_vars']])->first();
+    foreach($bookingLineGroup['booking_lines_ids'] as $booking_line_id => $bookingLine) {
+        $new_qty_vars = json_decode($bookingLine['qty_vars']);
+        $qty_vars = $map_booking_lines_qty_vars[$booking_line_id];
+        foreach($qty_vars as $i => $qty_var) {
+            if($qty_var === 0) {
+                $new_qty_vars[$i] = -$bookingLine['qty'];
+            }
+        }
+        BookingLine::id($booking_line_id)->update(['qty_vars' => json_encode($new_qty_vars)]);
+    }
+/**/
 
 // restore events in case this controller is chained with others
 $orm->enableEvents();
