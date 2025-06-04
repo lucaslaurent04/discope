@@ -1,5 +1,8 @@
 {
     "name": "Sponsors",
+    "description": "List of sponsors.",
+    "order": "name",
+    "sort": "asc",
     "layout": {
         "items": [
             {
