@@ -117,7 +117,7 @@ $orm->disableEvents();
     foreach($bookingLineGroup['booking_lines_ids'] as $booking_line_id => $bookingLine) {
         $qty_vars = json_decode($bookingLine['qty_vars']);
         foreach($qty_vars as $i => $qty_var) {
-            $qty_vars[$i] = intval(($bookingLine['qty'] + $qty_var) === 0);
+            $qty_vars[$i] = intval( ($bookingLine['qty'] + $qty_var) !== 0 );
         }
         $map_booking_lines_qty_vars[$booking_line_id] = $qty_vars;
     }
@@ -179,6 +179,7 @@ Booking::refreshPrice($orm, $group['booking_id']['id']);
         $new_qty_vars = json_decode($bookingLine['qty_vars']);
         $qty_vars = $map_booking_lines_qty_vars[$booking_line_id];
         foreach($qty_vars as $i => $qty_var) {
+            $new_qty_var = $new_qty_vars[$i];
             if($qty_var === 0) {
                 $new_qty_vars[$i] = -$bookingLine['qty'];
             }
