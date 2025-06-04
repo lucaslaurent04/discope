@@ -77,6 +77,25 @@ class Employee extends \identity\Partner {
                 'foreign_field'     => 'object_id',
                 'description'       => "Mails related to the employee.",
                 'domain'            => ['object_class', '=', 'hr\employee\Employee']
+            ],
+
+            'extref_employee' => [
+                'type'              => 'string',
+                'default'           => 'employee',
+                'description'       => 'External reference of the Employee.'
+            ],
+
+            'description' => [
+                'type'              => 'string',
+                'usage'             => 'text/plain',
+                'default'           => 'employee',
+                'description'       => 'Short description of the Employee (diplomas).'
+            ],
+
+            'activity_type' => [
+                'type'              => 'string',
+                'default'           => 'employee',
+                'description'       => 'Activity assigned to the employee.'
             ]
 
         ];
