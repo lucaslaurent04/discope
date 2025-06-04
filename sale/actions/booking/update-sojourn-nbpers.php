@@ -72,8 +72,11 @@ if(in_array($group['booking_id']['status'], ['invoiced', 'debit_balance', 'credi
     For each line, remember initial resulting qty_vars (independent from nb_pers and qty), false means "no change"
 */
 $map_booking_lines_qty_vars = [];
-$bookingLineGroup = BookingLineGroup::id($params['id'])->read(['nb_pers', 'booking_lines_ids' => ['qty', 'qty_vars']])->first();
+$bookingLineGroup = BookingLineGroup::id($params['id'])->read(['nb_pers', 'booking_lines_ids' => ['qty_accounting_method', 'qty', 'qty_vars']])->first();
 foreach($bookingLineGroup['booking_lines_ids'] as $booking_line_id => $bookingLine) {
+    if($bookingLine['qty_accounting_method'] !== 'person') {
+        continue;
+    }
     $qty_vars = json_decode($bookingLine['qty_vars']);
     foreach($qty_vars as $i => $qty_var) {
         $qty_var = intval($qty_var);
