@@ -1995,9 +1995,8 @@ class BookingLine extends Model {
             );
         // fill qty_vars with zeros
         $qty_vars = array_fill(0, $nb_repeat, 0);
-        // #memo - triggers onupdateQty and onupdateQtyVar
+        // #memo - if events are enalbled, this triggers onupdateQty and onupdateQtyVar
         $om->update(self::getType(), $id, ['qty' => $qty, 'qty_vars' => json_encode($qty_vars)]);
-
     }
 
 
