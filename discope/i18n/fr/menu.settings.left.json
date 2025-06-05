@@ -382,6 +382,10 @@
             "label": "Plan comptable",
             "help": ""
         },
+        "finance.accounting.analytic_chart": {
+            "label": "Plan comptable",
+            "help": ""
+        },
         "finance.accounting.accounting_journals": {
             "label": "Journaux comptables",
             "help": ""
