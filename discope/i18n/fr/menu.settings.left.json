@@ -379,11 +379,11 @@
             "help": ""
         },
         "finance.accounting.account_chart": {
-            "label": "Plan analytique",
+            "label": "Plan comptable",
             "help": ""
         },
         "finance.accounting.analytic_chart": {
-            "label": "Plan comptable",
+            "label": "Plan analytique",
             "help": ""
         },
         "finance.accounting.accounting_journals": {
