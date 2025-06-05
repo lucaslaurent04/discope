@@ -1109,6 +1109,16 @@
                                 }
                             },
                             {
+                                "id": "finance.accounting.analytic_sections",
+                                "type": "entry",
+                                "label": "Analytic Sections",
+                                "description": "",
+                                "context": {
+                                    "entity": "finance\\accounting\\AnalyticSection",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
                                 "id": "finance.accounting.accounting_journals",
                                 "type": "entry",
                                 "label": "Accounting journals",
