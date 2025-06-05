@@ -52,6 +52,12 @@ class ProductModel extends Model {
                 'description'       => 'Statistics section to which relates the product, if any.'
             ],
 
+            'analytic_section_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'finance\accounting\AnalyticSection',
+                'description'       => 'Analytic section the product model relates to, if any.'
+            ],
+
             'can_buy' => [
                 'type'              => 'boolean',
                 'description'       => "Can this product be purchassed?",

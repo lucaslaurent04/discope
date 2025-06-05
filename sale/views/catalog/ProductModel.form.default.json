@@ -31,7 +31,12 @@
                                             {
                                                 "type": "field",
                                                 "value": "stat_section_id",
-                                                "width": "50%"
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "analytic_section_id",
+                                                "width": "33%"
                                             },
                                             {
                                                 "type": "field",
