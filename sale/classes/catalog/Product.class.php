@@ -206,6 +206,12 @@ class Product extends Model {
                 'description'       => 'Statistics section (overloads the model one, if any).'
             ],
 
+            'analytic_section_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'finance\accounting\AnalyticSection',
+                'description'       => 'Analytic section (overloads the model one, if any).'
+            ],
+
             /* can_buy and can_sell are adapted when related values are changed in parent product_model */
 
             'can_buy' => [
