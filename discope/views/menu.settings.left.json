@@ -1099,6 +1099,16 @@
                                 }
                             },
                             {
+                                "id": "finance.accounting.analytic_chart",
+                                "type": "entry",
+                                "label": "Analytic Chart",
+                                "description": "",
+                                "context": {
+                                    "entity": "finance\\accounting\\AnalyticChart",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
                                 "id": "finance.accounting.accounting_journals",
                                 "type": "entry",
                                 "label": "Accounting journals",
