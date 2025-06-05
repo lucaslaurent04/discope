@@ -1,5 +1,8 @@
 {
     "name": "Works Council",
+    "description": "List of works councils.",
+    "order": "name",
+    "sort": "asc",
     "layout": {
         "items": [
             {

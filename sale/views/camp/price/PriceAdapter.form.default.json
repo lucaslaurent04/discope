@@ -14,7 +14,10 @@
                                             {
                                                 "type": "field",
                                                 "value": "sponsor_id",
-                                                "width": "33%"
+                                                "width": "50%",
+                                                "widget": {
+                                                    "domain": ["amount", ">", 0]
+                                                }
                                             },
                                             {
                                                 "type": "field",
