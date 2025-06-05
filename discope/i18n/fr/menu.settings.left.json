@@ -379,7 +379,7 @@
             "help": ""
         },
         "finance.accounting.account_chart": {
-            "label": "Plan comptable",
+            "label": "Plan analytique",
             "help": ""
         },
         "finance.accounting.analytic_chart": {
