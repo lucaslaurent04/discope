@@ -258,6 +258,9 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         weekEndDate.setDate(weekEndDate.getDate() + 6);
         this.weekEndDate = weekEndDate;
 
+        this.showPrevBtn = this.weekStartDate.getTime() > this.booking.date_from.getTime();
+        this.showNextBtn = this.weekEndDate.getTime() < this.booking.date_to.getTime();
+
         await this.loadWeekActivities();
 
         if(this.planning?.[this.selectedDay]?.[this.selectedTimeSlot]?.[this.selectedGroup.activity_group_num]) {
@@ -282,6 +285,9 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         const weekEndDate = new Date(this.weekStartDate);
         weekEndDate.setDate(weekEndDate.getDate() + 6);
         this.weekEndDate = weekEndDate;
+
+        this.showPrevBtn = this.weekStartDate.getTime() > this.booking.date_from.getTime();
+        this.showNextBtn = this.weekEndDate.getTime() < this.booking.date_to.getTime();
 
         await this.loadWeekActivities();
 
