@@ -340,7 +340,7 @@
                                                 "value": "is_from_channelmanager",
                                                 "label": "channel manager",
                                                 "width": "33%",
-                                                "visible": ["is_from_channelmanager", "=", true],
+                                                "visible": [[true, "=", "env.sale.features.booking.channel_manager"]],
                                                 "widget": {
                                                     "readonly": true
                                                 }
@@ -350,7 +350,7 @@
                                                 "value": "extref_reservation_id",
                                                 "label": "Channel manager ID",
                                                 "width": "33%",
-                                                "visible": ["is_from_channelmanager", "=", true],
+                                                "visible": [[true, "=", "env.sale.features.booking.channel_manager"], ["is_from_channelmanager", "=", true]],
                                                 "widget": {
                                                     "readonly": true
                                                 }
@@ -360,7 +360,7 @@
                                                 "value": "guarantee_id",
                                                 "label": "Guarantee",
                                                 "width": "33%",
-                                                "visible": ["is_from_channelmanager", "=", true],
+                                                "visible": [[true, "=", "env.sale.features.booking.channel_manager"], ["is_from_channelmanager", "=", true]],
                                                 "widget": {
                                                     "readonly": true
                                                 }
