@@ -707,10 +707,10 @@ class BookingLine extends Model {
                 $booking_activities = self::computeLineActivities(
                     $line['service_date'],
                     $line['time_slot_id'],
-                    $line['product_id.product_model_id.is_fullday'],
-                    $line['product_id.product_model_id.has_duration'],
-                    $line['product_id.product_model_id.duration'],
-                    $line['product_id.description']
+                    $line['product_id.product_model_id.is_fullday'] ?? false,
+                    $line['product_id.product_model_id.has_duration'] ?? false,
+                    $line['product_id.product_model_id.duration'] ?? 0,
+                    $line['product_id.description'] ?? ''
                 );
 
                 $main_activity_id = null;
