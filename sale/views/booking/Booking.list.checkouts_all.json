@@ -38,7 +38,10 @@
                 "type": "field",
                 "value": "display_name",
                 "width": "35%",
-                "sortable": true
+                "sortable": true,
+                "widget": {
+                    "wrap": true
+                }
             },
             {
                 "type": "field",
@@ -81,7 +84,10 @@
                 "label": "Type",
                 "value": "type_id",
                 "width": "10%",
-                "readonly": true
+                "readonly": true,
+                "widget": {
+                    "wrap": true
+                }
             },
             {
                 "type": "field",
