@@ -81,27 +81,28 @@ $lodgingBookingPrintBookingFormatMember = function($booking) {
     return $code . ' - ' . $booking['customer_id']['partner_identity_id']['display_name'];
 };
 
-$lodgingBookingPrintAgeRangesText = function($booking, $conection_names) {
+$lodgingBookingPrintAgeRangesText = function($booking, $connection_names) {
     $age_rang_maps = [];
 
-    foreach ($booking['booking_lines_groups_ids'] as $booking_line_group) {
-        if ($booking_line_group['is_sojourn']) {
-            foreach ($booking_line_group['age_range_assignments_ids'] as $age_range_assignment) {
-                $age_range_assignment_code = $age_range_assignment['age_range_id']['id'];
-                if (!isset($age_rang_maps[$age_range_assignment_code])) {
-                    $age_rang_maps[$age_range_assignment_code] = [
-                        'age_range' => $age_range_assignment['age_range_id']['name'],
-                        'qty' => 0
-                    ];
-                }
-                $age_rang_maps[$age_range_assignment_code]['qty'] += $age_range_assignment['qty'];
+    foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
+        if(!$booking_line_group['is_sojourn'] || $booking_line_group['group_type'] !== 'sojourn') {
+            continue;
+        }
+        foreach($booking_line_group['age_range_assignments_ids'] as $age_range_assignment) {
+            $age_range_assignment_code = $age_range_assignment['age_range_id']['id'];
+            if(!isset($age_rang_maps[$age_range_assignment_code])) {
+                $age_rang_maps[$age_range_assignment_code] = [
+                    'age_range' => $age_range_assignment['age_range_id']['name'],
+                    'qty'       => 0
+                ];
             }
+            $age_rang_maps[$age_range_assignment_code]['qty'] += $age_range_assignment['qty'];
         }
     }
 
-    $parts = array_map(fn($item) => $item['qty'] . ' ' . strtolower($item['age_range']), $age_rang_maps);
+    $parts = array_map(function($item) { return $item['qty'] . ' ' . strtolower($item['age_range']); }, $age_rang_maps);
     $last = array_pop($parts);
-    return count($parts) ? implode(', ', $parts) . ' ' . $conection_names[0] . ' ' . $last : $last;
+    return count($parts) ? implode(', ', $parts) . ' ' . $connection_names[0] . ' ' . $last : $last;
 };
 /*
     Retrieve the requested template
@@ -227,6 +228,7 @@ $fields = [
         'id',
         'name',
         'has_pack',
+        'group_type',
         'is_locked',
         'is_sojourn',
         'pack_id'  => ['label'],
@@ -462,7 +464,7 @@ $conection_languages = [
     ['fr' => 'et', 'en' => 'and', 'nl' => 'en'],
 ];
 
-$conection_names = array_map(function($item) use ($params) {
+$connection_names = array_map(function($item) use ($params) {
     return $item[$params['lang']];
 }, $conection_languages);
 
@@ -568,7 +570,7 @@ if($booking['center_id']['template_category_id']) {
 
             $value = str_replace('{date_to}', $date_to, $value);
 
-            $text_pers = $lodgingBookingPrintAgeRangesText($booking, $conection_names);
+            $text_pers = $lodgingBookingPrintAgeRangesText($booking, $connection_names);
             $value = str_replace('{nb_pers}', $text_pers, $value);
 
             $values['header_html'] = $value;
