@@ -22,8 +22,8 @@ export interface BookedServicesDisplaySettings {
     meals_show: boolean;
     accommodations_folded: boolean;
     meals_prefs_folded: boolean;
-    meals_prefs_show: boolean;
-    activities_show: boolean;
+    meals_prefs_enabled: boolean;
+    activities_enabled: boolean;
 }
 
 @Component({
@@ -45,8 +45,8 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
         meals_show: true,
         accommodations_folded: true,
         meals_prefs_folded: true,
-        meals_prefs_show: true,
-        activities_show: true
+        meals_prefs_enabled: true,
+        activities_enabled: true
     };
 
     public ready: boolean = false;
@@ -178,11 +178,13 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
                 products_folded: 'sale.features.ui.booking.products_folded',
                 accommodations_folded: 'sale.features.ui.booking.accommodations_folded',
                 activities_folded: 'sale.features.ui.booking.activities_folded',
-                activities_show: 'sale.features.booking.activity',
+                activities_enabled: 'sale.features.booking.activity',
+                activities_visible: 'sale.features.ui.booking.activities_visible',
                 meals_folded: 'sale.features.ui.booking.meals_folded',
                 meals_show: 'sale.features.booking.meal',
                 meals_prefs_folded: 'sale.features.ui.booking.meal_preferences_folded',
-                meals_prefs_show: 'sale.features.booking.meal_preferences'
+                meals_prefs_enabled: 'sale.features.booking.meal_preferences',
+                meals_prefs_visible: 'sale.features.ui.booking.meal_preferences_visible'
             };
 
             for(let setting of Object.keys(settings)) {
