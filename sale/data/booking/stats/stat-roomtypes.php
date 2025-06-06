@@ -67,61 +67,58 @@ $result = [];
 
 $property = Property::id($params['property_id'])->read(['id', 'name', 'room_types_ids' => ['id', 'name', 'center_id', 'extref_roomtype_id', 'rental_units_ids']])->first(true);
 
-if(!$property) {
-    throw new Exception('unknown_property', QN_ERROR_UNKNOWN_OBJECT);
-}
+if($property) {
+    foreach($property['room_types_ids'] as $room_type) {
+        // prefill with max value (total)
+        $total = count($room_type['rental_units_ids']);
+        $map_dates_availability = [];
+        for($d = $params['date_from']; $d < $params['date_to']; $d = strtotime('+1 day', $d)) {
+            $date_index = substr(date('c', $d), 0, 10);
+            $map_dates_availability[$date_index] = $total;
+        }
 
-foreach($property['room_types_ids'] as $room_type) {
-    // prefill with max value (total)
-    $total = count($room_type['rental_units_ids']);
-    $map_dates_availability = [];
-    for($d = $params['date_from']; $d < $params['date_to']; $d = strtotime('+1 day', $d)) {
-        $date_index = substr(date('c', $d), 0, 10);
-        $map_dates_availability[$date_index] = $total;
-    }
+        // #memo - this logic is duplicated in `check-contingencies`
 
-    // #memo - this logic is duplicated in `check-contingencies`
+        // #memo - this returns the compacted version of the consumptions (with virtual consumptions that span over several days) holding a date_from and date_to computed fields
+        // #memo - consumptions includes direct occupancy ('book') along with related occupancies (parents - 'part' & children rental units - 'link')
+        $map_existing_consumptions = Consumption::getExistingConsumptions($orm, [$room_type['center_id']], $params['date_from'], $params['date_to']);
 
-    // #memo - this returns the compacted version of the consumptions (with virtual consumptions that span over several days) holding a date_from and date_to computed fields
-    // #memo - consumptions includes direct occupancy ('book') along with related occupancies (parents - 'part' & children rental units - 'link')
-    $map_existing_consumptions = Consumption::getExistingConsumptions($orm, [$room_type['center_id']], $params['date_from'], $params['date_to']);
-
-    foreach($map_existing_consumptions as $rental_unit_id => $dates) {
-        // we consider consumptions relating to rental unit, whatever the type of the consumption
-        if(in_array($rental_unit_id, $room_type['rental_units_ids'])) {
-            foreach($dates as $index => $consumptions) {
-                foreach($consumptions as $consumption) {
-                    for($d = $consumption['date_from']+$consumption['schedule_from']; $d < $consumption['date_to']+$consumption['schedule_to']; $d = strtotime('+1 day', $d)) {
-                        $date_index = substr(date('c', $d), 0, 10);
-                        if(isset($map_dates_availability[$date_index]) && $map_dates_availability[$date_index] > 0) {
-                            --$map_dates_availability[$date_index];
-                            // #todo - this might require a review in case of change in the logic of repairings (the same processing occurs in the planning.calendar.component of the Booking App)
-                            if($consumption['type'] == 'ooo' && $d == $consumption['date_from']+$consumption['schedule_from']) {
-                                $prev_date_index = substr(date('c', strtotime('-1 day', $consumption['date_from']+$consumption['schedule_from'])), 0, 10);
-                                if(isset($map_dates_availability[$prev_date_index]) && $map_dates_availability[$prev_date_index] > 0) {
-                                    --$map_dates_availability[$prev_date_index];
+        foreach($map_existing_consumptions as $rental_unit_id => $dates) {
+            // we consider consumptions relating to rental unit, whatever the type of the consumption
+            if(in_array($rental_unit_id, $room_type['rental_units_ids'])) {
+                foreach($dates as $index => $consumptions) {
+                    foreach($consumptions as $consumption) {
+                        for($d = $consumption['date_from']+$consumption['schedule_from']; $d < $consumption['date_to']+$consumption['schedule_to']; $d = strtotime('+1 day', $d)) {
+                            $date_index = substr(date('c', $d), 0, 10);
+                            if(isset($map_dates_availability[$date_index]) && $map_dates_availability[$date_index] > 0) {
+                                --$map_dates_availability[$date_index];
+                                // #todo - this might require a review in case of change in the logic of repairings (the same processing occurs in the planning.calendar.component of the Booking App)
+                                if($consumption['type'] == 'ooo' && $d == $consumption['date_from']+$consumption['schedule_from']) {
+                                    $prev_date_index = substr(date('c', strtotime('-1 day', $consumption['date_from']+$consumption['schedule_from'])), 0, 10);
+                                    if(isset($map_dates_availability[$prev_date_index]) && $map_dates_availability[$prev_date_index] > 0) {
+                                        --$map_dates_availability[$prev_date_index];
+                                    }
                                 }
                             }
-                        }
-                        else {
-                            // unexpected situation (date_index is not part of the range) : ignore
+                            else {
+                                // unexpected situation (date_index is not part of the range) : ignore
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
-    foreach($map_dates_availability as $date_index => $count_available) {
-        $result[] = [
-            'property'      => $property['name'],
-            'date'          => $date_index,
-            'room_type'     => $room_type['extref_roomtype_id'].' - '.$room_type['name'],
-            'availability'  => $count_available
-        ];
+        foreach($map_dates_availability as $date_index => $count_available) {
+            $result[] = [
+                'property'      => $property['name'],
+                'date'          => $date_index,
+                'room_type'     => $room_type['extref_roomtype_id'].' - '.$room_type['name'],
+                'availability'  => $count_available
+            ];
+        }
     }
 }
-
 
 $context->httpResponse()
         ->body($result)
