@@ -70,7 +70,7 @@
                                 "context": {
                                     "entity": "identity\\Identity",
                                     "view": "list.default",
-                                    "domain": ["id", "in", [1,2,3,4,100]]
+                                    "domain": ["id", "in", [1,2,3,4]]
                                 }
                             },
                             {
