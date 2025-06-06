@@ -9,8 +9,8 @@
             "help": ""
         },
         "code": {
-            "label": "Code de groupe",
-            "description": "Code unique de regroupement centre (1 chiffre hexa).",
+            "label": "Code équipe de gestion",
+            "description": "Code unique de l'équipe (1 chiffre hexa).",
             "help": ""
         },
         "contacts_ids": {
