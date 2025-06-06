@@ -123,18 +123,19 @@ $lodgingBookingPrintBookingFormatMember = function($booking) {
 $lodgingBookingPrintAgeRangesText = function($booking, $connection_names) {
     $age_rang_maps = [];
 
-    foreach ($booking['booking_lines_groups_ids'] as $booking_line_group) {
-        if ($booking_line_group['is_sojourn']) {
-            foreach ($booking_line_group['age_range_assignments_ids'] as $age_range_assignment) {
-                $age_range_assignment_code = $age_range_assignment['age_range_id']['id'];
-                if (!isset($age_rang_maps[$age_range_assignment_code])) {
-                    $age_rang_maps[$age_range_assignment_code] = [
-                        'age_range' => $age_range_assignment['age_range_id']['name'],
-                        'qty'       => 0
-                    ];
-                }
-                $age_rang_maps[$age_range_assignment_code]['qty'] += $age_range_assignment['qty'];
+    foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
+        if(!$booking_line_group['is_sojourn'] || $booking_line_group['group_type'] !== 'sojourn') {
+            continue;
+        }
+        foreach ($booking_line_group['age_range_assignments_ids'] as $age_range_assignment) {
+            $age_range_assignment_code = $age_range_assignment['age_range_id']['id'];
+            if (!isset($age_rang_maps[$age_range_assignment_code])) {
+                $age_rang_maps[$age_range_assignment_code] = [
+                    'age_range' => $age_range_assignment['age_range_id']['name'],
+                    'qty'       => 0
+                ];
             }
+            $age_rang_maps[$age_range_assignment_code]['qty'] += $age_range_assignment['qty'];
         }
     }
 
@@ -237,6 +238,7 @@ $fields = [
             'id',
             'name',
             'has_pack',
+            'group_type',
             'is_locked',
             'is_sojourn',
             'pack_id'  => ['label'],
