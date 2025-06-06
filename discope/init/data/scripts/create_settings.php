@@ -36,9 +36,11 @@ Setting::assert_value('sale', 'features', 'ui.booking.activities_folded', true);
 Setting::assert_value('sale', 'features', 'ui.booking.accommodations_folded', true);
 Setting::assert_value('sale', 'features', 'ui.booking.meals_folded', true);
 Setting::assert_value('sale', 'features', 'ui.booking.meal_preferences_folded', true);
+Setting::assert_value('sale', 'features', 'ui.booking.activities_visible', true);
+Setting::assert_value('sale', 'features', 'ui.booking.meal_preferences_visible', true);
 Setting::assert_value('sale', 'features', 'templates.quote.consumption_table', true);
 Setting::assert_value('sale', 'features', 'templates.quote.activities', false);
-Setting::assert_value('sale', 'features', 'payment.remind.active.1', 1);                                // Rappel de paiement actif
+Setting::assert_value('sale', 'features', 'payment.remind.active.1', 1);
 // === discope.features ===
 Setting::assert_value('discope', 'features', 'has_custom_package', false);
 Setting::assert_value('discope', 'features', 'custom_package');
