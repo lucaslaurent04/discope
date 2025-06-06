@@ -96,7 +96,7 @@ $orm->update(Booking::getType(), $booking_id, [
         'status'                => 'quote',
         'date_from'             => strtotime($params['fields']['date_from']),
         'date_to'               => strtotime($params['fields']['date_to']),
-        'has_tour_operator'     => $params['fields']['has_tour_operator'] ?? false,
+        'has_tour_operator'     => ($params['fields']['has_tour_operator'] ?? '') === 'true',
         'tour_operator_id'      => $params['fields']['tour_operator_id'] ?? null,
         'tour_operator_ref'     => $params['fields']['tour_operator_ref'] ?? ''
     ]);
