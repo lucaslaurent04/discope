@@ -768,6 +768,7 @@ class Identity extends Model {
                 $result[$id] = (string) $id;
             }
             else {
+                $accounting_account = null;
                 do {
                     Setting::set_value('identity', 'accounting', 'customer_account.sequence', $sequence_account + 1);
 
@@ -780,8 +781,12 @@ class Identity extends Model {
                     ++$sequence_account;
                 }
                 while($existingIdentity);
+
+                if($accounting_account) {
+                    $result[$id] = $accounting_account;
+                }
             }
-            $result[$id] = $accounting_account;
+
         }
         return $result;
     }
