@@ -87,7 +87,7 @@
             <div class="group-liner-part" style="width: 15%;">
                 <div *ngIf="!groupNbPersOpen" style="white-space: nowrap; overflow: hidden;" (click)="onclickGroupNbPers()">{{instance.nb_pers}} pers.</div>
                 <div *ngIf="groupNbPersOpen" style="position: relative;">
-                    <mat-form-field *ngIf="instance.age_range_assignments_ids?.length <= 1" style="transform: translateY(-18px); padding: 0;">
+                    <mat-form-field style="transform: translateY(-18px); padding: 0;">
                         <input
                             type="number"
                             matInput
@@ -97,7 +97,6 @@
                             [value]="instance.nb_pers"
                             [formControl]="vm.participants_count.formControl">
                     </mat-form-field>
-                    <div *ngIf="instance.age_range_assignments_ids?.length > 1" style="margin-left: auto; white-space: nowrap; overflow: hidden;">{{ instance.nb_pers }}</div>
                 </div>
             </div>
             <!-- price -->
@@ -160,7 +159,7 @@
                     </div>
 
                     <!-- participants -->
-                    <div class="cell" style="flex: 0.5 1 0; max-width: 155px; min-width: 60px;">
+                    <div class="cell" style="flex: 1; max-width: 100px; min-width: 60px; display: flex; align-items: center;">
 
                         <mat-form-field *ngIf="instance.age_range_assignments_ids?.length <= 1">
                             <mat-label>Participants</mat-label>
@@ -175,7 +174,7 @@
                                 Doit être supérieur à 0.
                             </mat-error>
                         </mat-form-field>
-                        <div *ngIf="instance.age_range_assignments_ids?.length > 1">{{ instance.nb_pers }}</div>
+                        <div *ngIf="instance.age_range_assignments_ids?.length > 1" style="width: 100%; text-align: right;" >{{ instance.nb_pers }} pers.</div>
 
                     </div>
 
