@@ -117,7 +117,8 @@
                             (keyup.enter)="onblurGroupNbPers()"
                             (keyup.esc)="onblurGroupNbPers()"
                             [value]="instance.nb_pers"
-                            [formControl]="vm.participants_count.formControl">
+                            [formControl]="vm.participants_count.formControl"
+                            [disabled]="instance.age_range_assignments_ids?.length > 1">
                     </mat-form-field>
                 </div>
             </div>
@@ -190,7 +191,8 @@
                                 matInput
                                 (blur)="onchangeNbPers()"
                                 [value]="instance.nb_pers"
-                                [formControl]="vm.participants_count.formControl">
+                                [formControl]="vm.participants_count.formControl"
+                                [disabled]="instance.age_range_assignments_ids?.length > 1">
                             <mat-hint>Nombre de personnes</mat-hint>
                             <mat-error *ngIf="vm.participants_count.formControl.hasError('required')">
                                 Doit être supérieur à 0.
