@@ -829,7 +829,9 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     }
 
     public onclickGroupNbPers() {
-        this.groupNbPersOpen = true;
+        if(this.instance.age_range_assignments_ids?.length <= 1) {
+            this.groupNbPersOpen = true;
+        }
     }
 
     public onblurGroupNbPers() {
