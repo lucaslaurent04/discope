@@ -1756,6 +1756,9 @@ class BookingLine extends Model {
             'product_model_id'      => ['type', 'service_type', 'is_repeatable', 'schedule_offset']
         ]);
         foreach($self as $id => $booking_line) {
+            if(!$booking_line['product_model_id']) {
+                continue;
+            }
             $product_model = $booking_line['product_model_id'];
             if(
                 $product_model['type'] === 'service'
@@ -1779,6 +1782,9 @@ class BookingLine extends Model {
         $result = [];
         $self->read(['product_model_id' => ['type', 'service_type', 'time_slot_id', 'time_slots_ids']]);
         foreach($self as $id => $booking_line) {
+            if(!$booking_line['product_model_id']) {
+                continue;
+            }
             $product_model = $booking_line['product_model_id'];
             if($product_model['type'] !== 'service' || $product_model['service_type'] !== 'schedulable') {
                 continue;

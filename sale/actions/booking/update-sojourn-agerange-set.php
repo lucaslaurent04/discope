@@ -164,7 +164,7 @@ if($group['has_pack']) {
 $bookingLines = BookingLine::search(['booking_line_group_id', '=', $bookingLineGroup['id']])->read(['product_id' => ['has_age_range', 'age_range_id']]);
 foreach($bookingLines as $booking_line_id => $bookingLine) {
     if(!$bookingLine['product_id']['has_age_range'] || $bookingLine['product_id']['age_range_id'] === $ageRangeAssignment['age_range_id']) {
-        BookingLine::refreshQty($om, $booking_line_id);
+        BookingLine::refreshQty($orm, $booking_line_id);
     }
 }
 
