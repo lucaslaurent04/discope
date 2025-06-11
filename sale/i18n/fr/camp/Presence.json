@@ -19,13 +19,13 @@
             "help": ""
         },
         "am_daycare": {
-            "label": "Guarderie matin",
-            "description": "L'enfant est-il en guarderie le matin avant le camp.",
+            "label": "Garderie matin",
+            "description": "L'enfant est-il en garderie le matin avant le camp.",
             "help": ""
         },
         "pm_daycare": {
-            "label": "Guarderie soir",
-            "description": "L'enfant est-il en guarderie le soir après le camp.",
+            "label": "Garderie soir",
+            "description": "L'enfant est-il en garderie le soir après le camp.",
             "help": ""
         }
     },

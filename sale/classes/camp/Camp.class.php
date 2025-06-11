@@ -113,7 +113,8 @@ class Camp extends Model {
                     'circus',
                     'culture',
                     'environment',
-                    'horse-riding'
+                    'horse-riding',
+                    'recreation'
                 ],
                 'description'       => "Type of camp.",
                 'default'           => 'sport'
