@@ -91,15 +91,16 @@ if(!$age_range) {
 }
 
 // read Age range assignment object
-$age_range_assignment = BookingLineGroupAgeRangeAssignment::id($params['age_range_assignment_id'])
+$ageRangeAssignment = BookingLineGroupAgeRangeAssignment::id($params['age_range_assignment_id'])
     ->read([
         'id',
         'name',
-        'qty'
+        'qty',
+        'age_range_id'
     ])
     ->first(true);
 
-if(!$age_range_assignment) {
+if(!$ageRangeAssignment) {
     throw new Exception("unknown_age_range_assignment", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
@@ -155,9 +156,18 @@ Booking::refreshNbPers($orm, $group['booking_id']['id']);
 // #memo - this might create new groups
 Booking::refreshAutosaleProducts($orm, $group['booking_id']['id']);
 
+// #memo - only all-ages lines and lines specific to the changed age range are impacted
+/*
 if($group['has_pack']) {
     // append/refresh lines based on pack configuration
     BookingLineGroup::refreshPack($orm, $group['id']);
+}
+*/
+$bookingLines = BookingLine::search(['booking_line_group_id', '=', $bookingLineGroup['id']])->read(['product_id' => ['has_age_range', 'age_range_id']]);
+foreach($bookingLines as $booking_line_id => $bookingLine) {
+    if(!$bookingLine['product_id']['has_age_range'] || $bookingLine['product_id']['age_range_id'] === $ageRangeAssignment['age_range_id']) {
+        BookingLine::refreshQty($orm, $booking_line_id);
+    }
 }
 
 // #memo - this might create new lines
