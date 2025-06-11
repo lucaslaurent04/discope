@@ -83,8 +83,8 @@
             "description": "Enfant présent le 5ème jour du camp."
         },
         "daycare_day_1": {
-            "label": "Guarderie jour 1",
-            "description": "Guarderie de l'enfant pour le 1er jour.",
+            "label": "Garderie jour 1",
+            "description": "Garderie de l'enfant pour le 1er jour.",
             "selection": {
                 "none": "Aucune",
                 "am": "Matin",
@@ -93,8 +93,8 @@
             }
         },
         "daycare_day_2": {
-            "label": "Guarderie jour 2",
-            "description": "Guarderie de l'enfant pour le 2ème jour.",
+            "label": "Garderie jour 2",
+            "description": "Garderie de l'enfant pour le 2ème jour.",
             "selection": {
                 "none": "Aucune",
                 "am": "Matin",
@@ -103,8 +103,8 @@
             }
         },
         "daycare_day_3": {
-            "label": "Guarderie jour 3",
-            "description": "Guarderie de l'enfant pour le 3ème jour.",
+            "label": "Garderie jour 3",
+            "description": "Garderie de l'enfant pour le 3ème jour.",
             "selection": {
                 "none": "Aucune",
                 "am": "Matin",
@@ -113,8 +113,8 @@
             }
         },
         "daycare_day_4": {
-            "label": "Guarderie jour 4",
-            "description": "Guarderie de l'enfant pour le 4ème jour.",
+            "label": "Garderie jour 4",
+            "description": "Garderie de l'enfant pour le 4ème jour.",
             "selection": {
                 "none": "Aucune",
                 "am": "Matin",
@@ -123,8 +123,8 @@
             }
         },
         "daycare_day_5": {
-            "label": "Guarderie jour 5",
-            "description": "Guarderie de l'enfant pour le 5ème jour.",
+            "label": "Garderie jour 5",
+            "description": "Garderie de l'enfant pour le 5ème jour.",
             "selection": {
                 "none": "Aucune",
                 "am": "Matin",
@@ -205,7 +205,7 @@
                     "label": "Réductions"
                 },
                 "section.daycare": {
-                    "label": "Guarderie"
+                    "label": "Garderie"
                 },
                 "section.child-remarks": {
                     "label": "Remarques enfant"
