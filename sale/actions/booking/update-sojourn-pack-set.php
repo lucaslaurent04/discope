@@ -81,21 +81,24 @@ if(!$pack) {
 // they need to be disabled here to prevent deep cycling that can lead to performance issues.
 $orm->disableEvents();
 
-BookingLineGroup::id($group['id'])->update([
+BookingLineGroup::id($group['id'])
+    ->update([
         'has_pack' => true,
         'pack_id' => $params['pack_id']
     ]);
 
 // if group has default name : update group name based on pack
 if(strpos($group['name'], 'Services ') === 0 && isset($pack['product_model_id']['name'])) {
-    BookingLineGroup::id($group['id'])->update([
+    BookingLineGroup::id($group['id'])
+        ->update([
             'name' => $pack['product_model_id']['name']
         ]);
 }
 
 // update date_to according to pack duration (if set)
 if($pack['product_model_id']['has_duration']) {
-    BookingLineGroup::id($group['id'])->update([
+    BookingLineGroup::id($group['id'])
+        ->update([
             'date_to' =>  $group['date_from'] + ($pack['product_model_id']['duration'] * 60*60*24)
         ]);
     BookingLineGroup::refreshNbNights($orm, $group['id']);
@@ -103,9 +106,10 @@ if($pack['product_model_id']['has_duration']) {
 }
 
 if($pack['product_model_id']['qty_accounting_method'] == 'accomodation' && $pack['product_model_id']['capacity'] > $group['nb_pers']) {
-        BookingLineGroup::id($group['id'])->update([
-            'nb_pers' =>  $pack['product_model_id']['capacity']
-        ]);
+        BookingLineGroup::id($group['id'])
+            ->update([
+                'nb_pers' =>  $pack['product_model_id']['capacity']
+            ]);
     Booking::refreshNbPers($orm, $group['booking_id']['id']);
 }
 
