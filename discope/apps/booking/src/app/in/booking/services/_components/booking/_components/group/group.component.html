@@ -100,6 +100,10 @@
                     </mat-form-field>
                 </div>
             </div>
+            <div style="display: none;">
+                Disabled ? {{ instance.age_range_assignments_ids?.length > 1 }}
+                ({{ instance.age_range_assignments_ids?.length }})
+            </div>
             <!-- price -->
             <div class="group-liner-part" style="width: 10%; text-align: right;">
                 <div style="margin-left: auto; white-space: nowrap; overflow: hidden;">{{ instance?.price ?? 0 | number : '1.2-2' }}€</div>
