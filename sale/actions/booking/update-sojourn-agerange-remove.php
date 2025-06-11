@@ -94,6 +94,7 @@ if(!$ageRangeAssignment) {
 */
 $map_booking_lines_qty_vars = [];
 $bookingLineGroup = BookingLineGroup::id($params['id'])->read(['nb_pers', 'booking_lines_ids' => ['qty_accounting_method', 'qty', 'qty_vars']])->first();
+$original_nb_pers = $bookingLineGroup['nb_pers'];
 foreach($bookingLineGroup['booking_lines_ids'] as $booking_line_id => $bookingLine) {
     if($bookingLine['qty_accounting_method'] !== 'person') {
         continue;
@@ -105,7 +106,7 @@ foreach($bookingLineGroup['booking_lines_ids'] as $booking_line_id => $bookingLi
             $qty_vars[$i] = false;
         }
         else {
-            $qty_vars[$i] = $bookingLineGroup['nb_pers'] + $qty_var;
+            $qty_vars[$i] = $original_nb_pers + $qty_var;
         }
     }
     $map_booking_lines_qty_vars[$booking_line_id] = $qty_vars;
@@ -180,7 +181,7 @@ $orm->enableEvents();
     #memo - qty_vars only applies for booking lines with accounting_method == 'person'
     For each line, force specific days to previously manually set value, if any
 */
-$bookingLineGroup = BookingLineGroup::id($params['id'])->read(['nb_pers', 'booking_lines_ids' => ['qty', 'qty_vars']])->first();
+$bookingLineGroup = BookingLineGroup::id($params['id'])->read(['booking_lines_ids' => ['qty', 'qty_vars']])->first();
 foreach($bookingLineGroup['booking_lines_ids'] as $booking_line_id => $bookingLine) {
     if(!isset($map_booking_lines_qty_vars[$booking_line_id])) {
         continue;
@@ -188,9 +189,8 @@ foreach($bookingLineGroup['booking_lines_ids'] as $booking_line_id => $bookingLi
     $new_qty_vars = json_decode($bookingLine['qty_vars']);
     $qty_vars = $map_booking_lines_qty_vars[$booking_line_id];
     foreach($qty_vars as $i => $qty_var) {
-        $new_qty_var = $new_qty_vars[$i];
         if($qty_var !== false) {
-            $new_qty_vars[$i] = $qty_var - $bookingLineGroup['nb_pers'];
+            $new_qty_vars[$i] = $qty_var - $original_nb_pers;
         }
     }
     BookingLine::id($booking_line_id)->update(['qty_vars' => json_encode($new_qty_vars)]);
