@@ -6,6 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 use sale\booking\Booking;
+use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\booking\BookingLineGroupAgeRangeAssignment;
 use sale\customer\AgeRange;
@@ -57,16 +58,7 @@ $group = BookingLineGroup::id($params['id'])
         'booking_id' => ['id', 'status'],
         'age_range_assignments_ids'
     ])
-    ->first(true);
-
-// read Age range object
-$age_range_assignment = BookingLineGroupAgeRangeAssignment::id($params['age_range_assignment_id'])
-    ->read([
-        'id',
-        'name',
-        'qty'
-    ])
-    ->first(true);
+    ->first();
 
 if(!$group) {
     throw new Exception("unknown_sojourn", EQ_ERROR_UNKNOWN_OBJECT);
@@ -80,7 +72,17 @@ if(!in_array($group['booking_id']['status'], ['quote', 'checkedout']) && !$group
     throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
-if(!$age_range_assignment) {
+// read Age range object
+$ageRangeAssignment = BookingLineGroupAgeRangeAssignment::id($params['age_range_assignment_id'])
+    ->read([
+        'id',
+        'name',
+        'qty',
+        'age_range_id'
+    ])
+    ->first();
+
+if(!$ageRangeAssignment) {
     throw new Exception("unknown_age_range_assignment", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
@@ -90,11 +92,11 @@ if(!$age_range_assignment) {
 // they need to be disabled here to prevent recursive cycles that could lead to deep cycling issues.
 $orm->disableEvents();
 
-BookingLineGroupAgeRangeAssignment::id($params['age_range_assignment_id'])->delete(true);
+BookingLineGroupAgeRangeAssignment::id($ageRangeAssignment['id'])->delete(true);
 
 BookingLineGroup::id($group['id'])
     ->update([
-        'nb_pers' => $group['nb_pers'] - $age_range_assignment['qty']
+        'nb_pers' => $group['nb_pers'] - $ageRangeAssignment['qty']
     ]);
 
 // #memo - this impacts autosales at booking level
@@ -103,9 +105,18 @@ Booking::refreshNbPers($orm, $group['booking_id']['id']);
 // #memo - this might create new groups
 Booking::refreshAutosaleProducts($orm, $group['booking_id']['id']);
 
+// #memo - whether we have a pack or not, the lines relating to the deleted age range are no longer relevant
+/*
 if($group['has_pack']) {
     // append/refresh lines based on pack configuration
     BookingLineGroup::refreshPack($orm, $group['id']);
+}
+*/
+$bookingLines = BookingLine::search(['booking_line_group_id', '=', $group['id']])->read(['product_id' => ['has_age_range', 'age_range_id']]);
+foreach($bookingLines as $booking_line_id => $bookingLine) {
+    if($bookingLine['product_id']['has_age_range'] && $bookingLine['product_id']['age_range_id'] === $ageRangeAssignment['age_range_id']) {
+        BookingLine::id($booking_line_id)->delete(true);
+    }
 }
 
 // #memo - this might create new lines
@@ -115,10 +126,10 @@ BookingLineGroup::refreshAutosaleProducts($orm, $group['id']);
 
 /*
     #memo - adapters depend on date_from, nb_nights, nb_pers, nb_children
-        rate_class_id,
-        center_id.discount_list_category_id,
-        center_office_id.freebies_manual_assignment,
-    and are applied both on group and each of its lines
+                rate_class_id,
+                center_id.discount_list_category_id,
+                center_office_id.freebies_manual_assignment,
+        and are applied both on group and each of its lines
 */
 BookingLineGroup::refreshPriceAdapters($orm, $group['id']);
 
