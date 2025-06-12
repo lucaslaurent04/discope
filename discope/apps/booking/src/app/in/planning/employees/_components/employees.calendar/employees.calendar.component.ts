@@ -261,10 +261,17 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return activities.find((a: any) => a.is_exclusive) !== undefined;
     }
 
-    public getActivities(partner: Partner, day: Date, time_slot: string): any {
-        if(this.activities[partner.id] ?? false) {
-            let date_index = this.calcDateIndex(day);
-            return (this.activities[partner.id]?.[date_index]?.[time_slot] ?? []).sort((a: any, b: any) => {
+    public getActivities(partner: Partner, day: Date, time_slot: string): any[] {
+        if(!this.activities?.[partner.id]) {
+            return [];
+        }
+
+        let date_index = this.calcDateIndex(day);
+        const allActivities = this.activities[partner.id]?.[date_index]?.[time_slot] ?? [];
+
+        return allActivities
+            .filter((a: any) => !a.is_partner_event)
+            .sort((a: any, b: any) => {
                 if(a.schedule_from < b.schedule_from) {
                     return -1;
                 }
@@ -273,12 +280,22 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 }
                 return 0;
             });
-        }
-        return [];
     }
 
-    public getDescription(activity: any): string {
+    public getPartnerEvents(partner: Partner, day: Date, time_slot: string): any[] {
+        if(!this.activities?.[partner.id]) {
+            return [];
+        }
+
+        let date_index = this.calcDateIndex(day);
+        const allActivities = this.activities[partner.id]?.[date_index]?.[time_slot] ?? [];
+
+        return allActivities.filter((a: any) => a.is_partner_event);
+    }
+
+    public getActivityDescription(activity: any): string {
         if(activity.booking_id) {
+            // booking activity
             let group_details = `<dt>Groupe ${activity.group_num}`;
             if(activity.age_range_assignments_ids.length === 1) {
                 const assign = activity.age_range_assignments_ids[0];
@@ -298,30 +315,59 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<dt>Handicap : <b>${activity.booking_line_group_id.has_person_with_disability ? 'oui' : 'non'}</b></dt>` +
                 `<dt>Séjour du ${activity.booking_id.date_from} au ${activity.booking_id.date_to}</dt>` +
                 `<dt>${activity.booking_id.nb_pers} personnes</dt>` +
-                `<br />` +
+                `<br>` +
                 `<dt>${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
+                `<br>` +
+                `<dt>${this.humanReadableSchedule(activity.schedule_from)} - ${this.humanReadableSchedule(activity.schedule_to)}</dt>` +
                 '</dl>';
         }
-
-        if(activity.camp_id && !activity.is_partner_event) {
+        else {
+            // camp activity
             return '<dl>' +
                 `<dt>${activity.camp_id.short_name}</dt>` +
                 `<dt>Groupe ${activity.group_num}, ${activity.camp_id.enrollments_qty} personne${activity.camp_id.enrollments_qty > 1 ? 's' : ''} (${activity.camp_id.min_age} - ${activity.camp_id.max_age})</dt>` +
                 `<dt>Camp du ${activity.camp_id.date_from} au ${activity.camp_id.date_to}</dt>` +
-                `<br />` +
+                `<br>` +
                 `<dt>${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
+                `<br>` +
+                `<dt>${this.humanReadableSchedule(activity.schedule_from)} - ${this.humanReadableSchedule(activity.schedule_to)}</dt>` +
                 '</dl>';
         }
+    }
 
-        return '<dl>' +
-            (activity.camp_id ? `<dt>${activity.camp_id.short_name}</dt>` : '') +
-            (activity.camp_id ? `<dt>Groupe ${activity.group_num}, ${activity.camp_id.enrollments_qty} personne${activity.camp_id.enrollments_qty > 1 ? 's' : ''} (${activity.camp_id.min_age} - ${activity.camp_id.max_age})</dt>` : '') +
-            (activity.camp_id ? `<dt>Camp du ${activity.camp_id.date_from} au ${activity.camp_id.date_to}</dt>` : '') +
-            (activity.camp_id ? `<br />` : '') +
-            `<dt>${activity.name}</dt>` +
-            `<br />` +
-            (activity.description ? `<dt>${activity.description}</dt>` : '') +
-            '</dl>';
+    private humanReadableSchedule(schedule: number) {
+        const hours = Math.floor(schedule / 3600);
+        const minutes = Math.floor((schedule % 3600) / 60);
+        const seconds = schedule % 60;
+
+        return (
+            hours.toString().padStart(2, '0') + ':' +
+            minutes.toString().padStart(2, '0') + ':' +
+            seconds.toString().padStart(2, '0')
+        );
+    }
+
+    public getPartnerEventDescription(partnerEvent: any): string {
+        if(partnerEvent.camp_id) {
+            // auto generated partner event because the partner is responsible for the camp group
+            return '<dl>' +
+                (partnerEvent.camp_id ? `<dt>${partnerEvent.camp_id.short_name}</dt>` : '') +
+                (partnerEvent.camp_id ? `<dt>Groupe ${partnerEvent.group_num}, ${partnerEvent.camp_id.enrollments_qty} personne${partnerEvent.camp_id.enrollments_qty > 1 ? 's' : ''} (${partnerEvent.camp_id.min_age} - ${partnerEvent.camp_id.max_age})</dt>` : '') +
+                (partnerEvent.camp_id ? `<dt>Camp du ${partnerEvent.camp_id.date_from} au ${partnerEvent.camp_id.date_to}</dt>` : '') +
+                (partnerEvent.camp_id ? `<br>` : '') +
+                `<dt>${partnerEvent.name}</dt>` +
+                `<br>` +
+                (partnerEvent.description ? `<dt>${partnerEvent.description}</dt>` : '') +
+                '</dl>';
+        }
+        else {
+            // partner event
+            return '<dl>' +
+                `<dt>${partnerEvent.name}</dt>` +
+                `<br>` +
+                (partnerEvent.description ? `<dt>${partnerEvent.description}</dt>` : '') +
+                '</dl>';
+        }
     }
 
     private async onFiltersChange() {
