@@ -242,11 +242,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return (day.getDay() == 0 || day.getDay() == 6);
     }
 
-    public hasActivity(partner: Partner, day_index: string, time_slot: string, ignore_partner_events = false): boolean {
+    public hasActivity(partner: Partner, day_index: string, time_slot: string): boolean {
         const activities = this.activities[partner.id]?.[day_index]?.[time_slot] ?? [];
-        if(!ignore_partner_events) {
-            return activities.length > 0;
-        }
 
         for(let activity of activities) {
             if(!activity?.is_partner_event) {
@@ -256,10 +253,26 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return false;
     }
 
+    public hasExclusiveActivity(employee: Employee, day_index: string, time_slot: string) {
+        let activities = this.activities[employee.id]?.[day_index]?.[time_slot] ?? [];
+
+        activities = activities.filter((a: any) => !a.is_partner_event);
+
+        return activities.find((a: any) => a.is_exclusive) !== undefined;
+    }
+
     public getActivities(partner: Partner, day: Date, time_slot: string): any {
         if(this.activities[partner.id] ?? false) {
             let date_index = this.calcDateIndex(day);
-            return this.activities[partner.id]?.[date_index]?.[time_slot] ?? [];
+            return (this.activities[partner.id]?.[date_index]?.[time_slot] ?? []).sort((a: any, b: any) => {
+                if(a.schedule_from < b.schedule_from) {
+                    return -1;
+                }
+                if(a.schedule_from > b.schedule_from) {
+                    return 1;
+                }
+                return 0;
+            });
         }
         return [];
     }
@@ -396,7 +409,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         let months:any = {};
         // pass-1 assign dates
 
-        for (let i = 0; i < this.params.duration; i++) {
+        for(let i = 0; i < this.params.duration; i++) {
             let date = new Date(this.params.date_from.getTime());
             date.setDate(date.getDate() + i);
             this.headers.days.push(date);
@@ -457,6 +470,12 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public onhoverActivity(activity: any) {
+        if(this.currentDraggedActivity) {
+            this.hovered_activity = null;
+            this.hoveredActivityTimeout = null;
+            return;
+        }
+
         if(this.hoveredActivityTimeout === null && activity) {
             this.hovered_activity = activity;
         }
@@ -559,10 +578,11 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             }
         }
 
-        // Check that the employee hasn't been assigned an activity yet
-        if(this.hasActivity(employee, date_index, time_slot, true)) {
+        // Check that the employee hasn't been assigned an exclusive activity yet
+        if(this.hasExclusiveActivity(employee, date_index, time_slot)) {
             return false;
         }
+
         return true;
     }
 

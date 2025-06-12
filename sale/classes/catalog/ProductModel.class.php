@@ -352,6 +352,14 @@ class ProductModel extends Model {
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
             ],
 
+            'is_exclusive' => [
+                'type'              => 'boolean',
+                'description'       => "Is the activity exclusive to the employee's time slot?",
+                'help'              => "Multiple non exclusive activities can be assigned to an employee's time slot.",
+                'default'           => true,
+                'visible'           => ['is_activity', '=', true]
+            ],
+
             'transport_product_model_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\catalog\ProductModel',

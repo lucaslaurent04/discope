@@ -248,6 +248,15 @@ class BookingActivity extends Model {
                 'function'          => 'calcScheduleTo'
             ],
 
+            'is_exclusive' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => "Is the activity exclusive to the employee's time slot?",
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['product_model_id' => 'is_exclusive']
+            ],
+
             'rental_unit_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'realestate\RentalUnit',
@@ -261,7 +270,7 @@ class BookingActivity extends Model {
                 'description'       => "Does the activity need an employee to be assigned to it?",
                 'store'             => true,
                 'instant'           => true,
-                'relation'          => ['product_model_id' => ['has_staff_required']]
+                'relation'          => ['product_model_id' => 'has_staff_required']
             ],
 
             'has_provider' => [
@@ -270,7 +279,7 @@ class BookingActivity extends Model {
                 'description'       => "Does the activity need one or multiple providers to be assigned to it?",
                 'store'             => true,
                 'instant'           => true,
-                'relation'          => ['product_model_id' => ['has_provider']]
+                'relation'          => ['product_model_id' => 'has_provider']
             ],
 
             'group_num' => [
@@ -732,12 +741,13 @@ class BookingActivity extends Model {
             $activities_ids = BookingActivity::search([
                 ['activity_date', '=', $activity_date],
                 ['time_slot_id', '=', $time_slot_id],
-                ['employee_id', '=', $employee_id]
+                ['employee_id', '=', $employee_id],
+                ['is_exclusive', '=', true]
             ])
                 ->ids();
 
             if(!empty($activities_ids)) {
-                return ['employee_id' => ['already_assigned' => "An activity is already assigned to this user for that moment."]];
+                return ['employee_id' => ['already_assigned' => "An exclusive activity is already assigned to this employee for that moment."]];
             }
 
             // check that a group doesn't have two activities at the same time (check done in BookingLine if linked to one)
