@@ -282,6 +282,17 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             });
     }
 
+    public hasPartnerEvent(partner: Partner, day_index: string, time_slot: string): boolean {
+        const activities = this.activities[partner.id]?.[day_index]?.[time_slot] ?? [];
+
+        for(let activity of activities) {
+            if(activity?.is_partner_event) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public getPartnerEvents(partner: Partner, day: Date, time_slot: string): any[] {
         if(!this.activities?.[partner.id]) {
             return [];
@@ -478,7 +489,6 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 }
             );
         }
-
     }
 
     /**
@@ -488,9 +498,9 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     public onmouseenterTableCell(event: Event | MouseEvent, index: number, employee: Employee, date_index: string, time_slot: string) {
         this.hover_row_index = index;
         if(this.currentDraggedActivity) {
-            const element = event.target as HTMLElement;
             if(this.isDroppable(this.currentDraggedActivity, employee, date_index, time_slot)) {
-                element.style.setProperty('background-color', '#ff4081', 'important');
+                const element = event.target as HTMLElement;
+                element.classList.add('cell-droppable');
             }
         }
     }
@@ -498,7 +508,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     public onmouseleaveTableCell(event: Event | MouseEvent) {
         this.hover_row_index = -1;
         const element = event.target as HTMLElement;
-        element.style.setProperty('background-color', '');
+        element.classList.remove('cell-droppable');
     }
 
     public ondoubleclickTableCell(day: Date, partner: any, timeSlotCode: 'AM'|'PM'|'EV') {
@@ -758,8 +768,12 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 }
             }
             this.currentDraggedActivity = null;
-        }
 
+            const elements = Array.from(document.getElementsByClassName('cell-droppable'));
+            for (let element of elements) {
+                element.classList.remove('cell-droppable');
+            }
+        }
     }
 
     public trackByActivity(index: number, activity: any): string {

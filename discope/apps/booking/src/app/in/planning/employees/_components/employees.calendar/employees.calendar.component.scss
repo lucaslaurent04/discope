@@ -111,6 +111,12 @@
                 tr {
                     td {
                         &.cell-days {
+                            &.cell-droppable {
+                                .cell-activities {
+                                    display: none;
+                                }
+                            }
+
                             .cell-activities {
                                 display: flex;
                                 flex-direction: row;
@@ -121,6 +127,19 @@
                                 display: flex;
                                 flex-direction: column;
                                 gap: 1px;
+                            }
+
+                            .drop-zone {
+                                display: none;
+                                height: var(--rows_height);
+                                background-color: #ff4081 !important;
+                            }
+
+                            &.cell-droppable {
+                                .drop-zone {
+                                    display: flex;
+                                    flex-direction: row;
+                                }
                             }
                         }
                         .cdk-drag-placeholder {
