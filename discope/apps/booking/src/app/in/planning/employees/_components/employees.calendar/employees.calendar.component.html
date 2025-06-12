@@ -118,14 +118,7 @@
                                             (cdkDragStarted)="onDragStart(activity)"
                                         ></planning-employees-calendar-activity>
 
-                                        <div *ngIf="hovered_activity == activity"
-                                             class="cell-hint"
-                                             [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -274) + 'px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'"
-                                             #vDescription="var"
-                                             [var]="{value: getActivityDescription(activity)}"
-                                             (mouseenter)="onhoverActivity(activity)"
-                                             (mouseleave)="onhoverActivity(null)"
-                                        >
+                                        <div *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -274) + 'px) translateY(calc(var(--rows_height) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
                                             <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
                                         </div>
                                     </ng-container>
@@ -143,14 +136,7 @@
                                             (selected)="onSelectedActivity($event)"
                                         ></planning-employees-calendar-activity>
 
-                                        <div *ngIf="hovered_activity == partnerEvent"
-                                             class="cell-hint"
-                                             [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -274) + 'px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'"
-                                             #vDescription="var"
-                                             [var]="{value: getPartnerEventDescription(partnerEvent)}"
-                                             (mouseenter)="onhoverActivity(partnerEvent)"
-                                             (mouseleave)="onhoverActivity(null)"
-                                        >
+                                        <div *ngIf="hovered_activity == partnerEvent" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -274) + 'px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getPartnerEventDescription(partnerEvent)}" (mouseenter)="onhoverActivity(partnerEvent)" (mouseleave)="onhoverActivity(null)">
                                             <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
                                         </div>
                                     </ng-container>
@@ -186,7 +172,7 @@
                                             (cdkDragStarted)="onDragStart(activity)">
                                         </planning-employees-calendar-activity>
 
-                                        <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(16px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                        <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(16px) translateY(calc(var(--rows_height) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
                                             <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
                                         </span>
                                     </ng-container>
@@ -204,14 +190,7 @@
                                             (selected)="onSelectedActivity($event)"
                                         ></planning-employees-calendar-activity>
 
-                                        <div *ngIf="hovered_activity == partnerEvent"
-                                             class="cell-hint"
-                                             [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -274) + 'px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'"
-                                             #vDescription="var"
-                                             [var]="{value: getPartnerEventDescription(partnerEvent)}"
-                                             (mouseenter)="onhoverActivity(partnerEvent)"
-                                             (mouseleave)="onhoverActivity(null)"
-                                        >
+                                        <div *ngIf="hovered_activity == partnerEvent" class="cell-hint" [style]="'transform: translateX(16px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getPartnerEventDescription(partnerEvent)}" (mouseenter)="onhoverActivity(partnerEvent)" (mouseleave)="onhoverActivity(null)">
                                             <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
                                         </div>
                                     </ng-container>
@@ -247,7 +226,7 @@
                                             (cdkDragStarted)="onDragStart(activity)">
                                         </planning-employees-calendar-activity>
 
-                                        <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(16px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                        <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(16px) translateY(calc(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
                                             <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
                                         </span>
                                     </ng-container>
