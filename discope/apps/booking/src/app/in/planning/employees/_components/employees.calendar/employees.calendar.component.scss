@@ -113,6 +113,12 @@
                         &.cell-days {
                             .cell-activities {
                                 display: flex;
+                                flex-direction: row;
+                                gap: 1px;
+                            }
+
+                            .cell-partner-events {
+                                display: flex;
                                 flex-direction: column;
                                 gap: 1px;
                             }
