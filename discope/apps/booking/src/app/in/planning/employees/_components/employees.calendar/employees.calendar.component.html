@@ -108,7 +108,7 @@
                             </div>
 
                             <!-- activities cell -->
-                            <div *ngIf="hasActivity(partner, headers.days_indexes[i], 'AM')" class="cell-activities">
+                            <div *ngIf="hasActivity(partner, headers.days_indexes[i], 'AM')" class="cell-activities" [ngClass]="{ 'space-before': hasSpaceBefore(partner, day, 'AM'), 'space-after': hasSpaceAfter(partner, day, 'AM') }">
                                 <ng-container *ngFor="let activity of getActivities(partner, day, 'AM'); let j = index">
                                     <planning-employees-calendar-activity
                                         [height]="rowsHeight"
@@ -168,7 +168,7 @@
                             </div>
 
                             <!-- activities cell -->
-                            <div *ngIf="hasActivity(partner, headers.days_indexes[i], 'PM')" class="cell-activities">
+                            <div *ngIf="hasActivity(partner, headers.days_indexes[i], 'PM')" class="cell-activities" [ngClass]="{ 'space-before': hasSpaceBefore(partner, day, 'PM'), 'space-after': hasSpaceAfter(partner, day, 'PM') }">
                                 <ng-container *ngFor="let activity of getActivities(partner, day, 'PM'); let j = index">
 
                                     <planning-employees-calendar-activity
@@ -229,7 +229,7 @@
                             </div>
 
                             <!-- activities cell -->
-                            <div *ngIf="hasActivity(partner, headers.days_indexes[i], 'EV')" class="cell-activities">
+                            <div *ngIf="hasActivity(partner, headers.days_indexes[i], 'EV')" class="cell-activities" [ngClass]="{ 'space-before': hasSpaceBefore(partner, day, 'EV'), 'space-after': hasSpaceAfter(partner, day, 'EV') }">
                                 <ng-container *ngFor="let activity of getActivities(partner, day, 'EV'); let j = index">
 
                                     <planning-employees-calendar-activity
