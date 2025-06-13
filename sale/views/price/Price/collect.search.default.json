@@ -23,7 +23,7 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "label": "Identity",
+                                                "label": "Price List",
                                                 "value": "price_list_id",
                                                 "width": "100%"
                                             },
