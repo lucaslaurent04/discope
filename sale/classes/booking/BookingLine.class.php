@@ -505,7 +505,7 @@ class BookingLine extends Model {
 
                 foreach($self as $id => $line) {
 
-                    // #todo - create at a random place
+                    // #memo - prevent in case of direct assignment of an activity (product with is_activity) on the BookingLine
                     if(!isset($line['service_date'], $line['time_slot_id'])) {
                         continue;
                     }
@@ -710,7 +710,7 @@ class BookingLine extends Model {
             }
 
             if($line['product_id.product_model_id.is_activity']) {
-                // #todo - temp cehck activites assignment
+                // #memo - prevent in case of direct assignment of an activity (product with is_activity) on the BookingLine
                 if(!isset($line['service_date'], $line['time_slot_id'])) {
                     continue;
                 }
