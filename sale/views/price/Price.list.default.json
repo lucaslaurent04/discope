@@ -14,6 +14,7 @@
             ]
         }
     },
+    "controller": "sale_price_Price_collect",
     "layout": {
         "items": [
             {
