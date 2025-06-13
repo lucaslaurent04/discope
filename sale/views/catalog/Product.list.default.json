@@ -74,7 +74,8 @@
                 "type": "field",
                 "label": "Analytic",
                 "value": "analytic_section_id",
-                "width": "15%"
+                "width": "15%",
+                "sortable": true
             },
             {
                 "type": "field",
