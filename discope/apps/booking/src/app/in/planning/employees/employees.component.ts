@@ -35,7 +35,7 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
     // interval for refreshing the data
     private refreshTimeout: any;
 
-    private mapTimeSlotIdCode: {[key: string]: {id: number, name: string, code: 'AM'|'PM'|'EV'}} = {};
+    public mapTimeSlot: {[key: string]: {id: number, name: string, code: 'AM'|'PM'|'EV', schedule_from: string, schedule_to: string}} = {};
 
     constructor(
         private context: ContextService,
@@ -108,9 +108,9 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
         try {
             const domain = ['code', 'in', ['AM', 'PM', 'EV']];
 
-            const timeSlots: TimeSlot[] = await this.api.collect('sale\\booking\\TimeSlot', domain, ['id', 'name', 'code']);
+            const timeSlots: TimeSlot[] = await this.api.collect('sale\\booking\\TimeSlot', domain, ['id', 'name', 'code', 'schedule_from', 'schedule_to']);
             for(let timeSlot of timeSlots) {
-                this.mapTimeSlotIdCode[timeSlot.code] = timeSlot;
+                this.mapTimeSlot[timeSlot.code] = timeSlot;
             }
         }
         catch(response) {
@@ -165,6 +165,34 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
                 this.applySettings();
             }
         });
+    }
+
+    public onShowActivity(activity: any) {
+        let descriptor: any = {
+            context_silent: true, // do not update sidebar
+            context: {
+                entity: 'sale\\booking\\BookingActivity',
+                type: 'form',
+                name: activity.camp_id ? 'camp' : 'default',
+                domain: ['id', '=', activity.id],
+                mode: 'view',
+                purpose: 'view',
+                display_mode: 'popup',
+                callback: (data:any) => {
+                    // restart angular lifecycles
+                    this.cd.reattach();
+                    // force a refresh
+                    this.planningCalendar.onRefresh();
+                }
+            }
+        };
+
+        if(this.fullscreen) {
+            descriptor.context['dom_container'] = '.planning-body';
+        }
+        // prevent angular lifecycles while a context is open
+        this.cd.detach();
+        this.context.change(descriptor);
     }
 
     public onShowBooking(activity: any) {
@@ -286,7 +314,7 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
                 domain: [
                     ['partner_id', '=', data.partnerId],
                     ['event_date', '=', Math.floor(data.eventDate.getTime() / 1000)],
-                    ['time_slot_id', '=', this.mapTimeSlotIdCode[data.timeSlotCode].id]
+                    ['time_slot_id', '=', this.mapTimeSlot[data.timeSlotCode].id]
                 ],
                 mode: 'edit',
                 purpose: 'create',

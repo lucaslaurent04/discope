@@ -24,6 +24,8 @@ export interface BookedServicesDisplaySettings {
     meals_prefs_folded: boolean;
     meals_prefs_enabled: boolean;
     activities_enabled: boolean;
+    activities_visible: boolean;
+    meals_prefs_visible: boolean;
 }
 
 @Component({
@@ -46,7 +48,9 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
         accommodations_folded: true,
         meals_prefs_folded: true,
         meals_prefs_enabled: true,
-        activities_enabled: true
+        activities_enabled: true,
+        activities_visible: true,
+        meals_prefs_visible: true
     };
 
     public ready: boolean = false;
