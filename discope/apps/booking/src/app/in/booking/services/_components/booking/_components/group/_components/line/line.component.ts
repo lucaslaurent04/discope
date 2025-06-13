@@ -441,8 +441,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         let filtered:any[] = [];
         try {
             let domain = [
-                    ['is_pack', '=', false],
-                    ['is_activity', '=', false]
+                    ['is_pack', '=', false]
                 ];
 
             if(name && name.length) {
