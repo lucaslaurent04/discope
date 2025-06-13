@@ -530,9 +530,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         element.classList.remove('cell-droppable');
     }
 
-    public onmouseenterDropZone(employee: Employee, date_index: string, time_slot: string, position: 'left'|'center'|'right') {
-        const activities = this.activities[employee.id]?.[date_index]?.[time_slot] ?? [];
-        if(activities.length === 0) {
+    public onmouseenterDropZone(position: 'left'|'center'|'right') {
+        if(this.currentDraggedActivity && this.currentDraggedActivity.is_exclusive) {
             this.dropZonePosition = 'center';
         }
         else {
@@ -802,9 +801,9 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
         // update back-end
         try {
-            const employeeActivities = this.activities[employee.id][date_index][time_slot];
+            const employeeActivities = this.activities[employee.id][date_index][time_slot].filter((a: any) => !a.is_partner_event);
             const timeSlot = this.mapTimeSlot[time_slot];
-            if(employeeActivities.length === 1) {
+            if(employeeActivities.length === 1 && this.dropZonePosition === 'center') {
                 // handle only one activity is assigned to employee's moment
                 await this.api.call('?do=model_update', {
                     entity: 'sale\\booking\\BookingActivity',
@@ -817,35 +816,50 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 });
             }
             else {
-                // handle multiple activities assigned to employee's moment
-                const scheduleIntervals = this.splitSchedule(timeSlot.schedule_from, timeSlot.schedule_to, employeeActivities.length);
-
-                let activities = this.activities[employee.id][date_index][time_slot];
-
-                let index = 0;
-                for(let activity of activities) {
-                    const interval = scheduleIntervals[index++];
-
-                    const fields: any = {
-                        schedule_from: interval.from,
-                        schedule_to: interval.to
-                    };
-                    if(this.currentDraggedActivity.id === activity.id) {
-                        fields.employee_id = employee.id
-                    }
+                if(employeeActivities.length === 1) {
+                    // handle one activity assigned to employee's moment and positioned left/right
+                    const scheduleIntervals = this.splitSchedule(timeSlot.schedule_from, timeSlot.schedule_to, 2);
+                    const interval = this.dropZonePosition === 'left' ? scheduleIntervals[0] : scheduleIntervals[1];
 
                     await this.api.call('?do=model_update', {
                         entity: 'sale\\booking\\BookingActivity',
-                        id: activity.id,
-                        fields
+                        id: employeeActivities[0].id,
+                        fields: {
+                            schedule_from: interval.from,
+                            schedule_to: interval.to,
+                            employee_id: employee.id
+                        }
                     });
+                }
+                else {
+                    // handle multiple activities assigned to employee's moment
+                    const scheduleIntervals = this.splitSchedule(timeSlot.schedule_from, timeSlot.schedule_to, employeeActivities.length);
+
+                    let index = 0;
+                    for(let activity of employeeActivities) {
+                        const interval = scheduleIntervals[index++];
+
+                        const fields: any = {
+                            schedule_from: interval.from,
+                            schedule_to: interval.to
+                        };
+                        if(this.currentDraggedActivity.id === activity.id) {
+                            fields.employee_id = employee.id
+                        }
+
+                        await this.api.call('?do=model_update', {
+                            entity: 'sale\\booking\\BookingActivity',
+                            id: activity.id,
+                            fields
+                        });
+                    }
                 }
             }
 
             this.currentDraggedActivity = null;
 
             // full refresh if multiple activities to get them correctly sorted
-            this.onRefresh(employeeActivities.length > 1 || (old_employee_id > 0 && this.activities[old_employee_id][date_index][time_slot].length > 0));
+            this.onRefresh(employeeActivities.length > 1 || this.dropZonePosition !== 'center' || (old_employee_id > 0 && this.activities[old_employee_id][date_index][time_slot].length > 0));
         }
         catch(response) {
             this.api.errorFeedback(response);
