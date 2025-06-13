@@ -72,6 +72,12 @@
             },
             {
                 "type": "field",
+                "label": "Analytic",
+                "value": "analytic_section_id",
+                "width": "15%"
+            },
+            {
+                "type": "field",
                 "value": "is_pack",
                 "width": "10%",
                 "sortable": true
