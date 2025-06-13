@@ -12,8 +12,9 @@
                 #planningCalendar
                 [rowsHeight]="rowsHeight"
                 [mapTimeSlot]="mapTimeSlot"
-                (showBooking)="onShowActivity($event)"
-                (showCamp)="onShowActivity($event)"
+                (showActivity)="onShowActivity($event)"
+                (showBooking)="onShowBooking($event)"
+                (showCamp)="onShowCamp($event)"
                 (showPartner)="onShowPartner($event)"
                 (showPartnerEvent)="onShowPartnerEvent($event)"
                 (createPartnerEvent)="onCreatePartnerEvent($event)"

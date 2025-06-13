@@ -68,6 +68,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     @Input() mapTimeSlot: {[key: string]: {id: number, name: string, code: 'AM'|'PM'|'EV', schedule_from: string, schedule_to: string}};
 
     @Output() filters = new EventEmitter<ChangeReservationArg>();
+    @Output() showActivity = new EventEmitter();
     @Output() showBooking = new EventEmitter();
     @Output() showCamp = new EventEmitter();
     @Output() showPartner = new EventEmitter();
@@ -598,10 +599,12 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             this.showPartnerEvent.emit(activity);
         }
         else if(activity.booking_id) {
-            this.showBooking.emit(activity);
+            // this.showBooking.emit(activity);
+            this.showActivity.emit(activity);
         }
         else if(activity.camp_id) {
-            this.showCamp.emit(activity);
+            // this.showCamp.emit(activity);
+            this.showActivity.emit(activity);
         }
     }
 
@@ -896,7 +899,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
         const result = [];
 
-        for (let i = 0; i < qty; i++) {
+        for(let i = 0; i < qty; i++) {
             const from = toTime(start + interval * i);
             const to = toTime(start + interval * (i + 1));
             result.push({ from, to });
