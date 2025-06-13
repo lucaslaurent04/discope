@@ -72,6 +72,23 @@
                                             {
                                                 "type": "field",
                                                 "value": "",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "From",
+                                                "value": "schedule_from",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "To",
+                                                "value": "schedule_to",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "",
                                                 "width": "66%"
                                             },
                                             {

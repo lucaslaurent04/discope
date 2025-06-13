@@ -84,12 +84,12 @@
             "help": ""
         },
         "schedule_from": {
-            "label": "Début",
+            "label": "De",
             "description": "Heure à laquelle l'activité commence (incluse).",
             "help": ""
         },
         "schedule_to": {
-            "label": "Fin",
+            "label": "À",
             "description": "Heure à laquelle l'activité se termine (exclue).",
             "help": ""
         },
