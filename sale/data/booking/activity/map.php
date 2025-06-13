@@ -100,7 +100,6 @@ if(!empty($params['partners_ids'])) {
 
     if(!empty($employees_ids)) {
         $domain[] = [
-            ['id', 'in', $activities_ids],
             ['employee_id', 'in', $employees_ids]
         ];
 
