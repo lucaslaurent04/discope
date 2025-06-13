@@ -7,6 +7,7 @@
 */
 
 use core\setting\Setting;
+use equal\orm\Field;
 use hr\employee\Employee;
 use identity\Identity;
 use identity\Partner;
@@ -53,15 +54,16 @@ use sale\provider\Provider;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context', 'orm', 'auth', 'adapt']
 ]);
 
 /**
- * @var \equal\php\Context                   $context
- * @var \equal\orm\ObjectManager             $orm
- * @var \equal\auth\AuthenticationManager    $auth
+ * @var \equal\php\Context                  $context
+ * @var \equal\orm\ObjectManager            $orm
+ * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\data\adapt\AdapterProvider   $dap
  */
-['context' => $context, 'orm' => $orm, 'auth' => $auth] = $providers;
+['context' => $context, 'orm' => $orm, 'auth' => $auth, 'adapt' => $dap] = $providers;
 
 // #memo - processing of this controller might be heavy, so we make sure AC does not check permissions for each single consumption
 $auth->su();
@@ -197,6 +199,9 @@ $age_range_assignments = $orm->read(BookingLineGroupAgeRangeAssignment::getType(
 
 $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
 
+/** @var equal\data\adapt\DataAdapterJson $adapter */
+$adapter = $dap->get('json');
+
 $result = [];
 // build result: enrich and adapt consumptions
 foreach($activities as $id => $activity) {
@@ -241,10 +246,16 @@ foreach($activities as $id => $activity) {
         $camp['date_to'] = date($date_format, $camp['date_to']);
     }
 
+    $activity_date = $adapter->adaptOut($activity['activity_date'], Field::MAP_TYPE_USAGE['date']);
+    $schedule_from = $adapter->adaptOut($activity['schedule_from'], Field::MAP_TYPE_USAGE['time']);
+    $schedule_to = $adapter->adaptOut($activity['schedule_to'], Field::MAP_TYPE_USAGE['time']);
+
     $data = [
         'is_partner_event'          => false,
-        'activity_date'             => date('c', $activity['activity_date']),
+        'activity_date'             => $activity_date,
         'time_slot'                 => $time_slot,
+        'schedule_from'             => $schedule_from,
+        'schedule_to'               => $schedule_to,
         'booking_id'                => $booking,
         'booking_line_group_id'     => $booking_group,
         'camp_id'                   => $camp,

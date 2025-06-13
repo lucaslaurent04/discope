@@ -63,7 +63,10 @@ export class ProductModel {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, AfterViewChecked {
+
     @Input() rowsHeight: number;
+    @Input() mapTimeSlot: {[key: string]: {id: number, name: string, code: 'AM'|'PM'|'EV', schedule_from: string, schedule_to: string}};
+
     @Output() filters = new EventEmitter<ChangeReservationArg>();
     @Output() showBooking = new EventEmitter();
     @Output() showCamp = new EventEmitter();
@@ -138,6 +141,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
     public productModelCategories: ProductModelCategory[] = [];
     public productModels: ProductModel[] = [];
+
+    public dropZonePosition: 'left'|'center'|'right' = null;
 
     constructor(
         private params: PlanningEmployeesCalendarParamService,
@@ -329,7 +334,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<br>` +
                 `<dt>${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
                 `<br>` +
-                `<dt>${this.humanReadableSchedule(activity.schedule_from)} - ${this.humanReadableSchedule(activity.schedule_to)}</dt>` +
+                `<dt>${activity.schedule_from} - ${activity.schedule_to}</dt>` +
                 '</dl>';
         }
         else {
@@ -341,7 +346,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<br>` +
                 `<dt>${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
                 `<br>` +
-                `<dt>${this.humanReadableSchedule(activity.schedule_from)} - ${this.humanReadableSchedule(activity.schedule_to)}</dt>` +
+                `<dt>${activity.schedule_from} - ${activity.schedule_to}</dt>` +
                 '</dl>';
         }
     }
@@ -511,6 +516,20 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         element.classList.remove('cell-droppable');
     }
 
+    public onmouseenterDropZone(employee: Employee, date_index: string, time_slot: string, position: 'left'|'center'|'right') {
+        const activities = this.activities[employee.id]?.[date_index]?.[time_slot] ?? [];
+        if(activities.length === 0) {
+            this.dropZonePosition = 'center';
+        }
+        else {
+            this.dropZonePosition = position;
+        }
+    }
+
+    public onmouseleaveDropZone() {
+        this.dropZonePosition = null;
+    }
+
     public ondoubleclickTableCell(day: Date, partner: any, timeSlotCode: 'AM'|'PM'|'EV') {
         // remove timezone offset
         const eventDate = new Date();
@@ -634,8 +653,16 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             }
         }
 
+        // Check that activity is not already assigned to this employee
+        let activities = this.activities[employee.id]?.[date_index]?.[time_slot] ?? [];
+        for(let a of activities) {
+            if(a.id === activity.id) {
+                return false;
+            }
+        }
+
         // Check that the employee hasn't been assigned an exclusive activity yet
-        if(this.hasExclusiveActivity(employee, date_index, time_slot)) {
+        if((activity.is_exclusive && this.hasActivity(employee, date_index, time_slot)) || this.hasExclusiveActivity(employee, date_index, time_slot)) {
             return false;
         }
 
@@ -704,76 +731,150 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         }
     }
 
-    public async onDrop(event: Event | CdkDragDrop<any, any>, index: number, employee: Employee, date_index: string, time_slot: string) {
-        if(this.currentDraggedActivity) {
-            if(!this.isDroppable(this.currentDraggedActivity, employee, date_index, time_slot)) {
-                if(employee.relationship !== 'employee') {
-                    this.snack.open('Cette activité ne peut pas être assignée à un prestataire.', 'ERREUR');
-                }
-                else if(this.currentDraggedActivity.employee_id !== employee.id) {
-                    this.snack.open('Cette activité ne peut pas être assignée à cet animateur ou à cette plage horaire.', 'ERREUR');
-                }
+    public async onDrop(event: Event | CdkDragDrop<any, any>, employee: Employee, date_index: string, time_slot: string) {
+        if(!this.currentDraggedActivity) {
+            return;
+        }
+
+        if(!this.isDroppable(this.currentDraggedActivity, employee, date_index, time_slot)) {
+            if(employee.relationship !== 'employee') {
+                this.snack.open('Cette activité ne peut pas être assignée à un prestataire.', 'ERREUR');
             }
-            else {
-                const dropEvent = event as CdkDragDrop<any, any>;
-
-                const element = dropEvent.container.element.nativeElement as HTMLElement;
-                element.style.setProperty('background-color', '');
-
-                // #todo - (?) tenir compte du type (event_type)
-                let old_employee_id = this.currentDraggedActivity.employee_id ?? 0;
-
-                // remove from this.activities[0][date_index][time_slot]
-                this.activities[old_employee_id][date_index][time_slot] = this.activities[old_employee_id][date_index][time_slot].filter( (activity: any) => activity.id !== this.currentDraggedActivity.id);
-
-                // add to this.activities[employee.id][date_index][time_slot]
-                if(!(this.activities[employee.id] ?? false)) {
-                    this.activities[employee.id] = {};
-                }
-                if(!(this.activities[employee.id][date_index] ?? false)) {
-                    this.activities[employee.id][date_index] = {};
-                }
-                if(!(this.activities[employee.id][date_index][time_slot] ?? false)) {
-                    this.activities[employee.id][date_index][time_slot] = [];
-                }
-
-                this.currentDraggedActivity.partner_id = employee;
-                this.currentDraggedActivity.employee_id = employee.id;
-                if(this.currentDraggedActivity?.is_partner_event) {
-                    this.activities[employee.id][date_index][time_slot].push(this.currentDraggedActivity);
-                }
-                else {
-                    this.activities[employee.id][date_index][time_slot].unshift(this.currentDraggedActivity);
-                }
-
-                // this.headers.days = this.headers.days.slice();
-
-                // update back-end
-                try {
-                    await this.api.call('?do=model_update', {
-                        entity: 'sale\\booking\\BookingActivity',
-                        id: this.currentDraggedActivity.id,
-                        fields: {
-                            employee_id: employee.id
-                        }
-                    });
-
-                    this.onRefresh(false);
-                }
-                catch(response) {
-                    this.api.errorFeedback(response);
-
-                    this.activities[employee.id][date_index][time_slot] = this.activities[employee.id][date_index][time_slot].filter( (activity: any) => activity.id !== this.currentDraggedActivity.id);
-                    this.activities[old_employee_id][date_index][time_slot].unshift(this.currentDraggedActivity);
-                }
+            else if(this.currentDraggedActivity.employee_id !== employee.id) {
+                this.snack.open('Cette activité ne peut pas être assignée à cet animateur ou à cette plage horaire.', 'ERREUR');
             }
+
             this.currentDraggedActivity = null;
 
-            const elements = Array.from(document.getElementsByClassName('cell-droppable'));
-            for (let element of elements) {
-                element.classList.remove('cell-droppable');
-            }
+            return;
         }
+
+        const dropEvent = event as CdkDragDrop<any, any>;
+
+        const element = dropEvent.container.element.nativeElement as HTMLElement;
+        element.classList.remove('cell-droppable');
+
+        // #todo - (?) tenir compte du type (event_type)
+        let old_partner_id = this.currentDraggedActivity.partner_id ?? null;
+        let old_employee_id = this.currentDraggedActivity.employee_id ?? 0;
+
+        const old_index = this.activities[old_employee_id][date_index][time_slot].findIndex((activity: any) => activity.id === this.currentDraggedActivity.id);
+
+        // remove from this.activities[0][date_index][time_slot]
+        this.activities[old_employee_id][date_index][time_slot] = this.activities[old_employee_id][date_index][time_slot].filter((activity: any) => activity.id !== this.currentDraggedActivity.id);
+
+        // add to this.activities[employee.id][date_index][time_slot]
+        if(!(this.activities[employee.id] ?? false)) {
+            this.activities[employee.id] = {};
+        }
+        if(!(this.activities[employee.id][date_index] ?? false)) {
+            this.activities[employee.id][date_index] = {};
+        }
+        if(!(this.activities[employee.id][date_index][time_slot] ?? false)) {
+            this.activities[employee.id][date_index][time_slot] = [];
+        }
+
+        this.currentDraggedActivity.partner_id = employee;
+        this.currentDraggedActivity.employee_id = employee.id;
+
+        if(this.dropZonePosition === 'left') {
+            this.activities[employee.id][date_index][time_slot].unshift(this.currentDraggedActivity);
+        }
+        else {
+            this.activities[employee.id][date_index][time_slot].push(this.currentDraggedActivity);
+        }
+
+        // this.headers.days = this.headers.days.slice();
+
+        // update back-end
+        try {
+            const employeeActivities = this.activities[employee.id][date_index][time_slot];
+            const timeSlot = this.mapTimeSlot[time_slot];
+            if(employeeActivities.length === 1) {
+                // handle only one activity is assigned to employee's moment
+                await this.api.call('?do=model_update', {
+                    entity: 'sale\\booking\\BookingActivity',
+                    id: this.currentDraggedActivity.id,
+                    fields: {
+                        employee_id: employee.id,
+                        schedule_from: timeSlot.schedule_from,
+                        schedule_to: timeSlot.schedule_to
+                    }
+                });
+            }
+            else {
+                // handle multiple activities assigned to employee's moment
+                const scheduleIntervals = this.splitSchedule(timeSlot.schedule_from, timeSlot.schedule_to, employeeActivities.length);
+
+                let activities = this.activities[employee.id][date_index][time_slot];
+
+                let index = 0;
+                for(let activity of activities) {
+                    const interval = scheduleIntervals[index++];
+
+                    const fields: any = {
+                        schedule_from: interval.from,
+                        schedule_to: interval.to
+                    };
+                    if(this.currentDraggedActivity.id === activity.id) {
+                        fields.employee_id = employee.id
+                    }
+
+                    await this.api.call('?do=model_update', {
+                        entity: 'sale\\booking\\BookingActivity',
+                        id: activity.id,
+                        fields
+                    });
+                }
+            }
+
+            this.currentDraggedActivity = null;
+
+            // full refresh if multiple activities to get them correctly sorted
+            this.onRefresh(employeeActivities.length > 1);
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+
+            // move the activity to its previous position
+            this.activities[employee.id][date_index][time_slot] = this.activities[employee.id][date_index][time_slot].filter((activity: any) => activity.id !== this.currentDraggedActivity.id);
+            this.activities[old_employee_id][date_index][time_slot].splice(old_index, 0, this.currentDraggedActivity);
+
+            // reset employee related data (needed because the object wasn't cloned and is modified above)
+            this.currentDraggedActivity.partner_id = old_partner_id;
+            this.currentDraggedActivity.employee_id = old_employee_id;
+
+            // drag and drop finished
+            this.currentDraggedActivity = null;
+        }
+    }
+
+    private splitSchedule(schedule_from: string, schedule_to: string, qty: number) {
+        const toSeconds = (time: string) => {
+            const [hours, minutes, seconds] = time.split(':').map(Number);
+            return hours * 3600 + minutes * 60 + seconds;
+        };
+
+        const toTime = (totalSeconds: number) => {
+            const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            const seconds = String(totalSeconds % 60).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        };
+
+        const start = toSeconds(schedule_from);
+        const end = toSeconds(schedule_to);
+        const interval = (end - start) / qty;
+
+        const result = [];
+
+        for (let i = 0; i < qty; i++) {
+            const from = toTime(start + interval * i);
+            const to = toTime(start + interval * (i + 1));
+            result.push({ from, to });
+        }
+
+        return result;
     }
 
     public trackByActivity(index: number, activity: any): string {

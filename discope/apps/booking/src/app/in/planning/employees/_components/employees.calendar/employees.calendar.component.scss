@@ -111,34 +111,55 @@
                 tr {
                     td {
                         &.cell-days {
-                            &.cell-droppable {
-                                .cell-activities {
-                                    display: none;
-                                }
-                            }
-
                             .cell-activities {
                                 display: flex;
                                 flex-direction: row;
                                 gap: 1px;
                             }
 
+                            &.cell-droppable {
+                                .cell-activities {
+                                    display: none;
+                                }
+                            }
+
                             .cell-partner-events {
                                 display: flex;
                                 flex-direction: column;
                                 gap: 1px;
+                                margin-top: 1px;
                             }
 
                             .drop-zone {
                                 display: none;
+                                flex-direction: row;
                                 height: var(--rows_height);
-                                background-color: #ff4081 !important;
+                                width: 100%;
+
+                                &.drop-zone--left {
+                                    .drop-zone-left {
+                                        background-color: #ff4081 !important;
+                                    }
+                                }
+
+                                &.drop-zone--center {
+                                    .drop-zone-left,
+                                    .drop-zone-center,
+                                    .drop-zone-right {
+                                        background-color: #ff4081 !important;
+                                    }
+                                }
+
+                                &.drop-zone--right {
+                                    .drop-zone-right {
+                                        background-color: #ff4081 !important;
+                                    }
+                                }
                             }
 
                             &.cell-droppable {
                                 .drop-zone {
                                     display: flex;
-                                    flex-direction: row;
                                 }
                             }
                         }

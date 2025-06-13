@@ -98,10 +98,14 @@
                                 (mouseleave)="onmouseleaveTableCell($event)"
                                 (dblclick)="ondoubleclickTableCell(day, partner, 'AM')"
                                 cdkDropList
-                                (cdkDropListDropped)="onDrop($event, index, partner, headers.days_indexes[i], 'AM')">
+                                (cdkDropListDropped)="onDrop($event, partner, headers.days_indexes[i], 'AM')">
 
                             <!-- activity drop zone -->
-                            <div class="drop-zone"></div>
+                            <div class="drop-zone" [ngClass]="{'drop-zone--left': this.dropZonePosition === 'left', 'drop-zone--center': this.dropZonePosition === 'center', 'drop-zone--right': this.dropZonePosition === 'right'}">
+                                <div class="drop-zone-left" style="width: 25px;" (mouseenter)="onmouseenterDropZone(partner, headers.days_indexes[i], 'AM', 'left')" (mouseleave)="onmouseleaveDropZone()"></div>
+                                <div class="drop-zone-center" style="flex-grow: 1;" (mouseenter)="onmouseenterDropZone(partner, headers.days_indexes[i], 'AM', 'center')" (mouseleave)="onmouseleaveDropZone()"></div>
+                                <div class="drop-zone-right" style="width: 25px;" (mouseenter)="onmouseenterDropZone(partner, headers.days_indexes[i], 'AM', 'right')" (mouseleave)="onmouseleaveDropZone()"></div>
+                            </div>
 
                             <!-- activities cell -->
                             <div *ngIf="hasActivity(partner, headers.days_indexes[i], 'AM')" class="cell-activities">
@@ -154,10 +158,14 @@
                                 (mouseleave)="onmouseleaveTableCell($event)"
                                 (dblclick)="ondoubleclickTableCell(day, partner, 'PM')"
                                 cdkDropList
-                                (cdkDropListDropped)="onDrop($event, index, partner, headers.days_indexes[i], 'PM')">
+                                (cdkDropListDropped)="onDrop($event, partner, headers.days_indexes[i], 'PM')">
 
                             <!-- activity drop zone -->
-                            <div class="drop-zone"></div>
+                            <div class="drop-zone" [ngClass]="{'drop-zone--left': this.dropZonePosition === 'left', 'drop-zone--center': this.dropZonePosition === 'center', 'drop-zone--right': this.dropZonePosition === 'right'}">
+                                <div class="drop-zone-left" style="width: 25px;" (mouseenter)="onmouseenterDropZone(partner, headers.days_indexes[i], 'PM', 'left')" (mouseleave)="onmouseleaveDropZone()"></div>
+                                <div class="drop-zone-center" style="flex-grow: 1;" (mouseenter)="onmouseenterDropZone(partner, headers.days_indexes[i], 'PM', 'center')" (mouseleave)="onmouseleaveDropZone()"></div>
+                                <div class="drop-zone-right" style="width: 25px;" (mouseenter)="onmouseenterDropZone(partner, headers.days_indexes[i], 'PM', 'right')" (mouseleave)="onmouseleaveDropZone()"></div>
+                            </div>
 
                             <!-- activities cell -->
                             <div *ngIf="hasActivity(partner, headers.days_indexes[i], 'PM')" class="cell-activities">
@@ -211,10 +219,14 @@
                                 (mouseleave)="onmouseleaveTableCell($event)"
                                 (dblclick)="ondoubleclickTableCell(day, partner, 'EV')"
                                 cdkDropList
-                                (cdkDropListDropped)="onDrop($event, index, partner, headers.days_indexes[i], 'EV')">
+                                (cdkDropListDropped)="onDrop($event, partner, headers.days_indexes[i], 'EV')">
 
                             <!-- activity drop zone -->
-                            <div class="drop-zone"></div>
+                            <div class="drop-zone" [ngClass]="{'drop-zone--left': this.dropZonePosition === 'left', 'drop-zone--center': this.dropZonePosition === 'center', 'drop-zone--right': this.dropZonePosition === 'right'}">
+                                <div class="drop-zone-left" style="width: 25px;" (mouseenter)="onmouseenterDropZone(partner, headers.days_indexes[i], 'EV', 'left')" (mouseleave)="onmouseleaveDropZone()"></div>
+                                <div class="drop-zone-center" style="flex-grow: 1;" (mouseenter)="onmouseenterDropZone(partner, headers.days_indexes[i], 'EV', 'center')" (mouseleave)="onmouseleaveDropZone()"></div>
+                                <div class="drop-zone-right" style="width: 25px;" (mouseenter)="onmouseenterDropZone(partner, headers.days_indexes[i], 'EV', 'right')" (mouseleave)="onmouseleaveDropZone()"></div>
+                            </div>
 
                             <!-- activities cell -->
                             <div *ngIf="hasActivity(partner, headers.days_indexes[i], 'EV')" class="cell-activities">
