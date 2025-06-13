@@ -710,6 +710,11 @@ class BookingLine extends Model {
             }
 
             if($line['product_id.product_model_id.is_activity']) {
+                // #todo - temp cehck activites assignment
+                if(!isset($line['service_date'], $line['time_slot_id'])) {
+                    continue;
+                }
+
                 $booking_activities = self::computeLineActivities(
                     $line['service_date'],
                     $line['time_slot_id'],
