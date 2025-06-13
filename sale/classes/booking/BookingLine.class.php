@@ -504,6 +504,12 @@ class BookingLine extends Model {
                 }
 
                 foreach($self as $id => $line) {
+
+                    // #todo - create at a random place
+                    if(!isset($line['service_date'], $line['time_slot_id'])) {
+                        continue;
+                    }
+
                     $activities_to_check = self::computeLineActivities(
                         $line['service_date'],
                         $line['time_slot_id'],
