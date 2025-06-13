@@ -266,6 +266,20 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return activities.find((a: any) => a.is_exclusive) !== undefined;
     }
 
+    public hasSpaceBefore(employee: Employee, day: Date, time_slot: 'AM'|'PM'|'EV') {
+        let activities = this.getActivities(employee, day, time_slot);
+        let timeSlot = this.mapTimeSlot[time_slot];
+
+        return activities.length > 0 && activities[0].schedule_from > timeSlot.schedule_from;
+    }
+
+    public hasSpaceAfter(employee: Employee, day: Date, time_slot: 'AM'|'PM'|'EV') {
+        let activities = this.getActivities(employee, day, time_slot);
+        let timeSlot = this.mapTimeSlot[time_slot];
+
+        return activities.length > 0 && activities[activities.length - 1].schedule_to < timeSlot.schedule_to;
+    }
+
     public getActivities(partner: Partner, day: Date, time_slot: string): any[] {
         if(!this.activities?.[partner.id]) {
             return [];
@@ -831,7 +845,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             this.currentDraggedActivity = null;
 
             // full refresh if multiple activities to get them correctly sorted
-            this.onRefresh(employeeActivities.length > 1);
+            this.onRefresh(employeeActivities.length > 1 || (old_employee_id > 0 && this.activities[old_employee_id][date_index][time_slot].length > 0));
         }
         catch(response) {
             this.api.errorFeedback(response);

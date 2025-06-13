@@ -117,6 +117,14 @@
                                 gap: 1px;
                             }
 
+                            .cell-activities.space-before {
+                                padding-left: 25%;
+                            }
+
+                            .cell-activities.space-after {
+                                padding-right: 20%;
+                            }
+
                             &.cell-droppable {
                                 .cell-activities {
                                     display: none;
