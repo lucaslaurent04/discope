@@ -12,6 +12,7 @@ import { BookingServicesBookingGroupLineDiscountComponent } from './_components/
 import { BookingServicesBookingGroupLinePriceadapterComponent } from './_components/priceadapter/priceadapter.component';
 import { BookingServicesBookingGroupLinePriceDialogComponent } from './_components/price.dialog/price.component';
 import { MatDialog } from '@angular/material/dialog';
+import { BookedServicesDisplaySettings } from 'src/app/in/booking/services/services.component';
 
 // declaration of the interface for the map associating relational Model fields with their components
 interface BookingLineComponentsMap {
@@ -72,6 +73,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
     @Input() time_slots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
+    @Input() displaySettings: BookedServicesDisplaySettings;
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
 
@@ -443,6 +445,10 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
             let domain = [
                     ['is_pack', '=', false]
                 ];
+
+            if(this.displaySettings.activities_enabled && !this.displaySettings.activities_visible) {
+                domain.push(['is_activity', '=', false]);
+            }
 
             if(name && name.length) {
                 domain.push(['name', 'ilike', '%'+name+'%']);
