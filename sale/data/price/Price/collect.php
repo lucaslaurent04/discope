@@ -20,15 +20,12 @@ use equal\orm\Domain;
 
         'price_list_id' => [
             'type'              => 'many2one',
-            'foreign_object'    => 'identity\Identity',
-            'domain'            => ["id", ">", 4],
-            'description'       => 'Customer identity.'
+            'foreign_object'    => 'sale\price\PriceList'
         ],
 
         'center_id' => [
             'type'              => 'many2one',
-            'foreign_object'    => 'identity\Center',
-            'description'       => "The center to which the booking relates to."
+            'foreign_object'    => 'identity\Center'
         ],
 
         'product_id' => [
@@ -37,8 +34,7 @@ use equal\orm\Domain;
         ],
 
         'is_active' => [
-            'type'              => 'boolean',
-            'description'       => 'Mark the booking as completed by a Tour Operator.'
+            'type'              => 'boolean'
         ]
 
     ],
