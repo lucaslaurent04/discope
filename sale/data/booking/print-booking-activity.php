@@ -284,8 +284,9 @@ foreach($meals as $meal_id => $meal) {
     }
 
     $meal_provided = $meal['is_self_provided'] ? 'par vos soins' : '';
+    $date = date('d/m/Y', $meal['date']) . ' ' . $days_names[date('w', $meal['date'])];
 
-    $map_meals[$meal['date']][$meal['time_slot_id']['code']] = [
+    $map_meals[$date][$time_slot_code] = [
         'name'      => $meal_name,
         'place'     => $meal_place,
         'provided'  => $meal_provided
