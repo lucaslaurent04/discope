@@ -37,13 +37,13 @@
                                         ]
                                     }
                                 ]
-                            }                           
+                            }
                         ]
                     }
                 ]
             },
             {
-                "sections": [            
+                "sections": [
                     {
                         "id": "section.customer_details",
                         "label": "Details",
@@ -127,13 +127,13 @@
                                                 "type": "field",
                                                 "value": "bookings_ids",
                                                 "width": "100%"
-                                            }                                            
+                                            }
                                         ]
                                     }
                                 ]
-                            }                            
+                            }
                         ]
-                    }                                        
+                    }
                 ]
             }
         ]
