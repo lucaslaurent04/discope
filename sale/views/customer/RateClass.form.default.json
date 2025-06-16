@@ -17,11 +17,18 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "code",
+                                                "value": "name",
                                                 "width": "50%",
                                                 "widget": {
-                                                    "heading": true
+                                                    "heading": true,
+                                                    "readonly": true
                                                 }
+                                            },
+
+                                            {
+                                                "type": "field",
+                                                "value": "code",
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
