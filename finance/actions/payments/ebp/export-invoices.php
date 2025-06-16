@@ -10,6 +10,7 @@ use documents\Export;
 use finance\accounting\AccountingJournal;
 use identity\CenterOffice;
 use sale\booking\Invoice;
+use sale\customer\Customer;
 
 list($params, $providers) = eQual::announce([
     'description'   => "Creates an export archive containing all emitted invoices that haven't been exported yet (for external accounting software).",
@@ -105,23 +106,22 @@ if(is_null($journal)) {
     throw new Exception("unknown_accounting_journal", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-$invoices = Invoice::search(
-    [
-        [
-            ['is_exported', '=', false],
-            ['center_office_id', '=', $params['center_office_id']],
-            ['booking_id', '>', 0],
-            ['status', '<>', 'proforma'],
+$invoices = Invoice::search([
+            [
+                ['is_exported', '=', false],
+                ['center_office_id', '=', $params['center_office_id']],
+                ['booking_id', '>', 0],
+                ['status', '<>', 'proforma'],
+            ],
+            [
+                ['is_exported', '=', false],
+                ['center_office_id', '=', $params['center_office_id']],
+                ['has_orders', '=', true],
+                ['status', '<>', 'proforma'],
+            ]
         ],
-        [
-            ['is_exported', '=', false],
-            ['center_office_id', '=', $params['center_office_id']],
-            ['has_orders', '=', true],
-            ['status', '<>', 'proforma'],
-        ]
-    ],
-    ['sort'  => ['number' => 'asc']]
-)
+        ['sort'  => ['number' => 'asc']]
+    )
     ->read([
         'id',
         'name',
@@ -156,6 +156,7 @@ if(!empty($invoices)) {
     $entry_num = 1;
     $data = [];
     foreach($invoices as $invoice) {
+        $customer = Customer::search($invoice['partner_id'])->read(['rate_class_id' => ['code']])->first();
         $added = 0;
         foreach($invoice['invoice_lines_ids'] as $line) {
             foreach($line['price_id']['accounting_rule_id']['accounting_rule_line_ids'] as $rule_line) {
@@ -186,9 +187,8 @@ if(!empty($invoices)) {
                     ''
                 ];
 
-                // #todo - Find out why other line for >210 or >220
                 $data[] = [
-                    '>210', // #todo - Find out why 210 or 220 (maybe related to VAT?)
+                    '>' . $customer['rate_class_id']['code'],
                     number_format($rule_line['share'] * 100, 2, '.', ''),
                     number_format($line['price'] * $rule_line['share'], 2, '.', '')
                 ];
