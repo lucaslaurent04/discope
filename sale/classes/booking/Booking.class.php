@@ -521,10 +521,6 @@ class Booking extends Model {
         ];
     }
 
-    public static function oncreate($self) {
-        $self->do('import_contacts');
-    }
-
     public static function calcName($om, $oids, $lang) {
         $result = [];
 
