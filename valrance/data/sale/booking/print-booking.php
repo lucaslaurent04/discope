@@ -460,13 +460,13 @@ if($booking['center_id']['use_office_details']) {
 }
 
 
-$conection_languages = [
+$connection_languages = [
     ['fr' => 'et', 'en' => 'and', 'nl' => 'en'],
 ];
 
 $connection_names = array_map(function($item) use ($params) {
     return $item[$params['lang']];
-}, $conection_languages);
+}, $connection_languages);
 
 
 
@@ -575,9 +575,9 @@ if($booking['center_id']['template_category_id']) {
 
             $values['header_html'] = $value;
         }
-        if($part['name'] == 'service') {
+        elseif($part['name'] == 'service') {
             $value = $part['value'];
-            if ($booking['customer_id']['rate_class_id']) {
+            if($booking['customer_id']['rate_class_id']) {
                 $map_rate_class = [
                     1 => 'sejour',
                     4 => 'groupe',
