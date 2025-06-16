@@ -22,12 +22,12 @@
             "label": "Code",
             "description": "Le code associé à l’identifiant du créneau horaire.",
             "selection": {
-                "B" : "Petit-déjeuner",
-                "AM" : "Activités (matin)",
-                "L" : "Déjeuner",
-                "PM" : "Activités (après-midi)",
-                "D" : "Dîner",
-                "EV": "Veillée (après le dîner)"
+                "B" : "B",
+                "AM" : "AM",
+                "L" : "L",
+                "PM" : "PM",
+                "D" : "D",
+                "EV": "EV"
             },
             "help": ""
         },
