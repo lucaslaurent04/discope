@@ -291,11 +291,8 @@ foreach($meals as $meal_id => $meal) {
         $meal_place = 'en déplacement';
     }
 
-    $map_meals[$date][$time_slot_code][] = [
-        'name'      => $meal_name,
-        'place'     => $meal_place,
-        'provided'  => $meal_provided
-    ];
+    $map_meals[$date][$time_slot_code][] = $meal_name . ' ' . $meal_place . ' ' . $meal_provided;
+
 }
 
 foreach($booking_activities as $activity) {
