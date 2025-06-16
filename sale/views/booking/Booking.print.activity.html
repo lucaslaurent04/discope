@@ -145,7 +145,7 @@ div.footer {
                             <td style="text-align: left; vertical-align: top; padding: 4px;">
                                 {% set data = details.time_slots[slot_code] | default({}) %}
                                 <div style="margin-bottom: 4px;">
-                                    <strong>Repas:</strong> {{ data['meal']['name'] | default('') }}  {{ data['meal']['place'] | default('') }}  {{ data['meal']['provided'] | default('') }}<br>
+                                    <strong>Repas:</strong> {{ data['meal'] | default('') }}<br>
                                 </div>
                                 <div style="margin-bottom: 4px;">
                                     <strong>{{ data['activity'] | default('') | raw }}</strong><br>
