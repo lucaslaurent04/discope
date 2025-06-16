@@ -271,11 +271,10 @@ $meals = BookingMeal::search(['booking_id', '=', $booking['id']])
 foreach($meals as $meal_id => $meal) {
     $time_slot_code = ['B' => 'AM', 'L' => 'PM', 'D' => 'EV'][$meal['time_slot_id']['code']];
     $date = date('d/m/Y', $meal['date']) . ' ' . $days_names[date('w', $meal['date'])];
-    $meal_provided = $meal['is_self_provided'] ? 'par vos soins' : '';
 
     $meal_name = '';
     $meal_place = '';
-    $meal_provided = '';
+    $meal_provided = $meal['is_self_provided'] ? 'par vos soins' : '';
 
     if($meal['meal_type_id']['code'] == 'regular') {
         $meal_name = ['AM' => 'Petit déjeuner', 'PM' => 'Déjeuner', 'EV' => 'Dîner'][$time_slot_code];
