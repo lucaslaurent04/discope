@@ -144,9 +144,11 @@ div.footer {
                             {% set slot_code = slot.code %}
                             <td style="text-align: left; vertical-align: top; padding: 4px;">
                                 {% set data = details.time_slots[slot_code] | default({}) %}
+                                {% if data.meal is defined and data.meal is not empty %}
                                 <div style="margin-bottom: 4px;">
                                     <strong>Repas:</strong> {{ data['meal'] | default('') }}<br>
                                 </div>
+                                {% endif %}
                                 <div style="margin-bottom: 4px;">
                                     <strong>{{ data['activity'] | default('') | raw }}</strong><br>
                                     {% if data['schedule_from'] != 0 and data['schedule_to'] != 0 %}
