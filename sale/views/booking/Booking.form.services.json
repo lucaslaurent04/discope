@@ -128,6 +128,14 @@
             "description": "The status of the booking will be adapted according to the status of its fundings.",
             "controller": "sale_booking_update-status",
             "visible": [ ["status", "in", ["invoiced", "debit_balance", "credit_balance"]] ]
+        },
+        {
+            "id": "action.booking.activities-program",
+            "label": "Activities program",
+            "description": "",
+            "icon": "list_alt",
+            "controller": "sale_booking_print-booking-activity",
+            "confirm": true
         }
     ],
     "routes": [
