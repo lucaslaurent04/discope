@@ -111,7 +111,7 @@ div.footer {
     <h3> {{ i18n['activity_schedule']|upper }}</h3>
     {% for group_id, group in activities_map %}
         <div style="position: relative; margin-top: 30px; margin-bottom: 30px;">
-            <table style="border: solid 1px black; border-collapse: collapse; width: 100%;" border="1">
+            <table style="border: solid 1px black; border-collapse: collapse; width: 100%; page-break-inside: avoid;" border="1">
                 <tr>
                     <th rowspan="2">
                         {{ i18n['day'] }}
@@ -132,7 +132,7 @@ div.footer {
 
                 {% for date, details in group.dates %}
                     <tr>
-                        <td style="text-align: center; width: 5%; height: 100px;">
+                        <td style="text-align: center; width: 5%; height: 100px; vertical-align: top;">
                             <div style="display: flex; align-items: center; justify-content: center; ">
                                 <span style="display: inline-block; transform: rotate(-90deg); white-space: nowrap;">
                                     {{ date|split(' ')[0] }}<br>{{ date|split(' ', 2)[1] }}
