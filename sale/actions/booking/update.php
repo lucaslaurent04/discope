@@ -88,12 +88,8 @@ else {
 $orm->disableEvents();
 
 $orm->update(Booking::getType(), $booking_id, [
-        'state'                 => 'instance',
-        'customer_id'           => $params['fields']['customer_id'],
-        'customer_identity_id'  => $params['fields']['customer_identity_id'],
         'customer_nature_id'    => $params['fields']['customer_nature_id'],
         'center_id'             => $params['fields']['center_id'],
-        'status'                => 'quote',
         'date_from'             => strtotime($params['fields']['date_from']),
         'date_to'               => strtotime($params['fields']['date_to']),
         'has_tour_operator'     => ($params['fields']['has_tour_operator'] ?? '') === 'true',
@@ -107,6 +103,10 @@ Booking::id($booking_id)->do('import_contacts');
 // restore events in case this controller is chained with others
 $orm->enableEvents();
 
+// sync with customer
+$orm->update(Booking::getType(), $booking_id, [
+        'customer_identity_id'  => $params['fields']['customer_identity_id']
+    ]);
 
 // 2) check customer history
 
