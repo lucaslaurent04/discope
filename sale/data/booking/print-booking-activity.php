@@ -291,7 +291,7 @@ foreach($meals as $meal_id => $meal) {
         $meal_place = 'en déplacement';
     }
 
-    $map_meals[$date][$time_slot_code] = [
+    $map_meals[$date][$time_slot_code][] = [
         'name'      => $meal_name,
         'place'     => $meal_place,
         'provided'  => $meal_provided
@@ -330,7 +330,7 @@ foreach($booking_activities as $activity) {
     $time_slot_code = $activity['time_slot_id']['code'];
     if(isset($activities_map[$group_id]['dates'][$date]['time_slots'][$time_slot_code])) {
         $activities_map[$group_id]['dates'][$date]['time_slots'][$time_slot_code] = [
-            'meal'                  => $map_meals[$date][$time_slot_code] ?? null,
+            'meal'                  => implode(',', $map_meals[$date][$time_slot_code] ?? []),
             'activity'              => $activity['product_model_id']['name'],
             'schedule_from'         => $activity['schedule_from'],
             'schedule_to'           => $activity['schedule_to'],
