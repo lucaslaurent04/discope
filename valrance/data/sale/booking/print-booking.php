@@ -491,7 +491,7 @@ if($booking['center_id']['template_category_id']) {
             $date_from = $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']);
             $date_to = $days_names[date('w', $booking['date_to'])] . ' '. date('d/m/Y', $booking['date_to']);
 
-            // retrive meals info for arrival day
+            // retrieve meals info for arrival day
             $lunch = false;
             $snack = false;
 
