@@ -269,27 +269,29 @@ $meals = BookingMeal::search(['booking_id', '=', $booking['id']])
     ->read(['date', 'time_slot_id' => ['code'], 'is_self_provided', 'meal_type_id' => ['code', 'name'], 'meal_place_id' => ['place_type']]);
 
 foreach($meals as $meal_id => $meal) {
-    $time_slot_code = $meal['time_slot_id']['code'];
+    $time_slot_code = ['B' => 'AM', 'L' => 'PM', 'D' => 'EV'][$meal['time_slot_id']['code']];
+    $date = date('d/m/Y', $meal['date']) . ' ' . $days_names[date('w', $meal['date'])];
+    $meal_provided = $meal['is_self_provided'] ? 'par vos soins' : '';
+
     if($meal['meal_type_id']['code'] == 'regular') {
-        $meal_name = ['B' => 'Petit déjeuner', 'L' => 'Déjeuner', 'D' => 'Dîner'][$time_slot_code];
+        $meal_name = ['AM' => 'Petit déjeuner', 'PM' => 'Déjeuner', 'EV' => 'Dîner'][$time_slot_code];
     }
     else {
         $meal_name = $meal['meal_type_id']['name'];
     }
     if($meal['meal_place_id']['code'] != 'offsite') {
-        $meal_place = 'au centre';
+        if(!$meal['is_self_provided']) {
+            $meal_place = 'au centre';
+        }
     }
     else {
         $meal_place = 'en déplacement';
     }
 
-    $meal_provided = $meal['is_self_provided'] ? 'par vos soins' : '';
-    $date = date('d/m/Y', $meal['date']) . ' ' . $days_names[date('w', $meal['date'])];
-
     $map_meals[$date][$time_slot_code] = [
-        'name'      => $meal_name,
-        'place'     => $meal_place,
-        'provided'  => $meal_provided
+        'name'      => $meal_name ?? '',
+        'place'     => $meal_place ?? '',
+        'provided'  => $meal_provided ?? ''
     ];
 }
 
