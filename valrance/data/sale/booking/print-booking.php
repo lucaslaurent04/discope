@@ -512,10 +512,10 @@ if($booking['center_id']['template_category_id']) {
             }
             else {
                 if(!$snack) {
-                    $date_from .= ' (avec un pic-nic et un gouter amenés par vos soins)';
+                    $date_from .= ' (avec un pique-nique et un gouter amenés par vos soins)';
                 }
                 else {
-                    $date_from .= ' (avec un pic-nic apporté par vos soins)';
+                    $date_from .= ' (avec un pique-nique apporté par vos soins)';
                 }
             }
 
@@ -557,10 +557,10 @@ if($booking['center_id']['template_category_id']) {
                 }
                 else {
                     if($snack) {
-                        $date_to .= ' (en matinée avec pic-nic et goûter à emporter)';
+                        $date_to .= ' (en matinée avec pique-nique et goûter à emporter)';
                     }
                     else {
-                        $date_to .= ' (en matinée avec pic-nic à emporter)';
+                        $date_to .= ' (en matinée avec pique-nique à emporter)';
                     }
                 }
             }
@@ -578,8 +578,14 @@ if($booking['center_id']['template_category_id']) {
         if($part['name'] == 'service') {
             $value = $part['value'];
             if ($booking['customer_id']['rate_class_id']) {
-
-                $part_name = 'service_'. $booking['customer_id']['rate_class_id']['name'];
+                $map_rate_class = [
+                    1 => 'sejour',
+                    4 => 'groupe',
+                    5 => 'classe',
+                    6 => 'clsh',
+                    7 => 'cv'
+                ];
+                $part_name = 'service_'. $map_rate_class[$booking['customer_id']['rate_class_id']['id']];
                 $template_part = TemplatePart::search([['name', '=', $part_name], ['template_id', '=', $template['id']] ])
                         ->read(['value'], $params['lang'])
                         ->first(true);
