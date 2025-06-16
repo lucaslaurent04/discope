@@ -132,7 +132,7 @@ div.footer {
 
                 {% for date, details in group.dates %}
                     <tr>
-                        <td style="text-align: center; width: 5%; height: 100px; vertical-align: top;">
+                        <td style="text-align: center; width: 5%; height: 100px;">
                             <div style="display: flex; align-items: center; justify-content: center; ">
                                 <span style="display: inline-block; transform: rotate(-90deg); white-space: nowrap;">
                                     {{ date|split(' ')[0] }}<br>{{ date|split(' ', 2)[1] }}
@@ -141,7 +141,7 @@ div.footer {
                         </td>
                         {% for slot in time_slots_activities %}
                             {% set slot_code = slot.code %}
-                            <td style="text-align: left;">
+                            <td style="text-align: left; vertical-align: top;">
                                 {% set data = details.time_slots[slot_code] | default({}) %}
                                 <strong>{{ data['activity'] | default('') | raw }}</strong><br>
                                 {{ data['description'] | default('') | raw }}
