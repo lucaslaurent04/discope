@@ -269,7 +269,7 @@ $meals = BookingMeal::search(['booking_id', '=', $booking['id']])
     ->read(['date', 'time_slot_id' => ['code'], 'is_self_provided', 'meal_type_id' => ['code', 'name'], 'meal_place_id' => ['place_type']]);
 
 foreach($meals as $meal_id => $meal) {
-    $time_slot_code = ['B' => 'AM', 'L' => 'PM', 'D' => 'EV'][$meal['time_slot_id']['code']];
+    $time_slot_code = ['B' => 'AM', 'L' => 'PM', 'D' => 'EV'][$meal['time_slot_id']['code']] ?? $meal['time_slot_id']['code'];
     $date = date('d/m/Y', $meal['date']) . ' ' . $days_names[date('w', $meal['date'])];
 
     $meal_name = '';
