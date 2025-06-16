@@ -47,6 +47,12 @@
                 "label": "Lang",
                 "value": "lang_id",
                 "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "relationship",
+                "width": "10%",
+                "visible": false
             }
         ]
     }
