@@ -97,16 +97,15 @@ $orm->update(Booking::getType(), $booking_id, [
         'tour_operator_ref'     => $params['fields']['tour_operator_ref'] ?? ''
     ]);
 
-// re-create contacts
-Booking::id($booking_id)->do('import_contacts');
 
 // restore events in case this controller is chained with others
 $orm->enableEvents();
 
-// sync with customer
-$orm->update(Booking::getType(), $booking_id, [
-        'customer_identity_id'  => $params['fields']['customer_identity_id']
-    ]);
+Booking::id($booking_id)
+    // sync with customer
+    ->update(['customer_identity_id'  => $params['fields']['customer_identity_id']])
+    // re-create contacts
+    ->do('import_contacts');
 
 // 2) check customer history
 
