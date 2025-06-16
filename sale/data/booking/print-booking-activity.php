@@ -14,6 +14,7 @@ use Dompdf\Options as DompdfOptions;
 use equal\data\DataFormatter;
 use sale\booking\Booking;
 use sale\booking\BookingActivity;
+use sale\booking\BookingMeal;
 use sale\booking\Consumption;
 use sale\booking\TimeSlot;
 use Twig\Environment as TwigEnvironment;
@@ -260,6 +261,37 @@ usort($booking_activities, function ($a, $b) {
         ?: $a['activity_date'] <=> $b['activity_date'];
 });
 
+
+
+$map_meals = [];
+
+$meals = BookingMeal::search(['booking_id', '=', $booking['id']])
+    ->read(['date', 'time_slot_id' => ['code'], 'is_self_provided', 'meal_type_id' => ['code', 'name'], 'meal_place_id' => ['place_type']]);
+
+foreach($meals as $meal_id => $meal) {
+    $time_slot_code = $meal['time_slot_id']['code'];
+    if($meal['meal_type_id']['code'] == 'regular') {
+        $meal_name = ['B' => 'Petit déjeuner', 'L' => 'Déjeuner', 'D' => 'Dîner'][$time_slot_code];
+    }
+    else {
+        $meal_name = $meal['meal_type_id']['name'];
+    }
+    if($meal['meal_place_id']['code'] != 'offsite') {
+        $meal_place = 'au centre';
+    }
+    else {
+        $meal_place = 'en déplacement';
+    }
+
+    $meal_provided = $meal['is_self_provided'] ? 'par vos soins' : '';
+
+    $map_meals[$meal['date']][$meal['time_slot_id']['code']] = [
+        'name'      => $meal_name,
+        'place'     => $meal_place,
+        'provided'  => $meal_provided
+    ];
+}
+
 foreach($booking_activities as $activity) {
     $group_id = $activity['booking_line_group_id']['id'];
 
@@ -289,9 +321,10 @@ foreach($booking_activities as $activity) {
         }
     }
 
-    $time_slot_name = $activity['time_slot_id']['code'];
-    if(isset($activities_map[$group_id]['dates'][$date]['time_slots'][$time_slot_name])) {
-        $activities_map[$group_id]['dates'][$date]['time_slots'][$time_slot_name] = [
+    $time_slot_code = $activity['time_slot_id']['code'];
+    if(isset($activities_map[$group_id]['dates'][$date]['time_slots'][$time_slot_code])) {
+        $activities_map[$group_id]['dates'][$date]['time_slots'][$time_slot_code] = [
+            'meal'                  => $map_meals[$date][$time_slot_code] ?? null,
             'activity'              => $activity['product_model_id']['name'],
             'schedule_from'         => $activity['schedule_from'],
             'schedule_to'           => $activity['schedule_to'],

@@ -111,7 +111,8 @@ div.footer {
     <h3> {{ i18n['activity_schedule']|upper }}</h3>
     {% for group_id, group in activities_map %}
         <div style="position: relative; margin-top: 30px; margin-bottom: 30px;">
-            <table style="border: solid 1px black; border-collapse: collapse; width: 100%; page-break-inside: avoid;" border="1">
+            <table style="border: solid 1px black; border-collapse: collapse; width: 100%;" border="1">
+                <thead style="display: table-header-group;">
                 <tr>
                     <th rowspan="2">
                         {{ i18n['day'] }}
@@ -129,9 +130,9 @@ div.footer {
                         </th>
                     {% endfor %}
                 </tr>
-
+                </thead>
                 {% for date, details in group.dates %}
-                    <tr>
+                    <tr style="page-break-inside: avoid;">
                         <td style="text-align: center; width: 5%; height: 100px;">
                             <div style="display: flex; align-items: center; justify-content: center; ">
                                 <span style="display: inline-block; transform: rotate(-90deg); white-space: nowrap;">
@@ -142,9 +143,12 @@ div.footer {
                         {% for slot in time_slots_activities %}
                             {% set slot_code = slot.code %}
                             <td style="text-align: left; vertical-align: top; padding: 4px;">
+                                <strong>Repas:</strong> {{ data['meal']['name'] | default('') }}  {{ data['meal']['place'] | default('') }}  {{ data['meal']['provided'] | default('') }}<br>
                                 {% set data = details.time_slots[slot_code] | default({}) %}
                                 <strong>{{ data['activity'] | default('') | raw }}</strong><br>
-                                <strong>({{ data['schedule_from'] | date('H:i') }} - {{ data['schedule_to'] | date('H:i') }})</strong><br>
+                                {% if data['schedule_from'] != 0 and data['schedule_to'] != 0 %}
+                                    <strong>({{ data['schedule_from'] | date('H:i') }} - {{ data['schedule_to'] | date('H:i') }})</strong><br>
+                                {% endif %}
                                 {{ data['description'] | default('') | raw }}
                             </td>
                         {% endfor %}
