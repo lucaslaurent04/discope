@@ -295,9 +295,12 @@ foreach($booking_activities as $activity) {
             'activity'              => $activity['product_model_id']['name'],
             'schedule_from'         => $activity['schedule_from'],
             'schedule_to'           => $activity['schedule_to'],
-            'product_description'   => $activity['activity_booking_line_id']['product_id']['description'],
+            'description'           => $activity['description'],
+            /*
             'activity_description'  => $activity['description'],
+            'product_description'   => $activity['activity_booking_line_id']['product_id']['description'],
             'service_description'   => $activity['activity_booking_line_id']['description']
+            */
         ];
     }
 }

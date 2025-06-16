@@ -46,6 +46,12 @@ div.footer {
     overflow: hidden;
 }
 
+div.header {
+    top: 0;
+    left: 0;
+    height: 150px;
+}
+
 div.header table.header {
     width: 100%;
     border-spacing: 0px;
@@ -62,11 +68,6 @@ div.footer {
     overflow: visible;
     z-index: 200;
     font-size: 0.8em !important;
-}
-
-hr {
-    page-break-after: always;
-    border: 0;
 }
 
 </style>
@@ -107,9 +108,9 @@ hr {
 
 
 {% if activities_map | length > 0 %}
-    <h3> {{ i18n['activity_schedule'] | upper }}</h3>
+    <h3> {{ i18n['activity_schedule']|upper }}</h3>
     {% for group_id, group in activities_map %}
-        <div style="position: relative; margin-top: 30px; margin-bottom: 30px; page-break-inside: avoid;">
+        <div style="position: relative; margin-top: 30px; margin-bottom: 30px;">
             <table style="border: solid 1px black; border-collapse: collapse; width: 100%;" border="1">
                 <tr>
                     <th rowspan="2">
@@ -124,7 +125,7 @@ hr {
                 <tr>
                     {% for slot in time_slots_activities %}
                         <th style="text-align: center; width: 25%;">
-                            {{ slot.name }}
+                            {{ slot.name }} ({{ slot.schedule_from|date('H:i') }} - {{ slot.schedule_to|date('H:i') }})
                         </th>
                     {% endfor %}
                 </tr>
@@ -134,23 +135,16 @@ hr {
                         <td style="text-align: center; width: 5%; height: 100px;">
                             <div style="display: flex; align-items: center; justify-content: center; ">
                                 <span style="display: inline-block; transform: rotate(-90deg); white-space: nowrap;">
-                                    {{ date | split(' ')[0] }}<br /><strong>{{ date | split(' ', 2)[1] }}</strong>
+                                    {{ date|split(' ')[0] }}<br>{{ date|split(' ', 2)[1] }}
                                 </span>
                             </div>
                         </td>
                         {% for slot in time_slots_activities %}
                             {% set slot_code = slot.code %}
-                            <td style="text-align: left; vertical-align: top; padding: 4px;">
+                            <td style="text-align: left;">
                                 {% set data = details.time_slots[slot_code] | default({}) %}
-                                {% if data.activity is defined and data.activity | trim != '' %}
-                                    <strong>{{ data['activity'] | default('') | raw }}</strong><br />
-                                    <strong>({{ data['schedule_from'] | date('H:i') }} - {{ data['schedule_to'] | date('H:i') }})</strong><br />
-                                    <!--
-                                    {{ data['service_description'] | default('') | raw }}<br />
-                                    {{ data['product_description'] | default('') | raw }}<br />
-                                    -->
-                                    {{ data['activity_description'] | default('') | raw }}
-                                {% endif %}
+                                <strong>{{ data['activity'] | default('') | raw }}</strong><br>
+                                {{ data['description'] | default('') | raw }}
                             </td>
                         {% endfor %}
                     </tr>
