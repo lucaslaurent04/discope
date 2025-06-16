@@ -273,6 +273,10 @@ foreach($meals as $meal_id => $meal) {
     $date = date('d/m/Y', $meal['date']) . ' ' . $days_names[date('w', $meal['date'])];
     $meal_provided = $meal['is_self_provided'] ? 'par vos soins' : '';
 
+    $meal_name = '';
+    $meal_place = '';
+    $meal_provided = '';
+
     if($meal['meal_type_id']['code'] == 'regular') {
         $meal_name = ['AM' => 'Petit déjeuner', 'PM' => 'Déjeuner', 'EV' => 'Dîner'][$time_slot_code];
     }
@@ -289,9 +293,9 @@ foreach($meals as $meal_id => $meal) {
     }
 
     $map_meals[$date][$time_slot_code] = [
-        'name'      => $meal_name ?? '',
-        'place'     => $meal_place ?? '',
-        'provided'  => $meal_provided ?? ''
+        'name'      => $meal_name,
+        'place'     => $meal_place,
+        'provided'  => $meal_provided
     ];
 }
 
