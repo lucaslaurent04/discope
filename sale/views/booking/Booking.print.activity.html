@@ -125,7 +125,7 @@ div.footer {
                 <tr>
                     {% for slot in time_slots_activities %}
                         <th style="text-align: center; width: 25%;">
-                            {{ slot.name }} ({{ slot.schedule_from|date('H:i') }} - {{ slot.schedule_to|date('H:i') }})
+                            {{ slot.name }}
                         </th>
                     {% endfor %}
                 </tr>
@@ -135,7 +135,7 @@ div.footer {
                         <td style="text-align: center; width: 5%; height: 100px;">
                             <div style="display: flex; align-items: center; justify-content: center; ">
                                 <span style="display: inline-block; transform: rotate(-90deg); white-space: nowrap;">
-                                    {{ date|split(' ')[0] }}<br>{{ date|split(' ', 2)[1] }}
+                                    {{ date|split(' ')[0] }}<br>{{ date | split(' ', 2)[1] }}
                                 </span>
                             </div>
                         </td>
@@ -144,6 +144,7 @@ div.footer {
                             <td style="text-align: left; vertical-align: top; padding: 4px;">
                                 {% set data = details.time_slots[slot_code] | default({}) %}
                                 <strong>{{ data['activity'] | default('') | raw }}</strong><br>
+                                <strong>({{ data['schedule_from'] | date('H:i') }} - {{ data['schedule_to'] | date('H:i') }})</strong><br>
                                 {{ data['description'] | default('') | raw }}
                             </td>
                         {% endfor %}
