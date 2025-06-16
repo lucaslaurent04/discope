@@ -530,6 +530,14 @@ class Booking extends Model {
         ];
     }
 
+    /**
+     * #memo - this is necessary when a Booking is created at once using ::create
+     *
+     */
+    public static function oncreate($self) {
+        $self->do('import_contacts');
+    }
+
     public static function calcName($om, $oids, $lang) {
         $result = [];
 

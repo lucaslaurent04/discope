@@ -102,7 +102,7 @@ $orm->update(Booking::getType(), $booking_id, [
 $orm->enableEvents();
 
 Booking::id($booking_id)
-    // sync with customer
+    // assign identity & sync with customer
     ->update(['customer_identity_id'  => $params['fields']['customer_identity_id']])
     // re-create contacts
     ->do('import_contacts');
