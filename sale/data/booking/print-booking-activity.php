@@ -276,11 +276,16 @@ foreach($meals as $meal_id => $meal) {
     $meal_place = '';
     $meal_provided = $meal['is_self_provided'] ? 'par vos soins' : '';
 
-    if($meal['meal_type_id']['code'] == 'regular' && in_array($meal['time_slot_id']['code'], ['B', 'L', 'D'])) {
-        $meal_name = ['AM' => 'Petit déjeuner', 'PM' => 'Déjeuner', 'EV' => 'Dîner'][$time_slot_code];
+    if(in_array($meal['time_slot_id']['code'], ['B', 'L', 'D'])) {
+        if($meal['meal_type_id']['code'] == 'regular') {
+            $meal_name = ['AM' => 'Petit déjeuner', 'PM' => 'Déjeuner', 'EV' => 'Dîner'][$time_slot_code];
+        }
+        else {
+            $meal_name = $meal['meal_type_id']['name'];
+        }
     }
     else {
-        $meal_name = $meal['meal_type_id']['name'];
+        $meal_name = 'Goûter';
     }
     if($meal['meal_place_id']['code'] != 'offsite') {
         if(!$meal['is_self_provided']) {
