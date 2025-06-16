@@ -50,6 +50,11 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
             'type'          => 'string',
             'selection'     => ['pdf', 'html'],
             'default'       => 'pdf'
+        ],
+        'booking_line_group_id' => [
+            'type'          => 'many2one',
+            'foreign_object'=> 'sale\booking\BookingLineGroup',
+            'description'   => 'Identifier of the booking line group (sojourn) to print.'
         ]
     ],
     'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
@@ -256,10 +261,14 @@ usort($booking_activities, function ($a, $b) {
 });
 
 foreach($booking_activities as $activity) {
-    $group = $activity['booking_line_group_id']['id'];
+    $group_id = $activity['booking_line_group_id']['id'];
 
-    if(!isset($activities_map[$group])) {
-        $activities_map[$group] = [
+    if(isset($params['booking_line_group_id']) && $params['booking_line_group_id'] != $group_id) {
+        continue;
+    }
+
+    if(!isset($activities_map[$group_id])) {
+        $activities_map[$group_id] = [
             'info' => [
                 'name' => $activity['booking_line_group_id']['name'],
                 'nb_pers' => $activity['booking_line_group_id']['nb_pers'],
@@ -270,19 +279,19 @@ foreach($booking_activities as $activity) {
     }
 
     $date = date('d/m/Y', $activity['activity_date']) . ' ' . $days_names[date('w', $activity['activity_date'])];
-    if(!isset($activities_map[$group]['dates'][$date])) {
-        $activities_map[$group]['dates'][$date] = [
+    if(!isset($activities_map[$group_id]['dates'][$date])) {
+        $activities_map[$group_id]['dates'][$date] = [
             'time_slots' => []
         ];
 
         foreach($time_slots_activities as $time_slot) {
-            $activities_map[$group]['dates'][$date]['time_slots'][$time_slot['code']] = [];
+            $activities_map[$group_id]['dates'][$date]['time_slots'][$time_slot['code']] = [];
         }
     }
 
     $time_slot_name = $activity['time_slot_id']['code'];
-    if(isset($activities_map[$group]['dates'][$date]['time_slots'][$time_slot_name])) {
-        $activities_map[$group]['dates'][$date]['time_slots'][$time_slot_name] = [
+    if(isset($activities_map[$group_id]['dates'][$date]['time_slots'][$time_slot_name])) {
+        $activities_map[$group_id]['dates'][$date]['time_slots'][$time_slot_name] = [
             'activity'              => $activity['product_model_id']['name'],
             'schedule_from'         => $activity['schedule_from'],
             'schedule_to'           => $activity['schedule_to'],
