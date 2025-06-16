@@ -158,7 +158,7 @@ $fields = [
             'email'
     ],
     'customer_id' => [
-        'rate_class_id' => ['id', 'name'],
+        'rate_class_id' => ['id', 'name', 'code'],
         'partner_identity_id' => [
             'id',
             'display_name',
@@ -238,7 +238,7 @@ $fields = [
         'total',
         'price',
         'fare_benefit',
-        'rate_class_id' => ['id', 'name', 'description'],
+        'rate_class_id' => ['id', 'name', 'code', 'description'],
         'date_from',
         'date_to',
         'nb_pers',
@@ -579,13 +579,13 @@ if($booking['center_id']['template_category_id']) {
             $value = $part['value'];
             if($booking['customer_id']['rate_class_id']) {
                 $map_rate_class = [
-                    1 => 'sejour',
-                    4 => 'groupe',
-                    5 => 'classe',
-                    6 => 'clsh',
-                    7 => 'cv'
+                    230 => 'sejour',
+                    220 => 'groupe',
+                    210 => 'classe',
+                    250 => 'clsh',
+                    240 => 'cv'
                 ];
-                $part_name = 'service_'. $map_rate_class[$booking['customer_id']['rate_class_id']['id']];
+                $part_name = 'service_'. $map_rate_class[$booking['customer_id']['rate_class_id']['code']];
                 $template_part = TemplatePart::search([['name', '=', $part_name], ['template_id', '=', $template['id']] ])
                         ->read(['value'], $params['lang'])
                         ->first(true);
