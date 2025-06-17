@@ -1547,6 +1547,7 @@ class BookingLine extends Model {
             'is_accomodation',
             'is_meal',
             'is_snack',
+            'product_id.is_freebie_excluded',
             'product_id.product_model_id.has_duration',
             'product_id.product_model_id.duration',
             'product_id.product_model_id.is_repeatable',
@@ -1566,6 +1567,12 @@ class BookingLine extends Model {
         foreach($lines as $id => $line) {
             $free_qty = 0;
 
+            if($line['product_id.is_freebie_excluded']) {
+                // if product is excluded from freebies, no free quantity
+                $result[$id] = 0;
+                continue;
+            }
+
             $adapters = $om->read('sale\booking\BookingPriceAdapter', $line['auto_discounts_ids'], ['type', 'value']);
             foreach($adapters as $adapter_id => $adapter) {
                 if($adapter['type'] == 'freebie') {
@@ -1580,8 +1587,7 @@ class BookingLine extends Model {
                 }
             }
 
-            // #memo - for all sojourn types, freebies apply only on meals and accommodations
-            if($age_range_freebies && ($line['is_accomodation'] || $line['is_meal'] || $line['is_snack'])) {
+            if($age_range_freebies) {
                 $nb_repeat = 1;
                 if($line['product_id.product_model_id.has_duration']) {
                     $nb_repeat = $line['product_id.product_model_id.duration'];
