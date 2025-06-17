@@ -53,7 +53,7 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "is_freebie_excluded",
+                                                "value": "is_freebie_allowed",
                                                 "width": "50%"
                                             },
                                             {

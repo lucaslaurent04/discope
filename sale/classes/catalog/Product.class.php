@@ -190,10 +190,10 @@ class Product extends Model {
                 'store'             => true
             ],
 
-            'is_freebie_excluded' => [
+            'is_freebie_allowed' => [
                 'type'              => 'boolean',
-                'description'       => 'Is the product excluded from freebies?',
-                'help'              => 'If set, the product will not be considered when computing the freebie eligibility.',
+                'description'       => 'Is the product eligible for freebies?',
+                'help'              => 'If not set, the product will not be considered when computing the freebies eligibility.',
                 'default'           => false
             ],
 
