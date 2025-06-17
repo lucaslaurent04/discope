@@ -111,7 +111,20 @@ else {
         ];
 
     // sanitize / exclude fields
-    // #memo - sanitizing has been removed and any values is accepted by specific entity channelmanager\Identity
+
+    if(!(preg_match('/^[A-Z]{2}$/u', $values['address_country']))) {
+       $values['address_country'] = 'BE';
+    }
+
+    if(!preg_match('/^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/', $values['email'])) {
+        unset($values['email']);
+    }
+
+    if(in_array($values['address_zip'], ['na', 'n/a', '000', '0000', '00000'])) {
+        unset($values['address_zip']);
+    }
+
+    // #memo - for other fields sanitizing has been removed and any values is accepted by specific entity channelmanager\Identity
     /*
     if(!(preg_match('/^[\w\'\-,.][^0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]{1,}$/u', $values['firstname'])) || strlen($values['firstname']) <= 0) {
         $values['firstname'] = "prénom-invalide";
@@ -119,15 +132,9 @@ else {
     if(!(preg_match('/^[\w\'\-,.][^0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]{1,}$/u', $values['lastname'])) || strlen($values['lastname']) <= 0) {
         $values['lastname'] = "nom-invalide";
     }
-    if(!(preg_match('/^[A-Z]{2}$/u', $values['address_country']))) {
-       $values['address_country'] = 'BE';
-    }
     $sanitized_phone = str_replace(['.', '/', ' ', '-'], '', $values['phone']);
     if(!preg_match('/^[\+]?[0-9]{6,13}$/', $sanitized_phone)) {
         unset($values['phone']);
-    }
-    if(!preg_match('/^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/', $values['email'])) {
-        unset($values['email']);
     }
     */
     // create a new identity
