@@ -68,6 +68,11 @@
             "description": "Produit visible et sélectionnable ?",
             "help": ""
         },
+        "is_freebie_allowed": {
+            "label": "Gratuité autorisée",
+            "description": "Le produit peut-il être offert gratuitement ?",
+            "help": ""
+        },
         "stat_section_id": {
             "label": "Statistiques",
             "description": "Section statistique associée au produit.",
