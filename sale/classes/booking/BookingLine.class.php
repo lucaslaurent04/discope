@@ -1547,7 +1547,7 @@ class BookingLine extends Model {
             'is_accomodation',
             'is_meal',
             'is_snack',
-            'product_id.is_freebie_excluded',
+            'product_id.is_freebie_allowed',
             'product_id.product_model_id.has_duration',
             'product_id.product_model_id.duration',
             'product_id.product_model_id.is_repeatable',
@@ -1567,7 +1567,7 @@ class BookingLine extends Model {
         foreach($lines as $id => $line) {
             $free_qty = 0;
 
-            if($line['product_id.is_freebie_excluded']) {
+            if(!$line['product_id.is_freebie_allowed']) {
                 // if product is excluded from freebies, no free quantity
                 $result[$id] = 0;
                 continue;
