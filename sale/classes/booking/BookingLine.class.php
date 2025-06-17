@@ -1545,6 +1545,8 @@ class BookingLine extends Model {
             'manual_discounts_ids',
             'qty_accounting_method',
             'is_accomodation',
+            'is_meal',
+            'is_snack',
             'product_id.product_model_id.has_duration',
             'product_id.product_model_id.duration',
             'product_id.product_model_id.is_repeatable',
@@ -1578,7 +1580,8 @@ class BookingLine extends Model {
                 }
             }
 
-            if($age_range_freebies) {
+            // #memo - for all sojourn types, freebies apply only on meals and accommodations
+            if($age_range_freebies && ($line['is_accomodation'] || $line['is_meal'] || $line['is_snack'])) {
                 $nb_repeat = 1;
                 if($line['product_id.product_model_id.has_duration']) {
                     $nb_repeat = $line['product_id.product_model_id.duration'];
