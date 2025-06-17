@@ -49,7 +49,12 @@
                                             {
                                                 "type": "field",
                                                 "value": "can_sell",
-                                                "width": "100%"
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_freebie_excluded",
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",

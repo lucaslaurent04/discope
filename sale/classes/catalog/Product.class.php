@@ -190,6 +190,13 @@ class Product extends Model {
                 'store'             => true
             ],
 
+            'is_freebie_excluded' => [
+                'type'              => 'boolean',
+                'description'       => 'Is the product excluded from freebies?',
+                'help'              => 'If set, the product will not be considered when computing the freebie eligibility.',
+                'default'           => false
+            ],
+
             // if the organisation uses price-lists, the price to use depends on the applicable
 
             'prices_ids' => [
