@@ -887,7 +887,7 @@ if($params['mode'] === 'grouped') {
     foreach($lines_map as $booking_line_group_id => $groupings) {
         foreach($groupings as $grouping_code_id => $products) {
             foreach($products as $product_id => $product) {
-                if (!isset($lines[$grouping_code_id])) {
+                if(!isset($lines[$grouping_code_id])) {
                         $lines[$grouping_code_id] = [
                             'name'          => $product['grouping'],
                             'unit_price'    => 0,
@@ -900,9 +900,10 @@ if($params['mode'] === 'grouped') {
                             'is_pack'       => false
                         ];
                 }
-                $lines[$grouping_code_id]['price'] += $product['price'];
+
                 $lines[$grouping_code_id]['total'] += $product['total'];
-                $lines[$grouping_code_id]['unit_price'] += $product['unit_price'];
+                $lines[$grouping_code_id]['price'] += $product['price'];
+                $lines[$grouping_code_id]['unit_price'] += $product['total'];
             }
         }
     }
