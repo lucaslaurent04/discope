@@ -905,6 +905,9 @@ if($params['mode'] === 'grouped') {
                 $lines[$grouping_code_id]['price'] += $product['price'];
                 $lines[$grouping_code_id]['unit_price'] += $product['total'];
             }
+            if($lines[$grouping_code_id]['price'] == 0.0) {
+                unset($lines[$grouping_code_id]);
+            }
         }
     }
 
