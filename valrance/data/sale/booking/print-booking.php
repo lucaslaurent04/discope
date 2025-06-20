@@ -905,9 +905,12 @@ if($params['mode'] === 'grouped') {
                 $lines[$grouping_code_id]['price'] += $product['price'];
                 $lines[$grouping_code_id]['unit_price'] += $product['total'];
             }
+            /*
+            // #memo - we must display all grouping lines, even if the price is 0.0 (to show the customer what is included, even if free)
             if($lines[$grouping_code_id]['price'] == 0.0) {
                 unset($lines[$grouping_code_id]);
             }
+            */
         }
     }
 
