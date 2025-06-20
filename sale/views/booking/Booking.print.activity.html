@@ -108,7 +108,7 @@ div.footer {
 
 
 {% if activities_map | length > 0 %}
-    <h3> {{ i18n['activity_schedule']|upper }}</h3>
+    <h3> {{ i18n['activity_schedule'] | upper }}</h3>
     {% for group_id, group in activities_map %}
         <div style="position: relative; margin-top: 30px; margin-bottom: 30px;">
             <table style="border: solid 1px black; border-collapse: collapse; width: 100%;" border="1">
@@ -162,6 +162,9 @@ div.footer {
                 {% endfor %}
             </table>
         </div>
+        {% if not loop.last %}
+            <div style="page-break-after: always;"></div>
+        {% endif %}
     {% endfor %}
 {% endif %}
 
