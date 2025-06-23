@@ -25,7 +25,7 @@ use sale\catalog\Family;
 
         'name' => [
             'type'              => 'string',
-            'description'       => "Search by keywords."
+            'description'       => "Search by non-contiguous keywords."
         ],
 
         'price_list_id' => [
