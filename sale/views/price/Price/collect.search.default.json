@@ -29,8 +29,8 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "label": "Active",
-                                                "value": "is_active",
+                                                "label": "Name",
+                                                "value": "name",
                                                 "width": "100%"
                                             }
                                         ]
@@ -48,6 +48,12 @@
                                                 "type": "field",
                                                 "label": "Center",
                                                 "value": "center_id",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Active",
+                                                "value": "is_active",
                                                 "width": "100%"
                                             }
                                         ]
