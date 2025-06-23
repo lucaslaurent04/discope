@@ -7,34 +7,60 @@
 */
 
 use equal\orm\Domain;
+use sale\camp\catalog\Product;
+use sale\camp\catalog\ProductModel;
+use sale\camp\price\Price;
+use sale\catalog\Family;
 
 [$params, $providers] = eQual::announce([
-    'description'   => 'Advanced search for Bookings: returns a collection of Booking according to extra parameters.',
+    'description'   => "Advanced search for Prices: returns a collection of Price according to extra parameters.",
     'extends'       => 'core_model_collect',
     'params'        => [
+
         'entity' =>  [
-            'description'   => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
-            'type'          => 'string',
-            'default'       => 'sale\price\Price'
+            'type'              => 'string',
+            'description'       => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
+            'default'           => 'sale\price\Price'
+        ],
+
+        'name' => [
+            'type'              => 'string',
+            'description'       => "Search by non-contiguous keywords."
         ],
 
         'price_list_id' => [
             'type'              => 'many2one',
+            'description'       => "The Price List the price belongs to.",
             'foreign_object'    => 'sale\price\PriceList'
         ],
 
         'center_id' => [
             'type'              => 'many2one',
+            'description'       => "The Center of the Price (Product -> ProductModel -> Family).",
             'foreign_object'    => 'identity\Center'
         ],
 
         'product_id' => [
             'type'              => 'many2one',
+            'description'       => "The Product (sku) the price applies to.",
             'foreign_object'    => 'sale\catalog\Product',
         ],
 
         'is_active' => [
-            'type'              => 'boolean'
+            'type'              => 'boolean',
+            'description'       => "Is the price currently applicable?"
+        ],
+
+        'rate_class_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\customer\RateClass',
+            'description'       => "The rate class that applies to the price, defining variations based on the target audience."
+        ],
+
+        'grouping_code_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\catalog\GroupingCode',
+            'description'       => "The GroupingCode of the Price (Product)."
         ]
 
     ],
@@ -43,14 +69,13 @@ use equal\orm\Domain;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm' ]
+    'providers'     => ['context']
 ]);
 
 /**
  * @var \equal\php\Context $context
- * @var \equal\orm\ObjectManager $orm
  */
-['context' => $context, 'orm' => $orm] = $providers;
+['context' => $context] = $providers;
 
 
 /*
@@ -60,22 +85,84 @@ use equal\orm\Domain;
 $domain = $params['domain'];
 $prices_ids = [];
 
+if(!empty($params['name'])) {
+    $keywords = explode(' ', trim($params['name']));
+    foreach($keywords as $keyword) {
+        $domain = Domain::conditionAdd($domain, ['name', 'ilike', '%'.$keyword.'%']);
+    }
+}
 
-if(isset($params['is_active']) && $params['is_active'] === true ) {
+if(isset($params['is_active']) && $params['is_active'] === true) {
     $domain = Domain::conditionAdd($domain, ['is_active', '=', true]);
 }
 
-if(isset($params['product_id']) && ($params['product_id'] > 0 )) {
+if(isset($params['rate_class_id']) && $params['rate_class_id'] > 0) {
+    $domain = Domain::conditionAdd($domain, ['rate_class_id', '=', $params['rate_class_id']]);
+}
+
+if(isset($params['grouping_code_id']) && $params['grouping_code_id'] > 0) {
+    $products = Product::search(['grouping_code_id', 'in', $params['grouping_code_id']])
+        ->read(['id'])
+        ->get(true);
+
+    $products_ids = array_column($products, 'id');
+
+    $domain = Domain::conditionAdd($domain, ['product_id', 'in', $products_ids]);
+}
+
+if(isset($params['product_id']) && $params['product_id'] > 0) {
     $domain = Domain::conditionAdd($domain, ['product_id', '=', $params['product_id']]);
 }
 
-if(isset($params['price_list_id']) && ($params['price_list_id'] > 0 )) {
+if(isset($params['price_list_id']) && $params['price_list_id'] > 0) {
     $domain = Domain::conditionAdd($domain, ['price_list_id', '=', $params['price_list_id']]);
 }
 
 if(isset($params['center_id']) && $params['center_id'] > 0) {
-    // add constraint on center_id
-    $domain = Domain::conditionAdd($domain, ['center_id', '=', $params['center_id']]);
+    $prices_ids = [];
+
+    $families = Family::search()
+        ->read(['centers_ids', 'product_models_ids'])
+        ->get(true);
+
+    $family_product_models_ids = [];
+    foreach($families as $family) {
+        if(!in_array($params['center_id'], $family['centers_ids'])) {
+            continue;
+        }
+        foreach($family['product_models_ids'] as $product_models_id) {
+            $family_product_models_ids[$product_models_id] = true;
+        }
+    }
+    $family_product_models_ids = array_keys($family_product_models_ids);
+
+    if(!empty($family_product_models_ids)) {
+        $product_models = ProductModel::ids($family_product_models_ids)
+            ->read(['products_ids'])
+            ->get(true);
+
+        $family_products_ids = [];
+        foreach($product_models as $product_model) {
+            foreach($product_model['products_ids'] as $product_id) {
+                $family_products_ids[$product_id] = true;
+            }
+        }
+        $family_products_ids = array_keys($family_products_ids);
+
+        if(!empty($family_products_ids)) {
+            $prices = Price::search()
+                ->read(['product_id'])
+                ->get(true);
+
+            foreach($prices as $price) {
+                if(in_array($price['product_id'], $family_products_ids)) {
+                    $prices_ids[] = $price['id'];
+                }
+            }
+        }
+    }
+
+    $domain = Domain::conditionAdd($domain, ['id', 'in', $prices_ids]);
 }
 
 if(count($prices_ids)) {
@@ -85,7 +172,6 @@ if(count($prices_ids)) {
 $params['domain'] = $domain;
 
 $result = eQual::run('get', 'model_collect', $params, true);
-
 
 $context->httpResponse()
         ->body($result)
