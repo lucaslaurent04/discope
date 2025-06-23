@@ -29,7 +29,6 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "label": "Name",
                                                 "value": "name",
                                                 "width": "100%"
                                             }
