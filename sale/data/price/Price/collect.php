@@ -23,6 +23,11 @@ use sale\catalog\Family;
             'default'           => 'sale\price\Price'
         ],
 
+        'name' => [
+            'type'              => 'string',
+            'description'       => "Search by keywords."
+        ],
+
         'price_list_id' => [
             'type'              => 'many2one',
             'description'       => "The Price List the price belongs to.",
@@ -69,7 +74,6 @@ use sale\catalog\Family;
 
 /**
  * @var \equal\php\Context $context
- * @var \equal\orm\ObjectManager $orm
  */
 ['context' => $context] = $providers;
 
@@ -81,6 +85,12 @@ use sale\catalog\Family;
 $domain = $params['domain'];
 $prices_ids = [];
 
+if(!empty($params['name'])) {
+    $keywords = explode(' ', trim($params['name']));
+    foreach($keywords as $keyword) {
+        $domain = Domain::conditionAdd($domain, ['name', 'ilike', '%'.$keyword.'%']);
+    }
+}
 
 if(isset($params['is_active']) && $params['is_active'] === true) {
     $domain = Domain::conditionAdd($domain, ['is_active', '=', true]);
