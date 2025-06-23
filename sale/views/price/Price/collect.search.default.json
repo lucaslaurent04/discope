@@ -40,6 +40,12 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "label": "Grouping Code",
+                                                "value": "grouping_code_id",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "label": "Center",
                                                 "value": "center_id",
                                                 "width": "100%"

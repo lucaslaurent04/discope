@@ -7,6 +7,7 @@
 */
 
 use equal\orm\Domain;
+use sale\camp\catalog\Product;
 use sale\camp\catalog\ProductModel;
 use sale\camp\price\Price;
 use sale\catalog\Family;
@@ -17,9 +18,9 @@ use sale\catalog\Family;
     'params'        => [
 
         'entity' =>  [
-            'type'          => 'string',
-            'description'   => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
-            'default'       => 'sale\price\Price'
+            'type'              => 'string',
+            'description'       => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
+            'default'           => 'sale\price\Price'
         ],
 
         'price_list_id' => [
@@ -30,7 +31,7 @@ use sale\catalog\Family;
 
         'center_id' => [
             'type'              => 'many2one',
-            'description'       => "The Center ",
+            'description'       => "The Center of the Price (Product -> ProductModel -> Family).",
             'foreign_object'    => 'identity\Center'
         ],
 
@@ -49,6 +50,12 @@ use sale\catalog\Family;
             'type'              => 'many2one',
             'foreign_object'    => 'sale\customer\RateClass',
             'description'       => "The rate class that applies to the price, defining variations based on the target audience."
+        ],
+
+        'grouping_code_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\catalog\GroupingCode',
+            'description'       => "The GroupingCode of the Price (Product)."
         ]
 
     ],
@@ -81,6 +88,16 @@ if(isset($params['is_active']) && $params['is_active'] === true) {
 
 if(isset($params['rate_class_id']) && $params['rate_class_id'] > 0) {
     $domain = Domain::conditionAdd($domain, ['rate_class_id', '=', $params['rate_class_id']]);
+}
+
+if(isset($params['grouping_code_id']) && $params['grouping_code_id'] > 0) {
+    $products = Product::search(['grouping_code_id', 'in', $params['grouping_code_id']])
+        ->read(['id'])
+        ->get(true);
+
+    $products_ids = array_column($products, 'id');
+
+    $domain = Domain::conditionAdd($domain, ['product_id', 'in', $products_ids]);
 }
 
 if(isset($params['product_id']) && $params['product_id'] > 0) {
