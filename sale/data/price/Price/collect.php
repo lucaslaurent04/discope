@@ -43,6 +43,12 @@ use sale\catalog\Family;
         'is_active' => [
             'type'              => 'boolean',
             'description'       => "Is the price currently applicable?"
+        ],
+
+        'rate_class_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\customer\RateClass',
+            'description'       => "The rate class that applies to the price, defining variations based on the target audience."
         ]
 
     ],
@@ -73,11 +79,15 @@ if(isset($params['is_active']) && $params['is_active'] === true) {
     $domain = Domain::conditionAdd($domain, ['is_active', '=', true]);
 }
 
-if(isset($params['product_id']) && ($params['product_id'] > 0)) {
+if(isset($params['rate_class_id']) && $params['rate_class_id'] > 0) {
+    $domain = Domain::conditionAdd($domain, ['rate_class_id', '=', $params['rate_class_id']]);
+}
+
+if(isset($params['product_id']) && $params['product_id'] > 0) {
     $domain = Domain::conditionAdd($domain, ['product_id', '=', $params['product_id']]);
 }
 
-if(isset($params['price_list_id']) && ($params['price_list_id'] > 0)) {
+if(isset($params['price_list_id']) && $params['price_list_id'] > 0) {
     $domain = Domain::conditionAdd($domain, ['price_list_id', '=', $params['price_list_id']]);
 }
 

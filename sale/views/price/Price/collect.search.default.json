@@ -49,7 +49,12 @@
                                     {
                                         "width": "33%",
                                         "items": [
-
+                                            {
+                                                "type": "field",
+                                                "label": "Rate Class",
+                                                "value": "rate_class_id",
+                                                "width": "100%"
+                                            }
                                         ]
                                     }
                                 ]
