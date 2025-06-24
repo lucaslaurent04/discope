@@ -28,7 +28,7 @@ class CustomerNature extends Model {
                 'description'       => "Short description of the customer nature.",
                 'multilang'         => true
             ],
-            
+
             'rate_class_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\RateClass',

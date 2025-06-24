@@ -9,6 +9,7 @@ namespace sale\booking;
 use core\setting\Setting;
 use equal\orm\Model;
 use identity\CenterOffice;
+use sale\customer\CustomerNature;
 
 class Booking extends Model {
 
@@ -83,6 +84,13 @@ class Booking extends Model {
                 'description'       => 'Nature of the customer (synced with customer) for views convenience.',
                 'onupdate'          => 'onupdateCustomerNatureId',
                 'required'          => true
+            ],
+
+            'customer_rate_class_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\customer\RateClass',
+                'description'       => 'Rate class that applies to the customer.',
+                'onupdate'          => 'onupdateCustomerRateClassId',
             ],
 
             'organisation_id' => [
@@ -1020,11 +1028,25 @@ class Booking extends Model {
         $bookings = $om->read(self::getType(), $oids, ['customer_id', 'customer_nature_id', 'customer_nature_id.rate_class_id'], $lang);
 
         if($bookings > 0) {
-            foreach($bookings as $oid => $odata) {
-                if($odata['customer_nature_id.rate_class_id']) {
-                    $om->update('sale\customer\Customer', $odata['customer_id'], [
-                        'customer_nature_id'    => $odata['customer_nature_id'],
-                        'rate_class_id'         => $odata['customer_nature_id.rate_class_id']
+            foreach($bookings as $id => $booking) {
+                if($booking['customer_nature_id.rate_class_id']) {
+                    $om->update('sale\customer\Customer', $booking['customer_id'], [
+                        'customer_nature_id'    => $booking['customer_nature_id'],
+                        'rate_class_id'         => $booking['customer_nature_id.rate_class_id']
+                    ]);
+                }
+            }
+        }
+    }
+
+    public static function onupdateCustomerRateClassId($om, $oids, $values, $lang) {
+        $bookings = $om->read(self::getType(), $oids, ['customer_id', 'rate_class_id'], $lang);
+
+        if($bookings > 0) {
+            foreach($bookings as $id => $booking) {
+                if($booking['rate_class_id']) {
+                    $om->update('sale\customer\Customer', $booking['customer_id'], [
+                        'rate_class_id'         => $booking['rate_class_id.rate_class_id']
                     ]);
                 }
             }
@@ -1244,6 +1266,13 @@ class Booking extends Model {
                     }
                 }
             }
+        }
+        elseif(isset($event['customer_nature_id'])) {
+            $customer_nature = CustomerNature::id($event['customer_nature_id'])->read(['rate_class_id' => ['id', 'name']])->first(true);
+            $result['customer_rate_class_id'] = [
+                'id'    => $customer_nature['rate_class_id']['id'],
+                'name'  => $customer_nature['rate_class_id']['name']
+            ];
         }
 
         return $result;
