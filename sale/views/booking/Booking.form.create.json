@@ -71,6 +71,24 @@
                                                 }
                                             },
                                             {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Customer Nature",
+                                                "value": "customer_rate_class_id",
+                                                "width": "50%",
+                                                "widget":{
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
                                                 "type": "field",
                                                 "value": "customer_id",
                                                 "width": "25%",
