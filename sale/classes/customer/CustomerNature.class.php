@@ -41,7 +41,7 @@ class CustomerNature extends Model {
                 'foreign_object'    => 'sale\customer\CustomerType',
                 'description'       => "The customer type the nature relates to.",
                 'required'          => true
-            ],            
+            ]
         ];
     }
 
