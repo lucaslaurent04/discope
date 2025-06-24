@@ -9,6 +9,7 @@ namespace sale\booking;
 use core\setting\Setting;
 use equal\orm\Model;
 use identity\CenterOffice;
+use sale\customer\Customer;
 use sale\customer\CustomerNature;
 
 class Booking extends Model {
@@ -94,9 +95,13 @@ class Booking extends Model {
             ],
 
             'organisation_id' => [
-                'type'              => 'many2one',
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
                 'foreign_object'    => 'identity\Identity',
-                'description'       => "The organisation the establishment belongs to."
+                'description'       => "The organisation the establishment belongs to.",
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['center_id' => 'organisation_id']
             ],
 
             'center_id' => [
@@ -988,6 +993,8 @@ class Booking extends Model {
      */
     public static function onupdateCustomerId($om, $oids, $values, $lang) {
 
+        /*
+        // #memo - this has been removed to allow manual assignment of rat_class_id
         // update rate_class, based on customer
         $bookings = $om->read(self::getType(), $oids, [
             'booking_lines_groups_ids',
@@ -1004,6 +1011,7 @@ class Booking extends Model {
                 }
             }
         }
+        */
 
         // update auto sale products
         $om->callonce(self::getType(), 'updateAutosaleProducts', $oids, [], $lang);
@@ -1025,28 +1033,32 @@ class Booking extends Model {
      * Maintain sync with Customer
      */
     public static function onupdateCustomerNatureId($om, $oids, $values, $lang) {
-        $bookings = $om->read(self::getType(), $oids, ['customer_id', 'customer_nature_id', 'customer_nature_id.rate_class_id'], $lang);
+        $bookings = $om->read(self::getType(), $oids, ['customer_id', 'customer_rate_class_id', 'customer_nature_id', 'customer_nature_id.rate_class_id'], $lang);
 
         if($bookings > 0) {
             foreach($bookings as $id => $booking) {
-                if($booking['customer_nature_id.rate_class_id']) {
+                if($booking['customer_nature_id.rate_class_id'] && $booking['customer_id']) {
                     $om->update('sale\customer\Customer', $booking['customer_id'], [
-                        'customer_nature_id'    => $booking['customer_nature_id'],
-                        'rate_class_id'         => $booking['customer_nature_id.rate_class_id']
+                        'customer_nature_id'    => $booking['customer_nature_id']
                     ]);
+                    if(!$booking['customer_rate_class_id']) {
+                        $om->update('sale\customer\Customer', $booking['customer_id'], [
+                            'rate_class_id'         => $booking['customer_nature_id.rate_class_id']
+                        ]);
+                    }
                 }
             }
         }
     }
 
     public static function onupdateCustomerRateClassId($om, $oids, $values, $lang) {
-        $bookings = $om->read(self::getType(), $oids, ['customer_id', 'rate_class_id'], $lang);
+        $bookings = $om->read(self::getType(), $oids, ['customer_id', 'customer_rate_class_id'], $lang);
 
         if($bookings > 0) {
             foreach($bookings as $id => $booking) {
-                if($booking['rate_class_id']) {
+                if($booking['customer_rate_class_id'] && $booking['customer_id']) {
                     $om->update('sale\customer\Customer', $booking['customer_id'], [
-                        'rate_class_id'         => $booking['rate_class_id.rate_class_id']
+                        'rate_class_id'         => $booking['customer_rate_class_id']
                     ]);
                 }
             }
@@ -1087,7 +1099,8 @@ class Booking extends Model {
             'customer_identity_id.has_parent',
             'customer_identity_id.parent_id',
             'customer_nature_id',
-            'customer_nature_id.rate_class_id'
+            'customer_nature_id.rate_class_id',
+            'customer_rate_class_id'
         ]);
 
         if($bookings > 0) {
@@ -1114,7 +1127,7 @@ class Booking extends Model {
                         $partner_id = $om->create('sale\customer\Customer', [
                             'partner_identity_id'   => $identity_id,
                             'customer_type_id'      => $identity['type_id'],
-                            'rate_class_id'         => $booking['customer_nature_id.rate_class_id'],
+                            'rate_class_id'         => $booking['customer_rate_class_id'] ?? $booking['customer_nature_id.rate_class_id'],
                             'customer_nature_id'    => $booking['customer_nature_id']
                         ]);
                     }
@@ -1247,25 +1260,31 @@ class Booking extends Model {
         }
         // try to retrieve nature from an identity
         if(isset($event['customer_identity_id'])) {
-            // search for a partner that relates to this identity, if any
-            $partners_ids = $om->search('sale\customer\Customer', [
-                ['relationship', '=', 'customer'],
-                ['owner_identity_id', '=', 1],
-                ['partner_identity_id', '=', $event['customer_identity_id']]
-            ]);
-            if(count($partners_ids)) {
-                $partners = $om->read('sale\customer\Customer', $partners_ids, ['id', 'name', 'customer_nature_id.id', 'customer_nature_id.name']);
-                if($partners > 0) {
-                    $partner = reset($partners);
-                    $result['customer_id'] = ['id' => $partner['id'], 'name' => $partner['name']];
-                    if(isset($partner['customer_nature_id.id']) && $partner['customer_nature_id.id']) {
-                        $result['customer_nature_id'] = [
-                            'id'    => $partner['customer_nature_id.id'],
-                            'name'  => $partner['customer_nature_id.name']
-                        ];
-                    }
-                }
+            $partner = Customer::search([
+                    ['relationship', '=', 'customer'],
+                    ['owner_identity_id', '=', 1],
+                    ['partner_identity_id', '=', $event['customer_identity_id']]
+                ])
+                ->read(['id', 'name', 'customer_nature_id' => ['id', 'name'], 'rate_class_id' => ['id', 'name']])
+                ->first();
+
+            $result['customer_id'] = [
+                    'id' => $partner['id'],
+                    'name' => $partner['name']
+                ];
+            if(isset($partner['customer_nature_id'])) {
+                $result['customer_nature_id'] = [
+                        'id'    => $partner['customer_nature_id']['id'],
+                        'name'  => $partner['customer_nature_id']['name']
+                    ];
             }
+            if(isset($partner['rate_class_id'])) {
+                $result['customer_rate_class_id'] = [
+                        'id'    => $partner['rate_class_id']['id'],
+                        'name'  => $partner['rate_class_id']['name']
+                    ];
+            }
+
         }
         elseif(isset($event['customer_nature_id'])) {
             $customer_nature = CustomerNature::id($event['customer_nature_id'])->read(['rate_class_id' => ['id', 'name']])->first(true);
@@ -1824,7 +1843,7 @@ class Booking extends Model {
                 $group = [
                     'name'          => 'Suppléments obligatoires',
                     'booking_id'    => $id,
-                    'rate_class_id' => ($booking['customer_id.rate_class_id'])?$booking['customer_id.rate_class_id']:4,
+                    'rate_class_id' => ($booking['customer_id.rate_class_id']) ? $booking['customer_id.rate_class_id'] : 4,
                     'date_from'     => $booking['date_from'],
                     'date_to'       => $booking['date_to'],
                     'is_autosale'   => true
