@@ -81,6 +81,32 @@ class Partner extends Model {
                 'visible'           => ['relationship', '=', 'customer']
             ],
 
+            // if partner is a customer, it can be assigned to a rate class
+            'rate_class_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\customer\RateClass',
+                'description'       => 'Rate class that applies to the customer.',
+                'visible'           => ['relationship', '=', 'customer'],
+                'default'           => 1
+            ],
+
+            'customer_nature_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\customer\CustomerNature',
+                'description'       => 'Nature of the customer (map with rate classes).',
+                'onupdate'          => 'sale\customer\Customer::onupdateCustomerNatureId',
+                'visible'           => ['relationship', '=', 'customer']
+            ],
+
+            // if partner is a customer, it can be assigned a customer type
+            'customer_type_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\customer\CustomerType',
+                'description'       => 'Type of customer (map with rate classes).',
+                'visible'           => ['relationship', '=', 'customer'],
+                'default'           => 1                                                // default is 'individual'
+            ],
+
             'email' => [
                 'type'              => 'computed',
                 'relation'          => ['partner_identity_id' => 'email'],
