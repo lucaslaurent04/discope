@@ -125,6 +125,11 @@
             "description": "Nature applicable au client.",
             "help": ""
         },
+        "customer_rate_class_id": {
+            "label": "Catégorie tarifaire",
+            "description": "Catégorie tarifaire applicable au client.",
+            "help": ""
+        },
         "center_id": {
             "label": "Centre",
             "description": "Le centre visé par la réservation.",

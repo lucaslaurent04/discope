@@ -21,37 +21,12 @@ class Customer extends \identity\Partner {
 
         return [
 
-            // if partner is a customer, it can be assigned to a rate class
-            'rate_class_id' => [
-                'type'              => 'many2one',
-                'foreign_object'    => 'sale\customer\RateClass',
-                'description'       => 'Rate class that applies to the customer.',
-                'visible'           => ['relationship', '=', 'customer'],
-                'default'           => 1
-            ],
-
             'partner_identity_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Identity',
                 'description'       => 'The targeted identity (the partner).',
                 'onupdate'          => 'onupdatePartnerIdentityId',
                 'required'          => true
-            ],
-
-            'customer_nature_id' => [
-                'type'              => 'many2one',
-                'foreign_object'    => 'sale\customer\CustomerNature',
-                'description'       => 'Nature of the customer (map with rate classes).',
-                'onupdate'          => 'sale\customer\Customer::onupdateCustomerNatureId'
-            ],
-
-            // if partner is a customer, it can be assigned a customer type
-            'customer_type_id' => [
-                'type'              => 'many2one',
-                'foreign_object'    => 'sale\customer\CustomerType',
-                'description'       => 'Type of customer (map with rate classes).',
-                'visible'           => ['relationship', '=', 'customer'],
-                'default'           => 1                                                // default is 'individual'
             ],
 
             'relationship' => [
@@ -123,6 +98,8 @@ class Customer extends \identity\Partner {
     }
 
     public static function onupdateCustomerNatureId($om, $oids, $values, $lang) {
+        /*
+        // #memo - this has been removed to allow manual setting of rate class
         $customers = $om->read(__CLASS__, $oids, ['customer_nature_id.rate_class_id', 'customer_nature_id.customer_type_id']);
         if($customers > 0 && count($customers)) {
             foreach($customers as $cid => $customer) {
@@ -133,6 +110,7 @@ class Customer extends \identity\Partner {
                 }
             }
         }
+        */
     }
 
     /**

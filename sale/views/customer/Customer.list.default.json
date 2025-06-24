@@ -51,7 +51,7 @@
             {
                 "type": "field",
                 "value": "relationship",
-                "width": "10%",
+                "width": "0%",
                 "visible": false
             }
         ]
