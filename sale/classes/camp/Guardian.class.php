@@ -68,6 +68,11 @@ class Guardian extends Model {
                 'description'       => "Work phone number of the child's guardian."
             ],
 
+            'work_phone_ext' => [
+                'type'              => 'integer',
+                'description'       => "Work phone number extension of the child's guardian."
+            ],
+
             'relation_type' => [
                 'type'              => 'string',
                 'selection'         => [
@@ -76,10 +81,12 @@ class Guardian extends Model {
                     'legal-tutor',
                     'family-member',
                     'home-manager',
-                    'departmental-council'
+                    'departmental-council',
+                    'childminder',
+                    'other'
                 ],
-                'description'       => "Relation of the person to the guardian.",
-                'default'           => 'mother'
+                'description'       => "Relation of the child to the guardian.",
+                'default'           => 'other'
             ],
 
             'address_street' => [
@@ -154,6 +161,11 @@ class Guardian extends Model {
                 'visible'           => ['different_invoicing_address', '=', true]
             ],
 
+            'external_ref' => [
+                'type'              => 'string',
+                'description'       => 'External reference for guardian, if any.'
+            ],
+
             'children_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\camp\Child',
@@ -172,8 +184,19 @@ class Guardian extends Model {
         $result = [];
         $self->read(['firstname', 'lastname']);
         foreach($self as $id => $child) {
-            if(isset($child['firstname'], $child['lastname'])) {
-                $result[$id] = $child['firstname'].' '.$child['lastname'];
+            $name = '';
+            if(!empty($child['firstname']) && !empty($child['lastname'])) {
+                $name = $child['firstname'].' '.$child['lastname'];
+            }
+            elseif(!empty($child['firstname'])) {
+                $name = $child['firstname'];
+            }
+            elseif(!empty($child['lastname'])) {
+                $name = $child['lastname'];
+            }
+
+            if(!empty($name)) {
+                $result[$id] = $name;
             }
         }
 

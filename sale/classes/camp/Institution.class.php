@@ -68,6 +68,11 @@ class Institution extends Model {
                 'foreign_object'    => 'sale\camp\Child',
                 'foreign_field'     => 'institution_id',
                 'description'       => "Children that are in this institution."
+            ],
+
+            'external_ref' => [
+                'type'              => 'string',
+                'description'       => 'External reference for institution, if any.'
             ]
 
         ];
