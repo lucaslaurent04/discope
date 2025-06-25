@@ -1,5 +1,7 @@
 {
     "name": "Children",
+    "order": "created",
+    "sort": "desc",
     "layout": {
         "items": [
             {
@@ -34,6 +36,20 @@
             {
                 "type": "field",
                 "value": "gender",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "main_guardian_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "institution_id",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
