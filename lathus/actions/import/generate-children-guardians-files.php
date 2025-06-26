@@ -28,8 +28,129 @@ use sale\camp\Skill;
 
 $lang = 'fr';
 
-$map_parent_old_to_new_guardian_id = [];
-$map_parent_old_to_new_institution_id = [];
+/************
+ * Children *
+ ************/
+
+$child_mapping = [
+    'num_enfant'            => 'external_ref',
+    'nom_enfant'            => 'lastname',
+    'prenom_enfant'         => 'firstname',
+    'sexe_enfant'           => 'gender',
+    'date_naissance_enfant' => 'birthdate',
+    'num_license_enfant'    => 'license_ffe'
+];
+
+$map_gender = [
+    'G' => 'M',
+    'g' => 'M',
+    'F' => 'F',
+    'f' => 'F'
+];
+
+$file_path = EQ_BASEDIR.'/packages/lathus/import/child.xlsx';
+if(!file_exists($file_path)) {
+    throw new Exception("missing_file", EQ_ERROR_INVALID_CONFIG);
+}
+
+$spreadsheet = IOFactory::load($file_path);
+$sheet = $spreadsheet->getActiveSheet();
+$rows = $sheet->toArray(null, true, true, true);
+
+$headers = array_map('trim', array_shift($rows));
+
+$child_id = 0;
+$children = [];
+foreach($rows as $row) {
+    $child = [
+        'id'                => ++$child_id,
+        'creator'           => 1,
+        'modifier'          => 1,
+        'state'             => 'instance',
+        'guardians_ids'     => [],
+        'skills_ids'        => [],
+        'has_license_ffe'   => false
+    ];
+
+    foreach($headers as $col => $field) {
+        if(!isset($row[$col])) {
+            if($field === 'date_naissance_enfant') {
+                // skip children without a birthdate set
+                $child_id--;
+                continue 2;
+            }
+            continue;
+        }
+
+        $value = trim($row[$col]);
+        if(empty($value)) {
+            continue;
+        }
+
+        // handle fields without mapping
+        switch($field) {
+            case 'num_parent_enfant':
+                $child['num_parent_enfant'] = $value;
+                continue 2;
+            case 'galop_enfant':
+                $galop_skill = Skill::search(['name', 'ilike', '%galop '.$value.'%'])
+                    ->read(['id'])
+                    ->first();
+
+                if(!is_null($galop_skill)) {
+                    $child['skills_ids'][] = $galop_skill['id'];
+                }
+                continue 2;
+            case 'num_license_enfant':
+                $child['has_license_ffe'] = true;
+                $child['license_ffe'] = $value;
+                continue 2;
+            case 'adresse_enfant':
+                $child['address_street'] = $value;
+                continue 2;
+            case 'adresse2_enfant':
+                $child['address_dispatch'] = $value;
+                continue 2;
+            case 'code_postal_enfant':
+                $child['address_zip'] = $value;
+                continue 2;
+            case 'ville_enfant':
+                $child['address_city'] = $value;
+                continue 2;
+        }
+
+        $target = $child_mapping[$field] ?? null;
+        if(is_null($target)) {
+            continue;
+        }
+
+        if($target === 'gender') {
+            if(isset($map_gender[$value])) {
+                $value = $map_gender[$value];
+            }
+        }
+        elseif($target === 'birthdate') {
+            $date = DateTime::createFromFormat('m/d/Y', $value);
+            $value = $date->format('Y-m-d');
+
+            if($value < '2008-01-01') {
+                // skip children born before 2008
+                $child_id--;
+                continue 2;
+            }
+        }
+
+        if(!isset($child[$target])) {
+            $child[$target] = $value;
+        }
+    }
+
+    $children[] = $child;
+}
+
+/******************************
+ * Guardians and institutions *
+ ******************************/
 
 $type_parent_institutions = [
     'Foyer Mandela',
@@ -40,26 +161,31 @@ $type_parent_institutions = [
 ];
 
 $nom_parent_institutions = [
-    'ALSEA 87', 'Lieu de Vie Timoun Yo', 'MECS', 'Association St Nicolas', 'Mme CAILLET', 'LVA L\'ETINCELLE', 'MECS La Bergerie', 'Action Enfance 86', 'AMESHAG 86',
-    'LVA les Robinsons', 'LE VIEUX COLLEGE', 'IDEF 37', 'LVA Les Robins', 'LVA EMA', 'PFSE - Croix Rouge', 'Mme.BACLE', 'Mme. CHAUDRON',
-    'LVA LE PASSAGE', 'M. Mme GROUPIL', 'Mme BOURDEAU', 'Mme.Robin_x000d_Mme.ROBIN', 'Mme PARESSANT', 'M. FAJARDO', 'AMESHAG 86', 'Mme.MAMODE', 'Mme. CASSANT', 'LDV SALVERT',
-    'LE TEMPS VOULU', 'GAILLEDRAT', 'MEURANT', 'Mme MAISONNETTE', 'PFS LE POINTEAU', 'MECS Les Métives', 'LE POINTEAU 16', 'MDE 79', 'LVA Courte Echelle', 'Mme. VIGNE',
-    'Mme. Nogueira', 'Mme.McCOMISH-LORAIN', 'Mme. Rivet', 'ADIASEAA 36', 'Mme CHAMBORD', 'CSE Caisse Ep', 'M. PLAURENDEAU', 'MDS 60',
-    'LVA EQUI-PASSAGE', 'Centre Nouvel Horizon', 'CDEF Haute Vienne', 'Mme. COCHEGRUE', 'Mme MAISONNETTE', 'LVA Chant d oiseaux', 'M HOME 36',
-    'DPDS 36', 'Mme. LUTGEN', 'La Vie devant soi', 'M. DECEMME', 'Mme. Lamarche', 'Mme. Lombard', 'LDV les Repères', 'Fondation VERDIER',
-    'APLB16', 'MAE de Barroux', 'LVA EVEA', 'Mme. Ripoteau', 'MAEB', 'Mme.MARCHISIO', 'M. Riviere', 'PFS APLB16', 'La sauvegarde 95', 'FOYER CELINE LEBRET',
-    'Mme DELORME', 'Vjoly', 'MAISON EFNANT ST FRAIGNE', 'Mme Chabenat', 'OUDART', 'La vie familial', 'Mme Boutet', 'Asso le temps voulu',
-    'LDV la courte echelle', 'Mme Voldoire', 'Mme RENARD', 'LDV chant doiseaux', 'Fondation Action Enfance', 'Mme. Violle', 'Village d\'Enfants', 'Fondation Auteuil', 'BARBAULT',
-    'UPASE MONJOIE', 'Mme buord', 'LVA Happyday', 'JOURDAIN', 'Interrogation', 'Centre Colbert ASE 36', 'FOYER EDUCATIF CELINE LEBRET', 'Foyer educatif Céline Lebret', 'Logement Jeune 93',
-    'ASSOCIATION LE ST NICOLAS', 'Ass Passage', 'Mme.Vigne', 'ALSEA', 'ASE 36', 'UPE 79', 'Mme ALEXANDRE', 'UDAF 86', 'UDAF 37', 'LDV Le chant d\'Oiseaux', 'Aide Sociale à l\'Enfance',
-    'Maison Départementale', 'M. Mme LEMAY - LEMERCIER', 'Foyer éducatif Mixte', 'Foyer des Métives', 'Foyer Mandela', 'FOYER Paul Nicolas', 'SC La Houchardiere', 'MDS Fontaine le Comte',
-    'la vie familiale', 'Maison enfants', 'Pole enfance', 'Plate forme Sociale', 'LOGIS DES FERRIERES', 'La Courte Echelle', 'Lieu de Vie', 'LDV HAPPYDAYS', 'LVA MAISON DE MAILLE',
-    'Foyer Céline Lebret', 'SOS VILLAGE ENFANTS'
+    'ALSEA 87', 'Lieu de Vie Timoun Yo', 'MECS', 'Association St Nicolas', 'LVA L\'ETINCELLE', 'MECS La Bergerie',
+    'Action Enfance 86', 'AMESHAG 86', 'LVA les Robinsons', 'LE VIEUX COLLEGE', 'IDEF 37', 'LVA Les Robins',
+    'LVA EMA', 'PFSE - Croix Rouge', 'LVA LE PASSAGE', 'AMESHAG 86', 'LDV SALVERT', 'LE TEMPS VOULU',
+    'MEURANT', 'PFS LE POINTEAU', 'MECS Les Métives', 'LE POINTEAU 16', 'MDE 79', 'LVA Courte Echelle',
+    'ADIASEAA 36', 'CSE Caisse Ep', 'MDS 60', 'LVA EQUI-PASSAGE', 'Centre Nouvel Horizon', 'CDEF Haute Vienne',
+    'LVA Chant d oiseaux', 'M HOME 36', 'DPDS 36', 'La Vie devant soi', 'LDV les Repères', 'Fondation VERDIER',
+    'APLB16', 'MAE de Barroux', 'LVA EVEA', 'MAEB', 'PFS APLB16', 'La sauvegarde 95',
+    'FOYER CELINE LEBRET', 'MAISON EFNANT ST FRAIGNE', 'La vie familial', 'Asso le temps voulu', 'LDV la courte echelle',
+    'LDV chant doiseaux', 'Fondation Action Enfance', 'Village d\'Enfants', 'Fondation Auteuil', 'UPASE MONJOIE',
+    'LVA Happyday', 'Interrogation', 'Centre Colbert ASE 36', 'FOYER EDUCATIF CELINE LEBRET', 'Foyer educatif Céline Lebret',
+    'Logement Jeune 93', 'ASSOCIATION LE ST NICOLAS', 'Ass Passage', 'ALSEA', 'ASE 36', 'UPE 79', 'UDAF 86', 'UDAF 37',
+    'LDV Le chant d\'Oiseaux', 'Aide Sociale à l\'Enfance', 'Maison Départementale', 'Foyer éducatif Mixte', 'Foyer des Métives',
+    'Foyer Mandela', 'FOYER Paul Nicolas', 'SC La Houchardiere', 'MDS Fontaine le Comte', 'la vie familiale',
+    'Maison enfants', 'Pole enfance', 'Plate forme Sociale', 'LOGIS DES FERRIERES', 'La Courte Echelle', 'Lieu de Vie',
+    'LDV HAPPYDAYS', 'LVA MAISON DE MAILLE', 'Foyer Céline Lebret', 'SOS VILLAGE ENFANTS', 'OUDART',
+    'Maisons des Deux-Sèvres', 'ASSOCIATION', 'Lieu de Vie', 'Maison enfants', 'CDEF Limoges', 'Maison d\'enfants'
 ];
 
-/*************
- * Guardians *
- *************/
+$nom_parent_institutions_start_with = [
+    'Mme.',
+    'M.',
+    'Mme '
+];
+
+// Guardians
 
 $guardian_mapping = [
     'num_parent'                => 'external_ref',
@@ -90,13 +216,9 @@ $map_type_parent_relation_type = [
     'PARENTS'                                   => 'legal-tutor',
     'parents'                                   => 'legal-tutor',
     'TUTRICE'                                   => 'legal-tutor',
-    'Foyer Mandela'                             => 'legal-tutor',
-
     'Mère'                                      => 'mother',
-
     'Père'                                      => 'father',
     'PERE'                                      => 'father',
-
     'Grand Parent'                              => 'family-member',
     'Grand mere'                                => 'family-member',
     'Grands parent'                             => 'family-member',
@@ -104,9 +226,7 @@ $map_type_parent_relation_type = [
     'Sœur'                                      => 'family-member',
     'tante'                                     => 'family-member',
     'tonton'                                    => 'family-member',
-
     'Centre Départemental d\'Action Sociale'    => 'departmental-council',
-
     'Assistante maternelle'                     => 'childminder',
     'Assistante Familiale'                      => 'childminder',
     'Assistante familiale'                      => 'childminder',
@@ -130,32 +250,44 @@ $rows = $sheet->toArray(null, true, true, true);
 
 $headers = array_map('trim', array_shift($rows));
 
+$index_col_num_parent = array_search('num_parent', $headers);
 $index_col_nom_parent = array_search('nom_parent', $headers);
-$index_col_prenom_parent = array_search('prenom_parent', $headers);
 $index_col_type_parent = array_search('type_parent', $headers);
 $index_col_titre_parent = array_search('titre_parent', $headers);
 
 $guardian_id = 0;
 $guardians = [];
 foreach($rows as $row) {
-    $nom_parent = trim($row[$index_col_nom_parent]);
-    $prenom_parent = trim($row[$index_col_prenom_parent]);
-    $type_parent = trim($row[$index_col_type_parent]);
-    // skip if is an institution
-    if($row[array_keys($headers)[0]] === '14499' || (in_array($nom_parent, $nom_parent_institutions) && !$prenom_parent) || in_array($type_parent, $type_parent_institutions)) {
+    $num_parent = trim($row[$index_col_num_parent]);
+    $has_child = false;
+    foreach($children as $child) {
+        if($child['num_parent_enfant'] === $num_parent) {
+            $has_child = true;
+            break;
+        }
+    }
+    if(!$has_child) {
+        // skip if no child
         continue;
     }
 
-    $guardian_id++;
-    if(isset($row[array_keys($headers)[0]])) {
-        $map_parent_old_to_new_guardian_id[$row[array_keys($headers)[0]]] = $guardian_id;
+    $nom_parent = trim($row[$index_col_nom_parent]);
+    $type_parent = trim($row[$index_col_type_parent]);
+    // skip if is an institution
+    if(in_array($nom_parent, $nom_parent_institutions) || in_array($type_parent, $type_parent_institutions)) {
+        continue;
+    }
+    foreach($nom_parent_institutions_start_with as $start_nom_parent) {
+        if(str_starts_with($nom_parent, $start_nom_parent)) {
+            continue 2;
+        }
     }
 
     $guardian = [
-        'id'            => $guardian_id,
-        'creator'       => 1,
-        'modifier'      => 1,
-        'state'         => 'instance'
+        'id'        => ++$guardian_id,
+        'creator'   => 1,
+        'modifier'  => 1,
+        'state'     => 'instance'
     ];
 
     $titre_parent = trim($row[$index_col_titre_parent]);
@@ -211,9 +343,7 @@ foreach($rows as $row) {
     $guardians[] = $guardian;
 }
 
-/****************
- * Institutions *
- ****************/
+// Institutions
 
 $institution_mapping = [
     'num_parent'                => 'external_ref',
@@ -244,29 +374,42 @@ $rows = $sheet->toArray(null, true, true, true);
 
 $headers = array_map('trim', array_shift($rows));
 
+$index_col_num_parent = array_search('num_parent', $headers);
 $index_col_nom_parent = array_search('nom_parent', $headers);
-$index_col_prenom_parent = array_search('prenom_parent', $headers);
 $index_col_type_parent = array_search('type_parent', $headers);
 $index_col_titre_parent = array_search('titre_parent', $headers);
 
 $institution_id = 0;
 $institutions = [];
 foreach($rows as $row) {
-    $nom_parent = trim($row[$index_col_nom_parent]);
-    $prenom_parent = trim($row[$index_col_prenom_parent]);
-    $type_parent = trim($row[$index_col_type_parent]);
-    // skip if isn't an institution
-    if($row[array_keys($headers)[0]] !== '14499' && (!in_array($nom_parent, $nom_parent_institutions) || $prenom_parent) && !in_array($type_parent, $type_parent_institutions)) {
+    $num_parent = trim($row[$index_col_num_parent]);
+    $has_child = false;
+    foreach($children as $child) {
+        if($child['num_parent_enfant'] === $num_parent) {
+            $has_child = true;
+            break;
+        }
+    }
+    if(!$has_child) {
+        // skip if no child
         continue;
     }
 
-    $institution_id++;
-    if(isset($row[array_keys($headers)[0]])) {
-        $map_parent_old_to_new_institution_id[$row[array_keys($headers)[0]]] = $institution_id;
+    $nom_parent = trim($row[$index_col_nom_parent]);
+    $type_parent = trim($row[$index_col_type_parent]);
+    $start_with_nom = false;
+    foreach($nom_parent_institutions_start_with as $start_nom_parent) {
+        if(str_starts_with($nom_parent, $start_nom_parent)) {
+            $start_with_nom = true;
+        }
+    }
+    // skip if isn't an institution
+    if(!in_array($nom_parent, $nom_parent_institutions) && !$start_with_nom && !in_array($type_parent, $type_parent_institutions)) {
+        continue;
     }
 
     $institution = [
-        'id' => $institution_id
+        'id' => ++$institution_id
     ];
 
     foreach($headers as $col => $field) {
@@ -306,166 +449,61 @@ foreach($rows as $row) {
     $institutions[] = $institution;
 }
 
-/************
- * Children *
- ************/
 
-$child_mapping = [
-    'num_enfant'            => 'external_ref',
-    'nom_enfant'            => 'lastname',
-    'prenom_enfant'         => 'firstname',
-    'sexe_enfant'           => 'gender',
-    'date_naissance_enfant' => 'birthdate',
-    'num_license_enfant'    => 'license_ffe'
-];
+// link children to guardians and institutions
+// set guardian and institution addresses
 
-$map_gender = [
-    'G' => 'M',
-    'g' => 'M',
-    'F' => 'F',
-    'f' => 'F'
-];
+foreach($children as &$child) {
+    $has_guardian = false;
+    foreach($guardians as &$guardian) {
+        if($guardian['external_ref'] === $child['num_parent_enfant']) {
+            $has_guardian = true;
 
-$file_path = EQ_BASEDIR.'/packages/lathus/import/child.xlsx';
-if(!file_exists($file_path)) {
-    throw new Exception("missing_file", EQ_ERROR_INVALID_CONFIG);
-}
+            // link to guardian
+            $child['guardians_ids'] = [$guardian['id']];
+            $child['main_guardian_id'] = $guardian['id'];
 
-$spreadsheet = IOFactory::load($file_path);
-$sheet = $spreadsheet->getActiveSheet();
-$rows = $sheet->toArray(null, true, true, true);
-
-$headers = array_map('trim', array_shift($rows));
-
-$child_id = 0;
-$children = [];
-foreach($rows as $row) {
-    $child = [
-        'id'                => ++$child_id,
-        'creator'           => 1,
-        'modifier'          => 1,
-        'state'             => 'instance',
-        'guardians_ids'     => [],
-        'skills_ids'        => [],
-        'has_license_ffe'   => false
-    ];
-
-    $address = [
-        'street'    => '',
-        'dispatch'  => '',
-        'zip'       => '',
-        'city'      => ''
-    ];
-
-    foreach($headers as $col => $field) {
-        if(!isset($row[$col])) {
-            continue;
-        }
-
-        $value = trim($row[$col]);
-        if(empty($value)) {
-            continue;
-        }
-
-        // handle fields without mapping
-        switch($field) {
-            case 'num_parent_enfant':
-                if(isset($map_parent_old_to_new_guardian_id[$value])) {
-                    $child['guardians_ids'] = [$map_parent_old_to_new_guardian_id[$value]];
-                    $child['main_guardian_id'] = $map_parent_old_to_new_guardian_id[$value];
-                }
-                elseif(isset($map_parent_old_to_new_institution_id[$value])) {
-                    $child['institution_id'] = $map_parent_old_to_new_institution_id[$value];
-                    $child['is_foster'] = true;
-                }
-                continue 2;
-            case 'galop_enfant':
-                $galop_skill = Skill::search(['name', 'ilike', '%galop '.$value.'%'])
-                    ->read(['id'])
-                    ->first();
-
-                if(!is_null($galop_skill)) {
-                    $child['skills_ids'][] = $galop_skill['id'];
-                }
-                continue 2;
-            case 'num_license_enfant':
-                $child['has_license_ffe'] = true;
-                $child['license_ffe'] = $value;
-                continue 2;
-            case 'adresse_enfant':
-                $address['street'] = $value;
-                continue 2;
-            case 'adresse2_enfant':
-                $address['dispatch'] = $value;
-                continue 2;
-            case 'code_postal_enfant':
-                $address['zip'] = $value;
-                continue 2;
-            case 'ville_enfant':
-                $address['city'] = $value;
-                continue 2;
-        }
-
-        $target = $child_mapping[$field] ?? null;
-        if(is_null($target)) {
-            continue;
-        }
-
-        if($target === 'gender') {
-            if(isset($map_gender[$value])) {
-                $value = $map_gender[$value];
-            }
-        }
-        elseif($target === 'birthdate') {
-            $date = DateTime::createFromFormat('m/d/Y', $value);
-            $value = $date->format('Y-m-d');
-        }
-
-        if(!isset($child[$target])) {
-            $child[$target] = $value;
-        }
-    }
-
-    $children[] = $child;
-
-    if(isset($child['guardians_ids'][0])) {
-        foreach($guardians as &$guardian) {
-            if($guardian['id'] !== $child['guardians_ids'][0]) {
-                continue;
-            }
-
+            // set address
             if(
-                !is_null($guardian)
-                && (!empty($address['street']) && !empty($address['zip'])  && !empty($address['city']))
+                (!empty($child['address_street']) && !empty($child['address_zip'])  && !empty($child['address_city']))
                 && (empty($guardian['address_street']) || empty($guardian['address_zip']) || empty($guardian['address_city']))
             ) {
-                $guardian['address_street'] = $address['street'];
-                $guardian['address_dispatch'] = !empty($address['dispatch']) ? $address['dispatch'] : null;
-                $guardian['address_zip'] = $address['zip'];
-                $guardian['address_city'] = $address['city'];
-                break;
-            }
-        }
-    }
-    elseif(isset($child['institution_id'])) {
-        foreach($institutions as &$institution) {
-            if(isset($child['institution_id']) && $institution['id'] !== $child['institution_id']) {
-                continue;
+                $guardian['address_street'] = $child['address_street'];
+                $guardian['address_dispatch'] = !empty($child['address_dispatch']) ? $child['address_dispatch'] : null;
+                $guardian['address_zip'] = $child['address_zip'];
+                $guardian['address_city'] = $child['address_city'];
             }
 
-            if(
-                !is_null($institution)
-                && (!empty($address['street']) && !empty($address['zip'])  && !empty($address['city']))
-                && (empty($institution['address_street']) || empty($institution['address_zip']) || empty($institution['address_city']))
-            ) {
-                $institution['address_street'] = $address['street'];
-                $institution['address_dispatch'] = !empty($address['dispatch']) ? $address['dispatch'] : null;
-                $institution['address_zip'] = $address['zip'];
-                $institution['address_city'] = $address['city'];
+            break;
+        }
+    }
+
+    if(!$has_guardian) {
+        foreach($institutions as &$institution) {
+            if($institution['external_ref'] === $child['num_parent_enfant']) {
+                $child['institution_id'] = $institution['id'];
+                $child['is_foster'] = true;
+
+                if(
+                    (!empty($child['address_street']) && !empty($child['address_zip'])  && !empty($child['address_city']))
+                    && (empty($institution['address_street']) || empty($institution['address_zip']) || empty($institution['address_city']))
+                ) {
+                    $institution['address_street'] = $child['address_street'];
+                    $institution['address_dispatch'] = !empty($child['address_dispatch']) ? $child['address_dispatch'] : null;
+                    $institution['address_zip'] = $child['address_zip'];
+                    $institution['address_city'] = $child['address_city'];
+                }
+
                 break;
             }
         }
     }
+
+    unset($child['num_parent_enfant']);
+    unset($child['address_street']);
+    unset($child['address_dispatch']);
+    unset($child['address_zip']);
+    unset($child['address_city']);
 }
 
 $data = [

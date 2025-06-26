@@ -53,6 +53,14 @@
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "is_foster",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
             }
         ]
     }
