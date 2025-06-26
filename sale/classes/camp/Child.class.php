@@ -113,6 +113,11 @@ class Child extends Model {
                 'function'          => 'calcCampClass'
             ],
 
+            'external_ref' => [
+                'type'              => 'string',
+                'description'       => 'External reference for child, if any.'
+            ],
+
             'skills_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\camp\Skill',
@@ -265,7 +270,12 @@ class Child extends Model {
     public static function onupdateGuardiansIds($self) {
         $self->read(['main_guardian_id', 'guardians_ids']);
         foreach($self as $id => $child) {
-            self::id($id)->update(['main_guardian_id' => $child['guardians_ids'][0] ?? null]);
+            if(is_null($child['main_guardian_id']) && !empty($child['guardians_ids'])) {
+                self::id($id)->update(['main_guardian_id' => $child['guardians_ids'][0]]);
+            }
+            elseif(!is_null($child['main_guardian_id']) && empty($child['guardians_ids'])) {
+                self::id($id)->update(['main_guardian_id' => null]);
+            }
         }
     }
 

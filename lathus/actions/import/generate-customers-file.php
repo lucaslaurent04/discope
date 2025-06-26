@@ -164,7 +164,7 @@ $timestamp = date('Ymd_His');
 
 $import_folder_path = EQ_BASEDIR.'/import/'.$timestamp;
 if(!mkdir($import_folder_path, 0754, true)) {
-    throw new Exception(serialize(['folder_creation_error' => "unable to create output folder $path"]), EQ_ERROR_UNKNOWN);
+    throw new Exception(serialize(['folder_creation_error' => "unable to create output folder $import_folder_path"]), EQ_ERROR_UNKNOWN);
 }
 
 $outputFile = $import_folder_path . "/import_{$timestamp}.json";
