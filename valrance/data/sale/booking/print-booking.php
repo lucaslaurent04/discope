@@ -844,14 +844,14 @@ if($params['mode'] === 'grouped') {
                 $grouping_code = $booking_line['description'];
             }
 
-            if (!isset($lines_map[$booking_line_group_id])) {
+            if(!isset($lines_map[$booking_line_group_id])) {
                 $lines_map[$booking_line_group_id] = [];
             }
-            if (!isset($lines_map[$booking_line_group_id][$grouping_code])) {
+            if(!isset($lines_map[$booking_line_group_id][$grouping_code])) {
                 $lines_map[$booking_line_group_id][$grouping_code] = [];
             }
 
-            if (!isset($lines_map[$booking_line_group_id][$grouping_code][$product['id']])) {
+            if(!isset($lines_map[$booking_line_group_id][$grouping_code][$product['id']])) {
                 $lines_map[$booking_line_group_id][$grouping_code][$product['id']] = [
                     'name'          => $booking_line['name'],
                     'price'         => null,
@@ -867,14 +867,12 @@ if($params['mode'] === 'grouped') {
                 ];
 
                 if($booking_line['booking_activity_id'] &&
-                    (!empty($booking_line['booking_activity_id']['supplies_booking_lines_ids']) ||
-                     !empty($booking_line['booking_activity_id']['transports_booking_lines_ids'])
-                    )
-                  ){
+                    !empty($booking_line['booking_activity_id']['supplies_booking_lines_ids'])
+                ) {
                     $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] += $booking_line['booking_activity_id']['price'];
                     $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] += $booking_line['booking_activity_id']['total'];
                 }
-                else{
+                else {
                     $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['unit_price'] = $booking_line['unit_price'];
                     $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] = $booking_line['price'];
                     $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] = $booking_line['total'];
