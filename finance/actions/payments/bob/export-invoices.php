@@ -35,7 +35,7 @@ list($params, $providers) = eQual::announce([
 
 /**
  * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $om
+ * @var \equal\orm\ObjectManager            $orm
  * @var \equal\auth\AuthenticationManager   $auth
  * @var \equal\dispatch\Dispatcher          $dispatch
  */

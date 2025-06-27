@@ -29,6 +29,12 @@ use sale\booking\Invoice;
     'providers'     => ['context', 'orm', 'auth', 'dispatch']
 ]);
 
+/**
+ * @var \equal\php\Context                  $context
+ * @var \equal\orm\ObjectManager            $orm
+ * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\dispatch\Dispatcher          $dispatch
+ */
 ['context' => $context, 'orm' => $orm, 'auth' => $auth, 'dispatch' => $dispatch] = $providers;
 
 $office = CenterOffice::id($params['center_office_id'])
