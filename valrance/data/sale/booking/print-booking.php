@@ -812,9 +812,12 @@ if($params['mode'] === 'grouped') {
     $lines = [];
     foreach ($booking['booking_lines_groups_ids'] as $booking_line_group) {
         foreach ($booking_line_group['booking_lines_ids'] as $booking_line) {
+            /*
+            // #memo - even if part of an activity - transports must be grouped distinctively
             if ($booking_line['is_transport'] && !empty($booking_line['booking_activity_id'])){
                 continue;
             }
+            */
 
             if ($booking_line['is_supply'] && !empty($booking_line['booking_activity_id'])){
                 continue;
