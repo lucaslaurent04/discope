@@ -26,16 +26,14 @@ use sale\booking\Invoice;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth', 'dispatch']
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
  * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
  * @var \equal\auth\AuthenticationManager   $auth
- * @var \equal\dispatch\Dispatcher          $dispatch
  */
-['context' => $context, 'orm' => $orm, 'auth' => $auth, 'dispatch' => $dispatch] = $providers;
+['context' => $context, 'auth' => $auth] = $providers;
 
 $office = CenterOffice::id($params['center_office_id'])
     ->read(['id'])
