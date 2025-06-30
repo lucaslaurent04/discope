@@ -25,7 +25,9 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use sale\booking\BookingActivity;
 use sale\catalog\Product;
 use sale\booking\BookingLine;
+use sale\booking\BookingLineGroup;
 use sale\booking\BookingMeal;
+use sale\booking\SojournProductModelRentalUnitAssignement;
 
 list($params, $providers) = announce([
     'description'   => "Render a contract given its ID as a PDF document.",
@@ -366,6 +368,7 @@ $customer_address = $booking['customer_id']['partner_identity_id']['address_stre
 $has_activity = false;
 
 $consumption_table_show  = Setting::get_value('sale', 'features', 'templates.quote.consumption_table', 1);
+
 $values = [
     'attn_address1'               => '',
     'attn_address2'               => '',
@@ -546,6 +549,50 @@ if($booking['center_id']['use_office_details']) {
 
 $hasFooter = false;
 
+
+/*
+    retrieve specific options
+*/
+$booking_options = [];
+
+// retrieve bed linens & make beds
+$booking_options['has_bed_linens'] = false;
+$booking_options['has_make_beds'] = false;
+
+$bookingLineGroups = BookingLineGroup::search([
+        ['booking_id', '=', $booking['id']],
+        ['bed_linens', '=', true]
+    ])
+    ->read(['bed_linens', 'make_beds']);
+
+foreach($bookingLineGroups as $booking_line_group_id => $bookingLineGroup) {
+    if($bookingLineGroup['bed_linens']) {
+        $booking_options['has_bed_linens'] = true;
+    }
+    if($bookingLineGroup['make_beds']) {
+        $booking_options['has_make_beds'] = true;
+    }
+}
+
+// retrieve number of rooms
+$booking_options['nb_rooms'] = 0;
+
+$spmAssignments = SojournProductModelRentalUnitAssignement::search([
+        ['booking_id', '=', $booking_id],
+        ['is_accomodation', '=', true]
+    ])
+    ->read(['rental_unit_id' => ['has_children', 'children_ids']]);
+
+foreach($spmAssignments as $spmAssignment) {
+    if($spmAssignment['has_children']) {
+        $booking_options['nb_rooms'] += count($spmAssignment['children_ids']);
+    }
+    else {
+        ++$booking_options['nb_rooms'];
+    }
+}
+
+
 /*
     retrieve templates
 */
@@ -578,9 +625,20 @@ if($booking['center_id']['template_category_id']) {
         }
         elseif($part['name'] == 'service') {
 
+            if(!$booking_options['has_bed_linens']) {
+                $service_beds = Setting::get_value('lodging', 'locale', 'i18n.not_bed_linens', null, [], $params['lang']);
+            }
+            else {
+                if($booking_option['has_make_beds']) {
+                    $service_beds = Setting::get_value('lodging', 'locale', 'i18n.make_beds', null, [], $params['lang']);
+                }
+                else {
+                    $service_beds = Setting::get_value('lodging', 'locale', 'i18n.bed_linens', null, [], $params['lang']);
+                }
+            }
 
-            $value = $part['value'];
-            $value = str_replace('{center}', $booking['center_id']['name'], $value);
+            $value = str_replace('{beds_service}', $service_beds, $value);
+            $value = str_replace('{nb_rooms}', $booking_options['nb_rooms'], $value);
 
             $date_from = $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']);
             $date_to = $days_names[date('w', $booking['date_to'])] . ' '. date('d/m/Y', $booking['date_to']);
@@ -1119,47 +1177,6 @@ else if($installment_amount > 0) {
 /*
     Generate consumptions map simple
 */
-
-
-$setting_bed_linens = Setting::get_value('sale', 'organization', 'sku.bed_linens', 'not_found');
-
-$product_bed_linens = Product::search(['sku', '=', $setting_bed_linens])
-    ->read(['id' , 'product_model_id'])
-    ->first(true);
-
-$bl_bed_linens = BookingLine::search([
-        ['booking_id', '=', $booking['id']],
-        ['product_model_id', '=', $product_bed_linens['product_model_id']]
-    ])
-    ->read(['product_model_id' => ['id', 'name']])
-    ->first(true);
-
-$setting_make_beds = Setting::get_value('sale', 'organization', 'sku.make_beds', 'not_found');
-
-$product_make_beds = Product::search(['sku', '=', $setting_make_beds])
-    ->read(['id' , 'product_model_id'])
-    ->first(true);
-
-
-$bl_make_beds = BookingLine::search([
-        ['booking_id', '=', $booking['id']],
-        ['product_model_id', '=', $product_make_beds['product_model_id']]
-    ])
-    ->read([
-        'product_model_id' => ['id', 'name']
-    ])
-    ->first(true);
-
-if(!$bl_bed_linens && !$bl_make_beds) {
-    $service_beds = Setting::get_value('lodging', 'locale', 'i18n.not_bed_linens', null, [], $params['lang']);
-} elseif($bl_bed_linens && !$bl_make_beds) {
-    $service_beds = Setting::get_value('lodging', 'locale', 'i18n.bed_linens', null, [], $params['lang']);
-} elseif($bl_make_beds) {
-    $service_beds = Setting::get_value('lodging', 'locale', 'i18n.make_beds', null, [], $params['lang']);
-}
-
-$values['service_beds'] = $service_beds;
-
 
 $setting_transport = Setting::get_value('sale', 'organization', 'sku.transport', 'not_found');
 
