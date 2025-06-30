@@ -578,7 +578,7 @@ foreach($bookingLineGroups as $booking_line_group_id => $bookingLineGroup) {
 $booking_options['nb_rooms'] = 0;
 
 $spmAssignments = SojournProductModelRentalUnitAssignement::search([
-        ['booking_id', '=', $booking_id],
+        ['booking_id', '=', $booking['id']],
         ['is_accomodation', '=', true]
     ])
     ->read(['rental_unit_id' => ['has_children', 'children_ids']]);
