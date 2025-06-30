@@ -615,7 +615,6 @@ if($booking['center_id']['template_category_id']) {
         $value = str_replace('{customer}', $customer_name, $value);
         $value = str_replace('{customer_address}', $customer_address, $value);
         $value = str_replace('{contact}', $contact_name, $value);
-        $value = str_replace('{nb_pers}', $booking['nb_pers'] ,$value);
         $value = str_replace('{price}', $booking['price'], $value);
 
         if($part['name'] == 'header') {
