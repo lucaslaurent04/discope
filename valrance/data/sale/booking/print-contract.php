@@ -593,6 +593,9 @@ foreach($spmAssignments as $spmAssignment) {
     }
 }
 
+// compute insurance amount
+$booking_options['insurance_amount'] = round(3.5 * $contract['price'] / 100, 2);
+
 
 /*
     retrieve templates
@@ -758,7 +761,11 @@ if($booking['center_id']['template_category_id']) {
         elseif($part['name'] == 'payment') {
             $values['contract_payment_html'] = $value;
         }
+        elseif($part['name'] == 'withdrawal') {
+            $values['contract_withdrawal_html'] = $value;
+        }
         elseif($part['name'] == 'cancellation') {
+            $value = str_replace('{insurance_amount}', $booking_options['insurance_amount'], $value);
             $values['contract_cancellation_html'] = $value;
         }
         elseif($part['name'] == 'contract_approved') {
