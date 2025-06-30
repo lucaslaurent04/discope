@@ -142,10 +142,11 @@ $lodgingBookingPrintAgeRangesText = function($booking, $connection_names) {
         }
     }
 
-    $parts = array_map(fn($item) => $item['qty'] . ' ' . strtolower($item['age_range']), $age_rang_maps);
+    $parts = array_map(function($item) { return $item['qty'] . ' ' . strtolower($item['age_range']); }, $age_rang_maps);
     $last = array_pop($parts);
     return count($parts) ? implode(', ', $parts) . ' ' . $connection_names[0] . ' ' . $last : $last;
 };
+
 // read contract
 $fields = [
     'created',
