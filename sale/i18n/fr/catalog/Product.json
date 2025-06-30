@@ -157,6 +157,16 @@
             "label": "Est une activité",
             "description": "Le produit est-il une activité ?",
             "help": "Le produit est-il une activité ? (cela inclut des activités comme des jeux, des ateliers, etc.)"
+        },
+        "is_fullday": {
+            "label": "Activité journée complète",
+            "description": "Indique si l'activité dure toute la journée. Si vrai, les assignations doivent inclure AM et PM ; sinon, l'une ou l'autre.",
+            "help": "L'activité se déroule-t-elle sur toute la journée ? Si oui, il faut prévoir des assignations pour le matin (AM) et l'après-midi (PM)."
+        },
+        "is_billable": {
+            "label": "Est facturable",
+            "description": "L'activité est-elle facturable ? (génère une ligne de service lors de la facturation).",
+            "help": "Permet d'indiquer si une activité est facturable, ce qui entraînera la création d'une ligne de service dans la facturation."
         }
     },
     "view": {
@@ -169,6 +179,9 @@
                 },
                 "section.prices_section": {
                     "label": "Prix"
+                },
+                "section.activity": {
+                    "label": "Activité"
                 },
                 "section.attributes": {
                     "label": "Attributs"
