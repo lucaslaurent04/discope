@@ -190,6 +190,15 @@ class Product extends Model {
                 'store'             => true
             ],
 
+            'is_billable' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => "Indicates whether the activity is billable (generates a service line in invoicing).",
+                'relation'          => ['product_model_id' => 'is_billable'],
+                'instant'           => true,
+                'store'             => true
+            ],
+
             'is_freebie_allowed' => [
                 'type'              => 'boolean',
                 'description'       => 'Is the product eligible for freebies?',

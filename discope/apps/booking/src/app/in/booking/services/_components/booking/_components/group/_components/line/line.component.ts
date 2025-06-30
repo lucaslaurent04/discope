@@ -442,16 +442,35 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
     private async filterProducts(name: string) {
         let filtered:any[] = [];
         try {
-            let domain = [
-                    ['is_pack', '=', false]
-                ];
+            let domain: any = [];
 
             if(this.displaySettings.activities_enabled && !this.displaySettings.activities_visible) {
-                domain.push(['is_activity', '=', false]);
-            }
+                domain = [
+                    ['is_pack', '=', false],
+                    ['is_activity', '=', false]
+                ];
 
-            if(name && name.length) {
-                domain.push(['name', 'ilike', '%'+name+'%']);
+                if(name && name.length) {
+                    domain.push(['name', 'ilike', '%'+name+'%']);
+                }
+            }
+            else {
+                domain = [
+                    [
+                        ['is_pack', '=', false],
+                        ['is_activity', '=', false]
+                    ],
+                    [
+                        ['is_pack', '=', false],
+                        ['is_activity', '=', true],
+                        ['is_billable', '=', true]
+                    ]
+                ];
+
+                if(name && name.length) {
+                    domain[0].push(['name', 'ilike', '%'+name+'%']);
+                    domain[1].push(['name', 'ilike', '%'+name+'%']);
+                }
             }
 
             const data:any[] = await this.api.fetch('?get=sale_catalog_product_collect', {
