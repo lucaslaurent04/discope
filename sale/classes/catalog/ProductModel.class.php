@@ -415,7 +415,8 @@ class ProductModel extends Model {
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the activity is billable (generates a service line in invoicing).',
                 'default'           => true,
-                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ],
+                'dependents'        => ['product_id' => 'is_billable']
             ],
 
             'has_staff_required' => [

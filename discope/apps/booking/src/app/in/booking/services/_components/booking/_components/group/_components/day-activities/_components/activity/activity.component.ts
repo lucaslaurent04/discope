@@ -147,7 +147,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         let filtered: any[] = [];
         try {
             let domain = [
-                ['is_activity', '=', true]
+                ['is_activity', '=', true],
+                ['is_billable', '=', true]
             ];
 
             if(!this.allowFulldaySelection) {
