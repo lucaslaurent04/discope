@@ -237,12 +237,13 @@ hr {
     <div class="heading">
         {{ contract_service_html | raw }}
     </div>
+    <div class="page-break"></div>
     <div class="heading">
         {{ contract_engage_html | raw }}
     </div>
-
+    <div class="page-break"></div>
     <div class="heading">
-        CONDITIONS FINANCIÈRES:
+        <b>CONDITIONS FINANCIÈRES:</b>
     </div>
     <div class="wrapper">
         <table width="100%" cellpadding="4" cellspacing="0">
@@ -319,6 +320,8 @@ hr {
             {% endfor %}
         </table>
     </div>
+
+    <!-- content should be here -->
 </div>
 <div class="trailer">
     <div class="wrapper" style="margin-top: -1px;">
@@ -569,7 +572,6 @@ hr {
 <div class="heading">{{ contract_notice_html | raw }}</div>
 
 
-
 {% if installment_amount > 0 %}
 <div style="position: relative; margin-top: 40px; border: solid 2px black; height: 180px; page-break-inside: avoid;">
     <div style="padding-top: 15px; font-size: 15px; padding-left: 15px; ">
@@ -594,7 +596,6 @@ hr {
 <div class="heading">{{ contract_withdrawal_html | raw }}</div>
 <div class="heading">{{ contract_cancellation_html | raw }}</div>
 <div class="heading">{{ contract_authorization_html | raw }}</div>
-
 <div class="page-break"></div>
 <div class="heading">{{ contract_misc_provisions_html | raw }}</div>
 
@@ -628,7 +629,6 @@ hr {
         </div>
     {% endif %}
 </div>
-
 
 
 
