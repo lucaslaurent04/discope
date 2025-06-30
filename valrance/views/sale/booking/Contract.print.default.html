@@ -236,13 +236,13 @@ hr {
     </div>
     <div class="heading">
         {{ contract_service_html | raw }}
-        <ul>
-            <li >{{ service_beds }}</li>
-        </ul>
     </div>
-    <div class="page-break"></div>
-    <div>
+    <div class="heading">
         {{ contract_engage_html | raw }}
+    </div>
+
+    <div class="heading">
+        CONDITIONS FINANCIÈRES:
     </div>
     <div class="wrapper">
         <table width="100%" cellpadding="4" cellspacing="0">
@@ -320,7 +320,6 @@ hr {
         </table>
     </div>
 </div>
-
 <div class="trailer">
     <div class="wrapper" style="margin-top: -1px;">
         <table width="100%" style="border: 0px; border-right: solid 1px black;" cellpadding="4" cellspacing="0">
@@ -379,6 +378,8 @@ hr {
     {% endif %}
 
 </div>
+
+<div class="heading">{{ contract_payment_html | raw }}</div>
 
 {% if fundings | length > 0  %}
 <div style="margin-top: 50px; page-break-inside: avoid;">
@@ -567,7 +568,7 @@ hr {
 
 <div class="heading">{{ contract_notice_html | raw }}</div>
 
-<div class="heading">{{ contract_payment_html | raw }}</div>
+
 
 {% if installment_amount > 0 %}
 <div style="position: relative; margin-top: 40px; border: solid 2px black; height: 180px; page-break-inside: avoid;">
