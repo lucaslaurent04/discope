@@ -584,8 +584,8 @@ $spmAssignments = SojournProductModelRentalUnitAssignement::search([
     ->read(['rental_unit_id' => ['has_children', 'children_ids']]);
 
 foreach($spmAssignments as $spmAssignment) {
-    if($spmAssignment['has_children']) {
-        $booking_options['nb_rooms'] += count($spmAssignment['children_ids']);
+    if($spmAssignment['rental_unit_id']['has_children']) {
+        $booking_options['nb_rooms'] += count($spmAssignment['rental_unit_id']['children_ids']);
     }
     else {
         ++$booking_options['nb_rooms'];
