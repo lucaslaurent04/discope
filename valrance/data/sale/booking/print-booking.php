@@ -104,6 +104,7 @@ $lodgingBookingPrintAgeRangesText = function($booking, $connection_names) {
     $last = array_pop($parts);
     return count($parts) ? implode(', ', $parts) . ' ' . $connection_names[0] . ' ' . $last : $last;
 };
+
 /*
     Retrieve the requested template
 */
