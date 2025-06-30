@@ -239,11 +239,6 @@ hr {
         <ul>
             <li >{{ service_beds }}</li>
         </ul>
-        {% if has_service_transport %}
-            <ul>
-                <li >{{ service_transport }}</li>
-            </ul>
-        {% endif %}
     </div>
     <div class="page-break"></div>
     <div>
@@ -377,7 +372,7 @@ hr {
             </tr>
             {% endfor %}
         </table>
-        <div>
+        <div style="margin-top: 10px;">
             {{ advantage_notice_html | raw }}
         </div>
     </div>
@@ -569,7 +564,9 @@ hr {
 {% endif %}
 
 <div class="page-break"></div>
+
 <div class="heading">{{ contract_notice_html | raw }}</div>
+
 <div class="heading">{{ contract_payment_html | raw }}</div>
 
 {% if installment_amount > 0 %}
