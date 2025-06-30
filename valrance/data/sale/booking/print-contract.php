@@ -434,9 +434,6 @@ $values = [
     'total'                       => $contract['total'],
     'has_activity'               => $has_activity,
     'activities_map'             => '',
-    'sheets_beds'                => '',
-    'service_transport'          => '',
-    'has_service_transport'      => 0 ,
     'show_consumption'           => $consumption_table_show
 ];
 
@@ -556,6 +553,25 @@ $hasFooter = false;
 */
 $booking_options = [];
 
+
+// retrieve transport
+$setting_transport = Setting::get_value('sale', 'organization', 'sku.transport', 'not_found');
+
+$product_transport = Product::search(['sku', '=', $setting_transport])
+    ->read(['id' , 'product_model_id'])
+    ->first(true);
+
+$transport = BookingLine::search([
+        ['booking_id', '=', $booking['id']],
+        ['product_model_id', '=', $product_transport['product_model_id']]
+    ])
+    ->read(['product_model_id' => ['id', 'name']])
+    ->first(true);
+
+if($transport) {
+    $booking_options['has_transport'] = false;
+}
+
 // retrieve bed linens & make beds
 $booking_options['has_bed_linens'] = false;
 $booking_options['has_make_beds'] = false;
@@ -640,7 +656,15 @@ if($booking['center_id']['template_category_id']) {
                 }
             }
 
+            if($booking_options['has_transport']) {
+                $service_transport = Setting::get_value('lodging', 'locale', 'i18n.round_trip_transport', null, [], $params['lang']);
+            }
+            else {
+                $service_transport = '';
+            }
+
             $value = str_replace('{beds_service}', $service_beds, $value);
+            $value = str_replace('{transport_service}', $service_transport, $value);
             $value = str_replace('{nb_rooms}', $booking_options['nb_rooms'], $value);
 
             $date_from = $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']);
@@ -759,13 +783,14 @@ if($booking['center_id']['template_category_id']) {
             $values['contract_notice_html'] = $value;
         }
         elseif($part['name'] == 'payment') {
+            $value = str_replace('{table_fundings}', '', $value);
             $values['contract_payment_html'] = $value;
         }
         elseif($part['name'] == 'withdrawal') {
             $values['contract_withdrawal_html'] = $value;
         }
         elseif($part['name'] == 'cancellation') {
-            $value = str_replace('{insurance_amount}', $booking_options['insurance_amount'], $value);
+            $value = str_replace('{insurance_amount}',  number_format($booking_options['insurance_amount'], 2, ',', ''), $value);
             $values['contract_cancellation_html'] = $value;
         }
         elseif($part['name'] == 'contract_approved') {
@@ -1184,26 +1209,6 @@ else if($installment_amount > 0) {
 /*
     Generate consumptions map simple
 */
-
-$setting_transport = Setting::get_value('sale', 'organization', 'sku.transport', 'not_found');
-
-$product_transport = Product::search(['sku', '=', $setting_transport])
-    ->read(['id' , 'product_model_id'])
-    ->first(true);
-
-
-$transport = BookingLine::search([
-        ['booking_id', '=', $booking['id']],
-        ['product_model_id', '=', $product_transport['product_model_id']]
-    ])
-    ->read(['product_model_id' => ['id', 'name']])
-    ->first(true);
-
-if($transport) {
-    $values['has_service_transport'] = 1;
-    $transport_translation = Setting::get_value('lodging', 'locale', 'i18n.round_trip_transport', null, [], $params['lang']);
-}
-$values['service_transport'] = $transport_translation;
 
 $consumptions_map_simple = [];
 
