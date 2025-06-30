@@ -25,6 +25,7 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use sale\booking\BookingActivity;
 use sale\catalog\Product;
 use sale\booking\BookingLine;
+use sale\booking\BookingMeal;
 
 list($params, $providers) = announce([
     'description'   => "Render a contract given its ID as a PDF document.",
@@ -576,11 +577,95 @@ if($booking['center_id']['template_category_id']) {
             $values['contract_header_html'] = $value;
         }
         elseif($part['name'] == 'service') {
-            $text_pers = $lodgingBookingPrintAgeRangesText($booking, $connection_names);
 
+
+            $value = $part['value'];
+            $value = str_replace('{center}', $booking['center_id']['name'], $value);
+
+            $date_from = $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']);
+            $date_to = $days_names[date('w', $booking['date_to'])] . ' '. date('d/m/Y', $booking['date_to']);
+
+            // retrieve meals info for arrival day
+            $lunch = false;
+            $snack = false;
+
+            $meals = BookingMeal::search([['booking_id', '=', $booking['id']], ['date', '=', $booking['date_from']]])
+                ->read(['time_slot_id' => ['code'], 'is_self_provided']);
+
+            foreach($meals as $meal_id => $meal) {
+                if($meal['time_slot_id']['code'] === 'L' && !$meal['is_self_provided']) {
+                    $lunch = true;
+                }
+                if($meal['time_slot_id']['code'] === 'PM' && !$meal['is_self_provided']) {
+                    $snack = true;
+                }
+            }
+
+            if($lunch) {
+                $date_from .= ' (avant le repas du midi)';
+            }
+            else {
+                if(!$snack) {
+                    $date_from .= ' (avec un pique-nique et un gouter amenés par vos soins)';
+                }
+                else {
+                    $date_from .= ' (avec un pique-nique apporté par vos soins)';
+                }
+            }
+
+            $value = str_replace('{date_from}', $date_from, $value);
+
+            // retrieve meals info for departure day
+            $lunch = false;
+            $snack = false;
+            $lunch_onsite = false;
+            $snack_onsite = false;
+
+            $meals = BookingMeal::search([['booking_id', '=', $booking['id']], ['date', '=', $booking['date_to']]])
+                ->read(['time_slot_id' => ['code'], 'is_self_provided', 'meal_place_id' => ['place_type']]);
+
+            foreach($meals as $meal_id => $meal) {
+                if($meal['time_slot_id']['code'] === 'L' && !$meal['is_self_provided']) {
+                    $lunch = true;
+                    $lunch_onsite = ($meal['meal_place_id']['place_type'] === 'onsite');
+                }
+                if($meal['time_slot_id']['code'] === 'PM' && !$meal['is_self_provided']) {
+                    $snack = true;
+                    $snack_onsite = ($meal['meal_place_id']['place_type'] === 'onsite');
+                }
+            }
+
+            if($lunch) {
+                if($lunch_onsite) {
+                    if($snack) {
+                        if($snack_onsite) {
+                            $date_to .= ' (après le goûter)';
+                        }
+                        else {
+                            $date_to .= ' (après le repas de midi, avec goûter à emporter)';
+                        }
+                    }
+                    else {
+                        $date_to .= ' (après le repas de midi)';
+                    }
+                }
+                else {
+                    if($snack) {
+                        $date_to .= ' (en matinée avec pique-nique et goûter à emporter)';
+                    }
+                    else {
+                        $date_to .= ' (en matinée avec pique-nique à emporter)';
+                    }
+                }
+            }
+            else {
+                $date_to .= ' (avant le repas du midi)';
+            }
+
+            $value = str_replace('{date_to}', $date_to, $value);
+
+            $text_pers = $lodgingBookingPrintAgeRangesText($booking, $connection_names);
             $value = str_replace('{nb_pers}', $text_pers, $value);
-            $value = str_replace('{date_from}', $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']) , $value);
-            $value = str_replace('{date_to}',  $days_names[date('w', $booking['date_to'])] . ' '. date('d/m/Y', $booking['date_to']) , $value);
 
             if($booking['customer_id']['rate_class_id']) {
                 $part_name = 'service_'. $booking['customer_id']['rate_class_id']['name'];
