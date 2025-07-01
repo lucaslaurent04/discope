@@ -370,6 +370,45 @@ $has_activity = false;
 
 $consumption_table_show  = Setting::get_value('sale', 'features', 'templates.quote.consumption_table', 1);
 
+
+
+// retrieve transport
+
+// transport to and from the group to the accommodation
+$setting_transport = Setting::get_value('sale', 'organization', 'sku.transport', 'not_found');
+
+$product_transport = Product::search(['sku', '=', $setting_transport])
+    ->read(['id' , 'product_model_id'])
+    ->first(true);
+
+$transport = BookingLine::search([
+        ['booking_id', '=', $booking['id']],
+        ['product_model_id', '=', $product_transport['product_model_id']]
+    ])
+    ->read(['product_model_id' => ['id', 'name']])
+    ->first(true);
+
+
+$has_roundtrip_transport = (bool) $transport;
+
+
+// travel throughout the stay for external activities
+// #todo - put this in settings
+$product_transport = Product::search(['sku', '=', 'RV-Transport-Externe'])
+    ->read(['id' , 'product_model_id'])
+    ->first(true);
+
+$transport = BookingLine::search([
+        ['booking_id', '=', $booking['id']],
+        ['product_model_id', '=', $product_transport['product_model_id']]
+    ])
+    ->read(['product_model_id' => ['id', 'name']])
+    ->first(true);
+
+
+$has_activities_transport = (bool) $transport;
+
+
 $values = [
     'attn_address1'               => '',
     'attn_address2'               => '',
@@ -420,6 +459,8 @@ $values = [
     'date'                        => date('d/m/Y', $contract['created']),
     'fundings'                    => [],
     'has_contract_approved'       => 0,
+    'has_roundtrip_transport'     => $has_roundtrip_transport,
+    'has_activities_transport'    => $has_activities_transport,
     'header_img_url'              => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
     'installment_amount'          => 0,
     'installment_date'            => '',
@@ -553,25 +594,6 @@ $hasFooter = false;
 */
 $booking_options = [];
 
-
-// retrieve transport
-$setting_transport = Setting::get_value('sale', 'organization', 'sku.transport', 'not_found');
-
-$product_transport = Product::search(['sku', '=', $setting_transport])
-    ->read(['id' , 'product_model_id'])
-    ->first(true);
-
-$transport = BookingLine::search([
-        ['booking_id', '=', $booking['id']],
-        ['product_model_id', '=', $product_transport['product_model_id']]
-    ])
-    ->read(['product_model_id' => ['id', 'name']])
-    ->first(true);
-
-if($transport) {
-    $booking_options['has_transport'] = false;
-}
-
 // retrieve bed linens & make beds
 $booking_options['has_bed_linens'] = false;
 $booking_options['has_make_beds'] = false;
@@ -642,6 +664,7 @@ if($booking['center_id']['template_category_id']) {
 
             $values['contract_header_html'] = $value;
         }
+        // services provided by the center Valrance
         elseif($part['name'] == 'service') {
 
             if(!$booking_options['has_bed_linens']) {
@@ -656,15 +679,12 @@ if($booking['center_id']['template_category_id']) {
                 }
             }
 
-            if($booking_options['has_transport']) {
-                $service_transport = Setting::get_value('lodging', 'locale', 'i18n.round_trip_transport', null, [], $params['lang']);
-            }
-            else {
-                $service_transport = '';
-            }
+            $service_transport_roundtrip = ($has_roundtrip_transport) ? "assurer la prise en charge du transport aller et le retour du groupe" : '';
+            $service_transport_activities = ($has_activities_transport) ? "assurer les éventuels déplacements tout au long du séjour" : '';
 
             $value = str_replace('{beds_service}', $service_beds, $value);
-            $value = str_replace('{transport_service}', $service_transport, $value);
+            $value = str_replace('{transport_service}', $service_transport_roundtrip, $value);
+            $value = str_replace('{transport_activity}', $service_transport_activities, $value);
             $value = str_replace('{nb_rooms}', $booking_options['nb_rooms'], $value);
 
             $date_from = $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']);
@@ -763,8 +783,12 @@ if($booking['center_id']['template_category_id']) {
                 }
             }
 
+            // remove empty list items, if any
+            $value = preg_replace('/<li>\s*<\/li>/i', '', $value);
+
             $values['contract_service_html'] = $value;
         }
+        // engagements the customer pledges to comply with
         elseif($part['name'] == 'engage') {
             if($booking['customer_id']['rate_class_id']) {
                 $part_name = 'engage_'. $booking['customer_id']['rate_class_id']['name'];
@@ -772,7 +796,15 @@ if($booking['center_id']['template_category_id']) {
                         ->read(['value'], $params['lang'])
                         ->first(true);
 
-                if($template_part){
+                if($template_part) {
+                    $service_transport_roundtrip = ($has_roundtrip_transport) ? '' : "assurer la prise en charge du transport aller et le retour du groupe";
+                    $service_transport_activities = ($has_activities_transport) ? '' : "assurer les éventuels déplacements tout au long du séjour";
+
+                    $value = str_replace('{transport_service}', $service_transport_roundtrip, $value);
+                    $value = str_replace('{transport_activity}', $service_transport_activities, $value);
+
+                    // remove empty list items, if any
+                    $value = preg_replace('/<li>\s*<\/li>/i', '', $value);
                     $value .= $template_part['value'];
                 }
             }

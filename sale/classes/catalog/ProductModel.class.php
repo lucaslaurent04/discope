@@ -481,9 +481,9 @@ class ProductModel extends Model {
             ],
 
             'nutritional_coefficient' => [
-                'type'              => 'integer',
+                'type'              => 'float',
                 'description'       => "The nutritional coefficient of the meal.",
-                'default'           => 1,
+                'default'           => 1.0,
                 'visible'           => ['is_meal', '=', true]
             ],
 
