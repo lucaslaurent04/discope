@@ -60,7 +60,7 @@ class Camp extends Model {
                 'selection'         => [
                     'draft',
                     'published',
-                    'canceled'
+                    'cancelled'
                 ],
                 'description'       => "Status of the camp.",
                 'default'           => 'draft'
@@ -206,7 +206,7 @@ class Camp extends Model {
             'enrollments_qty' => [
                 'type'              => 'computed',
                 'result_type'       => 'integer',
-                'description'       => "Quantity of enrollments that aren't canceled or waitlisted.",
+                'description'       => "Quantity of enrollments that aren't cancelled or waitlisted.",
                 'store'             => true,
                 'function'          => 'calcEnrollmentsQty'
             ],
@@ -408,7 +408,7 @@ class Camp extends Model {
                         'onafter'       => 'onafterPublish'
                     ],
                     'cancel' => [
-                        'status'        => 'canceled',
+                        'status'        => 'cancelled',
                         'description'   => "Cancel the camp.",
                         'onafter'       => 'onafterCancel'
                     ]
@@ -419,15 +419,15 @@ class Camp extends Model {
                 'description' => "The camp is configured and published on the website.",
                 'transitions' => [
                     'cancel' => [
-                        'status'        => 'canceled',
+                        'status'        => 'cancelled',
                         'description'   => "Cancel the camp.",
                         'onafter'       => 'onafterCancel'
                     ]
                 ]
             ],
 
-            'canceled' => [
-                'description' => "The camp was canceled.",
+            'cancelled' => [
+                'description' => "The camp was cancelled.",
             ]
 
         ];
@@ -499,7 +499,7 @@ class Camp extends Model {
         foreach($self as $id => $camp) {
             $enrollment_qty = 0;
             foreach($camp['enrollments_ids'] as $enrollment) {
-                if(!in_array($enrollment['status'], ['canceled', 'waitlisted'])) {
+                if(!in_array($enrollment['status'], ['cancelled', 'waitlisted'])) {
                     $enrollment_qty++;
                 }
             }

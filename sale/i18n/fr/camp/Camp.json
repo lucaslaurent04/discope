@@ -20,7 +20,7 @@
             "selection": {
                 "draft": "Brouillon",
                 "published": "Publié",
-                "canceled": "Annulé"
+                "cancelled": "Annulé"
             }
         },
         "remarks": {

@@ -11,7 +11,7 @@ use sale\camp\Enrollment;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Transfer an enrollment from one camp to another.",
-    'help'          => "Usually used when a camp is canceled.",
+    'help'          => "Usually used when a camp is cancelled.",
     'params'        => [
 
         'id' => [
@@ -58,8 +58,8 @@ $camp = Camp::id($params['camp_id'])
     ->read(['status'])
     ->first();
 
-if($camp['status'] === 'canceled') {
-    throw new Exception("canceled_camp", EQ_ERROR_INVALID_PARAM);
+if($camp['status'] === 'cancelled') {
+    throw new Exception("cancelled_camp", EQ_ERROR_INVALID_PARAM);
 }
 
 $was_locked = false;

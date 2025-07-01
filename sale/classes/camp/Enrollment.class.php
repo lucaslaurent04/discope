@@ -257,7 +257,7 @@ class Enrollment extends Model {
                     'pending',
                     'waitlisted',
                     'confirmed',
-                    'canceled'
+                    'cancelled'
                 ],
                 'description'       => "The status of the enrollment.",
                 'default'           => 'pending'
@@ -664,7 +664,7 @@ class Enrollment extends Model {
         $self->update([
             'is_locked'         => false,
             'cancellation_date' => time(),
-            'status'            => 'canceled'   // #todo - find why needed and fix error
+            'status'            => 'cancelled'   // #todo - find why needed and fix error
         ]);
 
         $self->do('reset-camp-enrollments-qty');
@@ -684,7 +684,7 @@ class Enrollment extends Model {
                         'onafter'       => 'onafterConfirm'
                     ],
                     'cancel' => [
-                        'status'        => 'canceled',
+                        'status'        => 'cancelled',
                         'description'   => "Cancel the pending enrollment.",
                         'onafter'       => 'onafterCancel'
                     ]
@@ -701,7 +701,7 @@ class Enrollment extends Model {
                         'onafter'       => 'onafterPending'
                     ],
                     'cancel' => [
-                        'status'        => 'canceled',
+                        'status'        => 'cancelled',
                         'description'   => "Cancel the waiting enrollment.",
                         'onafter'       => 'onafterCancel'
                     ]
@@ -712,15 +712,15 @@ class Enrollment extends Model {
                 'description' => "The enrollment is confirmed, the child can attend the camp.",
                 'transitions' => [
                     'cancel' => [
-                        'status'        => 'canceled',
+                        'status'        => 'cancelled',
                         'description'   => "Cancel the confirmed enrollment.",
                         'onafter'       => 'onafterCancel'
                     ]
                 ]
             ],
 
-            'canceled' => [
-                'description' => "The enrollment has been canceled."
+            'cancelled' => [
+                'description' => "The enrollment has been cancelled."
             ]
 
         ];
@@ -743,14 +743,14 @@ class Enrollment extends Model {
             }
         }
 
-        // Check that camp isn't canceled
+        // Check that camp isn't cancelled
         if(isset($values['camp_id'])) {
             $camp = Camp::id($values['camp_id'])
                 ->read(['status'])
                 ->first();
 
-            if($camp['status'] === 'canceled') {
-                return ['camp_id' => ['canceled_camp' => "Cannot enroll to a canceled camp."]];
+            if($camp['status'] === 'cancelled') {
+                return ['camp_id' => ['cancelled_camp' => "Cannot enroll to a cancelled camp."]];
             }
         }
 

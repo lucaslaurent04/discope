@@ -16,7 +16,7 @@
         "errors": {
             "unknown_enrollment": "Inscription n'existe pas.",
             "same_camp": "Transfer vers un camp identitque.",
-            "canceled_camp": "Camp annulé."
+            "cancelled_camp": "Camp annulé."
         }
     }
 }

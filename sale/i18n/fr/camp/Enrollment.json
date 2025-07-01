@@ -150,7 +150,7 @@
                 "pending": "En cours",
                 "waitlisted": "Sur liste d'attente",
                 "confirmed": "Confirmée",
-                "canceled": "Annulée"
+                "cancelled": "Annulée"
             }
         },
         "is_ase": {
@@ -242,7 +242,7 @@
             "locked_enrollment": "Impossible de modifier une inscription verrouillée."
         },
         "camp_id": {
-            "canceled_camp": "Inscription à un camp annulé impossible.",
+            "cancelled_camp": "Inscription à un camp annulé impossible.",
             "full": "Le camp est complet.",
             "day_1_full": "Le 1er jour du camp est complet.",
             "day_2_full": "Le 2ème jour du camp est complet.",

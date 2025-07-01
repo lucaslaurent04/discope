@@ -79,7 +79,7 @@
             "label": "Transfer",
             "controller": "sale_camp_transfer-enrollment",
             "visible": [
-                ["status", "<>", "canceled"],
+                ["status", "<>", "cancelled"],
                 ["state", "<>", "draft"]
             ]
         }
