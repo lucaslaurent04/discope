@@ -797,17 +797,18 @@ if($booking['center_id']['template_category_id']) {
                         ->first(true);
 
                 if($template_part) {
-                    $service_transport_roundtrip = ($has_roundtrip_transport) ? '' : "assurer la prise en charge du transport aller et le retour du groupe";
-                    $service_transport_activities = ($has_activities_transport) ? '' : "assurer les éventuels déplacements tout au long du séjour";
-
-                    $value = str_replace('{transport_service}', $service_transport_roundtrip, $value);
-                    $value = str_replace('{transport_activity}', $service_transport_activities, $value);
-
-                    // remove empty list items, if any
-                    $value = preg_replace('/<li>\s*<\/li>/i', '', $value);
                     $value .= $template_part['value'];
                 }
             }
+
+            $service_transport_roundtrip = ($has_roundtrip_transport) ? '' : "assurer la prise en charge du transport aller et le retour du groupe";
+            $service_transport_activities = ($has_activities_transport) ? '' : "assurer les éventuels déplacements tout au long du séjour";
+
+            $value = str_replace('{transport_service}', $service_transport_roundtrip, $value);
+            $value = str_replace('{transport_activity}', $service_transport_activities, $value);
+
+            // remove empty list items, if any
+            $value = preg_replace('/<li>\s*<\/li>/i', '', $value);
 
             $values['contract_engage_html'] = $value;
         }
