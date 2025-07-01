@@ -150,7 +150,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                 }
                 this.weekStartDate = weekStartDate;
 
-                this.selectedDay = this.formatDayIndex(this.weekStartDate);
+                this.selectedDay = this.formatDayIndex(this.booking.date_from);
 
                 const weekEndDate = new Date(this.weekStartDate);
                 weekEndDate.setDate(weekEndDate.getDate() + 6);
@@ -252,7 +252,12 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         weekStartDate.setDate(weekStartDate.getDate() - 7);
         this.weekStartDate = weekStartDate;
 
-        this.selectedDay = this.formatDayIndex(this.weekStartDate);
+        if(this.weekStartDate < this.booking.date_from) {
+            this.selectedDay = this.formatDayIndex(this.booking.date_from);
+        }
+        else {
+            this.selectedDay = this.formatDayIndex(this.weekStartDate);
+        }
 
         const weekEndDate = new Date(this.weekStartDate);
         weekEndDate.setDate(weekEndDate.getDate() + 6);
@@ -432,6 +437,21 @@ export class BookingActivitiesPlanningComponent implements OnInit {
             });
 
             await this.loadActivityGroups(Object.getOwnPropertyNames(new BookingLineGroup()));
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+
+        this.loading = false;
+    }
+
+    public async onHasPersonWithDisabilityChanged(hasPersonWithDisability: boolean) {
+        this.loading = true;
+
+        try {
+            await this.api.update('sale\\booking\\BookingLineGroup', [this.selectedGroup.id], {
+                has_person_with_disability: hasPersonWithDisability
+            });
         }
         catch(response) {
             this.api.errorFeedback(response);

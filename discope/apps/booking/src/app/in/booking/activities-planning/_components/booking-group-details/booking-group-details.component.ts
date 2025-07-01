@@ -16,16 +16,19 @@ export class BookingActivitiesPlanningBookingGroupDetailsComponent implements On
     @Output() nbPersChanged = new EventEmitter<number>();
     @Output() ageFromChanged = new EventEmitter<number>();
     @Output() ageToChanged = new EventEmitter<number>();
+    @Output() hasPersonWithDisabilityChanged = new EventEmitter<boolean>();
 
     public nbPersFormControl: FormControl;
     public ageFromFormControl: FormControl;
     public ageToFormControl: FormControl;
+    public hasPersonWithDisabilityFormControl: FormControl;
 
     constructor(
     ) {
         this.nbPersFormControl = new FormControl(0, [Validators.min(1)]);
         this.ageFromFormControl = new FormControl(0, [Validators.min(0), Validators.max(99), this.maxAgeTo()]);
         this.ageToFormControl = new FormControl(0, [Validators.min(0), Validators.max(99), this.minAgeFrom()]);
+        this.hasPersonWithDisabilityFormControl = new FormControl(false);
     }
 
     public maxAgeTo(): ValidatorFn {
@@ -55,6 +58,7 @@ export class BookingActivitiesPlanningBookingGroupDetailsComponent implements On
     public ngOnChanges(changes: SimpleChanges) {
         if(changes.group && this.group) {
             this.nbPersFormControl.setValue(this.group.nb_pers);
+            this.hasPersonWithDisabilityFormControl.setValue(this.group.has_person_with_disability);
 
             if(this.mapGroupAgeRangeAssignment[this.group.id]) {
                 const ageRangeAssign = this.mapGroupAgeRangeAssignment[this.group.id];
@@ -93,5 +97,13 @@ export class BookingActivitiesPlanningBookingGroupDetailsComponent implements On
         }
 
         this.ageToChanged.emit(this.ageToFormControl.value);
+    }
+
+    public async onHasPersonWithDisabilityChanges() {
+        if(!this.hasPersonWithDisabilityFormControl.valid) {
+            return;
+        }
+
+        this.hasPersonWithDisabilityChanged.emit(this.hasPersonWithDisabilityFormControl.value);
     }
 }
