@@ -63,6 +63,12 @@
                                                 "label": "Quantity",
                                                 "value": "qty",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Rate Class",
+                                                "value": "rate_class_id",
+                                                "width": "50%"
                                             }
                                         ]
                                     }

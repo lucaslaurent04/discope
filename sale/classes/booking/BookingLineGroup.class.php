@@ -3610,6 +3610,7 @@ class BookingLineGroup extends Model {
                 'date_to',
                 'booking_id',
                 'has_pack',
+                'rate_class_id',
                 'pack_id.product_model_id.booking_type_id.code',
                 'booking_id.center_id.autosale_list_category_id',
                 'booking_id.customer_id',
@@ -3689,6 +3690,7 @@ class BookingLineGroup extends Model {
 				'has_own_qty',
 				'qty',
 				'scope',
+                'rate_class_id',
 				'conditions_ids'
 			]);
 
@@ -3700,6 +3702,9 @@ class BookingLineGroup extends Model {
 				if($autosale['scope'] != 'group') {
 					continue;
 				}
+                if(isset($autosale['rate_class_id']) && $group['rate_class_id'] !== $autosale['rate_class_id']) {
+                    continue;
+                }
 				// #kaleo - do not apply city tax for school sojourns
 				if( $group['has_pack']
 					&& isset($group['pack_id.product_model_id.booking_type_id.code'])
