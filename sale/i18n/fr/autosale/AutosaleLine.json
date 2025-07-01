@@ -28,6 +28,11 @@
             "description": "La liste à laquelle appartient la ligne.",
             "help": ""
         },
+        "rate_class_id": {
+            "label": "Catégorie tarifaire",
+            "description": "Catégorie tarifaire du client de la réservation ou du groupe, afin d'être applicable.",
+            "help": ""
+        },
         "conditions_ids": {
             "label": "Conditions",
             "description": "Les conditions requises pour la vente automatique.",

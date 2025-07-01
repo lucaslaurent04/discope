@@ -104,16 +104,6 @@ class Booking extends Model {
                 'dependents'        => ['organisation_id', 'center_office_id']
             ],
 
-            'organisation_id' => [
-                'type'              => 'computed',
-                'result_type'       => 'many2one',
-                'foreign_object'    => 'identity\Identity',
-                'description'       => "The organisation the establishment belongs to.",
-                'store'             => true,
-                'instant'           => true,
-                'relation'          => ['center_id' => 'organisation_id']
-            ],
-
             'center_office_id' => [
                 'type'              => 'computed',
                 'result_type'       => 'many2one',
@@ -1770,7 +1760,8 @@ class Booking extends Model {
             'nb_pers',
             'date_from',
             'date_to',
-            'center_id.autosale_list_category_id'
+            'center_id.autosale_list_category_id',
+            'customer_rate_class_id'
         ]);
 
         if($bookings <= 0) {
@@ -1852,6 +1843,7 @@ class Booking extends Model {
                 'has_own_qty',
                 'qty',
                 'scope',
+                'rate_class_id',
                 'conditions_ids'
             ]);
 
@@ -1861,6 +1853,9 @@ class Booking extends Model {
             // filter discounts to be applied on whole booking
             foreach($autosales as $autosale_id => $autosale) {
                 if($autosale['scope'] != 'booking') {
+                    continue;
+                }
+                if(isset($autosale['rate_class_id']) && $booking['customer_rate_class_id'] !== $autosale['rate_class_id']) {
                     continue;
                 }
                 $conditions = $om->read('sale\autosale\Condition', $autosale['conditions_ids'], ['operand', 'operator', 'value']);
