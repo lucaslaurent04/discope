@@ -164,7 +164,7 @@ class Payment extends \sale\pay\Payment {
         $payments = $om->read(self::getType(), $ids, ['state', 'statement_line_id.bank_statement_id', 'statement_line_id.remaining_amount']);
         if($payments > 0 && count($payments)) {
             foreach($payments as $id => $payment) {
-                $om->update(self::getType(), $id, ['state' => $payment, 'amount' => $payment['statement_line_id.remaining_amount']]);
+                $om->update(self::getType(), $id, ['state' => $payment['state'], 'amount' => $payment['statement_line_id.remaining_amount']]);
                 // #memo - status of BankStatement is computed from statement lines, and status of BankStatementLine depends on payments
                 $om->update(\sale\booking\BankStatement::getType(), $payment['statement_line_id.bank_statement_id'], ['status' => null]);
             }
