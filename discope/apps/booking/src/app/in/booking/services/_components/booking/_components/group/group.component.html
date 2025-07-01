@@ -395,13 +395,20 @@
                 <div class="row" [class.hidden]="vGroup.identification.folded">
                     <div>
                         <div style="padding-left: 12px;">
-                            Âges des participants
+                            Participants
                             <button mat-mini-fab
                                 color="primary"
                                 style="transform: scale(0.66);"
                                 (click)="oncreateAgeRange();"
                                 title="Ajouter une tranche d'âge">
                                 <mat-icon>add</mat-icon>
+                            </button>
+                            <button mat-mini-fab
+                                color="primary"
+                                style="transform: scale(0.66);"
+                                (click)="oneditParticipantsOptions();"
+                                title="Editer les options des participants">
+                                <mat-icon>info_outline</mat-icon>
                             </button>
                         </div>
                         <div style="padding-left: 12px;">
