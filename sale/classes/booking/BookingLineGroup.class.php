@@ -357,6 +357,11 @@ class BookingLineGroup extends Model {
                 'default'           => false
             ],
 
+            'person_disability_description' => [
+                'type'              => 'string',
+                'usage'             => 'text/plain'
+            ],
+
             'bed_linens' => [
                 'type'              => 'boolean',
                 'description'       => "Does the group include a product related to renting bed linens?",

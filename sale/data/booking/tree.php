@@ -68,6 +68,8 @@ $tree = [
         'booking_id',
         'sojourn_type_id',
         'activity_group_num',
+        'has_person_with_disability',
+        'person_disability_description',
         'pack_id' => [
             'id',
             'name'

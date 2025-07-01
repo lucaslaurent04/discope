@@ -21,6 +21,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { BookingActivityDay } from './_components/day-activities/day-activities.component';
 import { BookedServicesDisplaySettings } from '../../../../services.component';
 import { BookingMealDay } from './_components/day-meals/day-meals.component';
+import { BookingServicesBookingGroupDialogParticipantsOptionsComponent } from './_components/dialog-participants-options/dialog-participants-options.component';
 
 
 // declaration of the interface for the map associating relational Model fields with their components
@@ -703,6 +704,39 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         catch(response) {
             this.api.errorFeedback(response);
         }
+    }
+
+    public async oneditParticipantsOptions() {
+        const dialogRef = this.dialog.open(BookingServicesBookingGroupDialogParticipantsOptionsComponent, {
+            width: '33vw',
+            data: {
+                has_person_with_disability: this.instance.has_person_with_disability,
+                person_disability_description: this.instance.person_disability_description
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(async (result) => {
+            if(result) {
+                if(this.instance.has_person_with_disability != result.has_person_with_disability || this.instance.person_disability_description != result.person_disability_description) {
+                    this.loading = true;
+
+                    try {
+                        await this.api.update('sale\\booking\\BookingLineGroup', [this.instance.id], {
+                            has_person_with_disability: result.has_person_with_disability,
+                            person_disability_description: result.person_disability_description
+                        });
+
+                        // relay change to parent component
+                        this.updated.emit();
+                    }
+                    catch(response) {
+                        this.api.errorFeedback(response);
+                    }
+
+                    this.loading = false;
+                }
+            }
+        });
     }
 
     public async ondeleteAgeRange(age_range_assignment_id:number) {
