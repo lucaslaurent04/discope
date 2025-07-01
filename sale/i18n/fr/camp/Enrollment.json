@@ -150,6 +150,7 @@
                 "pending": "En cours",
                 "waitlisted": "Sur liste d'attente",
                 "confirmed": "Confirmée",
+                "validated": "Validée",
                 "cancelled": "Annulée"
             }
         },
