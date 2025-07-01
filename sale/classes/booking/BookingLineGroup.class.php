@@ -3692,7 +3692,7 @@ class BookingLineGroup extends Model {
                 'scope',
                 'rate_class_id',
                 'conditions_ids'
-			]);
+            ]);
 
 			// filter discounts based on related conditions
 			$products_to_apply = [];
