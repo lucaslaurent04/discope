@@ -3684,14 +3684,14 @@ class BookingLineGroup extends Model {
             $operands['nb_adults'] = $group['nb_pers'] - $group['nb_children'];
 
             $autosales = $om->read('sale\autosale\AutosaleLine', $autosale_list['autosale_lines_ids'], [
-				'product_id.id',
-				'product_id.name',
-				'product_id.sku',
-				'has_own_qty',
-				'qty',
-				'scope',
+                'product_id.id',
+                'product_id.name',
+                'product_id.sku',
+                'has_own_qty',
+                'qty',
+                'scope',
                 'rate_class_id',
-				'conditions_ids'
+                'conditions_ids'
 			]);
 
 			// filter discounts based on related conditions
