@@ -23,16 +23,32 @@
                                                 "label": "To",
                                                 "value": "date_to",
                                                 "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Camp",
+                                                "value": "camp_id",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Time slot",
+                                                "value": "time_slot_id",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Type",
+                                                "value": "meal_type_id",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Type",
+                                                "value": "meal_place_id",
+                                                "width": "20%"
                                             }
                                         ]
-                                    }
-                                ]
-                            },
-                            {
-                                "columns": [
-                                    {
-                                        "width": "100%",
-                                        "items": []
                                     }
                                 ]
                             }

@@ -10,6 +10,22 @@
         "date_to": {
             "label": "Au",
             "description": ""
+        },
+        "camp_id": {
+            "label": "Camp",
+            "description": ""
+        },
+        "time_slot_id": {
+            "label": "Tranche horaire",
+            "description": ""
+        },
+        "meal_type_id": {
+            "label": "Type",
+            "description": ""
+        },
+        "meal_place_id": {
+            "label": "Place",
+            "description": ""
         }
     },
     "view": {

@@ -26,6 +26,26 @@ use equal\orm\DomainCondition;
             'type'              => 'date',
             'description'       => "Date interval upper limit.",
             'default'           => fn() => time()
+        ],
+        'camp_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\camp\Camp',
+            'description'       => "The camp the meal relates to."
+        ],
+        'time_slot_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\booking\TimeSlot',
+            'description'       => "Specific day time slot on which the service is delivered."
+        ],
+        'meal_type_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\booking\MealType',
+            'description'       => "Type of the meal being served."
+        ],
+        'meal_place_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\booking\MealPlace',
+            'description'       => "Place where the meal is served."
         ]
     ],
     'response'      => [
@@ -54,6 +74,30 @@ if(isset($params['date_from'])) {
 if(isset($params['date_to'])) {
     $domain->addCondition(
         new DomainCondition('date', '<=', $params['date_to'])
+    );
+}
+
+if(isset($params['camp_id'])) {
+    $domain->addCondition(
+        new DomainCondition('camp_id', '=', $params['camp_id'])
+    );
+}
+
+if(isset($params['time_slot_id'])) {
+    $domain->addCondition(
+        new DomainCondition('time_slot_id', '=', $params['time_slot_id'])
+    );
+}
+
+if(isset($params['meal_type_id'])) {
+    $domain->addCondition(
+        new DomainCondition('meal_type_id', '=', $params['meal_type_id'])
+    );
+}
+
+if(isset($params['meal_place_id'])) {
+    $domain->addCondition(
+        new DomainCondition('meal_place_id', '=', $params['meal_place_id'])
     );
 }
 
