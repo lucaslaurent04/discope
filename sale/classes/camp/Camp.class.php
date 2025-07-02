@@ -357,25 +357,31 @@ class Camp extends Model {
 
             if(!$camp['is_clsh']) {
                 // create meals for the weekend if the camp isn't CLSH, in case some children stay
-                foreach(['B', 'L', 'D'] as $time_slot_code) {
-                    BookingMeal::create([
-                        'camp_id'       => $id,
-                        'date'          => $date,
-                        'time_slot_id'  => $map_time_slots[$time_slot_code]['id']
-                    ]);
+                $dates = [$date, $date + 86400];
+                foreach($dates as $d) {
+                    foreach(['B', 'L', 'D'] as $time_slot_code) {
+                        $meals_ids = BookingMeal::search([
+                            ['camp_id', '=', $id],
+                            ['date', '=', $d],
+                            ['time_slot_id', '=', $map_time_slots[$time_slot_code]['id']]
+                        ])
+                            ->ids();
 
-                    BookingMeal::create([
-                        'camp_id'       => $id,
-                        'date'          => $date + 86400,
-                        'time_slot_id'  => $map_time_slots[$time_slot_code]['id']
-                    ]);
+                        if(count($meals_ids) === 0) {
+                            BookingMeal::create([
+                                'camp_id'       => $id,
+                                'date'          => $d,
+                                'time_slot_id'  => $map_time_slots[$time_slot_code]['id']
+                            ]);
+                        }
+                    }
                 }
             }
         }
     }
 
     public static function doRemoveMeals($self) {
-        $self->read(['camp_id', 'child_id']);
+        $self->read([]);
         foreach($self as $id => $camp) {
             BookingMeal::search(['camp_id', '=', $id])->delete(true);
         }

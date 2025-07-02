@@ -54,7 +54,7 @@
                 "route": "/camps",
                 "context": {
                     "entity": "sale\\booking\\BookingMeal",
-                    "view": "list.camp"
+                    "view": "list.camp-collect"
                 }
             },
             {

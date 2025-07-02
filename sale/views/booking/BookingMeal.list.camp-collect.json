@@ -5,6 +5,15 @@
     "sort": "asc",
     "group_by": ["date"],
     "domain": ["camp_id", "<>", null],
+    "controller": "sale_booking_collect-booking-meals",
+    "header": {
+        "actions": {
+            "ACTION.CREATE" : false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
     "layout": {
         "items": [
             {
@@ -28,6 +37,13 @@
                 "value": "time_slot_order",
                 "width": "20%",
                 "visible": false
+            },
+            {
+                "type": "field",
+                "value": "camp_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
             },
             {
                 "type": "field",
