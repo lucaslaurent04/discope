@@ -100,6 +100,8 @@ if(!empty($params['partners_ids'])) {
 
     if(!empty($employees_ids)) {
         $domain[] = [
+            ['activity_date', '>=', $params['date_from']],
+            ['activity_date', '<', $params['date_to']],
             ['employee_id', 'in', $employees_ids]
         ];
 
@@ -220,7 +222,7 @@ foreach($activities as $id => $activity) {
     // camp
     $camp = null;
 
-    if(!is_null($activity['activity_booking_line_id'])) {
+    if(!is_null($activity['booking_id'])) {
         $booking = isset($activity['booking_id'], $bookings[$activity['booking_id']]) ? $bookings[$activity['booking_id']]->toArray() : null;
         if(is_null($booking)) {
             continue;
