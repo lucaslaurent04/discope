@@ -416,7 +416,6 @@
                 .header {
                     display: none;
                     gap: 5px;
-                    color: #2196F3;
                 }
 
                 .content {
@@ -425,7 +424,7 @@
                     overflow-y: auto;
                 }
 
-                &.tooltip--with-icons {
+                &.tooltip--with-header {
                     .header {
                         display: flex;
                         flex-direction: row;
