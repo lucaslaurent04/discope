@@ -26,6 +26,16 @@
                                                 "type": "field",
                                                 "value": "camp_id",
                                                 "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "am_daycare",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "pm_daycare",
+                                                "width": "20%"
                                             }
                                         ]
                                     }

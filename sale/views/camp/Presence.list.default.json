@@ -3,6 +3,15 @@
     "description": "Child presences to camps.",
     "group_by": ["presence_date"],
     "order": "presence_date",
+    "controller": "sale_camp_collect-presences",
+    "header": {
+        "actions": {
+            "ACTION.CREATE" : false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
     "layout": {
         "items": [
             {
