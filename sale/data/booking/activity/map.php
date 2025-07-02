@@ -174,7 +174,7 @@ foreach($activities as $id => $activity) {
 
 // load all foreign objects at once
 $bookings = $orm->read(Booking::getType(), array_keys($map_bookings), ['id', 'name', 'description', 'status', 'payment_status', 'customer_id', 'date_from', 'date_to', 'nb_pers']);
-$booking_groups = $orm->read(BookingLineGroup::getType(), array_keys($map_groups), ['id', 'nb_pers', 'age_range_assignments_ids', 'has_person_with_disability']);
+$booking_groups = $orm->read(BookingLineGroup::getType(), array_keys($map_groups), ['id', 'nb_pers', 'age_range_assignments_ids', 'has_person_with_disability', 'person_disability_description']);
 $camps = $orm->read(Camp::getType(), array_keys($map_camps), ['id', 'name', 'short_name', 'date_from', 'date_to', 'min_age', 'max_age', 'enrollments_qty', 'employee_ratio']);
 $employees = $orm->read(Employee::getType(), array_keys($map_employees), ['id', 'name', 'relationship']);
 $providers = $orm->read(Provider::getType(), array_keys($map_providers), ['id', 'name', 'relationship']);

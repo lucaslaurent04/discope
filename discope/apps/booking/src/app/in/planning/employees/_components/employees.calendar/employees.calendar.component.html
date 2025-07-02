@@ -125,7 +125,15 @@
                                     ></planning-employees-calendar-activity>
 
                                     <div *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -274) + 'px) translateY(calc(var(--rows_height) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
-                                        <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
+                                        <div class="tooltip" [class]="{'tooltip--with-icons': activity.booking_line_group_id.has_person_with_disability || activity.booking_id.date_from === activity.booking_id.date_to }">
+                                            <div class="header">
+                                                <mat-icon *ngIf="activity.booking_line_group_id.has_person_with_disability" aria-hidden="true">accessible</mat-icon>
+                                                <mat-icon *ngIf="activity.booking_id.date_from === activity.booking_id.date_to" aria-hidden="true">event</mat-icon>
+                                            </div>
+                                            <div class="content">
+                                                <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </ng-container>
                             </div>

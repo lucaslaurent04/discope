@@ -344,6 +344,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 (activity.partner_identity_id?.address_city ? `<dt>${activity.partner_identity_id?.address_city}</dt>` : '') +
                 group_details +
                 `<dt>Handicap : <b>${activity.booking_line_group_id.has_person_with_disability ? 'oui' : 'non'}</b></dt>` +
+                (activity.booking_line_group_id.has_person_with_disability && activity.booking_line_group_id.person_disability_description && activity.booking_line_group_id.person_disability_description.length > 0 ? activity.booking_line_group_id.person_disability_description : '') +
                 `<dt>Séjour du ${activity.booking_id.date_from} au ${activity.booking_id.date_to}</dt>` +
                 `<dt>${activity.booking_id.nb_pers} personnes</dt>` +
                 `<br>` +

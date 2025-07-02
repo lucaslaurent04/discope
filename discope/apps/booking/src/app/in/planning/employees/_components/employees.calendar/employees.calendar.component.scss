@@ -400,7 +400,7 @@
             z-index: 100;
             transform: translateX(16px) translateY(calc(var(--rows_height) + 1px));
 
-            span {
+            .tooltip {
                 display: block;
                 border: 1px solid grey;
                 background-color: white;
@@ -408,12 +408,34 @@
                 box-shadow: 0 3px 5px 0 rgb(0 0 0 / 10%) !important;
                 padding: 3px 10px;
                 border-radius: 4px;
-                color:black;
+                color: black;
                 width: 350px;
-                overflow-x: hidden;
-                overflow-y: auto;
                 height: 250px;
                 text-align: left;
+
+                .header {
+                    display: none;
+                    gap: 5px;
+                    color: #2196F3;
+                }
+
+                .content {
+                    height: 240px;
+                    overflow-x: hidden;
+                    overflow-y: auto;
+                }
+
+                &.tooltip--with-icons {
+                    .header {
+                        display: flex;
+                        flex-direction: row;
+                        height: 30px;
+                    }
+
+                    .content {
+                        height: 210px;
+                    }
+                }
             }
         }
 
