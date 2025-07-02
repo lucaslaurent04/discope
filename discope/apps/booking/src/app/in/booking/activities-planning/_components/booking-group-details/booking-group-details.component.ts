@@ -2,6 +2,8 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { BookingLineGroup } from '../../_models/booking-line-group.model';
 import { AbstractControl, FormControl, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { AgeRangeAssignment } from '../../_models/age-range-assignment.model';
+import { MatDialog } from '@angular/material/dialog';
+import { BookingActivitiesPlanningBookingGroupDetailDialogParticipantsOptionsComponent } from './_components/dialog-participants-options/dialog-participants-options.component';
 
 @Component({
     selector: 'booking-activities-planning-booking-group-details',
@@ -17,6 +19,7 @@ export class BookingActivitiesPlanningBookingGroupDetailsComponent implements On
     @Output() ageFromChanged = new EventEmitter<number>();
     @Output() ageToChanged = new EventEmitter<number>();
     @Output() hasPersonWithDisabilityChanged = new EventEmitter<boolean>();
+    @Output() participantsOptionsChanged = new EventEmitter<{ person_disability_description: string }>();
 
     public nbPersFormControl: FormControl;
     public ageFromFormControl: FormControl;
@@ -24,6 +27,7 @@ export class BookingActivitiesPlanningBookingGroupDetailsComponent implements On
     public hasPersonWithDisabilityFormControl: FormControl;
 
     constructor(
+        private dialog: MatDialog,
     ) {
         this.nbPersFormControl = new FormControl(0, [Validators.min(1)]);
         this.ageFromFormControl = new FormControl(0, [Validators.min(0), Validators.max(99), this.maxAgeTo()]);
@@ -105,5 +109,24 @@ export class BookingActivitiesPlanningBookingGroupDetailsComponent implements On
         }
 
         this.hasPersonWithDisabilityChanged.emit(this.hasPersonWithDisabilityFormControl.value);
+    }
+
+    public onclickParticipantsInfo() {
+        const dialogRef = this.dialog.open(BookingActivitiesPlanningBookingGroupDetailDialogParticipantsOptionsComponent, {
+            width: '33vw',
+            data: {
+                person_disability_description: this.group.person_disability_description
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(async (result) => {
+            if(result) {
+                if(this.group.person_disability_description != result.person_disability_description) {
+                    this.participantsOptionsChanged.emit({
+                        person_disability_description: result.person_disability_description
+                    });
+                }
+            }
+        });
     }
 }

@@ -35,4 +35,11 @@
     >
         Handicap
     </mat-slide-toggle>
+
+    <mat-icon *ngIf="group.has_person_with_disability"
+              (click)="onclickParticipantsInfo()"
+              style="cursor: pointer; transform: scale(0.8)"
+    >
+        info_outline
+    </mat-icon>
 </ng-container>

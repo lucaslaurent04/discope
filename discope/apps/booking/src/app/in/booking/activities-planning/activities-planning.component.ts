@@ -452,6 +452,23 @@ export class BookingActivitiesPlanningComponent implements OnInit {
             await this.api.update('sale\\booking\\BookingLineGroup', [this.selectedGroup.id], {
                 has_person_with_disability: hasPersonWithDisability
             });
+
+            this.selectedGroup.has_person_with_disability = hasPersonWithDisability;
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+
+        this.loading = false;
+    }
+
+    public async onParticipantsOptionsChanged(participantsOptions: { person_disability_description: string }) {
+        this.loading = true;
+
+        try {
+            await this.api.update('sale\\booking\\BookingLineGroup', [this.selectedGroup.id], participantsOptions);
+
+            this.selectedGroup.person_disability_description = participantsOptions.person_disability_description;
         }
         catch(response) {
             this.api.errorFeedback(response);
