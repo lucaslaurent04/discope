@@ -25,7 +25,7 @@ use sale\camp\Camp;
         ],
         'by_age' => [
             'type'              => 'boolean',
-            'description'       => "Group the children quantities by age.",
+            'description'       => "Split the children quantities by age.",
             'default'           => false
         ],
         'date_from' => [
@@ -50,7 +50,7 @@ use sale\camp\Camp;
         ],
         'age' => [
             'type'              => 'string',
-            'description'       => "The camp concerned by the quantities."
+            'description'       => "The age(s) concerned by the quantities."
         ],
         'qty_male' => [
             'type'              => 'integer',

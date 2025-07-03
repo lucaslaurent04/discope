@@ -315,6 +315,15 @@
                             "entity": "sale\\camp\\stats\\stat-children-quantities",
                             "view": "list.default"
                         }
+                    },
+                    {
+                        "id": "stats.camps.enrollments-by-areas",
+                        "label": "Enrollments by areas",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\camp\\stats\\stat-enrollments-by-areas",
+                            "view": "list.default"
+                        }
                     }
                 ]
             }
