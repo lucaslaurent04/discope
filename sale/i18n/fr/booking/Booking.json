@@ -211,12 +211,12 @@
             "help": ""
         },
         "payment_reference": {
-            "label": "Communictation structurée (VCS)",
+            "label": "Communictation structurée",
             "description": "Référence bancaire (SCOR/VCS) assocociée à la réservation.",
             "help": ""
         },
         "display_payment_reference": {
-            "label": "Communictation structurée (VCS)",
+            "label": "Communictation structurée",
             "description": "Référence bancaire (SCOR/VCS) assocociée à la réservation.",
             "help": ""
         },
