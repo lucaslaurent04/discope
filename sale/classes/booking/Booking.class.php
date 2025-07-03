@@ -795,6 +795,10 @@ class Booking extends Model {
             $booking_code = intval($booking['name']);
 
             switch($reference_type) {
+                // use Customer accounting_account as reference (from Identity)
+                case 'accounting_account':
+                    $reference_value = $booking['customer_identity_id']['accounting_account'];
+                    break;
                 // ISO-11649
                 case 'RF':
                     // structure: RFcc nnn... (up to 25 alpha-num chars) (we omit the 'RF' part in the result)
@@ -810,14 +814,14 @@ class Booking extends Model {
                     }
                     $mod97 = intval(bcmod($converted, '97'));
                     $control = str_pad(98 - $mod97, 2, '0', STR_PAD_LEFT);
-                    $code_reference = $control . $ref_base;
+                    $reference_value = $control . $ref_base;
                     break;
                 // FR specific
                 case 'RN':
                     // structure : RNccxxxxxxxxxxxxxxxxxxxx + key + up to 20 digits (we omit the 'RN' part in the result)
                     $ref_body = sprintf('%013d%07d', $code_ref, $booking_code);
                     $control = 97 - intval(bcmod($ref_body, '97'));
-                    $code_reference = str_pad($control, 2, '0', STR_PAD_LEFT) . $ref_body;
+                    $reference_value = str_pad($control, 2, '0', STR_PAD_LEFT) . $ref_body;
                     break;
                 // BE specific
                 case 'VCS':
@@ -825,10 +829,10 @@ class Booking extends Model {
                 default:
                     $control = ((76 * intval($code_ref)) + $booking_code) % 97;
                     $control = ($control == 0) ? 97 : $control;
-                    $code_reference = sprintf('%3d%04d%03d%02d', $code_ref, $booking_code / 1000, $booking_code % 1000, $control);
+                    $reference_value = sprintf('%3d%04d%03d%02d', $code_ref, $booking_code / 1000, $booking_code % 1000, $control);
             }
 
-            $result[$id] = $code_reference;
+            $result[$id] = $reference_value;
         }
         return $result;
     }
