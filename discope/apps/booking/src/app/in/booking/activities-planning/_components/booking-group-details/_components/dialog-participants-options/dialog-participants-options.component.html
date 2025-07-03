@@ -1,0 +1,16 @@
+<h3 style="display: flex; border-bottom: solid 1px lightgrey; margin-bottom: 0;" mat-dialog-title>
+    Info participants
+</h3>
+
+<div mat-dialog-content class="mat-dialog-content">
+    <mat-label style="margin-bottom: 5px; font-weight: bold">Description du handicap</mat-label>
+    <quill-editor [formControl]="vm.person_disability_description.formControl"
+                  theme="snow"
+                  [placeholder]="'Description du handicap'"
+    ></quill-editor>
+</div>
+
+<div mat-dialog-actions style="justify-content: flex-end; border-top: solid 1px lightgrey;">
+    <button  mat-raised-button color="primary" style="float: right;" (click)="onClose()">ANNULER</button>
+    <button  mat-raised-button color="primary" style="float: right;" (click)="onSave()">SAUVER</button>
+</div>
