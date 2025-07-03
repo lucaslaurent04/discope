@@ -25,6 +25,16 @@
                 "usage": "numeric/integer",
                 "suffix": " filles"
             },
+            "qty_old": {
+                "operation": "SUM",
+                "usage": "numeric/integer",
+                "suffix": " anciens"
+            },
+            "qty_new": {
+                "operation": "SUM",
+                "usage": "numeric/integer",
+                "suffix": " nouveaux"
+            },
             "qty": {
                 "operation": "SUM",
                 "usage": "numeric/integer",
@@ -58,6 +68,16 @@
             {
                 "type": "field",
                 "value": "qty_female",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty_old",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty_new",
                 "width": "10%"
             },
             {

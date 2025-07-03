@@ -8,6 +8,7 @@
 
 use identity\User;
 use sale\camp\Camp;
+use sale\camp\Enrollment;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Data about children's participation to camps.",
@@ -60,6 +61,14 @@ use sale\camp\Camp;
             'type'              => 'integer',
             'description'       => "Quantity of female children attending the camp."
         ],
+        'qty_old' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of children attending a camp for the first time."
+        ],
+        'qty_new' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of children attending who already have participated to a camp."
+        ],
         'qty' => [
             'type'              => 'integer',
             'description'       => "Quantity of children attending the camp."
@@ -105,6 +114,7 @@ $result = [];
 $camps = Camp::search($domain, ['sort' => ['date_from' => 'asc']])
     ->read([
         'name',
+        'date_from',
         'center_id' => [
             'name'
         ],
@@ -117,6 +127,32 @@ $camps = Camp::search($domain, ['sort' => ['date_from' => 'asc']])
         ]
     ])
     ->get();
+
+$map_children_ids = [];
+foreach($camps as $camp) {
+    foreach($camp['enrollments_ids'] as $enrollment) {
+        if(!isset($map_children_ids[$enrollment['child_id']['id']])) {
+            $map_children_ids[$enrollment['child_id']['id']] = true;
+        }
+    }
+}
+$children_ids = array_keys($map_children_ids);
+
+$children_enrollments = Enrollment::search(['child_id', 'in', $children_ids])
+    ->read([
+        'child_id',
+        'camp_id' => ['date_from']
+    ])
+    ->get();
+
+$map_children_first_camp_date = [];
+foreach($children_enrollments as $enrollment) {
+    if(isset($map_children_first_camp_date[$enrollment['child_id']]) && $map_children_first_camp_date[$enrollment['child_id']] < $enrollment['camp_id']['date_from']) {
+        continue;
+    }
+
+    $map_children_first_camp_date[$enrollment['child_id']] = $enrollment['camp_id']['date_from'];
+}
 
 foreach($camps as $camp) {
     $map_age_data = [];
@@ -132,6 +168,8 @@ foreach($camps as $camp) {
                 'age'           => $enrollment['child_age'],
                 'qty_male'      => 0,
                 'qty_female'    => 0,
+                'qty_old'       => 0,
+                'qty_new'       => 0,
                 'qty'           => 0
             ];
         }
@@ -144,6 +182,13 @@ foreach($camps as $camp) {
             case 'F':
                 $map_age_data[$enrollment['child_age']]['qty_female']++;
                 break;
+        }
+
+        if($map_children_first_camp_date[$enrollment['child_id']['id']] < $camp['date_from']) {
+            $map_age_data[$enrollment['child_age']]['qty_old']++;
+        }
+        else {
+            $map_age_data[$enrollment['child_age']]['qty_new']++;
         }
     }
 
@@ -159,12 +204,14 @@ foreach($camps as $camp) {
         sort($ages);
 
         $result[] = [
-            'center' => $camp['center_id']['name'],
-            'camp' => $camp['name'],
-            'age' => implode(', ', $ages),
-            'qty_male' => array_sum(array_column($map_age_data, 'qty_male')),
-            'qty_female' => array_sum(array_column($map_age_data, 'qty_female')),
-            'qty' => array_sum(array_column($map_age_data, 'qty'))
+            'center'        => $camp['center_id']['name'],
+            'camp'          => $camp['name'],
+            'age'           => implode(', ', $ages),
+            'qty_male'      => array_sum(array_column($map_age_data, 'qty_male')),
+            'qty_female'    => array_sum(array_column($map_age_data, 'qty_female')),
+            'qty_old'       => array_sum(array_column($map_age_data, 'qty_old')),
+            'qty_new'       => array_sum(array_column($map_age_data, 'qty_new')),
+            'qty'           => array_sum(array_column($map_age_data, 'qty'))
         ];
     }
 }

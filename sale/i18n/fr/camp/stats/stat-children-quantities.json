@@ -46,6 +46,16 @@
             "description": "",
             "help": ""
         },
+        "qty_old": {
+            "label": "Qté anciens",
+            "description": "",
+            "help": ""
+        },
+        "qty_new": {
+            "label": "Qté nouveaux",
+            "description": "",
+            "help": ""
+        },
         "qty": {
             "label": "Qté",
             "description": "",
