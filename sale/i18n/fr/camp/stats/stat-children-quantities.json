@@ -1,0 +1,68 @@
+{
+    "name": "Statistiques quantités d'enfants par camps et centres.",
+    "plural": "",
+    "description": "Statistiques quantités d'enfants par camps et centres.",
+    "model": {
+        "all_centers": {
+            "label": "Tous les centres"
+        },
+        "center_id": {
+            "label": "Centre"
+        },
+        "camp_id": {
+            "label": "Camp"
+        },
+        "date_from": {
+            "label": "Du"
+        },
+        "date_to": {
+            "label": "Au"
+        },
+        "by_age": {
+            "label": "Par age"
+        },
+        "center": {
+            "label": "Centre",
+            "description": "",
+            "help": ""
+        },
+        "camp": {
+            "label": "Camp",
+            "description": "",
+            "help": ""
+        },
+        "age": {
+            "label": "Age",
+            "description": "",
+            "help": ""
+        },
+        "qty_male": {
+            "label": "Qté garçons",
+            "description": "",
+            "help": ""
+        },
+        "qty_female": {
+            "label": "Qté filles",
+            "description": "",
+            "help": ""
+        },
+        "qty": {
+            "label": "Qté",
+            "description": "",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "",
+            "description": "",
+            "layout": {}
+        },
+        "list.default": {
+            "name": "Quantités d'enfants",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

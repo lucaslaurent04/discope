@@ -299,6 +299,24 @@
                         }
                     }
                 ]
+            },
+            {
+                "id": "stats.camps",
+                "icon": "query_stats",
+                "type": "parent",
+                "label": "Camps values",
+                "description": "",
+                "children": [
+                    {
+                        "id": "stats.camps.children-qty",
+                        "label": "Children quantities",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\camp\\stats\\stat-children-quantities",
+                            "view": "list.default"
+                        }
+                    }
+                ]
             }
         ]
     }

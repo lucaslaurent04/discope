@@ -25,6 +25,14 @@
         "stats.finance_funding": {
             "label": "Total Remboursements",
             "help": ""
+        },
+        "stats.camps": {
+            "label": "Stats Camps",
+            "help": ""
+        },
+        "stats.camps.children-qty": {
+            "label": "Quantités d'enfants",
+            "help": ""
         }
     }
 }
