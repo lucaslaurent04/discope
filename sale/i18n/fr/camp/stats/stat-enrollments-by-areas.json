@@ -28,6 +28,11 @@
             "description": "",
             "help": ""
         },
+        "address_zip": {
+            "label": "Code postal",
+            "description": "",
+            "help": ""
+        },
         "municipality": {
             "label": "Commune",
             "description": "",
@@ -35,6 +40,19 @@
         },
         "qty": {
             "label": "Qté",
+            "description": "",
+            "help": ""
+        },
+        "status": {
+            "label": "Status",
+            "selection": {
+                "all": "Toutes",
+                "validated": "Validées",
+                "confirmed": "Confirmées",
+                "pending": "Pré-inscription",
+                "waitlisted": "En attentes",
+                "canceled": "Annulées"
+            },
             "description": "",
             "help": ""
         }

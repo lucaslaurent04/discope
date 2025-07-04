@@ -38,6 +38,18 @@ use sale\camp\Camp;
             'description'       => "Date interval upper limit (defaults to last day of the current month).",
             'default'           => fn() => strtotime('last day of this month')
         ],
+        'status' => [
+            'type'              => 'string',
+            'description'       => "The status of the enrollments.",
+            'selection'         => [
+                'all',
+                'validated',
+                'confirmed',
+                'pending',
+                'waitlisted'
+            ],
+            'default'           => 'validated'
+        ],
 
         /* parameters used as properties of virtual entity */
         'center' => [
@@ -47,6 +59,10 @@ use sale\camp\Camp;
         'area' => [
             'type'              => 'string',
             'description'       => "The area concerned by the quantities."
+        ],
+        'address_zip' => [
+            'type'              => 'string',
+            'description'       => "The zip code of the address of the child's guardian."
         ],
         'municipality' => [
             'type'              => 'string',
@@ -134,7 +150,7 @@ $municipalities_86_and_87 = array_merge($municipalities_86, $municipalities_87);
 $map_area_municipality = [];
 foreach($camps as $camp) {
     foreach($camp['enrollments_ids'] as $enrollment) {
-        if(!in_array($enrollment['status'], ['confirmed', 'validated'])) {
+        if($params['status'] !== 'all' && $enrollment['status'] !== $params['status']) {
             continue;
         }
 
@@ -168,8 +184,10 @@ foreach($camps as $camp) {
                 $map_area_municipality[$area][$address_zip] = [
                     'center'        => $camp['center_id']['name'],
                     'area'          => $area_name,
+                    'address_zip'   => $address_zip,
                     'municipality'  => implode(', ', array_column($municipalities, 'name')).' ('.$address_zip.')',
-                    'qty'           => 0
+                    'qty'           => 0,
+                    'status'        => $enrollment['status']
                 ];
             }
 
@@ -181,8 +199,10 @@ foreach($camps as $camp) {
                     $unknown_zip => [
                         'center'        => $camp['center_id']['name'],
                         'area'          => $area_name,
+                        'address_zip'   => '',
                         'municipality'  => '',
-                        'qty'           => 0
+                        'qty'           => 0,
+                        'status'        => $enrollment['status']
                     ]
                 ];
             }

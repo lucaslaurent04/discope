@@ -50,6 +50,11 @@
                                                 "type": "field",
                                                 "value": "by_municipality",
                                                 "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "status",
+                                                "width": "100%"
                                             }
                                         ]
                                     }
