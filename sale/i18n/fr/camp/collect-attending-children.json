@@ -1,0 +1,51 @@
+{
+    "name": "Enfants participants",
+    "plural": "",
+    "description": "Liste des enfants participants aux camps en cours.",
+    "model": {
+        "date_from": {
+            "label": "Du",
+            "description": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": ""
+        },
+        "only_weekend": {
+            "label": "Weekend",
+            "description": ""
+        },
+        "only_birthday": {
+            "label": "Anniversaire",
+            "description": ""
+        },
+        "child_id": {
+            "label": "Enfant",
+            "description": ""
+        },
+        "gender": {
+            "label": "Genre",
+            "selection": {
+                "M": "Garçon",
+                "F": "Fille"
+            },
+            "description": ""
+        },
+        "birthday": {
+            "label": "Anniversaire",
+            "description": ""
+        },
+        "is_ase": {
+            "label": "ASE",
+            "description": ""
+        },
+        "weekend_extra": {
+            "label": "Extra weekend",
+            "description": ""
+        }
+    },
+    "view": {
+    },
+    "error": {
+    }
+}

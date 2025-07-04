@@ -1,7 +1,7 @@
 {
     "name": "Manage Camps Attending Children",
     "description": "",
-    "controller": "sale_camp_manage_manage-attending-children",
+    "controller": "sale_camp_collect-attending-children",
     "header": {
         "actions": {
             "ACTION.CREATE" : false
@@ -39,7 +39,7 @@
             },
             {
                 "type": "field",
-                "value": "is_foster",
+                "value": "is_ase",
                 "width": "20%"
             },
             {

@@ -45,13 +45,17 @@ use sale\camp\Camp;
         ],
         'gender' => [
             'type'              => 'string',
+            'selection'         => [
+                'M',
+                'F'
+            ],
             'description'       => "Gender of the gender."
         ],
         'birthday' => [
             'type'              => 'date',
             'description'       => "Birthday of the child if it happens during the camp."
         ],
-        'is_foster' => [
+        'is_ase' => [
             'type'              => 'boolean',
             'description'       => "Is the child a foster child."
         ],
@@ -93,7 +97,7 @@ $camps = Camp::search(
                 'name',
                 'gender',
                 'birthdate',
-                'is_foster'
+                'is_ase'
             ],
             'enrollment_lines_ids' => [
                 'product_id'
@@ -122,7 +126,7 @@ foreach($camps as $camp) {
             'child_id'      => ['id' => $enrollment['child_id']['id'], 'name' => $enrollment['child_id']['name']],
             'gender'        => $enrollment['child_id']['gender'],
             'birthday'      => !is_null($birthday) ? $json_adapter->adaptOut($birthday, Field::MAP_TYPE_USAGE['date']) : null,
-            'is_foster'     => $enrollment['child_id']['is_foster'],
+            'is_ase'     => $enrollment['child_id']['is_ase'],
             'weekend_extra' => $enrollment['weekend_extra']
         ];
     }

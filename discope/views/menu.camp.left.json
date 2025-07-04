@@ -117,7 +117,7 @@
                         "icon": "",
                         "route": "/camps",
                         "context": {
-                            "entity": "sale\\camp\\manage\\manage-attending-children",
+                            "entity": "sale\\camp\\collect-attending-children",
                             "view": "list.default"
                         }
                     },
