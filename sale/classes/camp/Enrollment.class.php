@@ -294,6 +294,14 @@ class Enrollment extends Model {
                 'function'          => 'calcPrice'
             ],
 
+            'all_documents_received' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => "Have all required documents been received?",
+                'store'             => true,
+                'function'          => 'calcAllDocumentsReceived'
+            ],
+
             'is_locked' => [
                 'type'              => 'boolean',
                 'description'       => "Can the enrollment be modified or not?",
@@ -574,6 +582,29 @@ class Enrollment extends Model {
         return $result;
     }
 
+    public static function calcAllDocumentsReceived($self): array {
+        $result = [];
+        $self->read([
+            'enrollment_documents_ids'  => ['document_id', 'received'],
+            'camp_id'                   => ['required_documents_ids']
+        ]);
+        foreach($self as $id => $enrollment) {
+            $doc_received = true;
+            foreach($enrollment['camp_id']['required_documents_ids'] as $required_documents_id) {
+                foreach($enrollment['enrollment_documents_ids'] as $en_doc) {
+                    if($en_doc['document_id'] === $required_documents_id && !$en_doc['received']) {
+                        $doc_received = false;
+                        break;
+                    }
+                }
+            }
+
+            $result[$id] = $doc_received;
+        }
+
+        return $result;
+    }
+
     public static function policyConfirm($self): array {
         $result = [];
         $self->read(['camp_id' => ['max_children', 'enrollments_ids' => ['status']]]);
@@ -595,23 +626,10 @@ class Enrollment extends Model {
 
     public static function policyValidate($self): array {
         $result = [];
-        $self->read([
-            'enrollment_documents_ids'  => ['document_id', 'received'],
-            'camp_id'                   => ['required_documents_ids']
-        ]);
+        $self->read(['all_documents_received']);
         foreach($self as $enrollment) {
-            foreach($enrollment['camp_id']['required_documents_ids'] as $required_documents_id) {
-                $doc_received = false;
-                foreach($enrollment['enrollment_documents_ids'] as $en_doc) {
-                    if($en_doc['document_id'] === $required_documents_id && $en_doc['received']) {
-                        $doc_received = true;
-                        break;
-                    }
-                }
-
-                if(!$doc_received) {
-                    return ['camp_id' => ['missing_document' => "At least one document is missing for the enrollment to this camp."]];
-                }
+            if(!$enrollment['all_documents_received']) {
+                return ['camp_id' => ['missing_document' => "At least one document is missing for the enrollment to this camp."]];
             }
 
             // # todo - check that the enrollment has been paid
@@ -1404,6 +1422,9 @@ class Enrollment extends Model {
                 ]);
             }
         }
+
+        // reset all documents received computed value
+        $self->update(['all_documents_received' => null]);
     }
 
     public static function getActions(): array {

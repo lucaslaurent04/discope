@@ -7,6 +7,22 @@
         "actions": {
             "ACTION.CREATE": false,
             "ACTION.EDIT": false
+        },
+        "selection": {
+            "default": false,
+            "actions": [
+                {
+                    "id": "action.transition.validate",
+                    "label": "Validate",
+                    "icon": "",
+                    "controller": "model_transition",
+                    "params": {
+                        "entity": "sale\\camp\\Enrollment",
+                        "transition": "validate",
+                        "ids": []
+                    }
+                }
+            ]
         }
     },
     "layout": {
@@ -65,6 +81,13 @@
             {
                 "type": "field",
                 "value": "price",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "all_documents_received",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true

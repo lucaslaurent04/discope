@@ -178,6 +178,11 @@
             "label": "Conseil d'entreprise",
             "description": "Le conseil d'entreprise qui va rehausser la classe du camp d'un niveau.",
             "help": ""
+        },
+        "all_documents_received": {
+            "label": "Tous les documents reçus",
+            "description": "Tous les documents requis pour le camp ont bien été reçus.",
+            "help": ""
         }
     },
     "view": {
@@ -235,17 +240,28 @@
         "list.default": {
             "name": "Inscriptions",
             "description": "",
-            "layout": []
+            "layout": {}
         },
         "list.confirmed": {
             "name": "Inscriptions à valider",
             "description": "",
-            "layout": []
+            "header": {
+                "action.transition.validate": {
+                    "label": "Valider"
+                }
+            },
+            "layout": {}
         },
         "list.pending": {
             "name": "Pré-inscriptions",
             "description": "",
-            "layout": []
+            "header": {
+                "action.transition.confirm": {
+                    "label": "Confirmer"
+                }
+            },
+            "layout": {
+            }
         }
     },
     "error": {

@@ -7,6 +7,21 @@
         "actions": {
             "ACTION.CREATE": false,
             "ACTION.EDIT": false
+        },
+        "selection": {
+            "default": false,
+            "actions": [
+                {
+                    "id": "action.transition.confirm",
+                    "label": "Confirm",
+                    "controller": "model_transition",
+                    "params": {
+                        "entity": "sale\\camp\\Enrollment",
+                        "transition": "confirm",
+                        "ids": []
+                    }
+                }
+            ]
         }
     },
     "layout": {
