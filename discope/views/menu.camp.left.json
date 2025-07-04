@@ -101,6 +101,63 @@
                         }
                     }
                 ]
+            },
+            {
+                "id": "manage-current",
+                "label": "Manage current",
+                "description": "Manage current camps and the children attending them.",
+                "icon": "boy",
+                "type": "parent",
+                "children": [
+                    {
+                        "id": "manage-current.children",
+                        "type": "entry",
+                        "label": "Children",
+                        "description": "List children by camps with birthdate + other info, add filter show only weekend (camps of week)",
+                        "icon": "",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "",
+                            "view": ""
+                        }
+                    },
+                    {
+                        "id": "manage-current.children-distribution",
+                        "type": "entry",
+                        "label": "Children distribution",
+                        "description": "Children gender, new/old and week/weekend distribution (camps of the week).",
+                        "icon": "",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\camp\\stats\\stat-children-distribution",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "manage-current.pending-enrollments",
+                        "type": "entry",
+                        "label": "Pending enrollments",
+                        "description": "List all pending enrollments (should generally come from website)",
+                        "icon": "",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "",
+                            "view": ""
+                        }
+                    },
+                    {
+                        "id": "manage-current.incomplete-enrollments",
+                        "type": "entry",
+                        "label": "Confirmed enrollments",
+                        "description": "List all confirmed enrollments with missing documents or payments.",
+                        "icon": "",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "",
+                            "view": ""
+                        }
+                    }
+                ]
             }
         ]
     }
