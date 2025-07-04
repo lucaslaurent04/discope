@@ -236,6 +236,16 @@
             "name": "Inscriptions",
             "description": "",
             "layout": []
+        },
+        "list.confirmed": {
+            "name": "Inscriptions à valider",
+            "description": "",
+            "layout": []
+        },
+        "list.pending": {
+            "name": "Pré-inscriptions",
+            "description": "",
+            "layout": []
         }
     },
     "error": {

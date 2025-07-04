@@ -141,8 +141,8 @@
                         "icon": "",
                         "route": "/camps",
                         "context": {
-                            "entity": "sale\\camp\\manage\\manage-pending-enrollments",
-                            "view": "list.default"
+                            "entity": "sale\\camp\\Enrollment",
+                            "view": "list.pending"
                         }
                     },
                     {
@@ -153,8 +153,8 @@
                         "icon": "",
                         "route": "/camps",
                         "context": {
-                            "entity": "sale\\camp\\manage\\manage-confirmed-enrollments",
-                            "view": "list.default"
+                            "entity": "sale\\camp\\Enrollment",
+                            "view": "list.confirmed"
                         }
                     }
                 ]

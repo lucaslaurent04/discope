@@ -41,6 +41,26 @@
         "requirements": {
             "label": "Exigences",
             "help": ""
+        },
+        "manage-current": {
+            "label": "En cours",
+            "help": ""
+        },
+        "manage-current.children": {
+            "label": "Enfants",
+            "help": ""
+        },
+        "manage-current.children-distribution": {
+            "label": "Distribution enfants",
+            "help": ""
+        },
+        "manage-current.pending-enrollments": {
+            "label": "Pré-inscriptions",
+            "help": ""
+        },
+        "manage-current.confirmed-enrollments": {
+            "label": "À valider",
+            "help": ""
         }
     }
 }
