@@ -30,10 +30,6 @@
             "label": "Stats Camps",
             "help": ""
         },
-        "stats.camps.children-qty": {
-            "label": "Quantités d'enfants",
-            "help": ""
-        },
         "stats.camps.enrollments-by-areas": {
             "label": "Inscriptions par régions",
             "help": ""

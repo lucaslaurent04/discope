@@ -308,15 +308,6 @@
                 "description": "",
                 "children": [
                     {
-                        "id": "stats.camps.children-qty",
-                        "label": "Children quantities",
-                        "description": "",
-                        "context": {
-                            "entity": "sale\\camp\\stats\\stat-children-quantities",
-                            "view": "list.default"
-                        }
-                    },
-                    {
                         "id": "stats.camps.enrollments-by-areas",
                         "label": "Enrollments by areas",
                         "description": "",
