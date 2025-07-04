@@ -1,0 +1,52 @@
+{
+    "name": "Manage Camps Attending Children",
+    "description": "",
+    "controller": "sale_camp_manage_manage-attending-children",
+    "header": {
+        "actions": {
+            "ACTION.CREATE" : false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "group_by": [
+        { "field": "camp", "open": true }
+    ],
+    "order": "asc",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "camp",
+                "width": "20%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "child_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "gender",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "birthday",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "is_foster",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "weekend_extra",
+                "width": "20%"
+            }
+        ]
+    }
+}
