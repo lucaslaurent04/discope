@@ -10,6 +10,7 @@ namespace sale\booking;
 
 use core\setting\Setting;
 use equal\orm\Model;
+use equal\orm\ObjectManager;
 use identity\Center;
 use sale\catalog\Product;
 use sale\catalog\ProductModel;
@@ -1195,28 +1196,6 @@ class BookingLineGroup extends Model {
                         if(isset($values['date_to'], $group['date_from']) && $values['date_to'] < $group['date_from']) {
                             return ['date_to' => ['invalid_daterange' => 'End date must be greater or equal to Start date.']];
                         }
-                    }
-
-                }
-            }
-        }
-
-        if(isset($values['date_from']) || isset($values['date_to'])) {
-            $groups = $om->read(self::getType(), $oids, ['date_from', 'date_to'], $lang);
-
-            if($groups > 0) {
-                foreach($groups as $id => $group) {
-                    $date_from = $values['date_from'] ?? $group['date_from'];
-                    $date_to = $values['date_to'] ?? $group['date_to'];
-
-                    $outside_dates_activities_ids = BookingActivity::search([
-                        [['booking_line_group_id', '=', $id], ['activity_date', '<', $date_from]],
-                        [['booking_line_group_id', '=', $id], ['activity_date', '>', $date_to]]
-                    ])
-                        ->ids();
-
-                    if(!empty($outside_dates_activities_ids)) {
-                        return ['date_from' => ['invalid_daterange' => 'An scheduled activity is outside of the date range.']];
                     }
                 }
             }
@@ -4501,6 +4480,46 @@ class BookingLineGroup extends Model {
 
             }
 
+        }
+    }
+
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Modifies date of the group's activities to match new date of the group
+     *
+     * @param ObjectManager $om
+     * @param int           $id         id of the group
+     * @param int           $dates_diff difference between the new date_from and the old one ($new_date_from - $old_date_from)
+     */
+    public static function refreshActivitiesDates($om, $id, $dates_diff) {
+        $groups = $om->read(self::getType(), $id, [
+            'date_from',
+            'date_to',
+            'booking_activities_ids'
+        ]);
+
+        if($groups <= 0) {
+            return;
+        }
+
+        $group = reset($groups);
+
+        $activities = $om->read(BookingActivity::getType(), $group['booking_activities_ids'], [
+            'activity_date'
+        ]);
+
+        if($activities <= 0) {
+            return;
+        }
+
+        foreach($activities as $id => $activity) {
+            $shifted_activity_date = $activity['activity_date'] + $dates_diff;
+
+            $om->update(BookingActivity::getType(), $id, [
+                'activity_date' => $shifted_activity_date
+            ]);
         }
     }
 }

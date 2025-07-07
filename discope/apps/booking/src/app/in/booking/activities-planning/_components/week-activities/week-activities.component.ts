@@ -95,11 +95,21 @@ export class BookingActivitiesPlanningWeekActivitiesComponent implements OnInit,
         return date >= this.booking.date_from && date <= this.booking.date_to;
     }
 
+    public dateInGroup(dateString: string, group: BookingLineGroup) {
+        const date = new Date(dateString);
+
+        return date >= group.date_from && date <= group.date_to;
+    }
+
     public activityShortName(activityName: string) {
         return activityName.replace(/\s\([^)]+\)$/, '');
     }
 
     public selectGroupActivity(dateString: string, timeSlotCode: string, group: BookingLineGroup) {
+        if(!this.dateInGroup(dateString, group)) {
+            return;
+        }
+
         this.daySelected.emit(dateString);
         this.timeSlotSelected.emit(timeSlotCode as 'AM'|'PM'|'EV');
         this.groupSelected.emit(group);
