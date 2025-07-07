@@ -3262,6 +3262,42 @@ class BookingLineGroup extends Model {
      * This method is called by `update-sojourn-[...]` controllers.
      * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
      *
+     * Modifies date of the group's meals to match new date of the group
+     *
+     * @param ObjectManager $om
+     * @param int           $id         id of the group
+     * @param int           $dates_diff difference between the new date_from and the old one ($new_date_from - $old_date_from)
+     */
+    public static function refreshMealsDates($om, $id, $dates_diff) {
+        $groups = $om->read(self::getType(), $id, ['booking_meals_ids']);
+
+        if($groups <= 0) {
+            return;
+        }
+
+        $group = reset($groups);
+
+        $meals = $om->read(BookingMeal::getType(), $group['booking_meals_ids'], [
+            'date'
+        ]);
+
+        if($meals <= 0) {
+            return;
+        }
+
+        foreach($meals as $id => $meal) {
+            $shifted_meal_date = $meal['date'] + $dates_diff;
+
+            $om->update(BookingMeal::getType(), $id, [
+                'date' => $shifted_meal_date
+            ]);
+        }
+    }
+
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
      * Resets lines according to PackLines related to assigned pack_id, according to `pack_id`.
      * This only applies to groups marked as Pack (`has_pack`).
      */
@@ -4494,11 +4530,7 @@ class BookingLineGroup extends Model {
      * @param int           $dates_diff difference between the new date_from and the old one ($new_date_from - $old_date_from)
      */
     public static function refreshActivitiesDates($om, $id, $dates_diff) {
-        $groups = $om->read(self::getType(), $id, [
-            'date_from',
-            'date_to',
-            'booking_activities_ids'
-        ]);
+        $groups = $om->read(self::getType(), $id, ['booking_activities_ids']);
 
         if($groups <= 0) {
             return;

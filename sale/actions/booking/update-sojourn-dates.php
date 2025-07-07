@@ -52,6 +52,7 @@ $group = BookingLineGroup::id($params['id'])
     ->read([
         'id', 'is_extra',
         'date_from', 'date_to',
+        'booking_meals_ids',
         'booking_activities_ids'  => ['employee_id'],
         'booking_id'              => ['id', 'status']
     ])
@@ -124,9 +125,15 @@ BookingLineGroup::refreshRentalUnitsAssignments($orm, $group['id']);
 
 BookingLineGroup::refreshPrice($orm, $group['id']);
 
-if(!empty($group['booking_activities_ids']) && $params['date_from'] - $group['date_from'] !== 0) {
-    // shift activities dates
-    BookingLineGroup::refreshActivitiesDates($orm, $group['id'], $params['date_from'] - $group['date_from']);
+if($params['date_from'] - $group['date_from'] !== 0) {
+    if(!empty($group['booking_meals_ids'])) {
+        // shift meals dates
+        BookingLineGroup::refreshMealsDates($orm, $group['id'], $params['date_from'] - $group['date_from']);
+    }
+    if(!empty($group['booking_activities_ids'])) {
+        // shift activities dates
+        BookingLineGroup::refreshActivitiesDates($orm, $group['id'], $params['date_from'] - $group['date_from']);
+    }
 }
 
 Booking::refreshPrice($orm, $group['booking_id']['id']);
