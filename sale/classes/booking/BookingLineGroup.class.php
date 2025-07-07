@@ -3199,6 +3199,8 @@ class BookingLineGroup extends Model {
      * This method is called by `update-sojourn-[...]` controllers.
      * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
      *
+     * @param ObjectManager $om
+     * @param int           $id id of the group
      */
     public static function refreshMeals($om, $id) {
         /*
@@ -3256,6 +3258,11 @@ class BookingLineGroup extends Model {
                 }
             }
         }
+
+        $outside_dates_meals_ids = $om->search(BookingMeal::getType(), [[['date', '<', $group['date_from']]], [['date', '>', $group['date_to']]]]);
+        if(count($outside_dates_meals_ids)) {
+            $om->delete(BookingMeal::getType(), $outside_dates_meals_ids, true);
+        }
     }
 
     /**
@@ -3285,13 +3292,15 @@ class BookingLineGroup extends Model {
             return;
         }
 
-        foreach($meals as $id => $meal) {
+        foreach($meals as $meal_id => $meal) {
             $shifted_meal_date = $meal['date'] + $dates_diff;
 
-            $om->update(BookingMeal::getType(), $id, [
+            $om->update(BookingMeal::getType(), $meal_id, [
                 'date' => $shifted_meal_date
             ]);
         }
+
+        self::refreshMeals($om, $id);
     }
 
     /**

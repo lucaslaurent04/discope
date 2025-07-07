@@ -125,15 +125,14 @@ BookingLineGroup::refreshRentalUnitsAssignments($orm, $group['id']);
 
 BookingLineGroup::refreshPrice($orm, $group['id']);
 
-if($params['date_from'] - $group['date_from'] !== 0) {
-    if(!empty($group['booking_meals_ids'])) {
-        // shift meals dates
-        BookingLineGroup::refreshMealsDates($orm, $group['id'], $params['date_from'] - $group['date_from']);
-    }
-    if(!empty($group['booking_activities_ids'])) {
-        // shift activities dates
-        BookingLineGroup::refreshActivitiesDates($orm, $group['id'], $params['date_from'] - $group['date_from']);
-    }
+if(!empty($group['booking_meals_ids'])) {
+    // shift dates of people's meals and create/delete some meals if needed
+    BookingLineGroup::refreshMealsDates($orm, $group['id'], $params['date_from'] - $group['date_from']);
+}
+
+if(!empty($group['booking_activities_ids'])) {
+    // shift activities dates
+    BookingLineGroup::refreshActivitiesDates($orm, $group['id'], $params['date_from'] - $group['date_from']);
 }
 
 Booking::refreshPrice($orm, $group['booking_id']['id']);
