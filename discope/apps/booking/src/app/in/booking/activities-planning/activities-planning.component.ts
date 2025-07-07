@@ -150,8 +150,6 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                 }
                 this.weekStartDate = weekStartDate;
 
-                this.selectedDay = this.formatDayIndex(this.booking.date_from);
-
                 const weekEndDate = new Date(this.weekStartDate);
                 weekEndDate.setDate(weekEndDate.getDate() + 6);
                 this.weekEndDate = weekEndDate;
@@ -188,8 +186,12 @@ export class BookingActivitiesPlanningComponent implements OnInit {
             this.activityGroups = await this.api.collect('sale\\booking\\BookingLineGroup', domain, fields, 'activity_group_num', 'asc');
 
             for(let group of this.activityGroups) {
+                group.date_from = new Date(group.date_from);
+                group.date_to = new Date(group.date_to);
+
                 if(group.activity_group_num === 1) {
                     this.selectedGroup = group;
+                    this.selectedDay = this.formatDayIndex(this.selectedGroup.date_from);
                 }
             }
 
@@ -227,7 +229,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         try {
             const domain = ['relationship','=', 'employee'];
 
-            this.employees = await this.api.collect('hr\\employee\\Employee', domain, fields);
+            this.employees = await this.api.collect('hr\\employee\\Employee', domain, fields, 'name', 'asc', 0, 1000);
         }
         catch(response) {
             console.log('unexpected error', response);

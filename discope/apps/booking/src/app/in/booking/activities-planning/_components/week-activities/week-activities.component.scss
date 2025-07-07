@@ -84,6 +84,11 @@
                         }
                     }
 
+                    &.group-disabled {
+                        cursor: auto;
+                        opacity: 0.5;
+                    }
+
                     .group-num {
                         position: relative;
                     }
