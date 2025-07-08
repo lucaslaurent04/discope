@@ -1,0 +1,69 @@
+{
+    "name": "Statistiques quantités d'inscriptions par aides.",
+    "plural": "",
+    "description": "Statistiques quantités d'inscriptions par aides.",
+    "model": {
+        "all_centers": {
+            "label": "Tous les centres"
+        },
+        "center_id": {
+            "label": "Centre"
+        },
+        "date_from": {
+            "label": "Du"
+        },
+        "date_to": {
+            "label": "Au"
+        },
+        "by_duration": {
+            "label": "Par durée"
+        },
+        "center": {
+            "label": "Centre",
+            "description": "",
+            "help": ""
+        },
+        "sojourn_type": {
+            "label": "Type séjour",
+            "selection": {
+                "camp": "Camp",
+                "clsh": "Camp CLSH",
+                "clsh-4-days": "Camp CLSH 4 jours",
+                "clsh-5-days": "Camp CLSH 5 jours"
+            },
+            "description": "",
+            "help": ""
+        },
+        "qty": {
+            "label": "Qté",
+            "description": "",
+            "help": ""
+        },
+        "status": {
+            "label": "Status",
+            "selection": {
+                "all": "Toutes",
+                "validated": "Validées",
+                "confirmed": "Confirmées",
+                "pending": "Pré-inscription",
+                "waitlisted": "En attentes",
+                "canceled": "Annulées"
+            },
+            "description": "",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "",
+            "description": "",
+            "layout": {}
+        },
+        "list.default": {
+            "name": "Quantités d'inscriptions par aides",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

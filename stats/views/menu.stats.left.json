@@ -349,6 +349,15 @@
                                     "entity": "sale\\camp\\stats\\stat-enrollments-by-works-councils",
                                     "view": "list.default"
                                 }
+                            },
+                            {
+                                "id": "stats.camps.enrollments.by-sojourn-types",
+                                "label": "By sojourn types",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-sojourn-types",
+                                    "view": "list.default"
+                                }
                             }
                         ]
                     }

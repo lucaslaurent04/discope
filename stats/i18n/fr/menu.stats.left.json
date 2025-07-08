@@ -49,6 +49,10 @@
         "stats.camps.enrollments.by-works-councils": {
             "label": "Par CEs",
             "help": ""
+        },
+        "stats.camps.enrollments.by-sojourn-types": {
+            "label": "Par type de séjour",
+            "help": ""
         }
     }
 }
