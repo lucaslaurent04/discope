@@ -53,6 +53,10 @@
         "stats.camps.enrollments.by-sojourn-types": {
             "label": "Par type de séjour",
             "help": ""
+        },
+        "stats.camps.enrollments.by-age-ranges": {
+            "label": "Par tranches d'age",
+            "help": ""
         }
     }
 }

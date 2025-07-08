@@ -358,6 +358,15 @@
                                     "entity": "sale\\camp\\stats\\stat-enrollments-by-sojourn-types",
                                     "view": "list.default"
                                 }
+                            },
+                            {
+                                "id": "stats.camps.enrollments.by-age-ranges",
+                                "label": "By age ranges",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-age-ranges",
+                                    "view": "list.default"
+                                }
                             }
                         ]
                     }
