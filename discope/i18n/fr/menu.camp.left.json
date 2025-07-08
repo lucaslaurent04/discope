@@ -46,7 +46,7 @@
             "label": "En cours",
             "help": ""
         },
-        "manage-current.children": {
+        "manage-current.attending-children": {
             "label": "Enfants",
             "help": ""
         },

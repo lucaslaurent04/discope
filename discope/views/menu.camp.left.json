@@ -110,14 +110,14 @@
                 "type": "parent",
                 "children": [
                     {
-                        "id": "manage-current.children",
+                        "id": "manage-current.attending-children",
                         "type": "entry",
                         "label": "Children",
                         "description": "List children by camps with birthdate + other info, add filter show only weekend (camps of week)",
                         "icon": "",
                         "route": "/camps",
                         "context": {
-                            "entity": "sale\\camp\\collect-attending-children",
+                            "entity": "sale\\camp\\AttendingChild",
                             "view": "list.default"
                         }
                     },

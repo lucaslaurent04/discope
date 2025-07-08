@@ -19,7 +19,7 @@ use sale\camp\Camp;
         ],
         'only_birthday' => [
             'type'              => 'boolean',
-            'description'       => "Show only the children that have a birthday during the camp.",
+            'description'       => "Show only the children with birthday during camp.",
             'default'           => false
         ],
         'date_from' => [
@@ -31,37 +31,6 @@ use sale\camp\Camp;
             'type'              => 'date',
             'description'       => "Date interval upper limit (defaults to last day of the current week).",
             'default'           => fn() => strtotime('Sunday this week')
-        ],
-
-        /* parameters used as properties of virtual entity */
-        'camp' => [
-            'type'              => 'string',
-            'description'       => "The camp that the child is attending."
-        ],
-        'child_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'sale\camp\Child',
-            'description'       => "The child attending the camp."
-        ],
-        'gender' => [
-            'type'              => 'string',
-            'selection'         => [
-                'M',
-                'F'
-            ],
-            'description'       => "Gender of the gender."
-        ],
-        'birthday' => [
-            'type'              => 'date',
-            'description'       => "Birthday of the child if it happens during the camp."
-        ],
-        'is_ase' => [
-            'type'              => 'boolean',
-            'description'       => "Is the child a foster child."
-        ],
-        'weekend_extra' => [
-            'type'              => 'string',
-            'description'       => "Does the child stay during the weekend."
         ]
     ],
     'response'      => [
@@ -93,11 +62,15 @@ $camps = Camp::search(
         'enrollments_ids' => [
             'status',
             'weekend_extra',
+            'is_ase',
             'child_id' => [
-                'name',
+                'firstname',
+                'lastname',
                 'gender',
                 'birthdate',
-                'is_ase'
+                'main_guardian_id'  => ['name'],
+                'institution_id'    => ['name'],
+                'is_foster'
             ],
             'enrollment_lines_ids' => [
                 'product_id'
@@ -114,21 +87,30 @@ foreach($camps as $camp) {
             continue;
         }
 
-        $birthday = null;
-        $month_day = date('m-d', $enrollment['child_id']['birthdate']);
-        $year_birthday = DateTime::createFromFormat('Y-m-d', date('Y').'-'.$month_day);
-        if($year_birthday->getTimestamp() >= $camp['date_from'] && $year_birthday->getTimestamp() <= $camp['date_to']) {
-            $birthday = $year_birthday->getTimestamp();
-        }
+        $child = $enrollment['child_id'];
 
-        $result[] = [
-            'camp'          => $camp['short_name'],
-            'child_id'      => ['id' => $enrollment['child_id']['id'], 'name' => $enrollment['child_id']['name']],
-            'gender'        => $enrollment['child_id']['gender'],
-            'birthday'      => !is_null($birthday) ? $json_adapter->adaptOut($birthday, Field::MAP_TYPE_USAGE['date']) : null,
-            'is_ase'     => $enrollment['child_id']['is_ase'],
-            'weekend_extra' => $enrollment['weekend_extra']
-        ];
+        $month_day = date('m-d', $child['birthdate']);
+        $year_birthday = DateTime::createFromFormat('Y-m-d', date('Y').'-'.$month_day);
+
+        $result[] = array_merge(
+            $child,
+            [
+                /*
+                 * Adapt
+                 */
+                'main_guardian_id'  => ['id' => $child['main_guardian_id']['id'], 'name' => $child['main_guardian_id']['name']],
+                'institution_id'    => ['id' => $child['institution']['id'], 'name' => $child['institution']['name']],
+                'birthdate'         => $json_adapter->adaptOut($child['birthdate'], Field::MAP_TYPE_USAGE['date']),
+
+                /*
+                 * Add AttendingChild fields
+                 */
+                'camp_id'           => ['id' => $camp['id'], 'name' => $camp['short_name']],
+                'weekend_extra'     => $enrollment['weekend_extra'],
+                'has_camp_birthday' => $year_birthday->getTimestamp() >= $camp['date_from'] && $year_birthday->getTimestamp() <= $camp['date_to'],
+                'is_ase'            => $enrollment['is_ase']
+            ]
+        );
     }
 }
 
@@ -142,10 +124,11 @@ if($params['only_weekend']) {
 if($params['only_birthday']) {
     $result = array_filter(
         $result,
-        fn($item) => !empty($item['birthday'])
+        fn($item) => $item['has_camp_birthday']
     );
 }
 
 $context->httpResponse()
+        ->header('X-Total-Count', count($result))
         ->body(array_values($result))
         ->send();
