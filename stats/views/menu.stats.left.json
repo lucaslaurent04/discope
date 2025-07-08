@@ -308,13 +308,31 @@
                 "description": "",
                 "children": [
                     {
-                        "id": "stats.camps.enrollments-by-areas",
-                        "label": "Enrollments by areas",
+                        "id": "stats.camps.enrollments",
+                        "icon": "",
+                        "type": "parent",
+                        "label": "Enrollments",
                         "description": "",
-                        "context": {
-                            "entity": "sale\\camp\\stats\\stat-enrollments-by-areas",
-                            "view": "list.default"
-                        }
+                        "children": [
+                            {
+                                "id": "stats.camps.enrollments.by-areas",
+                                "label": "By areas",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-areas",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.camps.enrollments.by-tariffs",
+                                "label": "By tariff",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-tariffs",
+                                    "view": "list.default"
+                                }
+                            }
+                        ]
                     }
                 ]
             }

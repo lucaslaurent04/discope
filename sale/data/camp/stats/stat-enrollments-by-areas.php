@@ -46,7 +46,8 @@ use sale\camp\Camp;
                 'validated',
                 'confirmed',
                 'pending',
-                'waitlisted'
+                'waitlisted',
+                'canceled'
             ],
             'default'           => 'validated'
         ],

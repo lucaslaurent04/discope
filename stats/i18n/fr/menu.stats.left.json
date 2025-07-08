@@ -30,8 +30,16 @@
             "label": "Stats Camps",
             "help": ""
         },
-        "stats.camps.enrollments-by-areas": {
-            "label": "Inscriptions par régions",
+        "stats.camps.enrollments": {
+            "label": "Inscriptions",
+            "help": ""
+        },
+        "stats.camps.enrollments.by-areas": {
+            "label": "Par régions",
+            "help": ""
+        },
+        "stats.camps.enrollments.by-tariffs": {
+            "label": "Par tarifs",
             "help": ""
         }
     }
