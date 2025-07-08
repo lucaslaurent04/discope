@@ -105,9 +105,7 @@ $result = [];
 
 $camps = Camp::search($domain)
     ->read([
-        'center_id' => [
-            'name'
-        ],
+        'center_id',
         'enrollments_ids' => [
             'status',
             'works_council_id'
@@ -124,19 +122,19 @@ foreach($camps as $camp) {
             continue;
         }
 
-        if(!isset($enrollment['works_council'])) {
+        if(!isset($enrollment['works_council_id'])) {
             continue;
         }
 
-        if(!isset($map_center_works_councils_enrollments_qty[$camp['center_id']['id']])) {
-            $map_center_works_councils_enrollments_qty[$camp['center_id']['id']] = [];
+        if(!isset($map_center_works_councils_enrollments_qty[$camp['center_id']])) {
+            $map_center_works_councils_enrollments_qty[$camp['center_id']] = [];
         }
-        if(!isset($map_center_works_councils_enrollments_qty[$camp['center_id']['id']][$enrollment['works_council']])) {
-            $map_center_works_councils_enrollments_qty[$camp['center_id']['id']][$enrollment['works_council']] = 0;
+        if(!isset($map_center_works_councils_enrollments_qty[$camp['center_id']][$enrollment['works_council_id']])) {
+            $map_center_works_councils_enrollments_qty[$camp['center_id']][$enrollment['works_council_id']] = 0;
         }
 
-        $map_center_works_councils_enrollments_qty[$camp['center_id']['id']][$enrollment['works_council']]++;
-        $map_works_councils[$enrollment['works_council']] = true;
+        $map_center_works_councils_enrollments_qty[$camp['center_id']][$enrollment['works_council_id']]++;
+        $map_works_councils[$enrollment['works_council_id']] = true;
     }
 }
 
@@ -172,7 +170,7 @@ foreach($map_center_works_councils_enrollments_qty as $center_id => $map_works_c
 
         $result[] = [
             'center'            => $center,
-            'works_councils'    => ['id' => $works_council_id, 'name' => $works_council],
+            'works_council_id'  => ['id' => $works_council_id, 'name' => $works_council],
             'qty'               => $qty
         ];
     }

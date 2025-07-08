@@ -110,9 +110,7 @@ $result = [];
 
 $camps = Camp::search($domain)
     ->read([
-        'center_id' => [
-            'name'
-        ],
+        'center_id',
         'enrollments_ids' => [
             'status',
             'price_adapters_ids' => [
@@ -138,22 +136,22 @@ foreach($camps as $camp) {
                 continue;
             }
 
-            if(!isset($map_center_sponsors_enrollments_qty[$camp['center_id']['id']])) {
-                $map_center_sponsors_enrollments_qty[$camp['center_id']['id']] = [];
+            if(!isset($map_center_sponsors_enrollments_qty[$camp['center_id']])) {
+                $map_center_sponsors_enrollments_qty[$camp['center_id']] = [];
             }
-            if(!isset($map_center_sponsors_enrollments_qty[$camp['center_id']['id']][$price_adapter['sponsor_id']])) {
-                $map_center_sponsors_enrollments_qty[$camp['center_id']['id']][$price_adapter['sponsor_id']] = 0;
-            }
-
-            if(!isset($map_center_sponsors_enrollments_amount[$camp['center_id']['id']])) {
-                $map_center_sponsors_enrollments_amount[$camp['center_id']['id']] = [];
-            }
-            if(!isset($map_center_sponsors_enrollments_amount[$camp['center_id']['id']][$price_adapter['sponsor_id']])) {
-                $map_center_sponsors_enrollments_amount[$camp['center_id']['id']][$price_adapter['sponsor_id']] = 0.0;
+            if(!isset($map_center_sponsors_enrollments_qty[$camp['center_id']][$price_adapter['sponsor_id']])) {
+                $map_center_sponsors_enrollments_qty[$camp['center_id']][$price_adapter['sponsor_id']] = 0;
             }
 
-            $map_center_sponsors_enrollments_qty[$camp['center_id']['id']][$price_adapter['sponsor_id']]++;
-            $map_center_sponsors_enrollments_amount[$camp['center_id']['id']][$price_adapter['sponsor_id']] += floatval($price_adapter['value']);
+            if(!isset($map_center_sponsors_enrollments_amount[$camp['center_id']])) {
+                $map_center_sponsors_enrollments_amount[$camp['center_id']] = [];
+            }
+            if(!isset($map_center_sponsors_enrollments_amount[$camp['center_id']][$price_adapter['sponsor_id']])) {
+                $map_center_sponsors_enrollments_amount[$camp['center_id']][$price_adapter['sponsor_id']] = 0.0;
+            }
+
+            $map_center_sponsors_enrollments_qty[$camp['center_id']][$price_adapter['sponsor_id']]++;
+            $map_center_sponsors_enrollments_amount[$camp['center_id']][$price_adapter['sponsor_id']] += floatval($price_adapter['value']);
             $map_sponsors[$price_adapter['sponsor_id']] = true;
         }
     }

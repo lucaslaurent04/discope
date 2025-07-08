@@ -107,9 +107,7 @@ $camps = Camp::search($domain)
         'day_product_id',
         'weekend_product_id',
         'saturday_morning_product_id',
-        'center_id' => [
-            'name'
-        ],
+        'center_id',
         'enrollments_ids' => [
             'status',
             'enrollment_lines_ids' => [
@@ -128,14 +126,14 @@ foreach($camps as $camp) {
             continue;
         }
 
-        if(!isset($map_center_tariffs_enrollments_qty[$camp['center_id']['id']])) {
-            $map_center_tariffs_enrollments_qty[$camp['center_id']['id']] = [];
+        if(!isset($map_center_tariffs_enrollments_qty[$camp['center_id']])) {
+            $map_center_tariffs_enrollments_qty[$camp['center_id']] = [];
         }
-        if(!isset($map_center_tariffs_enrollments_qty[$camp['center_id']['id']][$camp['product_id']])) {
-            $map_center_tariffs_enrollments_qty[$camp['center_id']['id']][$camp['product_id']] = 0;
+        if(!isset($map_center_tariffs_enrollments_qty[$camp['center_id']][$camp['product_id']])) {
+            $map_center_tariffs_enrollments_qty[$camp['center_id']][$camp['product_id']] = 0;
         }
 
-        $map_center_tariffs_enrollments_qty[$camp['center_id']['id']][$camp['product_id']]++;
+        $map_center_tariffs_enrollments_qty[$camp['center_id']][$camp['product_id']]++;
         $map_products[$camp['product_id']] = true;
     }
 }
