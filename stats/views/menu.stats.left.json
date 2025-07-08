@@ -340,6 +340,15 @@
                                     "entity": "sale\\camp\\stats\\stat-enrollments-by-sponsors",
                                     "view": "list.default"
                                 }
+                            },
+                            {
+                                "id": "stats.camps.enrollments.by-works-councils",
+                                "label": "By works councils",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-works-councils",
+                                    "view": "list.default"
+                                }
                             }
                         ]
                     }

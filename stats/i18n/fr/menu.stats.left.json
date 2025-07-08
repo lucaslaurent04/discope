@@ -45,6 +45,10 @@
         "stats.camps.enrollments.by-sponsors": {
             "label": "Par aides",
             "help": ""
+        },
+        "stats.camps.enrollments.by-works-councils": {
+            "label": "Par CEs",
+            "help": ""
         }
     }
 }
