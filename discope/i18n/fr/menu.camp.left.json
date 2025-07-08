@@ -42,23 +42,31 @@
             "label": "Exigences",
             "help": ""
         },
-        "manage-current": {
+        "pending": {
             "label": "En cours",
             "help": ""
         },
-        "manage-current.attending-children": {
-            "label": "Enfants",
+        "pending.camps": {
+            "label": "Camps",
             "help": ""
         },
-        "manage-current.children-distribution": {
+        "pending.camps.attending-children": {
+            "label": "Enfants participant",
+            "help": ""
+        },
+        "pending.camps.children-distribution": {
             "label": "Distribution enfants",
             "help": ""
         },
-        "manage-current.pending-enrollments": {
+        "pending.enrollments": {
+            "label": "Inscriptions",
+            "help": ""
+        },
+        "pending.enrollments.pending": {
             "label": "Pré-inscriptions",
             "help": ""
         },
-        "manage-current.confirmed-enrollments": {
+        "pending.enrollments.confirmed": {
             "label": "À valider",
             "help": ""
         }

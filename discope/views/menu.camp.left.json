@@ -103,59 +103,77 @@
                 ]
             },
             {
-                "id": "manage-current",
-                "label": "Manage current",
-                "description": "Manage current camps and the children attending them.",
-                "icon": "boy",
+                "id": "pending",
+                "label": "Pending",
+                "description": "Manage pending camps, the children attending them and enrollments that need to be handled.",
+                "icon": "pending_actions",
                 "type": "parent",
                 "children": [
                     {
-                        "id": "manage-current.attending-children",
-                        "type": "entry",
-                        "label": "Children",
-                        "description": "List children by camps with birthdate + other info, add filter show only weekend (camps of week)",
-                        "icon": "",
-                        "route": "/camps",
-                        "context": {
-                            "entity": "sale\\camp\\AttendingChild",
-                            "view": "list.default"
-                        }
+                        "id": "pending.camps",
+                        "label": "Camps",
+                        "description": "Manage pending camps, the children attending them.",
+                        "icon": "holiday_village",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "pending.camps.attending-children",
+                                "type": "entry",
+                                "label": "Children",
+                                "description": "List children by camps with birthdate + other info, add filter show only weekend (camps of week)",
+                                "icon": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\AttendingChild",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "pending.camps.children-distribution",
+                                "type": "entry",
+                                "label": "Children distribution",
+                                "description": "Children gender, new/old and week/weekend distribution (camps of the week).",
+                                "icon": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-children-distribution",
+                                    "view": "list.default"
+                                }
+                            }
+                        ]
                     },
                     {
-                        "id": "manage-current.children-distribution",
-                        "type": "entry",
-                        "label": "Children distribution",
-                        "description": "Children gender, new/old and week/weekend distribution (camps of the week).",
-                        "icon": "",
-                        "route": "/camps",
-                        "context": {
-                            "entity": "sale\\camp\\stats\\stat-children-distribution",
-                            "view": "list.default"
-                        }
-                    },
-                    {
-                        "id": "manage-current.pending-enrollments",
-                        "type": "entry",
-                        "label": "Pending enrollments",
-                        "description": "List all pending enrollments (should generally come from website)",
-                        "icon": "",
-                        "route": "/camps",
-                        "context": {
-                            "entity": "sale\\camp\\Enrollment",
-                            "view": "list.pending"
-                        }
-                    },
-                    {
-                        "id": "manage-current.confirmed-enrollments",
-                        "type": "entry",
-                        "label": "Confirmed enrollments",
-                        "description": "List all confirmed enrollments with missing documents or payments.",
-                        "icon": "",
-                        "route": "/camps",
-                        "context": {
-                            "entity": "sale\\camp\\Enrollment",
-                            "view": "list.confirmed"
-                        }
+                        "id": "pending.enrollments",
+                        "label": "Enrollments",
+                        "description": "Manage pending and confirmed enrollments that need to be handled.",
+                        "icon": "app_registration",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "pending.enrollments.pending",
+                                "type": "entry",
+                                "label": "Pending enrollments",
+                                "description": "List all pending enrollments (should generally come from website)",
+                                "icon": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\Enrollment",
+                                    "view": "list.pending"
+                                }
+                            },
+                            {
+                                "id": "pending.enrollments.confirmed",
+                                "type": "entry",
+                                "label": "Confirmed enrollments",
+                                "description": "List all confirmed enrollments with missing documents or payments.",
+                                "icon": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\Enrollment",
+                                    "view": "list.confirmed"
+                                }
+                            }
+                        ]
                     }
                 ]
             }
