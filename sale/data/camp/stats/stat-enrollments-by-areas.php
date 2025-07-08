@@ -226,5 +226,6 @@ usort($result, function($a, $b) {
 });
 
 $context->httpResponse()
+        ->header('X-Total-Count', count($result))
         ->body($result)
         ->send();
