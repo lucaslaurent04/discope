@@ -1,7 +1,7 @@
 {
-    "name": "Stat Enrollments By Areas Quantities",
+    "name": "Stat Enrollments By Sponsors Quantities",
     "description": "",
-    "controller": "sale_camp_stats_stat-enrollments-by-areas",
+    "controller": "sale_camp_stats_stat-enrollments-by-sponsors",
     "header": {
         "actions": {
             "ACTION.CREATE": false
@@ -18,7 +18,11 @@
             "qty": {
                 "operation": "SUM",
                 "usage": "numeric/integer",
-                "suffix": " enfants"
+                "suffix": " inscriptions"
+            },
+            "amount": {
+                "operation": "SUM",
+                "usage": "amount/money:2"
             }
         }
     },
@@ -32,19 +36,14 @@
             },
             {
                 "type": "field",
-                "value": "area",
+                "value": "sponsor_id",
                 "width": "20%"
             },
             {
                 "type": "field",
-                "value": "address_zip",
+                "value": "status",
                 "width": "20%",
                 "visible": false
-            },
-            {
-                "type": "field",
-                "value": "municipality",
-                "width": "33%"
             },
             {
                 "type": "field",
@@ -53,9 +52,9 @@
             },
             {
                 "type": "field",
-                "value": "status",
-                "width": "20%",
-                "visible": false
+                "label": "Amount",
+                "value": "amount",
+                "width": "20%"
             }
         ]
     }

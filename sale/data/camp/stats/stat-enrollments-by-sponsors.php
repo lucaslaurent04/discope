@@ -9,7 +9,7 @@
 use identity\Center;
 use identity\User;
 use sale\camp\Camp;
-use sale\camp\catalog\Product;
+use sale\camp\Sponsor;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Data about children's participation to camps.",
@@ -54,14 +54,19 @@ use sale\camp\catalog\Product;
             'type'              => 'string',
             'description'       => "Name of the center for the enrollments quantities."
         ],
-        'product_id' => [
+        'sponsor_id' => [
             'type'              => 'many2one',
-            'foreign_object'    => 'sale\catalog\Product',
-            'description'       => "The camp tariff."
+            'foreign_object'    => 'sale\camp\Sponsor',
+            'description'       => "The sponsor that was used with the enrollment."
         ],
         'qty' => [
             'type'              => 'integer',
-            'description'       => "Quantity of enrollments of the tariff."
+            'description'       => "Quantity of enrollments helped by the sponsor."
+        ],
+        'amount' => [
+            'type'              => 'float',
+            'usage'             => 'amount/money:2',
+            'description'       => "Total amount of enrollments helped by the sponsor."
         ]
     ],
     'response'      => [
@@ -78,6 +83,8 @@ use sale\camp\catalog\Product;
  * @var \equal\auth\AuthenticationManager   $auth
  */
 ['context' => $context, 'adapt' => $adapter_provider, 'auth' => $auth] = $providers;
+
+$json_adapter = $adapter_provider->get('json');
 
 $domain = [
     ['date_from', '>=', $params['date_from']],
@@ -103,60 +110,68 @@ $result = [];
 
 $camps = Camp::search($domain)
     ->read([
-        'product_id',
-        'day_product_id',
-        'weekend_product_id',
-        'saturday_morning_product_id',
         'center_id' => [
             'name'
         ],
         'enrollments_ids' => [
             'status',
-            'enrollment_lines_ids' => [
-                'product_id'
+            'price_adapters_ids' => [
+                'sponsor_id',
+                'value'
             ]
         ]
     ])
     ->get(true);
 
-$map_center_tariffs_enrollments_qty = [];
-$map_products = [];
+$map_center_sponsors_enrollments_qty = [];
+$map_center_sponsors_enrollments_amount = [];
+$map_sponsors = [];
 
 foreach($camps as $camp) {
-    if(!isset($map_tariffs_enrollments[$camp['product_id']])) {
-        $map_tariffs_enrollments[$camp['product_id']] = [];
-    }
-
     foreach($camp['enrollments_ids'] as $enrollment) {
         if($params['status'] !== 'all' && $enrollment['status'] !== $params['status']) {
             continue;
         }
 
-        if(!isset($map_center_tariffs_enrollments_qty[$camp['center_id']['id']])) {
-            $map_center_tariffs_enrollments_qty[$camp['center_id']['id']] = [];
-        }
-        if(!isset($map_center_tariffs_enrollments_qty[$camp['center_id']['id']][$camp['product_id']])) {
-            $map_center_tariffs_enrollments_qty[$camp['center_id']['id']][$camp['product_id']] = 0;
-        }
+        foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+            if(!isset($price_adapter['sponsor_id'])) {
+                continue;
+            }
 
-        $map_center_tariffs_enrollments_qty[$camp['center_id']['id']][$camp['product_id']]++;
-        $map_products[$camp['product_id']] = true;
+            if(!isset($map_center_sponsors_enrollments_qty[$camp['center_id']['id']])) {
+                $map_center_sponsors_enrollments_qty[$camp['center_id']['id']] = [];
+            }
+            if(!isset($map_center_sponsors_enrollments_qty[$camp['center_id']['id']][$price_adapter['sponsor_id']])) {
+                $map_center_sponsors_enrollments_qty[$camp['center_id']['id']][$price_adapter['sponsor_id']] = 0;
+            }
+
+            if(!isset($map_center_sponsors_enrollments_amount[$camp['center_id']['id']])) {
+                $map_center_sponsors_enrollments_amount[$camp['center_id']['id']] = [];
+            }
+            if(!isset($map_center_sponsors_enrollments_amount[$camp['center_id']['id']][$price_adapter['sponsor_id']])) {
+                $map_center_sponsors_enrollments_amount[$camp['center_id']['id']][$price_adapter['sponsor_id']] = 0.0;
+            }
+
+            $map_center_sponsors_enrollments_qty[$camp['center_id']['id']][$price_adapter['sponsor_id']]++;
+            $map_center_sponsors_enrollments_amount[$camp['center_id']['id']][$price_adapter['sponsor_id']] += floatval($price_adapter['value']);
+            $map_sponsors[$price_adapter['sponsor_id']] = true;
+        }
     }
 }
 
-$center_ids = array_keys($map_center_tariffs_enrollments_qty);
+$center_ids = array_keys($map_center_sponsors_enrollments_qty);
 
 $centers = Center::search(['id', 'in', $center_ids])
     ->read(['name'])
     ->get();
 
-$products_ids = array_keys($map_products);
+$sponsors_ids = array_keys($map_sponsors);
 
-$products = Product::search(['id', 'in', $products_ids])
+$sponsors = Sponsor::search(['id', 'in', $sponsors_ids])
     ->read(['name'])
     ->get();
 
-foreach($map_center_tariffs_enrollments_qty as $center_id => $map_products_qty) {
+foreach($map_center_sponsors_enrollments_qty as $center_id => $map_sponsors_qty) {
     $center = null;
     foreach($centers as $c) {
         if($c['id'] === $center_id) {
@@ -165,19 +180,20 @@ foreach($map_center_tariffs_enrollments_qty as $center_id => $map_products_qty) 
         }
     }
 
-    foreach($map_products_qty as $product_id => $qty) {
-        $product = null;
-        foreach($products as $p) {
-            if($p['id'] === $product_id) {
-                $product = $p['name'];
+    foreach($map_sponsors_qty as $sponsor_id => $qty) {
+        $sponsor = null;
+        foreach($sponsors as $s) {
+            if($s['id'] === $sponsor_id) {
+                $sponsor = $s['name'];
                 break;
             }
         }
 
         $result[] = [
             'center'        => $center,
-            'product_id'    => ['id' => $product_id, 'name' => $product],
-            'qty'           => $qty
+            'sponsor_id'    => ['id' => $sponsor_id, 'name' => $sponsor],
+            'qty'           => $qty,
+            'amount'        => $json_adapter->adaptOut($map_center_sponsors_enrollments_amount[$center_id][$sponsor_id], 'amount/money:4')
         ];
     }
 }

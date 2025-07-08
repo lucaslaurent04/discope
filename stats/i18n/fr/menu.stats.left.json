@@ -41,6 +41,10 @@
         "stats.camps.enrollments.by-tariffs": {
             "label": "Par tarifs",
             "help": ""
+        },
+        "stats.camps.enrollments.by-sponsors": {
+            "label": "Par aides",
+            "help": ""
         }
     }
 }

@@ -4,7 +4,7 @@
     "controller": "sale_camp_stats_stat-enrollments-by-tariffs",
     "header": {
         "actions": {
-            "ACTION.CREATE" : false
+            "ACTION.CREATE": false
         },
         "advanced_search": {
             "open": true
@@ -27,7 +27,7 @@
             {
                 "type": "field",
                 "value": "center",
-                "sortable" : true,
+                "sortable": true,
                 "width": "20%"
             },
             {

@@ -325,10 +325,19 @@
                             },
                             {
                                 "id": "stats.camps.enrollments.by-tariffs",
-                                "label": "By tariff",
+                                "label": "By tariffs",
                                 "description": "",
                                 "context": {
                                     "entity": "sale\\camp\\stats\\stat-enrollments-by-tariffs",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.camps.enrollments.by-sponsors",
+                                "label": "By sponsors",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-sponsors",
                                     "view": "list.default"
                                 }
                             }
