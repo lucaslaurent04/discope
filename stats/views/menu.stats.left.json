@@ -320,7 +320,7 @@
                                 "label": "Children distribution",
                                 "description": "Children gender, new/old and week/weekend distribution by camps.",
                                 "context": {
-                                    "entity": "sale\\camp\\stats\\stat-children-distribution",
+                                    "entity": "sale\\camp\\stats\\stat-camps-children-distribution",
                                     "view": "list.default"
                                 }
                             }

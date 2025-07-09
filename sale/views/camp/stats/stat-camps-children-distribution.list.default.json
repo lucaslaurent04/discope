@@ -1,7 +1,7 @@
 {
     "name": "Stat Camps Children Quantities",
     "description": "",
-    "controller": "sale_camp_stats_stat-children-distribution",
+    "controller": "sale_camp_stats_stat-camps-children-distribution",
     "header": {
         "actions": {
             "ACTION.CREATE": false
