@@ -1,0 +1,95 @@
+{
+    "name": "Stat Enrollments By Months Statuses Quantities",
+    "description": "",
+    "controller": "sale_camp_stats_stat-enrollments-by-months",
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "group_by": [
+        { "field": "center", "operations": ["SUM", "object.qty"], "open": true }
+    ],
+    "operations": {
+        "total": {
+            "qty_pending": {
+                "operation": "SUM",
+                "usage": "numeric/integer",
+                "suffix": " pré-inscriptions"
+            },
+            "qty_waitlisted": {
+                "operation": "SUM",
+                "usage": "numeric/integer",
+                "suffix": " en attentes"
+            },
+            "qty_confirmed": {
+                "operation": "SUM",
+                "usage": "numeric/integer",
+                "suffix": " confirmées"
+            },
+            "qty_validated": {
+                "operation": "SUM",
+                "usage": "numeric/integer",
+                "suffix": " validées"
+            },
+            "qty_cancelled": {
+                "operation": "SUM",
+                "usage": "numeric/integer",
+                "suffix": " annulées"
+            },
+            "qty": {
+                "operation": "SUM",
+                "usage": "numeric/integer",
+                "suffix": " inscriptions"
+            }
+        }
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "center",
+                "sortable": true,
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "month",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "qty_pending",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty_waitlisted",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty_confirmed",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty_validated",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty_cancelled",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty",
+                "width": "10%"
+            }
+        ]
+    }
+}

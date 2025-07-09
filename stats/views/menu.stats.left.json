@@ -386,6 +386,15 @@
                                     "entity": "sale\\camp\\stats\\stat-enrollments-by-age-ranges",
                                     "view": "list.default"
                                 }
+                            },
+                            {
+                                "id": "stats.camps.enrollments.by-months",
+                                "label": "By months",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-months",
+                                    "view": "list.default"
+                                }
                             }
                         ]
                     }
