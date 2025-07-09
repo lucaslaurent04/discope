@@ -294,6 +294,14 @@ class Enrollment extends Model {
                 'function'          => 'calcPrice'
             ],
 
+            'all_documents_received' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => "Have all required documents been received?",
+                'store'             => true,
+                'function'          => 'calcAllDocumentsReceived'
+            ],
+
             'is_locked' => [
                 'type'              => 'boolean',
                 'description'       => "Can the enrollment be modified or not?",
@@ -574,25 +582,24 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function policyRemoveFromWaitlist($self): array {
+    public static function calcAllDocumentsReceived($self): array {
         $result = [];
         $self->read([
-            'camp_id' => [
-                'max_children',
-                'enrollments_ids' => ['status']
-            ]
+            'enrollment_documents_ids'  => ['document_id', 'received'],
+            'camp_id'                   => ['required_documents_ids']
         ]);
-        foreach($self as $enrollment) {
-            $pending_confirmed_enrollments_qty = 0;
-            foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
-                if(in_array($en['status'], ['pending', 'confirmed', 'validated'])) {
-                    $pending_confirmed_enrollments_qty++;
+        foreach($self as $id => $enrollment) {
+            $doc_received = true;
+            foreach($enrollment['camp_id']['required_documents_ids'] as $required_documents_id) {
+                foreach($enrollment['enrollment_documents_ids'] as $en_doc) {
+                    if($en_doc['document_id'] === $required_documents_id && !$en_doc['received']) {
+                        $doc_received = false;
+                        break;
+                    }
                 }
             }
 
-            if($pending_confirmed_enrollments_qty >= $enrollment['camp_id']['max_children']) {
-                return ['camp_id' => ['camp_full' => "The camp is full."]];
-            }
+            $result[$id] = $doc_received;
         }
 
         return $result;
@@ -600,24 +607,32 @@ class Enrollment extends Model {
 
     public static function policyConfirm($self): array {
         $result = [];
-        $self->read([
-            'enrollment_documents_ids'  => ['document_id', 'received'],
-            'camp_id'                   => ['required_documents_ids']
-        ]);
+        $self->read(['camp_id' => ['max_children', 'enrollments_ids' => ['status']]]);
         foreach($self as $enrollment) {
-            foreach($enrollment['camp_id']['required_documents_ids'] as $required_documents_id) {
-                $doc_received = false;
-                foreach($enrollment['enrollment_documents_ids'] as $en_doc) {
-                    if($en_doc['document_id'] === $required_documents_id && $en_doc['received']) {
-                        $doc_received = true;
-                        break;
-                    }
-                }
-
-                if(!$doc_received) {
-                    return ['camp_id' => ['missing_document' => "At least one document is missing for the enrollment to this camp."]];
+            $confirmed_enrollments_qty = 0;
+            foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
+                if(in_array($en['status'], ['confirmed', 'validated'])) {
+                    $confirmed_enrollments_qty++;
                 }
             }
+
+            if($confirmed_enrollments_qty >= $enrollment['camp_id']['max_children']) {
+                return ['camp_id' => ['camp_full' => "The camp is full."]];
+            }
+        }
+
+        return $result;
+    }
+
+    public static function policyValidate($self): array {
+        $result = [];
+        $self->read(['all_documents_received']);
+        foreach($self as $enrollment) {
+            if(!$enrollment['all_documents_received']) {
+                return ['camp_id' => ['missing_document' => "At least one document is missing for the enrollment to this camp."]];
+            }
+
+            // # todo - check that the enrollment has been paid
         }
 
         return $result;
@@ -626,38 +641,35 @@ class Enrollment extends Model {
     public static function getPolicies(): array {
         return [
 
-            'remove-from-waitlist' => [
+            'confirm' => [
                 'description'   => "Checks if the camp isn't full yet.",
-                'function'      => 'policyRemoveFromWaitlist'
+                'function'      => "policyConfirm"
             ],
 
-            'confirm' => [
-                'description'   => "Checks if the enrollment can be confirmed, if the required documents have already been received.",
-                'function'      => "policyConfirm"
+            'validate' => [
+                'description'   => "Checks if the enrollment can be validated, if the required documents have already been received and the enrollment has been paid.",
+                'function'      => "policyValidate"
             ]
 
         ];
     }
 
-    public static function onafterPending($self) {
-        $self->update([
-            'is_locked' => false,
-            'status'    => 'pending'            // #todo - find why needed and fix error
-        ]);
-
+    /**
+     * After status confirm: reset the enrollments qty
+     */
+    public static function onafterConfirm($self) {
         $self->do('reset-camp-enrollments-qty');
     }
 
     /**
-     * Lock enrollment after status to confirm
+     * After status validate: lock enrollment and generate presences
      */
-    public static function onafterConfirm($self) {
+    public static function onafterValidate($self) {
         $self->update([
             'is_locked' => true,
-            'status'    => 'confirmed'          // #todo - find why needed and fix error
+            'status'    => 'validated'          // #todo - find why needed and fix error
         ]);
 
-        $self->do('reset-camp-enrollments-qty');
         $self->do('generate-presences');
     }
 
@@ -676,7 +688,7 @@ class Enrollment extends Model {
         return [
 
             'pending' => [
-                'description' => "The enrollment is waiting for confirmation, the entered child/parent data and provided documents need to be checked.",
+                'description' => "The enrollment is waiting for confirmation, it usually means that its an application from the website.",
                 'transitions' => [
                     'confirm' => [
                         'status'        => 'confirmed',
@@ -693,13 +705,13 @@ class Enrollment extends Model {
             ],
 
             'waitlisted' => [
-                'description' => "The enrollment is waiting for a confirmation.",
+                'description' => "The enrollment is waiting for a confirmation, waiting for a new camp group to be created or to be transferred.",
                 'transitions' => [
-                    'pending' => [
-                        'status'        => 'pending',
+                    'confirm' => [
+                        'status'        => 'confirm',
                         'description'   => "Remove from the waitlist.",
-                        'policies'      => ['remove-from-waitlist'],
-                        'onafter'       => 'onafterPending'
+                        'policies'      => ['confirm'],
+                        'onafter'       => 'onafterConfirm'
                     ],
                     'cancel' => [
                         'status'        => 'cancelled',
@@ -715,6 +727,7 @@ class Enrollment extends Model {
                     'validate' => [
                         'status'        => 'validated',
                         'description'   => "Mark the enrollment as validated (all docs and payments received).",
+                        'policies'      => ['validate']
                     ],
                     'cancel' => [
                         'status'        => 'cancelled',
@@ -725,7 +738,7 @@ class Enrollment extends Model {
             ],
 
             'validated' => [
-                'description' => "The enrollment is confirmed, the child can attend the camp.",
+                'description' => "The enrollment is validated, the required documents have been received and the enrollment has been paid.",
                 'transitions' => [
                     'cancel' => [
                         'status'        => 'cancelled',
@@ -773,7 +786,7 @@ class Enrollment extends Model {
         // Check that camp is not already full and that the child hasn't been enrolled yet
         if(
             isset($values['camp_id'])
-            || (isset($values['status']) && in_array($values['status'], ['pending', 'confirmed', 'validated']))
+            || (isset($values['status']) && in_array($values['status'], ['confirmed', 'validated']))
             || isset($values['presence_day_1'])
             || isset($values['presence_day_2'])
             || isset($values['presence_day_3'])
@@ -783,7 +796,7 @@ class Enrollment extends Model {
             foreach($self as $enrollment) {
                 $status = $values['status'] ?? $enrollment['status'];
 
-                if(in_array($status, ['pending', 'confirmed', 'validated'])) {
+                if(in_array($status, ['confirmed', 'validated'])) {
                     $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
                         ->read([
                             'is_clsh',
@@ -816,15 +829,14 @@ class Enrollment extends Model {
                                 continue;
                             }
 
-                            $day_pending_confirmed_enrollments_qty = 0;
-
+                            $day_confirmed_enrollments_qty = 0;
                             foreach($camp['enrollments_ids'] as $en) {
-                                if($en['presence_day_'.$day] && in_array($en['status'], ['pending', 'confirmed', 'validated']) && $en['id'] !== $enrollment['id']) {
-                                    $day_pending_confirmed_enrollments_qty++;
+                                if($en['presence_day_'.$day] && in_array($en['status'], ['confirmed', 'validated']) && $en['id'] !== $enrollment['id']) {
+                                    $day_confirmed_enrollments_qty++;
                                 }
                             }
 
-                            if($day_pending_confirmed_enrollments_qty >= $camp['max_children']) {
+                            if($day_confirmed_enrollments_qty >= $camp['max_children']) {
                                 if($day === 1) {
                                     return ['camp_id' => ['day_1_full' => "The 1st day of the camp is full."]];
                                 }
@@ -844,14 +856,14 @@ class Enrollment extends Model {
                         }
                     }
                     else {
-                        $pending_confirmed_enrollments_qty = 0;
+                        $confirmed_enrollments_qty = 0;
 
                         foreach($camp['enrollments_ids'] as $en) {
-                            if(in_array($en['status'], ['pending', 'confirmed', 'validated']) && $en['id'] !== $enrollment['id']) {
-                                $pending_confirmed_enrollments_qty++;
+                            if(in_array($en['status'], ['confirmed', 'validated']) && $en['id'] !== $enrollment['id']) {
+                                $confirmed_enrollments_qty++;
                             }
                         }
-                        if($pending_confirmed_enrollments_qty >= $camp['max_children']) {
+                        if($confirmed_enrollments_qty >= $camp['max_children']) {
                             return ['camp_id' => ['full' => "The camp is full."]];
                         }
                     }
@@ -961,7 +973,7 @@ class Enrollment extends Model {
                         $enrollment['id'] !== $en['id']
                         && $camp['date_from'] <= $en['camp_id']['date_to']
                         && $camp['date_to'] >= $en['camp_id']['date_from']
-                        && in_array($en['status'], ['pending', 'confirmed', 'validated'])
+                        && in_array($en['status'], ['confirmed', 'validated'])
                     ) {
                         return ['child_id' => ['already_enrolled_to_other_camp' => "Child has already been enrolled to another camp during this period."]];
                     }
@@ -1410,6 +1422,9 @@ class Enrollment extends Model {
                 ]);
             }
         }
+
+        // reset all documents received computed value
+        $self->update(['all_documents_received' => null]);
     }
 
     public static function getActions(): array {

@@ -1,18 +1,26 @@
 {
-    "name": "Réduction",
-    "plural": "Réductions",
-    "description": "Reductions d'aides.",
+    "name": "Inscription",
+    "plural": "Inscriptions",
+    "description": "Inscriptions d'enfants à des camps.",
     "model": {
-        "works_council_id": {
-            "label": "CE",
-            "description": ""
-        },
         "date_from": {
             "label": "Du",
             "description": ""
         },
         "date_to": {
             "label": "Au",
+            "description": ""
+        },
+        "status": {
+            "label": "Status",
+            "selection": {
+                "all": "Tous",
+                "pending": "Pré-inscription",
+                "waitlisted": "En attente",
+                "confirmed": "Confirmée",
+                "validated": "Validée",
+                "cancelled": "Annulée"
+            },
             "description": ""
         }
     },

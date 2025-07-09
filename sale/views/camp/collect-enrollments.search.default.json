@@ -14,12 +14,6 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "label": "Works council",
-                                                "value": "works_council_id",
-                                                "width": "25%"
-                                            },
-                                            {
-                                                "type": "field",
                                                 "label": "From",
                                                 "value": "date_from",
                                                 "width": "15%"
@@ -28,6 +22,12 @@
                                                 "type": "field",
                                                 "label": "To",
                                                 "value": "date_to",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Status",
+                                                "value": "status",
                                                 "width": "15%"
                                             }
                                         ]

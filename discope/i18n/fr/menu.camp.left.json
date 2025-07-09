@@ -41,6 +41,30 @@
         "requirements": {
             "label": "Exigences",
             "help": ""
+        },
+        "pending": {
+            "label": "En cours",
+            "help": ""
+        },
+        "pending.camps": {
+            "label": "Camps",
+            "help": ""
+        },
+        "pending.camps.attending-children": {
+            "label": "Enfants participant",
+            "help": ""
+        },
+        "pending.enrollments": {
+            "label": "Inscriptions",
+            "help": ""
+        },
+        "pending.enrollments.pending": {
+            "label": "Pré-inscriptions",
+            "help": ""
+        },
+        "pending.enrollments.confirmed": {
+            "label": "À valider",
+            "help": ""
         }
     }
 }

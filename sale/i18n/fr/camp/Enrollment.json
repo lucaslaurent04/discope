@@ -147,8 +147,8 @@
             "description": "Status de l'inscription.",
             "help": "",
             "selection": {
-                "pending": "En cours",
-                "waitlisted": "Sur liste d'attente",
+                "pending": "Pré-inscription",
+                "waitlisted": "En attente",
                 "confirmed": "Confirmée",
                 "validated": "Validée",
                 "cancelled": "Annulée"
@@ -177,6 +177,11 @@
         "works_council_id": {
             "label": "Conseil d'entreprise",
             "description": "Le conseil d'entreprise qui va rehausser la classe du camp d'un niveau.",
+            "help": ""
+        },
+        "all_documents_received": {
+            "label": "Tous les documents reçus",
+            "description": "Tous les documents requis pour le camp ont bien été reçus.",
             "help": ""
         }
     },
@@ -235,7 +240,28 @@
         "list.default": {
             "name": "Inscriptions",
             "description": "",
-            "layout": []
+            "layout": {}
+        },
+        "list.confirmed": {
+            "name": "Inscriptions à valider",
+            "description": "",
+            "header": {
+                "action.transition.validate": {
+                    "label": "Valider"
+                }
+            },
+            "layout": {}
+        },
+        "list.pending": {
+            "name": "Pré-inscriptions",
+            "description": "",
+            "header": {
+                "action.transition.confirm": {
+                    "label": "Confirmer"
+                }
+            },
+            "layout": {
+            }
         }
     },
     "error": {

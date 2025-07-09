@@ -1,5 +1,6 @@
 {
     "name": "Camps",
+    "controller": "sale_camp_collect-camps",
     "operations": {
         "total": {
             "enrollments_qty": {

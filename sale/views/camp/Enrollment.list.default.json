@@ -2,6 +2,7 @@
     "name": "Enrollments",
     "order": "created",
     "sort": "desc",
+    "controller": "sale_camp_collect-enrollments",
     "layout": {
         "items": [
             {

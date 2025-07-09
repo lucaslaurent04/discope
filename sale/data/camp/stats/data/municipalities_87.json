@@ -1,0 +1,790 @@
+[
+    {
+        "name": "Limoges",
+        "zip": "87000"
+    },
+    {
+        "name": "Limoges",
+        "zip": "87100"
+    },
+    {
+        "name": "Limoges",
+        "zip": "87280"
+    },
+    {
+        "name": "Aixe-sur-Vienne",
+        "zip": "87700"
+    },
+    {
+        "name": "Ambazac",
+        "zip": "87240"
+    },
+    {
+        "name": "Arnac-la-Poste",
+        "zip": "87160"
+    },
+    {
+        "name": "Augne",
+        "zip": "87120"
+    },
+    {
+        "name": "Aureil",
+        "zip": "87220"
+    },
+    {
+        "name": "Azat-le-Ris",
+        "zip": "87360"
+    },
+    {
+        "name": "Balledent",
+        "zip": "87290"
+    },
+    {
+        "name": "La Bazeuge",
+        "zip": "87210"
+    },
+    {
+        "name": "Beaumont-du-Lac",
+        "zip": "87120"
+    },
+    {
+        "name": "Bellac",
+        "zip": "87300"
+    },
+    {
+        "name": "Berneuil",
+        "zip": "87300"
+    },
+    {
+        "name": "Bersac-sur-Rivalier",
+        "zip": "87370"
+    },
+    {
+        "name": "Bessines-sur-Gartempe",
+        "zip": "87250"
+    },
+    {
+        "name": "Beynac",
+        "zip": "87700"
+    },
+    {
+        "name": "Les Billanges",
+        "zip": "87340"
+    },
+    {
+        "name": "Blanzac",
+        "zip": "87300"
+    },
+    {
+        "name": "Blond",
+        "zip": "87300"
+    },
+    {
+        "name": "Boisseuil",
+        "zip": "87220"
+    },
+    {
+        "name": "Bonnac-la-Côte",
+        "zip": "87270"
+    },
+    {
+        "name": "Bosmie-l'Aiguille",
+        "zip": "87110"
+    },
+    {
+        "name": "Breuilaufa",
+        "zip": "87300"
+    },
+    {
+        "name": "Le Buis",
+        "zip": "87140"
+    },
+    {
+        "name": "Bujaleuf",
+        "zip": "87460"
+    },
+    {
+        "name": "Burgnac",
+        "zip": "87800"
+    },
+    {
+        "name": "Bussière-Galant",
+        "zip": "87230"
+    },
+    {
+        "name": "Les Cars",
+        "zip": "87230"
+    },
+    {
+        "name": "Chaillac-sur-Vienne",
+        "zip": "87200"
+    },
+    {
+        "name": "Le Chalard",
+        "zip": "87500"
+    },
+    {
+        "name": "Châlus",
+        "zip": "87230"
+    },
+    {
+        "name": "Chamboret",
+        "zip": "87140"
+    },
+    {
+        "name": "Champagnac-la-Rivière",
+        "zip": "87150"
+    },
+    {
+        "name": "Champnétery",
+        "zip": "87400"
+    },
+    {
+        "name": "Champsac",
+        "zip": "87230"
+    },
+    {
+        "name": "La Chapelle-Montbrandeix",
+        "zip": "87440"
+    },
+    {
+        "name": "Chaptelat",
+        "zip": "87270"
+    },
+    {
+        "name": "Château-Chervix",
+        "zip": "87380"
+    },
+    {
+        "name": "Châteauneuf-la-Forêt",
+        "zip": "87130"
+    },
+    {
+        "name": "Châteauponsac",
+        "zip": "87290"
+    },
+    {
+        "name": "Le Châtenet-en-Dognon",
+        "zip": "87400"
+    },
+    {
+        "name": "Cheissoux",
+        "zip": "87460"
+    },
+    {
+        "name": "Chéronnac",
+        "zip": "87600"
+    },
+    {
+        "name": "Cieux",
+        "zip": "87520"
+    },
+    {
+        "name": "Cognac-la-Forêt",
+        "zip": "87310"
+    },
+    {
+        "name": "Compreignac",
+        "zip": "87140"
+    },
+    {
+        "name": "Condat-sur-Vienne",
+        "zip": "87920"
+    },
+    {
+        "name": "Coussac-Bonneval",
+        "zip": "87500"
+    },
+    {
+        "name": "Couzeix",
+        "zip": "87270"
+    },
+    {
+        "name": "La Croisille-sur-Briance",
+        "zip": "87130"
+    },
+    {
+        "name": "La Croix-sur-Gartempe",
+        "zip": "87210"
+    },
+    {
+        "name": "Cromac",
+        "zip": "87160"
+    },
+    {
+        "name": "Cussac",
+        "zip": "87150"
+    },
+    {
+        "name": "Dinsac",
+        "zip": "87210"
+    },
+    {
+        "name": "Dompierre-les-Églises",
+        "zip": "87190"
+    },
+    {
+        "name": "Domps",
+        "zip": "87120"
+    },
+    {
+        "name": "Le Dorat",
+        "zip": "87210"
+    },
+    {
+        "name": "Dournazac",
+        "zip": "87230"
+    },
+    {
+        "name": "Droux",
+        "zip": "87190"
+    },
+    {
+        "name": "Eybouleuf",
+        "zip": "87400"
+    },
+    {
+        "name": "Eyjeaux",
+        "zip": "87220"
+    },
+    {
+        "name": "Eymoutiers",
+        "zip": "87120"
+    },
+    {
+        "name": "Feytiat",
+        "zip": "87220"
+    },
+    {
+        "name": "Flavignac",
+        "zip": "87230"
+    },
+    {
+        "name": "Folles",
+        "zip": "87250"
+    },
+    {
+        "name": "Fromental",
+        "zip": "87250"
+    },
+    {
+        "name": "Gajoubert",
+        "zip": "87330"
+    },
+    {
+        "name": "La Geneytouse",
+        "zip": "87400"
+    },
+    {
+        "name": "Glandon",
+        "zip": "87500"
+    },
+    {
+        "name": "Glanges",
+        "zip": "87380"
+    },
+    {
+        "name": "Gorre",
+        "zip": "87310"
+    },
+    {
+        "name": "Les Grands-Chézeaux",
+        "zip": "87160"
+    },
+    {
+        "name": "Isle",
+        "zip": "87170"
+    },
+    {
+        "name": "Jabreilles-les-Bordes",
+        "zip": "87370"
+    },
+    {
+        "name": "Janailhac",
+        "zip": "87800"
+    },
+    {
+        "name": "Javerdat",
+        "zip": "87520"
+    },
+    {
+        "name": "La Jonchère-Saint-Maurice",
+        "zip": "87340"
+    },
+    {
+        "name": "Jouac",
+        "zip": "87890"
+    },
+    {
+        "name": "Jourgnac",
+        "zip": "87800"
+    },
+    {
+        "name": "Ladignac-le-Long",
+        "zip": "87500"
+    },
+    {
+        "name": "Laurière",
+        "zip": "87370"
+    },
+    {
+        "name": "Lavignac",
+        "zip": "87230"
+    },
+    {
+        "name": "Linards",
+        "zip": "87130"
+    },
+    {
+        "name": "Lussac-les-Églises",
+        "zip": "87360"
+    },
+    {
+        "name": "Magnac-Bourg",
+        "zip": "87380"
+    },
+    {
+        "name": "Magnac-Laval",
+        "zip": "87190"
+    },
+    {
+        "name": "Mailhac-sur-Benaize",
+        "zip": "87160"
+    },
+    {
+        "name": "Maisonnais-sur-Tardoire",
+        "zip": "87440"
+    },
+    {
+        "name": "Marval",
+        "zip": "87440"
+    },
+    {
+        "name": "Masléon",
+        "zip": "87130"
+    },
+    {
+        "name": "Meilhac",
+        "zip": "87800"
+    },
+    {
+        "name": "Meuzac",
+        "zip": "87380"
+    },
+    {
+        "name": "La Meyze",
+        "zip": "87800"
+    },
+    {
+        "name": "Moissannes",
+        "zip": "87400"
+    },
+    {
+        "name": "Montrol-Sénard",
+        "zip": "87330"
+    },
+    {
+        "name": "Mortemart",
+        "zip": "87330"
+    },
+    {
+        "name": "Nantiat",
+        "zip": "87140"
+    },
+    {
+        "name": "Nedde",
+        "zip": "87120"
+    },
+    {
+        "name": "Neuvic-Entier",
+        "zip": "87130"
+    },
+    {
+        "name": "Nexon",
+        "zip": "87800"
+    },
+    {
+        "name": "Nieul",
+        "zip": "87510"
+    },
+    {
+        "name": "Nouic",
+        "zip": "87330"
+    },
+    {
+        "name": "Oradour-Saint-Genest",
+        "zip": "87210"
+    },
+    {
+        "name": "Oradour-sur-Glane",
+        "zip": "87520"
+    },
+    {
+        "name": "Oradour-sur-Vayres",
+        "zip": "87150"
+    },
+    {
+        "name": "Pageas",
+        "zip": "87230"
+    },
+    {
+        "name": "Le Palais-sur-Vienne",
+        "zip": "87410"
+    },
+    {
+        "name": "Panazol",
+        "zip": "87350"
+    },
+    {
+        "name": "Pensol",
+        "zip": "87440"
+    },
+    {
+        "name": "Peyrat-de-Bellac",
+        "zip": "87300"
+    },
+    {
+        "name": "Peyrat-le-Château",
+        "zip": "87470"
+    },
+    {
+        "name": "Peyrilhac",
+        "zip": "87510"
+    },
+    {
+        "name": "Pierre-Buffière",
+        "zip": "87260"
+    },
+    {
+        "name": "La Porcherie",
+        "zip": "87380"
+    },
+    {
+        "name": "Rancon",
+        "zip": "87290"
+    },
+    {
+        "name": "Razès",
+        "zip": "87640"
+    },
+    {
+        "name": "Rempnat",
+        "zip": "87120"
+    },
+    {
+        "name": "Rilhac-Lastours",
+        "zip": "87800"
+    },
+    {
+        "name": "Rilhac-Rancon",
+        "zip": "87570"
+    },
+    {
+        "name": "La Roche-l'Abeille",
+        "zip": "87800"
+    },
+    {
+        "name": "Rochechouart",
+        "zip": "87600"
+    },
+    {
+        "name": "Royères",
+        "zip": "87400"
+    },
+    {
+        "name": "Roziers-Saint-Georges",
+        "zip": "87130"
+    },
+    {
+        "name": "Saillat-sur-Vienne",
+        "zip": "87720"
+    },
+    {
+        "name": "Saint-Amand-le-Petit",
+        "zip": "87120"
+    },
+    {
+        "name": "Saint-Amand-Magnazeix",
+        "zip": "87290"
+    },
+    {
+        "name": "Saint-Auvent",
+        "zip": "87310"
+    },
+    {
+        "name": "Saint-Bazile",
+        "zip": "87150"
+    },
+    {
+        "name": "Saint-Bonnet-Briance",
+        "zip": "87260"
+    },
+    {
+        "name": "Saint-Bonnet-de-Bellac",
+        "zip": "87300"
+    },
+    {
+        "name": "Saint-Brice-sur-Vienne",
+        "zip": "87200"
+    },
+    {
+        "name": "Saint-Cyr",
+        "zip": "87310"
+    },
+    {
+        "name": "Saint-Denis-des-Murs",
+        "zip": "87400"
+    },
+    {
+        "name": "Saint-Gence",
+        "zip": "87510"
+    },
+    {
+        "name": "Saint-Genest-sur-Roselle",
+        "zip": "87260"
+    },
+    {
+        "name": "Saint-Georges-les-Landes",
+        "zip": "87160"
+    },
+    {
+        "name": "Saint-Germain-les-Belles",
+        "zip": "87380"
+    },
+    {
+        "name": "Saint-Gilles-les-Forêts",
+        "zip": "87130"
+    },
+    {
+        "name": "Saint-Hilaire-Bonneval",
+        "zip": "87260"
+    },
+    {
+        "name": "Saint-Hilaire-la-Treille",
+        "zip": "87190"
+    },
+    {
+        "name": "Saint-Hilaire-les-Places",
+        "zip": "87800"
+    },
+    {
+        "name": "Saint-Jean-Ligoure",
+        "zip": "87260"
+    },
+    {
+        "name": "Saint-Jouvent",
+        "zip": "87510"
+    },
+    {
+        "name": "Saint-Julien-le-Petit",
+        "zip": "87460"
+    },
+    {
+        "name": "Saint-Junien",
+        "zip": "87200"
+    },
+    {
+        "name": "Saint-Junien-les-Combes",
+        "zip": "87300"
+    },
+    {
+        "name": "Saint-Just-le-Martel",
+        "zip": "87590"
+    },
+    {
+        "name": "Saint-Laurent-les-Églises",
+        "zip": "87240"
+    },
+    {
+        "name": "Saint-Laurent-sur-Gorre",
+        "zip": "87310"
+    },
+    {
+        "name": "Saint-Léger-la-Montagne",
+        "zip": "87340"
+    },
+    {
+        "name": "Saint-Léger-Magnazeix",
+        "zip": "87190"
+    },
+    {
+        "name": "Saint-Léonard-de-Noblat",
+        "zip": "87400"
+    },
+    {
+        "name": "Saint-Martial-sur-Isop",
+        "zip": "87330"
+    },
+    {
+        "name": "Saint-Martin-de-Jussac",
+        "zip": "87200"
+    },
+    {
+        "name": "Saint-Martin-le-Mault",
+        "zip": "87360"
+    },
+    {
+        "name": "Saint-Martin-le-Vieux",
+        "zip": "87700"
+    },
+    {
+        "name": "Saint-Martin-Terressus",
+        "zip": "87400"
+    },
+    {
+        "name": "Saint-Mathieu",
+        "zip": "87440"
+    },
+    {
+        "name": "Saint-Maurice-les-Brousses",
+        "zip": "87800"
+    },
+    {
+        "name": "Saint-Méard",
+        "zip": "87130"
+    },
+    {
+        "name": "Saint-Ouen-sur-Gartempe",
+        "zip": "87300"
+    },
+    {
+        "name": "Saint-Pardoux-le-Lac",
+        "zip": "8714087250"
+    },
+    {
+        "name": "Saint-Paul",
+        "zip": "87260"
+    },
+    {
+        "name": "Saint-Priest-Ligoure",
+        "zip": "87800"
+    },
+    {
+        "name": "Saint-Priest-sous-Aixe",
+        "zip": "87700"
+    },
+    {
+        "name": "Saint-Priest-Taurion",
+        "zip": "87480"
+    },
+    {
+        "name": "Saint-Sornin-la-Marche",
+        "zip": "87210"
+    },
+    {
+        "name": "Saint-Sornin-Leulac",
+        "zip": "87290"
+    },
+    {
+        "name": "Saint-Sulpice-Laurière",
+        "zip": "87370"
+    },
+    {
+        "name": "Saint-Sulpice-les-Feuilles",
+        "zip": "87160"
+    },
+    {
+        "name": "Saint-Sylvestre",
+        "zip": "87240"
+    },
+    {
+        "name": "Saint-Victurnien",
+        "zip": "87420"
+    },
+    {
+        "name": "Saint-Vitte-sur-Briance",
+        "zip": "87380"
+    },
+    {
+        "name": "Saint-Yrieix-la-Perche",
+        "zip": "87500"
+    },
+    {
+        "name": "Saint-Yrieix-sous-Aixe",
+        "zip": "87700"
+    },
+    {
+        "name": "Sainte-Anne-Saint-Priest",
+        "zip": "87120"
+    },
+    {
+        "name": "Sainte-Marie-de-Vaux",
+        "zip": "87420"
+    },
+    {
+        "name": "Les Salles-Lavauguyon",
+        "zip": "87440"
+    },
+    {
+        "name": "Sauviat-sur-Vige",
+        "zip": "87400"
+    },
+    {
+        "name": "Séreilhac",
+        "zip": "87620"
+    },
+    {
+        "name": "Solignac",
+        "zip": "87110"
+    },
+    {
+        "name": "Surdoux",
+        "zip": "87130"
+    },
+    {
+        "name": "Sussac",
+        "zip": "87130"
+    },
+    {
+        "name": "Tersannes",
+        "zip": "87360"
+    },
+    {
+        "name": "Thouron",
+        "zip": "87140"
+    },
+    {
+        "name": "Val d'Issoire",
+        "zip": "87330"
+    },
+    {
+        "name": "Val-d'Oire-et-Gartempe",
+        "zip": "8732087330"
+    },
+    {
+        "name": "Vaulry",
+        "zip": "87140"
+    },
+    {
+        "name": "Vayres",
+        "zip": "87600"
+    },
+    {
+        "name": "Verneuil-Moustiers",
+        "zip": "87360"
+    },
+    {
+        "name": "Verneuil-sur-Vienne",
+        "zip": "87430"
+    },
+    {
+        "name": "Veyrac",
+        "zip": "87520"
+    },
+    {
+        "name": "Vicq-sur-Breuilh",
+        "zip": "87260"
+    },
+    {
+        "name": "Videix",
+        "zip": "87600"
+    },
+    {
+        "name": "Le Vigen",
+        "zip": "87110"
+    },
+    {
+        "name": "Villefavard",
+        "zip": "87190"
+    }
+]

@@ -101,6 +101,11 @@
             "name": "Enfants",
             "description": "",
             "layout": []
+        },
+        "list.attending": {
+            "name": "Enfants participants",
+            "description": "",
+            "layout": []
         }
     },
     "error": []

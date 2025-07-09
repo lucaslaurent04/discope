@@ -1,0 +1,53 @@
+{
+    "name": "Stat Enrollments By Weeks Quantities",
+    "description": "",
+    "controller": "sale_camp_stats_stat-children-by-weeks",
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "group_by": [
+        { "field": "center", "operations": ["SUM", "object.qty"], "open": true }
+    ],
+    "operations": {
+        "total": {
+            "qty_week": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "qty_weekend": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            }
+        }
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "center",
+                "sortable": true,
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "week",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "qty_week",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty_weekend",
+                "width": "10%"
+            }
+        ]
+    }
+}

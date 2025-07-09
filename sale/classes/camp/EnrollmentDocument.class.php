@@ -32,7 +32,8 @@ class EnrollmentDocument extends Model {
             'received' => [
                 'type'              => 'boolean',
                 'description'       => "Has the document been received?",
-                'default'           => false
+                'default'           => false,
+                'dependents'        => ['enrollment_id' => 'all_documents_received']
             ]
 
         ];

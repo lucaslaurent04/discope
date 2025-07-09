@@ -207,6 +207,18 @@
                                                 "value": "status",
                                                 "width": "25%",
                                                 "visible": ["state", "=", "draft"]
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "50%",
+                                                "visible": ["state", "<>", "draft"]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "all_documents_received",
+                                                "width": "50%",
+                                                "visible": ["state", "<>", "draft"]
                                             }
                                         ]
                                     }

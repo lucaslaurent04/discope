@@ -1,0 +1,90 @@
+{
+    "name": "Stat Camps Children Quantities",
+    "description": "",
+    "controller": "sale_camp_stats_stat-camps-children-distribution",
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "group_by": [
+        { "field": "center", "operations": ["SUM", "object.qty"], "open": true }
+    ],
+    "operations": {
+        "total": {
+            "qty_male": {
+                "operation": "SUM",
+                "usage": "numeric/integer",
+                "suffix": " garçons"
+            },
+            "qty_female": {
+                "operation": "SUM",
+                "usage": "numeric/integer",
+                "suffix": " filles"
+            },
+            "qty_old": {
+                "operation": "SUM",
+                "usage": "numeric/integer",
+                "suffix": " anciens"
+            },
+            "qty_new": {
+                "operation": "SUM",
+                "usage": "numeric/integer",
+                "suffix": " nouveaux"
+            },
+            "qty": {
+                "operation": "SUM",
+                "usage": "numeric/integer",
+                "suffix": " enfants"
+            }
+        }
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "center",
+                "sortable": true,
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "camp",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "age",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "qty_male",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty_female",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty_old",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty_new",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty",
+                "width": "10%"
+            }
+        ]
+    }
+}

@@ -1,0 +1,73 @@
+{
+    "name": "Statistiques quantités d'inscriptions par département et communes.",
+    "plural": "",
+    "description": "Statistiques quantités d'inscriptions par département et communes.",
+    "model": {
+        "all_centers": {
+            "label": "Tous les centres"
+        },
+        "center_id": {
+            "label": "Centre"
+        },
+        "date_from": {
+            "label": "Du"
+        },
+        "date_to": {
+            "label": "Au"
+        },
+        "by_municipality": {
+            "label": "Par commune (86, 87)"
+        },
+        "center": {
+            "label": "Centre",
+            "description": "",
+            "help": ""
+        },
+        "area": {
+            "label": "Département",
+            "description": "",
+            "help": ""
+        },
+        "address_zip": {
+            "label": "Code postal",
+            "description": "",
+            "help": ""
+        },
+        "municipality": {
+            "label": "Commune",
+            "description": "",
+            "help": ""
+        },
+        "qty": {
+            "label": "Qté",
+            "description": "",
+            "help": ""
+        },
+        "status": {
+            "label": "Status",
+            "selection": {
+                "all": "Toutes",
+                "validated": "Validées",
+                "confirmed": "Confirmées",
+                "pending": "Pré-inscription",
+                "waitlisted": "En attentes",
+                "cancelled": "Annulées"
+            },
+            "description": "",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "",
+            "description": "",
+            "layout": {}
+        },
+        "list.default": {
+            "name": "Quantités d'inscriptions par régions",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

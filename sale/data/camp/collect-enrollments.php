@@ -8,7 +8,6 @@
 
 use equal\orm\Domain;
 use equal\orm\DomainCondition;
-use sale\camp\Camp;
 
 [$params, $providers] = eQual::announce([
     'extends'       => 'core_model_collect',
@@ -18,19 +17,29 @@ use sale\camp\Camp;
             'description'       => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
             'default'           => 'sale\camp\Enrollment'
         ],
-        'works_council_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'sale\camp\WorksCouncil',
-            'description'       => "Works council that is concerned by the enrollment."
-        ],
         'date_from' => [
             'type'              => 'date',
-            'description'       => "Date interval lower limit."
+            'description'       => "Date interval lower limit.",
+            'default'           => fn() => strtotime('first day of January this year')
         ],
         'date_to' => [
             'type'              => 'date',
-            'description'       => 'Date interval upper limit.'
+            'description'       => "Date interval upper limit.",
+            'default'           => fn() => strtotime('last day of December this year')
         ],
+        'status' => [
+            'type'              => 'string',
+            'selection'         => [
+                'all',
+                'pending',
+                'waitlisted',
+                'confirmed',
+                'validated',
+                'cancelled'
+            ],
+            'description'       => "Status of the enrollment.",
+            'default'           => 'all'
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -49,32 +58,21 @@ $result = [];
 
 $domain = new Domain($params['domain']);
 
-if(isset($params['works_council_id'])) {
+if(isset($params['date_from'])) {
     $domain->addCondition(
-        new DomainCondition('works_council_id', '=', $params['works_council_id'])
+        new DomainCondition('date_from', '>=', $params['date_from'])
     );
 }
 
-if(isset($params['date_from']) || isset($params['date_to'])) {
-    $camp_dom = [];
-    if(isset($params['date_from'])) {
-        $camp_dom[] = ['date_from', '>=', $params['date_from']];
-    }
-    if(isset($params['date_to'])) {
-        $camp_dom[] = ['date_to', '<=', $params['date_to']];
-    }
-
-    $camps = Camp::search($camp_dom)
-        ->read(['enrollments_ids'])
-        ->get(true);
-
-    $enrollments_ids = [];
-    foreach($camps as $camp) {
-        $enrollments_ids = array_merge($enrollments_ids, $camp['enrollments_ids']);
-    }
-
+if(isset($params['date_to'])) {
     $domain->addCondition(
-        new DomainCondition('id', 'in', $enrollments_ids)
+        new DomainCondition('date_from', '<=', $params['date_to'])
+    );
+}
+
+if(isset($params['status']) && $params['status'] !== 'all') {
+    $domain->addCondition(
+        new DomainCondition('status', '=', $params['status'])
     );
 }
 
