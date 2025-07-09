@@ -1,7 +1,7 @@
 {
-    "name": "Présences",
-    "plural": "Présences",
-    "description": "Présences d'enfants à des camps.",
+    "name": "Camp",
+    "plural": "Camps",
+    "description": "Camps auquels les enfants participes.",
     "model": {
         "date_from": {
             "label": "Du",

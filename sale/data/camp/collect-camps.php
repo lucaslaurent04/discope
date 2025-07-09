@@ -7,7 +7,6 @@
 */
 
 use equal\orm\Domain;
-use equal\orm\DomainClause;
 use equal\orm\DomainCondition;
 
 [$params, $providers] = eQual::announce([
@@ -169,5 +168,5 @@ $params['domain'] = $domain->toArray();
 $result = eQual::run('get', 'model_collect', $params, true);
 
 $context->httpResponse()
-    ->body($result)
-    ->send();
+        ->body($result)
+        ->send();

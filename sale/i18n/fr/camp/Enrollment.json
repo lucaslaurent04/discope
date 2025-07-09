@@ -147,8 +147,8 @@
             "description": "Status de l'inscription.",
             "help": "",
             "selection": {
-                "pending": "En cours",
-                "waitlisted": "Sur liste d'attente",
+                "pending": "Pré-inscription",
+                "waitlisted": "En attente",
                 "confirmed": "Confirmée",
                 "validated": "Validée",
                 "cancelled": "Annulée"
