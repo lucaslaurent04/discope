@@ -127,18 +127,6 @@
                                     "entity": "sale\\camp\\AttendingChild",
                                     "view": "list.default"
                                 }
-                            },
-                            {
-                                "id": "pending.camps.children-distribution",
-                                "type": "entry",
-                                "label": "Children distribution",
-                                "description": "Children gender, new/old and week/weekend distribution (camps of the week).",
-                                "icon": "",
-                                "route": "/camps",
-                                "context": {
-                                    "entity": "sale\\camp\\stats\\stat-children-distribution",
-                                    "view": "list.default"
-                                }
                             }
                         ]
                     },

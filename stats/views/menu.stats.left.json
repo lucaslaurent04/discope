@@ -308,6 +308,25 @@
                 "description": "",
                 "children": [
                     {
+                        "id": "stats.camps.camps",
+                        "icon": "",
+                        "type": "parent",
+                        "label": "Camps",
+                        "description": "",
+                        "children": [
+                            {
+                                "id": "stats.camps.camps.children-distribution",
+                                "type": "entry",
+                                "label": "Children distribution",
+                                "description": "Children gender, new/old and week/weekend distribution by camps.",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-children-distribution",
+                                    "view": "list.default"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "id": "stats.camps.enrollments",
                         "icon": "",
                         "type": "parent",

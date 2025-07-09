@@ -30,6 +30,14 @@
             "label": "Stats Camps",
             "help": ""
         },
+        "stats.camps.camps": {
+            "label": "Camps",
+            "help": ""
+        },
+        "stats.camps.camps.children-distribution": {
+            "label": "Distribution enfants",
+            "help": ""
+        },
         "stats.camps.enrollments": {
             "label": "Inscriptions",
             "help": ""
@@ -51,11 +59,11 @@
             "help": ""
         },
         "stats.camps.enrollments.by-sojourn-types": {
-            "label": "Par type de séjour",
+            "label": "Par types de séjour",
             "help": ""
         },
         "stats.camps.enrollments.by-age-ranges": {
-            "label": "Par tranches d'age",
+            "label": "Par tranches d'âge",
             "help": ""
         }
     }

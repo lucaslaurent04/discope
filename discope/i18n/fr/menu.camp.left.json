@@ -54,10 +54,6 @@
             "label": "Enfants participant",
             "help": ""
         },
-        "pending.camps.children-distribution": {
-            "label": "Distribution enfants",
-            "help": ""
-        },
         "pending.enrollments": {
             "label": "Inscriptions",
             "help": ""
