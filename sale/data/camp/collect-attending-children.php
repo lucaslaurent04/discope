@@ -15,7 +15,7 @@ use sale\camp\Camp;
         'date_from' => [
             'type'              => 'date',
             'description'       => "Date interval lower limit (defaults to first day of the current week).",
-            'default'           => fn() => strtotime('Monday this week')
+            'default'           => fn() => strtotime('last Sunday')
         ],
         'date_to' => [
             'type'              => 'date',
