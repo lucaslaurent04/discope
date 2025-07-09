@@ -1,7 +1,7 @@
 {
-    "name": "Réduction",
-    "plural": "Réductions",
-    "description": "Reductions d'aides.",
+    "name": "Inscription",
+    "plural": "Inscriptions",
+    "description": "Inscription d'un enfant à un camp.",
     "model": {
         "works_council_id": {
             "label": "CE",

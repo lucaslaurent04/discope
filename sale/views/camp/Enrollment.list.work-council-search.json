@@ -1,7 +1,7 @@
 {
     "name": "Enrollments",
     "description": "This view is intended for displaying the list of works councils' enrollments.",
-    "controller": "sale_camp_collect-enrollments",
+    "controller": "sale_camp_collect-works-councils-enrollments",
     "header": {
         "advanced_search": {
             "open": true

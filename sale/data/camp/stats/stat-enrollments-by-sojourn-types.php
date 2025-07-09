@@ -49,7 +49,7 @@ use sale\camp\WorksCouncil;
                 'confirmed',
                 'pending',
                 'waitlisted',
-                'canceled'
+                'cancelled'
             ],
             'default'           => 'validated'
         ],

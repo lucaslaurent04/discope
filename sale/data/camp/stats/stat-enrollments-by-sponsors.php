@@ -44,7 +44,7 @@ use sale\camp\Sponsor;
                 'confirmed',
                 'pending',
                 'waitlisted',
-                'canceled'
+                'cancelled'
             ],
             'default'           => 'validated'
         ],

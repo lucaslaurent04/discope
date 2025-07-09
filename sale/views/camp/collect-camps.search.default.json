@@ -1,0 +1,78 @@
+{
+    "name": "Presences",
+    "description": "Advanced collector for camps.",
+    "layout": {
+        "groups": [
+            {
+                "sections": [
+                    {
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "label": "From",
+                                                "value": "date_from",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "To",
+                                                "value": "date_to",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Status",
+                                                "value": "status",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Camp type",
+                                                "value": "camp_type",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Sojourn type",
+                                                "value": "sojourn_type",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Camp model",
+                                                "value": "camp_model_id",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "80%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Min age",
+                                                "value": "min_age",
+                                                "width": "10%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Max age",
+                                                "value": "max_age",
+                                                "width": "10%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,64 @@
+{
+    "name": "Présences",
+    "plural": "Présences",
+    "description": "Présences d'enfants à des camps.",
+    "model": {
+        "date_from": {
+            "label": "Du",
+            "description": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": ""
+        },
+        "status": {
+            "label": "Status",
+            "selection": {
+                "all": "Tous",
+                "draft": "Brouillon",
+                "published": "Publié",
+                "cancelled": "Annulé"
+            },
+            "description": ""
+        },
+        "camp_type": {
+            "label": "Type",
+            "description": "",
+            "selection": {
+                "all": "Tous",
+                "sport": "Sport",
+                "circus": "Cirque",
+                "culture": "Culture",
+                "environment": "Environnement",
+                "horse-riding": "Équitation"
+            }
+        },
+        "sojourn_type": {
+            "label": "Type séjour",
+            "description": "",
+            "selection": {
+                "all": "Tous",
+                "camp": "Camp",
+                "clsh": "Camp CLSH",
+                "clsh-4-days": "Camp CLSH 4 jours",
+                "clsh-5-days": "Camp CLSH 5 jours"
+            }
+        },
+        "camp_model_id": {
+            "label": "Modèle",
+            "description": ""
+        },
+        "min_age": {
+            "label": "Age min",
+            "description": ""
+        },
+        "max_age": {
+            "label": "Age max",
+            "description": ""
+        }
+    },
+    "view": {
+    },
+    "error": {
+    }
+}

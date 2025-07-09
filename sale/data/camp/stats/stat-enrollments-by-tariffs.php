@@ -44,7 +44,7 @@ use sale\camp\catalog\Product;
                 'confirmed',
                 'pending',
                 'waitlisted',
-                'canceled'
+                'cancelled'
             ],
             'default'           => 'validated'
         ],

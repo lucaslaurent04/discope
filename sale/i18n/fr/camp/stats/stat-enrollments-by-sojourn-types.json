@@ -47,7 +47,7 @@
                 "confirmed": "Confirmées",
                 "pending": "Pré-inscription",
                 "waitlisted": "En attentes",
-                "canceled": "Annulées"
+                "cancelled": "Annulées"
             },
             "description": "",
             "help": ""
