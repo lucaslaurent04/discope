@@ -39,11 +39,13 @@ use sale\camp\Camp;
         ],
         'date_from' => [
             'type'              => 'date',
-            'description'       => "Date interval lower limit."
+            'description'       => "Date interval lower limit.",
+            'default'           => fn() => strtotime('first day of January this year')
         ],
         'date_to' => [
             'type'              => 'date',
-            'description'       => 'Date interval upper limit.'
+            'description'       => 'Date interval upper limit.',
+            'default'           => fn() => strtotime('last day of December this year')
         ],
     ],
     'response'      => [

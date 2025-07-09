@@ -14,18 +14,6 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "label": "Sponsor",
-                                                "value": "sponsor_id",
-                                                "width": "25%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "label": "Type",
-                                                "value": "origin_type",
-                                                "width": "15%"
-                                            },
-                                            {
-                                                "type": "field",
                                                 "label": "From",
                                                 "value": "date_from",
                                                 "width": "15%"
@@ -35,6 +23,18 @@
                                                 "label": "To",
                                                 "value": "date_to",
                                                 "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Type",
+                                                "value": "origin_type",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Sponsor",
+                                                "value": "sponsor_id",
+                                                "width": "25%"
                                             }
                                         ]
                                     }
