@@ -12,16 +12,6 @@ use sale\camp\Camp;
 [$params, $providers] = eQual::announce([
     'description'   => "Manage children that are attending the current camps.",
     'params'        => [
-        'only_weekend' => [
-            'type'              => 'boolean',
-            'description'       => "Show only the children present during the weekend.",
-            'default'           => false
-        ],
-        'only_birthday' => [
-            'type'              => 'boolean',
-            'description'       => "Show only the children with birthday during camp.",
-            'default'           => false
-        ],
         'date_from' => [
             'type'              => 'date',
             'description'       => "Date interval lower limit (defaults to first day of the current week).",
@@ -31,6 +21,16 @@ use sale\camp\Camp;
             'type'              => 'date',
             'description'       => "Date interval upper limit (defaults to last day of the current week).",
             'default'           => fn() => strtotime('Sunday this week')
+        ],
+        'only_weekend' => [
+            'type'              => 'boolean',
+            'description'       => "Show only the children present during the weekend.",
+            'default'           => false
+        ],
+        'only_birthday' => [
+            'type'              => 'boolean',
+            'description'       => "Show only the children with birthday during camp.",
+            'default'           => false
         ]
     ],
     'response'      => [
