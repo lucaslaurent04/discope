@@ -91,7 +91,8 @@ use sale\camp\Camp;
 
 $domain = [
     ['date_from', '>=', $params['date_from']],
-    ['date_from', '<=', $params['date_to']]
+    ['date_from', '<=', $params['date_to']],
+    ['status', '<>', 'cancelled']
 ];
 
 if($params['all_centers']) {
