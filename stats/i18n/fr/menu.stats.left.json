@@ -38,6 +38,14 @@
             "label": "Distribution enfants",
             "help": ""
         },
+        "stats.camps.children": {
+            "label": "Enfants",
+            "help": ""
+        },
+        "stats.camps.children.by-weeks": {
+            "label": "Par semaines",
+            "help": ""
+        },
         "stats.camps.enrollments": {
             "label": "Inscriptions",
             "help": ""

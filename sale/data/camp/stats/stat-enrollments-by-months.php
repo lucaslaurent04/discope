@@ -98,6 +98,7 @@ use sale\camp\Sponsor;
  */
 ['context' => $context, 'adapt' => $adapter_provider, 'auth' => $auth] = $providers;
 
+/** @var \equal\data\adapt\DataAdapterJson $json_adapter */
 $json_adapter = $adapter_provider->get('json');
 
 $domain = [

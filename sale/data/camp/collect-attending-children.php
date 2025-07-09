@@ -47,6 +47,7 @@ use sale\camp\Camp;
  */
 ['context' => $context, 'adapt' => $adapter_provider] = $providers;
 
+/** @var \equal\data\adapt\DataAdapterJson $json_adapter */
 $json_adapter = $adapter_provider->get('json');
 
 $camps = Camp::search(
@@ -117,7 +118,7 @@ foreach($camps as $camp) {
 if($params['only_weekend']) {
     $result = array_filter(
         $result,
-        fn($item) => in_array($item['weekend_extra'], ['full', 'saturday-morning'])
+        fn($item) => $item['weekend_extra'] === 'full'
     );
 }
 

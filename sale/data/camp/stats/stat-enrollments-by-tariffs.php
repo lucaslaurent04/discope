@@ -106,7 +106,6 @@ $camps = Camp::search($domain)
         'product_id',
         'day_product_id',
         'weekend_product_id',
-        'saturday_morning_product_id',
         'center_id',
         'enrollments_ids' => [
             'status',

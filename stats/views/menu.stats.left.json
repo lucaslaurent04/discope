@@ -327,6 +327,25 @@
                         ]
                     },
                     {
+                        "id": "stats.camps.children",
+                        "icon": "",
+                        "type": "parent",
+                        "label": "Children",
+                        "description": "",
+                        "children": [
+                            {
+                                "id": "stats.camps.children.by-weeks",
+                                "type": "entry",
+                                "label": "By week/weekend",
+                                "description": "Children attending camps during weeks and weekends.",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-children-by-weeks",
+                                    "view": "list.default"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "id": "stats.camps.enrollments",
                         "icon": "",
                         "type": "parent",

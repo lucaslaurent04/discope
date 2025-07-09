@@ -9,7 +9,7 @@
 use identity\Center;
 use identity\User;
 use sale\camp\Camp;
-use sale\camp\WorksCouncil;
+use sale\camp\Sponsor;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Data about children's participation to camps.",
@@ -35,33 +35,23 @@ use sale\camp\WorksCouncil;
             'description'       => "Date interval upper limit (defaults to last day of the current month).",
             'default'           => fn() => strtotime('last day of this month')
         ],
-        'status' => [
-            'type'              => 'string',
-            'description'       => "The status of the enrollments.",
-            'selection'         => [
-                'all',
-                'validated',
-                'confirmed',
-                'pending',
-                'waitlisted',
-                'cancelled'
-            ],
-            'default'           => 'validated'
-        ],
 
         /* parameters used as properties of virtual entity */
         'center' => [
             'type'              => 'string',
-            'description'       => "Name of the center for the enrollments quantities."
+            'description'       => "Name of the center for the children quantities."
         ],
-        'works_council_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'sale\camp\WorksCouncil',
-            'description'       => "The works council that was used with the enrollment."
+        'week' => [
+            'type'              => 'date',
+            'description'       => "Week of the year, first day of the week."
         ],
-        'qty' => [
+        'qty_week' => [
             'type'              => 'integer',
-            'description'       => "Quantity of enrollments helped by the works council."
+            'description'       => "Quantity of children during week."
+        ],
+        'qty_weekend' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of children during weekend."
         ]
     ],
     'response'      => [
@@ -107,75 +97,83 @@ $result = [];
 $camps = Camp::search($domain)
     ->read([
         'center_id',
+        'date_from',
         'enrollments_ids' => [
             'status',
-            'works_council_id'
+            'weekend_extra'
         ]
     ])
     ->get(true);
 
-$map_center_works_councils_enrollments_qty = [];
-$map_works_councils = [];
+$map_center_weeks_children_qty = [];
 
 foreach($camps as $camp) {
     foreach($camp['enrollments_ids'] as $enrollment) {
-        if($params['status'] !== 'all' && $enrollment['status'] !== $params['status']) {
+        if($enrollment['status'] !== 'validated') {
             continue;
         }
 
-        if(!isset($enrollment['works_council_id'])) {
-            continue;
+        if(!isset($map_center_weeks_children_qty[$camp['center_id']])) {
+            $map_center_weeks_children_qty[$camp['center_id']] = [];
         }
 
-        if(!isset($map_center_works_councils_enrollments_qty[$camp['center_id']])) {
-            $map_center_works_councils_enrollments_qty[$camp['center_id']] = [];
-        }
-        if(!isset($map_center_works_councils_enrollments_qty[$camp['center_id']][$enrollment['works_council_id']])) {
-            $map_center_works_councils_enrollments_qty[$camp['center_id']][$enrollment['works_council_id']] = 0;
+        $week = date('W', $camp['date_from']);
+        $start_on_sunday = date('w', $camp['date_from']) === '0';
+        if($start_on_sunday) {
+            $week = strval(intval($week) + 1);
         }
 
-        $map_center_works_councils_enrollments_qty[$camp['center_id']][$enrollment['works_council_id']]++;
-        $map_works_councils[$enrollment['works_council_id']] = true;
+        $date = new DateTime();
+        $date->setISODate(date('Y', $camp['date_from']), $week);
+
+        $week = $date->format('Y-m-d');
+
+        if(!isset($map_center_weeks_children_qty[$camp['center_id']][$week])) {
+            $map_center_weeks_children_qty[$camp['center_id']][$week] = [
+                'week'      => 0,
+                'weekend'   => 0
+            ];
+        }
+
+        $map_center_weeks_children_qty[$camp['center_id']][$week]['week']++;
+        if($enrollment['weekend_extra'] === 'full') {
+            $map_center_weeks_children_qty[$camp['center_id']][$week]['weekend']++;
+        }
     }
 }
 
-$center_ids = array_keys($map_center_works_councils_enrollments_qty);
+$center_ids = array_keys($map_center_weeks_children_qty);
 
 $centers = Center::search(['id', 'in', $center_ids])
     ->read(['name'])
     ->get();
 
-$works_councils_ids = array_keys($map_works_councils);
-
-$works_councils = WorksCouncil::search(['id', 'in', $works_councils_ids])
-    ->read(['name'])
-    ->get();
-
-foreach($map_center_works_councils_enrollments_qty as $center_id => $map_works_councils_qty) {
+foreach($map_center_weeks_children_qty as $center_id => $map_weeks_children_qty) {
     $center = null;
-    foreach($centers as $c) {
-        if($c['id'] === $center_id) {
+    foreach ($centers as $c) {
+        if ($c['id'] === $center_id) {
             $center = $c['name'];
             break;
         }
     }
 
-    foreach($map_works_councils_qty as $works_council_id => $qty) {
-        $works_council = null;
-        foreach($works_councils as $wc) {
-            if($wc['id'] === $works_council_id) {
-                $works_council = $wc['name'];
-                break;
-            }
-        }
-
+    foreach($map_weeks_children_qty as $week => $map_children_qty) {
         $result[] = [
-            'center'            => $center,
-            'works_council_id'  => ['id' => $works_council_id, 'name' => $works_council],
-            'qty'               => $qty
+            'center'        => $center,
+            'week'          => $json_adapter->adaptOut(DateTime::createFromFormat('Y-m-d', $week)->getTimestamp(), 'date'),
+            'qty_week'      => $map_children_qty['week'],
+            'qty_weekend'   => $map_children_qty['weekend']
         ];
     }
 }
+
+usort($result, function($a, $b) {
+    $result = strcmp($a['center'], $b['center']);
+    if($result === 0) {
+        return strcmp($a['week'], $b['week']);
+    }
+    return $result;
+});
 
 $context->httpResponse()
         ->header('X-Total-Count', count($result))
