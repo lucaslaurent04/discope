@@ -9,8 +9,16 @@
     },
     "order": "created",
     "sort": "desc",
+    "operations": {
+        "total": {
+            "price": {
+                "operation": "SUM",
+                "usage": "amount/money:2"
+            }
+        }
+    },
     "domain": ["works_council_id", "<>", null],
-    "group_by": [{"field": "works_council_id"}],
+    "group_by": [{"field": "works_council_id", "operation": ["SUM", "object.price"]}],
     "layout": {
         "items": [
             {

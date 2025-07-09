@@ -18,6 +18,14 @@
             "open": true
         }
     },
+    "operations": {
+        "total": {
+            "value": {
+                "operation": "SUM",
+                "usage": "amount/money:2"
+            }
+        }
+    },
     "domain": ["sponsor_id", "<>", null],
     "group_by": [{"field": "sponsor_id", "operation": ["SUM", "object.value"]}],
     "layout": {
@@ -60,14 +68,14 @@
             },
             {
                 "type": "field",
-                "value": "value",
+                "value": "price_adapter_type",
                 "width": "10%",
                 "sortable": false,
                 "readonly": true
             },
             {
                 "type": "field",
-                "value": "price_adapter_type",
+                "value": "value",
                 "width": "10%",
                 "sortable": false,
                 "readonly": true
