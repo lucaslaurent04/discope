@@ -22,13 +22,29 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "status",
-                                                "width": "100%"
+                                                "value": "organisation_id",
+                                                "width": "100%",
+                                                "visible": false
                                             }
                                         ]
                                     },
                                     {
                                         "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "status",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "type_id",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "20%",
                                         "items": [
                                             {
                                                 "type": "field",
@@ -43,11 +59,11 @@
                                         ]
                                     },
                                     {
-                                        "width": "25%",
+                                        "width": "20%",
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "type_id",
+                                                "value": "customer_type_id",
                                                 "width": "100%"
                                             },
                                             {
@@ -58,7 +74,7 @@
                                         ]
                                     },
                                     {
-                                        "width": "25%",
+                                        "width": "20%",
                                         "items": [
                                             {
                                                 "type": "field",

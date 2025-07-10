@@ -19,6 +19,11 @@
             "help": ""
         },
         "type_id": {
+            "label": "Type réservation",
+            "description": "Type de la réservation.",
+            "help": ""
+        },
+        "customer_type_id": {
             "label": "Type de client",
             "description": "The type of the client identity.",
             "help": ""

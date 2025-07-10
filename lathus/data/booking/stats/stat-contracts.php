@@ -37,16 +37,6 @@ use sale\customer\Customer;
             'description'       => "The organisation the establishment belongs to.",
             'domain'            => ['id', '<', 6]
         ],
-        'rate_class_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'sale\customer\RateClass',
-            'description'       => "The rate class of the customer.",
-        ],
-        'type_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'identity\IdentityType',
-            'description'       => "Identity type of the customer."
-        ],
         'status' => [
             'type'              => 'string',
             'selection'         => [
@@ -64,6 +54,21 @@ use sale\customer\Customer;
             ],
             'description'       => 'Status of the booking.',
             'default'           => 'all'
+        ],
+        'type_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\booking\BookingType',
+            'description'       => "The kind of booking it is about."
+        ],
+        'rate_class_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\customer\RateClass',
+            'description'       => "The rate class of the customer.",
+        ],
+        'customer_type_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'identity\IdentityType',
+            'description'       => "Identity type of the customer."
         ],
 
         /* parameters used as properties of virtual entity */
@@ -83,6 +88,10 @@ use sale\customer\Customer;
         'booking' => [
             'type'              => 'string',
             'description'       => 'Name of the center.'
+        ],
+        'type' => [
+            'type'              => 'string',
+            'description'       => 'Type of the booking.'
         ],
         'created' => [
             'type'              => 'date',
@@ -555,9 +564,13 @@ if(($params['center_id'] || $params['organisation_id'])){
         $domain[] = [ 'status', '=', $params['status'] ];
     }
 
-    if($params['type_id'] && $params['type_id'] > 0) {
+    if(isset($params['type_id']) && $params['type_id'] > 0) {
+        $domain[] = [ 'type_id', '=', $params['type_id'] ];
+    }
+
+    if($params['customer_type_id'] && $params['customer_type_id'] > 0) {
         $type_customers_ids = Customer::search([
-            ['customer_type_id', '=', $params['type_id']],
+            ['customer_type_id', '=', $params['customer_type_id']],
             ['relationship', '=', 'customer']
         ])
             ->ids();
@@ -614,6 +627,7 @@ if(!empty($domain)){
             'date_to',
             'total',
             'price',
+            'type_id'                   => ['name'],
             'center_id'                 => ['id', 'name', 'center_office_id'],
             'customer_id'               => ['rate_class_id' => ['name'], 'customer_type_id' => ['name']],
             'customer_identity_id'      => [
@@ -722,6 +736,7 @@ foreach($bookings as $booking) {
         'center'            => $booking['center_id']['name'],
         'center_type'       => ($booking['center_id']['center_office_id'] == 1)?'GG':'GA',
         'booking'           => $booking['name'],
+        'type'              => $booking['type_id']['name'],
         'created'           => $adapter->adaptOut($booking['created'], 'date'),
         'created_aamm'      => date('Y-m', $booking['created']),
         'date_from'         => $adapter->adaptOut($booking['date_from'], 'date'),
