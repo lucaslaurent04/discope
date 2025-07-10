@@ -64,6 +64,7 @@ $camps = Camp::search(
             'status',
             'weekend_extra',
             'is_ase',
+            'child_remarks',
             'child_id' => [
                 'firstname',
                 'lastname',
@@ -109,7 +110,8 @@ foreach($camps as $camp) {
                 'camp_id'           => ['id' => $camp['id'], 'name' => $camp['short_name']],
                 'weekend_extra'     => $enrollment['weekend_extra'],
                 'has_camp_birthday' => $year_birthday->getTimestamp() >= $camp['date_from'] && $year_birthday->getTimestamp() <= $camp['date_to'],
-                'is_ase'            => $enrollment['is_ase']
+                'is_ase'            => $enrollment['is_ase'],
+                'remarks'           => $enrollment['child_remarks']
             ]
         );
     }

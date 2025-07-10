@@ -48,6 +48,11 @@ class AttendingChild extends Child {
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
                 'store'             => false
+            ],
+
+            'remarks' => [
+                'type'              => 'string',
+                'store'             => false
             ]
 
         ];

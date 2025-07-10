@@ -29,7 +29,8 @@
                 "value": "camp_id",
                 "width": "20%",
                 "sortable": false,
-                "readonly": true
+                "readonly": true,
+                "visible": false
             },
             {
                 "type": "field",
@@ -54,7 +55,21 @@
             },
             {
                 "type": "field",
+                "value": "has_camp_birthday",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
                 "value": "birthdate",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "remarks",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
