@@ -33,7 +33,8 @@
             {
                 "type": "field",
                 "value": "center_type",
-                "width": "10%"
+                "width": "10%",
+                "visible": false
             },
             {
                 "type": "field",
@@ -42,16 +43,23 @@
             },
             {
                 "type": "field",
+                "value": "type",
+                "width": "15%"
+            },
+            {
+                "type": "field",
                 "value": "created",
                 "width": "15%",
                 "widget": {
                     "usage": "date/short"
-                }
+                },
+                "visible": false
             },
             {
                 "type": "field",
                 "value": "created_aamm",
-                "width": "8%"
+                "width": "8%",
+                "visible": false
             },
 
             {
@@ -73,7 +81,8 @@
             {
                 "type": "field",
                 "value": "aamm",
-                "width": "8%"
+                "width": "8%",
+                "visible": false
             },
             {
                 "type": "field",
@@ -103,7 +112,8 @@
             {
                 "type": "field",
                 "value": "nb_rental_units",
-                "width": "10%"
+                "width": "10%",
+                "visible": false
             },
             {
                 "type": "field",
@@ -113,7 +123,8 @@
             {
                 "type": "field",
                 "value": "nb_room_nights",
-                "width": "15%"
+                "width": "15%",
+                "visible": false
             },
             {
                 "type": "field",
@@ -123,7 +134,8 @@
             {
                 "type": "field",
                 "value": "customer_lang",
-                "width": "10%"
+                "width": "10%",
+                "visible": false
             },
             {
                 "type": "field",
