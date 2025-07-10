@@ -1,0 +1,82 @@
+{
+    "name": "Menu Statistiques",
+    "description": "",
+    "view": {
+        "stats": {
+            "label": "Statistiques",
+            "help": ""
+        },
+        "stats.documents": {
+            "label": "Stats Documents",
+            "help": ""
+        },
+        "stats.booking": {
+            "label": "Stats Réservation",
+            "help": ""
+        },
+        "stats.sale": {
+            "label": "Stats Ventes",
+            "help": ""
+        },
+        "stats.finance": {
+            "label": "Stats Finance",
+            "help": ""
+        },
+        "stats.finance_funding": {
+            "label": "Total Remboursements",
+            "help": ""
+        },
+        "stats.camps": {
+            "label": "Stats Camps",
+            "help": ""
+        },
+        "stats.camps.camps": {
+            "label": "Camps",
+            "help": ""
+        },
+        "stats.camps.camps.children-distribution": {
+            "label": "Distribution enfants",
+            "help": ""
+        },
+        "stats.camps.children": {
+            "label": "Enfants",
+            "help": ""
+        },
+        "stats.camps.children.by-weeks": {
+            "label": "Par semaines",
+            "help": ""
+        },
+        "stats.camps.enrollments": {
+            "label": "Inscriptions",
+            "help": ""
+        },
+        "stats.camps.enrollments.by-areas": {
+            "label": "Par régions",
+            "help": ""
+        },
+        "stats.camps.enrollments.by-tariffs": {
+            "label": "Par tarifs",
+            "help": ""
+        },
+        "stats.camps.enrollments.by-sponsors": {
+            "label": "Par aides",
+            "help": ""
+        },
+        "stats.camps.enrollments.by-works-councils": {
+            "label": "Par CEs",
+            "help": ""
+        },
+        "stats.camps.enrollments.by-sojourn-types": {
+            "label": "Par types de séjour",
+            "help": ""
+        },
+        "stats.camps.enrollments.by-age-ranges": {
+            "label": "Par tranches d'âge",
+            "help": ""
+        },
+        "stats.camps.enrollments.by-months": {
+            "label": "Par mois",
+            "help": ""
+        }
+    }
+}
