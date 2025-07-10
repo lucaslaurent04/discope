@@ -6,10 +6,10 @@
     "layout": {
         "items": [
             {
-                "id": "stats.bookings",
+                "id": "stats.booking",
                 "icon": "query_stats",
                 "type": "parent",
-                "label": "Réservations",
+                "label": "Boolings values",
                 "description": "",
                 "children": [
                     {
@@ -18,7 +18,7 @@
                         "label": "Contrats & Réservations",
                         "description": "",
                         "context": {
-                            "entity": "sale\\booking\\stats\\stat-contracts",
+                            "entity": "lathus\\booking\\stats\\stat-contracts",
                             "view": "list.default"
                         }
                     }

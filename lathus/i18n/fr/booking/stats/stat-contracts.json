@@ -13,6 +13,16 @@
             "description": "Organisation pour lequel obtenir les stats.",
             "help": ""
         },
+        "type_id": {
+            "label": "Type de client",
+            "description": "The type of the client identity.",
+            "help": ""
+        },
+        "rate_class_id": {
+            "label": "Classe tarifaire",
+            "description": "The rate class used for this booking.",
+            "help": ""
+        },
         "center": {
             "label": "Centre",
             "description": "Centre auquel est assignée le séjour.",
@@ -88,6 +98,11 @@
             "description": "Catégorie tarifaire.",
             "help": ""
         },
+        "customer_type": {
+            "label": "Type client",
+            "description": "Type de client.",
+            "help": ""
+        },
         "customer_name": {
             "label": "Client",
             "description": "Nom du client.",
@@ -101,6 +116,11 @@
         "customer_zip": {
             "label": "CP",
             "description": "Code postal du client.",
+            "help": ""
+        },
+        "customer_area": {
+            "label": "Département",
+            "description": "Département de France d'origine du client.",
             "help": ""
         },
         "customer_country": {

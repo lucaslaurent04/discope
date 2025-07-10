@@ -47,7 +47,27 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "value": "type_id",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "rate_class_id",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
                                                 "value": "customer_country",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "customer_area",
                                                 "width": "100%"
                                             }
                                         ]

@@ -1,7 +1,7 @@
 {
     "name": "Stat Contracts",
     "description": "",
-    "controller": "sale_booking_stats_stat-contracts",
+    "controller": "lathus_booking_stats_stat-contracts",
     "header": {
         "actions": {
             "ACTION.CREATE" : false
@@ -87,6 +87,11 @@
             },
             {
                 "type": "field",
+                "value": "customer_type",
+                "width": "10%"
+            },
+            {
+                "type": "field",
                 "value": "nb_pers",
                 "width": "10%"
             },
@@ -123,6 +128,11 @@
             {
                 "type": "field",
                 "value": "customer_zip",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "customer_area",
                 "width": "10%"
             },
             {
