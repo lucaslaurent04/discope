@@ -47,6 +47,24 @@ use sale\customer\Customer;
             'foreign_object'    => 'identity\IdentityType',
             'description'       => "Identity type of the customer."
         ],
+        'status' => [
+            'type'              => 'string',
+            'selection'         => [
+                'all'               => 'Tous',
+                'quote'             => 'Devis',
+                'option'            => 'Option',
+                'confirmed'         => 'Confirmée',
+                'validated'         => 'Validée',
+                'checkedin'         => 'En cours',
+                'checkedout'        => 'Terminée',
+                'invoiced'          => 'Facturée',
+                'debit_balance'     => 'Solde débiteur',
+                'credit_balance'    => 'Solde créditeur',
+                'balanced'          => 'Clôturée'
+            ],
+            'description'       => 'Status of the booking.',
+            'default'           => 'all'
+        ],
 
         /* parameters used as properties of virtual entity */
 
@@ -531,6 +549,10 @@ if(($params['center_id'] || $params['organisation_id'])){
 
     if($params['organisation_id'] && $params['organisation_id'] > 0) {
         $domain[] = [ 'organisation_id', '=', $params['organisation_id'] ];
+    }
+
+    if(isset($params['status']) && $params['status'] !== 'all') {
+        $domain[] = [ 'status', '=', $params['status'] ];
     }
 
     if($params['type_id'] && $params['type_id'] > 0) {
