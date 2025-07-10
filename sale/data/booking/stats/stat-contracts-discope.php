@@ -401,7 +401,6 @@ $adaptOut = function($value, $type) use (&$adapter) {
     return $adapter->adaptOut($value, \equal\orm\Field::MAP_TYPE_USAGE[$type] ?? $type);
 };
 
-
 // #memo - we consider all bookings for which at least one sojourn finishes during the given period
 // #memo - only date_to matters: we collect all bookings that finished during the selection period (this is also the way stats are done in the accounting software)
 
@@ -423,7 +422,7 @@ if(($params['center_id'] || $params['organisation_id'])){
         $domain[] = [ 'organisation_id', '=', $params['organisation_id'] ];
     }
 
-    if($params['customer_country'] !== 'all') {
+    if(isset($params['customer_country']) && $params['customer_country'] !== 'all') {
         $country_identities_ids = Identity::search(['address_country', '=', $params['customer_country']])->ids();
 
         $country_customers_ids = Customer::search([

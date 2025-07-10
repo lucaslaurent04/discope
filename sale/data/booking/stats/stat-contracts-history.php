@@ -440,7 +440,7 @@ if(isset($organisation_id) || isset($center_id)) {
         $domain[] = ['center_id', '=', $center_id];
     }
 
-    if($params['customer_country'] !== 'all') {
+    if(isset($params['customer_country']) && $params['customer_country'] !== 'all') {
         $domain[] = ['customer_country_code', '=', $params['customer_country']];
     }
 }
