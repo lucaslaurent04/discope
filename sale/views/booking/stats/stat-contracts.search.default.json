@@ -41,16 +41,6 @@
                                                 "width": "100%"
                                             }
                                         ]
-                                    },
-                                    {
-                                        "width": "25%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "customer_country",
-                                                "width": "100%"
-                                            }
-                                        ]
                                     }
                                 ]
                             }
