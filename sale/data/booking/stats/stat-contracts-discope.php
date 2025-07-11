@@ -5,12 +5,10 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use identity\Identity;
 use sale\booking\Booking;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\catalog\Product;
-use sale\customer\Customer;
 
 list($params, $providers) = eQual::announce([
     'description'   => 'Lists all contracts and their related details for a given period.',
@@ -110,7 +108,8 @@ list($params, $providers) = eQual::announce([
         ],
         'customer_country' => [
             'type'              => 'string',
-            'usage'             => 'country/iso-3166:2'
+            'usage'             => 'country/iso-3166:2',
+            'description'       => 'Country.'
         ],
         'price_vate' => [
             'type'              => 'float',
@@ -155,6 +154,7 @@ $adaptOut = function($value, $type) use (&$adapter) {
 // #memo - only date_to matters: we collect all bookings that finished during the selection period (this is also the way stats are done in the accounting software)
 
 $domain = [];
+
 if($params['center_id'] || $params['organisation_id']) {
     $domain = [
         ['date_to', '>=', $params['date_from']],

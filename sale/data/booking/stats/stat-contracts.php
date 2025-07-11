@@ -103,7 +103,8 @@ list($params, $providers) = eQual::announce([
         ],
         'customer_country' => [
             'type'              => 'string',
-            'usage'             => 'country/iso-3166:2'
+            'usage'             => 'country/iso-3166:2',
+            'description'       => 'Country.'
         ],
         'price_vate' => [
             'type'              => 'float',
