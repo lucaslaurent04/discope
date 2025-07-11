@@ -150,11 +150,12 @@ $adaptOut = function($value, $type) use (&$adapter) {
     return $adapter->adaptOut($value, \equal\orm\Field::MAP_TYPE_USAGE[$type] ?? $type);
 };
 
-
 // #memo - we consider all bookings for which at least one sojourn finishes during the given period
-// #memo - only date_to matters : we collect all bookings that finished during the selection period (this is also the way stats are done in the accounting software)
+// #memo - only date_to matters: we collect all bookings that finished during the selection period (this is also the way stats are done in the accounting software)
 
-if (($params['center_id'] || $params['organisation_id'])){
+$domain = [];
+
+if($params['center_id'] || $params['organisation_id']) {
     $domain = [
         ['date_to', '>=', $params['date_from']],
         ['date_to', '<=', $params['date_to']],
@@ -172,7 +173,9 @@ if (($params['center_id'] || $params['organisation_id'])){
     }
 }
 
-if($domain){
+$bookings = [];
+
+if(!empty($domain)){
     $bookings = Booking::search($domain, ['sort'  => ['date_from' => 'asc']])
         ->read([
             'id',
@@ -303,6 +306,6 @@ foreach($bookings as $booking) {
 }
 
 $context->httpResponse()
-        ->header('X-Total-Count', count($bookings))
+        ->header('X-Total-Count', count($result))
         ->body($result)
         ->send();

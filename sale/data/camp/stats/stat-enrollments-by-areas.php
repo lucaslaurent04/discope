@@ -160,6 +160,9 @@ foreach($camps as $camp) {
 
         $address_zip = $enrollment['child_id']['main_guardian_id']['address_zip'] ?? $enrollment['child_id']['institution_id']['address_zip'] ?? $unknown_zip;
         $area = substr($address_zip, 0, 2);
+        if($area === '97' && strlen($address_zip >= 3)) {
+            $area = substr($address_zip, 0, 3);
+        }
 
         $area_name = $area;
         foreach($areas_france as $a) {
