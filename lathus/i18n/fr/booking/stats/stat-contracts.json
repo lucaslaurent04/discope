@@ -103,6 +103,11 @@
             "description": "Nombre d'unités locatives.",
             "help": ""
         },
+        "nb_activities": {
+            "label": "#activités",
+            "description": "Nombre d'activités.",
+            "help": ""
+        },
         "rate_class": {
             "label": "Cat. Tarif",
             "description": "Catégorie tarifaire.",

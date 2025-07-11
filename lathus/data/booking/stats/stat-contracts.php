@@ -129,6 +129,10 @@ use sale\customer\Customer;
             'type'              => 'integer',
             'description'       => 'Number of rental units (accommodations) involved in the sojourn.'
         ],
+        'nb_activities' => [
+            'type'              => 'integer',
+            'description'       => 'Number of booking activities involved in the sojourn.'
+        ],
         'rate_class' => [
             'type'              => 'string',
             'description'       => 'Internal code of the related booking.'
@@ -548,8 +552,7 @@ if(($params['center_id'] || $params['organisation_id'])){
         ['date_to', '>=', $params['date_from']],
         ['date_to', '<=', $params['date_to']],
         ['state', 'in', ['instance','archive']],
-        ['is_cancelled', '=', false],
-        ['status', 'not in', ['quote','option']]
+        ['is_cancelled', '=', false]
     ];
 
     if($params['center_id'] && $params['center_id'] > 0) {
@@ -585,7 +588,12 @@ if(($params['center_id'] || $params['organisation_id'])){
         ])
             ->ids();
 
-        $domain[] = ['customer_id', 'in', $rate_class_customers_ids];
+        if(!empty($rate_class_customers_ids)) {
+            $domain[] = ['customer_id', 'in', $rate_class_customers_ids];
+        }
+        else {
+            $domain[] = ['customer_id', 'in', -1];
+        }
     }
 
     if(isset($params['customer_area']) && substr($params['customer_area'], 0, 3) === 'FR-') {
@@ -600,7 +608,14 @@ if(($params['center_id'] || $params['organisation_id'])){
         ])
             ->ids();
 
-        $domain[] = ['customer_id', 'in',  $area_customers_ids];
+
+
+        if(!empty($area_customers_ids)) {
+            $domain[] = ['customer_id', 'in',  $area_customers_ids];
+        }
+        else {
+            $domain[] = ['customer_id', 'in', [-1]];
+        }
     }
     elseif(isset($params['customer_country']) && $params['customer_country'] !== 'all') {
         $country_identities_ids = Identity::search(['address_country', '=', $params['customer_country']])->ids();
@@ -611,7 +626,12 @@ if(($params['center_id'] || $params['organisation_id'])){
         ])
             ->ids();
 
-        $domain[] = ['customer_id', 'in',  $country_customers_ids];
+        if(!empty($country_customers_ids)) {
+            $domain[] = ['customer_id', 'in',  $country_customers_ids];
+        }
+        else {
+            $domain[] = ['customer_id', 'in', [-1]];
+        }
     }
 }
 
@@ -636,7 +656,8 @@ if(!empty($domain)){
                 'lang_id' => ['id', 'name'],
                 'address_zip',
                 'address_country'
-            ]
+            ],
+            'booking_activities_ids',
         ])
         ->get(true);
 }
@@ -748,6 +769,7 @@ foreach($bookings as $booking) {
         'nb_rental_units'   => $booking_nb_rental_units,
         'nb_pers_nights'    => $count_nb_pers_nights,
         'nb_room_nights'    => $count_nb_room_nights,
+        'nb_activities'     => count($booking['booking_activities_ids']),
         'rate_class'        => $booking['customer_id']['rate_class_id']['name'],
         'customer_type'     => $booking['customer_id']['customer_type_id']['name'],
         'customer_name'     => $booking['customer_identity_id']['name'],
