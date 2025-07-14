@@ -117,10 +117,22 @@
                         "type": "parent",
                         "children": [
                             {
+                                "id": "pending.camps.camps",
+                                "type": "entry",
+                                "label": "Camps",
+                                "description": "List of pending camps (camps of week).",
+                                "icon": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\Camp",
+                                    "view": "list.pending"
+                                }
+                            },
+                            {
                                 "id": "pending.camps.attending-children",
                                 "type": "entry",
                                 "label": "Children",
-                                "description": "List children by camps with birthdate + other info, add filter show only weekend (camps of week)",
+                                "description": "List children by camps with birthdate + other info, add filter show only weekend (camps of week).",
                                 "icon": "",
                                 "route": "/camps",
                                 "context": {

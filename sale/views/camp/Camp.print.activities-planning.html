@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+    <title>Planning</title>
+
+    <style type="text/css">
+        @page {
+            margin: 1cm;
+        }
+
+        body {
+            width: 100%;
+            margin: 0 0 35px;
+            padding: 0;
+            text-align: justify;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 0.7em;
+        }
+
+        div, table, table tr td {
+            font-family: Helvetica, Arial, sans-serif;
+        }
+
+        .table-planning {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            border: solid 1px black;
+            font-size: 0.7rem;
+        }
+
+        .table-planning th,
+        .table-planning td {
+            border: solid 1px black;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-small {
+            font-size: 0.5rem;
+        }
+
+        .text-uppercase {
+            text-transform: uppercase;
+        }
+
+        .list-animators,
+        .list-activities {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .list-animators li,
+        .list-activities li {
+            margin-bottom: 3px;
+        }
+    </style>
+</head>
+
+<body>
+
+<table class="table-planning">
+    <thead>
+        <tr>
+            <th rowspan="2" style="width: 15px;">N°</th>
+            <th rowspan="2" class="text-small" style="width: 15px; text-align: center; vertical-align: middle;">
+                <div style="width: 15px; transform: rotate(-90deg); white-space: nowrap; display: inline-block;">
+                    Nb enf.
+                </div>
+            </th>
+            <th rowspan="2" class="text-small" style="width: 15px; text-align: center; vertical-align: middle;">
+                <div style="width: 15px; transform: rotate(-90deg); white-space: nowrap; display: inline-block;">
+                    Nb anim.
+                </div>
+            </th>
+            <th rowspan="2" style="width: 60px;">Intitulé camp</th>
+            <th rowspan="2" style="width: 45px;">Anim.</th>
+            {% for day_name in days_names %}
+                <th colspan="4" class="text-uppercase" style="border-left: 3px solid black;">{{ day_name }}</th>
+            {% endfor %}
+        </tr>
+        <tr>
+            {% for day_name in days_names %}
+                <th class="text-small" style="border-left: 3px solid black; border-right: none; height: 20px;" valign="top">Matin</th>
+                <th class="text-small" style="border-left: none; height: 20px;" valign="bottom">Midi</th>
+                <th class="text-small" style="border-right: none; height: 20px;" valign="top">Ap. midi</th>
+                <th class="text-small" style="border-left: none; height: 20px;" valign="bottom">Soir</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+    {% for camp_planning in camps_planning %}
+        <tr>
+            <td class="text-center text-small">{{ camp_planning.sojourn_number }}</td>
+            <td class="text-center text-small">{{ camp_planning.children_qty }}</td>
+            <td class="text-center text-small">{{ camp_planning.animators_qty }}</td>
+            <td class="text-center text-small">{{ camp_planning.camp_name }}</td>
+            <td class="text-small">
+                <ul class="list-animators">
+                    {% for group in camp_planning.groups %}
+                        <li>{{ group.employee }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+            {% for day in camp_planning.days %}
+                <td class="text-small" style="border-left: 3px solid black;">
+                    <ul class="list-activities">
+                        {% for group in camp_planning.groups %}
+                            {% if day.AM[group.num] %}
+                                {% if camp_planning.groups|length > 1 %}
+                                    <li>{{ group.num }}. {{ day.AM[group.num].short_name }}</li>
+                                {% else %}
+                                    <li>{{ day.AM[group.num].short_name }}</li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td class="text-center text-small" style="background-color: #c3c3c3;">
+                    {{ day.L.meal_place_id.name }}
+                </td>
+                <td class="text-small">
+                    <ul class="list-activities">
+                        {% for group in camp_planning.groups %}
+                            {% if day.PM[group.num] %}
+                                {% if camp_planning.groups|length > 1 %}
+                                    <li>{{ group.num }}. {{ day.PM[group.num].short_name }}</li>
+                                {% else %}
+                                    <li>{{ day.PM[group.num].short_name }}</li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td class="text-center text-small" style="background-color: #c3c3c3;">
+                    {{ day.D.meal_place_id.name }}
+                </td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>
