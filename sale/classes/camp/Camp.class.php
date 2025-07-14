@@ -632,6 +632,7 @@ class Camp extends Model {
 
     public static function canupdate($self, $values): array {
         $self->read([
+            'status',
             'is_clsh',
             'clsh_type',
             'day_product_id',
@@ -641,6 +642,12 @@ class Camp extends Model {
             'camp_group_qty',
             'enrollments_ids' => ['status']
         ]);
+
+        foreach($self as $camp) {
+            if($camp['status'] === 'published') {
+                return ['status' => ['already_published' => "A published camp can't be modified."]];
+            }
+        }
 
         foreach($self as $camp) {
             $is_clsh = $values['is_clsh'] ?? $camp['is_clsh'];
