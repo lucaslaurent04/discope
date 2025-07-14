@@ -55,12 +55,6 @@
             },
             {
                 "type": "field",
-                "value": "total_snack",
-                "label": "Collaction",
-                "width": "10%"
-            },
-            {
-                "type": "field",
                 "value": "total_breakfast",
                 "label": "Petit déjeuner",
                 "width": "10%"
@@ -75,6 +69,12 @@
                 "type": "field",
                 "value": "total_diner",
                 "label": "Dîner",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "total_snack",
+                "label": "Collation",
                 "width": "10%"
             },
             {
