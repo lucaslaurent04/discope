@@ -388,8 +388,6 @@ hr {
 
 </div>
 
-<div class="heading">{{ contract_payment_html | raw }}</div>
-
 {% if fundings | length > 0  %}
 <div style="margin-top: 50px; page-break-inside: avoid;">
     <div style="margin: 0px 0px 20px 0px;"><b><u>{{i18n['payments_schedule']}}:</u></b></div>
@@ -439,6 +437,8 @@ hr {
     </table>
 </div>
 {% endif %}
+
+<div class="heading">{{ contract_payment_html | raw }}</div>
 
 {% if installment_amount > 0 %}
 <div style="position: relative; margin-top: 40px; border: solid 2px black; height: 180px; page-break-inside: avoid;">
