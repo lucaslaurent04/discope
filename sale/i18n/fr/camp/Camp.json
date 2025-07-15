@@ -191,7 +191,8 @@
         },
         "camp_groups_ids": {
             "one_needed": "Un camp doit avoir au moins un groupe de camp.",
-            "too_many_children": "Il y a trop d'enfants inscrits dans les groupes de camp."
+            "too_many_children": "Il y a trop d'enfants inscrits dans les groupes de camp.",
+            "missing_group": "Un groupe est nécssaire pour publier."
         },
         "employee_ratio": {
             "too_many_children": "Il y a trop d'enfants inscrits au camp."

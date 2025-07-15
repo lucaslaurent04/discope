@@ -387,6 +387,29 @@ class Camp extends Model {
         }
     }
 
+    public static function policyPublish($self): array {
+        $result = [];
+        $self->read(['camp_groups_ids']);
+        foreach($self as $camp) {
+            if(count($camp['camp_groups_ids']) < 1) {
+                return ['camp_groups_ids' => ['missing_group' => "The camp needs at least a group to be published."]];
+            }
+        }
+
+        return $result;
+    }
+
+    public static function getPolicies(): array {
+        return [
+
+            'publish' => [
+                'description'   => "Checks if the camp can be published.",
+                'function'      => "policyPublish"
+            ]
+
+        ];
+    }
+
     public static function onafterPublish($self) {
         $self->do('generate-meals');
     }
@@ -410,6 +433,7 @@ class Camp extends Model {
                 'transitions' => [
                     'publish' => [
                         'status'        => 'published',
+                        'policies'      => ['publish'],
                         'description'   => "Publish the camp on the website.",
                         'onafter'       => 'onafterPublish'
                     ],
