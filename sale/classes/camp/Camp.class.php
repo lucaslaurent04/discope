@@ -632,6 +632,7 @@ class Camp extends Model {
 
     public static function canupdate($self, $values): array {
         $self->read([
+            'status',
             'is_clsh',
             'clsh_type',
             'day_product_id',
@@ -641,6 +642,21 @@ class Camp extends Model {
             'camp_group_qty',
             'enrollments_ids' => ['status']
         ]);
+
+        foreach($self as $camp) {
+            if($camp['status'] !== 'published') {
+                continue;
+            }
+
+            $allowed_fields = [
+                'status', 'remarks', 'public_description', 'employee_ratio', 'max_children',
+                'enrollments_qty', 'camp_group_qty', 'ase_quota', 'camp_groups_ids',
+                'enrollments_ids', 'booking_activities_ids', 'presences_ids', 'booking_meals_ids'
+            ];
+            if(count(array_diff(array_keys($values), $allowed_fields)) > 0) {
+                return ['status' => ['non_editable' => "This field can't be modified on a published camp."]];
+            }
+        }
 
         foreach($self as $camp) {
             $is_clsh = $values['is_clsh'] ?? $camp['is_clsh'];

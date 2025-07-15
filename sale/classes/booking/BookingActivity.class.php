@@ -154,7 +154,8 @@ class BookingActivity extends Model {
                 'domain'            => [
                     ['is_activity', '=', true],
                     ['can_sell', '=', true]
-                ]
+                ],
+                'dependents'        => ['name']
             ],
 
             'product_model_id' => [

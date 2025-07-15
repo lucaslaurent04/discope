@@ -1,0 +1,131 @@
+{
+    "name": "Camps",
+    "controller": "sale_camp_collect-pending-camps",
+    "operations": {
+        "total": {
+            "enrollments_qty": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "max_children": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            }
+        }
+    },
+    "actions": [
+        {
+            "id": "action.print-activities-planning",
+            "label": "Planning",
+            "description": "Print the planning of activities.",
+            "controller": "sale_camp_print-activities-planning"
+        }
+    ],
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "5%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "short_name",
+                "width": "33%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "date_from",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "date_to",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "status",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "camp_type",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "is_clsh",
+                "width": "10%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "camp_model_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "min_age",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "max_age",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "employee_ratio",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "enrollments_qty",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": true
+            },
+            {
+                "type": "field",
+                "value": "max_children",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": true
+            },
+            {
+                "type": "field",
+                "value": "ase_quota",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            }
+        ]
+    }
+}
