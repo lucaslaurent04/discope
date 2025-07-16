@@ -4,7 +4,6 @@
     "access": {
         "groups": ["booking.default.user"]
     },
-    "controller": "sale_booking_bankcheck_collect",
     "layout": {
         "items": [
             {
@@ -46,12 +45,6 @@
             {
                 "type": "field",
                 "value": "funding_id",
-                "width": "15%",
-                "sortable": true
-            },
-            {
-                "type": "field",
-                "value": "booking_id",
                 "width": "15%",
                 "sortable": true
             },

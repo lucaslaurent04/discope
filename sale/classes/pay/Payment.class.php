@@ -1,17 +1,18 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\pay;
+
 use equal\orm\Model;
 
 class Payment extends Model {
 
     public static function getColumns() {
-
         return [
 
             'partner_id' => [
@@ -53,11 +54,18 @@ class Payment extends Model {
                     'voucher',              // gift, coupon, or tour-operator voucher
                     'cash',                 // cash money
                     'bank_card',            // electronic payment with credit or debit card
-                    'wire_transfer'         // transfer between bank account
+                    'bank_check',           // physical bank check
+                    'wire_transfer'         // transfer between bank accounts
                 ],
                 'description'       => "The method used for payment at the cashdesk.",
                 'visible'           => [ ['payment_origin', '=', 'cashdesk'] ],
                 'default'           => 'cash'
+            ],
+
+            'is_manual' => [
+                'type'              => 'boolean',
+                'description'       => 'Payment was created manually at the checkout directly in the booking (not through cashdesk).',
+                'default'           => false
             ],
 
             'operation_id' => [
@@ -107,6 +115,12 @@ class Payment extends Model {
                 ],
                 'description'       => 'Current status of the payment.',
                 'default'           => 'paid'
+            ],
+
+            'bank_check_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\pay\BankCheck',
+                'description'       => 'The BankCheck associated with the payment.'
             ]
 
         ];
@@ -233,22 +247,25 @@ class Payment extends Model {
     }
 
     /**
-     * Check wether the payments can be deleted.
+     * Check whether the payments can be deleted.
      *
      * @param  \equal\orm\ObjectManager    $om        ObjectManager instance.
      * @param  array                       $ids       List of objects identifiers.
      * @return array                       Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be deleted.
      */
     public static function candelete($om, $ids) {
-        $payments = $om->read(self::getType(), $ids, [ 'status', 'is_exported' ]);
+        $payments = $om->read(self::getType(), $ids, [ 'payment_origin', 'status', 'is_exported', 'is_manual', 'statement_line_id.status' ]);
 
         if($payments > 0) {
             foreach($payments as $id => $payment) {
                 if($payment['is_exported']) {
                     return ['is_exported' => ['non_removable' => 'Paid payment cannot be removed.']];
                 }
-                if($payment['status'] == 'paid') {
-                    return ['status' => ['non_removable' => 'Paid payment cannot be removed.']];
+                if($payment['payment_origin'] == 'bank' && $payment['statement_line_id.status'] != 'pending') {
+                    return ['status' => ['non_removable' => 'Payment from reconciled line cannot be removed.']];
+                }
+                if(!$payment['is_manual'] && $payment['status'] == 'paid') {
+                    return ['status' => ['non_removable' => 'Non manual paid payment cannot be removed.']];
                 }
             }
         }

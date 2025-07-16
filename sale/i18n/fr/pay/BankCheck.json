@@ -67,6 +67,11 @@
             "label": "Chèque-vacances",
             "description": "Est-ce un chèque-vacances ?",
             "help": ""
+        },
+        "payment_id": {
+            "label": "Paiement",
+            "description": "Paiement lié au chèque.",
+            "help": ""
         }
     },
     "view": {},

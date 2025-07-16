@@ -183,6 +183,20 @@
             "label": "Tous les documents reçus",
             "description": "Tous les documents requis pour le camp ont bien été reçus.",
             "help": ""
+        },
+        "paid_amount": {
+            "label": "Reçu",
+            "description": "Montant reçu pour l'inscription.",
+            "help": ""
+        },
+        "payment_status": {
+            "label": "Paiements",
+            "description": "Situation des paiements attendus.",
+            "selection": {
+                "paid": "Payé",
+                "due": "Dû"
+            },
+            "help": ""
         }
     },
     "view": {
@@ -218,6 +232,9 @@
                 },
                 "section.mails": {
                     "label": "E-mails"
+                },
+                "section.fundings": {
+                    "label": "Financements"
                 }
             }
         },

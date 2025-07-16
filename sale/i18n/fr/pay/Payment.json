@@ -73,6 +73,11 @@
                 "paid": "Payé"
             },
             "help": ""
+        },
+        "is_manual": {
+            "label": "Manuel",
+            "description": "Est-ce que le paiement est manuel (chèque).",
+            "help": ""
         }
     },
     "view": {

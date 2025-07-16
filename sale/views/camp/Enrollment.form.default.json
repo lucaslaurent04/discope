@@ -211,6 +211,19 @@
                                             {
                                                 "type": "label",
                                                 "value": "",
+                                                "width": "75%",
+                                                "visible": ["state", "<>", "draft"]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "paid_amount",
+                                                "width": "25%",
+                                                "visible": ["state", "<>", "draft"],
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
                                                 "width": "50%",
                                                 "visible": ["state", "<>", "draft"]
                                             },
@@ -431,6 +444,27 @@
                                             {
                                                 "type": "field",
                                                 "value": "enrollment_mails_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.fundings",
+                        "label": "Fundings",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "fundings_ids",
                                                 "width": "100%"
                                             }
                                         ]

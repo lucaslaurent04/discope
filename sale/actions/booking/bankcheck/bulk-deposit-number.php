@@ -7,7 +7,7 @@
 */
 
 
-list($params, $providers) = announce([
+list($params, $providers) = eQual::announce([
     'description'   => "Assign a deposit number to multiple bank checks.",
     'help'          => "This action assigns an official deposit number to a list of bank checks.
                         It iterates through the provided bank check IDs and updates each one with the specified deposit number.",
@@ -38,7 +38,7 @@ list($context) = [$providers['context']];
 
 foreach($params['ids'] as $id) {
     try {
-        eQual::run('do', 'sale_booking_bankCheck_add-deposit-number', ['id' => $id, 'deposit_number' => $params['deposit_number'] ]);
+        eQual::run('do', 'sale_booking_bankcheck_add-deposit-number', ['id' => $id, 'deposit_number' => $params['deposit_number'] ]);
     }
     catch (Exception $e) {
         $errors[] = "Failed to assign the deposit number to Bank Check ID {$id}: " . $e->getMessage();

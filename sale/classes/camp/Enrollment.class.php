@@ -316,6 +316,37 @@ class Enrollment extends Model {
                 'visible'           => ['is_clsh', '=', false]
             ],
 
+            'payment_status' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'usage'             => 'icon',
+                'selection'         => [
+                    'due',
+                    'paid'
+                ],
+                'function'          => 'calcPaymentStatus',
+                'store'             => true,
+                'description'       => "Current status of the payments. Depends on the status of the enrollment.",
+                'help'              => "'Due' means we are expecting some money for the enrollment (at the moment, at least one due funding has not been fully received). 'Paid' means that everything expected (all payments) has been received."
+            ],
+
+            'fundings_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\camp\Funding',
+                'foreign_field'     => 'enrollment_id',
+                'description'       => 'Fundings that relate to the enrollment.',
+                'ondetach'          => 'delete'
+            ],
+
+            'paid_amount' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:2',
+                'description'       => "Total amount that has been received so far.",
+                'function'          => 'calcPaidAmount',
+                'store'             => true
+            ],
+
             'enrollment_lines_ids' => [
                 'type'              => 'one2many',
                 'foreign_field'     => 'enrollment_id',
@@ -602,6 +633,43 @@ class Enrollment extends Model {
             $result[$id] = $doc_received;
         }
 
+        return $result;
+    }
+
+    public static function calcPaymentStatus($self): array {
+        $result = [];
+        $self->read(['status', 'fundings_ids' => ['due_date', 'is_paid']]);
+        foreach($self as $id => $enrollment) {
+            $payment_status = 'paid';
+            // if there is at least one overdue funding: a payment is 'due', otherwise enrollment is 'paid'
+            foreach($enrollment['fundings_ids'] as $funding) {
+                if(!$funding['is_paid'] && $funding['due_date'] > time()) {
+                    $payment_status = 'due';
+                    break;
+                }
+            }
+
+            $result[$id] = $payment_status;
+        }
+
+        return $result;
+    }
+
+    public static function calcPaidAmount($self): array {
+        $result = [];
+        $self->read(['fundings_ids' => ['due_amount', 'is_paid', 'paid_amount']]);
+        foreach($self as $id => $enrollment) {
+            $paid_amount = 0.0;
+            foreach($enrollment['fundings_ids'] as $funding) {
+                if($funding['is_paid']) {
+                    $paid_amount += $funding['due_amount'];
+                }
+                elseif($funding['paid_amount'] > 0) {
+                    $paid_amount += $funding['paid_amount'];
+                }
+            }
+            $result[$id] = $paid_amount;
+        }
         return $result;
     }
 

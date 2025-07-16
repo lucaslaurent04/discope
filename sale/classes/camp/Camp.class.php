@@ -34,7 +34,7 @@ class Camp extends Model {
             'center_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Center',
-                'description'       => "The center to which the booking relates to.",
+                'description'       => "The center to which the camp relates to.",
                 'default'           => 1
             ],
 

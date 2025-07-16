@@ -8,9 +8,9 @@
         {
             "id": "action.transition.add.payment",
             "label": "Add Payment",
-            "controller": "sale_booking_bankcheck_do-pay",
+            "controller": "sale_pay_bankcheck_do-pay",
             "access": {
-                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
+                "groups": ["finance.default.administrator", "finance.default.user"]
             },
             "visible": [
                 ["status", "=", "pending"]
@@ -19,18 +19,18 @@
         {
             "id": "action.transition.remove.payment",
             "label": "Remove Payment",
-            "controller": "sale_booking_bankcheck_remove-pay",
+            "controller": "sale_pay_bankcheck_remove-pay",
             "access": {
-                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
+                "groups": ["finance.default.administrator", "finance.default.user"]
             },
             "visible": ["status", "=", "paid"]
         },
         {
             "id": "action.transition.delete",
             "label": "Delete Bank Check",
-            "controller": "sale_booking_bankcheck_remove-bank-check",
+            "controller": "sale_pay_bankcheck_remove-bank-check",
             "access": {
-                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
+                "groups": ["finance.default.administrator", "finance.default.user"]
             },
             "visible": ["state", "<>", "draft"]
         },
@@ -39,7 +39,7 @@
             "label": "Reject",
             "controller": "model_transition",
             "params": {
-                "entity": "sale\\booking\\BankCheck",
+                "entity": "sale\\pay\\BankCheck",
                 "transition": "reject",
                 "ids": []
             },
@@ -104,13 +104,6 @@
                                                 "type": "field",
                                                 "value": "funding_id",
                                                 "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "booking_id",
-                                                "width": "50%",
-                                                "readonly": true,
-                                                "visible": ["state", "<>", "draft"]
                                             },
                                             {
                                                 "type": "field",

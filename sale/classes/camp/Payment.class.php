@@ -1,15 +1,12 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-namespace sale\booking;
 
-use sale\booking\Booking;
-use sale\booking\Funding;
-use sale\booking\Invoice;
+namespace sale\camp;
 
 class Payment extends \sale\pay\Payment {
 
@@ -17,20 +14,21 @@ class Payment extends \sale\pay\Payment {
 
         return [
 
-            'booking_id' => [
+            'enrollment_id' => [
                 'type'              => 'computed',
                 'result_type'       => 'many2one',
-                'function'          => 'calcBookingId',
-                'foreign_object'    => 'sale\booking\Booking',
-                'description'       => 'The booking the payment relates to, if any (computed).',
+                'function'          => 'calcEnrollmentId',
+                'foreign_object'    => 'sale\camp\Enrollment',
+                'description'       => 'The enrollment the payment relates to, if any (computed).',
                 'store'             => true
             ],
 
             'funding_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'sale\booking\Funding',
+                'foreign_object'    => 'sale\camp\Funding',
                 'description'       => 'The funding the payment relates to, if any.',
-                'onupdate'          => 'onupdateFundingId'
+                'onupdate'          => 'onupdateFundingId',
+                'dependents'        => ['enrollment_id' => ['payment_status', 'paid_amount']]
             ],
 
             'center_office_id' => [
@@ -44,7 +42,7 @@ class Payment extends \sale\pay\Payment {
 
             'statement_line_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'sale\booking\BankStatementLine',
+                'foreign_object'    => 'sale\pay\BankStatementLine',
                 'description'       => 'The bank statement line the payment relates to, if any.',
                 'visible'           => [ ['payment_origin', '=', 'bank'] ],
                 'onupdate'          => 'onupdateStatementLineId'
@@ -63,9 +61,7 @@ class Payment extends \sale\pay\Payment {
                     // money was received at the cashdesk
                     'cashdesk',
                     // money was received on a bank account
-                    'bank',
-                    // money was received online, through a PSP
-                    'online'
+                    'bank'
                 ],
                 'description'       => "Origin of the received money.",
                 'default'           => 'bank'
@@ -76,66 +72,31 @@ class Payment extends \sale\pay\Payment {
                 'selection'         => [
                     'cash',                 // cash money
                     'bank_card',            // electronic payment with bank (or credit) card
-                    'booking',              // payment through addition to the final (balance) invoice of a specific booking
                     'voucher',              // gift, coupon, or tour-operator voucher
                     'bank_check',           // physical bank check
-                    'financial_help'        // a financial help will take care of the payment
+                    // TODO: handle financial help
                 ],
                 'description'       => "The method used for payment at the cashdesk.",
                 'visible'           => [ ['payment_origin', '=', 'cashdesk'] ],
                 'default'           => 'cash'
             ],
 
-            'has_psp' => [
-                'type'              => 'boolean',
-                'description'       => 'Flag to tell payment was done through a Payment Service Provider.',
-                'default'           => false
-            ],
-
-            'psp_fee_amount' => [
-                'type'              => 'float',
-                'description'       => 'Amount of the fee of the Service Provider.'
-            ],
-
-            'psp_fee_currency' => [
-                'type'              => 'string',
-                'description'       => 'Currency of the PSP fee amount.',
-                'default'           => 'EUR'
-            ],
-
-            'psp_type' => [
-                'type'              => 'string',
-                'description'       => 'Identification string of the payment service provider (ex. \'stripe\').'
-            ],
-
-            'psp_ref' => [
-                'type'              => 'string',
-                'description'       => 'Reference allowing to retrieve the payment details from PSP.'
-            ],
-
             'bank_check_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'sale\booking\BankCheck',
+                'foreign_object'    => 'sale\camp\BankCheck',
                 'description'       => 'The BankCheck associated with the payment.'
-            ],
-
-            'financial_help_id' => [
-                'type'              => 'many2one',
-                'foreign_object'    => 'sale\booking\FinancialHelp',
-                'description'       => "The financial help that takes care of the payment.",
-                'visible'           => ['payment_method', '=', 'financial_help']
             ]
 
         ];
     }
 
 
-    public static function calcBookingId($om, $ids, $lang) {
+    public static function calcEnrollmentId($om, $ids, $lang) {
         $result = [];
-        $payments = $om->read(self::getType(), $ids, ['funding_id.booking_id']);
+        $payments = $om->read(self::getType(), $ids, ['funding_id.enrollment_id']);
         foreach($payments as $id => $payment) {
-            if(isset($payment['funding_id.booking_id'])) {
-                $result[$id] = $payment['funding_id.booking_id'];
+            if(isset($payment['funding_id.enrollment_id'])) {
+                $result[$id] = $payment['funding_id.enrollment_id'];
             }
         }
         return $result;
@@ -174,37 +135,37 @@ class Payment extends \sale\pay\Payment {
      * #memo - This cannot be undone.
      */
     public static function onupdateFundingId($om, $ids, $values, $lang) {
-        $payments = $om->read(self::getType(), $ids, ['funding_id', 'funding_id.booking_id', 'funding_id.invoice_id', 'funding_id.booking_id.date_from', 'funding_id.type']);
+        $payments = $om->read(self::getType(), $ids, ['funding_id', 'funding_id.enrollment_id', 'funding_id.invoice_id', 'funding_id.enrollment_id.camp_id.date_from', 'funding_id.type']);
 
         if($payments > 0) {
-            $map_bookings_ids = [];
-            $map_invoices_ids = [];
+            $map_enrollments_ids = [];
+            // $map_invoices_ids = [];
             foreach($payments as $pid => $payment) {
                 if($payment['funding_id']) {
-                    if($payment['funding_id.booking_id']) {
-                        $map_bookings_ids[$payment['funding_id.booking_id']] = true;
+                    if($payment['funding_id.enrollment_id']) {
+                        $map_enrollments_ids[$payment['funding_id.enrollment_id']] = true;
                         $current_year_last_day = mktime(0, 0, 0, 12, 31, date('Y'));
-                        if($payment['funding_id.type'] != 'invoice' && $payment['funding_id.booking_id.date_from'] > $current_year_last_day) {
+                        if($payment['funding_id.type'] != 'invoice' && $payment['funding_id.enrollment_id.camp_id.date_from'] > $current_year_last_day) {
                             // if payment relates to a funding attached to a booking that will occur after the 31st of december of current year, convert the funding to an invoice
                             // #memo #waiting - to be confirmed
                             // $om->callonce(Funding::getType(), '_convertToInvoice', $payment['funding_id']);
                         }
-                        // update booking_id
-                        $om->update(self::getType(), $pid, ['booking_id' => $payment['funding_id.booking_id']]);
+                        // update enrollment_id
+                        $om->update(self::getType(), $pid, ['enrollment_id' => $payment['funding_id.enrollment_id']]);
                     }
-                    if($payment['funding_id.invoice_id']) {
+                    /*if($payment['funding_id.invoice_id']) {
                         $map_invoices_ids[$payment['funding_id.invoice_id']] = true;
-                    }
+                    }*/
                     $om->update(Funding::getType(), $payment['funding_id'], ['paid_amount' => null, 'is_paid' => null], $lang);
                 }
                 else {
-                    // void booking_id
-                    $om->update(self::getType(), $ids, ['booking_id' => null]);
+                    // void enrollment_id
+                    $om->update(self::getType(), $ids, ['enrollment_id' => null]);
                 }
             }
-            $om->callonce(Booking::getType(), 'updateStatusFromFundings', array_keys($map_bookings_ids), [], $lang);
-            $om->update(Booking::getType(), array_keys($map_bookings_ids), ['payment_status' => null, 'paid_amount' => null], $lang);
-            $om->update(Invoice::getType(), array_keys($map_invoices_ids), ['is_paid' => null]);
+            // $om->callonce(Enrollment::getType(), 'updateStatusFromFundings', array_keys($map_enrollments_ids), [], $lang);
+            // $om->update(Enrollment::getType(), array_keys($map_enrollments_ids), ['payment_status' => null, 'paid_amount' => null], $lang);
+            // $om->update(Invoice::getType(), array_keys($map_invoices_ids), ['is_paid' => null]);
         }
     }
 
