@@ -17,7 +17,7 @@
         "errors": {
             "missing_confirmation": "La confirmation de cette action est requise.",
             "unknown_funding": "Financement inconnu.",
-            "unknown_bankCheck": "Chèque bancaire inconnu.",
+            "unknown_bank_check": "Chèque bancaire inconnu.",
             "payment_already_associated": "Impossible d'enregistrer le paiement : un paiement est déjà associé à ce chèque.",
             "nothing_to_pay": "Le financement est déjà entièrement réglé."
         }

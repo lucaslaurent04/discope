@@ -48,7 +48,7 @@ if(!$params['confirm']) {
 $bankCheck = BankCheck::id($params['id'])->read(['id','funding_id','payment_id', 'amount'])->first(true);
 
 if(!$bankCheck){
-    throw new Exception("unknown_bankCheck", EQ_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_bank_check", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($bankCheck['payment_id']){
