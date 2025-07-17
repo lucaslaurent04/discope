@@ -4,6 +4,21 @@
     "access": {
         "groups": ["sale.default.user"]
      },
+    "actions": [
+        {
+            "id": "action.mark-as-paid",
+            "label": "Marquer comme payé",
+            "description": "Marquer le financement comme payé même sans avoir reçu tous les paiments.",
+            "controller": "sale_pay_funding_do-mark-as-paid",
+            "access": {
+                "groups": ["finance.default.administrator", "finance.default.user"]
+            },
+            "visible": [
+                ["is_paid", "=", false],
+                ["enrollment_id", "<>", null]
+            ]
+        }
+    ],
     "layout": {
         "groups": [
             {

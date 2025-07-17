@@ -331,7 +331,6 @@ class Enrollment extends Model {
             'payment_status' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
-                'usage'             => 'icon',
                 'selection'         => [
                     'due',
                     'paid'
