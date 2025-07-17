@@ -152,9 +152,14 @@ class Funding extends \sale\pay\Funding {
 
     public static function calcPaymentReference($om, $ids, $lang) {
         $result = [];
-        $fundings = $om->read(self::getType(), $ids, ['booking_id.payment_reference'], $lang);
+        $fundings = $om->read(self::getType(), $ids, ['booking_id.payment_reference', 'enrollment_id.payment_reference'], $lang);
         foreach($fundings as $id => $funding) {
-            $result[$id] = $funding['booking_id.payment_reference'];
+            if(isset($funding['booking_id.payment_reference'])) {
+                $result[$id] = $funding['booking_id.payment_reference'];
+            }
+            elseif($funding['enrollment_id.payment_reference']) {
+                $result[$id] = $funding['enrollment_id.payment_reference'];
+            }
         }
         return $result;
     }
