@@ -105,6 +105,13 @@
                                                 "value": "camp_id",
                                                 "width": "60%"
                                             },
+
+                                            {
+                                                "type": "field",
+                                                "value": "main_guardian_id",
+                                                "width": "33%",
+                                                "visible": ["state", "<>", "draft"]
+                                            },
                                             {
                                                 "type": "field",
                                                 "value": "child_age",
@@ -119,7 +126,8 @@
                                             {
                                                 "type": "label",
                                                 "value": "",
-                                                "width": "33%"
+                                                "width": "33%",
+                                                "visible": ["state", "=", "draft"]
                                             },
                                             {
                                                 "type": "field",
@@ -211,8 +219,15 @@
                                             {
                                                 "type": "label",
                                                 "value": "",
-                                                "width": "75%",
+                                                "width": "50%",
                                                 "visible": ["state", "<>", "draft"]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "payment_reference",
+                                                "width": "25%",
+                                                "visible": ["state", "<>", "draft"],
+                                                "readonly": true
                                             },
                                             {
                                                 "type": "field",

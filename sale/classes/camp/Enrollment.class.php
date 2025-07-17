@@ -8,6 +8,7 @@
 
 namespace sale\camp;
 
+use core\setting\Setting;
 use equal\orm\Model;
 use sale\camp\catalog\Product;
 use sale\pay\Funding;
@@ -34,7 +35,7 @@ class Enrollment extends Model {
                 'foreign_object'    => 'sale\camp\Child',
                 'description'       => "The child that is enrolled.",
                 'required'          => true,
-                'dependents'        => ['name']
+                'dependents'        => ['name', 'main_guardian_id']
             ],
 
             'child_remarks' => [
@@ -49,6 +50,15 @@ class Enrollment extends Model {
                 'description'       => "The age of the child during the camp.",
                 'store'             => true,
                 'function'          => 'calcChildAge'
+            ],
+
+            'main_guardian_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\camp\Guardian',
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['child_id' => ['main_guardian_id']]
             ],
 
             'family_quotient' => [
@@ -332,12 +342,12 @@ class Enrollment extends Model {
                 'help'              => "'Due' means we are expecting some money for the enrollment (at the moment, at least one due funding has not been fully received). 'Paid' means that everything expected (all payments) has been received."
             ],
 
-            'fundings_ids' => [
-                'type'              => 'one2many',
-                'foreign_object'    => 'sale\pay\Funding',
-                'foreign_field'     => 'enrollment_id',
-                'description'       => 'Fundings that relate to the enrollment.',
-                'ondetach'          => 'delete'
+            'payment_reference' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Structured reference for identifying payments relating to the enrollment.",
+                'store'             => true,
+                'function'          => 'calcPaymentReference'
             ],
 
             'paid_amount' => [
@@ -347,6 +357,14 @@ class Enrollment extends Model {
                 'description'       => "Total amount that has been received so far.",
                 'function'          => 'calcPaidAmount',
                 'store'             => true
+            ],
+
+            'fundings_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\pay\Funding',
+                'foreign_field'     => 'enrollment_id',
+                'description'       => 'Fundings that relate to the enrollment.',
+                'ondetach'          => 'delete'
             ],
 
             'enrollment_lines_ids' => [
@@ -632,6 +650,64 @@ class Enrollment extends Model {
             }
 
             $result[$id] = $payment_status;
+        }
+
+        return $result;
+    }
+
+    public static function calcPaymentReference($self): array {
+        $result = [];
+        $self->read(['main_guardian_id']);
+        foreach($self as $id => $enrollment) {
+            // #memo - arbitrary value: used in the accounting software for identifying payments with a temporary account entry counterpart
+            $code_ref =  Setting::get_value('sale', 'organization', 'camp.reference.code', 151);
+            $reference_type =  Setting::get_value('sale', 'organization', 'camp.reference.type', 'VCS');
+
+            $enrollment_code = $enrollment['id'];
+
+            $reference_value = null;
+            switch($reference_type) {
+                // use main Guardian id as reference
+                case 'main_guardian_id':
+                    if(isset($enrollment['child_id']['main_guardian_id'])) {
+                        $reference_value = sprintf('%05d', $enrollment['child_id']['main_guardian_id']);
+                    }
+                    break;
+                // ISO-11649
+                case 'RF':
+                    // structure: RFcc nnn... (up to 25 alpha-num chars) (we omit the 'RF' part in the result)
+                    // build a numeric reference
+                    $ref_base = sprintf('%03d%07d', $code_ref, $enrollment_code);
+                    // append 'RF00' to compute the check
+                    $tmp = $ref_base . 'RF00';
+                    // replace letters with digits
+                    $converted = '';
+                    foreach(str_split($tmp) as $char) {
+                        // #memo - in ISO-11649 'A' = 10
+                        $converted .= ctype_alpha($char) ? (ord($char) - 55) : $char;
+                    }
+                    $mod97 = intval(bcmod($converted, '97'));
+                    $control = str_pad(98 - $mod97, 2, '0', STR_PAD_LEFT);
+                    $reference_value = $control . $ref_base;
+                    break;
+                // FR specific
+                case 'RN':
+                    // structure: RNccxxxxxxxxxxxxxxxxxxxx + key + up to 20 digits (we omit the 'RN' part in the result)
+                    $ref_body = sprintf('%013d%07d', $code_ref, $enrollment_code);
+                    $control = 97 - intval(bcmod($ref_body, '97'));
+                    $reference_value = str_pad($control, 2, '0', STR_PAD_LEFT) . $ref_body;
+                    break;
+                // BE specific
+                case 'VCS':
+                    // structure: +++xxx/xxxx/xxxcc+++ where cc is the control result (we omit the '+' and '/' chars in the result)
+                default:
+                $control = ((76 * intval($code_ref)) + $enrollment_code) % 97;
+                $control = ($control == 0) ? 97 : $control;
+                $reference_value = sprintf('%3d%04d%03d%02d', $code_ref, $enrollment_code / 1000, $enrollment_code % 1000, $control);
+                    break;
+            }
+
+            $result[$id] = $reference_value;
         }
 
         return $result;

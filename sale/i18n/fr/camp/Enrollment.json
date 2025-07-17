@@ -197,6 +197,11 @@
                 "due": "Dû"
             },
             "help": ""
+        },
+        "main_guardian_id": {
+            "label": "Responsable",
+            "description": "Le tuteur principal responsable de l'enfant.",
+            "help": "Utilisé pour savoir quelle adresse utiliser pour la facturation."
         }
     },
     "view": {
