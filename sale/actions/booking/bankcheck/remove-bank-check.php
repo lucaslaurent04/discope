@@ -55,7 +55,7 @@ $bankCheck = BankCheck::id($params['id'])
 
 
 if(!$bankCheck) {
-    throw new Exception("unknown_bank_check", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_bankcheck", QN_ERROR_UNKNOWN_OBJECT);
 }
 
 if($bankCheck['booking_id']['status'] == 'balanced') {

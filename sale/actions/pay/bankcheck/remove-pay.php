@@ -57,7 +57,7 @@ $bank_check = BankCheck::id($params['id'])
 file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', json_encode($bank_check).PHP_EOL, FILE_APPEND | LOCK_EX);
 
 if(is_null($bank_check)) {
-    throw new Exception("unknown_bank_check", EQ_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_bankcheck", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if(is_null($bank_check['funding_id'])) {

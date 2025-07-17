@@ -52,7 +52,7 @@ $bank_check = BankCheck::id($params['id'])
     ->first(true);
 
 if(is_null($bank_check)) {
-    throw new Exception("unknown_bank_check", EQ_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_bankcheck", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if(!is_null($bank_check['payment_id'])) {

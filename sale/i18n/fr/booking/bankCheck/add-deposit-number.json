@@ -15,7 +15,7 @@
     },
     "error": {
         "errors": {
-            "unknown_bank_check": "Chèque bancaire inconnu.",
+            "unknown_bankcheck": "Chèque bancaire inconnu.",
             "bank_check_already_deposit_number": "Impossible d’attribuer le numéro de remise : le chèque bancaire possède déjà un numéro de remise."
         }
     }
