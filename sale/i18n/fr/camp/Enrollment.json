@@ -307,8 +307,9 @@
         "is_clsh": {
             "needs_at_least_one_present_day": "L'enfant doit être présent à un jour du camp."
         },
-        "confirm": {
-            "missing_document": "Il manque au moins un document pour l'inscription à ce camp."
+        "validate": {
+            "missing_document": "Il manque au moins un document pour l'inscription à ce camp.",
+            "not_paid": "L'inscription n'est pas complètement payée."
         }
     }
 }

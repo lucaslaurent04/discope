@@ -676,13 +676,15 @@ class Enrollment extends Model {
 
     public static function policyValidate($self): array {
         $result = [];
-        $self->read(['all_documents_received']);
+        $self->read(['all_documents_received', 'payment_status']);
         foreach($self as $enrollment) {
             if(!$enrollment['all_documents_received']) {
                 return ['camp_id' => ['missing_document' => "At least one document is missing for the enrollment to this camp."]];
             }
 
-            // # todo - check that the enrollment has been paid
+            if($enrollment['payment_status'] !== 'paid') {
+                return ['camp_id' => ['not_paid' => "The enrollment isn't fully paid."]];
+            }
         }
 
         return $result;
