@@ -10,7 +10,7 @@
             "label": "Add Payment",
             "controller": "sale_pay_bankcheck_do-pay",
             "access": {
-                "groups": ["finance.default.administrator", "finance.default.user"]
+                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
             },
             "visible": [
                 ["status", "=", "pending"]
@@ -21,7 +21,7 @@
             "label": "Remove Payment",
             "controller": "sale_pay_bankcheck_remove-pay",
             "access": {
-                "groups": ["finance.default.administrator", "finance.default.user"]
+                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
             },
             "visible": ["status", "=", "paid"]
         },
@@ -30,7 +30,7 @@
             "label": "Delete Bank Check",
             "controller": "sale_pay_bankcheck_remove-bank-check",
             "access": {
-                "groups": ["finance.default.administrator", "finance.default.user"]
+                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
             },
             "visible": ["state", "<>", "draft"]
         },
@@ -104,6 +104,13 @@
                                                 "type": "field",
                                                 "value": "funding_id",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "enrollment_id",
+                                                "width": "50%",
+                                                "readonly": true,
+                                                "visible": ["state", "<>", "draft"]
                                             },
                                             {
                                                 "type": "field",

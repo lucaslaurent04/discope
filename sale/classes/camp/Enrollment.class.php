@@ -332,7 +332,7 @@ class Enrollment extends Model {
 
             'fundings_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'sale\camp\Funding',
+                'foreign_object'    => 'sale\pay\Funding',
                 'foreign_field'     => 'enrollment_id',
                 'description'       => 'Fundings that relate to the enrollment.',
                 'ondetach'          => 'delete'

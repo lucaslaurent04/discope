@@ -50,6 +50,12 @@
             },
             {
                 "type": "field",
+                "value": "enrollment_id",
+                "width": "15%",
+                "sortable": true
+            },
+            {
+                "type": "field",
                 "value": "payment_id",
                 "width": "15%",
                 "sortable": true

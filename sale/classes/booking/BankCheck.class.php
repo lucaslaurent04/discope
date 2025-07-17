@@ -1,16 +1,16 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\booking;
 
 class BankCheck extends \sale\pay\BankCheck  {
 
-    public static function getColumns() {
-
+    public static function getColumns(): array {
         return [
 
             'amount' => [
@@ -45,7 +45,7 @@ class BankCheck extends \sale\pay\BankCheck  {
         ];
     }
 
-    public static function calcBookingId($self) {
+    public static function calcBookingId($self): array {
         $result = [];
         $self->read(['funding_id' =>['id', 'booking_id']]);
         foreach($self as $id => $bankCheck) {
@@ -55,7 +55,6 @@ class BankCheck extends \sale\pay\BankCheck  {
         }
         return $result;
     }
-
 
     public static function onchange($event, $values): array {
         $result = parent::onchange($event, $values);
@@ -70,5 +69,4 @@ class BankCheck extends \sale\pay\BankCheck  {
 
         return $result;
     }
-
 }

@@ -61,8 +61,8 @@ if(!is_null($bank_check['payment_id'])){
 }
 
 $funding = Funding::id($bank_check['funding_id'])
-            ->read(['is_paid', 'paid_amount', 'due_amount'])
-            ->first(true);
+    ->read(['enrollment_id', 'center_office_id', 'paid_amount', 'due_amount'])
+    ->first(true);
 
 if(is_null($funding)) {
     throw new Exception("unknown_funding", EQ_ERROR_UNKNOWN_OBJECT);
@@ -76,12 +76,14 @@ if($remaining_amount <= 0) {
 }
 
 $payment = Payment::create([
-        'bank_check_id'     => $bank_check['id'],
-        'is_manual'         => true,
-        'amount'            => $bank_check['amount'],
-        'payment_origin'    => 'cashdesk',
-        'payment_method'    => 'bank_check'
-    ])
+    'enrollment_id'     => $funding['enrollment_id'],
+    'center_office_id'  => $funding['center_office_id'],
+    'bank_check_id'     => $bank_check['id'],
+    'is_manual'         => true,
+    'amount'            => $bank_check['amount'],
+    'payment_origin'    => 'cashdesk',
+    'payment_method'    => 'bank_check'
+])
     // this updated funding paid status
     ->update([
         'funding_id'        => $funding['id']

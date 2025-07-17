@@ -86,9 +86,35 @@ class BankCheck extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\pay\Payment',
                 'description'       => "The payment associated with the bank check."
+            ],
+
+            'enrollment_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'function'          => 'calcEnrollmentId',
+                'foreign_object'    => 'sale\camp\Enrollment',
+                'description'       => "The enrollment associated with the bank check, if applicable (computed field).",
+                'instant'           => true,
+                'store'             => true
             ]
 
         ];
+    }
+
+    public static function onchange($event, $values): array {
+        $result = parent::onchange($event, $values);
+
+        if(isset($event['funding_id']) && strlen($event['funding_id']) > 0) {
+            $funding = Funding::id($event['funding_id'])
+                ->read(['enrollment_id' => ['name']])
+                ->first();
+
+            if(!is_null($funding)) {
+                $result['enrollment_id'] = $funding['enrollment_id'];
+            }
+        }
+
+        return $result;
     }
 
     public static function getWorkflow(): array {
@@ -135,6 +161,17 @@ class BankCheck extends Model {
         $self->read(['bank_check_number', 'amount', 'emission_date']);
         foreach($self as $id => $bankCheck) {
             $result[$id] = $bankCheck['emission_date'] . ' ' . $bankCheck['bank_check_number'] . '(' . $bankCheck['amount'] .')';
+        }
+        return $result;
+    }
+
+    public static function calcEnrollmentId($self): array {
+        $result = [];
+        $self->read(['funding_id' => ['enrollment_id']]);
+        foreach($self as $id => $bank_check) {
+            if(isset($bank_check['funding_id']['enrollment_id'])) {
+                $result[$id] = $bank_check['funding_id']['enrollment_id'];
+            }
         }
         return $result;
     }
