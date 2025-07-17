@@ -52,7 +52,16 @@ class Camp extends Model {
                 'help'              => "Is handle by the setting sequence 'sale.organization.camp.sequence{center_id.center_office_id.code}'.",
                 'store'             => true,
                 'instant'           => true,
-                'function'          => 'calcSojournNumber'
+                'function'          => 'calcSojournNumber',
+                'dependents'        => ['sojourn_code']
+            ],
+
+            'sojourn_code' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Sojourn number padded to create a recognisable camp sojourn code.",
+                'store'             => true,
+                'function'          => 'calcCampCode'
             ],
 
             'status' => [
@@ -498,6 +507,16 @@ class Camp extends Model {
             $sequence = Setting::fetch_and_add('sale', 'organization', $sequence_name);
 
             $result[$id] = $sequence;
+        }
+
+        return $result;
+    }
+
+    public static function calcCampCode($self): array {
+        $result = [];
+        $self->read(['sojourn_number']);
+        foreach($self as $id => $camp) {
+            $result[$id] = str_pad($camp['sojourn_number'], 5, '0', STR_PAD_LEFT);
         }
 
         return $result;

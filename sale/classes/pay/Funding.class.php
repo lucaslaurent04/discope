@@ -162,12 +162,12 @@ class Funding extends Model {
 
     public static function calcName($om, $oids, $lang) {
         $result = [];
-        $fundings = $om->read(get_called_class(), $oids, ['payment_deadline_id.name', 'due_amount', 'enrollment_id.name'], $lang);
+        $fundings = $om->read(get_called_class(), $oids, ['payment_deadline_id.name', 'due_amount', 'enrollment_id.name', 'enrollment_id.camp_id.sojourn_code'], $lang);
 
         if($fundings > 0) {
             foreach($fundings as $oid => $funding) {
                 if(isset($funding['enrollment_id.name'])) {
-                    $result[$oid] = $funding['enrollment_id.name'].'    '.Setting::format_number_currency($funding['due_amount']);
+                    $result[$oid] = $funding['enrollment_id.camp_id.sojourn_code'].' '.$funding['enrollment_id.name'].'    '.Setting::format_number_currency($funding['due_amount']);
                 }
                 else {
                     $result[$oid] = Setting::format_number_currency($funding['due_amount']).'    '.$funding['payment_deadline_id.name'];

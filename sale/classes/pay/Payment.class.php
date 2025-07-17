@@ -177,6 +177,9 @@ class Payment extends Model {
                 if($funding['enrollment_id']) {
                     $result['enrollment_id'] = [ 'id' => $funding['enrollment_id'], 'name' => $funding['enrollment_id.name'] ];
                 }
+                else {
+                    $result['enrollment_id'] = null;
+                }
                 if($funding['type'] == 'invoice')  {
                     $result['partner_id'] = [ 'id' => $funding['invoice_id.partner_id.id'], 'name' => $funding['invoice_id.partner_id.name'] ];
                 }

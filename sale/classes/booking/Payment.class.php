@@ -228,6 +228,8 @@ class Payment extends \sale\pay\Payment {
                     'booking_id.name',
                     'booking_id.customer_id.id',
                     'booking_id.customer_id.name',
+                    'enrollment_id',
+                    'enrollment_id.name',
                     'invoice_id.partner_id.id',
                     'invoice_id.partner_id.name'
                 ],
@@ -236,7 +238,16 @@ class Payment extends \sale\pay\Payment {
 
             if($fundings > 0) {
                 $funding = reset($fundings);
-                $result['booking_id'] = [ 'id' => $funding['booking_id'], 'name' => $funding['booking_id.name'] ];
+
+                if($funding['enrollment_id']) {
+                    $result['enrollment_id'] = [ 'id' => $funding['enrollment_id'], 'name' => $funding['enrollment_id.name'] ];
+                    $result['booking_id'] = null;
+                }
+                elseif($funding['booking_id']) {
+                    $result['booking_id'] = [ 'id' => $funding['booking_id'], 'name' => $funding['booking_id.name'] ];
+                    $result['enrollment_id'] = null;
+                }
+
                 if($funding['type'] == 'invoice')  {
                     $result['partner_id'] = [ 'id' => $funding['invoice_id.partner_id.id'], 'name' => $funding['invoice_id.partner_id.name'] ];
                 }
