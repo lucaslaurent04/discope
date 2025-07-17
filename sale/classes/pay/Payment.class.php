@@ -9,6 +9,7 @@
 namespace sale\pay;
 
 use equal\orm\Model;
+use sale\camp\Enrollment;
 
 class Payment extends Model {
 
@@ -238,12 +239,6 @@ class Payment extends Model {
                 if($payment['funding_id']) {
                     if($payment['funding_id.enrollment_id']) {
                         $map_enrollments_ids[$payment['funding_id.enrollment_id']] = true;
-                        $current_year_last_day = mktime(0, 0, 0, 12, 31, date('Y'));
-                        if($payment['funding_id.type'] != 'invoice' && $payment['funding_id.enrollment_id.camp_id.date_from'] > $current_year_last_day) {
-                            // if payment relates to a funding attached to a booking that will occur after the 31st of december of current year, convert the funding to an invoice
-                            // #memo #waiting - to be confirmed
-                            // $om->callonce(Funding::getType(), '_convertToInvoice', $payment['funding_id']);
-                        }
                         // update enrollment_id
                         $om->update(self::getType(), $pid, ['enrollment_id' => $payment['funding_id.enrollment_id']]);
                     }
@@ -274,7 +269,7 @@ class Payment extends Model {
                     $om->update(self::getType(), $ids, ['enrollment_id' => null]);
                 }
             }
-            // $om->update(Enrollment::getType(), array_keys($map_enrollments_ids), ['payment_status' => null, 'paid_amount' => null], $lang);
+            $om->update(Enrollment::getType(), array_keys($map_enrollments_ids), ['payment_status' => null, 'paid_amount' => null], $lang);
             // force immediate re-computing of the is_paid field
             // $om->read('sale\pay\Funding', array_unique($fundings_ids), ['is_paid', 'paid_amount']);
         }

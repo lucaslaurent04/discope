@@ -10,6 +10,7 @@ namespace sale\booking;
 use sale\booking\Booking;
 use sale\booking\Funding;
 use sale\booking\Invoice;
+use sale\camp\Enrollment;
 
 class Payment extends \sale\pay\Payment {
 
@@ -174,10 +175,11 @@ class Payment extends \sale\pay\Payment {
      * #memo - This cannot be undone.
      */
     public static function onupdateFundingId($om, $ids, $values, $lang) {
-        $payments = $om->read(self::getType(), $ids, ['funding_id', 'funding_id.booking_id', 'funding_id.invoice_id', 'funding_id.booking_id.date_from', 'funding_id.type']);
+        $payments = $om->read(self::getType(), $ids, ['funding_id', 'funding_id.booking_id', 'funding_id.enrollment_id', 'funding_id.invoice_id', 'funding_id.booking_id.date_from', 'funding_id.type']);
 
         if($payments > 0) {
             $map_bookings_ids = [];
+            $map_enrollments_ids = [];
             $map_invoices_ids = [];
             foreach($payments as $pid => $payment) {
                 if($payment['funding_id']) {
@@ -192,18 +194,25 @@ class Payment extends \sale\pay\Payment {
                         // update booking_id
                         $om->update(self::getType(), $pid, ['booking_id' => $payment['funding_id.booking_id']]);
                     }
+                    elseif($payment['funding_id.enrollment_id']) {
+                        $map_enrollments_ids[$payment['funding_id.enrollment_id']] = true;
+                        // update enrollment_id
+                        $om->update(self::getType(), $pid, ['enrollment_id' => $payment['funding_id.enrollment_id']]);
+                    }
                     if($payment['funding_id.invoice_id']) {
                         $map_invoices_ids[$payment['funding_id.invoice_id']] = true;
                     }
                     $om->update(Funding::getType(), $payment['funding_id'], ['paid_amount' => null, 'is_paid' => null], $lang);
                 }
                 else {
-                    // void booking_id
+                    // void booking_id, enrollment_id
                     $om->update(self::getType(), $ids, ['booking_id' => null]);
+                    $om->update(self::getType(), $ids, ['enrollment_id' => null]);
                 }
             }
             $om->callonce(Booking::getType(), 'updateStatusFromFundings', array_keys($map_bookings_ids), [], $lang);
             $om->update(Booking::getType(), array_keys($map_bookings_ids), ['payment_status' => null, 'paid_amount' => null], $lang);
+            $om->update(Enrollment::getType(), array_keys($map_enrollments_ids), ['payment_status' => null, 'paid_amount' => null], $lang);
             $om->update(Invoice::getType(), array_keys($map_invoices_ids), ['is_paid' => null]);
         }
     }
