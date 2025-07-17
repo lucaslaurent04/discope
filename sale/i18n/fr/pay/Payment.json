@@ -41,7 +41,8 @@
                 "bank_card": "Carte bancaire",
                 "wire_transfer": "Virement bancaire",
                 "bank_check": "Chèque bancaire",
-                "financial_help": "Aide financière"
+                "financial_help": "Aide financière",
+                "camp_financial_help": "Aide financière camp"
             },
             "help": ""
         },

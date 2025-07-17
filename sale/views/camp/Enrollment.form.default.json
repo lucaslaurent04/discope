@@ -8,7 +8,7 @@
             "description": "Envoyer la confirmation de pré-inscription.",
             "icon": "email",
             "route": "/child/object.child_id/preregistration",
-            "visible": ["status", "=", "pending"]
+            "visible": ["status", "in", ["pending", "confirmed"]]
         },
         {
             "id": "item.confirmation.send",
@@ -16,7 +16,7 @@
             "description": "Envoyer la confirmation d'inscription.",
             "icon": "email",
             "route": "/enrollment/object.id/confirmation",
-            "visible": ["status", "=", "confirmed"]
+            "visible": ["status", "=", "validated"]
         }
     ],
     "header": {

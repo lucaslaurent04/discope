@@ -64,8 +64,8 @@ class Payment extends Model {
                     'cash',                 // cash money
                     'bank_card',            // electronic payment with credit or debit card
                     'bank_check',           // physical bank check
-                    'wire_transfer'         // transfer between bank accounts
-                    // TODO: handle financial help for enrollment
+                    'wire_transfer',        // transfer between bank accounts
+                    'camp_financial_help'   // camp sponsor financial help
                 ],
                 'description'       => "The method used for payment at the cashdesk.",
                 'visible'           => [ ['payment_origin', '=', 'cashdesk'] ],

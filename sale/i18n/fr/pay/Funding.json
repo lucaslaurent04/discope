@@ -57,6 +57,11 @@
             "description": "Le modèle de date limite utilisé pour créer le financement.",
             "help": "Le modèle de date limite utilisé pour créer le financement, le cas échéant."
         },
+        "enrollment_id": {
+            "label": "Inscription",
+            "description": "Inscription à laquelle est associé le financement.",
+            "help": ""
+        },
         "invoice_id": {
             "label": "Facture associée",
             "description": "La facture visée par le financement, le cas échéant.",
@@ -78,6 +83,9 @@
                 },
                 "section.payments": {
                     "label": "Paiments"
+                },
+                "section.bankchecks": {
+                    "label": "Chèques"
                 }
             }
         },

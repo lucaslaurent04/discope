@@ -174,6 +174,15 @@ $remaining_amount = 0;
 foreach($children as $child) {
     foreach($child['enrollments_ids'] as $enrollment) {
         $remaining_amount += $enrollment['price'];
+
+        foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+            // # memo - the percentage price-adapters are already applied on camp product price
+            if($price_adapter['price_adapter_type'] !== 'amount') {
+                continue;
+            }
+
+            $remaining_amount -= $price_adapter['value'];
+        }
     }
 }
 

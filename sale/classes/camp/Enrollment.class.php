@@ -10,6 +10,8 @@ namespace sale\camp;
 
 use equal\orm\Model;
 use sale\camp\catalog\Product;
+use sale\pay\Funding;
+use sale\pay\Payment;
 
 class Enrollment extends Model {
 
@@ -526,16 +528,6 @@ class Enrollment extends Model {
                 }
             }
 
-            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-                if($price_adapter['price_adapter_type'] !== 'amount') {
-                    continue;
-                }
-                $total -= $price_adapter['value'];
-            }
-            if($total < 0) {
-                $total = 0;
-            }
-
             // # memo - the percentage price-adapter only applies on camp price
             if(!is_null($camp_product_line)) {
                 $percent_price_adapter = null;
@@ -577,16 +569,6 @@ class Enrollment extends Model {
                 if(in_array($enrollment_line['product_id'], [$enrollment['camp_id']['product_id'], $enrollment['camp_id']['day_product_id']])) {
                     $camp_product_line = $enrollment_line;
                 }
-            }
-
-            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-                if($price_adapter['price_adapter_type'] !== 'amount') {
-                    continue;
-                }
-                $price -= $price_adapter['value'];
-            }
-            if($price < 0) {
-                $price = 0;
             }
 
             // # memo - the percentage price-adapter only applies on camp price
@@ -727,6 +709,7 @@ class Enrollment extends Model {
      */
     public static function onafterConfirm($self) {
         $self->do('reset-camp-enrollments-qty');
+        $self->do('generate-funding');
     }
 
     /**
@@ -1495,6 +1478,53 @@ class Enrollment extends Model {
         $self->update(['all_documents_received' => null]);
     }
 
+    public static function doGenerateFunding($self) {
+        $self->read([
+            'price',
+            'price_adapters_ids'    => ['value', 'price_adapter_type'],
+            'fundings_ids'          => ['amount'],
+            'camp_id'               => ['center_id' => ['center_office_id']]
+        ]);
+
+        foreach($self as $id => $enrollment) {
+            $remaining_amount = $enrollment['price'];
+
+            $fundings_amount = 0.0;
+            foreach($enrollment['fundings_ids'] as $funding) {
+                $fundings_amount += $funding['amount'];
+            }
+
+            $remaining_amount -= $fundings_amount;
+            if($remaining_amount <= 0) {
+                continue;
+            }
+
+            $funding = Funding::create([
+                'enrollment_id'     => $id,
+                'due_amount'        => $remaining_amount,
+                'center_office_id'  => $enrollment['camp_id']['center_id']['center_office_id']
+            ])
+                ->read(['center_office_id'])
+                ->first();
+
+            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+                // # memo - the percentage price-adapters are already removed from price
+                if($price_adapter['price_adapter_type'] !== 'amount') {
+                    continue;
+                }
+
+                Payment::create([
+                    'enrollment_id'     => $id,
+                    'amount'            => $price_adapter['value'],
+                    'payment_origin'    => 'cashdesk',
+                    'payment_method'    => 'camp_financial_help',
+                    'funding_id'        => $funding['id'],
+                    'center_office_id'  => $funding['center_office_id']
+                ]);
+            }
+        }
+    }
+
     public static function getActions(): array {
         return [
 
@@ -1532,6 +1562,12 @@ class Enrollment extends Model {
                 'description'   => "Creates/updates the enrollment documents that are required depending on the camp.",
                 'policies'      => [],
                 'function'      => 'doRefreshRequiredDocuments'
+            ],
+
+            'generate-funding' => [
+                'description'   => "Creates the enrollment funding if is does not already exists.",
+                'policies'      => [],
+                'function'      => 'doGenerateFunding'
             ]
 
         ];
