@@ -73,10 +73,10 @@
             "name": "Financement",
             "description": "",
             "layout": {
-                "section.funding_section": {
+                "section.funding": {
                     "label": "Détails"
                 },
-                "section.payments_section": {
+                "section.payments": {
                     "label": "Paiments"
                 }
             }

@@ -74,7 +74,7 @@ class Payment extends Model {
 
             'is_manual' => [
                 'type'              => 'boolean',
-                'description'       => 'Payment was created manually at the checkout directly in the booking (not through cashdesk).',
+                'description'       => 'Payment was created manually at the checkout directly in the booking (not through cashdesk). Can also be a payment from a bank check for enrollments and bookings.',
                 'default'           => false
             ],
 
@@ -204,10 +204,13 @@ class Payment extends Model {
 
     public static function calcCenterOfficeId($om, $ids, $lang) {
         $result = [];
-        $payments = $om->read(self::getType(), $ids, ['statement_line_id.center_office_id']);
+        $payments = $om->read(self::getType(), $ids, ['enrollment_id.camp_id.center_id.center_office_id', 'statement_line_id.center_office_id']);
         if($payments > 0 && count($payments)) {
             foreach($payments as $id => $payment) {
-                if(isset($payment['statement_line_id.center_office_id'])) {
+                if(isset($payment['enrollment_id.camp_id.center_id.center_office_id'])) {
+                    $result[$id] = $payment['enrollment_id.camp_id.center_id.center_office_id'];
+                }
+                elseif(isset($payment['statement_line_id.center_office_id'])) {
                     $result[$id] = $payment['statement_line_id.center_office_id'];
                 }
             }
@@ -280,7 +283,7 @@ class Payment extends Model {
             foreach($payments as $id => $payment) {
                 $om->update(self::getType(), $id, ['state' => $payment['state'], 'amount' => $payment['statement_line_id.remaining_amount']]);
                 // #memo - status of BankStatement is computed from statement lines, and status of BankStatementLine depends on payments
-                $om->update(\sale\booking\BankStatement::getType(), $payment['statement_line_id.bank_statement_id'], ['status' => null]);
+                $om->update(BankStatement::getType(), $payment['statement_line_id.bank_statement_id'], ['status' => null]);
             }
         }
     }

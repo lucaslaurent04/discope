@@ -41,7 +41,7 @@
                 "sections": [
                     {
                         "label": "General Info",
-                        "id": "section.funding_section",
+                        "id": "section.funding",
                         "rows": [
                             {
                                 "columns": [

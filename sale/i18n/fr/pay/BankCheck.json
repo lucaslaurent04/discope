@@ -72,6 +72,11 @@
             "label": "Paiement",
             "description": "Paiement lié au chèque.",
             "help": ""
+        },
+        "enrollment_id": {
+            "label": "Inscription",
+            "description": "Inscription à un camp lié au chèque.",
+            "help": ""
         }
     },
     "view": {},
