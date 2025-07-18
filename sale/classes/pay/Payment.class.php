@@ -181,9 +181,11 @@ class Payment extends Model {
                 else {
                     $result['enrollment_id'] = null;
                 }
+
                 if($funding['type'] == 'invoice')  {
                     $result['partner_id'] = [ 'id' => $funding['invoice_id.partner_id.id'], 'name' => $funding['invoice_id.partner_id.name'] ];
                 }
+
                 // set the amount according to the funding due_amount (the maximum assignable)
                 $max = $funding['due_amount'];
                 if(isset($values['amount']) && $values['amount'] < $max ) {

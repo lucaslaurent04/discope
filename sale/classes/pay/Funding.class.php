@@ -45,7 +45,6 @@ class Funding extends Model {
                 'description'       => "Enrollment the funding relates to.",
                 'ondelete'          => 'cascade',        // delete funding when parent enrollment is deleted
                 'required'          => true,
-                'dependents'        => ['enrollment_id' => ['payment_status', 'paid_amount']],
                 'onupdate'          => 'onupdateEnrollmentId'
             ],
 
@@ -345,13 +344,20 @@ class Funding extends Model {
 
     public static function onupdateEnrollmentId($self, $values) {
         $self->read(['enrollment_id' => ['camp_id' => ['center_id' => ['center_office_id']]]]);
+        $map_enrollments_ids = [];
         foreach($self as $funding) {
             if(is_null($funding['enrollment_id'])) {
                 continue;
             }
+            $map_enrollments_ids[$funding['enrollment_id']] = true;
+            Funding::id($funding['id'])->update([
+                'center_office_id' => $funding['enrollment_id']['camp_id']['center_id']['center_office_id']
+            ]);
+        }
 
-            Funding::id($funding['id'])
-                ->update(['center_office_id' => $funding['enrollment_id']['camp_id']['center_id']['center_office_id']]);
+        $enrollments_ids = array_keys($map_enrollments_ids);
+        if(!empty($enrollments_ids)) {
+            Enrollment::ids($enrollments_ids)->update(['payment_status' => null, 'paid_amount' => null]);
         }
     }
 

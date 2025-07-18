@@ -206,14 +206,22 @@ class Payment extends \sale\pay\Payment {
                 }
                 else {
                     // void booking_id, enrollment_id
-                    $om->update(self::getType(), $ids, ['booking_id' => null]);
-                    $om->update(self::getType(), $ids, ['enrollment_id' => null]);
+                    $om->update(self::getType(), $ids, ['booking_id' => null, 'enrollment_id' => null]);
                 }
             }
-            $om->callonce(Booking::getType(), 'updateStatusFromFundings', array_keys($map_bookings_ids), [], $lang);
-            $om->update(Booking::getType(), array_keys($map_bookings_ids), ['payment_status' => null, 'paid_amount' => null], $lang);
-            $om->update(Enrollment::getType(), array_keys($map_enrollments_ids), ['payment_status' => null, 'paid_amount' => null], $lang);
-            $om->update(Invoice::getType(), array_keys($map_invoices_ids), ['is_paid' => null]);
+            $bookings_ids = array_keys($map_bookings_ids);
+            if(!empty($bookings_ids)) {
+                $om->callonce(Booking::getType(), 'updateStatusFromFundings', $bookings_ids, [], $lang);
+                $om->update(Booking::getType(), $bookings_ids, ['payment_status' => null, 'paid_amount' => null], $lang);
+            }
+            $enrollments_ids = array_keys($map_enrollments_ids);
+            if(!empty($enrollments_ids)) {
+                $om->update(Enrollment::getType(), $enrollments_ids, ['payment_status' => null, 'paid_amount' => null], $lang);
+            }
+            $invoices_ids = array_keys($map_invoices_ids);
+            if(!empty($invoices_ids)) {
+                $om->update(Invoice::getType(), $invoices_ids, ['is_paid' => null]);
+            }
         }
     }
 
@@ -248,12 +256,16 @@ class Payment extends \sale\pay\Payment {
             if($fundings > 0) {
                 $funding = reset($fundings);
 
-                if($funding['enrollment_id']) {
+                if($funding['booking_id']) {
+                    $result['booking_id'] = [ 'id' => $funding['booking_id'], 'name' => $funding['booking_id.name'] ];
+                    $result['enrollment_id'] = null;
+                }
+                elseif($funding['enrollment_id']) {
                     $result['enrollment_id'] = [ 'id' => $funding['enrollment_id'], 'name' => $funding['enrollment_id.name'] ];
                     $result['booking_id'] = null;
                 }
-                elseif($funding['booking_id']) {
-                    $result['booking_id'] = [ 'id' => $funding['booking_id'], 'name' => $funding['booking_id.name'] ];
+                else {
+                    $result['booking_id'] = null;
                     $result['enrollment_id'] = null;
                 }
 
@@ -263,6 +275,7 @@ class Payment extends \sale\pay\Payment {
                 else {
                     $result['partner_id'] = [ 'id' => $funding['booking_id.customer_id.id'], 'name' => $funding['booking_id.customer_id.name'] ];
                 }
+
                 // set the amount according to the funding due_amount (the maximum assignable)
                 $max = $funding['due_amount'];
                 if(isset($values['amount']) && $values['amount'] < $max ) {
