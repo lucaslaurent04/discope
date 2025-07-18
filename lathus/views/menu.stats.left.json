@@ -13,6 +13,85 @@
                 "description": "",
                 "children": [
                     {
+                        "id": "stats.turnover",
+                        "icon": "business",
+                        "type": "parent",
+                        "label": "Chiffre d’affaires",
+                        "description": "",
+                        "children": [
+                            {
+                                "id": "stats.booking.total_bookings.generalRevenue",
+                                "type": "entry",
+                                "label": "CA général",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\stats\\stat-general-revenue",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.booking.total_bookings.revenue",
+                                "type": "entry",
+                                "label": "CA facturé",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\stats\\stat-revenue",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.booking.total_bookings.noInvoice",
+                                "type": "entry",
+                                "label": "CA non facturé",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\stats\\stat-notrevenue",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.booking.bookings",
+                                "type": "entry",
+                                "label": "CA théorique",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\stats\\stat-estimate",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.booking.total_bookings.provisional",
+                                "type": "entry",
+                                "label": "CA prévisionnel",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\stats\\stat-forecast",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.booking.total_bookings.invoicelines",
+                                "type": "entry",
+                                "label": "CA par produit",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\stats\\stat-products",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.booking.total_bookings.accounting",
+                                "type": "entry",
+                                "label": "CA par règle comptable",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\stats\\stat-accounting",
+                                    "view": "list.default"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "id": "stats.booking.total_bookings.contracts",
                         "type": "entry",
                         "label": "Contrats & Réservations",
