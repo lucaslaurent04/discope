@@ -44,7 +44,6 @@ class Funding extends Model {
                 'foreign_object'    => 'sale\camp\Enrollment',
                 'description'       => "Enrollment the funding relates to.",
                 'ondelete'          => 'cascade',        // delete funding when parent enrollment is deleted
-                'required'          => true,
                 'onupdate'          => 'onupdateEnrollmentId'
             ],
 
