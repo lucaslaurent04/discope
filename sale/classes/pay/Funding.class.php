@@ -349,7 +349,7 @@ class Funding extends Model {
             if(is_null($funding['enrollment_id'])) {
                 continue;
             }
-            $map_enrollments_ids[$funding['enrollment_id']] = true;
+            $map_enrollments_ids[$funding['enrollment_id']['id']] = true;
             Funding::id($funding['id'])->update([
                 'center_office_id' => $funding['enrollment_id']['camp_id']['center_id']['center_office_id']
             ]);
