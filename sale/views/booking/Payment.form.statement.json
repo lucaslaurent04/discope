@@ -44,7 +44,16 @@
                                                             "ACTION.CREATE": false
                                                         }
                                                     },
-                                                    "domain": ["is_paid", "=", false]
+                                                    "domain": [
+                                                        [
+                                                            ["is_paid", "=", false],
+                                                            ["booking_id", "<>", null]
+                                                        ],
+                                                        [
+                                                            ["is_paid", "=", false],
+                                                            ["enrollment_id", "<>", null]
+                                                        ]
+                                                    ]
                                                 }
                                             },
                                             {
@@ -54,14 +63,30 @@
                                                 "width": "50%",
                                                 "widget": {
                                                     "readonly": true,
-                                                    "required": true,
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": false,
                                                             "ACTION.OPEN": false
                                                         }
                                                     }
-                                                }
+                                                },
+                                                "visible": ["booking_id", "<>", null]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Enrollment",
+                                                "value": "enrollment_id",
+                                                "width": "50%",
+                                                "widget": {
+                                                    "readonly": true,
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.OPEN": false
+                                                        }
+                                                    }
+                                                },
+                                                "visible": ["enrollment_id", "<>", null]
                                             },
                                             {
                                                 "type": "field",
@@ -70,13 +95,13 @@
                                                 "width": "50%",
                                                 "widget": {
                                                     "readonly": true,
-                                                    "required": true,
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": false
                                                         }
                                                     }
-                                                }
+                                                },
+                                                "visible": ["booking_id", "<>", null]
                                             }
                                         ]
                                     }

@@ -48,7 +48,7 @@ if(!$params['confirm']) {
 $bankCheck = BankCheck::id($params['id'])->read(['id','funding_id','payment_id', 'amount'])->first(true);
 
 if(!$bankCheck){
-    throw new Exception("unknown_bankCheck", EQ_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_bankcheck", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($bankCheck['payment_id']){
@@ -56,11 +56,15 @@ if($bankCheck['payment_id']){
 }
 
 $funding = Funding::id($bankCheck['funding_id'])
-            ->read(['booking_id' => ['id', 'customer_id'], 'invoice_id', 'center_office_id', 'is_paid', 'paid_amount', 'due_amount'])
+            ->read(['booking_id' => ['customer_id'], 'center_office_id', 'is_paid', 'paid_amount', 'due_amount'])
             ->first(true);
 
 if(!$funding) {
     throw new Exception("unknown_funding", EQ_ERROR_UNKNOWN_OBJECT);
+}
+
+if(!$funding['booking_id']) {
+    throw new Exception("not_booking_funding", EQ_ERROR_INVALID_PARAM);
 }
 
 $sign = ($funding['due_amount'] >= 0) ? 1 : -1;

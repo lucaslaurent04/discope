@@ -16,7 +16,7 @@
     "error": {
         "errors": {
             "missing_confirmation": "La confirmation de cette action est requise.",
-            "unknown_bank_check": "Chèque bancaire inconnu.",
+            "unknown_bankcheck": "Chèque bancaire inconnu.",
             "booking_balanced": "Impossible de modifier la réservation car elle est déjà équilibrée.",
             "unknown_funding": "Financement inconnu.",
             "unknown_payment": "Paiement inconnu.",

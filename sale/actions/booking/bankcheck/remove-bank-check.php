@@ -55,7 +55,7 @@ $bankCheck = BankCheck::id($params['id'])
 
 
 if(!$bankCheck) {
-    throw new Exception("unknown_bank_check", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_bankcheck", QN_ERROR_UNKNOWN_OBJECT);
 }
 
 if($bankCheck['booking_id']['status'] == 'balanced') {
@@ -65,7 +65,7 @@ if($bankCheck['booking_id']['status'] == 'balanced') {
 
 if($bankCheck['payment_id']) {
     try {
-        eQual::run('do', 'sale_booking_bankCheck_remove-pay', ['id' => $bankCheck['id'], 'confirm' => true]);
+        eQual::run('do', 'sale_booking_bankcheck_remove-pay', ['id' => $bankCheck['id'], 'confirm' => true]);
     }
     catch (Exception $e) {
         throw new Exception("failed_remove_payment", QN_ERROR_UNKNOWN_OBJECT);

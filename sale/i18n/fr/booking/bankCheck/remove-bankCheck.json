@@ -16,7 +16,7 @@
     "error": {
         "errors": {
             "missing_confirmation": "La confirmation de cette action est requise.",
-            "unknown_bank_check": "Chèque bancaire inconnu.",
+            "unknown_bankcheck": "Chèque bancaire inconnu.",
             "booking_balanced": "Impossible de supprimer le chèque car la réservation associée est déjà équilibrée.",
             "failed_remove_payment": "Échec de la suppression du paiement associé."
         }

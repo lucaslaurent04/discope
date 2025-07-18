@@ -41,8 +41,14 @@
                 "bank_card": "Carte bancaire",
                 "wire_transfer": "Virement bancaire",
                 "bank_check": "Chèque bancaire",
-                "financial_help": "Aide financière"
+                "financial_help": "Aide financière",
+                "camp_financial_help": "Aide financière camp"
             },
+            "help": ""
+        },
+        "enrollment_id": {
+            "label": "Inscription",
+            "description": "L'inscription à laquelle est lié le paiement.",
             "help": ""
         },
         "operation_id": {
@@ -65,6 +71,11 @@
             "description": "Financement de réservation lié au paiement.",
             "help": ""
         },
+        "center_office_id": {
+            "label": "Centre de gestion",
+            "description": "Le centre de gestion lié au paiement.",
+            "help": ""
+        },
         "status": {
             "label": "Statut",
             "description": "Statut du paiement.",
@@ -72,6 +83,16 @@
                 "pending": "En attente",
                 "paid": "Payé"
             },
+            "help": ""
+        },
+        "is_manual": {
+            "label": "Manuel",
+            "description": "Est-ce que le paiement est manuel (chèque).",
+            "help": ""
+        },
+        "bank_check_id": {
+            "label": "Chèque bancaire",
+            "description": "La chèque bancaire à laquelle est lié le paiement",
             "help": ""
         }
     },

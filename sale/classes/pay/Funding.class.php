@@ -8,6 +8,7 @@
 namespace sale\pay;
 use equal\orm\Model;
 use core\setting\Setting;
+use sale\camp\Enrollment;
 
 class Funding extends Model {
 
@@ -27,10 +28,24 @@ class Funding extends Model {
                 'description'       => "Optional description to identify the funding."
             ],
 
-            'payments_ids' => [
-                'type'              => 'one2many',
-                'foreign_object'    => 'sale\pay\Payment',
-                'foreign_field'     => 'funding_id'
+            'status' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'pending',
+                    'in_process',
+                    'paid',
+                ],
+                'description'       => 'The current processing status of the funding',
+                'default'           => 'pending'
+            ],
+
+            'enrollment_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\Enrollment',
+                'description'       => "Enrollment the funding relates to.",
+                'ondelete'          => 'cascade',        // delete funding when parent enrollment is deleted
+                'required'          => true,
+                'onupdate'          => 'onupdateEnrollmentId'
             ],
 
             'type' => [
@@ -52,7 +67,7 @@ class Funding extends Model {
             'due_amount' => [
                 'type'              => 'float',
                 'usage'             => 'amount/money:2',
-                'description'       => 'Amount expected for the funding (computed based on VAT incl. price).',
+                'description'       => "Amount expected for the funding (computed based on VAT incl. price).",
                 'required'          => true,
                 'onupdate'          => 'onupdateDueAmount'
             ],
@@ -75,7 +90,8 @@ class Funding extends Model {
                 'usage'             => 'amount/money:2',
                 'description'       => "Total amount that has been received (can be greater than due_amount).",
                 'function'          => 'calcPaidAmount',
-                'store'             => true
+                'store'             => true,
+                'instant'           => true
             ],
 
             'is_paid' => [
@@ -84,12 +100,16 @@ class Funding extends Model {
                 'description'       => "Has the full payment been received?",
                 'function'          => 'calcIsPaid',
                 'store'             => true,
+                'onupdate'          => 'onupdateIsPaid'
             ],
 
             'amount_share' => [
-                'type'              => 'float',
+                'type'              => 'computed',
+                'result_type'       => 'float',
                 'usage'             => 'amount/percent',
-                'description'       => "Share of the payment over the total due amount."
+                'function'          => 'calcAmountShare',
+                'store'             => true,
+                'description'       => "Share of the payment over the total due amount (enrollment)."
             ],
 
             'payment_deadline_id' => [
@@ -109,9 +129,11 @@ class Funding extends Model {
             ],
 
             'payment_reference' => [
-                'type'              => 'string',
-                'description'       => 'Message for identifying the purpose of the transaction.',
-                'default'           => ''
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'function'          => 'calcPaymentReference',
+                'description'       => "Message for identifying the purpose of the transaction.",
+                'store'             => true
             ],
 
             'center_office_id' => [
@@ -119,7 +141,19 @@ class Funding extends Model {
                 'foreign_object'    => 'identity\CenterOffice',
                 'description'       => "The center office the booking relates to.",
                 'required'          => true
-            ]
+            ],
+
+            'payments_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\pay\Payment',
+                'foreign_field'     => 'funding_id'
+            ],
+
+            'bank_check_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\pay\BankCheck',
+                'foreign_field'     => 'funding_id'
+            ],
 
         ];
     }
@@ -127,11 +161,16 @@ class Funding extends Model {
 
     public static function calcName($om, $oids, $lang) {
         $result = [];
-        $fundings = $om->read(get_called_class(), $oids, ['payment_deadline_id.name', 'due_amount'], $lang);
+        $fundings = $om->read(get_called_class(), $oids, ['payment_deadline_id.name', 'due_amount', 'enrollment_id.name', 'enrollment_id.camp_id.sojourn_code'], $lang);
 
         if($fundings > 0) {
             foreach($fundings as $oid => $funding) {
-                $result[$oid] = Setting::format_number_currency($funding['due_amount']).'    '.$funding['payment_deadline_id.name'];
+                if(isset($funding['enrollment_id.name'])) {
+                    $result[$oid] = $funding['enrollment_id.camp_id.sojourn_code'].' '.$funding['enrollment_id.name'].'    '.Setting::format_number_currency($funding['due_amount']);
+                }
+                else {
+                    $result[$oid] = Setting::format_number_currency($funding['due_amount']).'    '.$funding['payment_deadline_id.name'];
+                }
             }
         }
         return $result;
@@ -139,12 +178,22 @@ class Funding extends Model {
 
     public static function calcPaidAmount($om, $oids, $lang) {
         $result = [];
-        $fundings = $om->read(self::getType(), $oids, ['payments_ids.amount'], $lang);
+        $fundings = $om->read(self::getType(), $oids, ['enrollment_id', 'payments_ids.amount'], $lang);
         if($fundings > 0) {
+            $map_enrollments_ids = [];
             foreach($fundings as $fid => $funding) {
+                if(isset($funding['enrollment_id'])) {
+                    $map_enrollments_ids[$funding['enrollment_id']] = true;
+                }
+
                 $result[$fid] = array_reduce((array) $funding['payments_ids.amount'], function ($c, $funding) {
                     return $c + $funding['amount'];
                 }, 0);
+            }
+
+            if(!empty($map_enrollments_ids)) {
+                // force recompute computed fields for impacted enrollments
+                $om->update(Enrollment::getType(), array_keys($map_enrollments_ids), ['payment_status' => null, 'paid_amount' => null]);
             }
         }
         return $result;
@@ -156,9 +205,50 @@ class Funding extends Model {
         if($fundings > 0) {
             foreach($fundings as $fid => $funding) {
                 $result[$fid] = false;
-                if($funding['paid_amount'] >= $funding['due_amount'] && $funding['due_amount'] > 0) {
-                    $result[$fid] = true;
+                if(abs(round($funding['due_amount'], 2)) > 0) {
+                    $sign_paid = intval($funding['paid_amount'] > 0) - intval($funding['paid_amount'] < 0);
+                    $sign_due  = intval($funding['due_amount'] > 0) - intval($funding['due_amount'] < 0);
+                    if($sign_paid == $sign_due && abs(round($funding['paid_amount'], 2)) >= abs(round($funding['due_amount'], 2))) {
+                        $result[$fid] = true;
+                        $om->update(Funding::getType(), $fid, ['status' => 'paid']);
+                    }
                 }
+            }
+        }
+        return $result;
+    }
+
+    public static function calcAmountShare($om, $ids, $lang) {
+        $result = [];
+        $fundings = $om->read(self::getType(), $ids, ['enrollment_id.price', 'due_amount'], $lang);
+
+        if($fundings > 0) {
+            foreach($fundings as $id => $funding) {
+                if(!isset($funding['enrollment_id.price'])) {
+                    continue;
+                }
+
+                $total = round($funding['enrollment_id.price'], 2);
+                if($total == 0) {
+                    $share = 1;
+                }
+                else {
+                    $share = round(abs($funding['due_amount']) / abs($total), 2);
+                }
+                $sign = ($funding['due_amount'] < 0)?-1:1;
+                $result[$id] = $share * $sign;
+            }
+        }
+
+        return $result;
+    }
+
+    public static function calcPaymentReference($om, $ids, $lang) {
+        $result = [];
+        $fundings = $om->read(self::getType(), $ids, ['enrollment_id.payment_reference'], $lang);
+        foreach($fundings as $id => $funding) {
+            if(isset($funding['enrollment_id.payment_reference'])) {
+                $result[$id] = $funding['enrollment_id.payment_reference'];
             }
         }
         return $result;
@@ -196,8 +286,41 @@ class Funding extends Model {
     }
 
     public static function onupdateDueAmount($om, $oids, $values, $lang) {
-        // reset the name
-        $om->update(self::getType(), $oids, ['name' => null], $lang);
+        $fundings = $om->read(self::getType(), $oids, ['enrollment_id']);
+        if($fundings > 0 && count($fundings)) {
+            $map_enrollments_ids = [];
+            $map_other_ids = [];
+            foreach($fundings as $fid => $funding) {
+                if(isset($funding['enrollment_id'])) {
+                    $map_enrollments_ids[$funding['enrollment_id']] = true;
+                }
+                else {
+                    $map_other_ids[$fid] = true;
+                }
+            }
+            if(!empty($map_enrollments_ids)) {
+                $fundings_ids = $om->search(self::getType(), ['enrollment_id', 'in', array_keys($map_enrollments_ids)]);
+                $om->update(self::getType(), $fundings_ids, ['name' => null, 'amount_share' => null]);
+            }
+            if(!empty($map_other_ids)) {
+                $om->update(self::getType(), array_keys($map_other_ids), ['name' => null]);
+            }
+        }
+    }
+
+    public static function onupdateIsPaid($orm, $oids, $values, $lang) {
+        $fundings = $orm->read(self::getType(), $oids, ['enrollment_id']);
+        if($fundings > 0 && count($fundings)) {
+            $map_enrollments_ids = [];
+            foreach($fundings as $fid => $funding) {
+                if(isset($funding['enrollment_id'])) {
+                    $map_enrollments_ids[$funding['enrollment_id']] = true;
+                }
+            }
+            if(!empty($map_enrollments_ids)) {
+                $orm->update(Enrollment::getType(), array_keys($map_enrollments_ids), ['payment_status' => null, 'paid_amount' => null]);
+            }
+        }
     }
 
     /**
@@ -216,6 +339,25 @@ class Funding extends Model {
                     $om->update(self::getType(), $oid, ['description' => $funding['payment_deadline_id.name']], $lang);
                 }
             }
+        }
+    }
+
+    public static function onupdateEnrollmentId($self, $values) {
+        $self->read(['enrollment_id' => ['camp_id' => ['center_id' => ['center_office_id']]]]);
+        $map_enrollments_ids = [];
+        foreach($self as $funding) {
+            if(is_null($funding['enrollment_id'])) {
+                continue;
+            }
+            $map_enrollments_ids[$funding['enrollment_id']] = true;
+            Funding::id($funding['id'])->update([
+                'center_office_id' => $funding['enrollment_id']['camp_id']['center_id']['center_office_id']
+            ]);
+        }
+
+        $enrollments_ids = array_keys($map_enrollments_ids);
+        if(!empty($enrollments_ids)) {
+            Enrollment::ids($enrollments_ids)->update(['payment_status' => null, 'paid_amount' => null]);
         }
     }
 
@@ -276,7 +418,6 @@ class Funding extends Model {
 
         return [];
     }
-
 
     /**
      * Hook invoked before object deletion for performing object-specific additional operations.

@@ -13,7 +13,7 @@ list($params, $providers) = eQual::announce([
                     The check must not have been previously assigned or already have a deposit number.",
     'params'        => [
         'id' =>  [
-            'description'       => 'Identifier of the targeted bankCheck.',
+            'description'       => 'Identifier of the targeted bank check.',
             'type'              => 'integer',
             'required'          => true
         ],
@@ -44,7 +44,7 @@ list($context, $om) = [ $providers['context'], $providers['orm'] ];
 $bankCheck = BankCheck::id($params['id'])->read(['id','status'])->first(true);
 
 if(!$bankCheck){
-    throw new Exception("unknown_bankCheck", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_bankcheck", QN_ERROR_UNKNOWN_OBJECT);
 }
 
 if(!empty($bankCheck['deposit_number'])){

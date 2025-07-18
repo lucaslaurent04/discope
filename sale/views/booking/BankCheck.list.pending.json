@@ -12,7 +12,7 @@
                     "id": "add_deposit_number_bulk",
                     "label": "Numéro de remise",
                     "icon": "update",
-                    "controller": "sale_booking_bankCheck_bulk-deposit-number",
+                    "controller": "sale_booking_bankcheck_bulk-deposit-number",
                     "confirm": true
                 }
             ]

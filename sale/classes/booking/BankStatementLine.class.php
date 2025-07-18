@@ -10,6 +10,7 @@ namespace sale\booking;
 use sale\booking\Booking;
 use sale\booking\Funding;
 use sale\booking\Invoice;
+use sale\camp\Enrollment;
 
 class BankStatementLine extends \sale\pay\BankStatementLine {
 
@@ -85,19 +86,36 @@ class BankStatementLine extends \sale\pay\BankStatementLine {
                     // force recomputing computed fields
                     $fundings_ids = [];
                     $bookings_ids = [];
+                    $enrollments_ids = [];
                     $invoices_ids = [];
                     foreach((array) $line['payments_ids.funding_id'] ?? [] as $pid => $payment) {
                         $fundings_ids[] = $payment['funding_id'];
                     }
-                    $fundings = $om->read(Funding::getType(), $fundings_ids, ['booking_id', 'invoice_id']);
+                    $fundings = $om->read(Funding::getType(), $fundings_ids, ['booking_id', 'enrollment_id', 'invoice_id']);
                     foreach($fundings as $fid => $funding) {
-                        $bookings_ids[] = $funding['booking_id'];
-                        $invoices_ids[] = $funding['invoice_id'];
+                        if(isset($funding['booking_id'])) {
+                            $bookings_ids[] = $funding['booking_id'];
+                        }
+                        if(isset($funding['enrollment_id'])) {
+                            $enrollments_ids[] = $funding['enrollment_id'];
+                        }
+                        if(isset($funding['invoice_id'])) {
+                            $invoices_ids[] = $funding['invoice_id'];
+                        }
                     }
                     $om->update(Funding::getType(), $fundings_ids, ['paid_amount' => null, 'is_paid' => null]);
-                    $om->update(Booking::getType(), $bookings_ids, ['payment_status' => null, 'paid_amount' => null]);
-                    $om->update(Invoice::getType(), $invoices_ids, ['is_paid' => null]);
-                    Booking::updateStatusFromFundings($om, $bookings_ids);
+                    if(!empty($bookings_ids)) {
+                        $om->update(Booking::getType(), $bookings_ids, ['payment_status' => null, 'paid_amount' => null]);
+                    }
+                    if(!empty($enrollments_ids)) {
+                        $om->update(Enrollment::getType(), $enrollments_ids, ['payment_status' => null, 'paid_amount' => null]);
+                    }
+                    if(!empty($invoices_ids)) {
+                        $om->update(Invoice::getType(), $invoices_ids, ['is_paid' => null]);
+                    }
+                    if(!empty($bookings_ids)) {
+                        Booking::updateStatusFromFundings($om, $bookings_ids);
+                    }
                 }
                 else {
                     // attempt retrieving Funding candidates from targeted booking

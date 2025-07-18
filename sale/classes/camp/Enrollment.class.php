@@ -8,8 +8,11 @@
 
 namespace sale\camp;
 
+use core\setting\Setting;
 use equal\orm\Model;
 use sale\camp\catalog\Product;
+use sale\pay\Funding;
+use sale\pay\Payment;
 
 class Enrollment extends Model {
 
@@ -32,7 +35,7 @@ class Enrollment extends Model {
                 'foreign_object'    => 'sale\camp\Child',
                 'description'       => "The child that is enrolled.",
                 'required'          => true,
-                'dependents'        => ['name']
+                'dependents'        => ['name', 'main_guardian_id']
             ],
 
             'child_remarks' => [
@@ -47,6 +50,15 @@ class Enrollment extends Model {
                 'description'       => "The age of the child during the camp.",
                 'store'             => true,
                 'function'          => 'calcChildAge'
+            ],
+
+            'main_guardian_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\camp\Guardian',
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['child_id' => ['main_guardian_id']]
             ],
 
             'family_quotient' => [
@@ -316,6 +328,44 @@ class Enrollment extends Model {
                 'visible'           => ['is_clsh', '=', false]
             ],
 
+            'payment_status' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'selection'         => [
+                    'due',
+                    'paid'
+                ],
+                'function'          => 'calcPaymentStatus',
+                'store'             => true,
+                'description'       => "Current status of the payments. Depends on the status of the enrollment.",
+                'help'              => "'Due' means we are expecting some money for the enrollment (at the moment, at least one due funding has not been fully received). 'Paid' means that everything expected (all payments) has been received."
+            ],
+
+            'payment_reference' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Structured reference for identifying payments relating to the enrollment.",
+                'store'             => true,
+                'function'          => 'calcPaymentReference'
+            ],
+
+            'paid_amount' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:2',
+                'description'       => "Total amount that has been received so far.",
+                'function'          => 'calcPaidAmount',
+                'store'             => true
+            ],
+
+            'fundings_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\pay\Funding',
+                'foreign_field'     => 'enrollment_id',
+                'description'       => 'Fundings that relate to the enrollment.',
+                'ondetach'          => 'delete'
+            ],
+
             'enrollment_lines_ids' => [
                 'type'              => 'one2many',
                 'foreign_field'     => 'enrollment_id',
@@ -495,16 +545,6 @@ class Enrollment extends Model {
                 }
             }
 
-            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-                if($price_adapter['price_adapter_type'] !== 'amount') {
-                    continue;
-                }
-                $total -= $price_adapter['value'];
-            }
-            if($total < 0) {
-                $total = 0;
-            }
-
             // # memo - the percentage price-adapter only applies on camp price
             if(!is_null($camp_product_line)) {
                 $percent_price_adapter = null;
@@ -546,16 +586,6 @@ class Enrollment extends Model {
                 if(in_array($enrollment_line['product_id'], [$enrollment['camp_id']['product_id'], $enrollment['camp_id']['day_product_id']])) {
                     $camp_product_line = $enrollment_line;
                 }
-            }
-
-            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-                if($price_adapter['price_adapter_type'] !== 'amount') {
-                    continue;
-                }
-                $price -= $price_adapter['value'];
-            }
-            if($price < 0) {
-                $price = 0;
             }
 
             // # memo - the percentage price-adapter only applies on camp price
@@ -605,6 +635,101 @@ class Enrollment extends Model {
         return $result;
     }
 
+    public static function calcPaymentStatus($self): array {
+        $result = [];
+        $self->read(['status', 'fundings_ids' => ['due_date', 'is_paid']]);
+        foreach($self as $id => $enrollment) {
+            $payment_status = 'paid';
+            // if there is at least one overdue funding: a payment is 'due', otherwise enrollment is 'paid'
+            foreach($enrollment['fundings_ids'] as $funding) {
+                if(!$funding['is_paid'] && $funding['due_date'] > time()) {
+                    $payment_status = 'due';
+                    break;
+                }
+            }
+
+            $result[$id] = $payment_status;
+        }
+
+        return $result;
+    }
+
+    public static function calcPaymentReference($self): array {
+        $result = [];
+        $self->read(['main_guardian_id']);
+        foreach($self as $id => $enrollment) {
+            // #memo - arbitrary value: used in the accounting software for identifying payments with a temporary account entry counterpart
+            $code_ref =  Setting::get_value('sale', 'organization', 'camp.reference.code', 151);
+            $reference_type =  Setting::get_value('sale', 'organization', 'camp.reference.type', 'VCS');
+
+            $enrollment_code = $enrollment['id'];
+
+            $reference_value = null;
+            switch($reference_type) {
+                // use main Guardian id as reference
+                case 'main_guardian_id':
+                    if(isset($enrollment['child_id']['main_guardian_id'])) {
+                        $reference_value = sprintf('%05d', $enrollment['child_id']['main_guardian_id']);
+                    }
+                    break;
+                // ISO-11649
+                case 'RF':
+                    // structure: RFcc nnn... (up to 25 alpha-num chars) (we omit the 'RF' part in the result)
+                    // build a numeric reference
+                    $ref_base = sprintf('%03d%07d', $code_ref, $enrollment_code);
+                    // append 'RF00' to compute the check
+                    $tmp = $ref_base . 'RF00';
+                    // replace letters with digits
+                    $converted = '';
+                    foreach(str_split($tmp) as $char) {
+                        // #memo - in ISO-11649 'A' = 10
+                        $converted .= ctype_alpha($char) ? (ord($char) - 55) : $char;
+                    }
+                    $mod97 = intval(bcmod($converted, '97'));
+                    $control = str_pad(98 - $mod97, 2, '0', STR_PAD_LEFT);
+                    $reference_value = $control . $ref_base;
+                    break;
+                // FR specific
+                case 'RN':
+                    // structure: RNccxxxxxxxxxxxxxxxxxxxx + key + up to 20 digits (we omit the 'RN' part in the result)
+                    $ref_body = sprintf('%013d%07d', $code_ref, $enrollment_code);
+                    $control = 97 - intval(bcmod($ref_body, '97'));
+                    $reference_value = str_pad($control, 2, '0', STR_PAD_LEFT) . $ref_body;
+                    break;
+                // BE specific
+                case 'VCS':
+                    // structure: +++xxx/xxxx/xxxcc+++ where cc is the control result (we omit the '+' and '/' chars in the result)
+                default:
+                $control = ((76 * intval($code_ref)) + $enrollment_code) % 97;
+                $control = ($control == 0) ? 97 : $control;
+                $reference_value = sprintf('%3d%04d%03d%02d', $code_ref, $enrollment_code / 1000, $enrollment_code % 1000, $control);
+                    break;
+            }
+
+            $result[$id] = $reference_value;
+        }
+
+        return $result;
+    }
+
+    public static function calcPaidAmount($self): array {
+        $result = [];
+        $self->read(['fundings_ids' => ['due_amount', 'is_paid', 'paid_amount']]);
+        foreach($self as $id => $enrollment) {
+            $paid_amount = 0.0;
+            foreach($enrollment['fundings_ids'] as $funding) {
+                if($funding['is_paid']) {
+                    $paid_amount += $funding['due_amount'];
+                }
+                elseif($funding['paid_amount'] > 0) {
+                    $paid_amount += $funding['paid_amount'];
+                }
+            }
+            $result[$id] = $paid_amount;
+        }
+        return $result;
+    }
+
     public static function policyConfirm($self): array {
         $result = [];
         $self->read(['camp_id' => ['max_children', 'enrollments_ids' => ['status']]]);
@@ -626,13 +751,15 @@ class Enrollment extends Model {
 
     public static function policyValidate($self): array {
         $result = [];
-        $self->read(['all_documents_received']);
+        $self->read(['all_documents_received', 'payment_status']);
         foreach($self as $enrollment) {
             if(!$enrollment['all_documents_received']) {
                 return ['camp_id' => ['missing_document' => "At least one document is missing for the enrollment to this camp."]];
             }
 
-            // # todo - check that the enrollment has been paid
+            if($enrollment['payment_status'] !== 'paid') {
+                return ['camp_id' => ['not_paid' => "The enrollment isn't fully paid."]];
+            }
         }
 
         return $result;
@@ -659,6 +786,7 @@ class Enrollment extends Model {
      */
     public static function onafterConfirm($self) {
         $self->do('reset-camp-enrollments-qty');
+        $self->do('generate-funding');
     }
 
     /**
@@ -1427,6 +1555,53 @@ class Enrollment extends Model {
         $self->update(['all_documents_received' => null]);
     }
 
+    public static function doGenerateFunding($self) {
+        $self->read([
+            'price',
+            'price_adapters_ids'    => ['value', 'price_adapter_type'],
+            'fundings_ids'          => ['amount'],
+            'camp_id'               => ['center_id' => ['center_office_id']]
+        ]);
+
+        foreach($self as $id => $enrollment) {
+            $remaining_amount = $enrollment['price'];
+
+            $fundings_amount = 0.0;
+            foreach($enrollment['fundings_ids'] as $funding) {
+                $fundings_amount += $funding['amount'];
+            }
+
+            $remaining_amount -= $fundings_amount;
+            if($remaining_amount <= 0) {
+                continue;
+            }
+
+            $funding = Funding::create([
+                'enrollment_id'     => $id,
+                'due_amount'        => $remaining_amount,
+                'center_office_id'  => $enrollment['camp_id']['center_id']['center_office_id']
+            ])
+                ->read(['center_office_id'])
+                ->first();
+
+            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+                // # memo - the percentage price-adapters are already removed from price
+                if($price_adapter['price_adapter_type'] !== 'amount') {
+                    continue;
+                }
+
+                Payment::create([
+                    'enrollment_id'     => $id,
+                    'amount'            => $price_adapter['value'],
+                    'payment_origin'    => 'cashdesk',
+                    'payment_method'    => 'camp_financial_help',
+                    'funding_id'        => $funding['id'],
+                    'center_office_id'  => $funding['center_office_id']
+                ]);
+            }
+        }
+    }
+
     public static function getActions(): array {
         return [
 
@@ -1464,6 +1639,12 @@ class Enrollment extends Model {
                 'description'   => "Creates/updates the enrollment documents that are required depending on the camp.",
                 'policies'      => [],
                 'function'      => 'doRefreshRequiredDocuments'
+            ],
+
+            'generate-funding' => [
+                'description'   => "Creates the enrollment funding if is does not already exists.",
+                'policies'      => [],
+                'function'      => 'doGenerateFunding'
             ]
 
         ];

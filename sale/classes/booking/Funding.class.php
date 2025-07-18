@@ -119,11 +119,19 @@ class Funding extends \sale\pay\Funding {
 
     public static function calcName($om, $oids, $lang) {
         $result = [];
-        $fundings = $om->read(get_called_class(), $oids, ['booking_id.name', 'due_amount'], $lang);
+        $fundings = $om->read(get_called_class(), $oids, ['booking_id.name', 'due_amount', 'enrollment_id.name', 'enrollment_id.camp_id.sojourn_code'], $lang);
 
         if($fundings > 0) {
             foreach($fundings as $oid => $funding) {
-                $result[$oid] = $funding['booking_id.name'].'    '.Setting::format_number_currency($funding['due_amount']);
+                if(isset($funding['booking_id.name'])) {
+                    $result[$oid] = $funding['booking_id.name'].'    '.Setting::format_number_currency($funding['due_amount']);
+                }
+                elseif(isset($funding['enrollment_id.name'])) {
+                    $result[$oid] = $funding['enrollment_id.camp_id.sojourn_code'].' '.$funding['enrollment_id.name'].'    '.Setting::format_number_currency($funding['due_amount']);
+                }
+                else {
+                    $result[$oid] = Setting::format_number_currency($funding['due_amount']).'    '.$funding['payment_deadline_id.name'];
+                }
             }
         }
         return $result;
@@ -152,9 +160,14 @@ class Funding extends \sale\pay\Funding {
 
     public static function calcPaymentReference($om, $ids, $lang) {
         $result = [];
-        $fundings = $om->read(self::getType(), $ids, ['booking_id.payment_reference'], $lang);
+        $fundings = $om->read(self::getType(), $ids, ['booking_id.payment_reference', 'enrollment_id.payment_reference'], $lang);
         foreach($fundings as $id => $funding) {
-            $result[$id] = $funding['booking_id.payment_reference'];
+            if(isset($funding['booking_id.payment_reference'])) {
+                $result[$id] = $funding['booking_id.payment_reference'];
+            }
+            elseif($funding['enrollment_id.payment_reference']) {
+                $result[$id] = $funding['enrollment_id.payment_reference'];
+            }
         }
         return $result;
     }
