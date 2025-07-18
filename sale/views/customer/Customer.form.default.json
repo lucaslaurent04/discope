@@ -16,7 +16,11 @@
                 "view": "form.create",
                 "mode": "edit",
                 "purpose": "create",
-                "domain": ["customer_identity_id", "=", "object.partner_identity_id.id"],
+                "domain": [
+                    ["customer_identity_id", "=", "object.partner_identity_id"],
+                    ["customer_nature_id", "=", "object.customer_nature_id"],
+                    ["customer_rate_class_id", "=", "object.rate_class_id"]
+                ],
                 "reset": true
             }
         }
