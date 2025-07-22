@@ -54,7 +54,7 @@ if($funding['booking_id']['status'] == 'balanced') {
     throw new Exception("booking_balanced", QN_ERROR_INVALID_PARAM);
 }
 
-// remove manuel payments, if any
+// remove manual payments, if any
 $payments = Payment::search([
         ['funding_id', '=', $funding['id']],
         ['is_manual', '=', true]
