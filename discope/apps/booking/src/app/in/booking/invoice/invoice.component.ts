@@ -143,9 +143,18 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
     // list of secondary recipients (addresses comma separated)
     public recipients: string[] = [];
 
-
     public vm: vmModel;
 
+    public quillCustomModules = {
+        toolbar: [
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['blockquote'],
+            [{ 'align': <any>[] }],
+            [{ 'color': <any>[] }, { 'background': <any>[] }],
+            ['link']
+        ]
+    };
 
     constructor(
         private api: ApiService,

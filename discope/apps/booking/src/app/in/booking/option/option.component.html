@@ -118,8 +118,9 @@
         <div class="row">
             <div class="column" style="display: block; width: 100%; margin-top: 10px;">
                 <quill-editor
-                    [formControl]="vm.message.formControl"
                     theme="snow"
+                    [formControl]="vm.message.formControl"
+                    [modules]="quillCustomModules"
                     [placeholder]="'Corps du message'">
                 </quill-editor>
             </div>
