@@ -203,7 +203,7 @@ class Product extends Model {
                 'type'              => 'boolean',
                 'description'       => 'Is the product eligible for freebies?',
                 'help'              => 'If not set, the product will not be considered when computing the freebies eligibility.',
-                'default'           => false
+                'default'           => true
             ],
 
             // if the organisation uses price-lists, the price to use depends on the applicable
