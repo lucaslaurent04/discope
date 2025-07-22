@@ -264,6 +264,7 @@ foreach($bookings as $booking) {
         'member'            => lodging_booking_print_booking_formatMember($booking),
         'contacts'          => [],
         'sojourns'          => [],
+        'rental_units'      => [],
         'customer'          => $booking['customer_identity_id'],
         'price'             => $booking['price'],
         'paid_amount'       => 0.0,
@@ -301,16 +302,40 @@ foreach($bookings as $booking) {
             ];
 
             foreach($group['sojourn_product_models_ids'] as $spm) {
-                if($spm['is_accomodation']) {
-                    foreach($spm['rental_unit_assignments_ids'] as $assignment) {
+                foreach($spm['rental_unit_assignments_ids'] as $assignment) {
+                    if($spm['is_accomodation']) {
                         $sojourn['rental_units'][] = [
                             'name'   => $assignment['rental_unit_id']['code'],
                             'qty'    => $assignment['qty']
                         ];
                     }
+                    else {
+                        $rental_units[] = [
+                            'code'  => $assignment['rental_unit_id']['code'],
+                            'name'  => $assignment['rental_unit_id']['name'],
+                            'qty'   => $assignment['qty']
+                        ];
+                    }
                 }
             }
             $item['sojourns'][] = $sojourn;
+        }
+        else {
+            $rental_units = [];
+            foreach($group['sojourn_product_models_ids'] as $spm) {
+                if(!$spm['is_accomodation']) {
+                    foreach($spm['rental_unit_assignments_ids'] as $assignment) {
+                        $rental_units[] = [
+                            'code'  => $assignment['rental_unit_id']['code'],
+                            'name'  => $assignment['rental_unit_id']['name'],
+                            'qty'   => $assignment['qty']
+                        ];
+                    }
+                }
+            }
+            if(!empty($rental_units)) {
+                $item['rental_units'] = array_merge($item['rental_units'], $rental_units);
+            }
         }
     }
 

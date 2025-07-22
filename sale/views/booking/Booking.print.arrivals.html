@@ -165,6 +165,17 @@ blockquote {
             </tr>
             {% endfor %}
         </table>
+        {% if booking.rental_units|length > 0 %}
+        <div><b># Salles</b></div>
+        <table>
+            {% for rental_unit in booking.rental_units %}
+            <tr>
+                <td style="width: 70%;">{{rental_unit.name}}</td>
+                <td>{{rental_unit.code}}<small>({{rental_unit.qty}})</small></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
     </div>
     {% endfor %}
 </body>
