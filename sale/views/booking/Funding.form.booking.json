@@ -70,7 +70,7 @@
         {
             "id": "action.unpay_instant",
             "label": "Undo payment",
-            "description": "This will remove any manual payment and Funding will be unmarked as paid.",
+            "description": "This will remove any manual payment and Funding will be marked as unpaid.",
             "controller": "sale_booking_funding_do-pay-remove",
             "confirm": true,
             "access": {
@@ -81,11 +81,11 @@
         {
             "id": "action.mark_paid",
             "label": "Payment via accounting",
-            "description": "Arbitrary mark a funding as paid for the booking that has tou operator, is not from channel manager, and for GA center.",
+            "description": "Arbitrary mark a funding as paid for the booking that has tour operator, is not from channel manager, and for GA center.",
             "controller": "sale_booking_funding_do-paid",
             "confirm": true,
             "access": {
-                "groups": ["finance.accounting.administrator"]
+                "groups": ["admins"]
             },
             "visible": ["is_paid", "=", false]
         },
@@ -107,7 +107,7 @@
             "controller": "sale_booking_funding_do-delete",
             "confirm": true,
             "access": {
-                "groups": ["booking.default.user", "finance.default.administrator"]
+                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
             },
             "visible": [["type", "<>", "invoice"], ["due_amount", "<", 0]]
         }

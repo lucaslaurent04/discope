@@ -46,9 +46,31 @@
             "visible": [[true, "=", "env.sale.features.payment.instant"], ["is_paid", "=", false]]
         },
         {
+            "id": "action.add_bank_check",
+            "label": "Add bank check",
+            "description": "This will complete the funding with a manual payment (bank check) and Funding will be marked as paid.",
+            "controller": "sale_booking_funding_add-bank-check",
+            "confirm": true,
+            "access": {
+                "groups": ["finance.default.administrator", "finance.default.user"]
+            },
+            "visible": [[true, "=", "env.sale.features.payment.bank_check"], ["is_paid", "=", false]]
+        },
+        {
+            "id": "action.pay_financial_help",
+            "label": "Financial help payment",
+            "description": "Use a financial help to create a funding payment.",
+            "controller": "sale_booking_funding_do-pay-financial-help",
+            "confirm": true,
+            "access": {
+                "groups": ["finance.default.administrator", "finance.default.user"]
+            },
+            "visible": [[true, "=", "env.sale.features.payment.financial_help"], ["is_paid", "=", false]]
+        },
+        {
             "id": "action.unpay_instant",
             "label": "Undo payment",
-            "description": "This will remove any manual payment and Funding will be unmarked as paid.",
+            "description": "This will remove any manual payment and Funding will be marked as unpaid.",
             "controller": "sale_booking_funding_do-pay-remove",
             "confirm": true,
             "access": {
@@ -58,23 +80,23 @@
         },
         {
             "id": "action.mark_paid",
-            "label": "Payment via Accounting",
-            "description": "Arbitrary mark a funding as paid for the booking that has tou operator, is not from channel manager, and for GA center.",
+            "label": "Payment via accounting",
+            "description": "Arbitrary mark a funding as paid for the booking that has tour operator, is not from channel manager, and for GA center.",
             "controller": "sale_booking_funding_do-paid",
             "confirm": true,
             "access": {
-                "groups": ["finance.default.administrator", "finance.default.user"]
+                "groups": ["admins"]
             },
             "visible": ["is_paid", "=", false]
         },
         {
             "id": "action.transfer",
-            "label": "Transfert de réservation",
+            "label": "Booking transfer",
             "description": "Allows to transfer the funding to another booking.",
-            "controller": "sale_booking_funding_do-paid",
+            "controller": "sale_booking_funding_do-transfer",
             "confirm": true,
             "access": {
-                "groups": ["finance.default.administrator", "finance.default.user", "booking.default.user"]
+                "groups": ["finance.default.administrator", "finance.default.user"]
             },
             "visible": ["type", "<>", "invoice"]
         },
@@ -85,7 +107,7 @@
             "controller": "sale_booking_funding_do-delete",
             "confirm": true,
             "access": {
-                "groups": ["finance.default.administrator", "finance.default.user", "booking.default.user"]
+                "groups": ["finance.default.administrator", "finance.default.user"]
             },
             "visible": [["type", "<>", "invoice"], ["due_amount", "<", 0]]
         }
