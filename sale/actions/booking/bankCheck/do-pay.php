@@ -75,7 +75,6 @@ $payment = Payment::create([
         'partner_id'        => $funding['booking_id']['customer_id'],
         'center_office_id'  => $funding['center_office_id'],
         'bank_check_id'     => $bankCheck['id'],
-        'is_manual'         => true,
         'amount'            => $bankCheck['amount'],
         'payment_origin'    => 'cashdesk',
         'payment_method'    => 'bank_check'

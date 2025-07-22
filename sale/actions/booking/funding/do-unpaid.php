@@ -9,7 +9,7 @@ use sale\booking\Funding;
 use sale\booking\Booking;
 
 list($params, $providers) = announce([
-    'description'   => "Arbitrary mark a funding as paid (has no effect on actual payments).",
+    'description'   => "Funding payment fields (status, paid_amount, is_paid) set to NULL for re-computation.",
     'deprecated'    => true,
     'params'        => [
         'id' =>  [
@@ -40,7 +40,10 @@ list($context, $om, $cron, $dispatch) = [$providers['context'], $providers['orm'
 
 $funding = Funding::id($params['id'])
     ->read(['booking_id'])
-    ->update(['is_paid' => null, 'paid_amount' => null])
+    // #memo - status will be changed to 'paid' in calcIsPaid
+    ->update(['status'      => 'pending'])
+    ->update(['paid_amount' => null])
+    ->update(['is_paid'     => null])
     ->first(true);
 
 Booking::id($funding['booking_id'])->update(['paid_amount' => null]);

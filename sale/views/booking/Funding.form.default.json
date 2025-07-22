@@ -63,15 +63,15 @@
             "controller": "sale_booking_funding_do-paid",
             "confirm": true,
             "access": {
-                "groups": ["finance.default.administrator", "finance.default.user"]
+                "groups": ["admins"]
             },
             "visible": ["is_paid", "=", false]
         },
         {
             "id": "action.transfer",
-            "label": "Transfert de réservation",
+            "label": "Booking transfer",
             "description": "Allows to transfer the funding to another booking.",
-            "controller": "sale_booking_funding_do-paid",
+            "controller": "sale_booking_funding_do-transfer",
             "confirm": true,
             "access": {
                 "groups": ["finance.default.administrator", "finance.default.user", "booking.default.user"]

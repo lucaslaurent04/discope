@@ -24,7 +24,7 @@ list($params, $providers) = eQual::announce([
         ]
     ],
     'access' => [
-        'groups'            => ['finance.accounting.administrator']
+        'groups'            => ['admins']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -81,7 +81,12 @@ if($booking['is_from_channelmanager']) {
     throw new Exception("invalid_booking_type", QN_ERROR_INVALID_PARAM);
 }
 
-Funding::id($params['id'])->update(['paid_amount' => $funding['due_amount'],'is_paid' => true]);
+Funding::id($params['id'])
+    ->update([
+        'paid_amount'   => $funding['due_amount'],
+        'is_paid'       => true,
+        'status'        => 'paid'
+    ]);
 
 Booking::updateStatusFromFundings($om, (array) $booking['id'], [], 'en');
 
