@@ -1567,8 +1567,8 @@ class BookingLine extends Model {
         foreach($lines as $id => $line) {
             $free_qty = 0;
 
-            if(!$line['product_id.is_freebie_allowed']) {
-                // if product is excluded from freebies, no free quantity
+            if(!$line['product_id.is_freebie_allowed'] || $line['qty_accounting_method'] !== 'person') {
+                // product is excluded from freebies: no free quantity
                 $result[$id] = 0;
                 continue;
             }
