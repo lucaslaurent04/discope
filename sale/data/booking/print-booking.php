@@ -69,6 +69,12 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
  */
 ['context' => $context] = $providers;
 
+$lodging_booking_print_booking_formatMember = function($booking) {
+    $id = $booking['customer_id']['partner_identity_id']['id'];
+    $code = ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
+    return $code.' - '.$booking['customer_id']['partner_identity_id']['display_name'];
+};
+
 $output = null;
 
 // steer towards custom controller, if any
@@ -283,7 +289,7 @@ if(!$output) {
         'is_price_tbc'               => $booking['is_price_tbc'],
         'is_agreement_html'    => '',
         'lines'                      => [],
-        'member'                     => lodging_booking_print_booking_formatMember($booking),
+        'member'                     => $lodging_booking_print_booking_formatMember($booking),
         'period'                     => 'Du '.date('d/m/Y', $booking['date_from']).' au '.date('d/m/Y', $booking['date_to']),
         'postal_address'             => sprintf("%s - %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
         'price'                      => $booking['price'],
@@ -975,8 +981,3 @@ $context->httpResponse()
 
 
 
-function lodging_booking_print_booking_formatMember($booking) {
-    $id = $booking['customer_id']['partner_identity_id']['id'];
-    $code = ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
-    return $code.' - '.$booking['customer_id']['partner_identity_id']['display_name'];
-}

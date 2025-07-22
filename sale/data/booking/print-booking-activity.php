@@ -287,7 +287,7 @@ foreach($meals as $meal_id => $meal) {
     else {
         $meal_name = 'Goûter';
     }
-    if($meal['meal_place_id']['code'] != 'offsite') {
+    if($meal['meal_place_id']['place_type'] != 'offsite') {
         if(!$meal['is_self_provided']) {
             $meal_place = 'au centre';
         }

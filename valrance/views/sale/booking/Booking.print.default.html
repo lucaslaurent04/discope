@@ -393,7 +393,11 @@ hr {
             {% endfor %}
         </table>
         <div style="margin-top: 10px;">
-            {{ advantage_notice_html | raw }}
+            <table style="border: solid 1px black; width: 100%;">
+                <tr>
+                    <td>{{ advantage_notice_html | raw }}</td>
+                </tr>
+            </table>
         </div>
     </div>
     {% endif %}

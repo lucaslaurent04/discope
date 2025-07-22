@@ -962,9 +962,9 @@ foreach($lines as $line) {
 foreach($booking['contacts_ids'] as $contact) {
     if(strlen($values['contact_name']) == 0 || $contact['type'] == 'booking') {
         // overwrite data of customer with contact info
-        $values['contact_name'] = str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title']) . ' ' . $contact['partner_identity_id']['display_name'];
-        $values['contact_phone'] = (strlen($contact['partner_identity_id']['phone']))?$contact['partner_identity_id']['phone']:$contact['partner_identity_id']['mobile'];
-        $values['contact_email'] = $contact['partner_identity_id']['email'];
+        $values['contact_name'] = str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title'] ?? '') . ' ' . ($contact['partner_identity_id']['display_name'] ?? '');
+        $values['contact_phone'] = (strlen($contact['partner_identity_id']['phone'] ?? '')) ? $contact['partner_identity_id']['phone'] : ($contact['partner_identity_id']['mobile'] ?? '');
+        $values['contact_email'] = $contact['partner_identity_id']['email'] ?? '';
     }
 }
 
