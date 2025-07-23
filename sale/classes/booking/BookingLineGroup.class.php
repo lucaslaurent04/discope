@@ -3259,7 +3259,10 @@ class BookingLineGroup extends Model {
             }
         }
 
-        $outside_dates_meals_ids = $om->search(BookingMeal::getType(), [[['date', '<', $group['date_from']]], [['date', '>', $group['date_to']]]]);
+        $outside_dates_meals_ids = $om->search(BookingMeal::getType(), [
+                [['booking_id', '=', $group['booking_id']], ['date', '<', $group['date_from']]],
+                [['booking_id', '=', $group['booking_id']], ['date', '>', $group['date_to']]]
+            ]);
         if(count($outside_dates_meals_ids)) {
             $om->delete(BookingMeal::getType(), $outside_dates_meals_ids, true);
         }
