@@ -513,7 +513,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
 
                 // relay change to parent component
                 this.updated.emit();
-                this.loading = false;
+
             }
             catch(response) {
                 console.log(response);
@@ -522,8 +522,8 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
                 // display error
                 // this.api.errorSnack('nb_pers', "Le nombre de personnes ne correspond pas aux tranches d'âge");
                 this.api.errorFeedback(response);
-                this.loading = false;
             }
+            this.loading = false;
         }
     }
 
@@ -580,16 +580,14 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
                                 date_to: date_to
                             });
                         this.updated.emit();
-                        this.loading = false;
                     }
                     catch(response) {
                         this.api.errorFeedback(response);
                         // #todo - improve to rollback non-updatable fields only
                         // force refresh
                         this.updated.emit();
-                        this.loading = false;
                     }
-
+                    this.loading = false;
                 });
             }
             // update VM values until refresh
@@ -612,12 +610,11 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
                 }
                 // relay change to parent component
                 this.updated.emit();
-                this.loading = false;
             }
             catch(response) {
                 this.api.errorFeedback(response);
-                this.loading = false;
             }
+            this.loading = false;
         }
     }
 
@@ -629,12 +626,11 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
                 await this.api.fetch('?do=sale_booking_update-sojourn-pack-set', {id: this.instance.id, pack_id: pack.id});
                 // relay change to parent component
                 this.updated.emit();
-                this.loading = false;
             }
             catch(response) {
-                this.loading = false;
                 this.api.errorFeedback(response);
             }
+            this.loading = false;
         }
     }
 
