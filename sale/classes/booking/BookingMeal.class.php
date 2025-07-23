@@ -155,23 +155,3 @@ class BookingMeal extends Model {
         return parent::canupdate($self, $values);
     }
 }
-
-
-/*
-    * Les repas sont globaux à une réservation, mais doivent nécessairement se mettre sur un groupe de service (il peut donc y avoir plusieurs BookingMeal en parallèle [même date, même tranche horaire] pour une même réservation)
-    * Les bookingMeal ne sont visibles que sur les groupes de type "sojourn" (pas "simple", "événement" ou "activité")
-    * les bookingMeal peuvent être modifiés en UI, mais pas créés
-    * les meals sont dans une section distincte "Repas" d'un bookingLineGroup
-
-    refreshMeals()
-        à chaque modification de bookingLine (product_id)
-        à chaque modification de la durée d'un groupe de service
-        à chaque modification du type d'un groupe de service
-
-    Pour toutes les bookingLine de type repas (is_meal), on vérifie si un bookingMeal existe pour ce groupe (pour cette réservation), et pour le time_slot correspondant, pour chacune des dates du séjour
-    si pas encore : on crée un bookingMeal
-    ensuite on assigne automatiquement la ligne au bookingMeal
-    (il peut y avoir plusieurs produits repas pour un même moment, comme variantes d'un même modèle [variation sur la tranche d'âge ou autre])
-
-
-*/
