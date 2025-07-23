@@ -110,7 +110,7 @@ div.footer {
 {% if activities_map | length > 0 %}
     <h3> {{ i18n['activity_schedule'] | upper }}</h3>
     {% for group_id, group in activities_map %}
-        <div style="position: relative; margin-top: 30px; margin-bottom: 30px;">
+        <div style="position: relative; margin-top: 30px;">
             <table style="border: solid 1px black; border-collapse: collapse; width: 100%;" border="1">
                 <thead style="display: table-header-group;">
                 <tr>
@@ -145,9 +145,9 @@ div.footer {
                             <td style="text-align: left; vertical-align: top; padding: 4px;">
                                 {% set data = details.time_slots[slot_code] | default({}) %}
                                 {% if data.meal is defined and data.meal is not empty %}
-                                <div style="margin-bottom: 4px;">
-                                    <strong>Repas:</strong> {{ data['meal'] | default('') }}<br>
-                                </div>
+                                    <div style="margin-bottom: 4px;">
+                                        <strong>Repas:</strong> {{ data['meal'] | default('') }}<br>
+                                    </div>
                                 {% endif %}
                                 <div style="margin-bottom: 4px;">
                                     <strong>{{ data['activity'] | default('') | raw }}</strong><br>
@@ -156,6 +156,22 @@ div.footer {
                                     {% endif %}
                                     {{ data['description'] | default('') | raw }}
                                 </div>
+
+                                {% if loop.parent.loop.first and loop.index == 1 and comments.first_day_am_comment %}
+                                    {{ comments.first_day_am_comment|raw }}
+                                {% elseif loop.parent.loop.first and loop.index == 2 and comments.first_day_pm_comment %}
+                                    {{ comments.first_day_pm_comment|raw }}
+                                {% elseif loop.parent.loop.first and loop.index == 3 and comments.first_day_ev_comment %}
+                                    {{ comments.first_day_ev_comment|raw }}
+                                {% endif %}
+
+                                {% if loop.parent.loop.last and loop.index == 1 and comments.last_day_am_comment %}
+                                    {{ comments.last_day_am_comment|raw }}
+                                {% elseif loop.parent.loop.last and loop.index == 2 and comments.last_day_pm_comment %}
+                                    {{ comments.last_day_pm_comment|raw }}
+                                {% elseif loop.parent.loop.last and loop.index == 3 and comments.last_day_ev_comment %}
+                                    {{ comments.last_day_ev_comment|raw }}
+                                {% endif %}
                             </td>
                         {% endfor %}
                     </tr>
