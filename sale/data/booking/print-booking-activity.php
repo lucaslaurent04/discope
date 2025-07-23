@@ -348,6 +348,23 @@ foreach($booking_activities as $activity) {
 
 $values['activities_map'] = $activities_map;
 
+$template_comments = Template::search([
+    ['code', '=', 'activity.doc'],
+    ['category_id', '=', 1],
+    ['type', '=', 'planning']
+])
+    ->read(['parts_ids' => ['name', 'value']])
+    ->first();
+
+$values['comments'] = [];
+if(!is_null($template_comments)) {
+    foreach($template_comments['parts_ids'] as $part) {
+        if(!empty($part['value'])) {
+            $values['comments'][$part['name']] = $part['value'];
+        }
+    }
+}
+
 try {
     $loader = new TwigFilesystemLoader(EQ_BASEDIR . "/packages/{$package}/views/");
 
