@@ -1,13 +1,14 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Funding;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Removes a refund funding.",
     'help'          => "Refund funding are expected to be created manually and are therefore allowed for removal.",
     'params'        => [
@@ -18,42 +19,44 @@ list($params, $providers) = eQual::announce([
             'required'       => true
         ]
     ],
-    'access' => [
-        'groups'            => ['booking.default.user', 'finance.default.administrator']
+    'access'        => [
+        'groups'        => ['booking.default.user', 'finance.default.administrator']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'cron', 'dispatch']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context  $context
  */
-list($context, $orm, $cron, $dispatch) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['dispatch']];
+['context' => $context] = $providers;
 
-$funding = Funding::id($params['id'])->read(['id', 'type', 'due_amount'])->first(true);
+$funding = Funding::id($params['id'])
+    ->read(['type', 'due_amount', 'paid_amount'])
+    ->first(true);
 
 if(!$funding) {
-    throw new Exception('unknown_funding', EQ_ERROR_INVALID_PARAM);
+    throw new Exception("unknown_funding", EQ_ERROR_INVALID_PARAM);
 }
 
-// fundings related to invoices cannot be transferred
+// fundings related to invoices cannot be deleted
 if($funding['type'] == 'invoice') {
-    throw new Exception('invalid_funding_type', EQ_ERROR_INVALID_PARAM);
+    throw new Exception("invalid_funding_type", EQ_ERROR_INVALID_PARAM);
 }
 
 if($funding['due_amount'] >= 0) {
-    throw new Exception('non_refund_funding', EQ_ERROR_INVALID_PARAM);
+    throw new Exception("non_refund_funding", EQ_ERROR_INVALID_PARAM);
 }
 
-Funding::id($params['id'])->delete(true);
+if($funding['paid_amount'] != 0) {
+    throw new Exception("funding_already_paid", EQ_ERROR_INVALID_PARAM);
+}
 
+Funding::id($funding['id'])->delete(true);
 
 $context->httpResponse()
         ->status(204)
