@@ -28,6 +28,11 @@ export interface BookedServicesDisplaySettings {
     meals_prefs_visible: boolean;
 }
 
+export interface RentalUnitsSettings {
+    store_rental_units_settings: boolean;
+    show: 'all'|'parents'|'children';
+}
+
 @Component({
     selector: 'booking-services',
     templateUrl: 'services.component.html',
@@ -51,6 +56,11 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
         activities_enabled: true,
         activities_visible: true,
         meals_prefs_visible: true
+    };
+
+    public rental_units_settings: RentalUnitsSettings = {
+        store_rental_units_settings: false,
+        show: 'all'
     };
 
     public ready: boolean = false;
@@ -201,6 +211,23 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
             if(this.display_settings.store_folded_settings) {
                 this.setDisplaySettingsFromLocalStorage();
             }
+
+            const rentalUnitsSettings: {[key: string]: string} = {
+                store_rental_units_settings: 'sale.features.ui.booking.store_rental_units_settings',
+                show: 'sale.features.ui.booking.show_parent_children_rental_units'
+            }
+
+            for(let setting of Object.keys(rentalUnitsSettings)) {
+                const settingName = rentalUnitsSettings[setting];
+                if(environment[settingName] !== undefined) {
+                    // @ts-ignore
+                    this.rental_units_settings[setting as keyof RentalUnitsSettings] = environment[settingName];
+                }
+            }
+
+            if(this.rental_units_settings.store_rental_units_settings) {
+                this.setRentalUnitsSettingsFromLocalStorage();
+            }
         }
         catch(response) {
             this.api.errorFeedback(response);
@@ -221,6 +248,24 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
         const booked_services_settings = map_bookings_booked_services_settings[this.booking_id];
         for(let key of Object.keys(this.display_settings)) {
             this.display_settings[key as keyof BookedServicesDisplaySettings] = booked_services_settings[key as keyof BookedServicesDisplaySettings];
+        }
+    }
+
+    private setRentalUnitsSettingsFromLocalStorage() {
+        const stored_map_bookings_rental_units_settings: string | null = localStorage.getItem('map_bookings_rental_units_settings');
+        if(stored_map_bookings_rental_units_settings === null) {
+            return;
+        }
+
+        const map_bookings_rental_units_settings: {[key: number]: RentalUnitsSettings} = JSON.parse(stored_map_bookings_rental_units_settings);
+        if(!map_bookings_rental_units_settings[this.booking_id]) {
+            return;
+        }
+
+        const rental_units_settings = map_bookings_rental_units_settings[this.booking_id];
+        for(let key of Object.keys(this.rental_units_settings)) {
+            // @ts-ignore
+            this.rental_units_settings[key as keyof RentalUnitsSettings] = rental_units_settings[key as keyof RentalUnitsSettings];
         }
     }
 }

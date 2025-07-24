@@ -12,7 +12,7 @@ import { BookingLineGroup } from './_models/booking_line_group.model';
 import { BookingActivity } from './_models/booking_activity.model';
 import { BookingLine } from './_models/booking_line.model';
 import { BookingActivityDay } from './_components/group/_components/day-activities/day-activities.component';
-import { BookedServicesDisplaySettings } from '../../services.component';
+import { BookedServicesDisplaySettings, RentalUnitsSettings } from '../../services.component';
 import { BookingMealDay } from './_components/group/_components/day-meals/day-meals.component';
 import { BookingMeal } from './_models/booking_meal.model';
 
@@ -53,6 +53,7 @@ export class BookingServicesBookingComponent
     @ViewChildren(BookingServicesBookingGroupComponent) bookingServicesBookingGroups: QueryList<BookingServicesBookingGroupComponent>;
     @Input() booking_id: number;
     @Input() display_settings: BookedServicesDisplaySettings;
+    @Input() rental_units_settings: RentalUnitsSettings;
 
     public ready: boolean = false;
     public loading: boolean = true;
