@@ -3,7 +3,7 @@
             [rental_unit]="hovered_rental_unit"
             [consumption]="hovered_consumption"
             [holidays]="hovered_holidays"
-            (refresh)="onRefresh()"
+            (refresh)="onRefresh(true)"
             (openLegendDialog)="onOpenLegendDialog()"
             (openPrefDialog)="onOpenPrefDialog()"
             (fullScreen)="onFullScreen()">
@@ -23,14 +23,14 @@
                 </th>
             </tr>
             <tr class="head">
-                <ng-container *ngFor="let day of headers.days" >
+                <ng-container *ngFor="let day of headers.days; let i = index" >
                     <th #calTableHeadCells
                             (mouseenter)="onhoverDate(day)"
                             (mouseleave)="onhoverDate(null)"
                             class="head-days"
                             [class.small]="cellsWidth <= 26"
                             [class.hidden]="cellsWidth < 10"
-                            [ngClass]="getHolidayClasses(day)">
+                            [ngClass]="holidays_classes[headers.days_indexes[i]] ?? []">
                         <div *ngIf="cellsWidth > 26" class="week-day">{{ day | date: 'EEE'}}</div>
                         <div *ngIf="cellsWidth <= 26" class="week-day">{{ day | date: 'EEEEE'}}</div>
                         <div class="month-day">{{ day | date: 'd'}}</div>
@@ -38,9 +38,9 @@
                 </ng-container>
             </tr>
         </thead>
-        <tbody (mouseleave)="onmouseleaveTable()" >
+        <tbody (mouseleave)="onmouseleaveTable()">
             <!-- body -->
-            <tr class="rows days cdk-drag-disabled" (dragstart)="preventDrag($event)"  *ngFor="let rental_unit of rental_units; let index = index;" >
+            <tr class="rows days cdk-drag-disabled" (dragstart)="preventDrag($event)"  *ngFor="let rental_unit of rental_units; let index = index; trackBy: trackRentalUnits" >
                 <td class="cell-room rental-unit"
                     (mouseenter)="onhoverRentalUnit(rental_unit); hover_row_index = index"
                     (mouseleave)="onhoverRentalUnit(null); hover_row_index = -1"
@@ -59,18 +59,18 @@
                 <td *ngFor="let day of headers.days; let i = index"
                     (dragstart)="preventDrag($event)"
                     class="cell-days cdk-drag-disabled"
-                    [class.is-weekend]="isWeekEnd(day)"
+                    [class.is-weekend]="headers.days_is_weekend[i]"
                     (mousedown)="onmousedown($event, rental_unit, day)"
                     (mouseup)="onmouseup()"
                     (mouseover)="onmouseover($event, day)"
                     (mouseenter)="hover_row_index = index"
                     (mouseleave)="hover_row_index = -1">
                     <!-- vertical indicator -->
-                    <div *ngIf="isToday(day)" class="is-today"></div>
+                    <div *ngIf="headers.days_is_today[i]" class="is-today"></div>
                     <!-- consumption cell -->
-                    <ng-container *ngIf="hasConsumption(rental_unit, headers.days_indexes[i])">
+                    <ng-container *ngIf="consumptions?.[rental_unit.id]?.hasOwnProperty(headers.days_indexes[i])">
                         <div class="cell-consumptions">
-                            <ng-container *ngFor="let consumption of getConsumptions(rental_unit, day)">
+                            <ng-container *ngFor="let consumption of consumptions[rental_unit.id][headers.days_indexes[i]]">
                                 <planning-calendar-booking
                                     [height]="rowsHeight"
                                     [width]="cellsWidth"
@@ -113,7 +113,7 @@
                 <!-- #debug - for debugging, add [attr.data-date]="day" -->
                 <td *ngFor="let day_index of headers.days_indexes; let i = index"
                     class="cell-stat cell-days"
-                    [class.is-weekend]="isWeekEnd(headers.days[i])"
+                    [class.is-weekend]="headers.days_is_weekend[i]"
                     [class.small]="cellsWidth <= 26"
                     [class.hidden]="cellsWidth < 10">
                         {{mapStats['capacity'][day_index]}}
@@ -127,7 +127,7 @@
                 <!-- #debug - for debugging, add [attr.data-date]="day" -->
                 <td *ngFor="let day_index of headers.days_indexes; let i = index"
                     class="cell-stat cell-days"
-                    [class.is-weekend]="isWeekEnd(headers.days[i])"
+                    [class.is-weekend]="headers.days_is_weekend[i]"
                     [class.small]="cellsWidth <= 26"
                     [class.hidden]="cellsWidth < 10">
                         {{mapStats['blocked'][day_index]}}
@@ -141,7 +141,7 @@
                 <!-- #debug - for debugging, add [attr.data-date]="day" -->
                 <td *ngFor="let day_index of headers.days_indexes; let i = index"
                     class="cell-stat cell-days"
-                    [class.is-weekend]="isWeekEnd(headers.days[i])"
+                    [class.is-weekend]="headers.days_is_weekend[i]"
                     [class.small]="cellsWidth <= 26"
                     [class.hidden]="cellsWidth < 10">
                         {{mapStats['occupied'][day_index]}}
@@ -173,10 +173,10 @@
                 <!-- #debug - for debugging, add [attr.data-date]="day" -->
                 <td *ngFor="let day_index of headers.days_indexes; let i = index"
                     class="cell-stat cell-days"
-                    [class.is-weekend]="isWeekEnd(headers.days[i])"
-                    [class.small]="(cellsWidth <= 50 && isToday(headers.days[i])) || cellsWidth <= 26"
+                    [class.is-weekend]="headers.days_is_weekend[i]"
+                    [class.small]="(cellsWidth <= 50 && headers.days_is_today[i]) || cellsWidth <= 26"
                     [class.hidden]="cellsWidth < 10">
-                        <ng-container *ngIf="isToday(headers.days[i])">{{mapStats['arrivals_confirmed'][day_index]}} / </ng-container>{{mapStats['arrivals_expected'][day_index]}}
+                        <ng-container *ngIf="headers.days_is_today[i]">{{mapStats['arrivals_confirmed'][day_index]}} / </ng-container>{{mapStats['arrivals_expected'][day_index]}}
                 </td>
             </tr>
             <tr class="rows">
@@ -187,10 +187,10 @@
                 <!-- #debug - for debugging, add [attr.data-date]="day" -->
                 <td *ngFor="let day_index of headers.days_indexes; let i = index"
                     class="cell-stat cell-days"
-                    [class.is-weekend]="isWeekEnd(headers.days[i])"
-                    [class.small]="(cellsWidth <= 50 && isToday(headers.days[i])) || cellsWidth <= 26"
+                    [class.is-weekend]="headers.days_is_weekend[i]"
+                    [class.small]="(cellsWidth <= 50 && headers.days_is_today[i]) || cellsWidth <= 26"
                     [class.hidden]="cellsWidth < 10">
-                        <ng-container *ngIf="isToday(headers.days[i])">{{mapStats['departures_confirmed'][day_index]}} / </ng-container>{{mapStats['departures_expected'][day_index]}}
+                        <ng-container *ngIf="headers.days_is_today[i]">{{mapStats['departures_confirmed'][day_index]}} / </ng-container>{{mapStats['departures_expected'][day_index]}}
                 </td>
             </tr>
         </tbody>

@@ -1,21 +1,24 @@
-<div class="reservedBox">
-
+<div class="reservedBox"
+     [style.--width]="width_property"
+     [style.--height]="height_property"
+     [style.--offset]="offset_property"
+>
     <div class="booking-details"
         [class.less-28]="height < 28"
         [class.less-15]="height < 15"
         [class.less-12]="height < 12"
         [class.not-first]="consumption.date != consumption.date_from"
         [class.part]="consumption.type == 'part'"
-        [style.background-color]="getColor()"
+        [style.background-color]="color"
         (mouseenter)="onEnterConsumption(consumption)"
-        (mouseleave)="onLeaveConsumption(consumption)">
-
+        (mouseleave)="onLeaveConsumption(consumption)"
+    >
         <div *ngIf="consumption.type != 'ooo'" (click)="onShowBooking(consumption)" >
             <div class="consumption-booking">
                 <!-- #memo - this part is discarded if available height is less than 28px -->
                 <div style="flex: 0 1 20%;">{{consumption.booking_id?.name}}</div>
                 <div style="margin-left: auto">
-                    <span class="material-icons">{{getIcon()}}</span>
+                    <span class="material-icons">{{icon}}</span>
                 </div>
             </div>
             <div class="consumption-customer">
@@ -31,7 +34,5 @@
                 </div>
             </div>
         </div>
-
     </div>
-
 </div>

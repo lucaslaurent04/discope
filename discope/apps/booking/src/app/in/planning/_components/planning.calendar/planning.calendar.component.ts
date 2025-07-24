@@ -4,14 +4,12 @@ import { ChangeReservationArg } from 'src/app/model/changereservationarg';
 import { HeaderDays } from 'src/app/model/headerdays';
 
 
-import { ApiService, AuthService } from 'sb-shared-lib';
+import { ApiService } from 'sb-shared-lib';
 import { CalendarParamService } from '../../_services/calendar.param.service';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { ConsumptionCreationDialog } from './_components/consumption.dialog/consumption.component';
-import { HttpResponse } from '@angular/common/http';
-import { max } from 'date-fns';
 
 class RentalUnit {
     constructor(
@@ -63,6 +61,7 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
     public consumptions: any = [];
     public rental_units: any = [];
     public holidays: any = [];
+    public holidays_classes: any = [];
     // count of rental units taken under account (not necessarily equal to `rental_units.length`)
     public count_rental_units: number = 0;
 
@@ -116,7 +115,8 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
         private dialog: MatDialog,
         private snack: MatSnackBar,
         private elementRef: ElementRef,
-        private cd: ChangeDetectorRef) {
+        private cd: ChangeDetectorRef
+    ) {
             this.headers = {};
             this.rental_units = [];
             this.previous_duration = 0;
@@ -140,6 +140,7 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
 
         this.params.getObservable().subscribe( () => {
             console.log('PlanningCalendarComponent cal params change', this.params);
+            this.consumptions = [];
             this.onRefresh();
         });
 
@@ -153,7 +154,7 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
      * After refreshing the view with new content, adapt header and relay new cell_width, if changed
      */
     async ngAfterViewChecked() {
-
+        this.cd.detach();
         this.tableRect = this.calTable.nativeElement.getBoundingClientRect();
 
         if(this.calTableHeadCells) {
@@ -181,12 +182,17 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
 
         // make sure ngOnChanges is triggered on sub-components
         this.cd.detectChanges();
+        this.cd.reattach();
     }
 
-    public onRefresh() {
-        console.log('onrefresh')
+    public onRefresh(manual = false) {
+        if(this.loading) {
+            console.log('onrefresh skipped because already refreshing');
+            return;
+        }
+        console.log('onrefresh');
+        this.cd.detach();
         this.loading = true;
-        this.cd.detectChanges();
         this.show_parents = (localStorage.getItem('planning_show_parents') === 'true');
         this.show_children = (localStorage.getItem('planning_show_children') === 'true');
         if(!this.show_parents && !this.show_children) {
@@ -195,9 +201,15 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
         }
         // refresh the view, then run onchange
         setTimeout( async () => {
-            await this.onFiltersChange();
-            this.cd.reattach();
+            try {
+                await this.onFiltersChange(manual);
+            }
+            catch(e) {
+                console.log('error onFiltersChange', e);
+            }
+
             this.loading = false;
+            this.cd.reattach();
             this.cd.detectChanges();
         });
     }
@@ -216,29 +228,15 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
     public isToday(day:Date) {
         return (day.getDate() == this.today.getDate() && day.getMonth() == this.today.getMonth() && day.getFullYear() == this.today.getFullYear());
     }
-/*
-    public isTodayIndex(day_index:string) {
-        return (this.today_index == day_index);
-    }
-*/
-    public hasConsumption(rentalUnit:RentalUnit, day_index: string):any {
+
+    public hasConsumption(rentalUnit: RentalUnit, day_index: string):any {
         if(!this.consumptions.hasOwnProperty(rentalUnit.id) || !this.consumptions[rentalUnit.id]) {
             return false;
         }
         return this.consumptions[rentalUnit.id].hasOwnProperty(day_index);
     }
 
-    public getConsumptions(rentalUnit:RentalUnit, day: Date): any {
-        if(this.consumptions.hasOwnProperty(rentalUnit.id) && this.consumptions[rentalUnit.id]) {
-            let date_index:string = this.calcDateIndex(day);
-            if(this.consumptions[rentalUnit.id].hasOwnProperty(date_index)) {
-                return this.consumptions[rentalUnit.id][date_index];
-            }
-        }
-        return {};
-    }
-
-    public getDescription(consumption:any): string {
+    public getDescription(consumption: any): string {
         if(consumption.hasOwnProperty('booking_id')
             && consumption['booking_id']
             && consumption['booking_id'].hasOwnProperty('description')) {
@@ -252,16 +250,18 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
         return '';
     }
 
-    public getHolidayClasses(day: Date): string[] {
-        let result = [];
-        let date_index:string = this.calcDateIndex(day);
-        if(this.holidays.hasOwnProperty(date_index) && this.holidays[date_index] && this.holidays[date_index].length) {
-            result = this.holidays[date_index];
-        }
-        return result.map( (o:any) => o.type);
-    }
-
     private async computeStats() {
+        this.mapStats = {
+            'occupied': {},
+            'capacity': {},
+            'blocked': {},
+            'occupancy': {},
+            'arrivals_expected': {},
+            'arrivals_confirmed': {},
+            'departures_expected': {},
+            'departures_confirmed': {}
+        };
+
         // reset values
         this.count_rental_units = 0;
         for(let rentalUnit of this.rental_units) {
@@ -381,89 +381,96 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
 
     }
 
-    private async onFiltersChange() {
-        this.createHeaderDays();
+    private async onFiltersChange(manual = false) {
+        if(!manual) {
+            this.createHeaderDays();
+        }
 
-        try {
-            const domain: any[] = JSON.parse(JSON.stringify(this.params.rental_units_filter));
-            if(!domain.length) {
-                domain.push([['can_rent', '=', true], ["center_id", "in", this.params.centers_ids]]);
+        const rental_units_domain: any[] = JSON.parse(JSON.stringify(this.params.rental_units_filter));
+        if(!rental_units_domain.length) {
+            rental_units_domain.push([['can_rent', '=', true], ["center_id", "in", this.params.centers_ids]]);
+        }
+        else {
+            for(let i = 0, n = rental_units_domain.length; i < n; ++i) {
+                rental_units_domain[i].push(["center_id", "in",  this.params.centers_ids]);
             }
-            else {
-                for(let i = 0, n = domain.length; i < n; ++i) {
-                    domain[i].push(["center_id", "in",  this.params.centers_ids]);
+        }
+
+        const rental_units_promise = this.api.collect(
+            "realestate\\RentalUnit",
+            rental_units_domain,
+            Object.getOwnPropertyNames(new RentalUnit()),
+            'center_id,order', 'asc', 0, 500
+        )
+            .then(response => {
+                if(response) {
+                    this.rental_units = response;
                 }
-            }
-            const rental_units = await this.api.collect(
-                "realestate\\RentalUnit",
-                domain,
-                Object.getOwnPropertyNames(new RentalUnit()),
-                'center_id,order', 'asc', 0, 500
-            );
-            if(rental_units) {
-                this.rental_units = rental_units;
-            }
-        }
-        catch(response) {
-            console.warn('unable to fetch rental units', response);
-        }
-
+            })
+            .catch(response => {
+                console.warn('unable to fetch rental units', response);
+            });
 
         if(this.params.centers_ids.length <= 0) {
-            this.loading = false;
+            await rental_units_promise;
             return;
         }
 
-        try {
-            let holidays:any = await this.api.collect(
-                "calendar\\Holiday",
-                [
-                    [ [ "date_from", ">=",  this.params.date_from], [ "date_to", "<=",  this.params.date_to ] ],
-                    [ [ "date_from", ">=",  this.params.date_from], [ "date_from", "<=",  this.params.date_to ] ],
-                    [ [ "date_to", ">=",  this.params.date_from], [ "date_to", "<=",  this.params.date_to ] ],
-                ],
-                ['name', 'date_from', 'date_to', 'type'],
-                'id', 'asc', 0, 100
-            );
-            if(holidays) {
-                for(let holiday of holidays) {
-                    holiday['date_from_int']  = parseInt(holiday.date_from.substring(0, 10).replace(/-/gi, ''), 10);
-                    holiday['date_to_int'] = parseInt(holiday.date_to.substring(0, 10).replace(/-/gi, ''), 10);
+        const holidays_promise = this.api.collect(
+            "calendar\\Holiday",
+            [
+                [ [ "date_from", ">=",  this.params.date_from], [ "date_to", "<=",  this.params.date_to ] ],
+                [ [ "date_from", ">=",  this.params.date_from], [ "date_from", "<=",  this.params.date_to ] ],
+                [ [ "date_to", ">=",  this.params.date_from], [ "date_to", "<=",  this.params.date_to ] ],
+            ],
+            ['name', 'date_from', 'date_to', 'type'],
+            'id', 'asc', 0, 100
+        )
+            .then(response => {
+                if(response) {
+                    for(let holiday of response) {
+                        holiday['date_from_int']  = parseInt(holiday.date_from.substring(0, 10).replace(/-/gi, ''), 10);
+                        holiday['date_to_int'] = parseInt(holiday.date_to.substring(0, 10).replace(/-/gi, ''), 10);
+                    }
+                    this.holidays = {};
+                    for (let d = new Date(this.params.date_from.getTime()); d <= this.params.date_to; d.setDate(d.getDate() + 1)) {
+                        let date_index:string = this.calcDateIndex(d);
+                        let date_int  = parseInt(date_index.replace(/-/gi, ''), 10);
+                        this.holidays[date_index] = response.filter( (h:any) => (date_int >= h['date_from_int'] && date_int <= h['date_to_int']) );
+                    }
+                    this.holidays_classes = {};
+                    for(let index in this.holidays) {
+                        this.holidays_classes[index] = this.holidays[index].map((h: any) => h.type);
+                    }
                 }
-                this.holidays = {};
-                let d = new Date();
-                for (let d = new Date(this.params.date_from.getTime()); d <= this.params.date_to; d.setDate(d.getDate() + 1)) {
-                    let date_index:string = this.calcDateIndex(d);
-                    let date_int  = parseInt(date_index.replace(/-/gi, ''), 10);
-                    this.holidays[date_index] = holidays.filter( (h:any) => (date_int >= h['date_from_int'] && date_int <= h['date_to_int']) );
+            })
+            .catch(response => {
+                console.warn('unable to fetch holidays', response);
+                // if a 403 response is received, we assume that the user is not identified: redirect to /auth
+                if(response.status == 403) {
+                    window.location.href = '/auth';
                 }
-            }
-        }
-        catch(response: any) {
-            console.warn('unable to fetch holidays', response);
-            // if a 403 response is received, we assume that the user is not identified: redirect to /auth
-            if(response.status == 403) {
-                window.location.href = '/auth';
-            }
-        }
-
-        try {
-            this.consumptions = await this.api.fetch('?get=sale_booking_consumption_map', {
-                // #memo - all dates are considered UTC
-                date_from: this.calcDateIndex(this.params.date_from),
-                date_to: this.calcDateIndex(this.params.date_to),
-                centers_ids: JSON.stringify(this.params.centers_ids)
             });
-            await this.computeStats();
-        }
-        catch(response: any ) {
-            console.warn('unable to fetch rental units', response);
-            // if a 403 response is received, we assume that the user is not identified: redirect to /auth
-            if(response.status == 403) {
-                window.location.href = '/auth';
-            }
-        }
 
+        const consumptions_promise = this.api.fetch('?get=sale_booking_consumption_map', {
+            // #memo - all dates are considered UTC
+            date_from: this.calcDateIndex(this.params.date_from),
+            date_to: this.calcDateIndex(this.params.date_to),
+            centers_ids: JSON.stringify(this.params.centers_ids)
+        })
+            .then(async (response) => {
+                this.consumptions = response;
+                await this.computeStats();
+            })
+            .catch(response => {
+                console.warn('unable to fetch rental units', response);
+                // if a 403 response is received, we assume that the user is not identified: redirect to /auth
+                if(response.status == 403) {
+                    window.location.href = '/auth';
+                }
+            });
+
+        await Promise.all([rental_units_promise, holidays_promise, consumptions_promise]);
     }
 
 
@@ -482,7 +489,6 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
      * headers.days: date[]
      */
     private createHeaderDays() {
-
         if(this.previous_duration != this.params.duration) {
             // temporarily reset cellsWidth to an arbitrary low value
             this.cellsWidth = 12;
@@ -494,6 +500,8 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
         this.headers = {
             months: [],
             days: [],
+            days_is_weekend: [],
+            days_is_today: [],
             days_indexes: []
         };
 
@@ -503,6 +511,8 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
             let date = new Date(this.params.date_from.getTime());
             date.setDate(date.getDate() + i);
             this.headers.days.push(date);
+            this.headers.days_is_weekend.push(this.isWeekEnd(date));
+            this.headers.days_is_today.push(this.isToday(date));
             this.headers.days_indexes.push(this.calcDateIndex(date))
             let month_index = date.getFullYear()*100+date.getMonth();
             if(!months.hasOwnProperty(month_index)) {
@@ -736,5 +746,9 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
 
     public preventDrag($event:any) {
         $event.preventDefault();
+    }
+
+    public trackRentalUnits(rentalUnit: any) {
+        return rentalUnit.id;
     }
 }
