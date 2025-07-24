@@ -55,7 +55,7 @@
                         overflow: hidden;
 
                         &.group-selected {
-                            max-height: 4000px;
+                            max-height: none;
                             transition: max-height .5s ease-in;
                         }
 
