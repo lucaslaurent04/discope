@@ -1,5 +1,4 @@
-import { Component, Input, Output, ElementRef, EventEmitter, OnInit, OnChanges, SimpleChanges, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { de, es } from 'date-fns/locale';
+import { Component, Input, Output, ElementRef, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 
 const millisecondsPerDay:number = 24 * 60 * 60 * 1000;
 
@@ -8,7 +7,7 @@ const millisecondsPerDay:number = 24 * 60 * 60 * 1000;
   templateUrl: './planning.calendar.booking.component.html',
   styleUrls: ['./planning.calendar.booking.component.scss']
 })
-export class PlanningCalendarBookingComponent implements OnInit, OnChanges  {
+export class PlanningCalendarBookingComponent implements OnChanges  {
     @Input()  day: Date;
     @Input()  consumption: any;
     @Input()  width: number;
@@ -17,18 +16,27 @@ export class PlanningCalendarBookingComponent implements OnInit, OnChanges  {
     @Output() hover = new EventEmitter<any>();
     @Output() selected = new EventEmitter<any>();
 
+    public color: string = '#7733aa';
+    public icon: string = '';
+
+    public width_property: string = '';
+    public height_property: string = '';
+    public offset_property: string = '';
+
     constructor(
         private elementRef: ElementRef
     ) {}
 
-    ngOnInit() { }
-
     ngOnChanges(changes: SimpleChanges) {
-        if (changes.consumption || changes.width) {
+        if(changes.consumption) {
+            this.color = this.getColor();
+            this.icon = this.getIcon();
+        }
+        if(changes.consumption || changes.width) {
             this.datasourceChanged();
         }
         if(changes.height) {
-            this.elementRef.nativeElement.style.setProperty('--height', this.height+'px');
+            this.height_property = this.height+'px';
         }
     }
 
@@ -111,14 +119,14 @@ export class PlanningCalendarBookingComponent implements OnInit, OnChanges  {
 
         // #memo - width can be expressed in px or %
         if(width === undefined) {
-            this.elementRef.nativeElement.style.setProperty('--width', '100%');
+            this.width_property = '100%';
         }
         else {
-            this.elementRef.nativeElement.style.setProperty('--width', width.toString() + 'px');
+            this.width_property = width.toString()+'px';
         }
 
-        this.elementRef.nativeElement.style.setProperty('--height', this.height+'px');
-        this.elementRef.nativeElement.style.setProperty('--offset', offset+'px');
+        this.height_property = this.height+'px';
+        this.offset_property = offset+'px';
     }
 
 
@@ -149,60 +157,46 @@ export class PlanningCalendarBookingComponent implements OnInit, OnChanges  {
         if(this.consumption.type == 'ooo') {
             return colors['red'];
         }
-        else if(this.consumption.booking_id?.status == 'quote') {
-            // #memo - reverted to quote but without releasing the rental units
-            return colors['grey'];
+
+        const statuses: any = {
+            quote: colors['grey'],
+            option: colors['blue'],
+            confirmed: colors['yellow'],
+            validated: colors['green'],
+            checkedin: colors['turquoise'],
+            checkedout: colors['grey'],
+        };
+
+        if(!this.consumption.booking_id?.status || !statuses[this.consumption.booking_id.status]) {
+            return colors['purple'];
         }
-        else if(this.consumption.booking_id?.status == 'option') {
-            return colors['blue'];
+        else {
+            return statuses[this.consumption.booking_id?.status];
         }
-        else if(this.consumption.booking_id?.status == 'confirmed') {
-            return colors['yellow'];
-        }
-        else if(this.consumption.booking_id?.status == 'validated') {
-            return colors['green'];
-        }
-        else if(this.consumption.booking_id?.status == 'checkedin') {
-            return colors['turquoise'];
-        }
-        else if(this.consumption.booking_id?.status == 'checkedout') {
-            return colors['grey'];
-        }
-        // invoiced and beyond
-        return colors['purple'];
     }
 
     public getIcon() {
         if(this.consumption.type == 'ooo') {
             return 'block';
         }
-        else if(this.consumption.booking_id?.status == 'quote') {
-            // #memo - reverted to quote but without releasing the rental units
-            return 'question_mark';
+
+        const statuses: any = {
+            quote: 'question_mark',
+            option: 'question_mark',
+            confirmed: 'attach_money',
+            validated: 'check',
+            invoiced: 'attach_money'
+        };
+
+        if(!this.consumption.booking_id?.status || !statuses[this.consumption.booking_id.status]) {
+            return '';
         }
-        else if(this.consumption.booking_id?.status == 'option') {
-            return 'question_mark';
+
+        if(this.consumption.booking_id.payment_status == 'paid') {
+            statuses.confirmed = statuses.invoiced = 'money_off';
         }
-        else if(this.consumption.booking_id?.status == 'confirmed') {
-            if(this.consumption.booking_id?.payment_status == 'paid') {
-                return 'money_off';
-            }
-            else {
-                return 'attach_money';
-            }
-        }
-        else if(this.consumption.booking_id?.status == 'validated') {
-            return 'check';
-        }
-        else if(this.consumption.booking_id?.status == 'invoiced') {
-            if(this.consumption.booking_id?.payment_status == 'paid') {
-                return 'money_off';
-            }
-            else {
-                return 'attach_money';
-            }
-        }
-        return '';
+
+        return statuses[this.consumption.booking_id.status];
     }
 
 }
