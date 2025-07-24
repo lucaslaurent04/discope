@@ -19,7 +19,7 @@ import { BookingAgeRangeAssignment } from '../../_models/booking_agerange_assign
 import { MatAutocomplete } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
 import { BookingActivityDay } from './_components/day-activities/day-activities.component';
-import { BookedServicesDisplaySettings } from '../../../../services.component';
+import { BookedServicesDisplaySettings, RentalUnitsSettings } from '../../../../services.component';
 import { BookingMealDay } from './_components/day-meals/day-meals.component';
 import { BookingServicesBookingGroupDialogParticipantsOptionsComponent } from './_components/dialog-participants-options/dialog-participants-options.component';
 
@@ -105,6 +105,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     @Input() bookingActivitiesDays: BookingActivityDay[];
     @Input() bookingMealsDays: BookingMealDay[];
     @Input() displaySettings: BookedServicesDisplaySettings;
+    @Input() rentalUnitsSettings: RentalUnitsSettings;
 
     @Output() loadStart = new EventEmitter();
     @Output() loadEnd   = new EventEmitter();
