@@ -160,12 +160,6 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "is_activity",
-                                                "width": "100%",
-                                                "visible": false
-                                            },
-                                            {
-                                                "type": "field",
                                                 "value": "is_fullday",
                                                 "width": "100%",
                                                 "readonly": true
@@ -290,6 +284,36 @@
                                                 "type": "field",
                                                 "value": "analytic_section_id",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_activity",
+                                                "width": "50%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_supply",
+                                                "width": "50%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_rental_unit",
+                                                "width": "50%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_meal",
+                                                "width": "50%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_snack",
+                                                "width": "50%",
+                                                "readonly": true
                                             }
                                         ]
                                     }
