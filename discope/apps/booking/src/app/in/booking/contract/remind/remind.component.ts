@@ -546,7 +546,7 @@ export class BookingContractRemindComponent implements OnInit, AfterContentInit 
         // emails of the contacts
         if(this.contacts && this.contacts.length) {
             for(let contact of this.contacts) {
-                if(!contact.email.length) {
+                if(!contact.email) {
                     continue;
                 }
                 if(!this.vm.recipient.addresses.includes(contact.email)) {

@@ -41,18 +41,18 @@
             "controller": "sale_booking_funding_do-paid",
             "confirm": true,
             "access": {
-                "groups": ["finance.default.administrator", "finance.default.user"]
+                "groups": ["admins"]
             },
             "visible": ["is_paid", "=", false]
         },
         {
             "id": "action.mark_unpaid",
-            "label": "Mark as non-paid",
-            "description": "Funding will be arbitrary marked as non paid (this has no impact on actual payments).",
+            "label": "Mark as not paid",
+            "description": "Funding payment fields (status, paid_amount, is_paid) set to NULL for re-computation.",
             "controller": "sale_booking_funding_do-unpaid",
             "confirm": true,
             "access": {
-                "groups": ["finance.default.administrator", "finance.default.user"]
+                "groups": ["admins"]
             },
             "visible": ["is_paid", "=", true]
         }
