@@ -795,6 +795,25 @@
                                 ]
                             },
                             {
+                                "id": "sales.settings.booking_types",
+                                "label": "Booking types",
+                                "description": "",
+                                "icon": "list",
+                                "type": "parent",
+                                "children": [
+                                    {
+                                        "id": "sales.settings.booking_types.assignments",
+                                        "type": "entry",
+                                        "label": "Assignments",
+                                        "description": "",
+                                        "context": {
+                                            "entity": "sale\\booking\\BookingTypeAssignment",
+                                            "view": "list.default"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
                                 "id": "sales.settings.payments_plans",
                                 "type": "entry",
                                 "label": "Payment plans",

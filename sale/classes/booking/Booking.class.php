@@ -1550,6 +1550,11 @@ class Booking extends Model {
      * Recomputes `type_id`.
      */
     public static function refreshBookingType($om, $id) {
+        $assignments_ids = $om->search(BookingTypeAssignment::getType(), []);
+        if(!empty($assignments_ids)) {
+            self::refreshBookingTypeWithAssignments($om, $id);
+            return;
+        }
 
         $bookings = $om->read(self::getType(), $id, [
             'id',
@@ -1624,6 +1629,142 @@ class Booking extends Model {
         }
 
         $om->update(self::getType(), $id, ['type_id' => $type_id]);
+    }
+
+    public static function refreshBookingTypeWithAssignments($om, $id) {
+        $bookings = $om->read(self::getType(), $id, [
+            'id',
+            'is_from_channelmanager',
+            'booking_lines_groups_ids'
+        ]);
+
+        if($bookings <= 0) {
+            return null;
+        }
+
+        $booking = reset($bookings);
+
+        $assignments_ids = $om->search(BookingTypeAssignment::getType(), []);
+        if(empty($assignments_ids)) {
+            return null;
+        }
+
+        $assignments = $om->read(BookingTypeAssignment::getType(), $assignments_ids, [
+            'name',
+            'booking_type_id',
+            'sojourn_type_id',
+            'booking_type_assign_rules_ids',
+            'rate_classes_ids'
+        ]);
+
+        $groups = $om->read(BookingLineGroup::getType(), $booking['booking_lines_groups_ids'], [
+            'id',
+            'is_sojourn',
+            'nb_pers',
+            'nb_adults',
+            'nb_children',
+            'rate_class_id'
+        ]);
+
+        $default_booking_type_id = 1;
+        $matched_assignment = null;
+        foreach($assignments as $assignment) {
+            $rules = $om->read(BookingTypeAssignmentRule::getType(), $assignment['booking_type_assign_rules_ids'], [
+                'operand',
+                'operator',
+                'value'
+            ]);
+
+            if(!$assignment['sojourn_type_id'] && empty($assignment['rate_classes_ids']) && empty($assignment['booking_type_assign_rules_ids'])) {
+                $default_booking_type_id = $assignment['booking_type_id'];
+                continue;
+            }
+
+            $on_booking = [
+                'is_from_channelmanager'
+            ];
+            $on_sojourn_group = [
+                'is_sojourn',
+                'nb_pers',
+                'nb_children',
+                'nb_adults',
+            ];
+
+            $valid = true;
+            foreach($rules as $rule) {
+                $operator = $rule['operator'];
+                if(!in_array($rule['operator'], ['>', '>=', '<', '<=', '='])) {
+                    $valid = false;
+                    break;
+                }
+                if($operator === '=') {
+                    $operator = '==';
+                }
+
+                $value = $rule['value'];
+                if(!is_numeric($rule['value'])) {
+                    $value = "'$value'";
+                }
+
+                if(in_array($rule['operand'], $on_booking)) {
+                    $operand = $booking[$rule['operand']];
+                    if(!is_numeric($operand)) {
+                        $operand = "'$operand'";
+                    }
+
+                    if(!eval("return $operand $operator $value;")) {
+                        $valid = false;
+                        break;
+                    }
+                }
+                elseif(in_array($rule['operand'], $on_sojourn_group)) {
+                    $group_match = false;
+                    foreach($groups as $group) {
+                        if(!empty($assignment['rate_classes_ids']) && !in_array($group['rate_class_id'], $assignment['rate_classes_ids'])) {
+                            continue;
+                        }
+
+                        $operand = $group[$rule['operand']];
+                        if(!is_numeric($operand)) {
+                            $operand = "'$value'";
+                        }
+
+                        if(eval("return $operand $operator $value;")) {
+                            $group_match = true;
+                            break;
+                        }
+                    }
+
+                    if(!$group_match) {
+                        $valid = false;
+                        break;
+                    }
+                }
+            }
+
+            if(empty($rules) && !empty($assignment['rate_classes_ids'])) {
+                $group_match = false;
+                foreach($groups as $group) {
+                    if(in_array($group['rate_class_id'], $assignment['rate_classes_ids'])) {
+                        $group_match = true;
+                        break;
+                    }
+                }
+
+                if(!$group_match) {
+                    $valid = false;
+                }
+            }
+
+            if($valid) {
+                $matched_assignment = $assignment;
+                break;
+            }
+        }
+
+        $booking_type_id = $matched_assignment ? $matched_assignment['booking_type_id'] : $default_booking_type_id;
+
+        $om->update(self::getType(), $id, ['type_id' => $booking_type_id]);
     }
 
 

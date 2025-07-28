@@ -1,0 +1,47 @@
+{
+    "name": "Assignation type réservation",
+    "plural": "Assignation type réservations",
+    "description": "Une configuration d'assignation de type de réservation.",
+    "model": {
+        "booking_type_id": {
+            "label": "Type de réservation à appliquer",
+            "description": "",
+            "help": ""
+        },
+        "sojourn_type_id": {
+            "label": "Type de séjour",
+            "description": "",
+            "help": ""
+        },
+        "booking_type_assign_rules_ids": {
+            "label": "Règles",
+            "description": "",
+            "help": ""
+        },
+        "rate_classes_ids": {
+            "label": "Classes tarifaire",
+            "description": "",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Assignation type réservation",
+            "description": "",
+            "layout": {
+                "section.rules": {
+                    "label": "Règles"
+                },
+                "section.rate_classes": {
+                    "label": "Catégories tarifaires"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Assignations type réservation",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

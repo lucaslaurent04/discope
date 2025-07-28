@@ -250,6 +250,14 @@
             "label": "Toutes les Saisons",
             "help": ""
         },
+        "sales.settings.booking_types": {
+            "label": "Types de réservations",
+            "help": ""
+        },
+        "sales.settings.booking_types.assignments": {
+            "label": "Assignations",
+            "help": ""
+        },
         "sales.settings.payments_plans": {
             "label": "Plans de paiement",
             "help": ""

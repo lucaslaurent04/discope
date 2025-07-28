@@ -1,0 +1,54 @@
+{
+    "name": "Règle d'assignation de type de réservation",
+    "plural": "Règle d'assignation de type de réservations",
+    "description": "",
+    "model": {
+        "booking_type_assignment_id": {
+            "label": "Assignation",
+            "description": "",
+            "help": ""
+        },
+        "operand": {
+            "label": "Opérande",
+            "description": "L'opérande de la condition.",
+            "help": "",
+            "selection": {
+                "nb_pers": "nombre de personnes",
+                "nb_children": "nombre d'enfants",
+                "nb_adults": "nombre d'adultes",
+                "is_from_channelmanager": "channel manager",
+                "is_sojourn": "séjour"
+            }
+        },
+        "operator": {
+            "label": "Opérateur",
+            "description": "L'opérateur à appliquer.",
+            "help": "",
+            "selection": {
+                "=": "=",
+                ">": ">",
+                ">=": ">=",
+                "<": "<",
+                "<=": "<="
+            }
+        },
+        "value": {
+            "label": "Valeur",
+            "description": "Valeur de la condition.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Règle d'assignation",
+            "description": "",
+            "layout": {}
+        },
+        "list.default": {
+            "name": "Règles d'assignation",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}
