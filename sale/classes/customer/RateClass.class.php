@@ -20,6 +20,7 @@ class RateClass extends Model {
 
     public static function getColumns() {
         return [
+
             'name' => [
                 'type'              => 'string',
                 'required'          => true,
@@ -30,8 +31,18 @@ class RateClass extends Model {
                 'type'              => 'string',
                 'description'       => "Short description of the rate class.",
                 'multilang'         => true
+            ],
+
+            'booking_type_attributions_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\booking\BookingTypeAttribution',
+                'foreign_field'     => 'rate_classes_ids',
+                'rel_table'         => 'sale_booking_type_attribution_rel_sale_rate_class',
+                'rel_local_key'     => 'rate_class_id',
+                'rel_foreign_key'   => 'booking_type_attribution_id',
+                'description'       => "The booking type attributions that may apply if booking customer has rate class."
             ]
+
         ];
     }
-
 }
