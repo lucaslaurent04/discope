@@ -33,14 +33,14 @@ class RateClass extends Model {
                 'multilang'         => true
             ],
 
-            'booking_type_assignments_ids' => [
+            'booking_type_attributions_ids' => [
                 'type'              => 'many2many',
-                'foreign_object'    => 'sale\booking\BookingTypeAssignment',
+                'foreign_object'    => 'sale\booking\BookingTypeAttribution',
                 'foreign_field'     => 'rate_classes_ids',
-                'rel_table'         => 'sale_booking_type_assignment_rel_sale_rate_class',
+                'rel_table'         => 'sale_booking_type_attribution_rel_sale_rate_class',
                 'rel_local_key'     => 'rate_class_id',
-                'rel_foreign_key'   => 'booking_type_assignment_id',
-                'description'       => "The booking type assignments that may apply if booking customer has rate class."
+                'rel_foreign_key'   => 'booking_type_attribution_id',
+                'description'       => "The booking type attributions that may apply if booking customer has rate class."
             ]
 
         ];

@@ -3,7 +3,7 @@
     "plural": "Règle d'assignation de type de réservations",
     "description": "",
     "model": {
-        "booking_type_assignment_id": {
+        "booking_type_attribution_id": {
             "label": "Assignation",
             "description": "",
             "help": ""

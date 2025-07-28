@@ -1550,9 +1550,9 @@ class Booking extends Model {
      * Recomputes `type_id`.
      */
     public static function refreshBookingType($om, $id) {
-        $assignments_ids = $om->search(BookingTypeAssignment::getType(), []);
-        if(!empty($assignments_ids)) {
-            self::refreshBookingTypeWithAssignments($om, $id);
+        $attributions_ids = $om->search(BookingTypeAttribution::getType(), []);
+        if(!empty($attributions_ids)) {
+            self::refreshBookingTypeWithAttributions($om, $id);
             return;
         }
 
@@ -1631,7 +1631,7 @@ class Booking extends Model {
         $om->update(self::getType(), $id, ['type_id' => $type_id]);
     }
 
-    public static function refreshBookingTypeWithAssignments($om, $id) {
+    public static function refreshBookingTypeWithAttributions($om, $id) {
         $bookings = $om->read(self::getType(), $id, [
             'id',
             'is_from_channelmanager',
@@ -1644,16 +1644,16 @@ class Booking extends Model {
 
         $booking = reset($bookings);
 
-        $assignments_ids = $om->search(BookingTypeAssignment::getType(), []);
-        if(empty($assignments_ids)) {
+        $attributions_ids = $om->search(BookingTypeAttribution::getType(), []);
+        if(empty($attributions_ids)) {
             return null;
         }
 
-        $assignments = $om->read(BookingTypeAssignment::getType(), $assignments_ids, [
+        $attributions = $om->read(BookingTypeAttribution::getType(), $attributions_ids, [
             'name',
             'booking_type_id',
             'sojourn_type_id',
-            'booking_type_assign_rules_ids',
+            'booking_type_conditions_ids',
             'rate_classes_ids'
         ]);
 
@@ -1663,20 +1663,21 @@ class Booking extends Model {
             'nb_pers',
             'nb_adults',
             'nb_children',
-            'rate_class_id'
+            'rate_class_id',
+            'sojourn_type_id'
         ]);
 
         $default_booking_type_id = 1;
         $matched_assignment = null;
-        foreach($assignments as $assignment) {
-            $rules = $om->read(BookingTypeAssignmentRule::getType(), $assignment['booking_type_assign_rules_ids'], [
+        foreach($attributions as $attribution) {
+            $conditions = $om->read(BookingTypeCondition::getType(), $attribution['booking_type_conditions_ids'], [
                 'operand',
                 'operator',
                 'value'
             ]);
 
-            if(!$assignment['sojourn_type_id'] && empty($assignment['rate_classes_ids']) && empty($assignment['booking_type_assign_rules_ids'])) {
-                $default_booking_type_id = $assignment['booking_type_id'];
+            if(!$attribution['sojourn_type_id'] && empty($attribution['rate_classes_ids']) && empty($attribution['booking_type_conditions_ids'])) {
+                $default_booking_type_id = $attribution['booking_type_id'];
                 continue;
             }
 
@@ -1691,9 +1692,9 @@ class Booking extends Model {
             ];
 
             $valid = true;
-            foreach($rules as $rule) {
-                $operator = $rule['operator'];
-                if(!in_array($rule['operator'], ['>', '>=', '<', '<=', '='])) {
+            foreach($conditions as $condition) {
+                $operator = $condition['operator'];
+                if(!in_array($condition['operator'], ['>', '>=', '<', '<=', '='])) {
                     $valid = false;
                     break;
                 }
@@ -1701,13 +1702,13 @@ class Booking extends Model {
                     $operator = '==';
                 }
 
-                $value = $rule['value'];
-                if(!is_numeric($rule['value'])) {
+                $value = $condition['value'];
+                if(!is_numeric($condition['value'])) {
                     $value = "'$value'";
                 }
 
-                if(in_array($rule['operand'], $on_booking)) {
-                    $operand = $booking[$rule['operand']];
+                if(in_array($condition['operand'], $on_booking)) {
+                    $operand = $booking[$condition['operand']];
                     if(!is_numeric($operand)) {
                         $operand = "'$operand'";
                     }
@@ -1717,14 +1718,17 @@ class Booking extends Model {
                         break;
                     }
                 }
-                elseif(in_array($rule['operand'], $on_sojourn_group)) {
+                elseif(in_array($condition['operand'], $on_sojourn_group)) {
                     $group_match = false;
                     foreach($groups as $group) {
-                        if(!empty($assignment['rate_classes_ids']) && !in_array($group['rate_class_id'], $assignment['rate_classes_ids'])) {
+                        if(!empty($attribution['rate_classes_ids']) && !in_array($group['rate_class_id'], $attribution['rate_classes_ids'])) {
+                            continue;
+                        }
+                        if($attribution['sojourn_type_id'] && $group['sojourn_type_id'] !== $attribution['sojourn_type_id']) {
                             continue;
                         }
 
-                        $operand = $group[$rule['operand']];
+                        $operand = $group[$condition['operand']];
                         if(!is_numeric($operand)) {
                             $operand = "'$value'";
                         }
@@ -1742,12 +1746,20 @@ class Booking extends Model {
                 }
             }
 
-            if(empty($rules) && !empty($assignment['rate_classes_ids'])) {
+            if(empty($conditions) && (!empty($attribution['rate_classes_ids']) || $attribution['sojourn_type_id'])) {
                 $group_match = false;
                 foreach($groups as $group) {
-                    if(in_array($group['rate_class_id'], $assignment['rate_classes_ids'])) {
-                        $group_match = true;
-                        break;
+                    if(!empty($attribution['rate_classes_ids'])) {
+                        if(in_array($group['rate_class_id'], $attribution['rate_classes_ids'])) {
+                            $group_match = true;
+                            break;
+                        }
+                    }
+                    elseif($attribution['sojourn_type_id']) {
+                        if($group['sojourn_type_id'] === $attribution['sojourn_type_id']) {
+                            $group_match = true;
+                            break;
+                        }
                     }
                 }
 
@@ -1757,7 +1769,7 @@ class Booking extends Model {
             }
 
             if($valid) {
-                $matched_assignment = $assignment;
+                $matched_assignment = $attribution;
                 break;
             }
         }

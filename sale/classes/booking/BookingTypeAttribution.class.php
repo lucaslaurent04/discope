@@ -10,10 +10,10 @@ namespace sale\booking;
 
 use equal\orm\Model;
 
-class BookingTypeAssignment extends Model {
+class BookingTypeAttribution extends Model {
 
     public static function getDescription(): string {
-        return "A set of rules that, if matched, will apply a specific booking type to a booking.";
+        return "A sojourn type, a set of rate classes and set of conditions that, if matched, will apply a specific booking type to a booking.";
     }
 
     public static function getColumns(): array {
@@ -39,22 +39,22 @@ class BookingTypeAssignment extends Model {
                 'help'              => "If empty no check is done on the booking's sojourn type."
             ],
 
-            'booking_type_assign_rules_ids' => [
+            'booking_type_conditions_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'sale\booking\BookingTypeAssignmentRule',
-                'foreign_field'     => 'booking_type_assignment_id',
-                'description'       => "The rules that have to match to apply the assignment.",
+                'foreign_object'    => 'sale\booking\BookingTypeCondition',
+                'foreign_field'     => 'booking_type_attribution_id',
+                'description'       => "The conditions that have to match to apply the booking type.",
                 'ondetach'          => 'delete'
             ],
 
             'rate_classes_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\customer\RateClass',
-                'foreign_field'     => 'booking_type_assignments_ids',
-                'rel_table'         => 'sale_booking_type_assignment_rel_sale_rate_class',
-                'rel_local_key'     => 'booking_type_assignment_id',
+                'foreign_field'     => 'booking_type_attributions_ids',
+                'rel_table'         => 'sale_booking_type_attribution_rel_sale_rate_class',
+                'rel_local_key'     => 'booking_type_attribution_id',
                 'rel_foreign_key'   => 'rate_class_id',
-                'description'       => "The rate classes the booking must match for this assignment to apply.",
+                'description'       => "The rate classes the booking must match for this type to apply.",
                 'help'              => "If empty no check is done on the rate class of the booking's customer."
             ]
 

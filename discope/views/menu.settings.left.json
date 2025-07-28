@@ -802,12 +802,12 @@
                                 "type": "parent",
                                 "children": [
                                     {
-                                        "id": "sales.settings.booking_types.assignments",
+                                        "id": "sales.settings.booking_types.attributions",
                                         "type": "entry",
-                                        "label": "Assignments",
+                                        "label": "Attributions",
                                         "description": "",
                                         "context": {
-                                            "entity": "sale\\booking\\BookingTypeAssignment",
+                                            "entity": "sale\\booking\\BookingTypeAttribution",
                                             "view": "list.default"
                                         }
                                     }

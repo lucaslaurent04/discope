@@ -10,10 +10,10 @@ namespace sale\booking;
 
 use equal\orm\Model;
 
-class BookingTypeAssignmentRule extends Model {
+class BookingTypeCondition extends Model {
 
     public static function getDescription(): string {
-        return "A set of rules that, if matched, will apply a specific booking type to a booking.";
+        return "A condition part of a booking type attribution, allows to check a booking or a group.";
     }
 
     public static function getColumns(): array {
@@ -22,15 +22,15 @@ class BookingTypeAssignmentRule extends Model {
             'name' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
-                'description'       => "Name the the booking type assignment rule.",
+                'description'       => "Name the the booking type assignment condition.",
                 'store'             => true,
                 'function'          => 'calcName'
             ],
 
-            'booking_type_assignment_id' => [
+            'booking_type_attribution_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'sale\booking\BookingTypeAssignment',
-                'description'       => "The booking type assignment the rule is part of.",
+                'foreign_object'    => 'sale\booking\BookingTypeAttribution',
+                'description'       => "The booking type attribution the condition is part of.",
                 'required'          => true
             ],
 
@@ -43,7 +43,7 @@ class BookingTypeAssignmentRule extends Model {
                     'is_from_channelmanager',
                     'is_sojourn'
                 ],
-                'description'       => "The field name on which the rule check is done.",
+                'description'       => "The field name on which the condition check is done.",
                 'required'          => true,
                 'dependents'        => ['name']
             ],
@@ -51,14 +51,14 @@ class BookingTypeAssignmentRule extends Model {
             'operator' => [
                 'type'              => 'string',
                 'selection'         => ['=', '>', '>=', '<', '<='],
-                'description'       => "The operand used the check the rule.",
+                'description'       => "The operand used the check the condition.",
                 'required'          => true,
                 'dependents'        => ['name']
             ],
 
             'value' => [
                 'type'              => 'string',
-                'description'       => "The value with which the rule check is done.",
+                'description'       => "The value with which the condition check is done.",
                 'required'          => true,
                 'dependents'        => ['name']
             ]
@@ -69,13 +69,13 @@ class BookingTypeAssignmentRule extends Model {
     public static function calcName($self): array {
         $result = [];
         $self->read(['operand', 'operator', 'value']);
-        foreach($self as $id => $rule) {
-            if(!empty($rule['operand']) || !empty($rule['operator']) || !empty($rule['value'])) {
+        foreach($self as $id => $condition) {
+            if(!empty($condition['operand']) || !empty($condition['operator']) || !empty($condition['value'])) {
                 $name = sprintf(
                     '%s %s %s',
-                    $rule['operand'] ?? '',
-                    $rule['operator'] ?? '',
-                    $rule['value'] ?? ''
+                    $condition['operand'] ?? '',
+                    $condition['operator'] ?? '',
+                    $condition['value'] ?? ''
                 );
 
                 $result[$id] = trim($name);

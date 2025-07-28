@@ -62,7 +62,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "booking_type_assign_rules_ids",
+                                                "value": "booking_type_conditions_ids",
                                                 "width": "100%"
                                             }
                                         ]

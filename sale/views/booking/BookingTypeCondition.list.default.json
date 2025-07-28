@@ -13,7 +13,7 @@
             },
             {
                 "type": "field",
-                "value": "booking_type_assignment_id",
+                "value": "booking_type_attribution_id",
                 "width": "33%",
                 "sortable": true,
                 "readonly": true

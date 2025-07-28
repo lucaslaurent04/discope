@@ -254,7 +254,7 @@
             "label": "Types de réservations",
             "help": ""
         },
-        "sales.settings.booking_types.assignments": {
+        "sales.settings.booking_types.attributions": {
             "label": "Assignations",
             "help": ""
         },

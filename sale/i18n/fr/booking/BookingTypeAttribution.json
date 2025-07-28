@@ -13,8 +13,8 @@
             "description": "",
             "help": ""
         },
-        "booking_type_assign_rules_ids": {
-            "label": "Règles",
+        "booking_type_conditions_ids": {
+            "label": "Conditions",
             "description": "",
             "help": ""
         },
@@ -30,7 +30,7 @@
             "description": "",
             "layout": {
                 "section.rules": {
-                    "label": "Règles"
+                    "label": "Conditions"
                 },
                 "section.rate_classes": {
                     "label": "Catégories tarifaires"
