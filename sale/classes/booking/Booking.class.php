@@ -1668,7 +1668,7 @@ class Booking extends Model {
         ]);
 
         $default_booking_type_id = 1;
-        $matched_assignment = null;
+        $matched_attribution = null;
         foreach($attributions as $attribution) {
             $conditions = $om->read(BookingTypeCondition::getType(), $attribution['booking_type_conditions_ids'], [
                 'operand',
@@ -1769,12 +1769,12 @@ class Booking extends Model {
             }
 
             if($valid) {
-                $matched_assignment = $attribution;
+                $matched_attribution = $attribution;
                 break;
             }
         }
 
-        $booking_type_id = $matched_assignment ? $matched_assignment['booking_type_id'] : $default_booking_type_id;
+        $booking_type_id = $matched_attribution ? $matched_attribution['booking_type_id'] : $default_booking_type_id;
 
         $om->update(self::getType(), $id, ['type_id' => $booking_type_id]);
     }
