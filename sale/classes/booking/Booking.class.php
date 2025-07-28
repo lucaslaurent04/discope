@@ -1557,6 +1557,7 @@ class Booking extends Model {
         }
 
         // If no attributions configured then use old algorithm to attribute a booking type
+        // #todo - delete below when the attributions rules are defined for Kaleo
 
         $bookings = $om->read(self::getType(), $id, [
             'id',
@@ -1637,7 +1638,8 @@ class Booking extends Model {
         $bookings = $om->read(self::getType(), $id, [
             'id',
             'is_from_channelmanager',
-            'booking_lines_groups_ids'
+            'booking_lines_groups_ids',
+            'booking_lines_ids'
         ]);
 
         if($bookings <= 0) {
@@ -1760,6 +1762,7 @@ class Booking extends Model {
                 }
             }
 
+            // If no conditions only check rate class and sojourn type
             if(empty($conditions) && (!empty($attribution['rate_classes_ids']) || $attribution['sojourn_type_id'])) {
                 $group_match = false;
                 foreach($groups as $group) {
@@ -1788,7 +1791,24 @@ class Booking extends Model {
             }
         }
 
-        $booking_type_id = $matched_attribution ? $matched_attribution['booking_type_id'] : $default_booking_type_id;
+        $booking_type_id = $default_booking_type_id;
+        if(isset($matched_attribution)) {
+            // Attribution matched, so use its booking type
+            $booking_type_id = $matched_attribution['booking_type_id'];
+        }
+        elseif($booking_type_id === 1) {
+            // As last resort, check the booking lines
+            $lines = $om->read(BookingLine::getType(), $booking['booking_lines_ids'], [
+                'product_id.product_model_id.booking_type_id'
+            ]);
+
+            foreach($lines as $line) {
+                if(isset($line['product_id.product_model_id.booking_type_id']) && $line['product_id.product_model_id.booking_type_id'] !== 1) {
+                    $booking_type_id = $line['product_id.product_model_id.booking_type_id'];
+                    break;
+                }
+            }
+        }
 
         $om->update(self::getType(), $id, ['type_id' => $booking_type_id]);
     }
