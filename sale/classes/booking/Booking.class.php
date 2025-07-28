@@ -1556,6 +1556,8 @@ class Booking extends Model {
             return;
         }
 
+        // If no attributions configured then use old algorithm to attribute a booking type
+
         $bookings = $om->read(self::getType(), $id, [
             'id',
             'booking_lines_groups_ids',
@@ -1664,9 +1666,21 @@ class Booking extends Model {
             'nb_adults',
             'nb_children',
             'rate_class_id',
-            'sojourn_type_id'
+            'sojourn_type_id',
+            'pack_id.product_model_id.booking_type_id'
         ]);
 
+        // First, use the pack product model configuration
+        foreach($groups as $group) {
+            if(isset($group['pack_id.product_model_id.booking_type_id']) && $group['pack_id.product_model_id.booking_type_id'] != 1) {
+                $om->update(self::getType(), $id, [
+                    'type_id' => $group['pack_id.product_model_id.booking_type_id']
+                ]);
+                return;
+            }
+        }
+
+        // Second, use the attributions' conditions
         $default_booking_type_id = 1;
         $matched_attribution = null;
         foreach($attributions as $attribution) {
