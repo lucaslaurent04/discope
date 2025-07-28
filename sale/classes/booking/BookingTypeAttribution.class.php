@@ -21,14 +21,14 @@ class BookingTypeAttribution extends Model {
 
             'name' => [
                 'type'              => 'string',
-                'description'       => "Name the the booking type assignment.",
+                'description'       => "Name the the booking type attribution.",
                 'required'          => true
             ],
 
             'booking_type_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingType',
-                'description'       => "The booking type the assignment applies.",
+                'description'       => "The booking type the attribution applies.",
                 'required'          => true
             ],
 

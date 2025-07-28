@@ -22,7 +22,7 @@ class BookingTypeCondition extends Model {
             'name' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
-                'description'       => "Name the the booking type assignment condition.",
+                'description'       => "Name the the booking type attribution condition.",
                 'store'             => true,
                 'function'          => 'calcName'
             ],
