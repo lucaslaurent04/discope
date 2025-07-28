@@ -1,6 +1,6 @@
 {
-    "name": "Booking type assignment",
-    "description": "Form view for Booking type assignment.",
+    "name": "Booking type attribution",
+    "description": "Form view for Booking type attribution.",
     "layout": {
         "groups": [
             {

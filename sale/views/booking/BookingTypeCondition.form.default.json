@@ -1,6 +1,6 @@
 {
-    "name": "Booking type assignment rule",
-    "description": "Form view for Booking type assignment rule.",
+    "name": "Booking type attribution condition",
+    "description": "Form view for Booking type attribution condition.",
     "layout": {
         "groups": [
             {

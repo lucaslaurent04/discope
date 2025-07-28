@@ -1,6 +1,6 @@
 {
-    "name": "Booking type assignment rules",
-    "description": "List view for Booking type assignment rules.",
+    "name": "Booking type attribution conditions",
+    "description": "List view for Booking type attribution conditions.",
     "layout": {
         "items": [
             {
