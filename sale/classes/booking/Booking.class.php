@@ -1321,6 +1321,10 @@ class Booking extends Model {
 
         if(isset($values['status'])) {
             foreach($bookings as $booking) {
+                if($values['status'] === $booking['status']) {
+                    continue;
+                }
+
                 $lines = $om->read(BookingLine::getType(), $booking['booking_lines_ids'], ['product_id']);
                 foreach($lines as $line) {
                     if(!$line['product_id']) {
