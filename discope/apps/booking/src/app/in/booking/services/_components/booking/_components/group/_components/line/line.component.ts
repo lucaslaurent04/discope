@@ -5,8 +5,8 @@ import { ApiService, ContextService, TreeComponent } from 'sb-shared-lib';
 import { BookingLineGroup } from '../../../../_models/booking_line_group.model';
 import { BookingLine } from '../../../../_models/booking_line.model';
 import { Booking } from '../../../../_models/booking.model';
-import {from, Observable, ReplaySubject} from 'rxjs';
-import {debounceTime, filter, map, mergeMap, switchMap} from 'rxjs/operators';
+import { from, Observable, ReplaySubject } from 'rxjs';
+import { debounceTime, filter, map, switchMap } from 'rxjs/operators';
 
 import { BookingServicesBookingGroupLineDiscountComponent } from './_components/discount/discount.component';
 import { BookingServicesBookingGroupLinePriceadapterComponent } from './_components/priceadapter/priceadapter.component';
@@ -17,7 +17,7 @@ import { MatDialog } from '@angular/material/dialog';
 interface BookingLineComponentsMap {
     manual_discounts_ids: QueryList<BookingServicesBookingGroupLineDiscountComponent>,
     auto_discounts_ids: QueryList<BookingServicesBookingGroupLinePriceadapterComponent>
-};
+}
 
 interface vmModel {
     product: {
