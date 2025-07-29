@@ -1319,6 +1319,16 @@ class Booking extends Model {
         // fields that can always be updated
         $allowed_fields = ['status', 'description', 'is_invoiced', 'payment_status'];
 
+        if(isset($values['status'])) {
+            foreach($bookings as $booking) {
+                $lines = $om->read(BookingLine::getType(), $booking['booking_lines_ids'], ['product_id']);
+                foreach($lines as $line) {
+                    if(!$line['product_id']) {
+                        return ['status' => ['undefined_product_id' => "Status cannot be updated if a booking line has no product."]];
+                    }
+                }
+            }
+        }
 
         if(isset($values['center_id'])) {
             $has_booking_lines = false;
