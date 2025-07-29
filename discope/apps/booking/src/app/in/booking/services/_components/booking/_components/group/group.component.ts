@@ -264,6 +264,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
 
         // #workaround - force age_ranges update (since it cannot be done in update())
         this.instance.age_range_assignments_ids = values.age_range_assignments_ids;
+        this.instance.booking_lines_ids = values.booking_lines_ids;
 
         // refresh the lists of available rental units for all SPM
         if(this.bookingServicesBookingGroupAccomodationComponents && typeof this.bookingServicesBookingGroupAccomodationComponents[Symbol.iterator] === 'function') {
