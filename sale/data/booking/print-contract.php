@@ -74,6 +74,12 @@ use sale\booking\BookingActivity;
 
 $output = null;
 
+$lodging_booking_print_contract_formatMember = function($booking) {
+    $id = $booking['customer_id']['partner_identity_id']['id'];
+    $code = ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
+    return $code.' - '.$booking['customer_id']['partner_identity_id']['display_name'];
+};
+
 // steer towards custom controller, if any
 $has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
 if($has_custom_package) {
@@ -254,7 +260,7 @@ if(!$output) {
         $img_url = "data:{$content_type};base64, ".base64_encode($logo_document_data);
     }
 
-    $member_name = lodging_booking_print_contract_formatMember($booking);
+    $member_name = $lodging_booking_print_contract_formatMember($booking);
 
     $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
@@ -1060,11 +1066,3 @@ $context->httpResponse()
         ->header('Content-Disposition', 'inline; filename="document.pdf"')
         ->body($output)
         ->send();
-
-
-
-function lodging_booking_print_contract_formatMember($booking) {
-    $id = $booking['customer_id']['partner_identity_id']['id'];
-    $code = ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
-    return $code.' - '.$booking['customer_id']['partner_identity_id']['display_name'];
-}
