@@ -322,14 +322,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     }
 
     public async oncreateLine() {
-        // do not allow to create multiple empty lines
-        for(let line of this.instance.booking_lines_ids) {
-            if(JSON.stringify(line.product_id) === '{}') {
-                // an empty line already exists
-                return;
-            }
-        }
-
         try {
             const new_line:any = await this.api.create("sale\\booking\\BookingLine", {
                 order: this.instance.booking_lines_ids.length + 1,
