@@ -671,7 +671,8 @@
             "missing_mandatory": "Champ obligatoire."
         },
         "status": {
-            "non_editable": "Le statut de la réservation ne permet pas son édition."
+            "non_editable": "Le statut de la réservation ne permet pas son édition.",
+            "undefined_product_id": "La statut ne peut être modifié si un produit n'est pas défini."
         },
         "errors": {
             "overbooking_detected": "Surbooking détecté"

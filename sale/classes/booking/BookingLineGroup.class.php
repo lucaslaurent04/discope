@@ -2391,17 +2391,19 @@ class BookingLineGroup extends Model {
                         // fetch the offset, in days, for the scheduling (only applies on sojourns)
                         $offset = ($group['is_sojourn']) ? $product_models[$line['product_id.product_model_id']]['schedule_offset'] : 0;
 
-                        // #todo - ? why don't we use the qty - it should already be set according to the criteria (including variations, if any)
+                        // by default, assign a quantity of $nb_times to each day
                         $days_nb_times = array_fill(0, $nb_products, $nb_times);
 
-                        if($qty_accounting_method == 'person' && ($nb_times * $nb_products) != $line['qty']) {
-                            // $nb_times varies from one day to another : load specific days_nb_times array
+                        if($qty_accounting_method == 'person') {
+
                             $qty_vars = json_decode($line['qty_vars']);
-                            // qty_vars is set and valid
-                            if($qty_vars) {
+                            $has_variations = is_array($qty_vars) && array_filter($qty_vars, function($v) { return $v !== 0; });
+
+                            // $nb_times varies from one day to another : load specific days_nb_times array
+                            if($has_variations) {
                                 $i = 0;
                                 foreach($qty_vars as $variation) {
-                                    if($nb_products < $i+1) {
+                                    if($i >= $nb_products) {
                                         break;
                                     }
                                     $days_nb_times[$i] = $nb_times + $variation;
@@ -2412,15 +2414,15 @@ class BookingLineGroup extends Model {
 
                         // $nb_products represent each day of the stay
                         for($i = 0; $i < $nb_products; ++$i) {
+                            // discard consumption with a resulting qty of 0
+                            if($days_nb_times[$i] == 0) {
+                                continue;
+                            }
+
                             $c_date = mktime(0, 0, 0, $month, $day+$i+$offset, $year);
                             $c_time_slot_id = $line['time_slot_id'];
                             $c_schedule_from = $schedule_from;
                             $c_schedule_to = $schedule_to;
-
-                            // discard consumption with a resulting qty set to 0
-                            if($days_nb_times[$i] == 0) {
-                                continue;
-                            }
 
                             // create a single consumption with the quantity set accordingly (may vary from one day to another)
                             // #todo - if the sojourn (BookingLineGroup) has a single age range assignment, then the related age_range_id prevails over product_id.age_range_id

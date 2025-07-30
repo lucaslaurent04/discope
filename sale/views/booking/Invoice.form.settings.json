@@ -184,6 +184,23 @@
                                                 "widget": {
                                                     "type": "date"
                                                 }
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "balance",
+                                                "width": "33%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "total",
+                                                "width": "33%",
+                                                "readonly": true
                                             }
                                         ]
                                     }

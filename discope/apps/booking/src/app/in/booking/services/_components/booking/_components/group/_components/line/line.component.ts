@@ -5,8 +5,8 @@ import { ApiService, ContextService, TreeComponent } from 'sb-shared-lib';
 import { BookingLineGroup } from '../../../../_models/booking_line_group.model';
 import { BookingLine } from '../../../../_models/booking_line.model';
 import { Booking } from '../../../../_models/booking.model';
-import { Observable, ReplaySubject } from 'rxjs';
-import { debounceTime, map, mergeMap } from 'rxjs/operators';
+import { from, Observable, ReplaySubject } from 'rxjs';
+import { debounceTime, filter, map, switchMap } from 'rxjs/operators';
 
 import { BookingServicesBookingGroupLineDiscountComponent } from './_components/discount/discount.component';
 import { BookingServicesBookingGroupLinePriceadapterComponent } from './_components/priceadapter/priceadapter.component';
@@ -18,7 +18,7 @@ import { BookedServicesDisplaySettings } from 'src/app/in/booking/services/servi
 interface BookingLineComponentsMap {
     manual_discounts_ids: QueryList<BookingServicesBookingGroupLineDiscountComponent>,
     auto_discounts_ids: QueryList<BookingServicesBookingGroupLinePriceadapterComponent>
-};
+}
 
 interface vmModel {
     product: {
@@ -83,6 +83,8 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
     public ready: boolean = false;
 
     public vm: vmModel;
+
+    private productRequestCounter = 0;
 
     constructor(
         private cd: ChangeDetectorRef,
@@ -190,7 +192,12 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         this.vm.product.filteredList = this.vm.product.inputClue.pipe(
             debounceTime(300),
             map( (value:any) => (typeof value === 'string' ? value : (value == null)?'':value.name) ),
-            mergeMap( async (name:string) => this.filterProducts(name) )
+            switchMap( (name: string) => {
+                const currentRequest = ++this.productRequestCounter;
+                return from(this.filterProducts(name)).pipe(
+                    filter(() => currentRequest === this.productRequestCounter) // only take into account the result of the latest request
+                );
+            })
         );
     }
 

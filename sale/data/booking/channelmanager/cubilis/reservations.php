@@ -490,7 +490,7 @@ if(isset($envelope['children'][0])) {
                     }
                     if($global_info['name'] == 'HotelReservationIDs' && $global_info['has_children']) {
                         $entry['reservation_id'] = intval($global_info['children']['HotelReservationID']['attributes']['ResID_Value']);
-                        $entry['partner_reservation_id'] = intval($global_info['children']['HotelReservationID']['attributes']['ResID_Source']);
+                        $entry['partner_reservation_id'] = $global_info['children']['HotelReservationID']['attributes']['ResID_Source'];
                         continue;
                     }
                     if($global_info['name'] == 'Profiles' && $global_info['has_children']) {

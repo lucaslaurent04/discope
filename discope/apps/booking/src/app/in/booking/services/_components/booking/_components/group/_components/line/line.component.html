@@ -27,7 +27,7 @@
             <!-- product -->
             <div class="cell">
 
-                <mat-form-field *ngIf="(instance.product_id | json) == '{}' || instance.product_id?.id == 0">
+                <mat-form-field *ngIf="(instance.product_id | json) == '{}' || !instance.product_id">
                     <mat-label>Produit</mat-label>
                     <input *ngIf="!group.is_locked"
                         matInput type="text"
