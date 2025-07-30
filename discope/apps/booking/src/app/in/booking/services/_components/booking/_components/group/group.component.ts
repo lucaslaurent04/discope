@@ -12,8 +12,8 @@ import { BookingServicesBookingGroupMealPrefComponent } from './_components/meal
 import { BookingServicesBookingGroupAgeRangeComponent } from './_components/agerange/agerange.component';
 
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Observable, ReplaySubject } from 'rxjs';
-import { debounceTime, map, mergeMap } from 'rxjs/operators';
+import { from, Observable, ReplaySubject } from 'rxjs';
+import { debounceTime, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { BookingMealPref } from '../../_models/booking_mealpref.model';
 import { BookingAgeRangeAssignment } from '../../_models/booking_agerange_assignment.model';
 import { MatAutocomplete } from '@angular/material/autocomplete';
@@ -130,6 +130,9 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     public ready: boolean = false;
     public loading: boolean = false;
 
+    private packRequestCounter = 0;
+    private rateClassRequestCounter = 0;
+
     public vm: vmModel;
 
     constructor(
@@ -222,13 +225,23 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         this.vm.pack.filteredList = this.vm.pack.inputClue.pipe(
             debounceTime(300),
             map( (value:any) => (typeof value === 'string' ? value : (value == null)?'':value.name) ),
-            mergeMap( async (name:string) => this.filterPacks(name) )
+            switchMap( (name: string) => {
+                const currentRequest = ++this.packRequestCounter;
+                return from(this.filterPacks(name)).pipe(
+                    filter(() => currentRequest === this.packRequestCounter)
+                )
+            })
         );
 
         this.vm.rate_class.filteredList = this.vm.rate_class.inputClue.pipe(
             debounceTime(300),
             map( (value:any) => (typeof value === 'string' ? value : (value == null)?'':value.name) ),
-            mergeMap( async (name:string) => this.filterRateClasses(name) )
+            switchMap( (name: string) => {
+                const currentRequest = ++this.rateClassRequestCounter;
+                return from(this.filterRateClasses(name)).pipe(
+                    filter(() => currentRequest === this.rateClassRequestCounter)
+                )
+            })
         );
 
         this.vm.name.formControl.valueChanges.subscribe( (value:string)  => {
@@ -264,6 +277,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
 
         // #workaround - force age_ranges update (since it cannot be done in update())
         this.instance.age_range_assignments_ids = values.age_range_assignments_ids;
+        this.instance.booking_lines_ids = values.booking_lines_ids;
 
         // refresh the lists of available rental units for all SPM
         if(this.bookingServicesBookingGroupAccomodationComponents && typeof this.bookingServicesBookingGroupAccomodationComponents[Symbol.iterator] === 'function') {
@@ -739,15 +753,12 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     private async filterPacks(name: string) {
         let filtered:any[] = [];
         try {
-            let domain = [
-                ['is_pack', '=', true]
-            ];
-
+            let domain = [];
             if(name && name.length) {
                 domain.push(['name', 'ilike', '%'+name+'%']);
             }
 
-            const data:any[] = await this.api.fetch('?get=sale_catalog_product_collect', {
+            const data:any[] = await this.api.fetch('?get=sale_catalog_product_collect-pack', {
                     center_id: this.booking.center_id.id,
                     domain: JSON.stringify(domain),
                     date_from: this.booking.date_from.toISOString(),

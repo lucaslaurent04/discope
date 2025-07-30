@@ -53,7 +53,7 @@ class Booking extends Model {
 
             'description' => [
                 'type'              => 'string',
-                'usage'             => 'text/plain',
+                'usage'             => 'text/html',
                 'description'       => "Reason or comments about the booking, if any (for internal use).",
                 'default'           => ''
             ],
@@ -1319,6 +1319,20 @@ class Booking extends Model {
         // fields that can always be updated
         $allowed_fields = ['status', 'description', 'is_invoiced', 'payment_status'];
 
+        if(isset($values['status'])) {
+            foreach($bookings as $booking) {
+                if($values['status'] === $booking['status']) {
+                    continue;
+                }
+
+                $lines = $om->read(BookingLine::getType(), $booking['booking_lines_ids'], ['product_id']);
+                foreach($lines as $line) {
+                    if(!$line['product_id']) {
+                        return ['status' => ['undefined_product_id' => "Status cannot be updated if a booking line has no product."]];
+                    }
+                }
+            }
+        }
 
         if(isset($values['center_id'])) {
             $has_booking_lines = false;
@@ -1550,6 +1564,14 @@ class Booking extends Model {
      * Recomputes `type_id`.
      */
     public static function refreshBookingType($om, $id) {
+        $attributions_ids = $om->search(BookingTypeAttribution::getType(), []);
+        if(!empty($attributions_ids)) {
+            self::refreshBookingTypeWithAttributions($om, $id);
+            return;
+        }
+
+        // If no attributions configured then use old algorithm to attribute a booking type
+        // #todo - delete below when the attributions rules are defined for Kaleo
 
         $bookings = $om->read(self::getType(), $id, [
             'id',
@@ -1624,6 +1646,185 @@ class Booking extends Model {
         }
 
         $om->update(self::getType(), $id, ['type_id' => $type_id]);
+    }
+
+    public static function refreshBookingTypeWithAttributions($om, $id) {
+        $bookings = $om->read(self::getType(), $id, [
+            'id',
+            'is_from_channelmanager',
+            'booking_lines_groups_ids',
+            'booking_lines_ids'
+        ]);
+
+        if($bookings <= 0) {
+            return null;
+        }
+
+        $booking = reset($bookings);
+
+        $attributions_ids = $om->search(BookingTypeAttribution::getType(), []);
+        if(empty($attributions_ids)) {
+            return null;
+        }
+
+        $attributions = $om->read(BookingTypeAttribution::getType(), $attributions_ids, [
+            'name',
+            'booking_type_id',
+            'sojourn_type_id',
+            'booking_type_conditions_ids',
+            'rate_classes_ids'
+        ]);
+
+        $groups = $om->read(BookingLineGroup::getType(), $booking['booking_lines_groups_ids'], [
+            'id',
+            'is_sojourn',
+            'nb_pers',
+            'nb_adults',
+            'nb_children',
+            'rate_class_id',
+            'sojourn_type_id',
+            'pack_id.product_model_id.booking_type_id'
+        ]);
+
+        // First, use the pack product model configuration
+        foreach($groups as $group) {
+            if(isset($group['pack_id.product_model_id.booking_type_id']) && $group['pack_id.product_model_id.booking_type_id'] != 1) {
+                $om->update(self::getType(), $id, [
+                    'type_id' => $group['pack_id.product_model_id.booking_type_id']
+                ]);
+                return;
+            }
+        }
+
+        // Second, use the attributions' conditions
+        $default_booking_type_id = 1;
+        $matched_attribution = null;
+        foreach($attributions as $attribution) {
+            $conditions = $om->read(BookingTypeCondition::getType(), $attribution['booking_type_conditions_ids'], [
+                'operand',
+                'operator',
+                'value'
+            ]);
+
+            if(!$attribution['sojourn_type_id'] && empty($attribution['rate_classes_ids']) && empty($attribution['booking_type_conditions_ids'])) {
+                $default_booking_type_id = $attribution['booking_type_id'];
+                continue;
+            }
+
+            $on_booking = [
+                'is_from_channelmanager'
+            ];
+            $on_sojourn_group = [
+                'is_sojourn',
+                'nb_pers',
+                'nb_children',
+                'nb_adults',
+            ];
+
+            $valid = true;
+            foreach($conditions as $condition) {
+                $operator = $condition['operator'];
+                if(!in_array($condition['operator'], ['>', '>=', '<', '<=', '='])) {
+                    $valid = false;
+                    break;
+                }
+                if($operator === '=') {
+                    $operator = '==';
+                }
+
+                $value = $condition['value'];
+                if(!is_numeric($condition['value'])) {
+                    $value = "'$value'";
+                }
+
+                if(in_array($condition['operand'], $on_booking)) {
+                    $operand = $booking[$condition['operand']];
+                    if(!is_numeric($operand)) {
+                        $operand = "'$operand'";
+                    }
+
+                    if(!eval("return $operand $operator $value;")) {
+                        $valid = false;
+                        break;
+                    }
+                }
+                elseif(in_array($condition['operand'], $on_sojourn_group)) {
+                    $group_match = false;
+                    foreach($groups as $group) {
+                        if(!empty($attribution['rate_classes_ids']) && !in_array($group['rate_class_id'], $attribution['rate_classes_ids'])) {
+                            continue;
+                        }
+                        if($attribution['sojourn_type_id'] && $group['sojourn_type_id'] !== $attribution['sojourn_type_id']) {
+                            continue;
+                        }
+
+                        $operand = $group[$condition['operand']];
+                        if(!is_numeric($operand)) {
+                            $operand = "'$value'";
+                        }
+
+                        if(eval("return $operand $operator $value;")) {
+                            $group_match = true;
+                            break;
+                        }
+                    }
+
+                    if(!$group_match) {
+                        $valid = false;
+                        break;
+                    }
+                }
+            }
+
+            // If no conditions only check rate class and sojourn type
+            if(empty($conditions) && (!empty($attribution['rate_classes_ids']) || $attribution['sojourn_type_id'])) {
+                $group_match = false;
+                foreach($groups as $group) {
+                    if(!empty($attribution['rate_classes_ids'])) {
+                        if(in_array($group['rate_class_id'], $attribution['rate_classes_ids'])) {
+                            $group_match = true;
+                            break;
+                        }
+                    }
+                    elseif($attribution['sojourn_type_id']) {
+                        if($group['sojourn_type_id'] === $attribution['sojourn_type_id']) {
+                            $group_match = true;
+                            break;
+                        }
+                    }
+                }
+
+                if(!$group_match) {
+                    $valid = false;
+                }
+            }
+
+            if($valid) {
+                $matched_attribution = $attribution;
+                break;
+            }
+        }
+
+        $booking_type_id = $default_booking_type_id;
+        if(isset($matched_attribution)) {
+            // Attribution matched, so use its booking type
+            $booking_type_id = $matched_attribution['booking_type_id'];
+        }
+        elseif($booking_type_id === 1) {
+            // As last resort, check the booking lines
+            $lines = $om->read(BookingLine::getType(), $booking['booking_lines_ids'], [
+                'product_id.product_model_id.booking_type_id'
+            ]);
+
+            foreach($lines as $line) {
+                if(isset($line['product_id.product_model_id.booking_type_id']) && $line['product_id.product_model_id.booking_type_id'] !== 1) {
+                    $booking_type_id = $line['product_id.product_model_id.booking_type_id'];
+                    break;
+                }
+            }
+        }
+
+        $om->update(self::getType(), $id, ['type_id' => $booking_type_id]);
     }
 
 
