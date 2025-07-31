@@ -1296,7 +1296,7 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
     foreach($assignments as $assignment) {
         if($assignment['free_qty'] > 0) {
             $values['benefit_freebies'][] = [
-                'name'  => 'Gratuités ' . $assignment['age_range_id']['name'],
+                'name'  => 'Gratuités ' . $assignment['age_range_id']['name'] . ' - ' . $group['name'],
                 'value' => $assignment['free_qty']
             ];
         }
