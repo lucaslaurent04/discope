@@ -546,7 +546,7 @@ if($booking['center_id']['template_category_id']) {
                 $date_from_text .= 'pour la nuitée';
             }
 
-            if($has_picnic) {
+            if($is_lunch_picnic) {
                 if(strlen($date_from_text)) {
                     $date_from_text .= ', ';
                 }
@@ -564,7 +564,7 @@ if($booking['center_id']['template_category_id']) {
                 }
                 $date_from_text .= 'avec goûter fourni par le Relais Valrance';
             }
-            elseif($has_lunch || $is_lunch_picnic) {
+            elseif($has_lunch) {
                 if(strlen($date_from_text)) {
                     $date_from_text .= ', et ';
                 }
