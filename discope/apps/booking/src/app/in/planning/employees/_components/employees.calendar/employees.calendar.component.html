@@ -126,7 +126,7 @@
                                         (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
                                         (selected)="onSelectedActivity($event)"
                                         cdkDrag
-                                        [cdkDragDisabled]="partner.relationship !== 'employee'"
+                                        [cdkDragDisabled]="activity?.is_partner_event"
                                         (cdkDragStarted)="onDragStart(activity)"
                                     ></planning-employees-calendar-activity>
 
@@ -195,7 +195,7 @@
                                         (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
                                         (selected)="onSelectedActivity($event)"
                                         cdkDrag
-                                        [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_event"
+                                        [cdkDragDisabled]="activity?.is_partner_event"
                                         (cdkDragStarted)="onDragStart(activity)">
                                     </planning-employees-calendar-activity>
 
@@ -264,7 +264,7 @@
                                         (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
                                         (selected)="onSelectedActivity($event)"
                                         cdkDrag
-                                        [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_event"
+                                        [cdkDragDisabled]="activity?.is_partner_event"
                                         (cdkDragStarted)="onDragStart(activity)">
                                     </planning-employees-calendar-activity>
 

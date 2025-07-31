@@ -220,13 +220,13 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
                 newLine = await this.api.create('sale\\booking\\BookingLine', {
                     order: this.group.booking_lines_ids.length + 1,
                     booking_id: this.booking.id,
-                    booking_line_group_id: this.group.id,
+                    booking_line_group_id: this.group.id
+                });
+                await this.api.call('?do=sale_booking_update-bookingline-activity', {
+                    id: newLine.id,
+                    product_id: product.id,
                     service_date: this.date.getTime() / 1000,
                     time_slot_id: this.timeSlot.id
-                });
-                await this.api.call('?do=sale_booking_update-bookingline-product', {
-                    id: newLine.id,
-                    product_id: product.id
                 });
                 this.vm.product.formControl.setErrors(null);
 

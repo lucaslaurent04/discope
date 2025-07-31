@@ -136,6 +136,8 @@ $activities = $orm->read(BookingActivity::getType(), $activities_ids, [
         'name',
         'has_staff_required',
         'employee_id',
+        'has_provider',
+        'qty',
         'providers_ids',
         'activity_date',
         'time_slot_id',
@@ -178,7 +180,7 @@ $booking_groups = $orm->read(BookingLineGroup::getType(), array_keys($map_groups
 $camps = $orm->read(Camp::getType(), array_keys($map_camps), ['id', 'name', 'short_name', 'date_from', 'date_to', 'min_age', 'max_age', 'enrollments_qty', 'employee_ratio']);
 $employees = $orm->read(Employee::getType(), array_keys($map_employees), ['id', 'name', 'relationship']);
 $providers = $orm->read(Provider::getType(), array_keys($map_providers), ['id', 'name', 'relationship']);
-$product_models = $orm->read(ProductModel::getType(), array_keys($map_product_models), ['id', 'name']);
+$product_models = $orm->read(ProductModel::getType(), array_keys($map_product_models), ['id', 'name', 'providers_ids']);
 
 $map_customers = [];
 foreach($bookings as $id => $booking) {
@@ -277,14 +279,20 @@ foreach($activities as $id => $activity) {
 
         $result[$partner_id][$date_index][$time_slot][] = array_merge($activity->toArray(), $data, ['partner_id' => $employee]);
     }
-    elseif(!empty($activity['providers_ids'])) {
-        foreach($activity['providers_ids'] as $provider_id) {
-            $provider = isset($providers[$provider_id]) ? $providers[$provider_id]->toArray() : null;
-            if(!is_null($provider)) {
-                $map_partners[$provider_id] = true;
-            }
+    elseif($activity['has_provider']) {
+        for($i = 0; $i < $activity['qty']; $i++) {
+            $provider_id = intval($activity['providers_ids'][$i] ?? null);
+            if($provider_id > 0) {
+                $provider = isset($providers[$provider_id]) ? $providers[$provider_id]->toArray() : null;
+                if(!is_null($provider)) {
+                    $map_partners[$provider_id] = true;
+                }
 
-            $result[$provider_id][$date_index][$time_slot][] = array_merge($activity->toArray(), $data, ['partner_id' => $provider]);
+                $result[$provider_id][$date_index][$time_slot][] = array_merge($activity->toArray(), $data, ['partner_id' => $provider]);
+            }
+            else {
+                $result[$provider_id][$date_index][$time_slot][] = array_merge($activity->toArray(), $data);
+            }
         }
     }
 }
