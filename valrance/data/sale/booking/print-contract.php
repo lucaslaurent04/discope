@@ -26,6 +26,7 @@ use sale\booking\BookingActivity;
 use sale\catalog\Product;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
+use sale\booking\BookingLineGroupAgeRangeAssignment;
 use sale\booking\BookingMeal;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 
@@ -414,6 +415,7 @@ $values = [
     'attn_address2'               => '',
     'attn_name'                   => '',
     'benefit_lines'               => [],
+    'benefit_freebies'            => [],
     'center'                      => $booking['center_id']['name'],
     'center_address'              => $booking['center_id']['address_street'].' - '.$booking['center_id']['address_zip'].' '.$booking['center_id']['address_city'],
     'center_contact1'             => (isset($booking['center_id']['manager_id']['name']))?$booking['center_id']['manager_id']['name']:'',
@@ -439,7 +441,7 @@ $values = [
     'contact_phone'               => (strlen($booking['customer_id']['partner_identity_id']['phone']))?$booking['customer_id']['partner_identity_id']['phone']:$booking['customer_id']['partner_identity_id']['mobile'],
     'consumptions_map_detailed'   => [],
     'consumptions_map_simple'     => [],
-    'consumptions_tye'            => isset($booking['type_id']['booking_schedule_layout'])?$booking['type_id']['booking_schedule_layout']:'simple',
+    'consumptions_type'           => isset($booking['type_id']['booking_schedule_layout'])?$booking['type_id']['booking_schedule_layout']:'simple',
     'contract_authorization_html' => '',
     'contract_header_html'        => '',
     'contract_service_html'       => '',
@@ -1264,6 +1266,7 @@ $values['lines'] = $lines;
     compute fare benefit detail
 */
 $values['benefit_lines'] = [];
+$values['benefit_freebies'] = [];
 
 foreach($contract['contract_line_groups_ids'] as $group) {
     if($group['fare_benefit'] == 0) {
@@ -1278,6 +1281,18 @@ foreach($contract['contract_line_groups_ids'] as $group) {
     }
     else {
         $values['benefit_lines'][$index]['value'] += $group['fare_benefit'];
+    }
+
+    $assignments = BookingLineGroupAgeRangeAssignment::search(['booking_line_group_id', '=', $group['id']])
+        ->read(['free_qty', 'age_range_id' => ['name']]);
+
+    foreach($assignments as $assignment) {
+        if($assignment['free_qty'] > 0) {
+            $values['benefit_freebies'][] = [
+                'name'  => 'Gratuités ' . $assignment['age_range_id']['name'],
+                'value' => $assignment['free_qty']
+            ];
+        }
     }
 }
 

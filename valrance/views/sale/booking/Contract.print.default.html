@@ -369,7 +369,7 @@ div.footer {
         </table>
     </div>
 
-    {% if benefit_lines | length > 0  %}
+    {% if benefit_lines is not empty or benefit_freebis is not empty %}
     <div class="important">
         <p><b>{{i18n['advantage_included']}}:</b></p>
         <table style="border: solid 1px black; width: 100%;">
@@ -385,10 +385,24 @@ div.footer {
                 <td style="text-align: center;">{{ (100*benefit_line.value/(price+benefit_line.value)) | round }} %</td>
             </tr>
             {% endfor %}
+
+            {% for benefit_freebie in benefit_freebies %}
+            <tr>
+                <td>{{ benefit_freebie.name }}</td>
+                <td style="text-align: center;">{{ benefit_freebie.value }}</td>
+                <td style="text-align: center;"></td>
+            </tr>
+            {% endfor %}
         </table>
+        {% if advantage_notice_html is not empty %}
         <div style="margin-top: 10px;">
-            {{ advantage_notice_html | raw }}
+            <table style="border: solid 1px black; width: 100%;">
+                <tr>
+                    <td>{{ advantage_notice_html | raw }}</td>
+                </tr>
+            </table>
         </div>
+        {% endif %}
     </div>
     {% endif %}
 
@@ -467,7 +481,7 @@ div.footer {
 {% endif %}
 
 {% if show_consumption %}
-    {% if consumptions_tye == 'simple' %}
+    {% if consumptions_type == 'simple' %}
         {% if consumptions_map_simple | length > 0  %}
         <div style="position: relative; margin-top: 30px; margin-bottom: 30px; page-break-inside: avoid;">
             <div class="consumptions">
@@ -512,7 +526,7 @@ div.footer {
         {% endif %}
     {% endif %}
 
-    {% if consumptions_tye == 'detailed' %}
+    {% if consumptions_type == 'detailed' %}
         {% if consumptions_map_detailed | length > 0 %}
         <div style="position: relative; margin-top: 30px; margin-bottom: 30px; page-break-inside: avoid;">
             <div class="consumptions">

@@ -14,6 +14,7 @@ use Dompdf\Options as DompdfOptions;
 use equal\data\DataFormatter;
 use sale\booking\Booking;
 use sale\booking\BookingActivity;
+use sale\booking\BookingLineGroupAgeRangeAssignment;
 use sale\booking\Consumption;
 use sale\booking\TimeSlot;
 use Twig\Environment as TwigEnvironment;
@@ -307,6 +308,7 @@ $values = [
     'attn_address2'              => '',
     'attn_name'                  => '',
     'benefit_lines'              => [],
+    'benefit_freebies'           => [],
     'center'                     => $booking['center_id']['name'],
     'center_address'             => $booking['center_id']['address_street'].' - '.$booking['center_id']['address_zip'].' '.$booking['center_id']['address_city'],
     'center_contact1'            => (isset($booking['center_id']['manager_id']['name']))?$booking['center_id']['manager_id']['name']:'',
@@ -329,7 +331,7 @@ $values = [
     'company_website'            => $booking['center_id']['organisation_id']['website'],
     'consumptions_map_detailed'  => [],
     'consumptions_map_simple'    => [],
-    'consumptions_tye'           => isset($booking['type_id']['booking_schedule_layout'])?$booking['type_id']['booking_schedule_layout']:'simple',
+    'consumptions_type'          => isset($booking['type_id']['booking_schedule_layout'])?$booking['type_id']['booking_schedule_layout']:'simple',
     'contact_email'              => $booking['customer_id']['partner_identity_id']['email'],
     'contact_name'               => '',
     'contact_phone'              => (strlen($booking['customer_id']['partner_identity_id']['phone']))?$booking['customer_id']['partner_identity_id']['phone']:$booking['customer_id']['partner_identity_id']['mobile'],
@@ -1043,6 +1045,7 @@ $values['lines'] = $lines;
     compute fare benefit detail
 */
 $values['benefit_lines'] = [];
+$values['benefit_freebies'] = [];
 
 foreach($booking['booking_lines_groups_ids'] as $group) {
     if($group['fare_benefit'] == 0) {
@@ -1058,7 +1061,21 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
     else {
         $values['benefit_lines'][$index]['value'] += $group['fare_benefit'];
     }
+
+    $assignments = BookingLineGroupAgeRangeAssignment::search(['booking_line_group_id', '=', $group['id']])
+        ->read(['free_qty', 'age_range_id' => ['name']]);
+
+    foreach($assignments as $assignment) {
+        if($assignment['free_qty'] > 0) {
+            $values['benefit_freebies'][] = [
+                'name'  => 'Gratuités ' . $assignment['age_range_id']['name'],
+                'value' => $assignment['free_qty']
+            ];
+        }
+    }
 }
+
+
 
 
 
