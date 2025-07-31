@@ -6,8 +6,7 @@
     "color": "#690c75",
     "access": {
         "groups": [
-            "booking.default.user",
-            "booking.default.administrator"
+            "camp.default.user"
         ]
     },
     "show_in_apps": true
