@@ -531,19 +531,19 @@ if($booking['center_id']['template_category_id']) {
             $date_from_text = '';
 
             if($has_breakfast) {
-                $date_from_text .= ' pour le petit-déjeuner';
+                $date_from_text .= 'pour le petit-déjeuner';
             }
             elseif($has_lunch || $is_lunch_picnic) {
-                $date_from_text .= ' pour le déjeuner';
+                $date_from_text .= 'pour le déjeuner';
             }
             elseif($has_snack) {
-                $date_from .= ' pour le goûter';
+                $date_from .= 'pour le goûter';
             }
             elseif($has_diner) {
-                $date_from .= ' pour le dîner';
+                $date_from .= 'pour le dîner';
             }
             else {
-                $date_from .= ' pour la nuitée';
+                $date_from .= 'pour la nuitée';
             }
 
             if($has_picnic) {
@@ -572,7 +572,7 @@ if($booking['center_id']['template_category_id']) {
             }
 
             if(strlen($date_from_text)) {
-                $date_from .= '(' . $date_from_text . ')';
+                $date_from .= ' (' . $date_from_text . ')';
             }
 
             $value = str_replace('{date_from}', $date_from, $value);
@@ -626,7 +626,7 @@ if($booking['center_id']['template_category_id']) {
                 $date_to_text .= 'après le goûter';
             }
             elseif($has_lunch && !$is_lunch_offsite) {
-                $date_to .= 'après le déjeuner';
+                $date_to_text .= 'après le déjeuner';
             }
             elseif($has_breakfast && !$is_breakfast_offsite) {
                 $date_to_text .= 'après le petit-déjeuner';
@@ -688,7 +688,7 @@ if($booking['center_id']['template_category_id']) {
             }
 
             if(strlen($date_to_text)) {
-                $date_to .= '(' . $date_to_text . ')';
+                $date_to .= ' (' . $date_to_text . ')';
             }
 
             $value = str_replace('{date_to}', $date_to, $value);
