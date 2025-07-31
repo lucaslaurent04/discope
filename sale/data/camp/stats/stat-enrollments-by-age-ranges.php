@@ -63,6 +63,10 @@ use sale\camp\Sponsor;
             'description'       => "Quantity of enrollments of the age range."
         ]
     ],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.user'],
+    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',

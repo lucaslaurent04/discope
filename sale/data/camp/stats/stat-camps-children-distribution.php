@@ -74,6 +74,10 @@ use sale\camp\Enrollment;
             'description'       => "Quantity of children attending the camp."
         ]
     ],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.user'],
+    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',

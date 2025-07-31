@@ -20,6 +20,10 @@ use sale\camp\Sponsor;
         ]
 
     ],
+    'access'        => [
+        'visibility'        => 'protected',
+        'groups'            => ['camp.default.user'],
+    ],
     'response'      => [
         'content-type'      => 'application/zip',
         'accept-origin'     => '*'

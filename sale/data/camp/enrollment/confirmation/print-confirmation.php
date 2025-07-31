@@ -44,7 +44,7 @@ use Twig\TwigFilter;
     'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
     'access' => [
         'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+        'groups'            => ['camp.default.user'],
     ],
     'response'      => [
         'content-type'      => 'application/pdf',

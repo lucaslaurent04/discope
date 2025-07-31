@@ -32,6 +32,10 @@ use Twig\TwigFilter;
         'content-type'      => 'application/pdf',
         'accept-origin'     => '*'
     ],
+    'access'        => [
+        'visibility'        => 'protected',
+        'groups'            => ['camp.default.user'],
+    ],
     'providers'     => ['context']
 ]);
 

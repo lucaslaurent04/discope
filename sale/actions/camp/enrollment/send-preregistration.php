@@ -87,8 +87,9 @@ use sale\camp\EnrollmentMail;
 
     ],
     'constants'             => ['DEFAULT_LANG'],
-    'access' => [
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'        => 'protected',
+        'groups'            => ['camp.default.user'],
     ],
     'response' => [
         'content-type'      => 'application/json',
