@@ -1266,7 +1266,6 @@ $values['lines'] = $lines;
     compute fare benefit detail
 */
 $values['benefit_lines'] = [];
-$values['benefit_freebies'] = [];
 
 foreach($contract['contract_line_groups_ids'] as $group) {
     if($group['fare_benefit'] == 0) {
@@ -1282,9 +1281,17 @@ foreach($contract['contract_line_groups_ids'] as $group) {
     else {
         $values['benefit_lines'][$index]['value'] += $group['fare_benefit'];
     }
+}
+
+$values['benefit_freebies'] = [];
+
+foreach($booking['booking_lines_groups_ids'] as $group) {
+    if(!$group['is_sojourn']) {
+        continue;
+    }
 
     $assignments = BookingLineGroupAgeRangeAssignment::search(['booking_line_group_id', '=', $group['id']])
-        ->read(['free_qty', 'age_range_id' => ['name']]);
+    ->read(['free_qty', 'age_range_id' => ['name']]);
 
     foreach($assignments as $assignment) {
         if($assignment['free_qty'] > 0) {
