@@ -533,7 +533,7 @@ if($booking['center_id']['template_category_id']) {
             if($has_breakfast) {
                 $date_from_text .= 'pour le petit-déjeuner';
             }
-            elseif($has_lunch || $is_lunch_picnic) {
+            elseif($has_lunch) {
                 $date_from_text .= 'pour le déjeuner';
             }
             elseif($has_snack) {
