@@ -551,24 +551,21 @@ if($booking['center_id']['template_category_id']) {
                     $date_from_text .= ', ';
                 }
                 if($has_lunch) {
-                    $date_from_text .= 'avec pique-nique fourni par le Relais Valrance';
+                    if($has_snack) {
+                        $date_from_text .= 'avec pique-nique et goûter fournis par le Relais Valrance';
+                    }
+                    else {
+                        $date_from_text .= 'avec pique-nique fourni par le Relais Valrance';
+                    }
                 }
                 else {
-                    $date_from_text .= 'avec pique-nique amené par vos soins';
+                    if($has_snack) {
+                        $date_from_text .= 'avec pique-nique amenés par vos soins et goûter fourni par le Relais Valrance';
+                    }
+                    else {
+                        $date_from_text .= 'avec pique-nique et goûter amenés par vos soins';
+                    }
                 }
-            }
-
-            if($has_snack) {
-                if(strlen($date_from_text)) {
-                    $date_from_text .= ', et ';
-                }
-                $date_from_text .= 'avec goûter fourni par le Relais Valrance';
-            }
-            elseif($has_lunch) {
-                if(strlen($date_from_text)) {
-                    $date_from_text .= ', et ';
-                }
-                $date_from_text .= 'avec goûter amené par vos soins';
             }
 
             if(strlen($date_from_text)) {
