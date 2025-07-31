@@ -1177,6 +1177,10 @@ class BookingLine extends Model {
         ]);
         if($lines > 0) {
             foreach($lines as $line) {
+                if(is_null($line['booking_activity_id'])) {
+                    continue;
+                }
+
                 $booking_activity_updates = ['qty' => null];
                 if($line['product_id.product_model_id.has_provider'] && count($line['booking_activity_id.providers_ids']) > $line['qty']) {
                     $providers_ids_to_remove = [];

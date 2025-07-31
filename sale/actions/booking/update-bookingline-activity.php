@@ -113,8 +113,6 @@ if(!$found) {
     throw new Exception("missing_price", EQ_ERROR_INVALID_PARAM);
 }
 
-file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', php_sapi_name().PHP_EOL, FILE_APPEND | LOCK_EX);
-
 /**
  * Set activity product to booking line
  */
