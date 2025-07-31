@@ -572,8 +572,6 @@ if($booking['center_id']['template_category_id']) {
                 $date_from .= ' (' . $date_from_text . ')';
             }
 
-            $value = str_replace('{date_from}', $date_from, $value);
-
 
             // 2) convert config to textual info for departure day
 
@@ -688,6 +686,7 @@ if($booking['center_id']['template_category_id']) {
                 $date_to .= ' (' . $date_to_text . ')';
             }
 
+            $value = str_replace('{date_from}', $date_from, $value);
             $value = str_replace('{date_to}', $date_to, $value);
 
             $text_pers = $lodgingBookingPrintAgeRangesText($booking, $connection_names);

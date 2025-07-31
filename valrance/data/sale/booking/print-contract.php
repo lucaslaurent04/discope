@@ -690,83 +690,201 @@ if($booking['center_id']['template_category_id']) {
             $date_from = $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']);
             $date_to = $days_names[date('w', $booking['date_to'])] . ' '. date('d/m/Y', $booking['date_to']);
 
+// 1) convert config to textual info for arrival day
+
             // retrieve meals info for arrival day
-            $lunch = false;
-            $snack = false;
+            $has_breakfast = false;
+            $has_lunch = false;
+            $has_diner = false;
+            $has_snack = false;
+            $is_lunch_picnic = false;
 
             $meals = BookingMeal::search([['booking_id', '=', $booking['id']], ['date', '=', $booking['date_from']]])
-                ->read(['time_slot_id' => ['code'], 'is_self_provided']);
+                ->read([
+                    'time_slot_id' => ['code'],
+                    'meal_type_id' => ['code'],
+                    'is_self_provided'
+                ]);
 
             foreach($meals as $meal_id => $meal) {
-                if($meal['time_slot_id']['code'] === 'L' && !$meal['is_self_provided']) {
-                    $lunch = true;
+                if($meal['time_slot_id']['code'] === 'B' && !$meal['is_self_provided']) {
+                    $has_breakfast = true;
                 }
-                if($meal['time_slot_id']['code'] === 'PM' && !$meal['is_self_provided']) {
-                    $snack = true;
+                elseif($meal['time_slot_id']['code'] === 'L') {
+                    if(!$meal['is_self_provided']) {
+                        $has_lunch = true;
+                    }
+                    if($meal['meal_type_id']['code'] === 'picnic') {
+                        $is_lunch_picnic = true;
+                    }
+                }
+                elseif($meal['time_slot_id']['code'] === 'D' && !$meal['is_self_provided']) {
+                    $has_diner = true;
+                }
+                elseif($meal['time_slot_id']['code'] === 'PM' && !$meal['is_self_provided']) {
+                    $has_snack = true;
                 }
             }
 
-            if($lunch) {
-                $date_from .= ' (avant le repas du midi)';
+            $date_from_text = '';
+
+            if($has_breakfast) {
+                $date_from_text .= 'pour le petit-déjeuner';
+            }
+            elseif($has_lunch) {
+                $date_from_text .= 'pour le déjeuner';
+            }
+            elseif($has_snack) {
+                $date_from_text .= 'pour le goûter';
+            }
+            elseif($has_diner) {
+                $date_from_text .= 'pour le dîner';
             }
             else {
-                if(!$snack) {
-                    $date_from .= ' (avec un pique-nique et un gouter amenés par vos soins)';
+                $date_from_text .= 'pour la nuitée';
+            }
+
+            if($is_lunch_picnic) {
+                if(strlen($date_from_text)) {
+                    $date_from_text .= ', ';
+                }
+                if($has_lunch) {
+                    if($has_snack) {
+                        $date_from_text .= 'avec pique-nique et goûter fournis par le Relais Valrance';
+                    }
+                    else {
+                        $date_from_text .= 'avec pique-nique fourni par le Relais Valrance';
+                    }
                 }
                 else {
-                    $date_from .= ' (avec un pique-nique apporté par vos soins)';
+                    if($has_snack) {
+                        $date_from_text .= 'avec pique-nique amenés par vos soins et goûter fourni par le Relais Valrance';
+                    }
+                    else {
+                        $date_from_text .= 'avec pique-nique et goûter amenés par vos soins';
+                    }
                 }
+            }
+
+            if(strlen($date_from_text)) {
+                $date_from .= ' (' . $date_from_text . ')';
+            }
+
+
+            // 2) convert config to textual info for departure day
+
+            // retrieve meals info for departure day
+            $has_breakfast = false;
+            $has_lunch = false;
+            $has_snack = false;
+            $has_diner = false;
+            $is_breakfast_offsite = false;
+            $is_lunch_offsite = false;
+            $is_snack_offsite = false;
+            $is_diner_offsite = false;
+
+            $meals = BookingMeal::search([['booking_id', '=', $booking['id']], ['date', '=', $booking['date_to']]])
+                ->read([
+                    'time_slot_id' => ['code'],
+                    'meal_place_id' => ['place_type'],
+                    'is_self_provided'
+                ]);
+
+            foreach($meals as $meal_id => $meal) {
+                $offsite = in_array($meal['meal_place_id']['place_type'], ['offsite', 'auto']);
+                if($meal['time_slot_id']['code'] === 'B' && !$meal['is_self_provided']) {
+                    $has_breakfast = true;
+                    $is_breakfast_offsite = $offsite;
+                }
+                elseif($meal['time_slot_id']['code'] === 'L' && !$meal['is_self_provided']) {
+                    $has_lunch = true;
+                    $is_lunch_offsite = $offsite;
+                }
+                elseif($meal['time_slot_id']['code'] === 'PM' && !$meal['is_self_provided']) {
+                    $has_snack = true;
+                    $is_snack_offsite = $offsite;
+                }
+                elseif($meal['time_slot_id']['code'] === 'D' && !$meal['is_self_provided']) {
+                    $has_diner = true;
+                    $is_diner_offsite = $offsite;
+                }
+            }
+
+            $date_to_text = '';
+
+            if($has_diner && !$is_diner_offsite) {
+                $date_to_text .= 'après le dîner';
+            }
+            elseif($has_snack && !$is_snack_offsite) {
+                $date_to_text .= 'après le goûter';
+            }
+            elseif($has_lunch && !$is_lunch_offsite) {
+                $date_to_text .= 'après le déjeuner';
+            }
+            elseif($has_breakfast && !$is_breakfast_offsite) {
+                $date_to_text .= 'après le petit-déjeuner';
+            }
+
+            if($has_breakfast && $is_breakfast_offsite) {
+                if(strlen($date_to_text)) {
+                    $date_to_text .= ', ';
+                }
+                if($is_lunch_offsite) {
+                    if($is_snack_offsite) {
+                        if($is_diner_offsite) {
+                            $date_to_text .= 'avec collation petit-déjeuner, pique-nique, goûter, et pique-nique du soir à emporter';
+                        }
+                        else {
+                            $date_to_text .= 'avec collation petit-déjeuner, pique-nique et goûter à emporter';
+                        }
+                    }
+                    else {
+                        $date_to_text .= 'avec collation petit-déjeuner et pique-nique à emporter';
+                    }
+                }
+                else {
+                    $date_to_text .= 'avec collation petit-déjeuner à emporter';
+                }
+            }
+            elseif($has_lunch && $is_lunch_offsite) {
+                if(strlen($date_to_text)) {
+                    $date_to_text .= ', ';
+                }
+                if($is_snack_offsite) {
+                    if($is_diner_offsite) {
+                        $date_to_text .= 'avec pique-nique, goûter, et pique-nique du soir à emporter';
+                    }
+                    else {
+                        $date_to_text .= 'avec pique-nique et goûter à emporter';
+                    }
+                }
+                else {
+                    $date_to_text .= 'avec pique-nique à emporter';
+                }
+            }
+            elseif($has_snack && $is_snack_offsite) {
+                if(strlen($date_to_text)) {
+                    $date_to_text .= ', ';
+                }
+                if($is_diner_offsite) {
+                    $date_to_text .= 'avec goûter et pique-nique du soir à emporter';
+                }
+                else {
+                    $date_to_text .= 'avec goûter à emporter';
+                }
+            }
+            elseif($has_diner && $is_diner_offsite) {
+                if(strlen($date_to_text)) {
+                    $date_to_text .= ', ';
+                }
+                $date_to_text .= 'avec pique-nique du soir à emporter';
+            }
+
+            if(strlen($date_to_text)) {
+                $date_to .= ' (' . $date_to_text . ')';
             }
 
             $value = str_replace('{date_from}', $date_from, $value);
-
-            // retrieve meals info for departure day
-            $lunch = false;
-            $snack = false;
-            $lunch_onsite = false;
-            $snack_onsite = false;
-
-            $meals = BookingMeal::search([['booking_id', '=', $booking['id']], ['date', '=', $booking['date_to']]])
-                ->read(['time_slot_id' => ['code'], 'is_self_provided', 'meal_place_id' => ['place_type']]);
-
-            foreach($meals as $meal_id => $meal) {
-                if($meal['time_slot_id']['code'] === 'L' && !$meal['is_self_provided']) {
-                    $lunch = true;
-                    $lunch_onsite = ($meal['meal_place_id']['place_type'] === 'onsite');
-                }
-                if($meal['time_slot_id']['code'] === 'PM' && !$meal['is_self_provided']) {
-                    $snack = true;
-                    $snack_onsite = ($meal['meal_place_id']['place_type'] === 'onsite');
-                }
-            }
-
-            if($lunch) {
-                if($lunch_onsite) {
-                    if($snack) {
-                        if($snack_onsite) {
-                            $date_to .= ' (après le goûter)';
-                        }
-                        else {
-                            $date_to .= ' (après le repas de midi, avec goûter à emporter)';
-                        }
-                    }
-                    else {
-                        $date_to .= ' (après le repas de midi)';
-                    }
-                }
-                else {
-                    if($snack) {
-                        $date_to .= ' (en matinée avec pique-nique et goûter à emporter)';
-                    }
-                    else {
-                        $date_to .= ' (en matinée avec pique-nique à emporter)';
-                    }
-                }
-            }
-            else {
-                $date_to .= ' (avant le repas du midi)';
-            }
-
             $value = str_replace('{date_to}', $date_to, $value);
 
             $text_pers = $lodgingBookingPrintAgeRangesText($booking, $connection_names);
