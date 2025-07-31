@@ -537,13 +537,13 @@ if($booking['center_id']['template_category_id']) {
                 $date_from_text .= 'pour le déjeuner';
             }
             elseif($has_snack) {
-                $date_from .= 'pour le goûter';
+                $date_from_text .= 'pour le goûter';
             }
             elseif($has_diner) {
-                $date_from .= 'pour le dîner';
+                $date_from_text .= 'pour le dîner';
             }
             else {
-                $date_from .= 'pour la nuitée';
+                $date_from_text .= 'pour la nuitée';
             }
 
             if($has_picnic) {
