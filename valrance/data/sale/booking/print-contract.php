@@ -165,7 +165,7 @@ $fields = [
                 'email'
         ],
         'customer_id' => [
-            'rate_class_id' => ['id', 'name'],
+            'rate_class_id' => ['id', 'name', 'code'],
             'partner_identity_id' => [
                 'id',
                 'display_name',
@@ -394,7 +394,7 @@ $has_roundtrip_transport = (bool) $transport;
 
 // travel throughout the stay for external activities
 // #todo - put this in settings
-$product_transport = Product::search(['sku', '=', 'RV-Transport-Externe'])
+$product_transport = Product::search(['name', 'ilike', 'Transport externe%'])
     ->read(['id' , 'product_model_id'])
     ->first(true);
 
@@ -813,7 +813,9 @@ if($booking['center_id']['template_category_id']) {
             $values['contract_engage_html'] = $value;
         }
         elseif($part['name'] == 'notice') {
-            $values['contract_notice_html'] = $value;
+            if(in_array($booking['customer_id']['rate_class_id']['code'] ?? '', ['220', '230', '240'])) {
+                $values['contract_notice_html'] = $value;
+            }
         }
         elseif($part['name'] == 'payment') {
             $value = str_replace('{table_fundings}', '', $value);
