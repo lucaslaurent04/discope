@@ -1060,9 +1060,6 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
     else {
         $values['benefit_lines'][$index]['value'] += $group['fare_benefit'];
     }
-
-
-
 }
 
 $values['benefit_freebies'] = [];
