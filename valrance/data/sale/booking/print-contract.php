@@ -1286,7 +1286,7 @@ foreach($contract['contract_line_groups_ids'] as $group) {
 $values['benefit_freebies'] = [];
 
 foreach($booking['booking_lines_groups_ids'] as $group) {
-    if(!$group['is_sojourn']) {
+    if($group['group_type'] !== 'sojourn') {
         continue;
     }
 
