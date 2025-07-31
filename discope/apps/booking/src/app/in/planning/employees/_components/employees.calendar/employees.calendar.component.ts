@@ -651,7 +651,16 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return false;
     }
 
-    private isDroppable(activity: any, employee: Employee, date_index: string, time_slot: string) {
+    private isDroppable(activity: any, partner: Partner, date_index: string, time_slot: string) {
+        if(activity.has_staff_required) {
+            return this.isDroppableEmployee(activity, partner as Employee, date_index, time_slot);
+        }
+        else {
+            return this.isDroppableProvider(activity, partner as Provider, date_index, time_slot);
+        }
+    }
+
+    private isDroppableEmployee(activity: any, employee: Employee, date_index: string, time_slot: string) {
         if(employee.relationship !== 'employee') {
             return false;
         }
@@ -679,11 +688,22 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         }
 
         // Check that the employee hasn't been assigned an exclusive activity yet
-        if((activity.is_exclusive && this.hasActivity(employee, date_index, time_slot)) || this.hasExclusiveActivity(employee, date_index, time_slot)) {
+        return !((activity.is_exclusive && this.hasActivity(employee, date_index, time_slot)) || this.hasExclusiveActivity(employee, date_index, time_slot));
+    }
+
+    private isDroppableProvider(activity: any, provider: Provider, date_index: string, time_slot: string) {
+        if(provider.relationship !== 'provider') {
             return false;
         }
 
-        return true;
+        const activity_date_index = this.calcDateIndex(new Date(activity.activity_date));
+
+        // Check drop and activity moment match
+        if(date_index !== activity_date_index || time_slot !== activity.time_slot) {
+            return false;
+        }
+
+        return activity.product_model_id.providers_ids.includes(provider.id);
     }
 
     public onDragStart(activity: any) {
@@ -748,17 +768,27 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         }
     }
 
-    public async onDrop(event: Event | CdkDragDrop<any, any>, employee: Employee, date_index: string, time_slot: string) {
+    public async onDrop(event: Event | CdkDragDrop<any, any>, partner: Partner, date_index: string, time_slot: string) {
         if(!this.currentDraggedActivity) {
             return;
         }
 
-        if(!this.isDroppable(this.currentDraggedActivity, employee, date_index, time_slot)) {
-            if(employee.relationship !== 'employee') {
-                this.snack.open('Cette activité ne peut pas être assignée à un prestataire.', 'ERREUR');
+        if(!this.isDroppable(this.currentDraggedActivity, partner, date_index, time_slot)) {
+            if(partner.relationship === 'employee') {
+                if(this.currentDraggedActivity.has_provider) {
+                    this.snack.open('Cette activité doit être assignée à un prestataire.');
+                }
+                else if(this.currentDraggedActivity.employee_id !== partner.id) {
+                    this.snack.open('Cette activité ne peut pas être assignée à cet animateur ou à cette plage horaire.', 'ERREUR');
+                }
             }
-            else if(this.currentDraggedActivity.employee_id !== employee.id) {
-                this.snack.open('Cette activité ne peut pas être assignée à cet animateur ou à cette plage horaire.', 'ERREUR');
+            else {
+                if(this.currentDraggedActivity.has_staff_required) {
+                    this.snack.open('Cette activité doit être assignée à un employé.');
+                }
+                else {
+                    this.snack.open('Cette activité ne peut pas être assignée à ce prestatire ou à cette plage horaire.', 'ERREUR');
+                }
             }
 
             this.currentDraggedActivity = null;
@@ -771,6 +801,15 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         const element = dropEvent.container.element.nativeElement as HTMLElement;
         element.classList.remove('cell-droppable');
 
+        if(partner.relationship === 'employee') {
+            await this.onDropOnEmployee(partner, date_index, time_slot);
+        }
+        else {
+            await this.onDropOnProvider(partner, date_index, time_slot);
+        }
+    }
+
+    private async onDropOnEmployee(partner: Partner, date_index: string, time_slot: string) {
         // #todo - (?) tenir compte du type (event_type)
         let old_partner_id = this.currentDraggedActivity.partner_id ?? null;
         let old_employee_id = this.currentDraggedActivity.employee_id ?? 0;
@@ -781,31 +820,31 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         this.activities[old_employee_id][date_index][time_slot] = this.activities[old_employee_id][date_index][time_slot].filter((activity: any) => activity.id !== this.currentDraggedActivity.id);
 
         // add to this.activities[employee.id][date_index][time_slot]
-        if(!(this.activities[employee.id] ?? false)) {
-            this.activities[employee.id] = {};
+        if(!(this.activities[partner.id] ?? false)) {
+            this.activities[partner.id] = {};
         }
-        if(!(this.activities[employee.id][date_index] ?? false)) {
-            this.activities[employee.id][date_index] = {};
+        if(!(this.activities[partner.id][date_index] ?? false)) {
+            this.activities[partner.id][date_index] = {};
         }
-        if(!(this.activities[employee.id][date_index][time_slot] ?? false)) {
-            this.activities[employee.id][date_index][time_slot] = [];
+        if(!(this.activities[partner.id][date_index][time_slot] ?? false)) {
+            this.activities[partner.id][date_index][time_slot] = [];
         }
 
-        this.currentDraggedActivity.partner_id = employee;
-        this.currentDraggedActivity.employee_id = employee.id;
+        this.currentDraggedActivity.partner_id = partner;
+        this.currentDraggedActivity.employee_id = partner.id;
 
         if(this.dropZonePosition === 'left') {
-            this.activities[employee.id][date_index][time_slot].unshift(this.currentDraggedActivity);
+            this.activities[partner.id][date_index][time_slot].unshift(this.currentDraggedActivity);
         }
         else {
-            this.activities[employee.id][date_index][time_slot].push(this.currentDraggedActivity);
+            this.activities[partner.id][date_index][time_slot].push(this.currentDraggedActivity);
         }
 
         // this.headers.days = this.headers.days.slice();
 
         // update back-end
         try {
-            const employeeActivities = this.activities[employee.id][date_index][time_slot].filter((a: any) => !a.is_partner_event);
+            const employeeActivities = this.activities[partner.id][date_index][time_slot].filter((a: any) => !a.is_partner_event);
             const timeSlot = this.mapTimeSlot[time_slot];
             if(employeeActivities.length === 1 && this.dropZonePosition === 'center') {
                 // handle only one activity is assigned to employee's moment
@@ -813,7 +852,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                     entity: 'sale\\booking\\BookingActivity',
                     id: this.currentDraggedActivity.id,
                     fields: {
-                        employee_id: employee.id,
+                        employee_id: partner.id,
                         schedule_from: timeSlot.schedule_from,
                         schedule_to: timeSlot.schedule_to
                     }
@@ -831,7 +870,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                         fields: {
                             schedule_from: interval.from,
                             schedule_to: interval.to,
-                            employee_id: employee.id
+                            employee_id: partner.id
                         }
                     });
                 }
@@ -848,7 +887,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                             schedule_to: interval.to
                         };
                         if(this.currentDraggedActivity.id === activity.id) {
-                            fields.employee_id = employee.id
+                            fields.employee_id = partner.id
                         }
 
                         await this.api.call('?do=model_update', {
@@ -869,12 +908,54 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             this.api.errorFeedback(response);
 
             // move the activity to its previous position
-            this.activities[employee.id][date_index][time_slot] = this.activities[employee.id][date_index][time_slot].filter((activity: any) => activity.id !== this.currentDraggedActivity.id);
+            this.activities[partner.id][date_index][time_slot] = this.activities[partner.id][date_index][time_slot].filter((activity: any) => activity.id !== this.currentDraggedActivity.id);
             this.activities[old_employee_id][date_index][time_slot].splice(old_index, 0, this.currentDraggedActivity);
 
             // reset employee related data (needed because the object wasn't cloned and is modified above)
             this.currentDraggedActivity.partner_id = old_partner_id;
             this.currentDraggedActivity.employee_id = old_employee_id;
+
+            // drag and drop finished
+            this.currentDraggedActivity = null;
+        }
+    }
+
+    private async onDropOnProvider(partner: Partner, date_index: string, time_slot: string) {
+        let old_partner_id = this.currentDraggedActivity.partner_id ?? null;
+        let old_providers_ids = this.currentDraggedActivity.providers_ids ?? [];
+
+        const old_index = this.activities[old_partner_id?.id ?? 0][date_index][time_slot].findIndex((activity: any) => activity.id === this.currentDraggedActivity.id);
+        this.activities[old_partner_id?.id ?? 0][date_index][time_slot] = this.activities[old_partner_id?.id ?? 0][date_index][time_slot].filter((activity: any) => activity.id !== this.currentDraggedActivity.id);
+
+        const providersIds = [partner.id];
+        if(old_partner_id) {
+            providersIds.push(-old_partner_id.id);
+        }
+
+        try {
+            await this.api.call('?do=model_update', {
+                entity: 'sale\\booking\\BookingActivity',
+                id: this.currentDraggedActivity.id,
+                fields: {
+                    providers_ids: providersIds
+                }
+            });
+
+            this.currentDraggedActivity = null;
+
+            // full refresh if multiple activities to get them correctly sorted
+            this.onRefresh();
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+
+            // move the activity to its previous position
+            this.activities[partner.id][date_index][time_slot] = this.activities[partner.id][date_index][time_slot].filter((activity: any) => activity.id !== this.currentDraggedActivity.id);
+            this.activities[old_partner_id?.id ?? 0][date_index][time_slot].splice(old_index, 0, this.currentDraggedActivity);
+
+            // reset employee related data (needed because the object wasn't cloned and is modified above)
+            this.currentDraggedActivity.partner_id = old_partner_id;
+            this.currentDraggedActivity.providers_ids = [old_providers_ids];
 
             // drag and drop finished
             this.currentDraggedActivity = null;
