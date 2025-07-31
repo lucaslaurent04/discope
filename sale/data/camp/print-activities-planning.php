@@ -37,7 +37,7 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
     'constants'     => ['L10N_LOCALE', 'L10N_TIMEZONE'],
     'access'        => [
         'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+        'groups'            => ['camp.default.user'],
     ],
     'response'      => [
         'content-type'      => 'application/pdf',

@@ -41,6 +41,10 @@ use equal\orm\DomainCondition;
             'default'           => 'all'
         ]
     ],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.user'],
+    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',

@@ -17,7 +17,7 @@
     ],
     'access' => [
         'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+        'groups'            => ['camp.default.user'],
     ],
     'response'      => [
         'content-type'      => 'application/pdf',

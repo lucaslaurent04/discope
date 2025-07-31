@@ -64,6 +64,10 @@ use sale\camp\catalog\Product;
             'description'       => "Quantity of enrollments of the tariff."
         ]
     ],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.user'],
+    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',

@@ -47,6 +47,10 @@ use equal\orm\DomainCondition;
             'description'       => "Show only PM day cares presences."
         ]
     ],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.user'],
+    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',

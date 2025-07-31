@@ -64,6 +64,10 @@ use sale\camp\WorksCouncil;
             'description'       => "Quantity of enrollments helped by the works council."
         ]
     ],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.user'],
+    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
