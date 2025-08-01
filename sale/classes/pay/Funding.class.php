@@ -119,6 +119,17 @@ class Funding extends Model {
                 'foreign_object'    => 'identity\CenterOffice',
                 'description'       => "The center office the booking relates to.",
                 'required'          => true
+            ],
+
+            'status' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'pending',
+                    'in_process',
+                    'paid',
+                ],
+                'description'       => 'The current processing status of the funding',
+                'default'           => 'pending'
             ]
 
         ];

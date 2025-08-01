@@ -102,18 +102,6 @@ class Funding extends \sale\pay\Funding {
                 'foreign_field'     => 'funding_id'
             ],
 
-            'status' => [
-                'type'              => 'string',
-                'selection'         => [
-                    'pending',
-                    'in_process',
-                    'paid',
-                ],
-                'description'       => 'The current processing status of the funding',
-                'default'           => 'pending'
-            ],
-
-
         ];
     }
 
