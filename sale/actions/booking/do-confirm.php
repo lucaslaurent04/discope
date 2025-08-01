@@ -466,7 +466,10 @@ foreach($booking['fundings_ids'] as $funding) {
     else {
         Funding::id($fid)
             ->update(['due_amount' => $funding['paid_amount']])
-            ->update(['is_paid' => true]);
+            ->update([
+                'is_paid' => true,
+                'status'  => 'paid'
+            ]);
         $fundings_handled_sum += $funding['paid_amount'];
     }
 }
