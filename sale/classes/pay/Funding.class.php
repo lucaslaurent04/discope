@@ -142,6 +142,17 @@ class Funding extends Model {
                 'required'          => true
             ],
 
+            'status' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'pending',
+                    'in_process',
+                    'paid',
+                ],
+                'description'       => 'The current processing status of the funding',
+                'default'           => 'pending'
+            ],
+
             'payments_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\pay\Payment',

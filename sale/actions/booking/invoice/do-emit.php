@@ -145,7 +145,10 @@ elseif(!is_null($invoice['booking_id'])) {
             else {
                 Funding::id($credit_note['funding_id'])
                     ->update(['due_amount'=> $funding['paid_amount']])
-                    ->update(['is_paid' => true]);
+                    ->update([
+                        'is_paid' => true,
+                        'status'  => 'paid'
+                    ]);
             }
         }
     }
