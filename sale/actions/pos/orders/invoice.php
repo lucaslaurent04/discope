@@ -185,7 +185,7 @@ foreach($orders as $order) {
 * VSG : 25
 * HVG : 32
 */
-if(in_array($center_id, [27, 30, 28, 24, 26]) && $date >= strtotime('2024-04-01 00:00:00')) {
+if(in_array($center_id, [27, 30, 28, 24, 26, 32]) && $date >= strtotime('2024-04-01 00:00:00')) {
     eQual::run('do', 'sale_pos_orders_payments', [
             'ids' => $orders_ids
         ]);
