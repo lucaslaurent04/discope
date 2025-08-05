@@ -6,11 +6,12 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use core\setting\Setting;
 use documents\Export;
 use finance\accounting\AccountingJournal;
 use identity\CenterOffice;
 use sale\booking\Invoice;
-use sale\customer\Customer;
+use sale\catalog\Product;
 
 list($params, $providers) = eQual::announce([
     'description'   => "Creates an export archive containing all emitted invoices that haven't been exported yet (for external accounting software).",
@@ -106,6 +107,26 @@ if(is_null($journal)) {
     throw new Exception("unknown_accounting_journal", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
+$account_downpayment = Setting::get_value('sale', 'accounting', 'invoice.downpayment_account', '4460000');
+
+if(is_null($account_downpayment)) {
+    throw new Exception("unknown_downpayment_account", EQ_ERROR_UNKNOWN_OBJECT);
+}
+
+$downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$office['id']);
+
+if(is_null($downpayment_sku)) {
+    throw new Exception("unknown_downpayment_sku", EQ_ERROR_UNKNOWN_OBJECT);
+}
+
+$downpayment_product = Product::search(['sku', '=', $downpayment_sku])
+    ->read(['id'])
+    ->first();
+
+if(is_null($downpayment_product)) {
+    throw new Exception("unknown_downpayment_product", EQ_ERROR_UNKNOWN_OBJECT);
+}
+
 $invoices = Invoice::search([
             [
                 ['is_exported', '=', false],
@@ -127,15 +148,23 @@ $invoices = Invoice::search([
         'name',
         'date',
         'type',
+        'price',
         'partner_id' => [
             'id',
-            'name'
+            'name',
+            'rate_class_id' => [
+                'code'
+            ],
+            'partner_identity_id' => [
+                'accounting_account'
+            ]
         ],
         'invoice_lines_ids' => [
             'id',
             'name',
             'total',
             'price',
+            'product_id',
             'price_id' => [
                 'id',
                 'vat_rate',
@@ -156,44 +185,79 @@ if(!empty($invoices)) {
     $entry_num = 1;
     $data = [];
     foreach($invoices as $invoice) {
-        $customer = Customer::search($invoice['partner_id'])->read(['rate_class_id' => ['code']])->first();
         $added = 0;
+
+        $data[] = [
+            $entry_num,
+            date('dmY', $invoice['date']),
+            'VE',
+            $invoice['partner_id']['partner_identity_id']['accounting_account'],
+            'F',
+            $invoice['partner_id']['name'],
+            $invoice['name'],
+            number_format($invoice['price'], 2, '.', ''),
+            $invoice['type'] === 'invoice' ? 'D' : 'C',
+            '',
+            ''
+        ];
+
+        $data[] = [
+            '>' . $invoice['partner_id']['rate_class_id']['code'],
+            number_format(100, 2, '.', ''),
+            number_format($invoice['price'], 2, '.', '')
+        ];
+
+        $added++;
+
         foreach($invoice['invoice_lines_ids'] as $line) {
-            foreach($line['price_id']['accounting_rule_id']['accounting_rule_line_ids'] as $rule_line) {
-                $debit = false;
-
-                $account_first = substr($rule_line['account_id']['code'], 0, 1);
-                $account_2_first = substr($rule_line['account_id']['code'], 0, 2);
-                $account_3_first = substr($rule_line['account_id']['code'], 0, 3);
-                if(
-                    in_array($account_2_first, ['60', '61', '62'])
-                    || in_array($account_3_first, ['411', '512', '530'])
-                    || $account_first === '2'
-                ) {
-                    $debit = true;
-                }
-
+            if($line['product_id'] === $downpayment_product['id'] && is_null($line['price_id'])) {
+                // Reference to down payment
                 $data[] = [
                     $entry_num,
                     date('dmY', $invoice['date']),
                     'VE',
-                    $rule_line['account_id']['code'],
+                    $account_downpayment,
                     'F',
                     $invoice['partner_id']['name'],
                     $invoice['name'],
-                    number_format($line['price'], 2, '.', ''),
-                    $debit ? 'D' : 'C',
+                    number_format(abs($line['price']), 2, '.', ''),
+                    $invoice['type'] === 'invoice' && $line['price'] >= 0 ? 'C' : 'D',
                     '',
                     ''
                 ];
 
                 $data[] = [
-                    '>' . $customer['rate_class_id']['code'],
-                    number_format($rule_line['share'] * 100, 2, '.', ''),
-                    number_format($line['price'] * $rule_line['share'], 2, '.', '')
+                    '>' . $invoice['partner_id']['rate_class_id']['code'],
+                    number_format(100, 2, '.', ''),
+                    number_format(abs($line['price']), 2, '.', '')
                 ];
 
                 $added++;
+            }
+            else {
+                foreach($line['price_id']['accounting_rule_id']['accounting_rule_line_ids'] as $rule_line) {
+                    $data[] = [
+                        $entry_num,
+                        date('dmY', $invoice['date']),
+                        'VE',
+                        $rule_line['account_id']['code'],
+                        'F',
+                        $invoice['partner_id']['name'],
+                        $invoice['name'],
+                        number_format(abs($line['price']), 2, '.', ''),
+                        $invoice['type'] === 'invoice' && $line['price'] >= 0 ? 'C' : 'D',
+                        '',
+                        ''
+                    ];
+
+                    $data[] = [
+                        '>' . $invoice['partner_id']['rate_class_id']['code'],
+                        number_format($rule_line['share'] * 100, 2, '.', ''),
+                        number_format(abs($line['price']) * $rule_line['share'], 2, '.', '')
+                    ];
+
+                    $added++;
+                }
             }
         }
 
@@ -201,6 +265,7 @@ if(!empty($invoices)) {
     }
 
     $csv_data = $formatToCsv($data);
+
     $file_name = sprintf('discope_extraction_%s.txt', date('Ymd', time()));
 
     $zip_data = $generateZip([$file_name => $csv_data]);
@@ -217,7 +282,7 @@ if(!empty($invoices)) {
 
     // mark processed invoices as exported
     $invoices_ids = array_column($invoices, 'id');
-    Invoice::ids($invoices_ids)->update(['is_exported' => true]);
+    //Invoice::ids($invoices_ids)->update(['is_exported' => true]);
 }
 
 $context->httpResponse()
