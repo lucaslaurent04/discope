@@ -195,14 +195,14 @@ class ProductModel extends Model {
 
             'description_delivery' => [
                 'type'              => 'string',
-                'usage'             => 'text/plain',
+                'usage'             => 'text/html',
                 'description'       => "Description for delivery notes.",
                 'multilang'         => true
             ],
 
             'description_receipt' => [
                 'type'              => 'string',
-                'usage'             => 'text/plain',
+                'usage'             => 'text/html',
                 'description'       => "Description for reception vouchers.",
                 'multilang'         => true
             ],
