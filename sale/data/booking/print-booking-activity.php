@@ -349,10 +349,10 @@ foreach($booking_activities as $activity) {
 $values['activities_map'] = $activities_map;
 
 $template_comments = Template::search([
-    ['code', '=', 'activity.doc'],
-    ['category_id', '=', $booking['center_id']['template_category_id']],
-    ['type', '=', 'planning']
-])
+        ['code', '=', 'activity.doc'],
+        ['category_id', '=', $booking['center_id']['template_category_id']],
+        ['type', '=', 'planning']
+    ])
     ->read(['parts_ids' => ['name', 'value']])
     ->first();
 

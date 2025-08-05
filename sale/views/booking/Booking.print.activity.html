@@ -150,11 +150,11 @@ div.footer {
                                     </div>
                                 {% endif %}
                                 <div style="margin-bottom: 4px;">
-                                    <strong>{{ data['activity'] | default('') | raw }}</strong><br>
+                                    <div>{{ data['activity'] | default('') | raw }}</div>
                                     {% if data['schedule_from'] != 0 and data['schedule_to'] != 0 %}
-                                        <strong>({{ data['schedule_from'] | date('H:i') }} - {{ data['schedule_to'] | date('H:i') }})</strong><br>
+                                        <div style="background-color: #ffa06b;">({{ data['schedule_from'] | date('H:i') }} - {{ data['schedule_to'] | date('H:i') }})</div>
                                     {% endif %}
-                                    {{ data['description'] | default('') | raw }}
+                                    <div>{{ data['description'] | default('') | raw }}</div>
                                 </div>
 
                                 {% if loop.parent.loop.first and loop.index == 1 and comments.first_day_am_comment %}
