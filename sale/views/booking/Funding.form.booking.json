@@ -177,7 +177,8 @@
                                             {
                                                 "type": "field",
                                                 "value": "status",
-                                                "width": "33%"
+                                                "width": "33%",
+                                                "visible": false
                                             },
                                             {
                                                 "type": "field",
@@ -188,18 +189,19 @@
                                                 }
                                             },
                                             {
-                                                "type": "field",
-                                                "value": "paid_amount",
-                                                "width": "33%",
-                                                "widget": {
-                                                    "readonly": true
-                                                }
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "33%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "center_office_id",
-                                                "visible": false,
-                                                "width": "0",
+                                                "value": "due_amount",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "paid_amount",
+                                                "width": "33%",
                                                 "widget": {
                                                     "readonly": true
                                                 }
@@ -211,8 +213,11 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "due_amount",
-                                                "width": "50%"
+                                                "value": "center_office_id",
+                                                "width": "50%",
+                                                "widget": {
+                                                    "readonly": true
+                                                }
                                             },
                                             {
                                                 "type": "field",
