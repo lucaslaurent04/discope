@@ -47,7 +47,7 @@ foreach($center_office_ids as $center_office_id) {
     try {
         eQual::run('do', 'finance_payments_ebp_export-invoices', compact('center_office_id'));
 
-        # todo - check if payments export needed
+        #memo - Valrance team does not use payments export
         // eQual::run('do', 'finance_payments_ebp_export-payments', compact('center_office_id'));
     }
     catch(Exception $e) {
