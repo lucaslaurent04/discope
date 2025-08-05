@@ -33,7 +33,7 @@ class BookingActivity extends Model {
 
             'description' => [
                 'type'              => 'string',
-                'usage'             => 'text/plain',
+                'usage'             => 'text/html',
                 'description'       => "Description of the activity."
             ],
 
