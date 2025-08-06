@@ -150,10 +150,10 @@ div.footer {
                                     </div>
                                 {% endif %}
                                 <div style="margin-bottom: 4px;">
-                                    <div>{{ data['activity'] | default('') | raw }}</div>
                                     {% if data['schedule_from'] != 0 and data['schedule_to'] != 0 %}
                                         <div style="background-color: #ffa06b;">({{ data['schedule_from'] | date('H:i') }} - {{ data['schedule_to'] | date('H:i') }})</div>
                                     {% endif %}
+                                    <div style="font-weight: bold;">{{ data['activity'] | default('') | raw }}</div>
                                     <div>{{ data['description'] | default('') | raw }}</div>
                                 </div>
 
