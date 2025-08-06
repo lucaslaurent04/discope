@@ -179,15 +179,13 @@ class Consumption extends Model {
             'meal_type_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\MealType',
-                'description'       => "Type of the meal being served.",
-                'default'           => 1
+                'description'       => "Type of the meal being served."
             ],
 
             'meal_place_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\MealPlace',
-                'description'       => "Place where the meal is served.",
-                'default'           => 1
+                'description'       => "Place where the meal is served."
             ],
 
             'is_accomodation' => [
