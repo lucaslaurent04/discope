@@ -265,7 +265,6 @@ if(!empty($invoices)) {
     }
 
     $csv_data = $formatToCsv($data);
-
     $file_name = sprintf('discope_extraction_%s.txt', date('Ymd', time()));
 
     $zip_data = $generateZip([$file_name => $csv_data]);
@@ -282,7 +281,7 @@ if(!empty($invoices)) {
 
     // mark processed invoices as exported
     $invoices_ids = array_column($invoices, 'id');
-    //Invoice::ids($invoices_ids)->update(['is_exported' => true]);
+    Invoice::ids($invoices_ids)->update(['is_exported' => true]);
 }
 
 $context->httpResponse()
