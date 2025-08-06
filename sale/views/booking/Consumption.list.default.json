@@ -59,6 +59,18 @@
             },
             {
                 "type": "field",
+                "value": "meal_type_id",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "meal_place_id",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
                 "value": "is_rental_unit",
                 "width": "10%",
                 "sortable": true

@@ -82,6 +82,16 @@
             "description": "Le service est un repas.",
             "help": ""
         },
+        "meal_type_id": {
+            "label": "Type repas",
+            "description": "Type de repas servi.",
+            "help": ""
+        },
+        "meal_place_id": {
+            "label": "Place repas",
+            "description": "Lieu où le repas est servi.",
+            "help": ""
+        },
         "is_accomodation": {
             "label": "Logement",
             "description": "Le service est un logement.",
