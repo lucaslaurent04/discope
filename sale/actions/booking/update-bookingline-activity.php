@@ -11,7 +11,7 @@ use sale\booking\TimeSlot;
 use sale\catalog\Product;
 
 [$params, $providers] = eQual::announce([
-    'description'	=> "Updates a Booking Line by changing its product.",
+    'description'   => "Updates a Booking Line by changing its product.",
     'help'          => "This script is meant to be called by the `booking/services` UI.",
     'params' 		=> [
         'id' => [
@@ -38,15 +38,15 @@ use sale\catalog\Product;
         ]
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'orm']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
