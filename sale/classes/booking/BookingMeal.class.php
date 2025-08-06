@@ -1,21 +1,26 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\booking;
 
 use equal\orm\Model;
 
 class BookingMeal extends Model {
 
-    public static function getName() {
+    public static function getName(): string {
         return "Booking meal";
     }
 
-    public static function getColumns() {
+    public static function getDescription(): string {
+        return "Specify the meal type and location to be assigned to consumptions recorded for a specific meal during the booking sojourn or camp.";
+    }
+
+    public static function getColumns(): array {
         return [
 
             /**
