@@ -523,24 +523,19 @@ class BookingLine extends Model {
                 ]);
 
                 if(!empty($res)) {
-                    $description = sprintf('Transport (%s - %s) : %s',
-                        date('d/m/Y', $line['service_date']),
-                        $time_slot['name'],
-                        $line['name']
-                    );
-
-                    self::create([
+                    $booking_line = self::create([
                         'order'                 => ++$line_order,
                         'booking_id'            => $booking['id'],
-                        'booking_line_group_id' => $line['booking_line_group_id'],
-                        'service_date'          => $values['service_date'],
-                        'time_slot_id'          => $time_slot['id'],
-                        'booking_activity_id'   => $main_activity_id,
-                        'description'           => $description,
-                        'product_id'            => $res[0]['id']
+                        'booking_line_group_id' => $line['booking_line_group_id']
                     ])
-                        ->do('update-price-id')
-                        ->do('update-qty');
+                        ->read(['id'])
+                        ->first();
+
+                    \eQual::run('do', 'sale_booking_update-bookingline-activity-product', [
+                        'id'                    => $booking_line['id'],
+                        'product_id'            => $res[0]['id'],
+                        'booking_activity_id'   => $main_activity_id,
+                    ]);
                 }
             }
 
@@ -558,17 +553,19 @@ class BookingLine extends Model {
                         continue;
                     }
 
-                    self::create([
+                    $booking_line = self::create([
                         'order'                 => ++$line_order,
                         'booking_id'            => $booking['id'],
-                        'booking_line_group_id' => $line['booking_line_group_id'],
-                        'service_date'          => $line['service_date'],
-                        'time_slot_id'          => $line['time_slot_id']['id'],
-                        'booking_activity_id'   => $main_activity_id,
-                        'product_id'            => $res[0]['id']
+                        'booking_line_group_id' => $line['booking_line_group_id']
                     ])
-                        ->do('update-price-id')
-                        ->do('update-qty');
+                        ->read(['id'])
+                        ->first();
+
+                    \eQual::run('do', 'sale_booking_update-bookingline-activity-product', [
+                        'id'                    => $booking_line['id'],
+                        'product_id'            => $res[0]['id'],
+                        'booking_activity_id'   => $main_activity_id,
+                    ]);
                 }
             }
 
