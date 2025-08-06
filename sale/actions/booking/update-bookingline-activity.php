@@ -13,7 +13,7 @@ use sale\catalog\Product;
 [$params, $providers] = eQual::announce([
     'description'   => "Updates a Booking Line by changing its product.",
     'help'          => "This script is meant to be called by the `booking/services` UI.",
-    'params' 		=> [
+    'params'        => [
         'id' => [
             'description'       => 'Identifier of the targeted Booking Line.',
             'type'              => 'many2one',
