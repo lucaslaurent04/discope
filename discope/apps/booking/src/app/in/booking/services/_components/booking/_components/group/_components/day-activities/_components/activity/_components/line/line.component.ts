@@ -8,6 +8,7 @@ import { BookingLine } from '../../../../../../../../_models/booking_line.model'
 import { debounceTime, map, mergeMap } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { BookingServicesBookingGroupLinePriceDialogComponent } from '../../../../../line/_components/price.dialog/price.component';
+import { BookingActivity } from '../../../../../../../../_models/booking_activity.model';
 
 interface vmModel {
     product: {
@@ -37,6 +38,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityLineComponent imple
     @Input() line: BookingLine | null;
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
+    @Input() activity: BookingActivity | null;
 
     @Output() loadStart = new EventEmitter();
     @Output() loadEnd = new EventEmitter();
@@ -157,8 +159,9 @@ export class BookingServicesBookingGroupDayActivitiesActivityLineComponent imple
             try {
                 this.loadStart.emit();
 
-                await this.api.call('?do=sale_booking_update-bookingline-product', {
+                await this.api.call('?do=sale_booking_update-bookingline-activity-product', {
                     id: this.line.id,
+                    booking_activity_id: this.activity.id,
                     product_id: product.id
                 });
                 this.vm.product.formControl.setErrors(null);

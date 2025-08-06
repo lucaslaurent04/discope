@@ -7,13 +7,13 @@
 */
 
 use sale\booking\BookingLine;
-use sale\booking\BookingLineGroup;
 use sale\booking\TimeSlot;
 use sale\catalog\Product;
 
 [$params, $providers] = eQual::announce([
-    'description'	=> "Updates a Booking Line by changed its product. This script is meant to be called by the `booking/services` UI.",
-    'params' 		=> [
+    'description'   => "Updates a Booking Line by changing its product.",
+    'help'          => "This script is meant to be called by the `booking/services` UI.",
+    'params'        => [
         'id' => [
             'description'       => 'Identifier of the targeted Booking Line.',
             'type'              => 'many2one',
@@ -38,15 +38,15 @@ use sale\catalog\Product;
         ]
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'orm']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
@@ -60,7 +60,7 @@ use sale\catalog\Product;
  * Check given params
  */
 
-// check product parm
+// check product param
 $product = Product::id($params['product_id'])
     ->read(['is_activity'])
     ->first();
