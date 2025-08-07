@@ -898,6 +898,7 @@ class BookingLineGroup extends Model {
             if($group['has_pack'] && !$group['is_locked']) {
                 // find the repetition factor
                 $nb_repeat = 1;
+                // #todo - we should test is_repeatable here
                 if($group['pack_id.product_model_id.has_duration']) {
                     $nb_repeat = $group['pack_id.product_model_id.duration'];
                 }
@@ -2357,14 +2358,15 @@ class BookingLineGroup extends Model {
                             $schedule_to    = $line['time_slot_id.schedule_to'];
                         }
 
+                        $is_repeatable = $product_models[$line['product_id.product_model_id']]['is_repeatable'];
                         $is_meal = $product_models[$line['product_id.product_model_id']]['is_meal'];
                         $is_snack = $product_models[$line['product_id.product_model_id']]['is_snack'];
                         $qty_accounting_method = $product_models[$line['product_id.product_model_id']]['qty_accounting_method'];
 
-                        // #memo - number of consumptions differs for accommodations (rooms are occupied nb_nights + 1, until sometime in the morning)
+                        // #memo - number of consumptions differs for accommodations (rooms are occupied nb_nights + 1, until some time in the morning)
                         // #memo - sojourns are accounted in nights, while events are accounted in days
                         $nb_products = ($group['is_sojourn']) ? $group['nb_nights'] : (($group['is_event']) ? ($group['nb_nights']+1) : 1);
-                        if(!$product_models[$line['product_id.product_model_id']]['is_repeatable']) {
+                        if(!$is_repeatable) {
                             $nb_products = 1;
                         }
                         $nb_times = $group['nb_pers'];
@@ -2384,12 +2386,17 @@ class BookingLineGroup extends Model {
                         if($has_duration) {
                             $nb_products = $product_models[$line['product_id.product_model_id']]['duration'];
                         }
-
+                        // #memo - service_date might be set, only for schedulable non-repeatable services
                         $date_from = $line['service_date'] ?? $group['date_from'];
 
-                        list($day, $month, $year) = [ date('j', $date_from), date('n', $date_from), date('Y', $date_from) ];
+                        [$day, $month, $year] = [ date('j', $date_from), date('n', $date_from), date('Y', $date_from) ];
                         // fetch the offset, in days, for the scheduling (only applies on sojourns)
-                        $offset = ($group['is_sojourn']) ? $product_models[$line['product_id.product_model_id']]['schedule_offset'] : 0;
+                        $offset = 0;
+
+                        if($group['is_sojourn']) {
+                            // #memo - schedule offset can be negative. By convention, offset = -1 refers to the departure day (i.e., the last date of the stay, not including a night)
+                            $offset = $product_models[$line['product_id.product_model_id']]['schedule_offset'];
+                        }
 
                         // by default, assign a quantity of $nb_times to each day
                         $days_nb_times = array_fill(0, $nb_products, $nb_times);
@@ -2419,7 +2426,20 @@ class BookingLineGroup extends Model {
                                 continue;
                             }
 
-                            $c_date = mktime(0, 0, 0, $month, $day+$i+$offset, $year);
+                            $day_index = $i + $offset;
+
+                            // support for negative offset: count backwards from the end of the stay (ex: offset = -1 => departure day)
+                            if($offset < 0 && !$is_repeatable) {
+                                $day_index = $group['nb_nights'] + $offset;
+                            }
+
+                            // ignore invalid offset
+                            if($day_index < 0 || $day_index > $group['nb_nights']) {
+                                continue;
+                            }
+
+                            $c_date = mktime(0, 0, 0, $month, $day + $day_index, $year);
+
                             $c_time_slot_id = $line['time_slot_id'];
                             $c_schedule_from = $schedule_from;
                             $c_schedule_to = $schedule_to;
