@@ -12,10 +12,10 @@
             "default" : false,
             "actions" : [
                 {
-                    "id": "action.send-partners-planning-selection",
-                    "label": "Send email",
-                    "description": "Send activity reminder to partners.",
-                    "controller": "sale_booking_send-partner-planning"
+                    "id": "action.create-partner-planning-summary",
+                    "label": "Create summary",
+                    "description": "Creates an activities summary for the selected partners.",
+                    "controller": "sale_booking_create-partner-planning-summary"
                 }
             ]
         }
@@ -30,71 +30,27 @@
                 "visible": false
             },
             {
+                "id": "item.employee_id",
                 "type": "field",
-                "value": "activity_date",
-                "width": "15%"
-            },
-            {
-                "type": "field",
-                "value": "time_slot_id",
+                "value": "employee_id",
                 "width": "20%"
             },
             {
-                "id": "item.partner_id",
+                "id": "item.provider_id",
                 "type": "field",
-                "value": "partner_id",
+                "value": "provider_id",
                 "width": "20%"
-            },
-            {
-                "type": "field",
-                "value": "booking_activity_id",
-                "width": "33%"
-            },
-            {
-                "type": "field",
-                "value": "customer_id",
-                "width": "20%"
-            },
-            {
-                "type": "field",
-                "value": "booking_id",
-                "width": "20%"
-            },
-            {
-                "type": "field",
-                "value": "booking_status",
-                "width": "20%"
-            },
-            {
-                "type": "field",
-                "value": "booking_line_group_id",
-                "width": "20%",
-                "visible": false
-            },
-            {
-                "type": "field",
-                "label": "Group number",
-                "value": "group_num",
-                "width": "20%"
-            },
-            {
-                "type": "field",
-                "label": "Qty people",
-                "value": "nb_pers",
-                "width": "10%",
-                "visible": false
-            },
-            {
-                "type": "field",
-                "label": "Qty children",
-                "value": "nb_children",
-                "width": "10%"
             },
             {
                 "type": "field",
                 "value": "relationship",
                 "width": "20%",
                 "visible": false
+            },
+            {
+                "type": "field",
+                "value": "activities_qty",
+                "width": "20%"
             }
         ]
     }

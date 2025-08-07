@@ -71,14 +71,6 @@ class Employee extends \identity\Partner {
                 'domain'            => ['is_activity', '=', true]
             ],
 
-            'mails_ids' => [
-                'type'              => 'one2many',
-                'foreign_object'    => 'sale\booking\PartnerPlanningMail',
-                'foreign_field'     => 'object_id',
-                'description'       => "Mails related to the employee.",
-                'domain'            => ['object_class', '=', 'hr\employee\Employee']
-            ],
-
             'extref_employee' => [
                 'type'              => 'string',
                 'description'       => 'External reference of the Employee.'

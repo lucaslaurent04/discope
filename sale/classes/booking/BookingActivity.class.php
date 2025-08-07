@@ -292,16 +292,6 @@ class BookingActivity extends Model {
                 'function'          => 'calcGroupNum'
             ],
 
-            'partner_planning_mails_ids' => [
-                'type'              => 'many2many',
-                'foreign_object'    => 'sale\booking\PartnerPlanningMail',
-                'foreign_field'     => 'booking_activities_ids',
-                'rel_table'         => 'sale_booking_bookingactivity_rel_partnerplanningmail',
-                'rel_foreign_key'   => 'partner_planning_mail_id',
-                'rel_local_key'     => 'booking_activity_id',
-                'description'       => "Mails that reminded the activities schedules to partners (employee/providers)."
-            ]
-
         ];
     }
 
