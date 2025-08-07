@@ -447,7 +447,8 @@ class BookingLine extends Model {
             'time_slot_id' => $values['time_slot_id']
         ]);
 
-        $self->do('update-price-id');
+        $self->do('update-price-id')
+            ->do('update-qty');
 
         $self->read([
             'name',
@@ -522,27 +523,18 @@ class BookingLine extends Model {
                 ]);
 
                 if(!empty($res)) {
-                    $description = sprintf('Transport (%s - %s) : %s',
-                        date('d/m/Y', $line['service_date']),
-                        $time_slot['name'],
-                        $line['name']
-                    );
-
                     $booking_line = self::create([
                         'order'                 => ++$line_order,
                         'booking_id'            => $booking['id'],
-                        'booking_line_group_id' => $line['booking_line_group_id'],
-                        'service_date'          => $values['service_date'],
-                        'time_slot_id'          => $time_slot['id'],
-                        'booking_activity_id'   => $main_activity_id,
-                        'description'           => $description
+                        'booking_line_group_id' => $line['booking_line_group_id']
                     ])
                         ->read(['id'])
                         ->first();
 
-                    \eQual::run('do', 'sale_booking_update-bookingline-product', [
-                        'id'            => $booking_line['id'],
-                        'product_id'    => $res[0]['id']
+                    \eQual::run('do', 'sale_booking_update-bookingline-activity-product', [
+                        'id'                    => $booking_line['id'],
+                        'product_id'            => $res[0]['id'],
+                        'booking_activity_id'   => $main_activity_id,
                     ]);
                 }
             }
@@ -564,17 +556,15 @@ class BookingLine extends Model {
                     $booking_line = self::create([
                         'order'                 => ++$line_order,
                         'booking_id'            => $booking['id'],
-                        'booking_line_group_id' => $line['booking_line_group_id'],
-                        'service_date'          => $line['service_date'],
-                        'time_slot_id'          => $line['time_slot_id']['id'],
-                        'booking_activity_id'   => $main_activity_id
+                        'booking_line_group_id' => $line['booking_line_group_id']
                     ])
                         ->read(['id'])
                         ->first();
 
-                    \eQual::run('do', 'sale_booking_update-bookingline-product', [
-                        'id'            => $booking_line['id'],
-                        'product_id'    => $res[0]['id']
+                    \eQual::run('do', 'sale_booking_update-bookingline-activity-product', [
+                        'id'                    => $booking_line['id'],
+                        'product_id'            => $res[0]['id'],
+                        'booking_activity_id'   => $main_activity_id,
                     ]);
                 }
             }
@@ -590,91 +580,6 @@ class BookingLine extends Model {
                 BookingActivity::id($main_activity_id)->update($booking_activity_data);
             }
         }
-
-        $self->read([
-            'qty',
-            'has_own_qty',
-            'is_rental_unit',
-            'is_accomodation',
-            'qty_accounting_method',
-            'booking_line_group_id' => [
-                'nb_pers',
-                'nb_nights',
-                'has_pack',
-                'is_sojourn',
-                'is_event',
-                'pack_id' => [
-                    'has_age_range'
-                ],
-                'age_range_assignments_ids' => [
-                    'age_range_id',
-                    'qty'
-                ]
-            ],
-            'product_id' => [
-                'has_age_range',
-                'age_range_id',
-                'product_model_id' => [
-                    'has_duration',
-                    'duration',
-                    'is_repeatable',
-                    'capacity'
-                ]
-            ]
-        ]);
-
-        // #memo - qty must always be recomputed, even if given amongst (updated) $values (when a new line is created the default qty is 1.0)
-        foreach($self as $lid => $line) {
-            $group = $line['booking_line_group_id'];
-            $product = $line['product_id'];
-            $product_model = $product['product_model_id'];
-
-            $qty = $line['qty'];
-            if(!$line['has_own_qty']) {
-                // retrieve number of persons to whom the product will be delivered (either nb_pers or age_range.qty)
-                $nb_pers = $group['nb_pers'];
-                // retrieve nb_pers from age range
-                // #memo - if parent group has a age_range set, keep `booking_line_group_id.nb_pers`
-                if($product['has_age_range'] && !($group['has_pack'] && $group['pack_id']['has_age_range'])) {
-                    foreach($group['age_range_assignments_ids'] as $assignment) {
-                        if($assignment['age_range_id'] == $product['age_range_id']) {
-                            $nb_pers = $assignment['qty'];
-                            break;
-                        }
-                    }
-                }
-                // default number of times the product is repeated (accounting method = 'unit' with no own quantity and non-repeatable)
-                $nb_repeat = 1;
-                if($product_model['has_duration']) {
-                    $nb_repeat = $product_model['duration'];
-                }
-                elseif($group['is_sojourn']) {
-                    if($product_model['is_repeatable']) {
-                        $nb_repeat = max(1, $group['nb_nights']);
-                    }
-                }
-                elseif($group['is_event']) {
-                    if($product_model['is_repeatable']) {
-                        $nb_repeat = $group['nb_nights'] + 1;
-                    }
-                }
-                // retrieve quantity to consider
-                $qty = self::computeLineQty(
-                    $line['qty_accounting_method'],
-                    $nb_repeat,
-                    $nb_pers,
-                    $product_model['is_repeatable'],
-                    $line['is_accomodation'],
-                    $product_model['capacity']
-                );
-            }
-            if($qty != $line['qty'] || $line['is_rental_unit']) {
-                BookingLine::id($lid)->update(['qty' => $qty]);
-            }
-        }
-
-        $self->do('update-qty');
-        $self->do('reset-prices');
     }
 
     protected static function doUpdatePriceId($om, $oids, $lang) {
@@ -979,6 +884,7 @@ class BookingLine extends Model {
             }
         }
 
+        // #todo - check if this part is needed, because the same is done just after with callonce updateQty
         // #memo - qty must always be recomputed, even if given amongst (updated) $values (when a new line is created the default qty is 1.0)
         foreach($lines as $lid => $line) {
             $qty = $line['qty'];

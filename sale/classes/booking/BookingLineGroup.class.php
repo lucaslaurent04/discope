@@ -2271,6 +2271,16 @@ class BookingLineGroup extends Model {
             // pass-3 : create consumptions for booking lines targeting non-rental_unit products (any other schedulable product, e.g. meals or activity)
             foreach($groups as $gid => $group) {
 
+                // create meals map, to add their specifications (type and place) to the consumptions
+                $meals = BookingMeal::search(['booking_line_group_id', '=', $gid])
+                    ->read(['date', 'time_slot_id', 'meal_type_id', 'meal_place_id'])
+                    ->get();
+
+                $map_meals = [];
+                foreach($meals as $meal) {
+                    $map_meals[$meal['date']][$meal['time_slot_id']] = $meal;
+                }
+
                 $lines = $om->read(\sale\booking\BookingLine::getType(), $group['booking_lines_ids'], [
                     'product_id',
                     'qty',
@@ -2480,6 +2490,11 @@ class BookingLineGroup extends Model {
                                     $description .= "<p>{$type} / {$pref} : {$preference['qty']} ; </p>";
                                 }
                                 $consumption['description'] = $description;
+                            }
+                            // for meals/snack we add the meal_type and meal_place, if any
+                            if(($is_meal || $is_snack) && isset($map_meals[$c_date][$c_time_slot_id])) {
+                                $consumption['meal_type_id'] = $map_meals[$c_date][$c_time_slot_id]['meal_type_id'];
+                                $consumption['meal_place_id'] = $map_meals[$c_date][$c_time_slot_id]['meal_place_id'];
                             }
                             $consumptions[] = $consumption;
                         }

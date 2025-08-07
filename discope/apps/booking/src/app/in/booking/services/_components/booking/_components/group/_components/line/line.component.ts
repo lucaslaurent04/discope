@@ -480,6 +480,15 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
                 }
             }
 
+
+            // Handle line is a transport or a supply linked to an activity
+            if(this.instance.is_transport) {
+                domain = ['is_transport', '=', true];
+            }
+            else if(this.instance.is_supply) {
+                domain = ['is_supply', '=', true];
+            }
+
             const data:any[] = await this.api.fetch('?get=sale_catalog_product_collect', {
                     center_id: this.booking.center_id.id,
                     domain: JSON.stringify(domain),
