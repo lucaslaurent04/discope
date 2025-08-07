@@ -15,7 +15,7 @@
                     "id": "action.create-partner-planning-summary",
                     "label": "Create summary",
                     "description": "Creates an activities summary for the selected partners.",
-                    "controller": "sale_booking_create-partner-planning-summary"
+                    "controller": "sale_booking_partnerplanning_create-partnerplanningsummary"
                 }
             ]
         }
