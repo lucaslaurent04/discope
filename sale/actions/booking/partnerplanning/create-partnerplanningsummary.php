@@ -75,6 +75,11 @@ if(is_null($date_to)) {
 }
 
 foreach($partners as $partner) {
+    $mail_subject = \eQual::run('get', 'sale_booking_partnerplanningsummary_generate-mail-subject', [
+        'date_from' => $date_from,
+        'date_to'   => $date_to
+    ]);
+
     $mail_content = \eQual::run('get', 'sale_booking_partnerplanningsummary_generate-mail-content', [
         'id'        => $partner['id'],
         'date_from' => $date_from,
@@ -85,6 +90,7 @@ foreach($partners as $partner) {
         'partner_id'    => $partner['id'],
         'date_from'     => $date_from,
         'date_to'       => $date_to,
+        'mail_subject'  => $mail_subject,
         'mail_content'  => $mail_content
     ]);
 }

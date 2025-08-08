@@ -44,10 +44,16 @@ class PartnerPlanningSummary extends Model {
                 'default'           => 0
             ],
 
+            'mail_subject' => [
+                'type'          => 'string',
+                'description'   => "Subject of the mail that will be sent.",
+                'required'      => true
+            ],
+
             'mail_content' => [
                 'type'          => 'string',
                 'usage'         => 'text/html',
-                'description'   => "Body of the last mail sent.",
+                'description'   => "Body of the mail that will be sent.",
                 'help'          => "If the planning summary hasn't been sent yet the content is the auto generated one at creation.",
                 'required'      => true
             ],

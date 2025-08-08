@@ -1,6 +1,13 @@
 {
     "name": "Partner planning summary",
     "description": "Form view for Partner planning summary.",
+    "actions": [
+        {
+            "id": "action.send-mail",
+            "label": "Send mail",
+            "controller": "sale_booking_partnerplanningsummary_send-mail"
+        }
+    ],
     "layout": {
         "groups": [
             {
@@ -48,7 +55,7 @@
             {
                 "sections": [
                     {
-                        "id": "section.mail-content",
+                        "id": "section.mail-to-send",
                         "label": "Mail content",
                         "rows": [
                             {
@@ -56,6 +63,11 @@
                                     {
                                         "width": "100%",
                                         "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "mail_subject",
+                                                "width": "50%"
+                                            },
                                             {
                                                 "type": "field",
                                                 "value": "mail_content",

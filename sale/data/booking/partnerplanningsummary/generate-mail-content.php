@@ -9,6 +9,7 @@
 use communication\Template;
 use identity\Partner;
 use sale\booking\BookingActivity;
+use sale\provider\Provider;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Generate the planning mail content of the given partner, between the given dates.",
@@ -58,14 +59,41 @@ if(is_null($template)) {
     throw new Exception("missing_template", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-$activities = BookingActivity::search(
-    [
-        ['providers_ids', 'in', $params['id']],
-        ['activity_date', '>=', $params['date_from']],
-        ['activity_date', '<=', $params['date_to']]
-    ],
-    ['sort'  => ['activity_date' => 'asc', 'group_num' => 'asc']]
-)
+$partner = Partner::id($params['id'])
+    ->read(['relationship'])
+    ->first();
+
+if(is_null($partner)) {
+    throw new Exception("unknown_partner", EQ_ERROR_UNKNOWN_OBJECT);
+}
+
+$domain = [
+    ['activity_date', '>=', $params['date_from']],
+    ['activity_date', '<=', $params['date_to']]
+];
+
+if($partner['relationship'] === 'employee') {
+    $domain[] = ['employee_id', '=', $partner['id']];
+}
+elseif($partner['relationship'] === 'provider') {
+    $provider = Provider::search([
+        ['id', '=', $partner['id']],
+        ['relationship', '=', 'provider']
+    ])
+        ->read(['booking_activities_ids'])
+        ->first();
+
+    if(empty($provider['booking_activities_ids'])) {
+        throw new Exception("provider_must_have_activities", EQ_ERROR_INVALID_PARAM);
+    }
+
+    $domain[] = ['id', 'in', $provider['booking_activities_ids']];
+}
+else {
+    throw new Exception("partner_must_be_employee_or_provider", EQ_ERROR_INVALID_PARAM);
+}
+
+$activities = BookingActivity::search($domain, ['sort'  => ['activity_date' => 'asc', 'group_num' => 'asc']])
     ->read([
         'name',
         'activity_date',
@@ -79,15 +107,9 @@ $activities = BookingActivity::search(
             'customer_id' => ['name']
         ],
         'booking_line_group_id' => [
-            'date_from',
-            'date_to',
             'age_range_assignments_ids' => ['qty', 'age_from', 'age_to']
         ]
     ])
-    ->get();
-
-$partner = Partner::id($params['id'])
-    ->read(['email', 'relationship'])
     ->get();
 
 $map_status = [
@@ -103,19 +125,21 @@ $map_status = [
     'balanced'          => 'Soldée'
 ];
 
-$date_from = $date_to = null;
 $planned_activities = [];
 foreach($activities as $activity) {
-    if(is_null($date_from) || $date_from > $activity['booking_line_group_id']['date_from']) {
-        $date_from = $activity['booking_line_group_id']['date_from'];
-    }
-    if(is_null($date_to) || $date_to < $activity['booking_line_group_id']['date_to']) {
-        $date_to = $activity['booking_line_group_id']['date_to'];
-    }
-
     $age_range_assignments = [];
     foreach($activity['booking_line_group_id']['age_range_assignments_ids'] as $age_range_assignment) {
         $age_range_assignments[] = $age_range_assignment['qty'].' ('.$age_range_assignment['age_from'].' à '.$age_range_assignment['age_to'].' ans)';
+    }
+
+    $matches = [];
+    preg_match('/(.*)\s+\(([^()]*)\)$/', $activity['name'], $matches);
+
+    $activity_name = $activity['name'];
+    $activity_sku = '';
+    if(count($matches) === 3) {
+        $activity_name = $matches[1];
+        $activity_sku = $matches[2];
     }
 
     $planned_activities[] = [
@@ -125,7 +149,8 @@ foreach($activities as $activity) {
         'age_range_assignments' => $age_range_assignments,
         'booking_status'        => $map_status[$activity['booking_id']['status']],
         'time_slot_name'        => $activity['time_slot_id']['name'],
-        'activity_name'         => explode(' (', $activity['name'])[0]
+        'activity_name'         => $activity_name,
+        'activity_sku'          => $activity_sku
     ];
 }
 
@@ -138,6 +163,7 @@ $activities_table =
                 <th style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #f4f4f4; color: #333;">Status réservation</th>
                 <th style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #f4f4f4; color: #333;">Moment</th>
                 <th style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #f4f4f4; color: #333;">Activité</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #f4f4f4; color: #333;">SKU</th>
             </tr>'
     .implode(
         array_map(
@@ -150,6 +176,7 @@ $activities_table =
                     '<td style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #fafafa;">'.$planned_activity['booking_status'].'</td>'.
                     '<td style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #fafafa;">'.$planned_activity['time_slot_name'].'</td>'.
                     '<td style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #fafafa;">'.$planned_activity['activity_name'].'</td>'.
+                    '<td style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #fafafa; font-size: 10px;">'.$planned_activity['activity_sku'].'</td>'.
                     '</tr>';
             },
             $planned_activities
