@@ -388,6 +388,17 @@
                                     "entity": "sale\\booking\\partnerPlanning-collect",
                                     "view": "list.provider"
                                 }
+                            },
+                            {
+                                "id": "item.planning.partners.partner-planning-summary",
+                                "type": "entry",
+                                "label": "Plannings summaries",
+                                "description": "",
+                                "route": "/bookings",
+                                "context": {
+                                    "entity": "sale\\booking\\PartnerPlanningSummary",
+                                    "view": "list.default"
+                                }
                             }
                         ]
                     },

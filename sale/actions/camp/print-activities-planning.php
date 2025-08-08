@@ -23,23 +23,25 @@
         'content-type'      => 'application/pdf',
         'accept-origin'     => '*'
     ],
-    'providers'     => ['context']
+    'providers'     => ['context', 'adapt']
 ]);
 
 /**
  * @var \equal\php\Context  $context
  */
-['context' => $context] = $providers;
+['context' => $context, 'adapt' => $dap] = $providers;
+
+$adapter = $dap->get('json');
 
 $date_from = strtotime('last Sunday');
 $date_to = strtotime('Sunday this week');
 
 if(!empty($params['params'])) {
     if(isset($params['params']['date_from'])) {
-        $date_from = DateTime::createFromFormat('Y-m-d\TH:i:s\Z', $params['params']['date_from'])->getTimestamp();
+        $date_from = $adapter->adaptIn($params['params']['date_from'], 'date/time');
     }
     if(isset($params['params']['date_to'])) {
-        $date_to = DateTime::createFromFormat('Y-m-d\TH:i:s\Z', $params['params']['date_to'])->getTimestamp();
+        $date_to = $adapter->adaptIn($params['params']['date_to'], 'date/time');
     }
 }
 

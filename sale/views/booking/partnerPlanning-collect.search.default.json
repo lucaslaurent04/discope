@@ -17,11 +17,6 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "partner_id",
-                                                "width": "25%"
-                                            },
-                                            {
-                                                "type": "field",
                                                 "value": "date_from",
                                                 "width": "25%"
                                             },
@@ -31,8 +26,13 @@
                                                 "width": "25%"
                                             },
                                             {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "25%"
+                                            },
+                                            {
                                                 "type": "field",
-                                                "value": "only_not_sent",
+                                                "value": "partner_id",
                                                 "width": "25%"
                                             }
                                         ]
