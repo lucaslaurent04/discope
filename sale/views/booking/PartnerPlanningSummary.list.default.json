@@ -1,6 +1,8 @@
 {
     "name": "Partner planning summary",
     "description": "List view for Partner planning summaries.",
+    "order": "created",
+    "sort": "desc",
     "layout": {
         "items": [
             {
