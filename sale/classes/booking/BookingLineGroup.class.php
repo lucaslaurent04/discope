@@ -715,6 +715,10 @@ class BookingLineGroup extends Model {
             $bookings_ids = array_map(function($a) {return $a['booking_id'];}, $groups);
             $om->update(Booking::getType(), $bookings_ids, ['time_from' => null, 'time_to' => null, 'total' => null, 'price' => null]);
         }
+        // refresh meals
+        foreach($oids as $oid) {
+            self::refreshMeals($om, $oid);
+        }
     }
 
     /**
@@ -3263,10 +3267,16 @@ class BookingLineGroup extends Model {
         if($lines <= 0) {
             return;
         }
+
+        $map_timeslots_ids = [];
+
+        $map_date_timeslot_meal = [];
         foreach($lines as $line_id => $line) {
             if(!$line['is_meal'] && !$line['is_snack']) {
                 continue;
             }
+
+            $map_timeslots_ids[$line['time_slot_id']] = true;
 
             $from_day_index = 1 + $line['product_model_id.schedule_offset'];
             $qty_vars = json_decode($line['qty_vars']);
@@ -3277,31 +3287,54 @@ class BookingLineGroup extends Model {
                 $is_self_provided = $day_index < $from_day_index || $day_index > $to_day_index;
                 $day_index++;
 
-                $values = [
+                if(!isset($map_date_timeslot_meal[$date][$line['time_slot_id']])) {
+                    $map_date_timeslot_meal[$date][$line['time_slot_id']] = [
                         'booking_id'            => $group['booking_id'],
                         'booking_line_group_id' => $id,
-                        'booking_lines_ids'     => [$line_id],
+                        'booking_lines_ids'     => !$is_self_provided ? [$line_id] : [],
                         'date'                  => $date,
                         'time_slot_id'          => $line['time_slot_id'],
                         'is_self_provided'      => $is_self_provided
                     ];
+                }
+                elseif(!$is_self_provided) {
+                    $map_date_timeslot_meal[$date][$line['time_slot_id']]['booking_lines_ids'][] = $line_id;
+                    $map_date_timeslot_meal[$date][$line['time_slot_id']]['is_self_provided'] = false;
+                }
+            }
+        }
 
-                $meals_ids = $om->search(BookingMeal::getType(), [['booking_line_group_id', '=', $id], ['time_slot_id', '=', $line['time_slot_id']], ['date', '=', $date]]);
+        foreach($map_date_timeslot_meal as $date => $map_timeslot_meal) {
+            foreach($map_timeslot_meal as $time_slot_id => $meal) {
+                $meals_ids = $om->search(BookingMeal::getType(), [
+                    ['booking_line_group_id', '=', $meal['booking_line_group_id']],
+                    ['time_slot_id', '=', $time_slot_id],
+                    ['date', '=', $date]
+                ]);
+
                 if(!count($meals_ids)) {
-                    $om->create(BookingMeal::getType(), $values);
+                    $om->create(BookingMeal::getType(), $meal);
                 }
                 else {
-                    $om->update(BookingMeal::getType(), $meals_ids, $values);
+                    $om->update(BookingMeal::getType(), $meals_ids, $meal);
                 }
             }
         }
 
         $outside_dates_meals_ids = $om->search(BookingMeal::getType(), [
-                [['booking_id', '=', $group['booking_id']], ['date', '<', $group['date_from']]],
+                [['booking_id', '=', $group['booking_id']], ['date', '<', $group['date_kfrom']]],
                 [['booking_id', '=', $group['booking_id']], ['date', '>', $group['date_to']]]
             ]);
-        if(count($outside_dates_meals_ids)) {
-            $om->delete(BookingMeal::getType(), $outside_dates_meals_ids, true);
+
+        $non_existing_timeslots_ids = [];
+        $timeslot_ids = array_keys($map_timeslots_ids);
+        if(!empty($timeslot_ids)) {
+            $non_existing_timeslots_ids = $om->search(BookingMeal::getType(), ['time_slot_id', 'not in', $timeslot_ids]);
+        }
+
+        $meals_to_delete_ids = array_merge($outside_dates_meals_ids, $non_existing_timeslots_ids);
+        if(!empty($meals_to_delete_ids)) {
+            $om->delete(BookingMeal::getType(), $meals_to_delete_ids, true);
         }
     }
 
