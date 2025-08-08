@@ -41,14 +41,8 @@ if(is_null($planning_summary)) {
     throw new Exception("unknown_partnerplanningsummary", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-$mail_content = \eQual::run('get', 'sale_booking_partnerplanningsummary_generate-mail-content', [
-    'id'        => $planning_summary['partner_id'],
-    'date_from' => $planning_summary['date_from'],
-    'date_to'   => $planning_summary['date_to']
-]);
-
 PartnerPlanningSummary::id($planning_summary['id'])
-    ->update(['mail_content' => $mail_content]);
+    ->do('refresh-mail-content');
 
 $context->httpResponse()
         ->status(204)
