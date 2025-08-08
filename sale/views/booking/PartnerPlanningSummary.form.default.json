@@ -6,6 +6,11 @@
             "id": "action.send-mail",
             "label": "Send mail",
             "controller": "sale_booking_partnerplanningsummary_send-mail"
+        },
+        {
+            "id": "action.refresh-mail-content",
+            "label": "Refresh mail content",
+            "controller": "sale_booking_partnerplanningsummary_refresh-mail-content"
         }
     ],
     "layout": {

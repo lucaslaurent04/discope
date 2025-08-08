@@ -46,6 +46,9 @@
             "actions": {
                 "action.send-mail": {
                     "label": "Envoyer e-mail"
+                },
+                "action.refresh-mail-content": {
+                    "label": "Rafraichir contenu e-mail"
                 }
             },
             "layout": {
