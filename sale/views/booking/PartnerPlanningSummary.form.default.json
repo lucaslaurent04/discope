@@ -1,6 +1,18 @@
 {
     "name": "Partner planning summary",
     "description": "Form view for Partner planning summary.",
+    "header": {
+        "actions": {
+            "ACTION.SAVE": [
+                {
+                    "id": "SAVE_AND_CONTINUE"
+                },
+                {
+                    "id": "SAVE_AND_CLOSE"
+                }
+            ]
+        }
+    },
     "actions": [
         {
             "id": "action.send-mail",
