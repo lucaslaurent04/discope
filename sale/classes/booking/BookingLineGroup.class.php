@@ -3322,7 +3322,7 @@ class BookingLineGroup extends Model {
         }
 
         $outside_dates_meals_ids = $om->search(BookingMeal::getType(), [
-                [['booking_id', '=', $group['booking_id']], ['date', '<', $group['date_kfrom']]],
+                [['booking_id', '=', $group['booking_id']], ['date', '<', $group['date_from']]],
                 [['booking_id', '=', $group['booking_id']], ['date', '>', $group['date_to']]]
             ]);
 
