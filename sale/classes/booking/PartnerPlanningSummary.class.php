@@ -67,6 +67,13 @@ class PartnerPlanningSummary extends Model {
                 'function'      => 'calcMailContent'
             ],
 
+            'mail_remarks' => [
+                'type'          => 'string',
+                'usage'         => 'text/plain',
+                'description'   => "Additional remarks added to the mail when the planning summary is sent.",
+                'dependencies'  => ['mail_content']
+            ],
+
             'mails_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'core\Mail',
@@ -130,7 +137,7 @@ class PartnerPlanningSummary extends Model {
 
         $result = [];
 
-        $self->read(['id']);
+        $self->read(['mail_remarks']);
         foreach($self as $id => $planning) {
             $activities = BookingActivity::ids(self::getActivitiesIds($id))
                 ->read([
@@ -228,7 +235,8 @@ class PartnerPlanningSummary extends Model {
                 if($part['name'] === 'body') {
                     $mail_content = $part['value'];
                     $data = [
-                        'activities_table' => $activities_table
+                        'activities_table'  => $activities_table,
+                        'mail_remarks'      => $planning['mail_remarks']
                     ];
                     foreach($data as $key => $val) {
                         if($key === 'activities_table') {

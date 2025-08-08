@@ -33,6 +33,11 @@
             "description": "Le contenu de l'e-mail qui sera envoyé.",
             "help": ""
         },
+        "mail_remarks": {
+            "label": "Remarques",
+            "description": "Remarques a ajouter au contenu de l'e-mail.",
+            "help": ""
+        },
         "mails_ids": {
             "label": "E-mails",
             "description": "Les e-mails envoyés à la relation concernant le planning des activités.",
