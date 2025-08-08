@@ -6,8 +6,6 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\Mail;
-use equal\email\Email;
 use sale\booking\PartnerPlanningSummary;
 
 [$params, $providers] = eQual::announce([
@@ -47,16 +45,8 @@ if(!isset($planning_summary['partner_id']['email'])) {
     throw new Exception("missing_partner_email", EQ_ERROR_INVALID_CONFIG);
 }
 
-$message = new Email();
-$message->setTo($planning_summary['partner_id']['email'])
-    ->setSubject($planning_summary['mail_subject'])
-    ->setContentType('text/html')
-    ->setBody($planning_summary['mail_content']);
-
-$mail_id = Mail::queue($message, 'sale\booking\PartnerPlanningSummary', $params['id']);
-
 PartnerPlanningSummary::id($planning_summary['id'])
-    ->update(['sent_qty' => ++$planning_summary['sent_qty']]);
+    ->do('send-mail');
 
 $context->httpResponse()
         ->status(204)

@@ -9,7 +9,9 @@
 namespace sale\booking;
 
 use communication\Template;
+use core\Mail;
 use core\setting\Setting;
+use equal\email\Email;
 use equal\orm\Model;
 use sale\provider\Provider;
 
@@ -252,6 +254,12 @@ class PartnerPlanningSummary extends Model {
                 'description'   => "Refresh the mail content with a html template displaying the booking activities.",
                 'policies'      => [],
                 'function'      => 'doRefreshMailContent'
+            ],
+
+            'send-mail' => [
+                'description'   => "Send the planning summary to the partner as a mail.",
+                'policies'      => [],
+                'function'      => 'doSendMail'
             ]
 
         ];
@@ -260,6 +268,28 @@ class PartnerPlanningSummary extends Model {
     protected static function doRefreshMailContent($self) {
         $self->update(['mail_content' => null])
             ->read(['mail_content']);
+    }
+
+    protected static function doSendMail($self) {
+        $self->read(['mail_subject', 'mail_content', 'sent_qty', 'partner_id' => ['email']]);
+        foreach($self as $planning) {
+            if (!isset($planning['partner_id']['email'])) {
+                throw new \Exception("missing_partner_email", EQ_ERROR_INVALID_CONFIG);
+            }
+        }
+
+        foreach($self as $id => $planning) {
+            $message = new Email();
+            $message->setTo($planning['partner_id']['email'])
+                ->setSubject($planning['mail_subject'])
+                ->setContentType('text/html')
+                ->setBody($planning['mail_content']);
+
+            Mail::queue($message, 'sale\booking\PartnerPlanningSummary', $id);
+
+            PartnerPlanningSummary::id($id)
+                ->update(['sent_qty' => ++$planning['sent_qty']]);
+        }
     }
 
     public static function getActivitiesIds($id): array {
