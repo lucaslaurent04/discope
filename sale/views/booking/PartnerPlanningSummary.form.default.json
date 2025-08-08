@@ -17,12 +17,22 @@
         {
             "id": "action.send-mail",
             "label": "Send mail",
-            "controller": "sale_booking_partnerplanningsummary_send-mail"
+            "controller": "model_do",
+            "params": {
+                "entity": "sale\\booking\\PartnerPlanningSummary",
+                "action": "send-mail",
+                "ids": []
+            }
         },
         {
             "id": "action.refresh-mail-content",
             "label": "Refresh mail content",
-            "controller": "sale_booking_partnerplanningsummary_refresh-mail-content"
+            "controller": "model_do",
+            "params": {
+                "entity": "sale\\booking\\PartnerPlanningSummary",
+                "action": "refresh-mail-content",
+                "ids": []
+            }
         }
     ],
     "layout": {
