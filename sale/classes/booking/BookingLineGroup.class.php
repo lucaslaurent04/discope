@@ -3265,6 +3265,12 @@ class BookingLineGroup extends Model {
             'product_model_id.schedule_offset'
         ]);
         if($lines <= 0) {
+            // no need of meal if no booking lines
+            $booking_meals_ids = $om->search(BookingMeal::getType(), [
+                    [['booking_line_group_id', '=', $group['id']], ['date', '<', $group['date_from']]],
+                    [['booking_line_group_id', '=', $group['id']], ['date', '>', $group['date_to']]]
+                ]);
+            $om->delete(BookingMeal::getType(), $booking_meals_ids, true);
             return;
         }
 
@@ -3322,14 +3328,17 @@ class BookingLineGroup extends Model {
         }
 
         $outside_dates_meals_ids = $om->search(BookingMeal::getType(), [
-                [['booking_id', '=', $group['booking_id']], ['date', '<', $group['date_from']]],
-                [['booking_id', '=', $group['booking_id']], ['date', '>', $group['date_to']]]
+                [['booking_line_group_id', '=', $group['id']], ['date', '<', $group['date_from']]],
+                [['booking_line_group_id', '=', $group['id']], ['date', '>', $group['date_to']]]
             ]);
 
         $non_existing_timeslots_ids = [];
         $timeslot_ids = array_keys($map_timeslots_ids);
         if(!empty($timeslot_ids)) {
-            $non_existing_timeslots_ids = $om->search(BookingMeal::getType(), ['time_slot_id', 'not in', $timeslot_ids]);
+            $non_existing_timeslots_ids = $om->search(BookingMeal::getType(), [
+                ['booking_line_group_id', '=', $group['id']],
+                ['time_slot_id', 'not in', $timeslot_ids]
+            ]);
         }
 
         $meals_to_delete_ids = array_merge($outside_dates_meals_ids, $non_existing_timeslots_ids);
