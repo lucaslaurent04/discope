@@ -3264,12 +3264,9 @@ class BookingLineGroup extends Model {
             'qty_vars',
             'product_model_id.schedule_offset'
         ]);
-        if($lines <= 0) {
+        if(empty($lines)) {
             // no need of meal if no booking lines
-            $booking_meals_ids = $om->search(BookingMeal::getType(), [
-                    [['booking_line_group_id', '=', $id], ['date', '<', $group['date_from']]],
-                    [['booking_line_group_id', '=', $id], ['date', '>', $group['date_to']]]
-                ]);
+            $booking_meals_ids = $om->search(BookingMeal::getType(), ['booking_line_group_id', '=', $id]);
             $om->delete(BookingMeal::getType(), $booking_meals_ids, true);
             return;
         }
