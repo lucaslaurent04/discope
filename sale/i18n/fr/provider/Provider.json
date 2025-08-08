@@ -32,11 +32,6 @@
             "label": "Activités",
             "description": "Activités organisées par le prestataire.",
             "help": ""
-        },
-        "mails_ids": {
-            "label": "E-mails",
-            "description": "Les e-mails envoyés au prestataire concernant le planning des activités.",
-            "help": ""
         }
     },
     "view": {

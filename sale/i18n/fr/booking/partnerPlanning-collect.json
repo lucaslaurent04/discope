@@ -7,71 +7,6 @@
             "description": "",
             "help": ""
         },
-        "employee_id": {
-            "label": "Employé",
-            "description": "",
-            "help": ""
-        },
-        "provider_id": {
-            "label": "Prestataire",
-            "description": "",
-            "help": ""
-        },
-        "booking_activity_id": {
-            "label": "Activité",
-            "description": "",
-            "help": ""
-        },
-        "activity_date": {
-            "label": "Date",
-            "description": "",
-            "help": ""
-        },
-        "time_slot_id": {
-            "label": "Créneau horaire",
-            "description": "",
-            "help": ""
-        },
-        "customer_id": {
-            "label": "Client",
-            "description": "",
-            "help": ""
-        },
-        "booking_line_group_id": {
-            "label": "Groupe réservation",
-            "description": "",
-            "help": ""
-        },
-        "group_num": {
-            "label": "Numéro groupe",
-            "description": "",
-            "help": ""
-        },
-        "nb_pers": {
-            "label": "Qté personnnes",
-            "description": "",
-            "help": ""
-        },
-        "nb_children": {
-            "label": "Qté enfants",
-            "description": "",
-            "help": ""
-        },
-        "booking_id": {
-            "label": "Réservation",
-            "description": "",
-            "help": ""
-        },
-        "booking_status": {
-            "label": "Status réservation",
-            "description": "",
-            "help": ""
-        },
-        "relationship": {
-            "label": "Relation",
-            "description": "",
-            "help": ""
-        },
         "date_from": {
             "label": "Du",
             "description": "",
@@ -82,8 +17,28 @@
             "description": "",
             "help": ""
         },
-        "only_not_sent": {
-            "label": "Seulement pas envoyé",
+        "id": {
+            "label": "Id",
+            "description": "",
+            "help": ""
+        },
+        "employee_id": {
+            "label": "Employé",
+            "description": "",
+            "help": ""
+        },
+        "provider_id": {
+            "label": "Prestataire",
+            "description": "",
+            "help": ""
+        },
+        "relationship": {
+            "label": "Relation",
+            "description": "",
+            "help": ""
+        },
+        "activities_qty": {
+            "label": "Qté activités",
             "description": "",
             "help": ""
         }

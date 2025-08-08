@@ -14,23 +14,21 @@ use sale\booking\BookingActivity;
         /**
          * Filters
          */
+        'partner_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'identity\Partner',
+            'description'       => "The partner concerned by the planning.",
+            'domain'            => ['relationship', 'in', ['provider', 'employee']]
+        ],
         'date_from' => [
             'type'              => 'date',
-            'description'       => "Start of the time interval of the desired plannings."
+            'description'       => "Start of the time interval of the desired plannings.",
+            'default'           => fn() => time()
         ],
         'date_to' => [
             'type'              => 'date',
-            'description'       => "End of the time interval of the desired plannings."
-        ],
-        'only_not_sent' => [
-            'type'              => 'boolean',
-            'description'       => "If true show only activities that were not reminded yet to partner.",
-            'default'           => true
-        ],
-        'partners_ids' => [
-            'type'              => 'array',
-            'description'       => "Partnerships that relate to the identity.",
-            'default'           => []
+            'description'       => "End of the time interval of the desired plannings.",
+            'default'           => fn() => strtotime('+1 month')
         ],
         'domain' => [
             'type'              => 'array',
@@ -43,83 +41,19 @@ use sale\booking\BookingActivity;
          */
         'id' => [
             'type'              => 'integer',
-            'description'       => "Combination of partner_id and booking_activity_id.",
-            'help'              => "Format: \"{partner_id}{booking_activity_id}{partner_id_length}\"."
-        ],
-        'partner_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'identity\Partner',
-            'description'       => "The counter party organization the invoice relates to.",
-            'domain'            => ['relationship', 'in', ['provider', 'employee']]
+            'description'       => "The id of the partner concerned by the planning."
         ],
         'employee_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'hr\employee\Employee',
-            'description'       => "The counter party organization the invoice relates to.",
+            'description'       => "The employee concerned by the planning.",
             'default'           => null
         ],
         'provider_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\provider\Provider',
-            'description'       => "The counter party organization the invoice relates to.",
+            'description'       => "The provider concerned by the planning.",
             'default'           => null
-        ],
-        'booking_activity_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'sale\booking\BookingActivity',
-            'description'       => "The activity to organize."
-        ],
-        'activity_date' => [
-            'type'              => 'date',
-            'description'       => "Date of the activity."
-        ],
-        'time_slot_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'sale\booking\TimeSlot',
-            'description'       => "Specification of the activity moment."
-        ],
-        'customer_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'sale\customer\Customer',
-            'description'       => "Customer the activity is for."
-        ],
-        'booking_line_group_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'sale\booking\BookingLineGroup',
-            'description'       => "Booking Group the activity is for."
-        ],
-        'group_num' => [
-            'type'              => 'integer',
-            'description'       => "Number of the activity booking group."
-        ],
-        'nb_pers' => [
-            'type'              => 'integer',
-            'description'       => "Quantity of people in the group."
-        ],
-        'nb_children' => [
-            'type'              => 'integer',
-            'description'       => "Quantity of children in the group."
-        ],
-        'booking_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'sale\booking\Booking',
-            'description'       => "Booking the activity is for."
-        ],
-        'booking_status' => [
-            'type'              => 'string',
-            'selection'         => [
-                'quote',
-                'option',
-                'confirmed',
-                'validated',
-                'checkedin',
-                'checkedout',
-                'invoiced',
-                'debit_balance',
-                'credit_balance',
-                'balanced'
-            ],
-            'description'       => "Status of the booking.",
         ],
         'relationship' => [
             'type'              => 'string',
@@ -127,6 +61,11 @@ use sale\booking\BookingActivity;
                 'employee',
                 'provider'
             ]
+        ],
+        'activities_qty' => [
+            'type'              => 'integer',
+            'description'       => "The quantities of activities that the partner has to handle for the given time range.",
+            'default'           => 0
         ]
     ],
     'response'      => [
@@ -143,6 +82,11 @@ use sale\booking\BookingActivity;
 ['context' => $context] = $providers;
 
 $result = [];
+
+$domain = [
+    ['activity_date', '>=', $params['date_from']],
+    ['activity_date', '<=', $params['date_to']]
+];
 
 if(!isset($params['relationship']) && !empty($params['domain'])) {
     if(is_array($params['domain'][0]) && !empty($params['domain'][0]) && is_string($params['domain'][0][0])) {
@@ -165,106 +109,68 @@ if(!isset($params['relationship']) && !empty($params['domain'])) {
     }
 }
 
-$domain = [];
-if(isset($params['date_from'])) {
-    $domain[] = ['activity_date', '>=', $params['date_from']];
-}
-if(isset($params['date_to'])) {
-    $domain[] = ['activity_date', '<=', $params['date_to']];
+$show = ['employee', 'provider'];
+if(isset($params['relationship'])) {
+    if($params['relationship'] === 'employee') {
+        $domain[] = ['has_staff_required', '=', true];
+        $show = ['employee'];
+    }
+    elseif($params['relationship'] === 'provider') {
+        $domain[] = ['has_provider', '=', true];
+        $show = ['provider'];
+    }
 }
 
 $activities = BookingActivity::search($domain)
     ->read([
-        'name',
-        'activity_date',
-        'group_num',
-        'time_slot_id'                  => ['name'],
-        'employee_id'                   => ['name'],
-        'providers_ids'                 => ['name'],
-        'booking_line_group_id'         => ['name', 'nb_pers', 'nb_children'],
-        'booking_id'                    => ['name', 'status', 'customer_id' => ['name']],
-        'partner_planning_mails_ids'    => ['object_id']
+        'employee_id'   => ['name'],
+        'providers_ids' => ['name']
     ])
     ->adapt('json')
     ->get();
 
-if(isset($params['partner_id'])) {
-    $params['partners_ids'] = array_merge(
-        $params['partners_ids'] ?? [],
-        [$params['partner_id']]
-    );
-}
+$map_partner_planning = [];
+foreach($activities as $activity) {
+    if(in_array('employee', $show) && !is_null($activity['employee_id']['id'])) {
+        $employee_id = $activity['employee_id']['id'];
+        if(empty($params['partner_id']) || $employee_id === $params['partner_id']) {
+            if(!isset($map_partner_planning[$employee_id])) {
+                $map_partner_planning[$employee_id] = [
+                    'id'                => $employee_id,
+                    'employee_id'       => $activity['employee_id'],
+                    'provider_id'       => null,
+                    'relationship'      => 'employee',
+                    'activities_qty'    => 0
+                ];
+            }
 
-if(!isset($params['relationship']) || $params['relationship'] === 'employee') {
-    foreach($activities as $activity) {
-        $reminded_partners_ids = array_column($activity['partner_planning_mails_ids'], 'object_id');
-
-        if(
-            is_null($activity['employee_id'])
-            || (!empty($params['partners_ids']) && !in_array($activity['employee_id']['id'], $params['partners_ids']))
-            || ($params['only_not_sent'] && in_array($activity['employee_id']['id'], $reminded_partners_ids))
-        ) {
-            continue;
+            $map_partner_planning[$employee_id]['activities_qty']++;
         }
-
-        $partner_id_len = str_pad(strlen(strval($activity['employee_id']['id'])), 2, '0', STR_PAD_LEFT);
-        $partner_activity_combined_id = intval($activity['employee_id']['id'].$activity['id'].$partner_id_len);
-
-        $result[] = [
-            'id'                    => $partner_activity_combined_id,
-            'partner_id'            => $activity['employee_id'],
-            'employee_id'           => $activity['employee_id'],
-            'booking_activity_id'   => ['id' => $activity['id'], 'name' => $activity['name']],
-            'activity_date'         => $activity['activity_date'],
-            'time_slot_id'          => $activity['time_slot_id'],
-            'customer_id'           => $activity['booking_id']['customer_id'],
-            'booking_line_group_id' => $activity['booking_line_group_id'],
-            'group_num'             => $activity['group_num'],
-            'nb_pers'               => $activity['booking_line_group_id']['nb_pers'],
-            'nb_children'           => $activity['booking_line_group_id']['nb_children'],
-            'booking_id'            => $activity['booking_id'],
-            'booking_status'        => $activity['booking_id']['status'],
-            'relationship'          => 'employee'
-        ];
     }
-}
 
-if(!isset($params['relationship']) || $params['relationship'] === 'provider') {
-    foreach($activities as $activity) {
-        $reminded_partners_ids = array_column($activity['partner_planning_mails_ids'], 'object_id');
-
+    if(in_array('provider', $show)) {
         foreach($activity['providers_ids'] as $provider) {
-            if(
-                (!empty($params['partners_ids']) && !in_array($provider['id'], $params['partners_ids']))
-                || ($params['only_not_sent'] && in_array($provider['id'], $reminded_partners_ids))
-            ) {
+            $provider_id = $provider['id'];
+            if(!empty($params['partner_id']) && $provider_id !== $params['partner_id']) {
                 continue;
             }
 
-            $partner_id_len = str_pad(strlen(strval($provider['id'])), 2, '0', STR_PAD_LEFT);
-            $partner_activity_combined_id = intval($provider['id'].$activity['id'].$partner_id_len);
+            if(!isset($map_partner_planning[$provider_id])) {
+                $map_partner_planning[$provider_id] = [
+                    'id'                => $provider_id,
+                    'employee_id'       => null,
+                    'provider_id'       => $provider,
+                    'relationship'      => 'provider',
+                    'activities_qty'    => 0
+                ];
+            }
 
-            $result[] = [
-                'id'                    => $partner_activity_combined_id,
-                'partner_id'            => $provider,
-                'provider_id'           => $provider,
-                'booking_activity_id'   => ['id' => $activity['id'], 'name' => $activity['name']],
-                'activity_date'         => $activity['activity_date'],
-                'time_slot_id'          => $activity['time_slot_id'],
-                'customer_id'           => $activity['booking_id']['customer_id'],
-                'booking_line_group_id' => $activity['booking_line_group_id'],
-                'group_num'             => $activity['group_num'],
-                'nb_pers'               => $activity['booking_line_group_id']['nb_pers'],
-                'nb_children'           => $activity['booking_line_group_id']['nb_children'],
-                'booking_id'            => $activity['booking_id'],
-                'booking_status'        => $activity['booking_id']['status'],
-                'relationship'          => 'provider'
-            ];
+            $map_partner_planning[$provider_id]['activities_qty']++;
         }
     }
 }
 
 $context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
+        ->header('X-Total-Count', count($map_partner_planning))
+        ->body(array_values($map_partner_planning))
         ->send();

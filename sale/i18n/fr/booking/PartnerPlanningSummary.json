@@ -1,0 +1,75 @@
+{
+    "name": "Recap. planing relation",
+    "plural": "Recap. planing relations",
+    "description": "",
+    "model": {
+        "partner_id": {
+            "label": "Relation",
+            "description": "Relation concernée par le récap.",
+            "help": ""
+        },
+        "date_from": {
+            "label": "Du",
+            "description": "Date de début du récap.",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "Date de fin du récap.",
+            "help": ""
+        },
+        "sent_qty": {
+            "label": "Qté d'envois",
+            "description": "La nombre de fois que le récap a été envoyé à la relation.",
+            "help": ""
+        },
+        "mail_subject": {
+            "label": "Sujet e-mail",
+            "description": "Le sujet de l'e-mail qui sera envoyé.",
+            "help": ""
+        },
+        "mail_content": {
+            "label": "Contenu e-mail",
+            "description": "Le contenu de l'e-mail qui sera envoyé.",
+            "help": ""
+        },
+        "mail_remarks": {
+            "label": "Remarques",
+            "description": "Remarques a ajouter au contenu de l'e-mail.",
+            "help": ""
+        },
+        "mails_ids": {
+            "label": "E-mails",
+            "description": "Les e-mails envoyés à la relation concernant le planning des activités.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Récapitulatif",
+            "description": "",
+            "actions": {
+                "action.send-mail": {
+                    "label": "Envoyer e-mail"
+                },
+                "action.refresh-mail-content": {
+                    "label": "Rafraichir contenu e-mail"
+                }
+            },
+            "layout": {
+                "section.mail-to-send":{
+                    "label": "E-mail à envoyer"
+                },
+                "section.mails":{
+                    "label": "E-mails"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Récapitulatifs",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

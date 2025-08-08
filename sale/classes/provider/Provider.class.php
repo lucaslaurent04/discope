@@ -74,14 +74,6 @@ class Provider extends \identity\Partner {
                 'rel_foreign_key'   => 'booking_activity_id',
                 'rel_local_key'     => 'provider_id',
                 'description'       => "The booking activities organized by the Provider."
-            ],
-
-            'mails_ids' => [
-                'type'              => 'one2many',
-                'foreign_object'    => 'sale\booking\PartnerPlanningMail',
-                'foreign_field'     => 'object_id',
-                'description'       => "Mails related to the provider.",
-                'domain'            => ['object_class', '=', 'sale\provider\Provider']
             ]
 
         ];
