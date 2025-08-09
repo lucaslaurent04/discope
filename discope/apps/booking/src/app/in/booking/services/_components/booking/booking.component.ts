@@ -9,9 +9,10 @@ import { trigger, style, animate, transition } from '@angular/animations';
 import { BookingServicesBookingGroupComponent } from './_components/group/group.component'
 import { Booking } from './_models/booking.model';
 import { BookingLineGroup } from './_models/booking_line_group.model';
-import { BookingActivity } from './_models/booking_activity.model';
+
 import { BookingLine } from './_models/booking_line.model';
-import { BookingActivityDay } from './_components/group/_components/day-activities/day-activities.component';
+
+
 import { BookedServicesDisplaySettings, RentalUnitsSettings } from '../../services.component';
 import { BookingMealDay } from './_components/group/_components/day-meals/day-meals.component';
 import { BookingMeal } from './_models/booking_meal.model';
@@ -64,8 +65,7 @@ export class BookingServicesBookingComponent
     public sojourn_types: { id: number, name: 'GA'|'GG' }[] = [];
     public meal_types: { id: number, name: string, code: string }[] = [];
     public meal_places: { id: number, name: string, code: string }[] = [];
-    public mapGroupsIdsBookingActivitiesDays: {[key: number]: BookingActivityDay[]} = {};
-    public mapGroupsIdsBookingMealsDays: {[key: number]: BookingMealDay[]} = {};
+
     public mapGroupsIdsHasActivity: {[key: number]: boolean};
 
     constructor(
@@ -116,8 +116,6 @@ export class BookingServicesBookingComponent
                 if(result) {
                     console.debug('received updated booking', result);
                     this.update(result);
-                    this.initMapGroupsIdsBookingActivitiesDays(result);
-                    this.initMapGroupsIdsBookingMealsDays(result);
                     this.initMapGroupsIdsHasActivity(result);
                     this.loading = false;
                 }
@@ -260,108 +258,6 @@ export class BookingServicesBookingComponent
         else {
             this.loading = false;
         }
-    }
-
-    private initMapGroupsIdsBookingActivitiesDays(booking: Booking) {
-        this.mapGroupsIdsBookingActivitiesDays = {};
-        for(let group of booking.booking_lines_groups_ids) {
-            this.mapGroupsIdsBookingActivitiesDays[group.id] = this.createGroupBookingActivitiesDays(group);
-        }
-    }
-
-    private createGroupBookingActivitiesDays(group: BookingLineGroup) {
-        const bookingActivitiesDays = [];
-        let date = new Date(group.date_from);
-        const dateTo = new Date(group.date_to);
-        while(date <= dateTo) {
-            const bookingActivityDay: BookingActivityDay = {
-                date: new Date(date),
-                AM: null,
-                PM: null,
-                EV: null
-            };
-
-            for(let bookingActivity of group.booking_activities_ids as BookingActivity[]) {
-                let activityDate = new Date(bookingActivity.activity_date).toISOString().split('T')[0];
-                if(activityDate !== date.toISOString().split('T')[0]) {
-                    continue;
-                }
-
-                let activityBookingLine: BookingLine | undefined = group.booking_lines_ids.find(
-                    (bookingLine: BookingLine) => bookingLine.id === bookingActivity.activity_booking_line_id
-                );
-
-                if(activityBookingLine && !activityBookingLine.service_date) {
-                    continue;
-                }
-
-                const timeSlot = this.time_slots.find((timeSlot: any) => timeSlot.id === bookingActivity.time_slot_id);
-                if(!timeSlot || !['AM', 'PM', 'EV'].includes(timeSlot.code)) {
-                    continue;
-                }
-
-                bookingActivityDay[timeSlot.code as 'AM'|'PM'|'EV'] = {
-                    ...bookingActivity,
-                    entity: 'sale\\booking\\BookingActivity',
-                    activity_booking_line_id: activityBookingLine ?? null,
-                    transports_booking_lines_ids: group.booking_lines_ids.filter(
-                        (bookingLine: BookingLine) => bookingActivity.transports_booking_lines_ids.map(Number).includes(bookingLine.id)
-                    ),
-                    supplies_booking_lines_ids: group.booking_lines_ids.filter(
-                        (bookingLine: BookingLine) => bookingActivity.supplies_booking_lines_ids.map(Number).includes(bookingLine.id)
-                    )
-                };
-            }
-
-            bookingActivitiesDays.push(bookingActivityDay);
-
-            date.setDate(date.getDate() + 1);
-        }
-
-        return bookingActivitiesDays;
-    }
-
-    private initMapGroupsIdsBookingMealsDays(booking: Booking) {
-        this.mapGroupsIdsBookingMealsDays = {};
-        for(let group of booking.booking_lines_groups_ids) {
-            this.mapGroupsIdsBookingMealsDays[group.id] = this.createGroupBookingMealsDays(group);
-        }
-    }
-
-    private createGroupBookingMealsDays(group: BookingLineGroup) {
-        const bookingMealsDays = [];
-        let date = new Date(group.date_from);
-        const dateTo = new Date(group.date_to);
-        while(date <= dateTo) {
-            const bookingMealDay: BookingMealDay = {
-                date: new Date(date),
-                B: null,
-                AM: null,
-                L: null,
-                PM: null,
-                D: null
-            };
-
-            for(let bookingMeal of group.booking_meals_ids as BookingMeal[]) {
-                let mealDate = new Date(bookingMeal.date).toISOString().split('T')[0];
-                if(mealDate !== date.toISOString().split('T')[0]) {
-                    continue;
-                }
-
-                const timeSlot = this.time_slots.find((timeSlot: any) => timeSlot.id === bookingMeal.time_slot_id);
-                if(!timeSlot || !['B', 'AM', 'L', 'PM', 'D'].includes(timeSlot.code)) {
-                    continue;
-                }
-
-                bookingMealDay[timeSlot.code as 'B'|'AM'|'L'|'PM'|'D'] = bookingMeal;
-            }
-
-            bookingMealsDays.push(bookingMealDay);
-
-            date.setDate(date.getDate() + 1);
-        }
-
-        return bookingMealsDays;
     }
 
     private initMapGroupsIdsHasActivity(booking: Booking) {

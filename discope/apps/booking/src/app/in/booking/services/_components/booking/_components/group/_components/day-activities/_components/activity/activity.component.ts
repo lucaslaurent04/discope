@@ -246,7 +246,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
             this.vm.product.formControl.setErrors(null);
 
             // relay change to parent component
-            this.updated.emit();
+            setTimeout(() => this.updated.emit());
         }
         catch(response: any) {
             if(newLine) {
@@ -271,7 +271,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         try {
             await this.api.update('sale\\booking\\BookingLine', [this.activity.activity_booking_line_id.id], {qty: this.vm.qty.formControl.value});
             // relay change to parent component
-            this.updated.emit();
+            setTimeout(() => this.updated.emit());
         }
         catch(response) {
             this.api.errorFeedback(response);
@@ -293,7 +293,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         try {
             await this.api.update('sale\\booking\\BookingActivity', [this.activity.id], {providers_ids: providersIds});
             // relay change to parent component
-            this.updated.emit();
+            setTimeout(() => this.updated.emit());
         }
         catch(response) {
             this.api.errorFeedback(response);
@@ -305,7 +305,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         try {
             await this.api.update('sale\\booking\\BookingActivity', [this.activity.id], {rental_unit_id: this.vm.rentalUnit.formControl.value});
             // relay change to parent component
-            this.updated.emit();
+            setTimeout(() => this.updated.emit());
         }
         catch(response) {
             this.api.errorFeedback(response);
@@ -325,7 +325,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
             });
 
             // relay change to parent component
-            this.updated.emit();
+            setTimeout(() => this.updated.emit());
         }
         catch(response) {
             this.api.errorFeedback(response);
@@ -353,9 +353,6 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
     }
 
     public ondeleteActivityLine(lineId: number) {
-        // instant removal (UI)
-        this.activity = null;
-
         setTimeout(() => this.deleteLine.emit(lineId));
     }
 

@@ -13,14 +13,19 @@ import { BookingServicesBookingGroupAgeRangeComponent } from './_components/ager
 
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { from, Observable, ReplaySubject } from 'rxjs';
-import { debounceTime, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { debounceTime, filter, map, switchMap } from 'rxjs/operators';
 import { BookingMealPref } from '../../_models/booking_mealpref.model';
 import { BookingAgeRangeAssignment } from '../../_models/booking_agerange_assignment.model';
 import { MatAutocomplete } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
 import { BookingActivityDay } from './_components/day-activities/day-activities.component';
-import { BookedServicesDisplaySettings, RentalUnitsSettings } from '../../../../services.component';
+import { BookingActivity } from '../../_models/booking_activity.model';
+
 import { BookingMealDay } from './_components/day-meals/day-meals.component';
+import { BookingMeal } from '../../_models/booking_meal.model';
+
+import { BookedServicesDisplaySettings, RentalUnitsSettings } from '../../../../services.component';
+
 import { BookingServicesBookingGroupDialogParticipantsOptionsComponent } from './_components/dialog-participants-options/dialog-participants-options.component';
 
 
@@ -102,8 +107,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     @Input() sojournTypes: { id: number, name: 'GA'|'GG' }[] = [];
     @Input() mealTypes: { id: number, name: string, code: string }[] = [];
     @Input() mealPlaces: { id: number, name: string, code: string }[] = [];
-    @Input() bookingActivitiesDays: BookingActivityDay[];
-    @Input() bookingMealsDays: BookingMealDay[];
     @Input() displaySettings: BookedServicesDisplaySettings;
     @Input() rentalUnitsSettings: RentalUnitsSettings;
 
@@ -112,6 +115,9 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
     @Output() toggle  = new EventEmitter();
+
+    public bookingActivitiesDays: BookingActivityDay[];
+    public bookingMealsDays: BookingMealDay[];
 
     public user: UserClass = null;
 
@@ -212,7 +218,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
 
     public ngAfterViewInit() {
         // init local componentsMap
-        let map:BookingLineGroupComponentsMap = {
+        let map: BookingLineGroupComponentsMap = {
             booking_lines_ids: this.bookingServicesBookingLineComponents,
             meal_preferences_ids: this.bookingServicesBookingGroupMealPrefComponents,
             age_range_assignments_ids: this.bookingServicesBookingGroupAgeRangeComponents,
@@ -264,7 +270,96 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
             this.onchangeTimeTo();
         });
 
+        this.initBookingActivitiesDays();
+        this.initBookingMealsDays();
+
         this.ready = true;
+    }
+
+    private initBookingActivitiesDays() {
+
+        this.bookingActivitiesDays = [];
+        let date = new Date(this.instance.date_from);
+        const dateTo = new Date(this.instance.date_to);
+        while(date <= dateTo) {
+            const bookingActivityDay: BookingActivityDay = {
+                date: new Date(date),
+                AM: null,
+                PM: null,
+                EV: null
+            };
+
+            for(let bookingActivity of this.instance.booking_activities_ids as BookingActivity[]) {
+                let activityDate = new Date(bookingActivity.activity_date).toISOString().split('T')[0];
+                if(activityDate !== date.toISOString().split('T')[0]) {
+                    continue;
+                }
+
+                let activityBookingLine: BookingLine | undefined = this.instance.booking_lines_ids.find(
+                    (bookingLine: BookingLine) => bookingLine.id === bookingActivity.activity_booking_line_id
+                );
+
+                if(activityBookingLine && !activityBookingLine.service_date) {
+                    continue;
+                }
+
+                const timeSlot = this.timeSlots.find((timeSlot: any) => timeSlot.id === bookingActivity.time_slot_id);
+                if(!timeSlot || !['AM', 'PM', 'EV'].includes(timeSlot.code)) {
+                    continue;
+                }
+
+                bookingActivityDay[timeSlot.code as 'AM'|'PM'|'EV'] = {
+                    ...bookingActivity,
+                    entity: 'sale\\booking\\BookingActivity',
+                    activity_booking_line_id: activityBookingLine ?? null,
+                    transports_booking_lines_ids: this.instance.booking_lines_ids.filter(
+                        (bookingLine: BookingLine) => bookingActivity.transports_booking_lines_ids.map(Number).includes(bookingLine.id)
+                    ),
+                    supplies_booking_lines_ids: this.instance.booking_lines_ids.filter(
+                        (bookingLine: BookingLine) => bookingActivity.supplies_booking_lines_ids.map(Number).includes(bookingLine.id)
+                    )
+                };
+            }
+
+            this.bookingActivitiesDays.push(bookingActivityDay);
+
+            date.setDate(date.getDate() + 1);
+        }
+
+    }
+
+    private initBookingMealsDays() {
+        this.bookingMealsDays = [];
+        let date = new Date(this.instance.date_from);
+        const dateTo = new Date(this.instance.date_to);
+        while(date <= dateTo) {
+            const bookingMealDay: BookingMealDay = {
+                date: new Date(date),
+                B: null,
+                AM: null,
+                L: null,
+                PM: null,
+                D: null
+            };
+
+            for(let bookingMeal of this.instance.booking_meals_ids as BookingMeal[]) {
+                let mealDate = new Date(bookingMeal.date).toISOString().split('T')[0];
+                if(mealDate !== date.toISOString().split('T')[0]) {
+                    continue;
+                }
+
+                const timeSlot = this.timeSlots.find((timeSlot: any) => timeSlot.id === bookingMeal.time_slot_id);
+                if(!timeSlot || !['B', 'AM', 'L', 'PM', 'D'].includes(timeSlot.code)) {
+                    continue;
+                }
+
+                bookingMealDay[timeSlot.code as 'B'|'AM'|'L'|'PM'|'D'] = bookingMeal;
+            }
+
+            this.bookingMealsDays.push(bookingMealDay);
+
+            date.setDate(date.getDate() + 1);
+        }
     }
 
     public update(values:any) {
@@ -366,10 +461,30 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
 
     public async ondeleteActivity(activity_id: number) {
         this.loading = true;
+
+
+        // 1) optimistic UI - remove activity
+        const activity: BookingActivity = this.instance.booking_activities_ids.find(
+            (e: any) => e.id === activity_id
+        );
+
+        const timeSlot = this.timeSlots.find((timeSlot: any) => timeSlot.id === activity.time_slot_id);
+        if(!timeSlot || !['AM', 'PM', 'EV'].includes(timeSlot.code)) {
+            return;
+        }
+
+        this.instance.bookingActivitiesDays.forEach( (bookingActivitiesDay: BookingActivityDay) => {
+            const targetActivity: BookingActivity = bookingActivitiesDay[timeSlot.code as 'AM'|'PM'|'EV'];
+            if(targetActivity && targetActivity.id == activity_id) {
+                bookingActivitiesDay[timeSlot.code as 'AM'|'PM'|'EV'] = null;
+            }
+        });
+
+        // 2) send request to server
         setTimeout( async () => {
             try {
                 await this.api.remove('sale\\booking\\BookingActivity', [activity_id]);
-                // relay to parent
+                // 3) relay to parent
                 this.updated.emit();
             }
             catch(response) {
