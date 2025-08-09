@@ -182,8 +182,14 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         this.vm.product.inputClue.next('');
     }
 
-    private productDisplay(product:any): string {
-        return (product && product.hasOwnProperty('name')) ? product.name : '';
+    private productDisplay(product: any): string {
+        if(!product) {
+             return '';
+        }
+        if(typeof product === 'string') { 
+            return product;
+        }
+        return product.name ?? '';
     }
 
     private productReset() {
@@ -201,50 +207,59 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         console.log('BookingServicesBookingGroupDayActivitiesActivityComponent::productChange', event)
 
         // from mat-autocomplete
-        if(event && event.option && event.option.value) {
-            let product = event.option.value;
-            if(
-                product.hasOwnProperty('name')
-                && (typeof product.name === 'string' || product.name instanceof String)
-                && product.name !== '[object Object]'
-            ) {
-                this.vm.product.name = product.name;
-            }
-
-            this.loadStart.emit();
-
-            let newLine: any = null;
-
-            // notify back-end about the change
-            try {
-                newLine = await this.api.create('sale\\booking\\BookingLine', {
-                    order: this.group.booking_lines_ids.length + 1,
-                    booking_id: this.booking.id,
-                    booking_line_group_id: this.group.id
-                });
-                await this.api.call('?do=sale_booking_update-bookingline-activity', {
-                    id: newLine.id,
-                    product_id: product.id,
-                    service_date: this.date.getTime() / 1000,
-                    time_slot_id: this.timeSlot.id
-                });
-                this.vm.product.formControl.setErrors(null);
-
-                this.loadEnd.emit();
-
-                // relay change to parent component
-                this.updated.emit();
-            }
-            catch(response: any) {
-                if(newLine) {
-                    this.deleteLine.emit(newLine.id);
-                }
-
-                this.loadEnd.emit();
-
-                this.api.errorFeedback(response);
-            }
+        if(!event || !event.option || !event.option.value) {
+            return;
         }
+
+
+        // apply commit-rollback logic
+        const prevProduct = this.vm.product.formControl.value;
+        let product = event.option.value;
+
+        if(
+            product.hasOwnProperty('name')
+            && (typeof product.name === 'string' || product.name instanceof String)
+            && product.name !== '[object Object]'
+        ) {
+            this.vm.product.name = product.name;
+            this.vm.product.formControl.setValue(product, { emitEvent: false });
+            this.vm.qty.formControl.setValue(1);
+        }
+
+        this.loadStart.emit();
+
+        let newLine: any = null;
+
+        // notify back-end about the change
+        try {
+            newLine = await this.api.create('sale\\booking\\BookingLine', {
+                order: this.group.booking_lines_ids.length + 1,
+                booking_id: this.booking.id,
+                booking_line_group_id: this.group.id
+            });
+            await this.api.call('?do=sale_booking_update-bookingline-activity', {
+                id: newLine.id,
+                product_id: product.id,
+                service_date: this.date.getTime() / 1000,
+                time_slot_id: this.timeSlot.id
+            });
+            this.vm.product.formControl.setErrors(null);
+
+            // relay change to parent component
+            this.updated.emit();
+        }
+        catch(response: any) {
+            if(newLine) {
+                this.deleteLine.emit(newLine.id);
+            }
+            // rollback to previous value
+            this.vm.product.formControl.setValue(prevProduct, { emitEvent: false });
+            this.vm.product.name = prevProduct.name;
+
+            this.api.errorFeedback(response);
+        }
+
+        this.loadEnd.emit();
     }
 
     public async qtyChange() {
@@ -338,6 +353,18 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
     }
 
     public ondeleteActivityLine(lineId: number) {
+        // instant removal (UI)
+        this.vm.product.formControl.setValue('', { emitEvent: false });
+        this.vm.product.formControl.setErrors(null);
+        this.vm.product.formControl.markAsPristine();
+        this.vm.product.name = '';
+
+        this.vm.qty.formControl.setValue(0, { emitEvent: false });
+        this.vm.qty.formControl.enable({ emitEvent: false });
+
+        this.vm.providers.formControls = [];
+        this.vm.rentalUnit.formControl.setValue(null, { emitEvent: false });
+
         this.deleteLine.emit(lineId);
     }
 

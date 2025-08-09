@@ -199,7 +199,7 @@ export class BookingQuoteComponent implements OnInit, AfterContentInit {
                 items:          []
             },
             documents: {
-                items:           []
+                items:          []
             }
         };
     }

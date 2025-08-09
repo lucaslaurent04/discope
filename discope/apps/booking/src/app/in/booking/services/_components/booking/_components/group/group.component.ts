@@ -866,10 +866,15 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     }
 
     public async selectedGroupSummaryProduct(product:any) {
+        // apply commit-rollback logic
+
+        // save previous values
         let prev_product_name = this.instance.name;
+
         // immediate view update (before refresh)
         this.groupSummaryOpen = false;
         this.instance.name = product.name;
+
         this.loadStart.emit();
 
         this.api.fetch('/?do=sale_booking_update-sojourn-product', {

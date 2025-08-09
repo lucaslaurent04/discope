@@ -28,11 +28,13 @@ use sale\booking\SojournProductModelRentalUnitAssignement;
         'charset'           => 'utf-8',
         'accept-origin'     => '*'
     ],
-    'providers' => ['context']
+    'providers' => ['context', 'auth']
 ]);
 
-list($context) = [$providers['context']];
+['context' => $context, 'auth' => $auth] = $providers;
 
+// #memo - processing of this controller might be heavy, so we make sure AC does not check permissions for each single consumption
+$auth->su();
 
 $tree = [
     'id', 'name', 'created', 'date_from', 'date_to', 'status', 'total', 'price', 'is_locked', 'nb_pers',
