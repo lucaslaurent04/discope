@@ -345,7 +345,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
             });
 
             // relay change to parent component
-            this.updated.emit();
+            setTimeout(() => this.updated.emit());
         }
         catch(response) {
             this.api.errorFeedback(response);
@@ -354,18 +354,9 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
 
     public ondeleteActivityLine(lineId: number) {
         // instant removal (UI)
-        this.vm.product.formControl.setValue('', { emitEvent: false });
-        this.vm.product.formControl.setErrors(null);
-        this.vm.product.formControl.markAsPristine();
-        this.vm.product.name = '';
+        this.activity = null;
 
-        this.vm.qty.formControl.setValue(0, { emitEvent: false });
-        this.vm.qty.formControl.enable({ emitEvent: false });
-
-        this.vm.providers.formControls = [];
-        this.vm.rentalUnit.formControl.setValue(null, { emitEvent: false });
-
-        this.deleteLine.emit(lineId);
+        setTimeout(() => this.deleteLine.emit(lineId));
     }
 
     public openPriceEdition() {
