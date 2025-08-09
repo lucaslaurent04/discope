@@ -79,13 +79,7 @@ export class BookingServicesBookingComponent
 
     public ngOnChanges(changes: SimpleChanges) {
         if(changes.booking_id && this.booking_id > 0) {
-            try {
-                this.load(this.booking_id);
-                this.ready = true;
-            }
-            catch(error) {
-                console.warn(error);
-            }
+            setTimeout(() => this.safeLoad(this.booking_id));
         }
     }
 
@@ -98,7 +92,7 @@ export class BookingServicesBookingComponent
     }
 
     public async ngOnInit() {
-
+        await this.loadMetaDataOnce();
     }
 
     private loadMetaDataOnce(): Promise<void> {
@@ -118,6 +112,14 @@ export class BookingServicesBookingComponent
             .catch(err => { this.metaDataLoading = undefined; throw err; });
         }
         return this.metaDataLoading;
+    }
+
+    private async safeLoad(id: number) {
+        try {
+            await this.loadMetaDataOnce();
+            await this.load(id);
+            this.ready = true;
+        } catch (e) { console.warn(e); }
     }
 
     /**
