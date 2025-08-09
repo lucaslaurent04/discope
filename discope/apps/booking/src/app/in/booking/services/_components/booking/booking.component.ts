@@ -67,6 +67,7 @@ export class BookingServicesBookingComponent
     public meal_places: { id: number, name: string, code: string }[] = [];
 
     public mapGroupsIdsHasActivity: {[key: number]: boolean};
+    private metaDataLoading?: Promise<void>;
 
     constructor(
         private dialog: MatDialog,
@@ -97,36 +98,53 @@ export class BookingServicesBookingComponent
     }
 
     public async ngOnInit() {
-        this.time_slots = await this.api.collect('sale\\booking\\TimeSlot', [], ['id', 'name', 'code']);
-        this.sojourn_types = await this.api.collect('sale\\booking\\SojournType', [], ['id', 'name']);
-        this.meal_types = await this.api.collect('sale\\booking\\MealType', [], ['id', 'name', 'code']);
-        this.meal_places = await this.api.collect('sale\\booking\\MealPlace', [], ['id', 'name', 'code']);
+
+    }
+
+    private loadMetaDataOnce(): Promise<void> {
+        if(!this.metaDataLoading) {
+            this.metaDataLoading = (async () => {
+                const [timeSlots, sojournTypes, mealTypes, mealPlaces] = await Promise.all([
+                    this.api.collect('sale\\booking\\TimeSlot', [], ['id','name','code']),
+                    this.api.collect('sale\\booking\\SojournType', [], ['id','name']),
+                    this.api.collect('sale\\booking\\MealType', [], ['id','name','code']),
+                    this.api.collect('sale\\booking\\MealPlace', [], ['id','name','code'])
+                ]);
+                this.time_slots = timeSlots;
+                this.sojourn_types = sojournTypes;
+                this.meal_types = mealTypes;
+                this.meal_places = mealPlaces;
+            })()
+            .catch(err => { this.metaDataLoading = undefined; throw err; });
+        }
+        return this.metaDataLoading;
     }
 
     /**
      * Load an Booking object using the sale_pos_order_tree controller
      * @param booking_id
      */
-    public load(booking_id: number) {
-        if(booking_id > 0) {
-            // #memo - init generates multiple load which badly impacts the UX
-            // this.loading = true;
-            this.api.fetch('?get=sale_booking_tree', {id:booking_id})
-            .then( (result:any) => {
-                if(result) {
-                    console.debug('received updated booking', result);
-                    this.update(result);
-                    this.initMapGroupsIdsHasActivity(result);
-                    this.loading = false;
-                }
-            })
-            .catch(response => {
-                console.warn(response);
-                // if a 403 response is received, we assume that the user is not identified: redirect to /auth
-                if(response.status == 403) {
-                    window.location.href = '/auth';
-                }
-            });
+    public async load(booking_id: number) {
+        if(booking_id <= 0) return;
+
+        this.loading = true;
+
+        try {
+            await this.loadMetaDataOnce();
+            const result: any = await this.api.fetch('?get=sale_booking_tree', { id: booking_id });
+            if (result) {
+                this.update(result);
+                this.initMapGroupsIdsHasActivity(result);
+            }
+        }
+        catch (e) {
+            console.warn(e);
+            if((e as any)?.status === 403) {
+                window.location.href = '/auth';
+            }
+        }
+        finally {
+            this.loading = false;
         }
     }
 
