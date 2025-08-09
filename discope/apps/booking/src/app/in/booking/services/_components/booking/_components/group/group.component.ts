@@ -270,9 +270,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
             this.onchangeTimeTo();
         });
 
-        this.initBookingActivitiesDays();
-        this.initBookingMealsDays();
-
         this.ready = true;
     }
 
@@ -385,6 +382,9 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
             }
         }
 
+        this.initBookingActivitiesDays();
+        this.initBookingMealsDays();
+
         // #workaround - force age_ranges update (since it cannot be done in update())
         this.instance.age_range_assignments_ids = values.age_range_assignments_ids;
         this.instance.booking_lines_ids = values.booking_lines_ids;
@@ -473,7 +473,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
             return;
         }
 
-        this.instance.bookingActivitiesDays.forEach( (bookingActivitiesDay: BookingActivityDay) => {
+        this.bookingActivitiesDays.forEach( (bookingActivitiesDay: BookingActivityDay) => {
             const targetActivity: BookingActivity = bookingActivitiesDay[timeSlot.code as 'AM'|'PM'|'EV'];
             if(targetActivity && targetActivity.id == activity_id) {
                 bookingActivitiesDay[timeSlot.code as 'AM'|'PM'|'EV'] = null;
