@@ -147,7 +147,11 @@ export class BookingServicesBookingGroupComponent
     @ViewChildren(BookingServicesBookingGroupMealPrefComponent) bookingServicesBookingGroupMealPrefComponents: QueryList<BookingServicesBookingGroupMealPrefComponent>;
     @ViewChildren(BookingServicesBookingGroupAgeRangeComponent) bookingServicesBookingGroupAgeRangeComponents: QueryList<BookingServicesBookingGroupAgeRangeComponent>;
 
+    // By convention, `ready` is set to true once the component has completed its
+    // initial lifecycle phase: constructor + first ngOnChanges (if any) + ngOnInit + ngAfterViewInit,
+    // At this point, the view has been initialized and all @Input values are available and the component is rendered in the DOM.
     public ready: boolean = false;
+
     public loading: boolean = false;
 
     private packRequestCounter = 0;
