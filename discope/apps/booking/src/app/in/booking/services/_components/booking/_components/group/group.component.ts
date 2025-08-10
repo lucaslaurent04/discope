@@ -217,17 +217,18 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     }
 
     public ngAfterViewInit() {
+        console.debug('BookingServicesBookingGroupComponent::ngAfterViewInit');
         // init local componentsMap
-        let map: BookingLineGroupComponentsMap = {
+        this.componentsMap = {
             booking_lines_ids: this.bookingServicesBookingLineComponents,
             meal_preferences_ids: this.bookingServicesBookingGroupMealPrefComponents,
             age_range_assignments_ids: this.bookingServicesBookingGroupAgeRangeComponents,
             sojourn_product_models_ids: this.bookingServicesBookingGroupAccomodationComponents
-        };
-        this.componentsMap = map;
+        } as BookingLineGroupComponentsMap;
     }
 
     public ngOnInit() {
+        console.debug('BookingServicesBookingGroupComponent::ngOnInit');
         if(this.booking.status == 'quote' || (this.instance.is_extra && !this.instance.has_consumptions)) {
             this.mode = 'edit';
         }
@@ -360,6 +361,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     }
 
     public update(values:any) {
+        console.debug('BookingServicesBookingGroupComponent::update');
         super.update(values);
         // assign VM values
         this.vm.name.formControl.setValue(this.instance.name);

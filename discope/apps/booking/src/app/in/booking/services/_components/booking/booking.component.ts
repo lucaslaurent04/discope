@@ -12,10 +12,7 @@ import { BookingLineGroup } from './_models/booking_line_group.model';
 
 import { BookingLine } from './_models/booking_line.model';
 
-
 import { BookedServicesDisplaySettings, RentalUnitsSettings } from '../../services.component';
-import { BookingMealDay } from './_components/group/_components/day-meals/day-meals.component';
-import { BookingMeal } from './_models/booking_meal.model';
 
 // declaration of the interface for the map associating relational Model fields with their components
 interface BookingComponentsMap {
@@ -56,6 +53,10 @@ export class BookingServicesBookingComponent
     @Input() display_settings: BookedServicesDisplaySettings;
     @Input() rental_units_settings: RentalUnitsSettings;
 
+    // By convention, `ready` is set to true once the component has completed its
+    // initial lifecycle phase: constructor + first ngOnChanges (if any) + ngOnInit,
+    // and the view has been initialized (ngAfterViewInit). At this point, all
+    // @Input values are available and the component is rendered in the DOM.
     public ready: boolean = false;
     public loading: boolean = true;
     private loadingStartTime: number;
@@ -67,7 +68,6 @@ export class BookingServicesBookingComponent
     public meal_places: { id: number, name: string, code: string }[] = [];
 
     public mapGroupsIdsHasActivity: {[key: number]: boolean};
-    private metaDataLoading?: Promise<void>;
 
     constructor(
         private dialog: MatDialog,
@@ -78,61 +78,57 @@ export class BookingServicesBookingComponent
     }
 
     public ngOnChanges(changes: SimpleChanges) {
+        if(!this.ready) {
+            console.debug('BookingServicesBookingComponent::ngOnChanges : first call - ignoring');
+            return;
+        }
+        console.debug('BookingServicesBookingComponent::ngOnChanges', changes);
         if(changes.booking_id && this.booking_id > 0) {
-            setTimeout(() => this.safeLoad(this.booking_id));
+            this.load(this.booking_id);
         }
     }
 
     public ngAfterViewInit() {
+        console.debug('BookingServicesBookingComponent::ngAfterViewInit');
         // init local componentsMap
-        let map:BookingComponentsMap = {
+        this.componentsMap = {
             booking_lines_groups_ids: this.bookingServicesBookingGroups
-        };
-        this.componentsMap = map;
+        } as BookingComponentsMap;
     }
 
     public async ngOnInit() {
-        await this.loadMetaDataOnce();
-    }
+        console.debug('BookingServicesBookingComponent::ngOnInit');
+        const [timeSlots, sojournTypes, mealTypes, mealPlaces] = await Promise.all([
+            this.api.collect('sale\\booking\\TimeSlot', [], ['id','name','code']),
+            this.api.collect('sale\\booking\\SojournType', [], ['id','name']),
+            this.api.collect('sale\\booking\\MealType', [], ['id','name','code']),
+            this.api.collect('sale\\booking\\MealPlace', [], ['id','name','code'])
+        ]);
 
-    private loadMetaDataOnce(): Promise<void> {
-        if(!this.metaDataLoading) {
-            this.metaDataLoading = (async () => {
-                const [timeSlots, sojournTypes, mealTypes, mealPlaces] = await Promise.all([
-                    this.api.collect('sale\\booking\\TimeSlot', [], ['id','name','code']),
-                    this.api.collect('sale\\booking\\SojournType', [], ['id','name']),
-                    this.api.collect('sale\\booking\\MealType', [], ['id','name','code']),
-                    this.api.collect('sale\\booking\\MealPlace', [], ['id','name','code'])
-                ]);
-                this.time_slots = timeSlots;
-                this.sojourn_types = sojournTypes;
-                this.meal_types = mealTypes;
-                this.meal_places = mealPlaces;
-            })()
-            .catch(err => { this.metaDataLoading = undefined; throw err; });
+        this.time_slots = timeSlots;
+        this.sojourn_types = sojournTypes;
+        this.meal_types = mealTypes;
+        this.meal_places = mealPlaces;
+
+        if(this.booking_id > 0) {
+            await this.load(this.booking_id);
         }
-        return this.metaDataLoading;
+
+        this.ready = true;
     }
 
-    private async safeLoad(id: number) {
-        try {
-            await this.loadMetaDataOnce();
-            await this.load(id);
-            this.ready = true;
-        } catch (e) { console.warn(e); }
-    }
 
     /**
      * Load an Booking object using the sale_pos_order_tree controller
      * @param booking_id
      */
     public async load(booking_id: number) {
-        if(booking_id <= 0) return;
-
-        this.loading = true;
+        if(booking_id <= 0){
+            return;
+        }
 
         try {
-            await this.loadMetaDataOnce();
+            this.loading = true;
             const result: any = await this.api.fetch('?get=sale_booking_tree', { id: booking_id });
             if (result) {
                 this.update(result);
@@ -217,7 +213,7 @@ export class BookingServicesBookingComponent
                 dialog.afterClosed().subscribe( async (result) => (result)?resolve(true):reject() );
             });
             try {
-                // instant remove in view
+                // optimistic UI - instant remove in view
                 this.instance.booking_lines_groups_ids = this.instance.booking_lines_groups_ids.filter( (group:any) => group.id !== group_id);
                 await this.api.fetch('?do=sale_booking_update-groups-remove', {id: this.instance.id, booking_line_group_id: group_id});
             }
@@ -268,6 +264,7 @@ export class BookingServicesBookingComponent
      * enact loading end from sub components while forcing a minimum duration
      */
     public onLoadEndGroup() {
+        if(!this.loadingStartTime) { this.loading = false; return; }
         const elapsed = Date.now() - this.loadingStartTime;
         const minDuration = 250;
         const remaining = minDuration - elapsed;
@@ -287,9 +284,9 @@ export class BookingServicesBookingComponent
             for(let line of group.booking_lines_ids as BookingLine[]) {
                 if(line.is_activity) {
                     hasActivity = true;
+                    break;
                 }
             }
-
             this.mapGroupsIdsHasActivity[group.id] = hasActivity;
         }
     }
