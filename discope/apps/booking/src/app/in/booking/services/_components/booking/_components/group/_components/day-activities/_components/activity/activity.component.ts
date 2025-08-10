@@ -219,7 +219,13 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         }
 
         this.vm.product.formControl.setErrors(null);
-        this.vm.product.name = this.activity?.activity_booking_line_id?.product_id ? this.activity.activity_booking_line_id.product_id.name : '';
+
+        if(!this.activity) {
+            this.vm.product.name = '';
+        }
+        else {
+            this.vm.product.name = this.activity?.activity_booking_line_id?.product_id ? this.activity.activity_booking_line_id.product_id.name : '';
+        }
     }
 
     public async onchangeProduct(event: any) {

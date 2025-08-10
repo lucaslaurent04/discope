@@ -51,6 +51,7 @@ export class BookingServicesBookingGroupDayActivitiesComponent implements OnInit
     }
 
     public ondeleteActivity(activity: BookingActivity) {
+        this.loadStart.emit();
         this.deleteActivity.emit(activity.id);
     }
 }

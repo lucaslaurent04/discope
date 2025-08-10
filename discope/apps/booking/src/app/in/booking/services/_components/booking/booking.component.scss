@@ -24,13 +24,54 @@
             --fade: 24px;
             --veil: rgba(0,0,0,0.1);
 
-            background:
+            background-image:
+                /* 1) centre plein */
+                linear-gradient(var(--veil), var(--veil)),
 
-            linear-gradient(var(--veil), var(--veil)) center / calc(100% - 2*var(--fade)) calc(100% - 2*var(--fade)) no-repeat,
-            linear-gradient(to bottom, transparent, var(--veil) var(--fade)) top / 100% var(--fade) no-repeat,
-            linear-gradient(to top, transparent, var(--veil) var(--fade)) bottom / 100% var(--fade) no-repeat,
-            linear-gradient(to right, transparent, var(--veil) var(--fade)) left / var(--fade) 100% no-repeat,
-            linear-gradient(to left, transparent, var(--veil) var(--fade)) right / var(--fade) 100% no-repeat;
+                /* 2-3) bandes haut/bas (hors coins) */
+                linear-gradient(to bottom, transparent, var(--veil)),
+                linear-gradient(to top,    transparent, var(--veil)),
+
+                /* 4-5) bandes gauche/droite (hors coins) */
+                linear-gradient(to right,  transparent, var(--veil)),
+                linear-gradient(to left,   transparent, var(--veil)),
+
+                /* 6-9) coins radiaux pour éviter l’effet “carré” */
+                radial-gradient(circle at top left,    transparent, var(--veil) var(--fade)),
+                radial-gradient(circle at top right,   transparent, var(--veil) var(--fade)),
+                radial-gradient(circle at bottom left, transparent, var(--veil) var(--fade)),
+                radial-gradient(circle at bottom right,transparent, var(--veil) var(--fade));
+
+            background-size:
+                /* centre */
+                calc(100% - 2*var(--fade)) calc(100% - 2*var(--fade)),
+
+                /* haut/bas (on retire les coins) */
+                calc(100% - 2*var(--fade)) var(--fade),
+                calc(100% - 2*var(--fade)) var(--fade),
+
+                /* gauche/droite (on retire les coins) */
+                var(--fade) calc(100% - 2*var(--fade)),
+                var(--fade) calc(100% - 2*var(--fade)),
+
+                /* coins (carrés de --fade x --fade) */
+                var(--fade) var(--fade),
+                var(--fade) var(--fade),
+                var(--fade) var(--fade),
+                var(--fade) var(--fade);
+
+            background-position:
+                center,
+                top center,
+                bottom center,
+                left center,
+                right center,
+                top left,
+                top right,
+                bottom left,
+                bottom right;
+
+            background-repeat: no-repeat;
 
             mat-spinner {
                 position: absolute;

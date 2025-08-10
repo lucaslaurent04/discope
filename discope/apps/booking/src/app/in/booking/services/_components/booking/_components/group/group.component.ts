@@ -507,8 +507,7 @@ export class BookingServicesBookingGroupComponent
         this.bookingActivitiesDays.forEach( (bookingActivitiesDay: BookingActivityDay) => {
             const targetActivity: BookingActivity = bookingActivitiesDay[timeSlot.code as 'AM'|'PM'|'EV'];
             if(targetActivity && targetActivity.id == activity_id) {
-                targetActivity.name = '';
-                targetActivity.qty = 0;
+                bookingActivitiesDay[timeSlot.code as 'AM'|'PM'|'EV'] = null;
             }
         });
 
