@@ -507,7 +507,8 @@ export class BookingServicesBookingGroupComponent
         this.bookingActivitiesDays.forEach( (bookingActivitiesDay: BookingActivityDay) => {
             const targetActivity: BookingActivity = bookingActivitiesDay[timeSlot.code as 'AM'|'PM'|'EV'];
             if(targetActivity && targetActivity.id == activity_id) {
-                bookingActivitiesDay[timeSlot.code as 'AM'|'PM'|'EV'] = null;
+                targetActivity.name = '';
+                targetActivity.qty = 0;
             }
         });
 
@@ -517,11 +518,11 @@ export class BookingServicesBookingGroupComponent
         }
         catch(response) {
             this.api.errorFeedback(response);
-            // re-load activity
-            this.updated.emit();
         }
         finally {
             this.loading = false;
+            // #memo - activity might be linked to a booking line, with a price : full reload is necessary
+            this.updated.emit();
         }
     }
 
