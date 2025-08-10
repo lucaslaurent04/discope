@@ -66,7 +66,7 @@ export class BookingServicesBookingComponent
     public meal_types: { id: number, name: string, code: string }[] = [];
     public meal_places: { id: number, name: string, code: string }[] = [];
 
-    public mapGroupsIdsHasActivity: {[key: number]: boolean};
+    private mapGroupsIdsHasActivity: {[key: number]: boolean};
 
     constructor(
         private dialog: MatDialog,
@@ -128,7 +128,7 @@ export class BookingServicesBookingComponent
         }
 
         try {
-            this.loading = true;
+            // #memo - do not set loading to true here (to allow silent update)
             const result: any = await this.api.fetch('?get=sale_booking_tree', { id: booking_id });
             if (result) {
                 this.update(result);
@@ -142,6 +142,7 @@ export class BookingServicesBookingComponent
             }
         }
         finally {
+            // if loading was set (init or loadStart), void it
             this.loading = false;
         }
     }
@@ -275,6 +276,10 @@ export class BookingServicesBookingComponent
         else {
             this.loading = false;
         }
+    }
+
+    public hasActivity(group_id: number): boolean {
+        return !!this.mapGroupsIdsHasActivity?.[group_id];
     }
 
     private initMapGroupsIdsHasActivity(booking: Booking) {

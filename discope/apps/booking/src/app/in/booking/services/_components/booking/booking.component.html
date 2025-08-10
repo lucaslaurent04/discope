@@ -49,7 +49,7 @@
                             (loadEnd)="onLoadEndGroup()"
                         ></booking-services-booking-group>
                         <div class="group-clone" *ngIf="maximized_group_id == 0">
-                            <button mat-icon-button title="Dupliquer ce groupe" [disabled]="!this.mapGroupsIdsHasActivity[group.id]" (click)="oncloneGroup(group.id)">
+                            <button mat-icon-button title="Dupliquer ce groupe" [disabled]="!this.hasActivity(group.id)" (click)="oncloneGroup(group.id)">
                                 <mat-icon>content_copy</mat-icon>
                             </button>
                         </div>
