@@ -116,10 +116,10 @@ export class BookingServicesBookingGroupComponent
     @Output() loadStart = new EventEmitter();
     @Output() loadEnd   = new EventEmitter();
     @Output() updated = new EventEmitter();
-    @Output() deleted = new EventEmitter();
     @Output() toggle  = new EventEmitter();
 
     private _model: any;
+    // flag signaling that an update was requested while the component was not ready
     private is_update_pending: boolean = false;
 
     public bookingActivitiesDays: BookingActivityDay[];
@@ -152,6 +152,7 @@ export class BookingServicesBookingGroupComponent
     // At this point, the view has been initialized and all @Input values are available and the component is rendered in the DOM.
     public ready: boolean = false;
 
+    // #memo - not for displaying the loader but for knowing if a change is in progress
     public loading: boolean = false;
 
     private packRequestCounter = 0;
@@ -540,19 +541,21 @@ export class BookingServicesBookingGroupComponent
                 });
             }
 
-            this.loading = true;
-            setTimeout( async () => {
-                try {
-                    // #todo #refresh - this triggers onupdateBookingLinesIds, which triggers _resetPrices
-                    await this.api.update(this.instance.entity, [this.instance.id], {booking_lines_ids: [-line_id]});
-                    // relay to parent
-                    this.updated.emit();
-                }
-                catch(response) {
-                    this.api.errorFeedback(response);
-                }
+            try {
+                this.loading = true;
+                // display parent loading
+                this.loadStart.emit();
+                await this.api.update(this.instance.entity, [this.instance.id], {booking_lines_ids: [-line_id]});
+                // relay to parent
+                this.updated.emit();
+            }
+            catch(response) {
+                this.api.errorFeedback(response);
+            }
+            finally {
                 this.loading = false;
-            });
+            }
+
         }
         catch(e) {
             // user discarded the dialog (selected 'no')
@@ -662,8 +665,8 @@ export class BookingServicesBookingGroupComponent
     public async onchangeNbPers() {
         console.log('BookingEditCustomerComponent::nbPersChange');
         if(this.vm.participants_count.formControl.value != this.instance.nb_pers) {
-            this.loading = true;
             try {
+                this.loading = true;
                 await this.api.fetch('?do=sale_booking_update-sojourn-nbpers', {
                         id: this.instance.id,
                         nb_pers: this.vm.participants_count.formControl.value
@@ -681,7 +684,9 @@ export class BookingServicesBookingGroupComponent
                 // this.api.errorSnack('nb_pers', "Le nombre de personnes ne correspond pas aux tranches d'âge");
                 this.api.errorFeedback(response);
             }
-            this.loading = false;
+            finally {
+                this.loading = false;
+            }
         }
     }
 
@@ -698,13 +703,15 @@ export class BookingServicesBookingGroupComponent
         }
     }
 
-    public onchangeDateRange() {
+    public async onchangeDateRange() {
         this.groupDatesOpen = false;
 
         let start = this.vm.daterange.start.formControl.value;
         let end = this.vm.daterange.end.formControl.value;
 
-        if(!start || !end) return;
+        if(!start || !end) {
+            return;
+        }
 
         if(typeof start == 'string') {
             start = new Date(start);
@@ -717,36 +724,36 @@ export class BookingServicesBookingGroupComponent
         let diff = Math.round((Date.parse(end.toString()) - Date.parse(start.toString())) / (60*60*24*1000));
 
         if(diff >= 0) {
-            this.vm.daterange.nights_count = (diff < 0)?0:diff;
+            this.vm.daterange.nights_count = (diff < 0) ? 0 : diff;
             // relay change to parent component
             if((start.getTime() != this.instance.date_from.getTime() || end.getTime() != this.instance.date_to.getTime())) {
-                this.loading = true;
-                setTimeout( async () => {
-                    // make dates UTC @ 00:00:00
-                    let timestamp, offset_tz;
-                    timestamp = start.getTime();
-                    offset_tz = start.getTimezoneOffset()*60*1000;
-                    let date_from = (new Date(timestamp-offset_tz)).toISOString().substring(0, 10)+'T00:00:00Z';
-                    timestamp = end.getTime();
-                    offset_tz = end.getTimezoneOffset()*60*1000;
-                    let date_to = (new Date(timestamp-offset_tz)).toISOString().substring(0, 10)+'T00:00:00Z';
+                // make dates UTC @ 00:00:00
+                let timestamp, offset_tz;
+                timestamp = start.getTime();
+                offset_tz = start.getTimezoneOffset()*60*1000;
+                let date_from = (new Date(timestamp-offset_tz)).toISOString().substring(0, 10)+'T00:00:00Z';
+                timestamp = end.getTime();
+                offset_tz = end.getTimezoneOffset()*60*1000;
+                let date_to = (new Date(timestamp-offset_tz)).toISOString().substring(0, 10)+'T00:00:00Z';
 
-                    try {
-                        await this.api.fetch('?do=sale_booking_update-sojourn-dates', {
-                                id: this.instance.id,
-                                date_from: date_from,
-                                date_to: date_to
-                            });
-                        this.updated.emit();
-                    }
-                    catch(response) {
-                        this.api.errorFeedback(response);
-                        // #todo - improve to rollback non-updatable fields only
-                        // force refresh
-                        this.updated.emit();
-                    }
+                try {
+                    this.loading = true;
+                    this.loadStart.emit();
+                    await this.api.fetch('?do=sale_booking_update-sojourn-dates', {
+                            id: this.instance.id,
+                            date_from: date_from,
+                            date_to: date_to
+                        });
+                }
+                catch(response) {
+                    this.api.errorFeedback(response);
+                    // #todo - improve to rollback non-updatable fields only
+                }
+                finally {
                     this.loading = false;
-                });
+                    this.updated.emit();
+                }
+
             }
             // update VM values until refresh
             // this.instance.date_from = start;
@@ -757,9 +764,9 @@ export class BookingServicesBookingGroupComponent
     public async onchangeHasPack(has_pack: any) {
         if(this.instance.has_pack != has_pack) {
             let fields: any = {has_pack: has_pack};
-            this.loading = true;
 
             try {
+                this.loading = true;
                 if(has_pack === false) {
                     await this.api.fetch('?do=sale_booking_update-sojourn-pack-remove', {id: this.instance.id});
                 }
@@ -772,15 +779,19 @@ export class BookingServicesBookingGroupComponent
             catch(response) {
                 this.api.errorFeedback(response);
             }
-            this.loading = false;
+            finally {
+                this.loading = false;
+            }
         }
     }
 
     public async onchangePackId(pack: any) {
         if(!this.instance.pack_id || this.instance.pack_id.id != pack.id) {
             this.vm.pack.name = pack.name;
-            this.loading = true;
+
             try {
+                this.loading = true;
+                this.loadStart.emit();
                 await this.api.fetch('?do=sale_booking_update-sojourn-pack-set', {id: this.instance.id, pack_id: pack.id});
                 // relay change to parent component
                 this.updated.emit();
@@ -788,7 +799,9 @@ export class BookingServicesBookingGroupComponent
             catch(response) {
                 this.api.errorFeedback(response);
             }
-            this.loading = false;
+            finally {
+                this.loading = false;
+            }
         }
     }
 
@@ -796,12 +809,16 @@ export class BookingServicesBookingGroupComponent
         if(this.instance.is_locked != locked) {
             this.vm.pack.is_locked = locked;
             try {
+                this.loading = true;
                 await this.api.update(this.instance.entity, [this.instance.id], {is_locked: locked});
                 // relay change to parent component
-                this.updated.emit();
             }
             catch(response) {
                 this.api.errorFeedback(response);
+            }
+            finally {
+                this.updated.emit();
+                this.loading = false;
             }
         }
     }
@@ -872,9 +889,9 @@ export class BookingServicesBookingGroupComponent
         dialogRef.afterClosed().subscribe(async (result) => {
             if(result) {
                 if(this.instance.has_person_with_disability != result.has_person_with_disability || this.instance.person_disability_description != result.person_disability_description) {
-                    this.loading = true;
 
                     try {
+                        this.loading = true;
                         await this.api.update('sale\\booking\\BookingLineGroup', [this.instance.id], {
                             has_person_with_disability: result.has_person_with_disability,
                             person_disability_description: result.person_disability_description
@@ -886,42 +903,48 @@ export class BookingServicesBookingGroupComponent
                     catch(response) {
                         this.api.errorFeedback(response);
                     }
-
-                    this.loading = false;
+                    finally {
+                        this.loading = false;
+                    }
                 }
             }
         });
     }
 
     public async ondeleteAgeRange(age_range_assignment_id:number) {
-        this.loading = true;
-        setTimeout( async () => {
-            try {
-                await this.api.fetch('?do=sale_booking_update-sojourn-agerange-remove', {
-                        id: this.instance.id,
-                        age_range_assignment_id: age_range_assignment_id,
-                    });
-                this.instance.age_range_assignments_ids.splice(this.instance.age_range_assignments_ids.findIndex((e:any) => e.id == age_range_assignment_id),1);
-                // relay to parent
-                this.updated.emit();
-            }
-            catch(response) {
-                this.api.errorFeedback(response);
-            }
-            this.loading = false;
-        });
-    }
 
-    public async onchangeSojournType(event:any) {
-        this.vm.sojourn_type.value = event.value;
-        // update model
         try {
-            await this.api.update(this.instance.entity, [this.instance.id], {sojourn_type_id: (event.value=='GA')?1:2});
-            // relay change to parent component
+            this.loading = true;
+            await this.api.fetch('?do=sale_booking_update-sojourn-agerange-remove', {
+                    id: this.instance.id,
+                    age_range_assignment_id: age_range_assignment_id,
+                });
+            this.instance.age_range_assignments_ids.splice(this.instance.age_range_assignments_ids.findIndex((e:any) => e.id == age_range_assignment_id),1);
+            // relay to parent
             this.updated.emit();
         }
         catch(response) {
             this.api.errorFeedback(response);
+        }
+        finally {
+            this.loading = false;
+        }
+
+    }
+
+    public async onchangeSojournType(event: any) {
+        this.vm.sojourn_type.value = event.value;
+        // update model
+        try {
+            this.loading = true;
+            await this.api.update(this.instance.entity, [this.instance.id], {sojourn_type_id: (event.value=='GA')?1:2});
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+        finally {
+            this.updated.emit();
+            this.loading = false;
         }
     }
 
@@ -933,12 +956,15 @@ export class BookingServicesBookingGroupComponent
         if(rate_class && rate_class.hasOwnProperty('id') && rate_class.id) {
             this.vm.rate_class.name = rate_class.name + ' - ' + rate_class.description;
             try {
+                this.loading = true;
                 await this.api.update(this.instance.entity, [this.instance.id], {rate_class_id: rate_class.id});
-                // relay change to parent component
-                this.updated.emit();
             }
             catch(response) {
                 this.api.errorFeedback(response);
+            }
+            finally {
+                this.updated.emit();
+                this.loading = true;
             }
         }
     }
@@ -1014,27 +1040,26 @@ export class BookingServicesBookingGroupComponent
         // save previous values
         let prev_product_name = this.instance.name;
 
-        // immediate view update (before refresh)
+        // optimistic UI - immediate view update (before refresh)
         this.groupSummaryOpen = false;
         this.instance.name = product.name;
 
-        this.loadStart.emit();
-
-        this.api.fetch('/?do=sale_booking_update-sojourn-product', {
-            id: this.instance.id,
-            product_id: product.id
-        })
-        .then( () => {
-            this.loadEnd.emit();
-            // relay change to parent component
-            this.updated.emit();
-        })
-        .catch(response => {
+        try {
+            this.loading = true;
+            await this.api.fetch('/?do=sale_booking_update-sojourn-product', {
+                id: this.instance.id,
+                product_id: product.id
+            });
+        }
+        catch(response) {
             // rollback
             this.instance.name = prev_product_name;
-            this.loadEnd.emit();
             this.api.errorFeedback(response);
-        });
+        }
+        finally {
+            this.updated.emit();
+            this.loading = false;
+        }
     }
 
     public onblurGroupSummarySelect() {
@@ -1049,27 +1074,27 @@ export class BookingServicesBookingGroupComponent
         this.groupTypeOpen = false;
     }
 
-    public onchangeGroupType(value: any) {
+    public async onchangeGroupType(value: any) {
         this.groupTypeOpen = false;
 
         let prev_group_type = this.instance.group_type;
-
         this.instance.group_type = value;
-        this.loading = true;
 
-        setTimeout( async () => {
-            try {
-                await this.api.fetch('?do=sale_booking_update-sojourn-type', {id: this.instance.id, group_type: this.instance.group_type});
-                // relay change to parent component
-                this.updated.emit();
-            }
-            catch(response) {
-                // rollback
-                this.instance.group_type = prev_group_type;
-                this.api.errorFeedback(response);
-            }
+        try {
+            this.loading = true;
+            await this.api.fetch('?do=sale_booking_update-sojourn-type', {id: this.instance.id, group_type: this.instance.group_type});
+        }
+        catch(response) {
+            // rollback
+            this.instance.group_type = prev_group_type;
+            this.api.errorFeedback(response);
+        }
+        finally {
+            // relay change to parent component
+            this.updated.emit();
             this.loading = false;
-        });
+        }
+
     }
 
     public onclickGroupNbPers() {

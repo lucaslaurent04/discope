@@ -114,7 +114,6 @@ export class BookingServicesBookingComponent
         this.sojourn_types = sojournTypes;
         this.meal_types = mealTypes;
         this.meal_places = mealPlaces;
-
     }
 
 
@@ -142,8 +141,8 @@ export class BookingServicesBookingComponent
             }
         }
         finally {
-            // if loading was set (init or loadStart), void it
-            this.loading = false;
+            // if loading was set (init or loadStart), make sure it is reverted
+            setTimeout( () => this.loading = false, 250);
         }
     }
 
@@ -151,7 +150,7 @@ export class BookingServicesBookingComponent
      *
      * @param values
      */
-    public update(values:any) {
+    public update(values: any) {
         super.update(values);
     }
 
@@ -226,7 +225,6 @@ export class BookingServicesBookingComponent
         }
         catch(response) {
             // user discarded the dialog (selected 'no')
-            return;
         }
     }
 

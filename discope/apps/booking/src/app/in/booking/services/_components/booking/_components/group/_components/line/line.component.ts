@@ -75,6 +75,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
     @Input() time_slots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
     @Input() displaySettings: BookedServicesDisplaySettings;
     @Output() updated = new EventEmitter();
+    @Output() loadStart = new EventEmitter();
     @Output() deleted = new EventEmitter();
 
     @ViewChildren(BookingServicesBookingGroupLineDiscountComponent) bookingServicesBookingGroupLineDiscountComponents: QueryList<BookingServicesBookingGroupLineDiscountComponent>;
@@ -82,12 +83,14 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
 
     public ready: boolean = false;
 
+    // #memo - not for displaying the loader but for knowing if a change is in progress
+    public loading: boolean = false;
+
     public vm: vmModel;
 
     private productRequestCounter = 0;
 
     constructor(
-        private cd: ChangeDetectorRef,
         private api: ApiService,
         private context: ContextService,
         public dialog: MatDialog
@@ -287,6 +290,9 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
     }
 
     private productRestore() {
+        if(this.loading) {
+            return;
+        }
         this.vm.product.formControl.setErrors(null);
         if(this.instance.product_id && this.instance.product_id.hasOwnProperty('name') && this.instance.product_id.name !== null) {
             this.vm.product.name = this.instance.product_id.name;
@@ -299,6 +305,10 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
     public async onchangeProduct(event:any) {
         console.log('BookingEditCustomerComponent::productChange', event)
 
+        if(this.loading) {
+            return;
+        }
+
         // from mat-autocomplete
         if(event && event.option && event.option.value) {
             let product = event.option.value;
@@ -307,17 +317,21 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
             }
             // notify back-end about the change
             try {
+                this.loading = true;
                 await this.api.call('?do=sale_booking_update-bookingline-product', {
                         id: this.instance.id,
                         product_id: product.id
                     });
                 this.vm.product.formControl.setErrors(null);
-                // relay change to parent component
-                this.updated.emit();
             }
             catch(response) {
                 this.vm.product.formControl.setErrors({'missing_price': 'Pas de liste de prix pour ce produit.'});
                 this.api.errorFeedback(response);
+            }
+            finally {
+                // relay change to parent component
+                this.updated.emit();
+                this.loading = false;
             }
         }
     }

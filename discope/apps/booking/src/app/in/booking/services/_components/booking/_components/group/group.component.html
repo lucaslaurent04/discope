@@ -580,6 +580,7 @@
                                     [time_slots]="timeSlots"
                                     [displaySettings]="displaySettings"
                                     (updated)="onupdateLine()"
+                                    (loadStart)="loadStart.emit()"
                                 ></booking-services-booking-group-line>
                             </div>
                         </div>
