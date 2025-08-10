@@ -230,6 +230,10 @@ export class BookingServicesBookingComponent
         }
     }
 
+    /**
+     * By convention, updating a group does not trigger the display of the loader.
+     * To do so, groups must explicitly relay a request through `loadStart`.
+     */
     public onupdateGroup() {
         // reload booking tree
         this.load(this.instance.id);

@@ -60,6 +60,9 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
 
     public ready: boolean = false;
 
+    // #memo - not for displaying the loader but for knowing if a change is in progress
+    public loading: boolean = false;
+
     public vm: vmModel;
 
     public mapTimeSlotCodeName: any = {
@@ -186,7 +189,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         if(!product) {
              return '';
         }
-        if(typeof product === 'string') { 
+        if(typeof product === 'string') {
             return product;
         }
         return product.name ?? '';
@@ -199,6 +202,9 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
     }
 
     private productRestore() {
+        if(this.loading) {
+            return;
+        }
         this.vm.product.formControl.setErrors(null);
         this.vm.product.name = this.activity?.activity_booking_line_id?.product_id ? this.activity.activity_booking_line_id.product_id.name : '';
     }
@@ -206,12 +212,14 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
     public async onchangeProduct(event: any) {
         console.log('BookingServicesBookingGroupDayActivitiesActivityComponent::productChange', event)
 
+        if(this.loading) {
+            return;
+        }
+
         // from mat-autocomplete
         if(!event || !event.option || !event.option.value) {
             return;
         }
-
-
         // apply commit-rollback logic
         const prevProduct = this.vm.product.formControl.value;
         let product = event.option.value;
@@ -226,12 +234,11 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
             this.vm.qty.formControl.setValue(1);
         }
 
-        this.loadStart.emit();
-
         let newLine: any = null;
 
         // notify back-end about the change
         try {
+            this.loading = true;
             newLine = await this.api.create('sale\\booking\\BookingLine', {
                 order: this.group.booking_lines_ids.length + 1,
                 booking_id: this.booking.id,
@@ -246,7 +253,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
             this.vm.product.formControl.setErrors(null);
 
             // relay change to parent component
-            setTimeout(() => this.updated.emit());
+            this.updated.emit();
         }
         catch(response: any) {
             if(newLine) {
@@ -258,27 +265,42 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
 
             this.api.errorFeedback(response);
         }
-
-        this.loadEnd.emit();
+        finally {
+            this.loading = false;
+        }
     }
 
     public async qtyChange() {
+
+        if(this.loading) {
+            return;
+        }
+
         if(!this.activity?.activity_booking_line_id || this.activity.activity_booking_line_id.qty == this.vm.qty.formControl.value) {
             return;
         }
 
         // notify back-end about the change
         try {
+            this.loading = true;
             await this.api.update('sale\\booking\\BookingLine', [this.activity.activity_booking_line_id.id], {qty: this.vm.qty.formControl.value});
             // relay change to parent component
-            setTimeout(() => this.updated.emit());
+            this.updated.emit();
         }
         catch(response) {
             this.api.errorFeedback(response);
         }
+        finally {
+            this.loading = false;
+        }
     }
 
     public async providerChange() {
+
+        if(this.loading) {
+            return;
+        }
+
         let providersIds: number[] = [];
         for(let providerId of this.activity.providers_ids) {
             providersIds.push(-providerId)
@@ -291,6 +313,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
 
         // notify back-end about the change
         try {
+            this.loading = true;
             await this.api.update('sale\\booking\\BookingActivity', [this.activity.id], {providers_ids: providersIds});
             // relay change to parent component
             setTimeout(() => this.updated.emit());
@@ -298,22 +321,37 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         catch(response) {
             this.api.errorFeedback(response);
         }
+        finally {
+            this.loading = false;
+        }
     }
 
     public async rentalUnitChange() {
+        if(this.loading) {
+            return;
+        }
         // notify back-end about the change
         try {
+            this.loading = true;
             await this.api.update('sale\\booking\\BookingActivity', [this.activity.id], {rental_unit_id: this.vm.rentalUnit.formControl.value});
             // relay change to parent component
-            setTimeout(() => this.updated.emit());
+            this.updated.emit();
         }
         catch(response) {
             this.api.errorFeedback(response);
         }
+        finally {
+            this.loading = true;
+        }
     }
 
     public async oncreateTransport() {
+        if(this.loading) {
+            return;
+        }
+
         try {
+            this.loading = true;
             await this.api.create('sale\\booking\\BookingLine', {
                 order: this.group.booking_lines_ids.length + 1,
                 booking_id: this.booking.id,
@@ -325,15 +363,23 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
             });
 
             // relay change to parent component
-            setTimeout(() => this.updated.emit());
+            this.updated.emit();
         }
         catch(response) {
             this.api.errorFeedback(response);
         }
+        finally {
+            this.loading = false;
+        }
     }
 
     public async oncreateSupply() {
+        if(this.loading) {
+            return;
+        }
+
         try {
+            this.loading = true;
             await this.api.create('sale\\booking\\BookingLine', {
                 order: this.group.booking_lines_ids.length + 1,
                 booking_id: this.booking.id,
@@ -345,10 +391,13 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
             });
 
             // relay change to parent component
-            setTimeout(() => this.updated.emit());
+            this.updated.emit();
         }
         catch(response) {
             this.api.errorFeedback(response);
+        }
+        finally {
+            this.loading = false;
         }
     }
 

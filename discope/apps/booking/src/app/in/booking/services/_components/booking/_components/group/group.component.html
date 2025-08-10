@@ -132,9 +132,12 @@
     <!-- expanded pane : all details of group / sojourn -->
     <div [class.hidden]="folded">
 
+        <!--
+        #memo - loader should only be displayed at Booking level, through `loadStart` event
         <div class="loader-overlay" *ngIf="loading">
             <div class="loader"><mat-spinner></mat-spinner></div>
         </div>
+        -->
 
         <!-- identification-->
         <div class="part">
@@ -382,8 +385,7 @@
                         <mat-form-field>
                             <mat-label>Type de séjour</mat-label>
                             <mat-select [ngModel]="vm.sojourn_type.value"
-                                        (selectionChange)="onchangeSojournType($event)"
-                            >
+                                        (selectionChange)="onchangeSojournType($event)">
                                 <mat-option *ngFor="let sojournType of sojournTypes " [value]="sojournType.name">
                                     {{sojournType.name}}
                                 </mat-option>
