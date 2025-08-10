@@ -103,7 +103,6 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
     }
 
     public ngOnInit() {
-        this.ready = true;
 
         if(!this.activity) {
             // listen to the changes on FormControl objects
@@ -140,6 +139,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         if(this.activity.rental_unit_id) {
             this.vm.rentalUnit.formControl.setValue(this.activity.rental_unit_id);
         }
+
+        this.ready = true;
     }
 
     public toggleOpen() {
@@ -220,8 +221,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         if(!event || !event.option || !event.option.value) {
             return;
         }
-        // apply commit-rollback logic
-        const prevProduct = this.vm.product.formControl.value;
+
         let product = event.option.value;
 
         if(
@@ -238,6 +238,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
 
         // notify back-end about the change
         try {
+            this.loadStart.emit();
             this.loading = true;
             newLine = await this.api.create('sale\\booking\\BookingLine', {
                 order: this.group.booking_lines_ids.length + 1,
@@ -251,22 +252,17 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
                 time_slot_id: this.timeSlot.id
             });
             this.vm.product.formControl.setErrors(null);
-
-            // relay change to parent component
-            this.updated.emit();
         }
         catch(response: any) {
             if(newLine) {
                 this.deleteLine.emit(newLine.id);
             }
-            // rollback to previous value
-            this.vm.product.formControl.setValue(prevProduct, { emitEvent: false });
-            this.vm.product.name = prevProduct.name;
-
             this.api.errorFeedback(response);
         }
         finally {
             this.loading = false;
+            // relay change to parent component
+            this.updated.emit();
         }
     }
 

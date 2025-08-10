@@ -489,15 +489,16 @@ export class BookingServicesBookingGroupComponent
     }
 
     public async ondeleteActivity(activity_id: number) {
-        this.loading = true;
+        if(this.loading) {
+            return;
+        }
 
-
-        // 1) optimistic UI - remove activity
+        // optimistic UI - remove activity
         const activity: BookingActivity = this.instance.booking_activities_ids.find(
             (e: any) => e.id === activity_id
         );
 
-        const timeSlot = this.timeSlots.find((timeSlot: any) => timeSlot.id === activity.time_slot_id);
+        const timeSlot = this.timeSlots.find((timeSlot: any) => timeSlot.id === activity?.time_slot_id);
         if(!timeSlot || !['AM', 'PM', 'EV'].includes(timeSlot.code)) {
             return;
         }
@@ -509,18 +510,18 @@ export class BookingServicesBookingGroupComponent
             }
         });
 
-        // 2) send request to server
-        setTimeout( async () => {
-            try {
-                await this.api.remove('sale\\booking\\BookingActivity', [activity_id]);
-                // 3) relay to parent
-                this.updated.emit();
-            }
-            catch(response) {
-                this.api.errorFeedback(response);
-            }
+        try {
+            this.loading = true;
+            await this.api.remove('sale\\booking\\BookingActivity', [activity_id]);
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+            // re-load activity
+            this.updated.emit();
+        }
+        finally {
             this.loading = false;
-        });
+        }
     }
 
     public async ondeleteLine(line_id:number) {
