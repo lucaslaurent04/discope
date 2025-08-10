@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ChangeDetectorRef, ViewChildren, QueryList, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ChangeDetectorRef, ViewChildren, QueryList, ViewChild, OnChanges } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { ApiService, AuthService, ContextService, TreeComponent, SbDialogConfirmDialog } from 'sb-shared-lib';
 import { BookingLineGroup } from '../../_models/booking_line_group.model';
@@ -99,9 +99,12 @@ interface vmModel {
     templateUrl: 'group.component.html',
     styleUrls: ['group.component.scss']
 })
-export class BookingServicesBookingGroupComponent extends TreeComponent<BookingLineGroup, BookingLineGroupComponentsMap> implements OnInit, AfterViewInit  {
+export class BookingServicesBookingGroupComponent
+    extends TreeComponent<BookingLineGroup, BookingLineGroupComponentsMap>
+    implements OnInit, OnChanges, AfterViewInit  {
+
     // server-model relayed by parent
-    @Input() set model(values: any) { this.update(values) }
+    @Input() set model(values: any) { this._model = values; this.is_update_pending = true; }
     @Input() booking: Booking;
     @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
     @Input() sojournTypes: { id: number, name: 'GA'|'GG' }[] = [];
@@ -115,6 +118,9 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
     @Output() toggle  = new EventEmitter();
+
+    private _model: any;
+    private is_update_pending: boolean = false;
 
     public bookingActivitiesDays: BookingActivityDay[];
     public bookingMealsDays: BookingMealDay[];
@@ -150,7 +156,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     public vm: vmModel;
 
     constructor(
-        private cd: ChangeDetectorRef,
         private api: ApiService,
         private auth: AuthService,
         private dialog: MatDialog,
@@ -216,6 +221,16 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         };
     }
 
+    public ngOnChanges() {
+        if(!this.ready) {
+            return;
+        }
+
+        if(this.is_update_pending) {
+            this.update(this._model);
+        }
+    }
+
     public ngAfterViewInit() {
         console.debug('BookingServicesBookingGroupComponent::ngAfterViewInit');
         // init local componentsMap
@@ -225,6 +240,13 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
             age_range_assignments_ids: this.bookingServicesBookingGroupAgeRangeComponents,
             sojourn_product_models_ids: this.bookingServicesBookingGroupAccomodationComponents
         } as BookingLineGroupComponentsMap;
+
+        this.ready = true;
+
+        if(this.is_update_pending) {
+            this.update(this._model);
+        }
+
     }
 
     public ngOnInit() {
@@ -271,7 +293,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
             this.onchangeTimeTo();
         });
 
-        this.ready = true;
     }
 
     private initBookingActivitiesDays() {
@@ -360,8 +381,9 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         }
     }
 
-    public update(values:any) {
+    public update(values: any) {
         console.debug('BookingServicesBookingGroupComponent::update');
+        this.is_update_pending = false;
         super.update(values);
         // assign VM values
         this.vm.name.formControl.setValue(this.instance.name);
@@ -1106,7 +1128,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
 
     public onCloseActivity(activityId: number) {
         const activityIdIndex = this.openedActivityIds.indexOf(activityId);
-        if(activityIdIndex !== undefined) {
+        if(activityIdIndex >= 0) {
             this.openedActivityIds.splice(activityIdIndex, 1);
         }
     }

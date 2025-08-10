@@ -88,12 +88,18 @@ export class BookingServicesBookingComponent
         }
     }
 
-    public ngAfterViewInit() {
+    public async ngAfterViewInit() {
         console.debug('BookingServicesBookingComponent::ngAfterViewInit');
         // init local componentsMap
         this.componentsMap = {
             booking_lines_groups_ids: this.bookingServicesBookingGroups
         } as BookingComponentsMap;
+
+        this.ready = true;
+
+        if(this.booking_id > 0) {
+            await this.load(this.booking_id);
+        }
     }
 
     public async ngOnInit() {
@@ -110,11 +116,6 @@ export class BookingServicesBookingComponent
         this.meal_types = mealTypes;
         this.meal_places = mealPlaces;
 
-        if(this.booking_id > 0) {
-            await this.load(this.booking_id);
-        }
-
-        this.ready = true;
     }
 
 
