@@ -13,7 +13,8 @@
         position: absolute;
         inset: 0;
         z-index: 4;
-        backdrop-filter: blur(3px);
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
 
         .loader {
             position: absolute;
@@ -28,19 +29,8 @@
                 position: absolute;
                 inset: 0;
                 pointer-events: none;
-
-                --fade: 24px;
-                --veil: rgba(0,0,0,0.10);
-
-                background: var(--veil);
-                /* on garde un rectangle central et on floute ses bords vers l’extérieur */
-                clip-path: inset(var(--fade));      /* rectangle réduit */
-                filter: blur(var(--fade));          /* crée le dégradé vers les bords */
-
-                /* si tu as des coins arrondis : */
-                /* --r: 16px; */
-                /* border-radius: var(--r); */
-                /* clip-path: inset(var(--fade) round var(--r)); */
+                padding: 10px;
+                backdrop-filter: blur(3px);
             }
 
             mat-spinner {
