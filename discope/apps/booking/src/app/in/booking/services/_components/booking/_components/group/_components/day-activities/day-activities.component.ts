@@ -42,11 +42,12 @@ export class BookingServicesBookingGroupDayActivitiesComponent implements OnInit
     };
 
     public ngOnInit() {
-        this.ready = true;
 
         for(let timeSlot of this.timeSlots) {
             this.mapTimeSlotsCode[timeSlot.code] = timeSlot;
         }
+
+        this.ready = true;
     }
 
     public ondeleteActivity(activity: BookingActivity) {

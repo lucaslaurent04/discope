@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ApiService } from 'sb-shared-lib';
 import { BookingLineGroup } from '../../../../../../_models/booking_line_group.model';
 import { FormControl, Validators } from '@angular/forms';
@@ -41,7 +41,7 @@ interface vmModel {
     templateUrl: 'activity.component.html',
     styleUrls: ['activity.component.scss']
 })
-export class BookingServicesBookingGroupDayActivitiesActivityComponent implements OnInit {
+export class BookingServicesBookingGroupDayActivitiesActivityComponent implements OnInit, OnChanges {
 
     @Input() activity: BookingActivity | null;
     @Input() date: Date;
@@ -141,6 +141,13 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         }
 
         this.ready = true;
+    }
+
+    public ngOnChanges(changes: SimpleChanges): void {
+        if(changes.hasOwnProperty('activity') && !changes.activity) {
+            this.vm.product.name = '';
+            this.vm.qty.formControl.setValue(0);
+        }
     }
 
     public toggleOpen() {
