@@ -779,19 +779,22 @@ class BookingActivity extends Model {
         $self->read([
             'booking_line_group_id',
             'booking_lines_ids',
-            'camp_group_id'
+            'camp_group_id',
+            'activity_booking_line_id'
         ]);
         foreach($self as $booking_activity) {
             if(!empty($booking_activity['booking_lines_ids'])) {
                 $booking_lines_ids_remove = array_map(
-                    function ($id) { return -$id; },
-                    $booking_activity['booking_lines_ids']
-                );
-
+                        function ($id) { return -$id; },
+                        $booking_activity['booking_lines_ids']
+                    );
                 BookingLineGroup::id($booking_activity['booking_line_group_id'])
                     ->update(['booking_lines_ids' => $booking_lines_ids_remove]);
             }
-            if(!is_null($booking_activity['camp_group_id'])) {
+            if($booking_activity['activity_booking_line_id']) {
+                BookingLine::id($booking_activity['activity_booking_line_id'])->delete(true);
+            }
+            if($booking_activity['camp_group_id']) {
                 PartnerEvent::search(['booking_activity_id', '=', $booking_activity['id']])->delete(true);
             }
         }
