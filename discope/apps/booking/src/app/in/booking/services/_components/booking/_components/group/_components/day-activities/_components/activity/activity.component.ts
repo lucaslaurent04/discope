@@ -197,6 +197,10 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
     }
 
     private productReset() {
+        if(this.loading) {
+            return;
+        }
+
         setTimeout(() => {
             this.vm.product.name = '';
         }, 100);
@@ -206,6 +210,7 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         if(this.loading) {
             return;
         }
+
         this.vm.product.formControl.setErrors(null);
         this.vm.product.name = this.activity?.activity_booking_line_id?.product_id ? this.activity.activity_booking_line_id.product_id.name : '';
     }

@@ -114,7 +114,8 @@ export class BookingServicesBookingGroupComponent
     @Input() rentalUnitsSettings: RentalUnitsSettings;
 
     @Output() loadStart = new EventEmitter();
-    @Output() loadEnd   = new EventEmitter();
+    // #deprecated
+    @Output() loadEnd = new EventEmitter();
     @Output() updated = new EventEmitter();
     @Output() toggle  = new EventEmitter();
 
@@ -542,16 +543,20 @@ export class BookingServicesBookingGroupComponent
                 });
             }
 
+            this.instance.booking_lines_ids.forEach( (bookingLine: BookingLine, index: number) => {
+                if(bookingLine.id == line_id) {
+                    this.instance.booking_lines_ids[index] = null;
+                }
+            });
+
             try {
                 this.loading = true;
-                // display parent loading
-                this.loadStart.emit();
                 await this.api.update(this.instance.entity, [this.instance.id], {booking_lines_ids: [-line_id]});
-                // relay to parent
-                this.updated.emit();
             }
             catch(response) {
                 this.api.errorFeedback(response);
+                // re-load line
+                this.updated.emit();
             }
             finally {
                 this.loading = false;
