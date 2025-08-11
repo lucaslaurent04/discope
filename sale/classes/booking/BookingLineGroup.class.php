@@ -3262,7 +3262,9 @@ class BookingLineGroup extends Model {
             'is_snack',
             'time_slot_id',
             'qty_vars',
-            'product_model_id.schedule_offset'
+            'product_model_id.schedule_offset',
+            'product_model_id.is_repeatable',
+            'booking_line_group_id.nb_pers'
         ]);
         if(empty($lines)) {
             // no need of meal if no booking lines
@@ -3281,13 +3283,33 @@ class BookingLineGroup extends Model {
 
             $map_timeslots_ids[$line['time_slot_id']] = true;
 
-            $from_day_index = 1 + $line['product_model_id.schedule_offset'];
-            $qty_vars = json_decode($line['qty_vars']);
-            $to_day_index = $line['product_model_id.schedule_offset'] + (is_array($qty_vars) ? count($qty_vars) : 0);
-
-            $day_index = 1;
+            $day_index = 0;
+            $days_qty = (($group['date_to'] - $group['date_from']) / 86400) + 1;
             for($date = $group['date_from']; $date <= $group['date_to']; $date += 86400) {
-                $is_self_provided = $day_index < $from_day_index || $day_index > $to_day_index;
+                $is_self_provided = true;
+                if($line['product_model_id.is_repeatable']) {
+                    $qty_vars = json_decode($line['qty_vars']);
+                    if($qty_vars && $day_index >= $line['product_model_id.schedule_offset']) {
+                        $nb_pers = $line['booking_line_group_id.nb_pers'];
+                        $variation = $qty_vars[$day_index - $line['product_model_id.schedule_offset']] ?? -$nb_pers;
+                        if(($nb_pers + $variation) > 0) {
+                            $is_self_provided = false;
+                        }
+                    }
+                }
+                else {
+                    if($line['product_model_id.schedule_offset'] >= 0) {
+                        if($line['product_model_id.schedule_offset'] === $day_index) {
+                            $is_self_provided = false;
+                        }
+                    }
+                    else {
+                        if($days_qty + $line['product_model_id.schedule_offset'] === $day_index) {
+                            $is_self_provided = false;
+                        }
+                    }
+                }
+
                 $day_index++;
 
                 if(!isset($map_date_timeslot_meal[$date][$line['time_slot_id']])) {
