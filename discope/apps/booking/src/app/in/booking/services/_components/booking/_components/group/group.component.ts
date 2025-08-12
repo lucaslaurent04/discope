@@ -543,11 +543,7 @@ export class BookingServicesBookingGroupComponent
                 });
             }
 
-            this.instance.booking_lines_ids.forEach( (bookingLine: BookingLine, index: number) => {
-                if(bookingLine.id == line_id) {
-                    this.instance.booking_lines_ids[index] = null;
-                }
-            });
+            this.instance.booking_lines_ids = this.instance.booking_lines_ids.filter((l: BookingLine) => l.id !== line_id);
 
             try {
                 this.loading = true;
@@ -555,11 +551,12 @@ export class BookingServicesBookingGroupComponent
             }
             catch(response) {
                 this.api.errorFeedback(response);
-                // re-load line
-                this.updated.emit();
             }
             finally {
                 this.loading = false;
+
+                // re-load line
+                this.updated.emit();
             }
 
         }
