@@ -113,8 +113,62 @@
                         &.cell-days {
                             .cell-activities {
                                 display: flex;
+                                flex-direction: row;
+                                gap: 1px;
+                            }
+
+                            .cell-activities.space-before {
+                                padding-left: 25%;
+                            }
+
+                            .cell-activities.space-after {
+                                padding-right: 20%;
+                            }
+
+                            &.cell-droppable {
+                                .cell-activities {
+                                    display: none;
+                                }
+                            }
+
+                            .cell-partner-events {
+                                display: flex;
                                 flex-direction: column;
                                 gap: 1px;
+                                margin-top: 1px;
+                            }
+
+                            .drop-zone {
+                                display: none;
+                                flex-direction: row;
+                                height: var(--rows_height);
+                                width: 100%;
+
+                                &.drop-zone--left {
+                                    .drop-zone-left {
+                                        background-color: #ff4081 !important;
+                                    }
+                                }
+
+                                &.drop-zone--center {
+                                    .drop-zone-left,
+                                    .drop-zone-center,
+                                    .drop-zone-right {
+                                        background-color: #ff4081 !important;
+                                    }
+                                }
+
+                                &.drop-zone--right {
+                                    .drop-zone-right {
+                                        background-color: #ff4081 !important;
+                                    }
+                                }
+                            }
+
+                            &.cell-droppable {
+                                .drop-zone {
+                                    display: flex;
+                                }
                             }
                         }
                         .cdk-drag-placeholder {
@@ -344,9 +398,9 @@
             display: block;
             position: fixed;
             z-index: 100;
-            transform: translateX(16px) translateY(calc(var(--rows_height) + 10px));
+            transform: translateX(16px) translateY(calc(var(--rows_height) + 1px));
 
-            span {
+            .tooltip {
                 display: block;
                 border: 1px solid grey;
                 background-color: white;
@@ -354,12 +408,33 @@
                 box-shadow: 0 3px 5px 0 rgb(0 0 0 / 10%) !important;
                 padding: 3px 10px;
                 border-radius: 4px;
-                color:black;
+                color: black;
                 width: 350px;
-                overflow-x: hidden;
-                overflow-y: auto;
                 height: 250px;
                 text-align: left;
+
+                .header {
+                    display: none;
+                    gap: 5px;
+                }
+
+                .content {
+                    height: 240px;
+                    overflow-x: hidden;
+                    overflow-y: auto;
+                }
+
+                &.tooltip--with-header {
+                    .header {
+                        display: flex;
+                        flex-direction: row;
+                        height: 30px;
+                    }
+
+                    .content {
+                        height: 210px;
+                    }
+                }
             }
         }
 
@@ -407,17 +482,6 @@
                 padding-left: 5px !important;
                 font-size: calc(8px + (var(--rows_height) / 4));
             }
-
-            .cell-hint {
-                display: none;
-            }
-
-            &:hover {
-                .cell-hint {
-                    display: block;
-                }
-            }
-
         }
 
 

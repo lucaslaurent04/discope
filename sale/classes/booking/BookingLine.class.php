@@ -8,6 +8,7 @@
 
 namespace sale\booking;
 
+use core\setting\Setting;
 use equal\orm\Collection;
 use equal\orm\Model;
 use sale\catalog\Product;
@@ -346,6 +347,16 @@ class BookingLine extends Model {
                 'description'       => 'All Booking Activities this line relates to (non virtual activity and virtual activities).'
             ],
 
+            'booking_meals_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\booking\BookingMeal',
+                'foreign_field'     => 'booking_lines_ids',
+                'rel_table'         => 'sale_booking_line_rel_booking_meal',
+                'rel_foreign_key'   => 'booking_meal_id',
+                'rel_local_key'     => 'booking_line_id',
+                'description'       => "All booking meals that are linked the line (moment).",
+            ],
+
             'service_date' => [
                 'type'              => 'computed',
                 'result_type'       => 'date',
@@ -389,6 +400,198 @@ class BookingLine extends Model {
             ]
 
         ];
+    }
+
+    public static function getActions(): array {
+        return [
+
+            'set-activity-product' => [
+                'description'   => "Sets an activity as the product of the booking line.",
+                'policies'      => [],
+                'function'      => 'doSetActivityProduct'
+            ],
+
+            'update-price-id' => [
+                'description'   => "Updates the price of the line using the current product and dates.",
+                'policies'      => [],
+                'function'      => 'doUpdatePriceId'
+            ],
+
+            'update-qty' => [
+                'description'   => "Updates qty related fields.",
+                'policies'      => [],
+                'function'      => 'doUpdateQty'
+            ],
+
+            'reset-prices' => [
+                'description'   => "Resets computed price related fields.",
+                'policies'      => [],
+                'function'      => 'doResetPrices'
+            ]
+
+        ];
+    }
+
+    protected static function doSetActivityProduct($self, $values) {
+        if(!isset($values['product_id'])) {
+            throw new \Exception("missing_product", EQ_ERROR_INVALID_PARAM);
+        }
+
+        if(!isset($values['service_date']) || !isset($values['time_slot_id'])) {
+            throw new \Exception("missing_moment", EQ_ERROR_MISSING_PARAM);
+        }
+
+        $self->update([
+            'product_id'   => $values['product_id'],
+            'service_date' => $values['service_date'],
+            'time_slot_id' => $values['time_slot_id']
+        ]);
+
+        $self->do('update-price-id')
+            ->do('update-qty');
+
+        $self->read([
+            'name',
+            'order',
+            'service_date',
+            'time_slot_id' => [
+                'name'
+            ],
+            'booking_id' => [
+                'center_id',
+                'date_from',
+                'date_to'
+            ],
+            'booking_line_group_id',
+            'product_id' => [
+                'description',
+                'product_model_id' => [
+                    'is_fullday',
+                    'has_duration',
+                    'duration',
+                    'has_transport_required',
+                    'transport_product_model_id',
+                    'has_supply',
+                    'supplies_ids',
+                    'has_provider',
+                    'providers_ids',
+                    'has_rental_unit',
+                    'activity_rental_units_ids'
+                ]
+            ]
+        ]);
+
+        // create booking activities and handle its transport, supplies, providers
+        foreach($self as $id => $line) {
+            $booking = $line['booking_id'];
+            $product_model = $line['product_id']['product_model_id'];
+            $time_slot = $line['time_slot_id'];
+
+            $booking_activities = self::computeLineActivities(
+                $line['service_date'],
+                $time_slot['id'],
+                $product_model['is_fullday'] ?? false,
+                $product_model['has_duration'] ?? false,
+                $product_model['duration'] ?? 0,
+                $line['product_id']['description'] ?? ''
+            );
+
+            $main_activity_id = null;
+            foreach($booking_activities as $index => $activity) {
+                $activity = BookingActivity::create(array_merge($activity, ['activity_booking_line_id' => $id]))
+                    ->read(['id'])
+                    ->first();
+
+                if($index === 0) {
+                    $main_activity_id = $activity['id'];
+                }
+            }
+
+            BookingLine::id($id)->update(['booking_activity_id'   => $main_activity_id]);
+
+            BookingActivity::id($main_activity_id)->do('update-counters');
+
+            $line_order = $line['order'];
+
+            // create transport related lines
+            if($product_model['has_transport_required'] && $product_model['transport_product_model_id']) {
+                $res = \eQual::run('get', 'sale_catalog_product_collect', [
+                    'center_id' => $booking['center_id'],
+                    'domain'    => ['product_model_id', '=', $product_model['transport_product_model_id']],
+                    'date_from' => $booking['date_from'],
+                    'date_to'   => $booking['date_to']
+                ]);
+
+                if(!empty($res)) {
+                    $booking_line = self::create([
+                        'order'                 => ++$line_order,
+                        'booking_id'            => $booking['id'],
+                        'booking_line_group_id' => $line['booking_line_group_id']
+                    ])
+                        ->read(['id'])
+                        ->first();
+
+                    \eQual::run('do', 'sale_booking_update-bookingline-activity-product', [
+                        'id'                    => $booking_line['id'],
+                        'product_id'            => $res[0]['id'],
+                        'booking_activity_id'   => $main_activity_id,
+                    ]);
+                }
+            }
+
+            // create supplies related lines
+            if($product_model['has_supply']) {
+                foreach($product_model['supplies_ids'] as $supply_product_model_id) {
+                    $res = \eQual::run('get', 'sale_catalog_product_collect', [
+                        'center_id' => $booking['center_id'],
+                        'domain'    => ['product_model_id', '=', $supply_product_model_id],
+                        'date_from' => $booking['date_from'],
+                        'date_to'   => $booking['date_to']
+                    ]);
+
+                    if(empty($res)) {
+                        continue;
+                    }
+
+                    $booking_line = self::create([
+                        'order'                 => ++$line_order,
+                        'booking_id'            => $booking['id'],
+                        'booking_line_group_id' => $line['booking_line_group_id']
+                    ])
+                        ->read(['id'])
+                        ->first();
+
+                    \eQual::run('do', 'sale_booking_update-bookingline-activity-product', [
+                        'id'                    => $booking_line['id'],
+                        'product_id'            => $res[0]['id'],
+                        'booking_activity_id'   => $main_activity_id,
+                    ]);
+                }
+            }
+
+            $booking_activity_data = [];
+            if($product_model['has_provider'] && count($product_model['providers_ids']) === 1) {
+                $booking_activity_data['providers_ids'] = $product_model['providers_ids'];
+            }
+            if($product_model['has_rental_unit'] && count($product_model['activity_rental_units_ids']) === 1) {
+                $booking_activity_data['rental_unit_id'] = $product_model['activity_rental_units_ids'][0];
+            }
+            if(!empty($booking_activity_data)) {
+                BookingActivity::id($main_activity_id)->update($booking_activity_data);
+            }
+        }
+    }
+
+    protected static function doUpdatePriceId($om, $oids, $lang) {
+        $om->callonce(self::getType(), 'updatePriceId', $oids, [], $lang);
+    }
+
+    protected static function doUpdateQty($om, $oids, $lang) {
+        $om->callonce(self::getType(), 'updateQty', $oids, [], $lang);
+    }
+
+    protected static function doResetPrices($om, $oids, $lang) {
+        $om->callonce(self::getType(), '_resetPrices', $oids, [], $lang);
     }
 
     /**
@@ -482,7 +685,7 @@ class BookingLine extends Model {
                 if($product['product_model_id']['is_fullday']) {
                     foreach($self as $id => $line) {
                         if(!in_array($line['time_slot_id'], $AM_PM_time_slot_ids)) {
-                            
+
                             // #todo - this should be done by the front-end with a distinct call (`canupdate` should not perform any data update)
                             // remove empty line because cannot set to activity
                             self::id($id)->delete(true);
@@ -493,7 +696,13 @@ class BookingLine extends Model {
                 }
 
                 foreach($self as $id => $line) {
-                    $activities_to_check = self::generateLineActivities(
+
+                    // #memo - prevent in case of direct assignment of an activity (product with is_activity) on the BookingLine
+                    if(!isset($line['service_date'], $line['time_slot_id'])) {
+                        continue;
+                    }
+
+                    $activities_to_check = self::computeLineActivities(
                         $line['service_date'],
                         $line['time_slot_id'],
                         $product['product_model_id']['is_fullday'],
@@ -515,10 +724,10 @@ class BookingLine extends Model {
                         }
 
                         $activity = BookingActivity::search([
-                            ['booking_line_group_id', '=',  $line['booking_line_group_id']['id']],
-                            ['activity_date', '=', $activity_to_check['activity_date']],
-                            ['time_slot_id', '=', $activity_to_check['time_slot_id']]
-                        ])
+                                ['booking_line_group_id', '=',  $line['booking_line_group_id']['id']],
+                                ['activity_date', '=', $activity_to_check['activity_date']],
+                                ['time_slot_id', '=', $activity_to_check['time_slot_id']]
+                            ])
                             ->read(['id'])
                             ->first();
 
@@ -564,11 +773,11 @@ class BookingLine extends Model {
                     }
 
                     $existing_activity = BookingActivity::search([
-                        ['booking_line_group_id', '=', $line['booking_line_group_id']['id']],
-                        ['activity_date', '=', $activity_date],
-                        ['time_slot_id', '=', ($values['time_slot_id'] ?? $booking_activity['time_slot_id'])],
-                        ['activity_booking_line_id', '<>', $line['id']]
-                    ])
+                            ['booking_line_group_id', '=', $line['booking_line_group_id']['id']],
+                            ['activity_date', '=', $activity_date],
+                            ['time_slot_id', '=', ($values['time_slot_id'] ?? $booking_activity['time_slot_id'])],
+                            ['activity_booking_line_id', '<>', $line['id']]
+                        ])
                         ->read(['id'])
                         ->first();
 
@@ -625,24 +834,10 @@ class BookingLine extends Model {
             'product_id.product_model_id.has_duration',
             'product_id.product_model_id.duration',
             'product_id.product_model_id.is_repeatable',
-            'product_id.product_model_id.is_activity',
-            'product_id.product_model_id.is_fullday',
-            'product_id.product_model_id.has_duration',
-            'product_id.product_model_id.duration',
-            'product_id.product_model_id.has_transport_required',
-            'product_id.product_model_id.transport_product_model_id',
-            'product_id.product_model_id.has_supply',
-            'product_id.product_model_id.supplies_ids',
-            'product_id.product_model_id.has_provider',
-            'product_id.product_model_id.providers_ids',
-            'product_id.product_model_id.has_rental_unit',
-            'product_id.product_model_id.activity_rental_units_ids',
             'product_id.has_age_range',
             'product_id.age_range_id',
+            'product_id.description',
             'booking_id',
-            'booking_id.center_id',
-            'booking_id.date_from',
-            'booking_id.date_to',
             'booking_line_group_id',
             'booking_line_group_id.is_sojourn',
             'booking_line_group_id.is_event',
@@ -658,10 +853,7 @@ class BookingLine extends Model {
             'is_rental_unit',
             'is_accomodation',
             'is_meal',
-            'qty_accounting_method',
-            'service_date',
-            'time_slot_id',
-            'time_slot_id.name'
+            'qty_accounting_method'
         ], $lang);
 
         foreach($lines as $lid => $line) {
@@ -690,113 +882,9 @@ class BookingLine extends Model {
                     }
                 }
             }
-
-            if($line['product_id.product_model_id.is_activity']) {
-                $booking_activities = self::generateLineActivities(
-                    $line['service_date'],
-                    $line['time_slot_id'],
-                    $line['product_id.product_model_id.is_fullday'],
-                    $line['product_id.product_model_id.has_duration'],
-                    $line['product_id.product_model_id.duration']
-                );
-
-                $main_activity_id = null;
-                foreach($booking_activities as $index => $activity) {
-                    $activity = BookingActivity::create(array_merge($activity, ['activity_booking_line_id' => $lid]))
-                        ->read(['id'])
-                        ->first();
-
-                    if($index === 0) {
-                        $main_activity_id = $activity['id'];
-                    }
-                }
-
-                BookingLine::id($lid)->update(['booking_activity_id' => $main_activity_id]);
-
-                BookingActivity::id($main_activity_id)->do('update-counters');
-
-                $line_order = $line['order'];
-
-                // create transport related lines
-                if($line['product_id.product_model_id.has_transport_required'] && $line['product_id.product_model_id.transport_product_model_id']) {
-                    $res = \eQual::run('get', 'sale_catalog_product_collect', [
-                        'center_id' => $line['booking_id.center_id'],
-                        'domain'    => ['product_model_id', '=', $line['product_id.product_model_id.transport_product_model_id']],
-                        'date_from' => $line['booking_id.date_from'],
-                        'date_to'   => $line['booking_id.date_to']
-                    ]);
-
-                    if(!empty($res)) {
-                        $description = sprintf('Transport (%s - %s) : %s',
-                            date('d/m/Y', $line['service_date']),
-                            $line['time_slot_id.name'],
-                            $line['name']
-                        );
-
-                        $booking_line = self::create([
-                            'order'                 => ++$line_order,
-                            'booking_id'            => $line['booking_id'],
-                            'booking_line_group_id' => $line['booking_line_group_id'],
-                            'service_date'          => $line['service_date'],
-                            'time_slot_id'          => $line['time_slot_id'],
-                            'booking_activity_id'   => $main_activity_id,
-                            'description'           => $description
-                        ])
-                            ->read(['id'])
-                            ->first();
-
-                        \eQual::run('do', 'sale_booking_update-bookingline-product', [
-                            'id'            => $booking_line['id'],
-                            'product_id'    => $res[0]['id']
-                        ]);
-                    }
-                }
-
-                // create supplies related lines
-                if($line['product_id.product_model_id.has_supply']) {
-                    foreach($line['product_id.product_model_id.supplies_ids'] as $supply_product_model_id) {
-                        $res = \eQual::run('get', 'sale_catalog_product_collect', [
-                            'center_id' => $line['booking_id.center_id'],
-                            'domain'    => ['product_model_id', '=', $supply_product_model_id],
-                            'date_from' => $line['booking_id.date_from'],
-                            'date_to'   => $line['booking_id.date_to']
-                        ]);
-
-                        if(empty($res)) {
-                            continue;
-                        }
-
-                        $booking_line = self::create([
-                            'order'                 => ++$line_order,
-                            'booking_id'            => $line['booking_id'],
-                            'booking_line_group_id' => $line['booking_line_group_id'],
-                            'service_date'          => $line['service_date'],
-                            'time_slot_id'          => $line['time_slot_id'],
-                            'booking_activity_id'   => $main_activity_id
-                        ])
-                            ->read(['id'])
-                            ->first();
-
-                        \eQual::run('do', 'sale_booking_update-bookingline-product', [
-                            'id'            => $booking_line['id'],
-                            'product_id'    => $res[0]['id']
-                        ]);
-                    }
-                }
-
-                $booking_activity_data = [];
-                if($line['product_id.product_model_id.has_provider'] && count($line['product_id.product_model_id.providers_ids']) === 1) {
-                    $booking_activity_data['providers_ids'] = $line['product_id.product_model_id.providers_ids'];
-                }
-                if($line['product_id.product_model_id.has_rental_unit'] && count($line['product_id.product_model_id.activity_rental_units_ids']) === 1) {
-                    $booking_activity_data['rental_unit_id'] = $line['product_id.product_model_id.activity_rental_units_ids'][0];
-                }
-                if(!empty($booking_activity_data)) {
-                    BookingActivity::id($main_activity_id)->update($booking_activity_data);
-                }
-            }
         }
 
+        // #todo - check if this part is needed, because the same is done just after with callonce updateQty
         // #memo - qty must always be recomputed, even if given amongst (updated) $values (when a new line is created the default qty is 1.0)
         foreach($lines as $lid => $line) {
             $qty = $line['qty'];
@@ -925,11 +1013,12 @@ class BookingLine extends Model {
         $om->callonce(self::getType(), '_resetPrices', $oids, [], $lang);
     }
 
-    private static function generateLineActivities(int $service_date, int $time_slot_id, bool $is_fullday, bool $has_duration, int $duration): array {
+    private static function computeLineActivities(int $service_date, int $time_slot_id, bool $is_fullday, bool $has_duration, int $duration, string $description=''): array {
         $booking_activities = [
             [
                 'activity_date' => $service_date,
                 'time_slot_id'  => $time_slot_id,
+                'description'   => $description,
                 'is_virtual'    => false
             ]
         ];
@@ -947,6 +1036,7 @@ class BookingLine extends Model {
             $booking_activities[] = [
                 'activity_date' => $service_date,
                 'time_slot_id'  => $map_codes_time_slot_ids['AM'] === $time_slot_id ? $map_codes_time_slot_ids['PM'] : $map_codes_time_slot_ids['AM'],
+                'description'   => $description,
                 'is_virtual'    => true
             ];
         }
@@ -958,6 +1048,7 @@ class BookingLine extends Model {
                 $booking_activities[] = [
                     'activity_date' => $service_date + $i * 86400,
                     'time_slot_id'  => $time_slot_id,
+                    'description'   => $description,
                     'is_virtual'    => true
                 ];
 
@@ -965,6 +1056,7 @@ class BookingLine extends Model {
                     $booking_activities[] = [
                         'activity_date' => $service_date + $i * 86400,
                         'time_slot_id'  => $map_codes_time_slot_ids['AM'] === $time_slot_id ? $map_codes_time_slot_ids['PM'] : $map_codes_time_slot_ids['AM'],
+                        'description'   => $description,
                         'is_virtual'    => true
                     ];
                 }
@@ -991,14 +1083,21 @@ class BookingLine extends Model {
         ]);
         if($lines > 0) {
             foreach($lines as $line) {
+                if(is_null($line['booking_activity_id'])) {
+                    continue;
+                }
+
+                $booking_activity_updates = ['qty' => null];
                 if($line['product_id.product_model_id.has_provider'] && count($line['booking_activity_id.providers_ids']) > $line['qty']) {
                     $providers_ids_to_remove = [];
                     for($i = count($line['booking_activity_id.providers_ids']) - 1; $i >= $line['qty']; $i--) {
                         $providers_ids_to_remove[] = -$line['booking_activity_id.providers_ids'][$i];
                     }
 
-                    BookingActivity::id($line['booking_activity_id'])->update(['providers_ids' => $providers_ids_to_remove]);
+                    $booking_activity_updates['providers_ids'] = $providers_ids_to_remove;
                 }
+
+                BookingActivity::id($line['booking_activity_id'])->update($booking_activity_updates);
             }
         }
 
@@ -1230,21 +1329,21 @@ class BookingLine extends Model {
                     $prices_ids = $om->search(\sale\price\Price::getType(), [
                         ['price_list_id', '=', $price_list_id],
                         ['product_id', '=', $product_id],
-                        [ 'has_rate_class' , '=', true],
-                        ['rate_class_id', '=', $line['booking_line_group_id.rate_class_id']],
+                        ['has_rate_class' , '=', true],
+                        ['rate_class_id', '=', $line['booking_line_group_id.rate_class_id']]
                     ]);
 
-                    if (!empty($prices_ids)) {
+                    if(!empty($prices_ids)) {
                         $result[$line_id] = reset($prices_ids);
                         break;
                     }
 
                     $prices_ids = $om->search(\sale\price\Price::getType(), [
                         ['price_list_id', '=', $price_list_id],
-                        ['product_id', '=', $product_id],
+                        ['product_id', '=', $product_id]
                     ]);
 
-                    if (!empty($prices_ids)) {
+                    if(!empty($prices_ids)) {
                         $result[$line_id] = reset($prices_ids);
                         break;
                     }
@@ -1426,30 +1525,26 @@ class BookingLine extends Model {
      * @param  array                        $oids       List of objects identifiers.
      * @return void
      */
-    public static function ondelete($om, $oids) {
-        $lines = $om->read(self::getType(), $oids, ['booking_line_group_id', 'product_id.product_model_id.is_activity']);
-        if($lines > 0) {
-            $map_groups_ids = [];
-            foreach($lines as $oid => $odata) {
-                $map_groups_ids[$odata['booking_line_group_id']] = true;
+    public static function onbeforedelete($self, $om, $ids) {
+        $self->read(['booking_line_group_id', 'product_id' => ['product_model_id' => ['is_activity']]]);
 
-                if($odata['product_id.product_model_id.is_activity']) {
-                    BookingActivity::search(['activity_booking_line_id', '=', $oid])->delete(true);
-
-                    $booking_activity = BookingActivity::search(['booking_line_group_id', '=', $odata['booking_line_group_id']])
-                        ->read(['id'])
-                        ->first();
-
-                    if(!is_null($booking_activity)) {
-                        BookingActivity::id($booking_activity['id'])->do('update-counters');
-                    }
-                }
+        $map_groups_ids = [];
+        foreach($self as $id => $bookingLine) {
+            if($bookingLine['booking_line_group_id']) {
+                $map_groups_ids[$bookingLine['booking_line_group_id']] = true;
             }
 
-            $om->callonce(BookingLineGroup::getType(), 'updateBedLinensAndMakeBeds', array_keys($map_groups_ids), ['ignored_lines_ids' => array_keys($lines)]);
+            if($bookingLine['product_id']['product_model_id']['is_activity'] ?? false) {
+                BookingActivity::search(['booking_line_group_id', '=', $bookingLine['booking_line_group_id']])
+                    ->do('update-counters');
+            }
         }
 
-        $om->callonce(self::getType(), 'updateSPM', $oids, ['deleted' => $oids]);
+        if(count($map_groups_ids)) {
+            $om->callonce(BookingLineGroup::getType(), 'updateBedLinensAndMakeBeds', array_keys($map_groups_ids), ['ignored_lines_ids' => $self->ids()]);
+        }
+
+        $om->callonce(self::getType(), 'updateSPM', $ids, ['deleted' => $ids]);
     }
 
     /**
@@ -1512,25 +1607,88 @@ class BookingLine extends Model {
 
     public static function calcFreeQty($om, $oids, $lang) {
         $result = [];
-        $lines = $om->read(get_called_class(), $oids, ['qty', 'auto_discounts_ids','manual_discounts_ids']);
+        $lines = $om->read(self::getType(), $oids, [
+            'qty',
+            'auto_discounts_ids',
+            'manual_discounts_ids',
+            'qty_accounting_method',
+            'is_accomodation',
+            'is_meal',
+            'is_snack',
+            'product_id.is_freebie_allowed',
+            'product_id.product_model_id.has_duration',
+            'product_id.product_model_id.duration',
+            'product_id.product_model_id.is_repeatable',
+            'product_id.product_model_id.capacity',
+            'product_id.product_model_id.is_repeatable',
+            'product_id.has_age_range',
+            'product_id.age_range_id',
+            'booking_line_group_id.is_sojourn',
+            'booking_line_group_id.is_event',
+            'booking_line_group_id.nb_nights',
+            'booking_line_group_id.age_range_assignments_ids.age_range_id',
+            'booking_line_group_id.age_range_assignments_ids.free_qty'
+        ]);
 
-        foreach($lines as $oid => $odata) {
+        $age_range_freebies = Setting::get_value('sale', 'features', 'booking.age_range.freebies', false);
+
+        foreach($lines as $id => $line) {
             $free_qty = 0;
 
-            $adapters = $om->read('sale\booking\BookingPriceAdapter', $odata['auto_discounts_ids'], ['type', 'value']);
-            foreach($adapters as $aid => $adata) {
-                if($adata['type'] == 'freebie') {
-                    $free_qty += $adata['value'];
+            if(!$line['product_id.is_freebie_allowed'] || $line['qty_accounting_method'] !== 'person') {
+                // product is excluded from freebies: no free quantity
+                $result[$id] = 0;
+                continue;
+            }
+
+            $adapters = $om->read('sale\booking\BookingPriceAdapter', $line['auto_discounts_ids'], ['type', 'value']);
+            foreach($adapters as $adapter_id => $adapter) {
+                if($adapter['type'] == 'freebie') {
+                    $free_qty += $adapter['value'];
                 }
             }
             // check additional manual discounts
-            $discounts = $om->read('sale\booking\BookingPriceAdapter', $odata['manual_discounts_ids'], ['type', 'value']);
-            foreach($discounts as $aid => $adata) {
-                if($adata['type'] == 'freebie') {
-                    $free_qty += $adata['value'];
+            $discounts = $om->read('sale\booking\BookingPriceAdapter', $line['manual_discounts_ids'], ['type', 'value']);
+            foreach($discounts as $discount_id => $discount) {
+                if($discount['type'] == 'freebie') {
+                    $free_qty += $discount['value'];
                 }
             }
-            $result[$oid] = min($free_qty, $odata['qty']);
+
+            if($age_range_freebies) {
+                $nb_repeat = 1;
+                if($line['product_id.product_model_id.has_duration']) {
+                    $nb_repeat = $line['product_id.product_model_id.duration'];
+                }
+                elseif($line['booking_line_group_id.is_sojourn']) {
+                    if($line['product_id.product_model_id.is_repeatable']) {
+                        $nb_repeat = max(1, $line['booking_line_group_id.nb_nights']);
+                    }
+                }
+                elseif($line['booking_line_group_id.is_event']) {
+                    if($line['product_id.product_model_id.is_repeatable']) {
+                        $nb_repeat = $line['booking_line_group_id.nb_nights'] + 1;
+                    }
+                }
+
+                foreach($line['booking_line_group_id.age_range_assignments_ids.age_range_id'] as $index => $assignment) {
+                    if(!$line['product_id.has_age_range'] || $line['product_id.age_range_id'] === $assignment['age_range_id']) {
+                        $free_qty += self::computeLineQty(
+                            $line['qty_accounting_method'],
+                            $nb_repeat,
+                            $line['booking_line_group_id.age_range_assignments_ids.free_qty'][$index]['free_qty'],
+                            $line['product_id.product_model_id.is_repeatable'],
+                            $line['is_accomodation'],
+                            $line['product_id.product_model_id.capacity']
+                        );
+                    }
+                    if($line['product_id.age_range_id'] === $assignment['age_range_id']) {
+                        break;
+                    }
+                }
+            }
+
+            $result[$id] = min($free_qty, $line['qty']);
         }
         return $result;
     }
@@ -1593,9 +1751,9 @@ class BookingLine extends Model {
      * Get total tax-excluded price of the line, with all discounts applied.
      *
      */
-    public static function calcTotal($om, $oids, $lang) {
+    public static function calcTotal($om, $ids, $lang) {
         $result = [];
-        $lines = $om->read(get_called_class(), $oids, [
+        $lines = $om->read(self::getType(), $ids, [
                     'qty',
                     'unit_price',
                     'free_qty',
@@ -1603,14 +1761,14 @@ class BookingLine extends Model {
                     'payment_mode'
                 ]);
         if($lines > 0) {
-            foreach($lines as $oid => $line) {
+            foreach($lines as $id => $line) {
 
                 if($line['payment_mode'] == 'free') {
-                    $result[$oid] = 0.0;
+                    $result[$id] = 0.0;
                     continue;
                 }
                 $qty = max(0, $line['qty'] - $line['free_qty']);
-                $result[$oid] = round($line['unit_price'] * (1.0 - $line['discount']) * ($qty), 4);
+                $result[$id] = round($line['unit_price'] * (1.0 - $line['discount']) * ($qty), 4);
             }
         }
 
@@ -1665,7 +1823,9 @@ class BookingLine extends Model {
         ]);
         if($lines > 0 && count($lines)) {
             foreach($lines as $oid => $odata) {
-                $result[$oid] = $odata['product_id.product_model_id.is_meal'];
+                if(isset($odata['product_id.product_model_id.is_meal'])) {
+                    $result[$oid] = $odata['product_id.product_model_id.is_meal'];
+                }
             }
         }
         return $result;
@@ -1780,20 +1940,32 @@ class BookingLine extends Model {
 
     public static function calcTimeSlotId($self): array {
         $result = [];
-        $self->read(['product_model_id' => ['type', 'service_type', 'time_slot_id', 'time_slots_ids']]);
+        $self->read([
+            'is_activity',
+            'is_fullday',
+            'booking_activity_id'   => ['time_slot_id'],
+            'product_model_id'      => ['type', 'service_type', 'time_slot_id', 'time_slots_ids']
+        ]);
         foreach($self as $id => $booking_line) {
             if(!$booking_line['product_model_id']) {
                 continue;
             }
-            $product_model = $booking_line['product_model_id'];
-            if($product_model['type'] !== 'service' || $product_model['service_type'] !== 'schedulable') {
-                continue;
+            if($booking_line['is_activity']) {
+                if(!$booking_line['is_fullday']) {
+                    $result[$id] = $booking_line['booking_activity_id']['time_slot_id'];
+                }
             }
-            if($product_model['time_slot_id']) {
-                $result[$id] = $product_model['time_slot_id'];
-            }
-            elseif(!empty($product_model['time_slots_ids'])) {
-                $result[$id] = current($product_model['time_slots_ids']);
+            else {
+                $product_model = $booking_line['product_model_id'];
+                if($product_model['type'] !== 'service' || $product_model['service_type'] !== 'schedulable') {
+                    continue;
+                }
+                if($product_model['time_slot_id']) {
+                    $result[$id] = $product_model['time_slot_id'];
+                }
+                elseif(!empty($product_model['time_slots_ids'])) {
+                    $result[$id] = current($product_model['time_slots_ids']);
+                }
             }
         }
         return $result;
@@ -1813,6 +1985,10 @@ class BookingLine extends Model {
             ]
             */
         ];
+    }
+
+    public static function refreshFreeQty($om, $id) {
+        $om->update(self::getType(), $id, ['free_qty' => null]);
     }
 
     public static function refreshPrice($om, $id) {

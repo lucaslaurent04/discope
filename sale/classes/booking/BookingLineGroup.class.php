@@ -10,6 +10,7 @@ namespace sale\booking;
 
 use core\setting\Setting;
 use equal\orm\Model;
+use equal\orm\ObjectManager;
 use identity\Center;
 use sale\catalog\Product;
 use sale\catalog\ProductModel;
@@ -169,11 +170,12 @@ class BookingLineGroup extends Model {
             ],
 
             'nb_pers' => [
-                'type'              => 'integer',
+                'type'              => 'computed',
+                'result_type'       => 'integer',
                 'description'       => 'Amount of persons this group is about.',
-                'default'           => 1,
+                'function'          => 'calcNbPers',
                 'onupdate'          => 'onupdateNbPers',
-                'dependents'        => ['nb_children']
+                'store'             => true
             ],
 
             'nb_children' => [
@@ -339,14 +341,26 @@ class BookingLineGroup extends Model {
 
             'activity_group_num' => [
                 'type'              => 'integer',
-                'description'       => "Identifier of the activity group in the booking.",
+                'description'       => "Number of the activity group in the booking.",
                 'onupdate'          => 'onupdateActivityGroupNum'
+            ],
+
+            'booking_meals_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\booking\BookingMeal',
+                'foreign_field'     => 'booking_line_group_id',
+                'description'       => "The booking meals that refer to the booking line group."
             ],
 
             'has_person_with_disability' => [
                 'type'              => 'boolean',
                 'description'       => "At least one person from the group has a disability.",
                 'default'           => false
+            ],
+
+            'person_disability_description' => [
+                'type'              => 'string',
+                'usage'             => 'text/plain'
             ],
 
             'bed_linens' => [
@@ -364,6 +378,18 @@ class BookingLineGroup extends Model {
             ]
 
         ];
+    }
+
+    public static function calcNbPers($self) {
+        $result = [];
+        $self->read(['age_range_assignments_ids' => ['qty']]);
+        foreach($self as $id => $bookingLineGroup) {
+            $result[$id] = 0;
+            foreach($bookingLineGroup['age_range_assignments_ids'] as $ageRangeAssignment) {
+                $result[$id] += $ageRangeAssignment['qty'];
+            }
+        }
+        return $result;
     }
 
     /**
@@ -400,9 +426,8 @@ class BookingLineGroup extends Model {
     }
 
     public static function onupdateGroupType($om, $ids, $values, $lang) {
-        $groups = $om->read(self::getType(), $ids, ['group_type', 'booking_id'], $lang);
+        $groups = $om->read(self::getType(), $ids, ['group_type', 'booking_id', 'booking_activities_ids'], $lang);
         if($groups > 0) {
-            $map_booking_ids = [];
             foreach($groups as $id => $group) {
                 if($group['group_type'] == 'simple') {
                     $om->update(self::getType(), $id, ['is_sojourn' => false]);
@@ -415,23 +440,24 @@ class BookingLineGroup extends Model {
                 elseif($group['group_type'] == 'camp') {
                     $om->update(self::getType(), $id, ['is_sojourn' => false]);
                     $om->update(self::getType(), $id, ['is_event' => false]);
-                    $map_booking_ids[$group['booking_id']] = true;
                 }
                 elseif($group['group_type'] == 'event') {
                     $om->update(self::getType(), $id, ['is_sojourn' => false]);
                     $om->update(self::getType(), $id, ['is_event' => true]);
                 }
-            }
-
-            foreach(array_keys($map_booking_ids) as $booking_id) {
-                self::refreshActivityGroupNumber($booking_id);
+                self::resetActivityGroupNumber($group['booking_id']);
+                BookingActivity::ids($group['booking_activities_ids'])->update(['group_num' => null]);
             }
         }
     }
 
+    /**
+     * Force resetting other activities 'group_num'
+     */
     public static function onupdateActivityGroupNum($self) {
-        $self->read(['booking_activities_ids']);
+        $self->read(['booking_id', 'booking_activities_ids']);
         foreach($self as $group) {
+            self::resetActivityGroupNumber($group['booking_id']);
             BookingActivity::ids($group['booking_activities_ids'])->update(['group_num' => null]);
         }
     }
@@ -571,39 +597,33 @@ class BookingLineGroup extends Model {
     }
 
     public static function onupdateOrder($self) {
-        $self->read(['booking_id']);
-
-        $map_booking_ids = [];
-        foreach ($self as $group) {
-            $map_booking_ids[$group['booking_id']] = true;
-        }
-
-        $booking_ids = array_keys($map_booking_ids);
-
-        foreach ($booking_ids as $booking_id) {
-            self::refreshActivityGroupNumber($booking_id);
+        $self->read(['booking_id', 'booking_activities_ids']);
+        foreach($self as $group) {
+            self::resetActivityGroupNumber($group['booking_id']);
+            BookingActivity::ids($group['booking_activities_ids'])->update(['group_num' => null]);
         }
     }
 
-    public static function refreshActivityGroupNumber(int $booking_id) {
+    /**
+     * #todo - this should be changed to a refresh method on the Booking class level, using an ($orm, $id) signature
+     * #memo - this method is used in several `update-[...]` controllers (to be adapted in case of change)
+     */
+    public static function resetActivityGroupNumber($booking_id) {
         $booking = Booking::id($booking_id)
             ->read(['booking_lines_groups_ids' => ['order', 'group_type']])
             ->first();
 
-        $map_order_group_id = [];
+        $map_order_groups_ids = [];
         foreach($booking['booking_lines_groups_ids'] as $group) {
             if($group['group_type'] === 'camp') {
-                $map_order_group_id[$group['order']] = $group['id'];
+                $map_order_groups_ids[$group['order']] = $group['id'];
             }
         }
 
-        $group_ids = array_values($map_order_group_id);
+        $group_ids = array_values($map_order_groups_ids);
         foreach($group_ids as $index => $group_id) {
-            BookingLineGroup::id($group_id)
-                ->update(['activity_group_num' => $index + 1]);
+            self::id($group_id)->update(['activity_group_num' => $index + 1]);
         }
-
-        BookingActivity::search(['booking_line_group_id', 'in', $group_ids])->update(['group_num' => null]);
     }
 
     public static function onupdateDateFrom($om, $oids, $values, $lang) {
@@ -695,6 +715,10 @@ class BookingLineGroup extends Model {
             $bookings_ids = array_map(function($a) {return $a['booking_id'];}, $groups);
             $om->update(Booking::getType(), $bookings_ids, ['time_from' => null, 'time_to' => null, 'total' => null, 'price' => null]);
         }
+        // refresh meals
+        foreach($oids as $oid) {
+            self::refreshMeals($om, $oid);
+        }
     }
 
     /**
@@ -758,10 +782,6 @@ class BookingLineGroup extends Model {
         // 1) invalidate prices
         $om->callonce(self::getType(), '_resetPrices', $ids, [], $lang);
 
-        // 2) invalidate nb children
-        // #memo - nb_children is amongst nb_pers dependents
-        // $om->callonce(self::getType(), '_resetNbChildren', $ids, [], $lang);
-
         $groups = $om->read(self::getType(), $ids, [
             'booking_id',
             'nb_pers',
@@ -795,7 +815,10 @@ class BookingLineGroup extends Model {
         // 4) update agerange assignments (for single assignment)
         if($groups > 0) {
             $booking_lines_ids = [];
-            foreach($groups as $group) {
+            foreach($groups as $group_id => $group) {
+                // invalidate nb children
+                self::refreshNbChildren($om, $group_id);
+
                 if($group['is_sojourn'] && count($group['age_range_assignments_ids']) == 1) {
                     $age_range_assignment_id = current($group['age_range_assignments_ids']);
                     $om->update(BookingLineGroupAgeRangeAssignment::getType(), $age_range_assignment_id, ['qty' => $group['nb_pers']]);
@@ -804,8 +827,8 @@ class BookingLineGroup extends Model {
                 // trigger sibling groups nb_pers update (this is necessary since the nb_pers is based on the booking total participants)
             }
             // re-compute bookinglines quantities
-            $om->update(\sale\booking\BookingLine::getType(), $booking_lines_ids, ['qty_vars' => null], $lang);
-            $om->callonce(\sale\booking\BookingLine::getType(), 'updateQty', $booking_lines_ids, [], $lang);
+            $om->update(BookingLine::getType(), $booking_lines_ids, ['qty_vars' => null], $lang);
+            $om->callonce(BookingLine::getType(), 'updateQty', $booking_lines_ids, [], $lang);
         }
 
         // 5) update dependencies
@@ -815,17 +838,12 @@ class BookingLineGroup extends Model {
         $om->callonce(self::getType(), 'updateMealPreferences', $ids, [], $lang);
     }
 
-    /**
-     * Reset the quantity of children for calculation when needed
-     *
-     * @param \equal\orm\ObjectManager  $om
-     * @param int[]                     $oids
-     * @param array                     $values
-     * @param string                    $lang
-     * @return void
-     */
-    public static function _resetNbChildren($om, $oids, $values, $lang) {
-        $om->update(__CLASS__, $oids, ['nb_children' => null]);
+    public static function refreshNbPers($om, $id) {
+        $om->update(self::getType(), $id, ['nb_pers' => null]);
+    }
+
+    public static function refreshNbChildren($om, $id) {
+        $om->update(self::getType(), $id, ['nb_children' => null]);
     }
 
     /**
@@ -884,6 +902,7 @@ class BookingLineGroup extends Model {
             if($group['has_pack'] && !$group['is_locked']) {
                 // find the repetition factor
                 $nb_repeat = 1;
+                // #todo - we should test is_repeatable here
                 if($group['pack_id.product_model_id.has_duration']) {
                     $nb_repeat = $group['pack_id.product_model_id.duration'];
                 }
@@ -1182,28 +1201,6 @@ class BookingLineGroup extends Model {
                         if(isset($values['date_to'], $group['date_from']) && $values['date_to'] < $group['date_from']) {
                             return ['date_to' => ['invalid_daterange' => 'End date must be greater or equal to Start date.']];
                         }
-                    }
-
-                }
-            }
-        }
-
-        if(isset($values['date_from']) || isset($values['date_to'])) {
-            $groups = $om->read(self::getType(), $oids, ['date_from', 'date_to'], $lang);
-
-            if($groups > 0) {
-                foreach($groups as $id => $group) {
-                    $date_from = $values['date_from'] ?? $group['date_from'];
-                    $date_to = $values['date_to'] ?? $group['date_to'];
-
-                    $outside_dates_activities_ids = BookingActivity::search([
-                        [['booking_line_group_id', '=', $id], ['activity_date', '<', $date_from]],
-                        [['booking_line_group_id', '=', $id], ['activity_date', '>', $date_to]]
-                    ])
-                        ->ids();
-
-                    if(!empty($outside_dates_activities_ids)) {
-                        return ['date_from' => ['invalid_daterange' => 'An scheduled activity is outside of the date range.']];
                     }
                 }
             }
@@ -2278,6 +2275,16 @@ class BookingLineGroup extends Model {
             // pass-3 : create consumptions for booking lines targeting non-rental_unit products (any other schedulable product, e.g. meals or activity)
             foreach($groups as $gid => $group) {
 
+                // create meals map, to add their specifications (type and place) to the consumptions
+                $meals = BookingMeal::search(['booking_line_group_id', '=', $gid])
+                    ->read(['date', 'time_slot_id', 'meal_type_id', 'meal_place_id'])
+                    ->get();
+
+                $map_meals = [];
+                foreach($meals as $meal) {
+                    $map_meals[$meal['date']][$meal['time_slot_id']] = $meal;
+                }
+
                 $lines = $om->read(\sale\booking\BookingLine::getType(), $group['booking_lines_ids'], [
                     'product_id',
                     'qty',
@@ -2365,14 +2372,15 @@ class BookingLineGroup extends Model {
                             $schedule_to    = $line['time_slot_id.schedule_to'];
                         }
 
+                        $is_repeatable = $product_models[$line['product_id.product_model_id']]['is_repeatable'];
                         $is_meal = $product_models[$line['product_id.product_model_id']]['is_meal'];
                         $is_snack = $product_models[$line['product_id.product_model_id']]['is_snack'];
                         $qty_accounting_method = $product_models[$line['product_id.product_model_id']]['qty_accounting_method'];
 
-                        // #memo - number of consumptions differs for accommodations (rooms are occupied nb_nights + 1, until sometime in the morning)
+                        // #memo - number of consumptions differs for accommodations (rooms are occupied nb_nights + 1, until some time in the morning)
                         // #memo - sojourns are accounted in nights, while events are accounted in days
                         $nb_products = ($group['is_sojourn']) ? $group['nb_nights'] : (($group['is_event']) ? ($group['nb_nights']+1) : 1);
-                        if(!$product_models[$line['product_id.product_model_id']]['is_repeatable']) {
+                        if(!$is_repeatable) {
                             $nb_products = 1;
                         }
                         $nb_times = $group['nb_pers'];
@@ -2392,12 +2400,17 @@ class BookingLineGroup extends Model {
                         if($has_duration) {
                             $nb_products = $product_models[$line['product_id.product_model_id']]['duration'];
                         }
-
+                        // #memo - service_date might be set, only for schedulable non-repeatable services
                         $date_from = $line['service_date'] ?? $group['date_from'];
 
-                        list($day, $month, $year) = [ date('j', $date_from), date('n', $date_from), date('Y', $date_from) ];
+                        [$day, $month, $year] = [ date('j', $date_from), date('n', $date_from), date('Y', $date_from) ];
                         // fetch the offset, in days, for the scheduling (only applies on sojourns)
-                        $offset = ($group['is_sojourn']) ? $product_models[$line['product_id.product_model_id']]['schedule_offset'] : 0;
+                        $offset = 0;
+
+                        if($group['is_sojourn']) {
+                            // #memo - schedule offset can be negative. By convention, offset = -1 refers to the departure day (i.e., the last date of the stay, not including a night)
+                            $offset = $product_models[$line['product_id.product_model_id']]['schedule_offset'];
+                        }
 
                         // by default, assign a quantity of $nb_times to each day
                         $days_nb_times = array_fill(0, $nb_products, $nb_times);
@@ -2427,7 +2440,20 @@ class BookingLineGroup extends Model {
                                 continue;
                             }
 
-                            $c_date = mktime(0, 0, 0, $month, $day+$i+$offset, $year);
+                            $day_index = $i + $offset;
+
+                            // support for negative offset: count backwards from the end of the stay (ex: offset = -1 => departure day)
+                            if($offset < 0 && !$is_repeatable) {
+                                $day_index = $group['nb_nights'] + $offset;
+                            }
+
+                            // ignore invalid offset
+                            if($day_index < 0 || $day_index > $group['nb_nights']) {
+                                continue;
+                            }
+
+                            $c_date = mktime(0, 0, 0, $month, $day + $day_index, $year);
+
                             $c_time_slot_id = $line['time_slot_id'];
                             $c_schedule_from = $schedule_from;
                             $c_schedule_to = $schedule_to;
@@ -2468,6 +2494,11 @@ class BookingLineGroup extends Model {
                                     $description .= "<p>{$type} / {$pref} : {$preference['qty']} ; </p>";
                                 }
                                 $consumption['description'] = $description;
+                            }
+                            // for meals/snack we add the meal_type and meal_place, if any
+                            if(($is_meal || $is_snack) && isset($map_meals[$c_date][$c_time_slot_id])) {
+                                $consumption['meal_type_id'] = $map_meals[$c_date][$c_time_slot_id]['meal_type_id'];
+                                $consumption['meal_place_id'] = $map_meals[$c_date][$c_time_slot_id]['meal_place_id'];
                             }
                             $consumptions[] = $consumption;
                         }
@@ -3063,7 +3094,7 @@ class BookingLineGroup extends Model {
      *
      * Resets `total` and `price` computed fields.
      */
-	public static function refreshPrice($om, $id) {
+    public static function refreshPrice($om, $id) {
         $om->update(self::getType(), $id, ['total' => null, 'price' => null, 'fare_benefit' => null]);
     }
 
@@ -3077,7 +3108,7 @@ class BookingLineGroup extends Model {
      *  - The selected price list might be marked as 'pending' / to be confirmed).
      *  - After a call to this method, `refreshIsTbc()` should be applied on the Parent Booking.
      */
-	public static function refreshPriceId($om, $id) {
+    public static function refreshPriceId($om, $id) {
         $groups = $om->read(self::getType(), $id, [
             'has_pack',
             'date_from',
@@ -3209,7 +3240,175 @@ class BookingLineGroup extends Model {
      * This method is called by `update-sojourn-[...]` controllers.
      * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
      *
-     * Resets lines according to PackLines assigned to it, according to `pack_id`.
+     * @param ObjectManager $om
+     * @param int           $id id of the group
+     */
+    public static function refreshMeals($om, $id) {
+        /*
+        For all bookingLines of type meal (is_meal & is_snack), we check if a bookingMeal exists for this group (for this reservation) and for the corresponding time_slot, for each date of the stay.
+            If not yet: we create a bookingMeal
+            (the line is linked to the bookingMeal via the booking_meals_ids relation)
+            (there can be multiple meal products for the same time slot, as variations of the same model [variation based on age group or other criteria])
+        */
+
+        $groups = $om->read(self::getType(), $id, ['booking_id', 'date_from', 'date_to', 'booking_lines_ids']);
+        if($groups <= 0) {
+            return;
+        }
+        $group = reset($groups);
+
+        $lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], [
+            'is_meal',
+            'is_snack',
+            'time_slot_id',
+            'qty_vars',
+            'product_model_id.schedule_offset',
+            'product_model_id.is_repeatable',
+            'booking_line_group_id.nb_pers'
+        ]);
+        if(empty($lines)) {
+            // no need of meal if no booking lines
+            $booking_meals_ids = $om->search(BookingMeal::getType(), ['booking_line_group_id', '=', $id]);
+            $om->delete(BookingMeal::getType(), $booking_meals_ids, true);
+            return;
+        }
+
+        $map_timeslots_ids = [];
+
+        $map_date_timeslot_meal = [];
+        foreach($lines as $line_id => $line) {
+            if(!$line['is_meal'] && !$line['is_snack']) {
+                continue;
+            }
+
+            $map_timeslots_ids[$line['time_slot_id']] = true;
+
+            $day_index = 0;
+            $days_qty = (($group['date_to'] - $group['date_from']) / 86400) + 1;
+            for($date = $group['date_from']; $date <= $group['date_to']; $date += 86400) {
+                $is_self_provided = true;
+                if($line['product_model_id.is_repeatable']) {
+                    $qty_vars = json_decode($line['qty_vars']);
+                    if($qty_vars && $day_index >= $line['product_model_id.schedule_offset']) {
+                        $nb_pers = $line['booking_line_group_id.nb_pers'];
+                        $variation = $qty_vars[$day_index - $line['product_model_id.schedule_offset']] ?? -$nb_pers;
+                        if(($nb_pers + $variation) > 0) {
+                            $is_self_provided = false;
+                        }
+                    }
+                }
+                else {
+                    if($line['product_model_id.schedule_offset'] >= 0) {
+                        if($line['product_model_id.schedule_offset'] === $day_index) {
+                            $is_self_provided = false;
+                        }
+                    }
+                    else {
+                        if($days_qty + $line['product_model_id.schedule_offset'] === $day_index) {
+                            $is_self_provided = false;
+                        }
+                    }
+                }
+
+                $day_index++;
+
+                if(!isset($map_date_timeslot_meal[$date][$line['time_slot_id']])) {
+                    $map_date_timeslot_meal[$date][$line['time_slot_id']] = [
+                        'booking_id'            => $group['booking_id'],
+                        'booking_line_group_id' => $id,
+                        'booking_lines_ids'     => !$is_self_provided ? [$line_id] : [],
+                        'date'                  => $date,
+                        'time_slot_id'          => $line['time_slot_id'],
+                        'is_self_provided'      => $is_self_provided
+                    ];
+                }
+                elseif(!$is_self_provided) {
+                    $map_date_timeslot_meal[$date][$line['time_slot_id']]['booking_lines_ids'][] = $line_id;
+                    $map_date_timeslot_meal[$date][$line['time_slot_id']]['is_self_provided'] = false;
+                }
+            }
+        }
+
+        foreach($map_date_timeslot_meal as $date => $map_timeslot_meal) {
+            foreach($map_timeslot_meal as $time_slot_id => $meal) {
+                $meals_ids = $om->search(BookingMeal::getType(), [
+                    ['booking_line_group_id', '=', $meal['booking_line_group_id']],
+                    ['time_slot_id', '=', $time_slot_id],
+                    ['date', '=', $date]
+                ]);
+
+                if(!count($meals_ids)) {
+                    $om->create(BookingMeal::getType(), $meal);
+                }
+                else {
+                    $om->update(BookingMeal::getType(), $meals_ids, $meal);
+                }
+            }
+        }
+
+        $outside_dates_meals_ids = $om->search(BookingMeal::getType(), [
+                [['booking_line_group_id', '=', $id], ['date', '<', $group['date_from']]],
+                [['booking_line_group_id', '=', $id], ['date', '>', $group['date_to']]]
+            ]);
+
+        $non_existing_timeslots_ids = [];
+        $timeslot_ids = array_keys($map_timeslots_ids);
+        if(!empty($timeslot_ids)) {
+            $non_existing_timeslots_ids = $om->search(BookingMeal::getType(), [
+                ['booking_line_group_id', '=', $id],
+                ['time_slot_id', 'not in', $timeslot_ids]
+            ]);
+        }
+
+        $meals_to_delete_ids = array_merge($outside_dates_meals_ids, $non_existing_timeslots_ids);
+        if(!empty($meals_to_delete_ids)) {
+            $om->delete(BookingMeal::getType(), $meals_to_delete_ids, true);
+        }
+    }
+
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Modifies date of the group's meals to match new date of the group
+     *
+     * @param ObjectManager $om
+     * @param int           $id         id of the group
+     * @param int           $dates_diff difference between the new date_from and the old one ($new_date_from - $old_date_from)
+     */
+    public static function refreshMealsDates($om, $id, $dates_diff) {
+        $groups = $om->read(self::getType(), $id, ['booking_meals_ids']);
+
+        if($groups <= 0) {
+            return;
+        }
+
+        $group = reset($groups);
+
+        $meals = $om->read(BookingMeal::getType(), $group['booking_meals_ids'], [
+            'date'
+        ]);
+
+        if($meals <= 0) {
+            return;
+        }
+
+        foreach($meals as $meal_id => $meal) {
+            $shifted_meal_date = $meal['date'] + $dates_diff;
+
+            $om->update(BookingMeal::getType(), $meal_id, [
+                'date' => $shifted_meal_date
+            ]);
+        }
+
+        self::refreshMeals($om, $id);
+    }
+
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Resets lines according to PackLines related to assigned pack_id, according to `pack_id`.
      * This only applies to groups marked as Pack (`has_pack`).
      */
     public static function refreshPack($om, $id) {
@@ -3221,6 +3420,7 @@ class BookingLineGroup extends Model {
             'age_range_assignments_ids',
             'nb_pers',
             'has_pack',
+            'rate_class_id',
             'pack_id.is_locked',
             'pack_id.has_age_range',
             'pack_id.age_range_id',
@@ -3302,6 +3502,7 @@ class BookingLineGroup extends Model {
                 }
             }
         }
+
         $new_lines_ids = [];
         // associative array mapping product_model_id with price_id
         $map_prices = [];
@@ -3322,23 +3523,58 @@ class BookingLineGroup extends Model {
                 ];
 
                 // handle products with no age_range (group must have only one line for those)
+                $product_id = null;
                 $has_single_range = false;
                 $age_range_id = $age_assignment['age_range_id'];
 
-                // search for a product matching model and age_range (there should be 1 or 0)
-                $products_ids = $om->search('sale\catalog\Product', [ ['product_model_id', '=', $pack_line['child_product_model_id']], ['age_range_id', '=', $age_range_id], ['can_sell', '=', true] ]);
-                // if no product for a specific age_range, use "all age" product and use range.qty
-                if($products_ids < 0 || !count($products_ids)) {
-                    $products_ids = $om->search('sale\catalog\Product', [ ['product_model_id', '=', $pack_line['child_product_model_id']], ['has_age_range', '=', false], ['can_sell', '=', true] ]);
-                    if($products_ids < 0 || !count($products_ids)) {
-                        // issue a warning : no product match for line
-                        trigger_error("ORM::no match for age range {$age_range_id} and no 'all ages' product found for model {$pack_line['child_product_model_id']}", QN_REPORT_WARNING);
-                        // skip the line (no age range found)
-                        continue 2;
+                $base_domain = [
+                    ['product_model_id', '=', $pack_line['child_product_model_id']],
+                    ['can_sell', '=', true],
+                ];
+
+                // build list of domains to try, ordered by priority
+                $domains_to_try = [];
+
+                // a) product with specific age range AND matching rate class
+                $domains_to_try[] = array_merge($base_domain, [
+                        ['age_range_id', '=', $age_range_id],
+                        ['rate_class_id', '=', $group['rate_class_id']]
+                    ]);
+
+                // b) product with specific age range but no rate class requirement
+                $domains_to_try[] = array_merge($base_domain, [
+                        ['age_range_id', '=', $age_range_id],
+                    ]);
+
+                // c) product without age range AND matching rate class
+                $domains_to_try[] = array_merge($base_domain, [
+                        ['has_age_range', '=', false],
+                        ['rate_class_id', '=', $group['rate_class_id']]
+                    ]);
+
+                // d) product without age range and no rate class requirement
+                $domains_to_try[] = array_merge($base_domain, [
+                        ['has_age_range', '=', false]
+                    ]);
+
+                // try each domain until a matching product is found
+                foreach($domains_to_try as $domain) {
+                    $products_ids = $om->search('sale\catalog\Product', $domain);
+                    if(is_array($products_ids) && count($products_ids)) {
+                        $product_id = reset($products_ids);
+                        // Check if fallback to "all ages" product was used
+                        if (in_array(['has_age_range', '=', false], $domain)) {
+                            $has_single_range = true;
+                        }
+                        break;
                     }
-                    $has_single_range = true;
                 }
-                $product_id = reset($products_ids);
+
+                // no product found: issue a warning and skip
+                if(!$product_id) {
+                    trigger_error("ORM::no match for age range {$age_range_id} and no 'all ages' product found for model {$pack_line['child_product_model_id']}", QN_REPORT_WARNING);
+                    continue 2;
+                }
 
                 // create a booking line with found product
                 $line['product_id'] = $product_id;
@@ -3368,6 +3604,7 @@ class BookingLineGroup extends Model {
                         $map_prices[$pack_line['child_product_model_id']] = $line['price_id'];
                     }
                 }
+                // do not loop to other age ranges
                 if($has_single_range) {
                     break;
                 }
@@ -3497,11 +3734,13 @@ class BookingLineGroup extends Model {
                 'is_autosale',
                 'is_sojourn',
                 'nb_pers',
+                'nb_children',
                 'nb_nights',
                 'date_from',
                 'date_to',
                 'booking_id',
                 'has_pack',
+                'rate_class_id',
                 'pack_id.product_model_id.booking_type_id.code',
                 'booking_id.center_id.autosale_list_category_id',
                 'booking_id.customer_id',
@@ -3516,165 +3755,176 @@ class BookingLineGroup extends Model {
 
         $group = reset($groups);
 
-		$center = Center::id($group['booking_id.center_id'])->read(['has_citytax_school'])->first(true);
+        $center = Center::id($group['booking_id.center_id'])->read(['has_citytax_school'])->first(true);
 
-		// reset previously set autosale products
-		$lines_ids_to_delete = [];
-		$booking_lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], ['is_autosale']);
-		if($booking_lines > 0) {
-			foreach($booking_lines as $lid => $line) {
-				if($line['is_autosale']) {
-					$lines_ids_to_delete[] = -$lid;
-				}
-			}
-			$om->update(self::getType(), $id, ['booking_lines_ids' => $lines_ids_to_delete]);
-		}
+        // reset previously set autosale products
+        $lines_ids_to_delete = [];
+        $booking_lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], ['is_autosale']);
+        if($booking_lines > 0) {
+            foreach($booking_lines as $lid => $line) {
+                if($line['is_autosale']) {
+                    $lines_ids_to_delete[] = -$lid;
+                }
+            }
+            $om->update(self::getType(), $id, ['booking_lines_ids' => $lines_ids_to_delete]);
+        }
 
-		// autosale groups are handled at the Booking level
-		if($group['is_autosale']) {
-			return;
-		}
-		// autosales only apply on sojourns
-		if(!$group['is_sojourn']) {
-			return;
-		}
+        // autosale groups are handled at the Booking level
+        if($group['is_autosale']) {
+            return;
+        }
+        // autosales only apply on sojourns
+        if(!$group['is_sojourn']) {
+            return;
+        }
 
-		/*
-			Find the first Autosale List that matches the booking dates
-		*/
+        /*
+            Find the first Autosale List that matches the booking dates
+        */
 
-		$autosale_lists_ids = $om->search('sale\autosale\AutosaleList', [
-			['autosale_list_category_id', '=', $group['booking_id.center_id.autosale_list_category_id']],
-			['date_from', '<=', $group['date_from']],
-			['date_to', '>=', $group['date_from']]
-		]);
+        $autosale_lists_ids = $om->search('sale\autosale\AutosaleList', [
+            ['autosale_list_category_id', '=', $group['booking_id.center_id.autosale_list_category_id']],
+            ['date_from', '<=', $group['date_from']],
+            ['date_to', '>=', $group['date_from']]
+        ]);
 
-		$autosale_lists = $om->read('sale\autosale\AutosaleList', $autosale_lists_ids, ['id', 'autosale_lines_ids']);
-		$autosale_list_id = 0;
-		$autosale_list = null;
-		if($autosale_lists > 0 && count($autosale_lists)) {
-			// use first match (there should always be only one or zero)
-			$autosale_list = array_pop($autosale_lists);
-			$autosale_list_id = $autosale_list['id'];
-			trigger_error("ORM:: match with autosale List {$autosale_list_id}", QN_REPORT_DEBUG);
-		}
-		else {
-			trigger_error("ORM:: no autosale List found", QN_REPORT_DEBUG);
-		}
-		/*
-			Search for matching Autosale products within the found List
-		*/
-		if($autosale_list_id) {
-			$operands = [];
+        $autosale_lists = $om->read('sale\autosale\AutosaleList', $autosale_lists_ids, ['id', 'autosale_lines_ids']);
+        $autosale_list_id = 0;
+        $autosale_list = null;
+        if($autosale_lists > 0 && count($autosale_lists)) {
+            // use first match (there should always be only one or zero)
+            $autosale_list = array_pop($autosale_lists);
+            $autosale_list_id = $autosale_list['id'];
+            trigger_error("ORM:: match with autosale List {$autosale_list_id}", QN_REPORT_DEBUG);
+        }
+        else {
+            trigger_error("ORM:: no autosale List found", QN_REPORT_DEBUG);
+        }
+        /*
+            Search for matching Autosale products within the found List
+        */
+        if($autosale_list_id) {
+            $operands = [];
 
-			// for now, we only support member cards for customer that haven't booked a service for more thant 12 months
+            // for now, we only support member cards for customer that haven't booked a service for more thant 12 months
 
-			$operands['count_booking_12'] = self::computeCountBooking12($om, $group['booking_id'], $group['booking_id.customer_id'], $group['date_from']);
-			$operands['nb_pers'] = $group['nb_pers'];
-			$operands['nb_nights'] = $group['nb_nights'];
+            $operands['count_booking_12'] = self::computeCountBooking12($om, $group['booking_id'], $group['booking_id.customer_id'], $group['date_from']);
+            $operands['nb_pers'] = $group['nb_pers'];
+            $operands['nb_nights'] = $group['nb_nights'];
+            $operands['nb_adults'] = $group['nb_pers'] - $group['nb_children'];
 
-			$autosales = $om->read('sale\autosale\AutosaleLine', $autosale_list['autosale_lines_ids'], [
-				'product_id.id',
-				'product_id.name',
-				'product_id.sku',
-				'has_own_qty',
-				'qty',
-				'scope',
-				'conditions_ids'
-			]);
+            $autosales = $om->read('sale\autosale\AutosaleLine', $autosale_list['autosale_lines_ids'], [
+                'product_id.id',
+                'product_id.name',
+                'product_id.sku',
+                'has_own_qty',
+                'qty',
+                'scope',
+                'rate_class_id',
+                'conditions_ids'
+            ]);
 
-			// filter discounts based on related conditions
-			$products_to_apply = [];
+            // filter discounts based on related conditions
+            $products_to_apply = [];
 
-			// pass-1: filter discounts to be applied on booking lines
-			foreach($autosales as $autosale_id => $autosale) {
-				if($autosale['scope'] != 'group') {
-					continue;
-				}
-				// #kaleo - do not apply city tax for school sojourns
-				if( $group['has_pack']
-					&& isset($group['pack_id.product_model_id.booking_type_id.code'])
-					&& $group['pack_id.product_model_id.booking_type_id.code'] == 'SEJ'
-					&& $autosale['product_id.sku'] == 'KA-CTaxSej-A'
-					&& !$center['has_citytax_school']
+            // pass-1: filter discounts to be applied on booking lines
+            foreach($autosales as $autosale_id => $autosale) {
+                if($autosale['scope'] != 'group') {
+                    continue;
+                }
+                if(isset($autosale['rate_class_id']) && $group['rate_class_id'] !== $autosale['rate_class_id']) {
+                    continue;
+                }
+                // #kaleo - do not apply city tax for school sojourns
+                if( $group['has_pack']
+                    && isset($group['pack_id.product_model_id.booking_type_id.code'])
+                    && $group['pack_id.product_model_id.booking_type_id.code'] == 'SEJ'
+                    && $autosale['product_id.sku'] == 'KA-CTaxSej-A'
+                    && !$center['has_citytax_school']
                 ) {
-					continue;
-				}
+                    continue;
+                }
 
-				$conditions = $om->read('sale\autosale\Condition', $autosale['conditions_ids'], ['operand', 'operator', 'value']);
-				$valid = true;
-				foreach($conditions as $c_id => $condition) {
-					if(!in_array($condition['operator'], ['>', '>=', '<', '<=', '='])) {
-						// unknown operator
-						continue;
-					}
-					$operator = $condition['operator'];
-					if($operator == '=') {
-						$operator = '==';
-					}
-					if(!isset($operands[$condition['operand']])) {
-						$valid = false;
-						break;
-					}
-					$operand = $operands[$condition['operand']];
-					$value = $condition['value'];
-					if(!is_numeric($operand)) {
-						$operand = "'$operand'";
-					}
-					if(!is_numeric($value)) {
-						$value = "'$value'";
-					}
-					trigger_error(" testing {$operand} {$operator} {$value}", QN_REPORT_DEBUG);
-					$valid = $valid && (bool) eval("return ( {$operand} {$operator} {$value});");
-					if(!$valid) {
+                $conditions = $om->read('sale\autosale\Condition', $autosale['conditions_ids'], ['operand', 'operator', 'value']);
+                $valid = true;
+                foreach($conditions as $c_id => $condition) {
+                    if(!in_array($condition['operator'], ['>', '>=', '<', '<=', '='])) {
+                        // unknown operator
+                        continue;
+                    }
+                    $operator = $condition['operator'];
+                    if($operator == '=') {
+                        $operator = '==';
+                    }
+                    if(!isset($operands[$condition['operand']])) {
+                        $valid = false;
                         break;
                     }
-				}
-				if($valid) {
-					trigger_error("ORM:: all conditions fullfilled", QN_REPORT_DEBUG);
-					$products_to_apply[$autosale_id] = [
-						'id'            => $autosale['product_id.id'],
-						'name'          => $autosale['product_id.name'],
-						'has_own_qty'   => $autosale['has_own_qty'],
-						'qty'           => $autosale['qty']
-					];
-				}
-			}
+                    $operand = $operands[$condition['operand']];
+                    $value = $condition['value'];
+                    if(!is_numeric($operand)) {
+                        $operand = "'$operand'";
+                    }
+                    if(!is_numeric($value)) {
+                        $value = "'$value'";
+                    }
+                    trigger_error(" testing {$operand} {$operator} {$value}", QN_REPORT_DEBUG);
+                    $valid = $valid && (bool) eval("return ( {$operand} {$operator} {$value});");
+                    if(!$valid) {
+                        break;
+                    }
+                }
+                if($valid) {
+                    trigger_error("ORM:: all conditions fullfilled", QN_REPORT_DEBUG);
+                    $products_to_apply[$autosale_id] = [
+                        'id'            => $autosale['product_id.id'],
+                        'name'          => $autosale['product_id.name'],
+                        'has_own_qty'   => $autosale['has_own_qty'],
+                        'qty'           => $autosale['qty']
+                    ];
+                }
+            }
 
-			// pass-2: apply all applicable products
-			$count = count($products_to_apply);
+            // pass-2: apply all applicable products
+            $count = count($products_to_apply);
 
-			if($count) {
-				// add all applicable products at the end of the group
-				$order = 1000;
-				foreach($products_to_apply as $autosale_id => $product) {
-					$line = [
-						'order'                     => $order++,
-						'booking_id'                => $group['booking_id'],
-						'booking_line_group_id'     => $id,
-						'is_autosale'               => true,
-						'has_own_qty'               => $product['has_own_qty']
-					];
-					$line_id = $om->create(BookingLine::getType(), $line);
-					// set product_id (#memo - we're in a refresh method called with disabled events - this does not trigger recompute)
-					$om->update(BookingLine::getType(), $line_id, ['product_id' => $product['id']]);
-					BookingLine::refreshPriceId($om, $line_id);
-					// read the resulting product
-					$lines = $om->read(BookingLine::getType(), $line_id, ['price_id', 'price_id.price']);
-					// prevent adding autosale products for which a price could not be retrieved (invoices with lines without accounting rule are invalid)
-					if($lines > 0 && count($lines)) {
-						$line = reset($lines);
-						if(!isset($line['price_id']) || is_null($line['price_id']) || $line['price_id.price'] <= 0.01) {
-							$om->delete(BookingLine::getType(), $line_id, true);
-						}
-					}
-				}
-			}
-		}
-		else {
-			$date = date('Y-m-d', $group['date_from']);
-			trigger_error("ORM::no matching autosale list found for date {$date}", QN_REPORT_DEBUG);
-		}
+            if($count) {
+                // add all applicable products at the end of the group
+                $order = 1000;
+                foreach($products_to_apply as $autosale_id => $product) {
+                    $line = [
+                        'order'                     => $order++,
+                        'booking_id'                => $group['booking_id'],
+                        'booking_line_group_id'     => $id,
+                        'is_autosale'               => true,
+                        'has_own_qty'               => $product['has_own_qty']
+                    ];
+                    $line_id = $om->create(BookingLine::getType(), $line);
+                    // set product_id (#memo - we're in a refresh method called with disabled events - this does not trigger recompute)
+                    $om->update(BookingLine::getType(), $line_id, ['product_id' => $product['id']]);
+                    $booking_line =  BookingLine::id($line_id)->read(['product_id'=>['id','sku']])->first(true);
+                    $has_specific_city_tax_calculation = Setting::get_value('sale', 'organization', 'has_specific_city_tax_calculation', 0);
+                    $city_tax_sku = Setting::get_value('sale', 'organization', 'sku.city_tax');
+                    if ($has_specific_city_tax_calculation && $city_tax_sku == $booking_line['product_id']['sku'] ){
+                        $om->update(BookingLine::getType(), $line_id, ['qty' => $group['nb_nights'] *  ( $group['nb_pers'] - $group['nb_children'])]);
+                    }
+                    BookingLine::refreshPriceId($om, $line_id);
+                    // read the resulting product
+                    $lines = $om->read(BookingLine::getType(), $line_id, ['price_id', 'price_id.price']);
+                    // prevent adding autosale products for which a price could not be retrieved (invoices with lines without accounting rule are invalid)
+                    if($lines > 0 && count($lines)) {
+                        $line = reset($lines);
+                        if(!isset($line['price_id']) || is_null($line['price_id']) || $line['price_id.price'] <= 0.01) {
+                            $om->delete(BookingLine::getType(), $line_id, true);
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            $date = date('Y-m-d', $group['date_from']);
+            trigger_error("ORM::no matching autosale list found for date {$date}", QN_REPORT_DEBUG);
+        }
 
     }
 
@@ -3697,6 +3947,7 @@ class BookingLineGroup extends Model {
 
         foreach($group['booking_lines_ids'] as $line_id) {
             BookingLine::refreshPriceId($om, $line_id);
+            BookingLine::refreshFreeQty($om, $line_id);
             BookingLine::refreshQty($om, $line_id);
             BookingLine::refreshPrice($om, $line_id);
         }
@@ -4375,6 +4626,42 @@ class BookingLineGroup extends Model {
 
             }
 
+        }
+    }
+
+    /**
+     * This method is called by `update-sojourn-[...]` controllers.
+     * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
+     *
+     * Modifies date of the group's activities to match new date of the group
+     *
+     * @param ObjectManager $om
+     * @param int           $id         id of the group
+     * @param int           $dates_diff difference between the new date_from and the old one ($new_date_from - $old_date_from)
+     */
+    public static function refreshActivitiesDates($om, $id, $dates_diff) {
+        $groups = $om->read(self::getType(), $id, ['booking_activities_ids']);
+
+        if($groups <= 0) {
+            return;
+        }
+
+        $group = reset($groups);
+
+        $activities = $om->read(BookingActivity::getType(), $group['booking_activities_ids'], [
+            'activity_date'
+        ]);
+
+        if($activities <= 0) {
+            return;
+        }
+
+        foreach($activities as $id => $activity) {
+            $shifted_activity_date = $activity['activity_date'] + $dates_diff;
+
+            $om->update(BookingActivity::getType(), $id, [
+                'activity_date' => $shifted_activity_date
+            ]);
         }
     }
 }

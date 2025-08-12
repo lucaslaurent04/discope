@@ -51,7 +51,10 @@ list($context, $orm) = [ $providers['context'], $providers['orm']];
 $group = BookingLineGroup::id($params['id'])
     ->read([
         'id', 'is_extra',
-        'booking_id' => ['id', 'status']
+        'date_from', 'date_to',
+        'booking_meals_ids',
+        'booking_activities_ids'  => ['employee_id'],
+        'booking_id'              => ['id', 'status']
     ])
     ->first(true);
 
@@ -61,6 +64,32 @@ if(!$group) {
 
 if(!in_array($group['booking_id']['status'], ['quote', 'checkedout']) && !$group['is_extra']) {
     throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
+}
+
+$day_diff = ($group['date_from'] - $params['date_from']) / 86400;
+// check that, if needed, the activities' dates can be switched to the new date_from to date_to interval
+if(!empty($group['booking_activities_ids'])) {
+    $old_date_diff = $group['date_to'] - $group['date_from'];
+    $old_day_dif = 0;
+    if($old_date_diff > 0) {
+        $old_day_dif = $old_date_diff / 86400;
+    }
+
+    $new_date_diff =  $params['date_to'] - $params['date_from'];
+    $new_day_diff = 0;
+    if($new_date_diff > 0) {
+        $new_day_diff = $new_date_diff / 86400;
+    }
+
+    if($old_day_dif !== $new_day_diff) {
+        throw new Exception("activities_wrong_duration", EQ_ERROR_INVALID_PARAM);
+    }
+
+    foreach($group['booking_activities_ids'] as $activity) {
+        if(isset($activity['employee_id'])) {
+            throw new Exception("activities_already_assigned", EQ_ERROR_INVALID_PARAM);
+        }
+    }
 }
 
 // Callbacks are defined on Booking, BookingLine, and BookingLineGroup to ensure consistency across these entities.
@@ -95,6 +124,16 @@ BookingLineGroup::refreshLines($orm, $group['id']);
 BookingLineGroup::refreshRentalUnitsAssignments($orm, $group['id']);
 
 BookingLineGroup::refreshPrice($orm, $group['id']);
+
+if(!empty($group['booking_meals_ids'])) {
+    // shift dates of people's meals and create/delete some meals if needed
+    BookingLineGroup::refreshMealsDates($orm, $group['id'], $params['date_from'] - $group['date_from']);
+}
+
+if(!empty($group['booking_activities_ids'])) {
+    // shift activities dates
+    BookingLineGroup::refreshActivitiesDates($orm, $group['id'], $params['date_from'] - $group['date_from']);
+}
 
 Booking::refreshPrice($orm, $group['booking_id']['id']);
 

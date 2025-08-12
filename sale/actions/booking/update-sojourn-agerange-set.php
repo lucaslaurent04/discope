@@ -37,6 +37,11 @@ list($params, $providers) = eQual::announce([
             'type'              => 'integer',
             'description'       => 'New amount of participants assigned to given ages.',
             'required'          => true
+        ],
+        'free_qty' =>  [
+            'type'              => 'integer',
+            'description'       => 'New amount of free participants assigned to given ages.',
+            'default'           => 0
         ]
     ],
     'access' => [
@@ -140,15 +145,12 @@ $orm->disableEvents();
 BookingLineGroupAgeRangeAssignment::id($params['age_range_assignment_id'])
     ->update([
         'qty'           => $params['qty'],
+        'free_qty'      => $params['free_qty'],
         'age_range_id'  => $params['age_range_id']
     ]);
 
-$delta = $params['qty'] - $ageRangeAssignment['qty'];
-
-BookingLineGroup::id($group['id'])
-    ->update([
-        'nb_pers' => $group['nb_pers'] + $delta
-    ]);
+BookingLineGroup::refreshNbPers($orm, $group['id']);
+BookingLineGroup::refreshNbChildren($orm, $group['id']);
 
 // #memo - this impacts autosales at booking level
 Booking::refreshNbPers($orm, $group['booking_id']['id']);

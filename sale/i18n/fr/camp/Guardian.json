@@ -1,0 +1,115 @@
+{
+    "name": "Tuteur",
+    "plural": "Tuteurs",
+    "description": "Tuteur d'un enfant qui participe à un camp.",
+    "model": {
+        "firstname": {
+            "label": "Prénom",
+            "description": "Prénom de l'enfant.",
+            "help": ""
+        },
+        "lastname": {
+            "label": "Nom",
+            "description": "Nom de famille de l'enfant.",
+            "help": ""
+        },
+        "email": {
+            "label": "Email",
+            "description": "Adresse e-mail.",
+            "help": ""
+        },
+        "mobile": {
+            "label": "Mobile",
+            "description": "Numéro de téléphone mobile.",
+            "help": ""
+        },
+        "phone": {
+            "label": "Téléphone",
+            "description": "Numéro de téléphone.",
+            "help": ""
+        },
+        "work_phone": {
+            "label": "Téléphone travail",
+            "description": "Numéro de téléphone du travail.",
+            "help": ""
+        },
+        "relation_type": {
+            "label": "Type de relation",
+            "description": "Relation entre l'enfant et le tuteur.",
+            "help": "",
+            "selection": {
+                "mother": "Mère",
+                "father": "Père",
+                "legal-tutor": "Tuteur légal",
+                "family-member": "Membre famille",
+                "home-manager": "Responsable foyer",
+                "departmental-council": "Conseil département"
+            }
+        },
+        "address_street": {
+            "label": "Rue",
+            "description": "Rue et numéro.",
+            "help": ""
+        },
+        "address_dispatch": {
+            "label": "Complément d'adresse",
+            "description": "Infos optionnelles pour l'envoi du courrier.",
+            "help": ""
+        },
+        "address_zip": {
+            "label": "Code Postal",
+            "description": "Code Postal.",
+            "help": ""
+        },
+        "address_city": {
+            "label": "Ville",
+            "description": "Ville.",
+            "help": ""
+        },
+        "different_invoicing_address": {
+            "label": "Adresse de facturation différente",
+            "description": "",
+            "help": ""
+        },
+        "invoicing_address_street": {
+            "label": "Rue",
+            "description": "Rue et numéro.",
+            "help": ""
+        },
+        "invoicing_address_dispatch": {
+            "label": "Complément d'adresse",
+            "description": "Infos optionnelles pour l'envoi du courrier.",
+            "help": ""
+        },
+        "invoicing_address_zip": {
+            "label": "Code Postal",
+            "description": "Code Postal.",
+            "help": ""
+        },
+        "invoicing_address_city": {
+            "label": "Ville",
+            "description": "Ville.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Tuteur",
+            "description": "",
+            "layout": {
+                "section.children": {
+                    "label": "Enfants"
+                },
+                "section.invoicing-address": {
+                    "label": "Adresse facturation"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Tuteurs",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}

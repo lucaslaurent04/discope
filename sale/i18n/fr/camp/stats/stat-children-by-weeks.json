@@ -1,0 +1,52 @@
+{
+    "name": "Statistiques quantités d'inscriptions par semaines.",
+    "plural": "",
+    "description": "Statistiques quantités d'inscriptions par semaines.",
+    "model": {
+        "all_centers": {
+            "label": "Tous les centres"
+        },
+        "center_id": {
+            "label": "Centre"
+        },
+        "date_from": {
+            "label": "Du"
+        },
+        "date_to": {
+            "label": "Au"
+        },
+        "center": {
+            "label": "Centre",
+            "description": "",
+            "help": ""
+        },
+        "week": {
+            "label": "Semaine",
+            "description": "",
+            "help": ""
+        },
+        "qty_week": {
+            "label": "Qté semaine",
+            "description": "",
+            "help": ""
+        },
+        "qty_weekend": {
+            "label": "Qté week-end",
+            "description": "",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "",
+            "description": "",
+            "layout": {}
+        },
+        "list.default": {
+            "name": "Quantités d'enfants par semaines",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

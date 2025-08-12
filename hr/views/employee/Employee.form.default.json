@@ -30,7 +30,17 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "code",
+                                                "value": "date_start",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "date_end",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
                                                 "width": "33%"
                                             },
                                             {

@@ -45,12 +45,30 @@
                                                 "widget": {
                                                     "fields": ["customer_id.bookings_ids"],
                                                     "heading": true
-                                                }
+                                                },
+                                                "visible": ["booking_id", "<>", null]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "partner_id",
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "visible": ["booking_id", "<>", null]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "enrollment_id",
+                                                "width": "50%",
+                                                "widget": {
+                                                    "fields": ["customer_id.bookings_ids"],
+                                                    "heading": true
+                                                },
+                                                "visible": ["enrollment_id", "<>", null]
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "50%",
+                                                "visible": ["enrollment_id", "<>", null]
                                             },
                                             {
                                                 "type": "field",

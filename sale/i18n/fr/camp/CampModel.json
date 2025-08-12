@@ -1,0 +1,105 @@
+{
+    "name": "Modèle de Camp",
+    "plural": "Modèles de Camp",
+    "description": "Modèle qui sert de base à la création de camps",
+    "model": {
+        "description": {
+            "label": "Description",
+            "description": "Description du modèle de camp.",
+            "help": ""
+        },
+        "product_id": {
+            "label": "Produit",
+            "description": "Le produit qui sera utilisé.",
+            "help": ""
+        },
+        "camp_type": {
+            "label": "Type",
+            "description": "Type de camp.",
+            "help": "",
+            "selection": {
+                "sport": "Sport",
+                "circus": "Cirque",
+                "culture": "Culture",
+                "environment": "Environnement",
+                "horse-riding": "Équitation",
+                "recreation": "Accueil & Loisir"
+            }
+        },
+        "is_clsh": {
+            "label": "CLSH",
+            "description": "Centre loisir sans hébergement.",
+            "help": ""
+        },
+        "clsh_type": {
+            "label": "Durée",
+            "description": "Type de camp CLSH.",
+            "help": "",
+            "selection": {
+                "5-days": "5 jours",
+                "4-days": "4 jours"
+            }
+        },
+        "day_product_id": {
+            "label": "Produit à la journée",
+            "description": "Le produit de vente du camp CLSH à la journée.",
+            "help": ""
+        },
+        "weekend_product_id": {
+            "label": "Produit weekend",
+            "description": "Le produit de vente de l'hébergement le weekend après le camp.",
+            "help": ""
+        },
+        "saturday_morning_product_id": {
+            "label": "Produit samedi matin",
+            "description": "Le produit de vente de l'hébergement jusqu'au samedi matin après le camp.",
+            "help": ""
+        },
+        "employee_ratio": {
+            "label": "Ratio employé",
+            "description": "La quantité d'enfants qu'un employé peut géré seul.",
+            "help": ""
+        },
+        "need_license_ffe": {
+            "label": "Besoin licence FFE",
+            "description": "Est-ce que les enfants on besoin d'une 'licence fédération française équitation' pour participé au camp.",
+            "help": ""
+        },
+        "ase_quota": {
+            "label": "Quota ASE (par groupe)",
+            "description": "Max d'enfants ASE par groupe (Aide social à l'enfance).",
+            "help": ""
+        },
+        "accounting_code": {
+            "label": "Code comptable",
+            "description": "Code comptable du camp.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Modèle",
+            "description": "",
+            "layout": {
+                "section.description": {
+                    "label": "Description"
+                },
+                "section.required-skills": {
+                    "label": "Compétences requises"
+                },
+                "section.required-documents": {
+                    "label": "Documents requis"
+                },
+                "section.camps": {
+                    "label": "Camps"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Modèles",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}

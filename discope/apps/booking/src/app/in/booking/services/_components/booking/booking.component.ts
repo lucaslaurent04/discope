@@ -9,10 +9,10 @@ import { trigger, style, animate, transition } from '@angular/animations';
 import { BookingServicesBookingGroupComponent } from './_components/group/group.component'
 import { Booking } from './_models/booking.model';
 import { BookingLineGroup } from './_models/booking_line_group.model';
-import { BookingActivity } from './_models/booking_activity.model';
+
 import { BookingLine } from './_models/booking_line.model';
-import { BookingActivityDay } from './_components/group/_components/day-activities/day-activities.component';
-import { BookedServicesDisplaySettings } from '../../services.component';
+
+import { BookedServicesDisplaySettings, RentalUnitsSettings } from '../../services.component';
 
 // declaration of the interface for the map associating relational Model fields with their components
 interface BookingComponentsMap {
@@ -51,14 +51,22 @@ export class BookingServicesBookingComponent
     @ViewChildren(BookingServicesBookingGroupComponent) bookingServicesBookingGroups: QueryList<BookingServicesBookingGroupComponent>;
     @Input() booking_id: number;
     @Input() display_settings: BookedServicesDisplaySettings;
+    @Input() rental_units_settings: RentalUnitsSettings;
 
+    // By convention, `ready` is set to true once the component has completed its
+    // initial lifecycle phase: constructor + first ngOnChanges (if any) + ngOnInit + ngAfterViewInit,
+    // At this point, the view has been initialized and all @Input values are available and the component is rendered in the DOM.
     public ready: boolean = false;
     public loading: boolean = true;
+    private loadingStartTime: number;
+
     public maximized_group_id: number = 0;
     public time_slots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[] = [];
     public sojourn_types: { id: number, name: 'GA'|'GG' }[] = [];
-    public mapGroupsIdsBookingActivitiesDays: {[key: number]: BookingActivityDay[]} = {};
-    public mapGroupsIdsHasActivity: {[key: number]: boolean};
+    public meal_types: { id: number, name: string, code: string }[] = [];
+    public meal_places: { id: number, name: string, code: string }[] = [];
+
+    private mapGroupsIdsHasActivity: {[key: number]: boolean};
 
     constructor(
         private dialog: MatDialog,
@@ -69,56 +77,72 @@ export class BookingServicesBookingComponent
     }
 
     public ngOnChanges(changes: SimpleChanges) {
+        if(!this.ready) {
+            console.debug('BookingServicesBookingComponent::ngOnChanges : first call - ignoring');
+            return;
+        }
+        console.debug('BookingServicesBookingComponent::ngOnChanges', changes);
         if(changes.booking_id && this.booking_id > 0) {
-            try {
-                this.load(this.booking_id);
-                this.ready = true;
-            }
-            catch(error) {
-                console.warn(error);
-            }
+            this.load(this.booking_id);
         }
     }
 
-    public ngAfterViewInit() {
+    public async ngAfterViewInit() {
+        console.debug('BookingServicesBookingComponent::ngAfterViewInit');
         // init local componentsMap
-        let map:BookingComponentsMap = {
+        this.componentsMap = {
             booking_lines_groups_ids: this.bookingServicesBookingGroups
-        };
-        this.componentsMap = map;
+        } as BookingComponentsMap;
+
+        this.ready = true;
+
+        if(this.booking_id > 0) {
+            await this.load(this.booking_id);
+        }
     }
 
     public async ngOnInit() {
-        this.time_slots = await this.api.collect('sale\\booking\\TimeSlot', [], ['id', 'name', 'code']);
-        this.sojourn_types = await this.api.collect('sale\\booking\\SojournType', [], ['id', 'name']);
+        console.debug('BookingServicesBookingComponent::ngOnInit');
+        const [timeSlots, sojournTypes, mealTypes, mealPlaces] = await Promise.all([
+            this.api.collect('sale\\booking\\TimeSlot', [], ['id','name','code']),
+            this.api.collect('sale\\booking\\SojournType', [], ['id','name']),
+            this.api.collect('sale\\booking\\MealType', [], ['id','name','code']),
+            this.api.collect('sale\\booking\\MealPlace', [], ['id','name','code'])
+        ]);
+
+        this.time_slots = timeSlots;
+        this.sojourn_types = sojournTypes;
+        this.meal_types = mealTypes;
+        this.meal_places = mealPlaces;
     }
+
 
     /**
      * Load an Booking object using the sale_pos_order_tree controller
      * @param booking_id
      */
-    public load(booking_id: number) {
-        if(booking_id > 0) {
-            // #memo - init generates multiple load which badly impacts the UX
-            // this.loading = true;
-            this.api.fetch('?get=sale_booking_tree', {id:booking_id})
-            .then( (result:any) => {
-                if(result) {
-                    console.debug('received updated booking', result);
-                    this.update(result);
-                    this.initMapGroupsIdsBookingActivitiesDays(result);
-                    this.initMapGroupsIdsHasActivity(result);
-                    this.loading = false;
-                }
+    public async load(booking_id: number) {
+        if(booking_id <= 0){
+            return;
+        }
 
-            })
-            .catch(response => {
-                console.warn(response);
-                // if a 403 response is received, we assume that the user is not identified: redirect to /auth
-                if(response.status == 403) {
-                    window.location.href = '/auth';
-                }
-            });
+        try {
+            // #memo - do not set loading to true here (to allow silent update)
+            const result: any = await this.api.fetch('?get=sale_booking_tree', { id: booking_id });
+            if (result) {
+                this.update(result);
+                this.initMapGroupsIdsHasActivity(result);
+            }
+        }
+        catch (e) {
+            console.warn(e);
+            if((e as any)?.status === 403) {
+                window.location.href = '/auth';
+            }
+        }
+        finally {
+            // if loading was set (init or loadStart), make sure it is reverted
+            setTimeout( () => this.loading = false, 250);
         }
     }
 
@@ -126,7 +150,7 @@ export class BookingServicesBookingComponent
      *
      * @param values
      */
-    public update(values:any) {
+    public update(values: any) {
         super.update(values);
     }
 
@@ -189,7 +213,7 @@ export class BookingServicesBookingComponent
                 dialog.afterClosed().subscribe( async (result) => (result)?resolve(true):reject() );
             });
             try {
-                // instant remove in view
+                // optimistic UI - instant remove in view
                 this.instance.booking_lines_groups_ids = this.instance.booking_lines_groups_ids.filter( (group:any) => group.id !== group_id);
                 await this.api.fetch('?do=sale_booking_update-groups-remove', {id: this.instance.id, booking_line_group_id: group_id});
             }
@@ -201,10 +225,13 @@ export class BookingServicesBookingComponent
         }
         catch(response) {
             // user discarded the dialog (selected 'no')
-            return;
         }
     }
 
+    /**
+     * By convention, updating a group does not trigger the display of the loader.
+     * To do so, groups must explicitly relay a request through `loadStart`.
+     */
     public onupdateGroup() {
         // reload booking tree
         this.load(this.instance.id);
@@ -228,71 +255,33 @@ export class BookingServicesBookingComponent
         }
     }
 
+    /**
+     * handle loading from sub components
+     */
     public onLoadStartGroup() {
         this.loading = true;
+        this.loadingStartTime = Date.now();
     }
 
+    /**
+     * enact loading end from sub components while forcing a minimum duration
+     */
     public onLoadEndGroup() {
-        this.loading = false;
-    }
+        if(!this.loadingStartTime) { this.loading = false; return; }
+        const elapsed = Date.now() - this.loadingStartTime;
+        const minDuration = 250;
+        const remaining = minDuration - elapsed;
 
-    private initMapGroupsIdsBookingActivitiesDays(booking: Booking) {
-        this.mapGroupsIdsBookingActivitiesDays = {};
-        for(let group of booking.booking_lines_groups_ids) {
-            this.mapGroupsIdsBookingActivitiesDays[group.id] = this.createGroupBookingActivitiesDays(group);
+        if (remaining > 0) {
+            setTimeout(() => this.loading = false, remaining);
+        }
+        else {
+            this.loading = false;
         }
     }
 
-    private createGroupBookingActivitiesDays(group: BookingLineGroup) {
-        const bookingActivitiesDays = [];
-        let date = new Date(group.date_from);
-        const dateTo = new Date(group.date_to);
-        while(date <= dateTo) {
-            const bookingActivityDay: BookingActivityDay = {
-                date: new Date(date),
-                AM: null,
-                PM: null,
-                EV: null
-            };
-
-            for(let bookingActivity of group.booking_activities_ids as BookingActivity[]) {
-                let activityDate = new Date(bookingActivity.activity_date).toISOString().split('T')[0];
-                if(activityDate !== date.toISOString().split('T')[0]) {
-                    continue;
-                }
-
-                let activityBookingLine: BookingLine | undefined = group.booking_lines_ids.find(
-                    (bookingLine: BookingLine) => bookingLine.id === bookingActivity.activity_booking_line_id
-                );
-
-                if(activityBookingLine === undefined || !activityBookingLine.service_date) {
-                    continue;
-                }
-
-                const timeSlot = this.time_slots.find((timeSlot: any) => timeSlot.id === bookingActivity.time_slot_id);
-                if(!timeSlot || !['AM', 'PM', 'EV'].includes(timeSlot.code)) {
-                    continue;
-                }
-
-                bookingActivityDay[timeSlot.code as 'AM'|'PM'|'EV'] = {
-                    ...bookingActivity,
-                    entity: 'sale\\booking\\BookingActivity',
-                    activity_booking_line_id: activityBookingLine,
-                    transports_booking_lines_ids: group.booking_lines_ids.filter(
-                        (bookingLine: BookingLine) => bookingActivity.transports_booking_lines_ids.map(Number).includes(bookingLine.id)
-                    ),
-                    supplies_booking_lines_ids: group.booking_lines_ids.filter(
-                        (bookingLine: BookingLine) => bookingActivity.supplies_booking_lines_ids.map(Number).includes(bookingLine.id)
-                    )
-                };
-            }
-
-            bookingActivitiesDays.push(bookingActivityDay);
-
-            date.setDate(date.getDate() + 1);
-        }
-
-        return bookingActivitiesDays;
+    public hasActivity(group_id: number): boolean {
+        return !!this.mapGroupsIdsHasActivity?.[group_id];
     }
 
     private initMapGroupsIdsHasActivity(booking: Booking) {
@@ -302,9 +291,9 @@ export class BookingServicesBookingComponent
             for(let line of group.booking_lines_ids as BookingLine[]) {
                 if(line.is_activity) {
                     hasActivity = true;
+                    break;
                 }
             }
-
             this.mapGroupsIdsHasActivity[group.id] = hasActivity;
         }
     }

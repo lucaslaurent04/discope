@@ -1,17 +1,18 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\pay;
+
 use equal\orm\Model;
 
 class BankCheck extends Model {
 
-    public static function getColumns() {
-
+    public static function getColumns(): array {
         return [
 
             'name' => [
@@ -75,51 +76,87 @@ class BankCheck extends Model {
                 'description'       => 'The official deposit number provided by the bank, used to track all associated checks.',
             ],
 
-            'is_voucher'    =>[
+            'is_voucher' => [
                 'type'              => 'boolean',
                 'description'       => "The check is the voucher",
                 'default'           => false
+            ],
+
+            'payment_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\pay\Payment',
+                'description'       => "The payment associated with the bank check."
+            ],
+
+            'enrollment_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'function'          => 'calcEnrollmentId',
+                'foreign_object'    => 'sale\camp\Enrollment',
+                'description'       => "The enrollment associated with the bank check, if applicable (computed field).",
+                'instant'           => true,
+                'store'             => true
             ]
+
         ];
     }
 
-    public static function getWorkflow() {
+    public static function onchange($event, $values): array {
+        $result = parent::onchange($event, $values);
+
+        if(isset($event['funding_id']) && strlen($event['funding_id']) > 0) {
+            $funding = Funding::id($event['funding_id'])
+                ->read(['enrollment_id' => ['name']])
+                ->first();
+
+            if(!is_null($funding)) {
+                $result['enrollment_id'] = $funding['enrollment_id'];
+            }
+        }
+
+        return $result;
+    }
+
+    public static function getWorkflow(): array {
         return [
+
             'pending' => [
                 'description' => 'The bank check has been registered and is waiting to be transferred to the bank.',
                 'transitions' => [
                     'reject' => [
-                        'description' => 'The bank check has been rejected by the bank.',
-                        'status' => 'rejected',
+                        'description'   => 'The bank check has been rejected by the bank.',
+                        'status'        => 'rejected'
                     ],
                     'pay' => [
-                        'description' => 'The bank check has been marked as paid, and a transfer has been created in the bank statement.',
-                        'status' => 'paid',
-                    ],
-                ],
+                        'description'   => 'The bank check has been marked as paid, and a transfer has been created in the bank statement.',
+                        'status'        => 'paid'
+                    ]
+                ]
             ],
+
             'paid' => [
                 'description' => 'The bank check has been marked as paid. It can now be linked to the funding.',
                 'transitions' => [
                     'pending' => [
-                        'description' => 'The payment has been removed and funding has been updated.',
-                        'status' => 'pending',
+                        'description'   => 'The payment has been removed and funding has been updated.',
+                        'status'        => 'pending'
                     ],
                     'reject' => [
-                        'description' => 'The bank check has been rejected by the bank.',
-                        'status' => 'rejected',
-                    ],
-                ],
+                        'description'   => 'The bank check has been rejected by the bank.',
+                        'status'        => 'rejected'
+                    ]
+                ]
             ],
+
             'rejected' => [
                 'description' => 'The bank check has been rejected. The client must be contacted.',
-                'transitions' => [],
-            ],
+                'transitions' => []
+            ]
+
         ];
     }
 
-
-    public static function calcName($self) {
+    public static function calcName($self): array {
         $result = [];
         $self->read(['bank_check_number', 'amount', 'emission_date']);
         foreach($self as $id => $bankCheck) {
@@ -128,8 +165,18 @@ class BankCheck extends Model {
         return $result;
     }
 
-    public static function canupdate($om, $oids, $values, $lang) {
+    public static function calcEnrollmentId($self): array {
+        $result = [];
+        $self->read(['funding_id' => ['enrollment_id']]);
+        foreach($self as $id => $bank_check) {
+            if(isset($bank_check['funding_id']['enrollment_id'])) {
+                $result[$id] = $bank_check['funding_id']['enrollment_id'];
+            }
+        }
+        return $result;
+    }
 
+    public static function canupdate($om, $oids, $values, $lang) {
         return self::validateAmount($values, function() use ($om, $oids, $values, $lang) {
             return parent::canupdate($om, $oids, $values, $lang);
         });
@@ -141,15 +188,11 @@ class BankCheck extends Model {
         });
     }
 
-
     private static function validateAmount($values, $callback) {
-
-        if ($values['amount'] < 0) {
+        if($values['amount'] < 0) {
             return ['amount' => ['non_editable' => 'The amount of the bank check cannot be negative.']];
         }
 
         return $callback();
     }
-
-
 }

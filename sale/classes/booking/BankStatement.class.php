@@ -1,16 +1,16 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\booking;
 
 class BankStatement extends \sale\pay\BankStatement {
 
     public static function getColumns() {
-
         return [
 
             'name' => [
@@ -27,12 +27,6 @@ class BankStatement extends \sale\pay\BankStatement {
                 'foreign_field'     => 'bank_statement_id',
                 'description'       => 'The lines that are assigned to the statement.',
                 'ondetach'          => 'null'
-            ],
-
-            'center_office_id' => [
-                'type'              => 'many2one',
-                'foreign_object'    => 'identity\CenterOffice',
-                'description'       => 'Center office related to the statement (based on account number).'
             ]
 
         ];
@@ -50,5 +44,4 @@ class BankStatement extends \sale\pay\BankStatement {
     public static function generateName() {
         return null;
     }
-
 }

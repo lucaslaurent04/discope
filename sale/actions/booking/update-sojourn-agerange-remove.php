@@ -11,7 +11,6 @@ use sale\booking\BookingLineGroup;
 use sale\booking\BookingLineGroupAgeRangeAssignment;
 use sale\customer\AgeRange;
 
-// announce script and fetch parameters values
 list($params, $providers) = eQual::announce([
     'description'	=>	"Create an empty additional age range. This script is meant to be called by the `booking/services` UI.",
     'params' 		=>	[
@@ -121,10 +120,8 @@ $orm->disableEvents();
 
 BookingLineGroupAgeRangeAssignment::id($ageRangeAssignment['id'])->delete(true);
 
-BookingLineGroup::id($group['id'])
-    ->update([
-        'nb_pers' => $group['nb_pers'] - $ageRangeAssignment['qty']
-    ]);
+BookingLineGroup::refreshNbPers($orm, $group['id']);
+BookingLineGroup::refreshNbChildren($orm, $group['id']);
 
 // #memo - this impacts autosales at booking level
 Booking::refreshNbPers($orm, $group['booking_id']['id']);
@@ -169,6 +166,7 @@ BookingLineGroup::refreshLines($orm, $group['id']);
 BookingLineGroup::refreshRentalUnitsAssignments($orm, $group['id']);
 
 BookingLineGroup::refreshPrice($orm, $group['id']);
+
 Booking::refreshPrice($orm, $group['booking_id']['id']);
 
 

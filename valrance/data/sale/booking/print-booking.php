@@ -14,15 +14,16 @@ use Dompdf\Options as DompdfOptions;
 use equal\data\DataFormatter;
 use sale\booking\Booking;
 use sale\booking\BookingActivity;
+use sale\booking\BookingLineGroupAgeRangeAssignment;
 use sale\booking\Consumption;
 use sale\booking\TimeSlot;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
-use sale\booking\BookingLineGroupAgeRangeAssignment;
+use sale\booking\BookingMeal;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Render a booking quote as a PDF document, given its id.",
     'params'        => [
         'id' => [
@@ -81,28 +82,30 @@ $lodgingBookingPrintBookingFormatMember = function($booking) {
     return $code . ' - ' . $booking['customer_id']['partner_identity_id']['display_name'];
 };
 
-$lodgingBookingPrintAgeRangesText = function($booking, $conection_names) {
+$lodgingBookingPrintAgeRangesText = function($booking, $connection_names) {
     $age_rang_maps = [];
 
-    foreach ($booking['booking_lines_groups_ids'] as $booking_line_group) {
-        if ($booking_line_group['is_sojourn']) {
-            foreach ($booking_line_group['age_range_assignments_ids'] as $age_range_assignment) {
-                $age_range_assignment_code = $age_range_assignment['age_range_id']['id'];
-                if (!isset($age_rang_maps[$age_range_assignment_code])) {
-                    $age_rang_maps[$age_range_assignment_code] = [
-                        'age_range' => $age_range_assignment['age_range_id']['name'],
-                        'qty' => 0
-                    ];
-                }
-                $age_rang_maps[$age_range_assignment_code]['qty'] += $age_range_assignment['qty'];
+    foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
+        if(!$booking_line_group['is_sojourn'] || $booking_line_group['group_type'] !== 'sojourn') {
+            continue;
+        }
+        foreach($booking_line_group['age_range_assignments_ids'] as $age_range_assignment) {
+            $age_range_assignment_code = $age_range_assignment['age_range_id']['id'];
+            if(!isset($age_rang_maps[$age_range_assignment_code])) {
+                $age_rang_maps[$age_range_assignment_code] = [
+                    'age_range' => $age_range_assignment['age_range_id']['name'],
+                    'qty'       => 0
+                ];
             }
+            $age_rang_maps[$age_range_assignment_code]['qty'] += $age_range_assignment['qty'];
         }
     }
 
-    $parts = array_map(fn($item) => $item['qty'] . ' ' . strtolower($item['age_range']), $age_rang_maps);
+    $parts = array_map(function($item) { return $item['qty'] . ' ' . strtolower($item['age_range']); }, $age_rang_maps);
     $last = array_pop($parts);
-    return count($parts) ? implode(', ', $parts) . ' ' . $conection_names[0] . ' ' . $last : $last;
+    return count($parts) ? implode(', ', $parts) . ' ' . $connection_names[0] . ' ' . $last : $last;
 };
+
 /*
     Retrieve the requested template
 */
@@ -157,7 +160,7 @@ $fields = [
             'email'
     ],
     'customer_id' => [
-        'rate_class_id' => ['id', 'name'],
+        'rate_class_id' => ['id', 'name', 'code'],
         'partner_identity_id' => [
             'id',
             'display_name',
@@ -227,6 +230,7 @@ $fields = [
         'id',
         'name',
         'has_pack',
+        'group_type',
         'is_locked',
         'is_sojourn',
         'pack_id'  => ['label'],
@@ -236,7 +240,7 @@ $fields = [
         'total',
         'price',
         'fare_benefit',
-        'rate_class_id' => ['id', 'name', 'description'],
+        'rate_class_id' => ['id', 'name', 'code', 'description'],
         'date_from',
         'date_to',
         'nb_pers',
@@ -250,14 +254,14 @@ $fields = [
                 'id',
                 'label' ,
                 'age_range_id',
-                'grouping_code_id' => ['id', 'name'],
-                'product_model_id' => ['id', 'name', 'grouping_code_id' => ['id', 'name']]
+                'grouping_code_id' => ['id', 'code', 'name'],
+                'product_model_id' => ['id', 'name', 'grouping_code_id' => ['id', 'code', 'name']]
             ],
             'booking_activity_id' => [
-                    'id', 'name', 'total', 'price',
-                    'supplies_booking_lines_ids' => ['id', 'qty', 'total', 'price'],
-                    'transports_booking_lines_ids' => ['id', 'qty', 'total', 'price']
-                    ],
+                'id', 'name', 'total', 'price',
+                'supplies_booking_lines_ids' => ['id', 'qty', 'total', 'price'],
+                'transports_booking_lines_ids' => ['id', 'qty', 'total', 'price']
+            ],
             'description',
             'is_accomodation',
             'qty',
@@ -304,6 +308,7 @@ $values = [
     'attn_address2'              => '',
     'attn_name'                  => '',
     'benefit_lines'              => [],
+    'benefit_freebies'           => [],
     'center'                     => $booking['center_id']['name'],
     'center_address'             => $booking['center_id']['address_street'].' - '.$booking['center_id']['address_zip'].' '.$booking['center_id']['address_city'],
     'center_contact1'            => (isset($booking['center_id']['manager_id']['name']))?$booking['center_id']['manager_id']['name']:'',
@@ -326,7 +331,7 @@ $values = [
     'company_website'            => $booking['center_id']['organisation_id']['website'],
     'consumptions_map_detailed'  => [],
     'consumptions_map_simple'    => [],
-    'consumptions_tye'           => isset($booking['type_id']['booking_schedule_layout'])?$booking['type_id']['booking_schedule_layout']:'simple',
+    'consumptions_type'          => isset($booking['type_id']['booking_schedule_layout'])?$booking['type_id']['booking_schedule_layout']:'simple',
     'contact_email'              => $booking['customer_id']['partner_identity_id']['email'],
     'contact_name'               => '',
     'contact_phone'              => (strlen($booking['customer_id']['partner_identity_id']['phone']))?$booking['customer_id']['partner_identity_id']['phone']:$booking['customer_id']['partner_identity_id']['mobile'],
@@ -347,10 +352,11 @@ $values = [
     'postal_address'             => sprintf("%s - %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
     'price'                      => $booking['price'],
     'agreement_html'             => '',
+    'signature_html'             => '',
     'footer_html'                => '',
     'header_html'                => '',
     'service_html'               => '',
-    'signature'                  => $booking['center_id']['organisation_id']['signature'] ?? '',
+    'stamp'                      => $booking['center_id']['organisation_id']['signature'] ?? '',
     'status'                     => $booking['status'],
     'tax_lines'                  => [],
     'total'                      => $booking['total'],
@@ -457,13 +463,13 @@ if($booking['center_id']['use_office_details']) {
 }
 
 
-$conection_languages = [
+$connection_languages = [
     ['fr' => 'et', 'en' => 'and', 'nl' => 'en'],
 ];
 
-$conection_names = array_map(function($item) use ($params) {
+$connection_names = array_map(function($item) use ($params) {
     return $item[$params['lang']];
-}, $conection_languages);
+}, $connection_languages);
 
 
 
@@ -484,19 +490,223 @@ if($booking['center_id']['template_category_id']) {
         if($part['name'] == 'header') {
             $value = $part['value'];
             $value = str_replace('{center}', $booking['center_id']['name'], $value);
-            $value = str_replace('{date_from}', $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']) , $value);
-            $value = str_replace('{date_to}',  $days_names[date('w', $booking['date_to'])] . ' '. date('d/m/Y', $booking['date_to']) , $value);
 
-            $text_pers = $lodgingBookingPrintAgeRangesText($booking, $conection_names);
+            $date_from = $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']);
+            $date_to = $days_names[date('w', $booking['date_to'])] . ' '. date('d/m/Y', $booking['date_to']);
+
+            // 1) convert config to textual info for arrival day
+
+            // retrieve meals info for arrival day
+            $has_breakfast = false;
+            $has_lunch = false;
+            $has_diner = false;
+            $has_snack = false;
+            $is_lunch_picnic = false;
+
+            $meals = BookingMeal::search([['booking_id', '=', $booking['id']], ['date', '=', $booking['date_from']]])
+                ->read([
+                    'time_slot_id' => ['code'],
+                    'meal_type_id' => ['code'],
+                    'is_self_provided'
+                ]);
+
+            foreach($meals as $meal_id => $meal) {
+                if($meal['time_slot_id']['code'] === 'B' && !$meal['is_self_provided']) {
+                    $has_breakfast = true;
+                }
+                elseif($meal['time_slot_id']['code'] === 'L') {
+                    if(!$meal['is_self_provided']) {
+                        $has_lunch = true;
+                    }
+                    if($meal['meal_type_id']['code'] === 'picnic') {
+                        $is_lunch_picnic = true;
+                    }
+                }
+                elseif($meal['time_slot_id']['code'] === 'D' && !$meal['is_self_provided']) {
+                    $has_diner = true;
+                }
+                elseif($meal['time_slot_id']['code'] === 'PM' && !$meal['is_self_provided']) {
+                    $has_snack = true;
+                }
+            }
+
+            $date_from_text = '';
+
+            if($has_breakfast) {
+                $date_from_text .= 'pour le petit-déjeuner';
+            }
+            elseif($has_lunch) {
+                $date_from_text .= 'pour le déjeuner';
+            }
+            elseif($has_snack) {
+                $date_from_text .= 'pour le goûter';
+            }
+            elseif($has_diner) {
+                $date_from_text .= 'pour le dîner';
+            }
+            else {
+                $date_from_text .= 'pour la nuitée';
+            }
+
+            if($is_lunch_picnic) {
+                if(strlen($date_from_text)) {
+                    $date_from_text .= ', ';
+                }
+                if($has_lunch) {
+                    if($has_snack) {
+                        $date_from_text .= 'avec pique-nique et goûter fournis par le Relais Valrance';
+                    }
+                    else {
+                        $date_from_text .= 'avec pique-nique fourni par le Relais Valrance';
+                    }
+                }
+                else {
+                    if($has_snack) {
+                        $date_from_text .= 'avec pique-nique amenés par vos soins et goûter fourni par le Relais Valrance';
+                    }
+                    else {
+                        $date_from_text .= 'avec pique-nique et goûter amenés par vos soins';
+                    }
+                }
+            }
+
+            if(strlen($date_from_text)) {
+                $date_from .= ' (' . $date_from_text . ')';
+            }
+
+
+            // 2) convert config to textual info for departure day
+
+            // retrieve meals info for departure day
+            $has_breakfast = false;
+            $has_lunch = false;
+            $has_snack = false;
+            $has_diner = false;
+            $is_breakfast_offsite = false;
+            $is_lunch_offsite = false;
+            $is_snack_offsite = false;
+            $is_diner_offsite = false;
+
+            $meals = BookingMeal::search([['booking_id', '=', $booking['id']], ['date', '=', $booking['date_to']]])
+                ->read([
+                    'time_slot_id' => ['code'],
+                    'meal_place_id' => ['place_type'],
+                    'is_self_provided'
+                ]);
+
+            foreach($meals as $meal_id => $meal) {
+                $offsite = in_array($meal['meal_place_id']['place_type'], ['offsite', 'auto']);
+                if($meal['time_slot_id']['code'] === 'B' && !$meal['is_self_provided']) {
+                    $has_breakfast = true;
+                    $is_breakfast_offsite = $offsite;
+                }
+                elseif($meal['time_slot_id']['code'] === 'L' && !$meal['is_self_provided']) {
+                    $has_lunch = true;
+                    $is_lunch_offsite = $offsite;
+                }
+                elseif($meal['time_slot_id']['code'] === 'PM' && !$meal['is_self_provided']) {
+                    $has_snack = true;
+                    $is_snack_offsite = $offsite;
+                }
+                elseif($meal['time_slot_id']['code'] === 'D' && !$meal['is_self_provided']) {
+                    $has_diner = true;
+                    $is_diner_offsite = $offsite;
+                }
+            }
+
+            $date_to_text = '';
+
+            if($has_diner && !$is_diner_offsite) {
+                $date_to_text .= 'après le dîner';
+            }
+            elseif($has_snack && !$is_snack_offsite) {
+                $date_to_text .= 'après le goûter';
+            }
+            elseif($has_lunch && !$is_lunch_offsite) {
+                $date_to_text .= 'après le déjeuner';
+            }
+            elseif($has_breakfast && !$is_breakfast_offsite) {
+                $date_to_text .= 'après le petit-déjeuner';
+            }
+
+            if($has_breakfast && $is_breakfast_offsite) {
+                if(strlen($date_to_text)) {
+                    $date_to_text .= ', ';
+                }
+                if($is_lunch_offsite) {
+                    if($is_snack_offsite) {
+                        if($is_diner_offsite) {
+                            $date_to_text .= 'avec collation petit-déjeuner, pique-nique, goûter, et pique-nique du soir à emporter';
+                        }
+                        else {
+                            $date_to_text .= 'avec collation petit-déjeuner, pique-nique et goûter à emporter';
+                        }
+                    }
+                    else {
+                        $date_to_text .= 'avec collation petit-déjeuner et pique-nique à emporter';
+                    }
+                }
+                else {
+                    $date_to_text .= 'avec collation petit-déjeuner à emporter';
+                }
+            }
+            elseif($has_lunch && $is_lunch_offsite) {
+                if(strlen($date_to_text)) {
+                    $date_to_text .= ', ';
+                }
+                if($is_snack_offsite) {
+                    if($is_diner_offsite) {
+                        $date_to_text .= 'avec pique-nique, goûter, et pique-nique du soir à emporter';
+                    }
+                    else {
+                        $date_to_text .= 'avec pique-nique et goûter à emporter';
+                    }
+                }
+                else {
+                    $date_to_text .= 'avec pique-nique à emporter';
+                }
+            }
+            elseif($has_snack && $is_snack_offsite) {
+                if(strlen($date_to_text)) {
+                    $date_to_text .= ', ';
+                }
+                if($is_diner_offsite) {
+                    $date_to_text .= 'avec goûter et pique-nique du soir à emporter';
+                }
+                else {
+                    $date_to_text .= 'avec goûter à emporter';
+                }
+            }
+            elseif($has_diner && $is_diner_offsite) {
+                if(strlen($date_to_text)) {
+                    $date_to_text .= ', ';
+                }
+                $date_to_text .= 'avec pique-nique du soir à emporter';
+            }
+
+            if(strlen($date_to_text)) {
+                $date_to .= ' (' . $date_to_text . ')';
+            }
+
+            $value = str_replace('{date_from}', $date_from, $value);
+            $value = str_replace('{date_to}', $date_to, $value);
+
+            $text_pers = $lodgingBookingPrintAgeRangesText($booking, $connection_names);
             $value = str_replace('{nb_pers}', $text_pers, $value);
 
             $values['header_html'] = $value;
         }
-        if($part['name'] == 'service') {
+        elseif($part['name'] == 'service') {
             $value = $part['value'];
-            if ($booking['customer_id']['rate_class_id']) {
-
-                $part_name = 'service_'. $booking['customer_id']['rate_class_id']['name'];
+            if($booking['customer_id']['rate_class_id']) {
+                $map_rate_class = [
+                    230 => 'sejour',
+                    220 => 'groupe',
+                    210 => 'classe',
+                    250 => 'clsh',
+                    240 => 'cv'
+                ];
+                $part_name = 'service_'. $map_rate_class[$booking['customer_id']['rate_class_id']['code']];
                 $template_part = TemplatePart::search([['name', '=', $part_name], ['template_id', '=', $template['id']] ])
                         ->read(['value'], $params['lang'])
                         ->first(true);
@@ -507,14 +717,17 @@ if($booking['center_id']['template_category_id']) {
             }
             $values['service_html'] = $value;
         }
-        elseif($part['name'] == 'agreement') {
+        elseif($part['name'] == 'agreement_notice') {
             $values['is_agreement_html'] = 1;
             $values['agreement_html'] = $part['value'];
         }
         elseif($part['name'] == 'footer') {
             $values['has_footer'] = 1;
-            $values['footer_html'] = $part['value'] . $values['center_signature'];
+            $values['footer_html'] = $part['value'];
             $hasFooter = true;
+        }
+        elseif($part['name'] == 'signature') {
+            $values['signature_html'] = $part['value'] . $values['center_signature'];
         }
     }
 
@@ -716,15 +929,16 @@ foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
 
 $lines_map = [];
 
-
-
-if($params['mode'] == 'grouped') {
+if($params['mode'] === 'grouped') {
     $lines = [];
     foreach ($booking['booking_lines_groups_ids'] as $booking_line_group) {
         foreach ($booking_line_group['booking_lines_ids'] as $booking_line) {
+            /*
+            // #memo - even if part of an activity - transports must be grouped distinctively
             if ($booking_line['is_transport'] && !empty($booking_line['booking_activity_id'])){
                 continue;
             }
+            */
 
             if ($booking_line['is_supply'] && !empty($booking_line['booking_activity_id'])){
                 continue;
@@ -733,86 +947,92 @@ if($params['mode'] == 'grouped') {
             $booking_line_group_id = $booking_line_group['id'];
             $product = $booking_line['product_id'];
 
-            $grouping_code = isset($product['grouping_code_id']['name'])
-                ? $product['grouping_code_id']['name']
-                : ($product['product_model_id']['grouping_code_id']['name']
-                ?? (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['product_id']['label']);
+            $grouping_code = $booking_line['product_id']['label'];
 
-            if (!isset($lines_map[$booking_line_group_id])) {
+            if(isset($product['grouping_code_id']['name'])) {
+                if($product['grouping_code_id']['code'] === 'invisible') {
+                    continue;
+                }
+                $grouping_code = $product['grouping_code_id']['name'];
+            }
+            elseif(isset($product['product_model_id']['grouping_code_id']['name'])) {
+                if($product['product_model_id']['grouping_code_id']['code'] === 'invisible') {
+                    continue;
+                }
+                $grouping_code = $product['product_model_id']['grouping_code_id']['name'];
+            }
+            elseif(strlen($booking_line['description']) > 0) {
+                $grouping_code = $booking_line['description'];
+            }
+
+            if(!isset($lines_map[$booking_line_group_id])) {
                 $lines_map[$booking_line_group_id] = [];
             }
-            if (!isset($lines_map[$booking_line_group_id][$grouping_code])) {
+            if(!isset($lines_map[$booking_line_group_id][$grouping_code])) {
                 $lines_map[$booking_line_group_id][$grouping_code] = [];
             }
 
-            if (!isset($lines_map[$booking_line_group_id][$grouping_code][$product['id']])) {
+            if(!isset($lines_map[$booking_line_group_id][$grouping_code][$product['id']])) {
                 $lines_map[$booking_line_group_id][$grouping_code][$product['id']] = [
                     'name'          => $booking_line['name'],
-                    'price'         => $null,
+                    'price'         => null,
                     'total'         => null,
                     'unit_price'    => null,
                     'vat_rate'      => null,
                     'qty'           => $booking_line['qty'],
                     'discount'      => null,
                     'has_pack'      => $booking_line_group['has_pack'],
+                    'is_activity'   => $booking_line['is_activity'],
                     'free_qty'      => $booking_line['free_qty'],
                     'grouping'      => $grouping_code
                 ];
 
                 if($booking_line['booking_activity_id'] &&
-                    (!empty($booking_line['booking_activity_id']['supplies_booking_lines_ids']) ||
-                     !empty($booking_line['booking_activity_id']['transports_booking_lines_ids'])
-                    )
-                  ){
-                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['unit_price'] = $booking_line['booking_activity_id']['unit_price'];
+                    !empty($booking_line['booking_activity_id']['supplies_booking_lines_ids'])
+                ) {
                     $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] += $booking_line['booking_activity_id']['price'];
                     $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] += $booking_line['booking_activity_id']['total'];
                 }
-                else{
+                else {
                     $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['unit_price'] = $booking_line['unit_price'];
                     $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] = $booking_line['price'];
                     $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] = $booking_line['total'];
                 }
-            } else {
+            }
+            else {
                 $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] += $booking_line['price'];
                 $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] += $booking_line['total'];
                 $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['qty'] += $booking_line['qty'];
             }
         }
     }
-    foreach ($lines_map as $booking_line_group_id => $groupings) {
-        foreach ($groupings as $grouping_code_id => $products) {
-            foreach ($products as $product_id => $product) {
-                if (!isset($lines[$grouping_code_id])) {
+    foreach($lines_map as $booking_line_group_id => $groupings) {
+        foreach($groupings as $grouping_code_id => $products) {
+            foreach($products as $product_id => $product) {
+                if(!isset($lines[$grouping_code_id])) {
                         $lines[$grouping_code_id] = [
                             'name'          => $product['grouping'],
                             'unit_price'    => 0,
                             'vat_rate'      => 0,
                             'free_qty'      => 0,
-                            'qty'           => 0,
+                            'qty'           => 1,
                             'price'         => 0,
                             'total'         => 0,
                             'is_group'      => false,
                             'is_pack'       => false
                         ];
                 }
-                $lines[$grouping_code_id]['price'] += $product['price'];
+
                 $lines[$grouping_code_id]['total'] += $product['total'];
-
-
-
-                if ($product['has_pack']){
-                    $lines[$grouping_code_id]['qty'] = $product['qty'];
-                    $lines[$grouping_code_id]['free_qty'] = $product['free_qty'];
-                    $lines[$grouping_code_id]['unit_price'] += $product['unit_price'];
-
-                } else{
-                    $lines[$grouping_code_id]['qty'] = $product['qty'];
-                    if ($lines[$grouping_code_id]['qty'] > 0) {
-                        $lines[$grouping_code_id]['unit_price'] = $lines[$grouping_code_id]['total'] / $lines[$grouping_code_id]['qty'];
-                    }
-                }
+                $lines[$grouping_code_id]['price'] += $product['price'];
+                $lines[$grouping_code_id]['unit_price'] += $product['total'];
             }
+            /*
+            // #memo - we must display all grouping lines, even if the price is 0.0 (to show the customer what is included, even if free)
+            if($lines[$grouping_code_id]['price'] == 0.0) {
+                unset($lines[$grouping_code_id]);
+            }
+            */
         }
     }
 
@@ -842,6 +1062,26 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
     }
 }
 
+$values['benefit_freebies'] = [];
+
+foreach($booking['booking_lines_groups_ids'] as $group) {
+    if($group['group_type'] !== 'sojourn') {
+        continue;
+    }
+
+    $assignments = BookingLineGroupAgeRangeAssignment::search(['booking_line_group_id', '=', $group['id']])
+    ->read(['free_qty', 'age_range_id' => ['name']]);
+
+    foreach($assignments as $assignment) {
+        if($assignment['free_qty'] > 0) {
+            $values['benefit_freebies'][] = [
+                'name'  => 'Gratuités ' . $assignment['age_range_id']['name'] . ' - ' . $group['name'],
+                'value' => $assignment['free_qty']
+            ];
+        }
+    }
+}
+
 
 
 /*
@@ -862,9 +1102,9 @@ foreach($lines as $line) {
 foreach($booking['contacts_ids'] as $contact) {
     if(strlen($values['contact_name']) == 0 || $contact['type'] == 'booking') {
         // overwrite data of customer with contact info
-        $values['contact_name'] = str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title']) . ' ' . $contact['partner_identity_id']['display_name'];
-        $values['contact_phone'] = (strlen($contact['partner_identity_id']['phone']))?$contact['partner_identity_id']['phone']:$contact['partner_identity_id']['mobile'];
-        $values['contact_email'] = $contact['partner_identity_id']['email'];
+        $values['contact_name'] = str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title'] ?? '') . ' ' . ($contact['partner_identity_id']['display_name'] ?? '');
+        $values['contact_phone'] = (strlen($contact['partner_identity_id']['phone'] ?? '')) ? $contact['partner_identity_id']['phone'] : ($contact['partner_identity_id']['mobile'] ?? '');
+        $values['contact_email'] = $contact['partner_identity_id']['email'] ?? '';
     }
 }
 

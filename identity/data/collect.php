@@ -30,7 +30,16 @@ list($params, $providers) = announce([
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Identity',
             'description'       => 'Related contact identity.'
+        ],
+        'address_city' => [
+            'type'        => 'string',
+            'description' => 'Filter identities by city name.',
+        ],
+        'address_zip'  => [
+            'type'        => 'string',
+            'description' => 'Filter identities by postal code (ZIP).',
         ]
+
     ],
     'response'      => [
         //'content-type'  => 'application/json',
@@ -96,6 +105,14 @@ if(isset($params['contact_identity_id']) && $params['contact_identity_id']) {
 
 if(isset($params['identifier']) && $params['identifier'] > 0) {
     $domain = Domain::conditionAdd([], ['id', '=', $params['identifier']]);
+}
+
+if (isset($params['address_city']) && strlen($params['address_city']) > 0) {
+    $domain = Domain::conditionAdd($domain, ['address_city', 'ilike', '%' . $params['address_city'] . '%']);
+}
+
+if(isset($params['address_zip']) && strlen($params['address_zip'] > 0)) {
+    $domain = Domain::conditionAdd([], ['address_zip',  'ilike','%'. $params['address_zip'].'%']);
 }
 
 $params['domain'] = $domain;

@@ -17,7 +17,7 @@ export interface BookingActivityDay {
 })
 export class BookingServicesBookingGroupDayActivitiesComponent implements OnInit {
 
-    @Input() bookingActivityDay: BookingActivityDay
+    @Input() bookingActivityDay: BookingActivityDay;
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
     @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
@@ -26,7 +26,7 @@ export class BookingServicesBookingGroupDayActivitiesComponent implements OnInit
     @Output() loadStart = new EventEmitter();
     @Output() loadEnd = new EventEmitter();
     @Output() updated = new EventEmitter();
-    @Output() deleteLine = new EventEmitter();
+    @Output() deleteActivity = new EventEmitter();
     @Output() openActivity = new EventEmitter();
     @Output() closeActivity = new EventEmitter();
 
@@ -42,14 +42,16 @@ export class BookingServicesBookingGroupDayActivitiesComponent implements OnInit
     };
 
     public ngOnInit() {
-        this.ready = true;
 
         for(let timeSlot of this.timeSlots) {
             this.mapTimeSlotsCode[timeSlot.code] = timeSlot;
         }
+
+        this.ready = true;
     }
 
-    public ondeleteActivity(lineId: number) {
-        this.deleteLine.emit(lineId);
+    public ondeleteActivity(activity: BookingActivity) {
+        this.loadStart.emit();
+        this.deleteActivity.emit(activity.id);
     }
 }

@@ -1,0 +1,13 @@
+{
+    "name": "Impression du programme d'activités",
+    "description": "Imprimer le programme d'activités pour un séjour spécifique.",
+    "model": {
+        "booking_line_group_id": {
+            "label": "Séjour",
+            "description": "Groupe de service à imprimer.",
+            "help": ""
+        }
+    },
+    "error": {
+    }
+}

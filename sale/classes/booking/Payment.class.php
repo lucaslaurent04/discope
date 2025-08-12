@@ -10,6 +10,7 @@ namespace sale\booking;
 use sale\booking\Booking;
 use sale\booking\Funding;
 use sale\booking\Invoice;
+use sale\camp\Enrollment;
 
 class Payment extends \sale\pay\Payment {
 
@@ -84,12 +85,6 @@ class Payment extends \sale\pay\Payment {
                 'description'       => "The method used for payment at the cashdesk.",
                 'visible'           => [ ['payment_origin', '=', 'cashdesk'] ],
                 'default'           => 'cash'
-            ],
-
-            'is_manual' => [
-                'type'              => 'boolean',
-                'description'       => 'Payment was created manually at the checkout directly in the booking (not through cashdesk).',
-                'default'           => false
             ],
 
             'has_psp' => [
@@ -180,10 +175,11 @@ class Payment extends \sale\pay\Payment {
      * #memo - This cannot be undone.
      */
     public static function onupdateFundingId($om, $ids, $values, $lang) {
-        $payments = $om->read(self::getType(), $ids, ['funding_id', 'funding_id.booking_id', 'funding_id.invoice_id', 'funding_id.booking_id.date_from', 'funding_id.type']);
+        $payments = $om->read(self::getType(), $ids, ['funding_id', 'funding_id.booking_id', 'funding_id.enrollment_id', 'funding_id.invoice_id', 'funding_id.booking_id.date_from', 'funding_id.type']);
 
         if($payments > 0) {
             $map_bookings_ids = [];
+            $map_enrollments_ids = [];
             $map_invoices_ids = [];
             foreach($payments as $pid => $payment) {
                 if($payment['funding_id']) {
@@ -198,19 +194,34 @@ class Payment extends \sale\pay\Payment {
                         // update booking_id
                         $om->update(self::getType(), $pid, ['booking_id' => $payment['funding_id.booking_id']]);
                     }
+                    elseif($payment['funding_id.enrollment_id']) {
+                        $map_enrollments_ids[$payment['funding_id.enrollment_id']] = true;
+                        // update enrollment_id
+                        $om->update(self::getType(), $pid, ['enrollment_id' => $payment['funding_id.enrollment_id']]);
+                    }
                     if($payment['funding_id.invoice_id']) {
                         $map_invoices_ids[$payment['funding_id.invoice_id']] = true;
                     }
                     $om->update(Funding::getType(), $payment['funding_id'], ['paid_amount' => null, 'is_paid' => null], $lang);
                 }
                 else {
-                    // void booking_id
-                    $om->update(self::getType(), $ids, ['booking_id' => null]);
+                    // void booking_id, enrollment_id
+                    $om->update(self::getType(), $ids, ['booking_id' => null, 'enrollment_id' => null]);
                 }
             }
-            $om->callonce(Booking::getType(), 'updateStatusFromFundings', array_keys($map_bookings_ids), [], $lang);
-            $om->update(Booking::getType(), array_keys($map_bookings_ids), ['payment_status' => null, 'paid_amount' => null], $lang);
-            $om->update(Invoice::getType(), array_keys($map_invoices_ids), ['is_paid' => null]);
+            $bookings_ids = array_keys($map_bookings_ids);
+            if(!empty($bookings_ids)) {
+                $om->callonce(Booking::getType(), 'updateStatusFromFundings', $bookings_ids, [], $lang);
+                $om->update(Booking::getType(), $bookings_ids, ['payment_status' => null, 'paid_amount' => null], $lang);
+            }
+            $enrollments_ids = array_keys($map_enrollments_ids);
+            if(!empty($enrollments_ids)) {
+                $om->update(Enrollment::getType(), $enrollments_ids, ['payment_status' => null, 'paid_amount' => null], $lang);
+            }
+            $invoices_ids = array_keys($map_invoices_ids);
+            if(!empty($invoices_ids)) {
+                $om->update(Invoice::getType(), $invoices_ids, ['is_paid' => null]);
+            }
         }
     }
 
@@ -234,6 +245,8 @@ class Payment extends \sale\pay\Payment {
                     'booking_id.name',
                     'booking_id.customer_id.id',
                     'booking_id.customer_id.name',
+                    'enrollment_id',
+                    'enrollment_id.name',
                     'invoice_id.partner_id.id',
                     'invoice_id.partner_id.name'
                 ],
@@ -242,13 +255,27 @@ class Payment extends \sale\pay\Payment {
 
             if($fundings > 0) {
                 $funding = reset($fundings);
-                $result['booking_id'] = [ 'id' => $funding['booking_id'], 'name' => $funding['booking_id.name'] ];
+
+                if($funding['booking_id']) {
+                    $result['booking_id'] = [ 'id' => $funding['booking_id'], 'name' => $funding['booking_id.name'] ];
+                    $result['enrollment_id'] = null;
+                }
+                elseif($funding['enrollment_id']) {
+                    $result['enrollment_id'] = [ 'id' => $funding['enrollment_id'], 'name' => $funding['enrollment_id.name'] ];
+                    $result['booking_id'] = null;
+                }
+                else {
+                    $result['booking_id'] = null;
+                    $result['enrollment_id'] = null;
+                }
+
                 if($funding['type'] == 'invoice')  {
                     $result['partner_id'] = [ 'id' => $funding['invoice_id.partner_id.id'], 'name' => $funding['invoice_id.partner_id.name'] ];
                 }
                 else {
                     $result['partner_id'] = [ 'id' => $funding['booking_id.customer_id.id'], 'name' => $funding['booking_id.customer_id.name'] ];
                 }
+
                 // set the amount according to the funding due_amount (the maximum assignable)
                 $max = $funding['due_amount'];
                 if(isset($values['amount']) && $values['amount'] < $max ) {
@@ -314,33 +341,5 @@ class Payment extends \sale\pay\Payment {
         }
 
         return parent::canupdate($om, $ids, $values, $lang);
-    }
-
-    /**
-     * Check whether the payments can be deleted.
-     *
-     * @param  \equal\orm\ObjectManager    $om        ObjectManager instance.
-     * @param  array                       $ids       List of objects identifiers.
-     * @return array                       Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be deleted.
-     */
-    public static function candelete($om, $ids) {
-        $payments = $om->read(self::getType(), $ids, ['payment_origin', 'is_exported', 'is_manual', 'statement_line_id.status']);
-
-        if($payments > 0) {
-            foreach($payments as $id => $payment) {
-                if($payment['is_exported']) {
-                    return ['is_exported' => ['non_removable' => 'Payment cannot be removed.']];
-                }
-                if($payment['payment_origin'] == 'bank') {
-                    if($payment['statement_line_id.status'] != 'pending') {
-                        return ['status' => ['non_removable' => 'Payment from reconciled line cannot be removed.']];
-                    }
-                }
-                elseif(!$payment['is_manual']) {
-                    return ['payment_origin' => ['non_removable' => 'Payment cannot be removed.']];
-                }
-            }
-        }
-        return [];
     }
 }

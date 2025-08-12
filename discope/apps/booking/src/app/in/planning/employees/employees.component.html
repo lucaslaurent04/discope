@@ -11,9 +11,13 @@
             <planning-employees-calendar
                 #planningCalendar
                 [rowsHeight]="rowsHeight"
+                [mapTimeSlot]="mapTimeSlot"
+                (showActivity)="onShowActivity($event)"
                 (showBooking)="onShowBooking($event)"
+                (showCamp)="onShowCamp($event)"
                 (showPartner)="onShowPartner($event)"
                 (showPartnerEvent)="onShowPartnerEvent($event)"
+                (createPartnerEvent)="onCreatePartnerEvent($event)"
                 (openLegendDialog)="onOpenLegendDialog()"
                 (openPrefDialog)="onOpenPrefDialog()"
                 (fullScreen)="onFullScreen()"

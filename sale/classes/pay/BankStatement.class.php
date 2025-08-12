@@ -11,8 +11,8 @@ use equal\orm\Model;
 class BankStatement extends Model {
 
     public static function getColumns() {
-
         return [
+
             'name' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
@@ -46,6 +46,12 @@ class BankStatement extends Model {
                 'description'       => 'Account balance after the transactions.',
                 'required'          => true,
                 'readonly'          => true
+            ],
+
+            'center_office_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\CenterOffice',
+                'description'       => 'Center office related to the statement (based on account number).'
             ],
 
             'statement_lines_ids' => [

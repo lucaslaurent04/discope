@@ -48,23 +48,39 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "has_age_range",
-                                                "width": "25%"
+                                                "value": "can_sell",
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "can_sell",
-                                                "width": "25%"
+                                                "value": "is_freebie_allowed",
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "is_pack",
-                                                "width": "25%"
+                                                "width": "100%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "has_own_price",
-                                                "width": "25%"
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "allow_price_adaptation",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_age_range",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "50%",
+                                                "visible": ["has_age_range", "=", false]
                                             },
                                             {
                                                 "type": "field",
@@ -74,8 +90,20 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "allow_price_adaptation",
-                                                "width": "100%"
+                                                "value": "has_rate_class",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "50%",
+                                                "visible": ["has_rate_class", "=", false]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Rate class",
+                                                "value": "rate_class_id",
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
@@ -113,6 +141,33 @@
                                                         }
                                                     }
                                                 }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Activity",
+                        "id": "section.activity",
+                        "visible": ["is_activity", "=", true],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "is_fullday",
+                                                "width": "100%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_billable",
+                                                "width": "100%"
                                             }
                                         ]
                                     }
@@ -204,6 +259,67 @@
                                                 "widget": {
                                                     "view": "list.pack"
                                                 }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Config",
+                        "id": "section.config",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "stat_section_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "analytic_section_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_activity",
+                                                "width": "50%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_supply",
+                                                "width": "50%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_transport",
+                                                "width": "50%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_rental_unit",
+                                                "width": "50%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_meal",
+                                                "width": "50%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_snack",
+                                                "width": "50%",
+                                                "readonly": true
                                             }
                                         ]
                                     }

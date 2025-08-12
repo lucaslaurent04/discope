@@ -146,6 +146,16 @@ export class BookingQuoteComponent implements OnInit, AfterContentInit {
 
     public vm: vmModel;
 
+    public quillCustomModules = {
+        toolbar: [
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['blockquote'],
+            [{ 'align': <any>[] }],
+            [{ 'color': <any>[] }, { 'background': <any>[] }],
+            ['link']
+        ]
+    };
 
     constructor(
         private dialog: MatDialog,
@@ -189,7 +199,7 @@ export class BookingQuoteComponent implements OnInit, AfterContentInit {
                 items:          []
             },
             documents: {
-                items:           []
+                items:          []
             }
         };
     }

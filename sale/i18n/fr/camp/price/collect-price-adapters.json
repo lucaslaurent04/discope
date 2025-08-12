@@ -1,0 +1,36 @@
+{
+    "name": "Réduction",
+    "plural": "Réductions",
+    "description": "Reductions d'aides.",
+    "model": {
+        "sponsor_id": {
+            "label": "Aide",
+            "description": ""
+        },
+        "origin_type": {
+            "label": "Type",
+            "description": "",
+            "selection": {
+                "all": "Tous",
+                "other": "Autres",
+                "commune": "Communes",
+                "community-of-communes": "Communautés de communes",
+                "department-caf": "CAF",
+                "department-msa": "MSA",
+                "loyalty-discount": "Fidélités"
+            }
+        },
+        "date_from": {
+            "label": "Du",
+            "description": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": ""
+        }
+    },
+    "view": {
+    },
+    "error": {
+    }
+}

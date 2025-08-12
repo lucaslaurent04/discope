@@ -1,0 +1,39 @@
+{
+    "name": "Groupe",
+    "plural": "Groupes",
+    "description": "Groupe d'un camp qu'un employé va prendre en charge.",
+    "model": {
+        "camp_id": {
+            "label": "Camp",
+            "description": "Le camp dont le groupe fait partie.",
+            "help": ""
+        },
+        "employee_id": {
+            "label": "Animateur",
+            "description": "L'animateur responsable du groupe durant le camp.",
+            "help": ""
+        },
+        "max_children": {
+            "label": "Max enfants",
+            "description": "Quantité maximal d'enfants qui peuvent faire partie du groupe.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "",
+            "description": "",
+            "layout": {
+                "section.activities": {
+                    "label": "Activités"
+                }
+            }
+        },
+        "list.default": {
+            "name": "",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": []
+}

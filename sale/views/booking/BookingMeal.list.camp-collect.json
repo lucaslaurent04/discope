@@ -1,0 +1,71 @@
+{
+    "name": "Booking meals",
+    "description": "List view for Booking meals.",
+    "order": "date,time_slot_order",
+    "sort": "asc",
+    "group_by": ["date"],
+    "domain": ["camp_id", "<>", null],
+    "controller": "sale_booking_collect-booking-meals",
+    "header": {
+        "actions": {
+            "ACTION.CREATE" : false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "10%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "date",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "time_slot_order",
+                "width": "20%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "camp_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "time_slot_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "meal_type_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "meal_place_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            }
+        ]
+    }
+}

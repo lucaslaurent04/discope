@@ -67,7 +67,7 @@ class Product extends Model {
 
             'description' => [
                 'type'              => 'string',
-                'usage'             => 'text/plain',
+                'usage'             => 'text/html',
                 'description'       => "Description of the variant (specifics)."
             ],
 
@@ -175,12 +175,35 @@ class Product extends Model {
                 'store'             => true
             ],
 
+            'is_camp' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'relation'          => ['product_model_id' => 'is_camp'],
+                'store'             => true
+            ],
+
             'is_fullday' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
                 'relation'          => ['product_model_id' => 'is_fullday'],
                 'instant'           => true,
                 'store'             => true
+            ],
+
+            'is_billable' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => "Indicates whether the activity is billable (generates a service line in invoicing).",
+                'relation'          => ['product_model_id' => 'is_billable'],
+                'instant'           => true,
+                'store'             => true
+            ],
+
+            'is_freebie_allowed' => [
+                'type'              => 'boolean',
+                'description'       => 'Is the product eligible for freebies?',
+                'help'              => 'If not set, the product will not be considered when computing the freebies eligibility.',
+                'default'           => true
             ],
 
             // if the organisation uses price-lists, the price to use depends on the applicable
@@ -197,6 +220,12 @@ class Product extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'finance\stats\StatSection',
                 'description'       => 'Statistics section (overloads the model one, if any).'
+            ],
+
+            'analytic_section_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'finance\accounting\AnalyticSection',
+                'description'       => 'Analytic section (overloads the model one, if any).'
             ],
 
             /* can_buy and can_sell are adapted when related values are changed in parent product_model */
@@ -241,6 +270,20 @@ class Product extends Model {
                 'description'       => 'Customers age range the product is intended for.',
                 'onupdate'          => 'onupdateAgeRangeId',
                 'visible'           => [ ['has_age_range', '=', true] ]
+            ],
+
+            'has_rate_class' => [
+                'type'              => 'boolean',
+                'description'       => "Applies on a specific rate class?",
+                'default'           => false
+            ],
+
+            'rate_class_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\customer\RateClass',
+                'description'       => 'Customers rate class the product is intended for.',
+                'onupdate'          => 'onupdateRateClassId',
+                'visible'           => [ ['has_rate_class', '=', true] ]
             ],
 
             'grouping_code_id' => [
@@ -310,12 +353,17 @@ class Product extends Model {
         }
     }
 
-    public static function onupdateAgeRangeId($om, $ids, $values, $lang) {
-        $products = $om->read(self::getType(), $ids, ['age_range_id']);
-        if($products > 0 && count($products)) {
-            foreach($products as $id => $product) {
-                $om->update(self::getType(), $id, ['has_age_range' => boolval($product['age_range_id'])], $lang);
-            }
+    public static function onupdateAgeRangeId($self) {
+        $self->read(['age_range_id']);
+        foreach($self as $id => $product) {
+            self::id($id)->update(['has_age_range' => boolval($product['age_range_id'])]);
+        }
+    }
+
+    public static function onupdateRateClassId($self) {
+        $self->read(['rate_class_id']);
+        foreach($self as $id => $product) {
+            self::id($id)->update(['has_rate_class' => boolval($product['rate_class_id'])]);
         }
     }
 

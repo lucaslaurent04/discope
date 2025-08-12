@@ -175,15 +175,19 @@ foreach($orders as $order) {
 }
 
 // create (exportable) payments for involved orders
-// #memo - waiting to be confirmed (the teams to be ready for the accounting)
-/*
-* Ovifat : 27
-* Wanne  : 30
-* LLN : 28
-* Eupen: 24
-* HSL : 26
-* VSG : 25
-* HVG : 32
+/**
+ *
+ * Only the following teams are using this feature:
+ *   - Ovifat : 27
+ *   - Wanne  : 30
+ *   - LLN : 28
+ *   - Eupen: 24
+ *   - HSL : 26
+ *   - HVG : 32
+ *
+ * Not using this feature:
+ *   - VSG : 25
+ *   - GG
 */
 if(in_array($center_id, [27, 30, 28, 24, 26, 32]) && $date >= strtotime('2024-04-01 00:00:00')) {
     eQual::run('do', 'sale_pos_orders_payments', [

@@ -1,0 +1,56 @@
+<div class="part" [class.hidden]="!ready">
+    <div class="part-toggle">
+        <span>{{ mapTimeSlotCodeName?.[timeSlot?.code] || 'Inconnu' }}</span>
+
+        <button mat-icon-button [disabled]="true" (click)="toggleOpen()">
+            <mat-icon style="font-size: 15px;">
+                <span *ngIf="opened">keyboard_arrow_up</span>
+                <span *ngIf="!opened">keyboard_arrow_right</span>
+            </mat-icon>
+        </button>
+    </div>
+
+    <div class="part-container">
+        <div class="row row-first" *ngIf="meal">
+            <div class="cell">
+                <mat-form-field>
+                    <mat-label>Type</mat-label>
+                    <mat-select [formControl]="vm.meal_type_id.formControl"
+                            (selectionChange)="vm.meal_type_id.change()">
+                        <mat-option *ngFor="let mealType of mealTypes" [value]="mealType.id">
+                            {{ mealType.name }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="cell">
+                <mat-form-field>
+                    <mat-label>Lieu</mat-label>
+                    <mat-select
+                            [formControl]="vm.meal_place_id.formControl"
+                            (selectionChange)="vm.meal_place_id.change()">
+                        <mat-option *ngFor="let mealPlace of mealPlaces" [value]="mealPlace.id">
+                            {{ mealPlace.name }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="cell cell-self-provided">
+                <mat-slide-toggle
+                        [formControl]="vm.is_self_provided.formControl"
+                        (change)="vm.is_self_provided.change()"
+                        style="margin-left: 20px; transform: scale(0.8);">
+                    {{ vm.is_self_provided.formControl.value ? 'Non fourni' : 'Inclu' }}
+                </mat-slide-toggle>
+            </div>
+            <!-- actions (empty: set in parent component) -->
+            <div class="cell cell-actions"></div>
+        </div>
+
+        <div *ngIf="!meal">
+            <button mat-icon-button style="margin-left: 20px; margin-bottom: 15px;" (click)="addMeal()">
+                <mat-icon>add</mat-icon>
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,24 @@
+{
+    "name": "Suppression d’un chèque bancaire",
+    "description": "Cette action supprime le chèque bancaire spécifié. Si un paiement lui est associé, il sera d'abord détaché puis supprimé avant la suppression du chèque. Le statut du financement est réinitialisé à 'en attente' si applicable.",
+    "model": {
+        "id": {
+            "label": "Identifiant",
+            "description": "Identifiant unique du chèque bancaire ciblé.",
+            "help": ""
+        },
+        "confirm": {
+            "label": "Confirmer",
+            "description": "Confirmation explicite requise pour procéder.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "missing_confirmation": "La confirmation de cette action est requise.",
+            "unknown_bankcheck": "Chèque bancaire inconnu.",
+            "booking_balanced": "Impossible de supprimer le chèque car la réservation associée est déjà équilibrée.",
+            "failed_remove_payment": "Échec de la suppression du paiement associé."
+        }
+    }
+}

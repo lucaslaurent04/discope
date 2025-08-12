@@ -397,13 +397,11 @@ else {
                 ->read(['id'])
                 ->first(true);
 
-            if(!$ota_booking_type) {
-                throw new Exception('missing_ota_booking_type', QN_ERROR_INVALID_CONFIG);
-            }
-
-            if($plan['booking_type_id'] === $ota_booking_type['id']
-                && $booking['type_id'] !== $ota_booking_type['id']) {
-                $match_criteria_count = 0;
+            if($ota_booking_type) {
+                if($plan['booking_type_id'] === $ota_booking_type['id']
+                    && $booking['type_id'] !== $ota_booking_type['id']) {
+                    $match_criteria_count = 0;
+                }
             }
 
             if($payment_plan < 0 || $match_criteria_count > $fulfilled_criteria_count) {

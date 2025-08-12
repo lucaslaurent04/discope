@@ -1,6 +1,6 @@
 <div>
     <planning-employees-calendar-navbar
-        [partner]="hovered_partner"
+        [partner]="hovered_activity_partner"
         [activity]="hovered_activity"
         [holidays]="hovered_holidays"
         [productModelCategories]="productModelCategories"
@@ -67,25 +67,31 @@
                         (dragstart)="preventDrag($event)">
 
                     <td class="cell-room partner"
-                        (mouseenter)="onhoverPartner(partner); hover_row_index = index"
-                        (mouseleave)="onhoverPartner(null); hover_row_index = -1"
+                        (mouseenter)="onhoverPartner(partner); hover_row_index = index;"
+                        (mouseleave)="onhoverPartner(null); hover_row_index = -1;"
                         [style.background]="partner?.color"
                         (click)="onSelectedPartner(partner)"
                     >
-                        <span class="partner-name">{{ partner.name }} </span>
+                        <span class="partner-name">{{ partner.name }}</span>
                         <span *ngIf="partner == hovered_partner" class="cell-hint">
-                            <span>
+                            <div class="tooltip tooltip--with-header">
                                 <ng-container *ngIf="partner.relationship === 'employee'">
-                                    <dt>{{partner.name}} (Employé)</dt>
-                                    <br />
-                                    <dt *ngFor="let id of partner.activity_product_models_ids">
-                                        {{getProductModelName(id)}}
-                                    </dt>
+                                    <div class="header">
+                                        <dt>{{partner.name}} (Employé)</dt>
+                                    </div>
+                                    <div class="content">
+                                        <dt *ngFor="let productModelName of createProductModelsNames(partner.activity_product_models_ids)">
+                                            {{productModelName}}
+                                        </dt>
+                                    </div>
                                 </ng-container>
+
                                 <ng-container *ngIf="partner.relationship === 'provider'">
-                                    <dt>{{partner.name}} (Prestataire)</dt>
+                                    <div class="header">
+                                        <dt>{{partner.name}} (Prestataire)</dt>
+                                    </div>
                                 </ng-container>
-                            </span>
+                            </div>
                         </span>
                     </td>
 
@@ -96,33 +102,67 @@
                                 (dragstart)="preventDrag($event)"
                                 (mouseenter)="onmouseenterTableCell($event, index, partner, headers.days_indexes[i], 'AM')"
                                 (mouseleave)="onmouseleaveTableCell($event)"
+                                (dblclick)="ondoubleclickTableCell(day, partner, 'AM')"
                                 cdkDropList
-                                (cdkDropListDropped)="onDrop($event, index, partner, headers.days_indexes[i], 'AM')">
+                                (cdkDropListDropped)="onDrop($event, partner, headers.days_indexes[i], 'AM')">
 
-                            <!-- activity cell -->
-                            <ng-container *ngIf="hasActivity(partner, headers.days_indexes[i], 'AM')">
-                                <div class="cell-activities">
-                                    <ng-container *ngFor="let activity of getActivities(partner, day, 'AM'); let j = index">
-                                        <planning-employees-calendar-activity
-                                            [height]="rowsHeight"
-                                            [width]="cellsWidth"
-                                            [tableRect]="tableRect"
-                                            [day]="day"
-                                            [activity]="activity"
-                                            (hover)="onhoverActivity($event); onhoverDay(partner, day)"
-                                            (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
-                                            (selected)="onSelectedBooking($event)"
-                                            cdkDrag
-                                            [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_event"
-                                            (cdkDragStarted)="onDragStart(activity)"
-                                        ></planning-employees-calendar-activity>
+                            <!-- activity drop zone -->
+                            <div class="drop-zone" [ngClass]="{'drop-zone--left': this.dropZonePosition === 'left', 'drop-zone--center': this.dropZonePosition === 'center', 'drop-zone--right': this.dropZonePosition === 'right'}">
+                                <div class="drop-zone-left" style="width: 25px;" (mouseenter)="onmouseenterDropZone('left')" (mouseleave)="onmouseleaveDropZone()"></div>
+                                <div class="drop-zone-center" style="flex-grow: 1;" (mouseenter)="onmouseenterDropZone('center')" (mouseleave)="onmouseleaveDropZone()"></div>
+                                <div class="drop-zone-right" style="width: 25px;" (mouseenter)="onmouseenterDropZone('right')" (mouseleave)="onmouseleaveDropZone()"></div>
+                            </div>
 
-                                        <div *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(16px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
-                                            <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
+                            <!-- activities cell -->
+                            <div *ngIf="hasActivity(partner, headers.days_indexes[i], 'AM')" class="cell-activities" [ngClass]="{ 'space-before': hasSpaceBefore(partner, day, 'AM'), 'space-after': hasSpaceAfter(partner, day, 'AM') }">
+                                <ng-container *ngFor="let activity of getActivities(partner, day, 'AM'); let j = index">
+                                    <planning-employees-calendar-activity
+                                        [height]="rowsHeight"
+                                        [width]="cellsWidth"
+                                        [tableRect]="tableRect"
+                                        [day]="day"
+                                        [activity]="activity"
+                                        (hover)="onhoverActivity($event); onhoverDay(partner, day)"
+                                        (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
+                                        (selected)="onSelectedActivity($event)"
+                                        cdkDrag
+                                        [cdkDragDisabled]="activity?.is_partner_event"
+                                        (cdkDragStarted)="onDragStart(activity)"
+                                    ></planning-employees-calendar-activity>
+
+                                    <div *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(var(--rows_height) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                        <div class="tooltip" [class]="{'tooltip--with-header': activity.booking_line_group_id.has_person_with_disability || activity.booking_id.date_from === activity.booking_id.date_to }">
+                                            <div class="header" style="color: #2196F3;">
+                                                <mat-icon *ngIf="activity.booking_line_group_id.has_person_with_disability" aria-hidden="true">accessible</mat-icon>
+                                                <mat-icon *ngIf="activity.booking_id.date_from === activity.booking_id.date_to" aria-hidden="true">event</mat-icon>
+                                            </div>
+                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></div>
                                         </div>
-                                    </ng-container>
-                                </div>
-                            </ng-container>
+                                    </div>
+                                </ng-container>
+                            </div>
+
+                            <!-- partner events -->
+                            <div *ngIf="hasPartnerEvent(partner, headers.days_indexes[i], 'AM')" class="cell-partner-events">
+                                <ng-container *ngFor="let partnerEvent of getPartnerEvents(partner, day, 'AM'); let j = index">
+                                    <planning-employees-calendar-activity
+                                        [height]="rowsHeight"
+                                        [width]="cellsWidth"
+                                        [tableRect]="tableRect"
+                                        [day]="day"
+                                        [activity]="partnerEvent"
+                                        (hover)="onhoverActivity($event); onhoverDay(partner, day)"
+                                        (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
+                                        (selected)="onSelectedActivity($event)"
+                                    ></planning-employees-calendar-activity>
+
+                                    <div *ngIf="hovered_activity == partnerEvent" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getPartnerEventDescription(partnerEvent)}" (mouseenter)="onhoverActivity(partnerEvent)" (mouseleave)="onhoverActivity(null)">
+                                        <div class="tooltip">
+                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </div>
                         </td>
 
                         <td     class="cell-PM cell-days cdk-drag-disabled"
@@ -130,34 +170,68 @@
                                 (dragstart)="preventDrag($event)"
                                 (mouseenter)="onmouseenterTableCell($event, index, partner, headers.days_indexes[i], 'PM')"
                                 (mouseleave)="onmouseleaveTableCell($event)"
+                                (dblclick)="ondoubleclickTableCell(day, partner, 'PM')"
                                 cdkDropList
-                                (cdkDropListDropped)="onDrop($event, index, partner, headers.days_indexes[i], 'PM')">
+                                (cdkDropListDropped)="onDrop($event, partner, headers.days_indexes[i], 'PM')">
 
-                            <!-- activity cell -->
-                            <ng-container *ngIf="hasActivity(partner, headers.days_indexes[i], 'PM')">
-                                <div class="cell-activities">
-                                    <ng-container *ngFor="let activity of getActivities(partner, day, 'PM'); let j = index">
+                            <!-- activity drop zone -->
+                            <div class="drop-zone" [ngClass]="{'drop-zone--left': this.dropZonePosition === 'left', 'drop-zone--center': this.dropZonePosition === 'center', 'drop-zone--right': this.dropZonePosition === 'right'}">
+                                <div class="drop-zone-left" style="width: 25px;" (mouseenter)="onmouseenterDropZone('left')" (mouseleave)="onmouseleaveDropZone()"></div>
+                                <div class="drop-zone-center" style="flex-grow: 1;" (mouseenter)="onmouseenterDropZone('center')" (mouseleave)="onmouseleaveDropZone()"></div>
+                                <div class="drop-zone-right" style="width: 25px;" (mouseenter)="onmouseenterDropZone('right')" (mouseleave)="onmouseleaveDropZone()"></div>
+                            </div>
 
-                                        <planning-employees-calendar-activity
-                                            [height]="rowsHeight"
-                                            [width]="cellsWidth"
-                                            [tableRect]="tableRect"
-                                            [day]="day"
-                                            [activity]="activity"
-                                            (hover)="onhoverActivity($event); onhoverDay(partner, day)"
-                                            (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
-                                            (selected)="onSelectedBooking($event)"
-                                            cdkDrag
-                                            [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_event"
-                                            (cdkDragStarted)="onDragStart(activity)">
-                                        </planning-employees-calendar-activity>
+                            <!-- activities cell -->
+                            <div *ngIf="hasActivity(partner, headers.days_indexes[i], 'PM')" class="cell-activities" [ngClass]="{ 'space-before': hasSpaceBefore(partner, day, 'PM'), 'space-after': hasSpaceAfter(partner, day, 'PM') }">
+                                <ng-container *ngFor="let activity of getActivities(partner, day, 'PM'); let j = index">
 
-                                        <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(16px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
-                                            <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
-                                        </span>
-                                    </ng-container>
-                                </div>
-                            </ng-container>
+                                    <planning-employees-calendar-activity
+                                        [height]="rowsHeight"
+                                        [width]="cellsWidth"
+                                        [tableRect]="tableRect"
+                                        [day]="day"
+                                        [activity]="activity"
+                                        (hover)="onhoverActivity($event); onhoverDay(partner, day)"
+                                        (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
+                                        (selected)="onSelectedActivity($event)"
+                                        cdkDrag
+                                        [cdkDragDisabled]="activity?.is_partner_event"
+                                        (cdkDragStarted)="onDragStart(activity)">
+                                    </planning-employees-calendar-activity>
+
+                                    <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                        <div class="tooltip" [class]="{'tooltip--with-header': activity.booking_line_group_id.has_person_with_disability || activity.booking_id.date_from === activity.booking_id.date_to }">
+                                            <div class="header" style="color: #2196F3;">
+                                                <mat-icon *ngIf="activity.booking_line_group_id.has_person_with_disability" aria-hidden="true">accessible</mat-icon>
+                                                <mat-icon *ngIf="activity.booking_id.date_from === activity.booking_id.date_to" aria-hidden="true">event</mat-icon>
+                                            </div>
+                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></div>
+                                        </div>
+                                    </span>
+                                </ng-container>
+                            </div>
+
+                            <!-- partner events -->
+                            <div *ngIf="hasPartnerEvent(partner, headers.days_indexes[i], 'PM')" class="cell-partner-events">
+                                <ng-container *ngFor="let partnerEvent of getPartnerEvents(partner, day, 'PM'); let j = index">
+                                    <planning-employees-calendar-activity
+                                        [height]="rowsHeight"
+                                        [width]="cellsWidth"
+                                        [tableRect]="tableRect"
+                                        [day]="day"
+                                        [activity]="partnerEvent"
+                                        (hover)="onhoverActivity($event); onhoverDay(partner, day)"
+                                        (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
+                                        (selected)="onSelectedActivity($event)"
+                                    ></planning-employees-calendar-activity>
+
+                                    <div *ngIf="hovered_activity == partnerEvent" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getPartnerEventDescription(partnerEvent)}" (mouseenter)="onhoverActivity(partnerEvent)" (mouseleave)="onhoverActivity(null)">
+                                        <div class="tooltip">
+                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </div>
                         </td>
 
                         <td     class="cell-EV cell-days cdk-drag-disabled"
@@ -165,34 +239,68 @@
                                 (dragstart)="preventDrag($event)"
                                 (mouseenter)="onmouseenterTableCell($event, index, partner, headers.days_indexes[i], 'EV')"
                                 (mouseleave)="onmouseleaveTableCell($event)"
+                                (dblclick)="ondoubleclickTableCell(day, partner, 'EV')"
                                 cdkDropList
-                                (cdkDropListDropped)="onDrop($event, index, partner, headers.days_indexes[i], 'EV')">
+                                (cdkDropListDropped)="onDrop($event, partner, headers.days_indexes[i], 'EV')">
 
-                            <!-- activity cell -->
-                            <ng-container *ngIf="hasActivity(partner, headers.days_indexes[i], 'EV')">
-                                <div class="cell-activities">
-                                    <ng-container *ngFor="let activity of getActivities(partner, day, 'EV'); let j = index">
+                            <!-- activity drop zone -->
+                            <div class="drop-zone" [ngClass]="{'drop-zone--left': this.dropZonePosition === 'left', 'drop-zone--center': this.dropZonePosition === 'center', 'drop-zone--right': this.dropZonePosition === 'right'}">
+                                <div class="drop-zone-left" style="width: 25px;" (mouseenter)="onmouseenterDropZone('left')" (mouseleave)="onmouseleaveDropZone()"></div>
+                                <div class="drop-zone-center" style="flex-grow: 1;" (mouseenter)="onmouseenterDropZone('center')" (mouseleave)="onmouseleaveDropZone()"></div>
+                                <div class="drop-zone-right" style="width: 25px;" (mouseenter)="onmouseenterDropZone('right')" (mouseleave)="onmouseleaveDropZone()"></div>
+                            </div>
 
-                                        <planning-employees-calendar-activity
-                                            [height]="rowsHeight"
-                                            [width]="cellsWidth"
-                                            [tableRect]="tableRect"
-                                            [day]="day"
-                                            [activity]="activity"
-                                            (hover)="onhoverActivity($event); onhoverDay(partner, day)"
-                                            (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
-                                            (selected)="onSelectedBooking($event)"
-                                            cdkDrag
-                                            [cdkDragDisabled]="partner.relationship !== 'employee' || activity?.is_partner_event"
-                                            (cdkDragStarted)="onDragStart(activity)">
-                                        </planning-employees-calendar-activity>
+                            <!-- activities cell -->
+                            <div *ngIf="hasActivity(partner, headers.days_indexes[i], 'EV')" class="cell-activities" [ngClass]="{ 'space-before': hasSpaceBefore(partner, day, 'EV'), 'space-after': hasSpaceAfter(partner, day, 'EV') }">
+                                <ng-container *ngFor="let activity of getActivities(partner, day, 'EV'); let j = index">
 
-                                        <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(16px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
-                                            <span *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></span>
-                                        </span>
-                                    </ng-container>
-                                </div>
-                            </ng-container>
+                                    <planning-employees-calendar-activity
+                                        [height]="rowsHeight"
+                                        [width]="cellsWidth"
+                                        [tableRect]="tableRect"
+                                        [day]="day"
+                                        [activity]="activity"
+                                        (hover)="onhoverActivity($event); onhoverDay(partner, day)"
+                                        (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
+                                        (selected)="onSelectedActivity($event)"
+                                        cdkDrag
+                                        [cdkDragDisabled]="activity?.is_partner_event"
+                                        (cdkDragStarted)="onDragStart(activity)">
+                                    </planning-employees-calendar-activity>
+
+                                    <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                        <div class="tooltip" [class]="{'tooltip--with-header': activity.booking_line_group_id.has_person_with_disability || activity.booking_id.date_from === activity.booking_id.date_to }">
+                                            <div class="header" style="color: #2196F3;">
+                                                <mat-icon *ngIf="activity.booking_line_group_id.has_person_with_disability" aria-hidden="true">accessible</mat-icon>
+                                                <mat-icon *ngIf="activity.booking_id.date_from === activity.booking_id.date_to" aria-hidden="true">event</mat-icon>
+                                            </div>
+                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></div>
+                                        </div>
+                                    </span>
+                                </ng-container>
+                            </div>
+
+                            <!-- partner events -->
+                            <div *ngIf="hasPartnerEvent(partner, headers.days_indexes[i], 'EV')" class="cell-partner-events">
+                                <ng-container *ngFor="let partnerEvent of getPartnerEvents(partner, day, 'EV'); let j = index">
+                                    <planning-employees-calendar-activity
+                                        [height]="rowsHeight"
+                                        [width]="cellsWidth"
+                                        [tableRect]="tableRect"
+                                        [day]="day"
+                                        [activity]="partnerEvent"
+                                        (hover)="onhoverActivity($event); onhoverDay(partner, day)"
+                                        (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
+                                        (selected)="onSelectedActivity($event)"
+                                    ></planning-employees-calendar-activity>
+
+                                    <div *ngIf="hovered_activity == partnerEvent" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getPartnerEventDescription(partnerEvent)}" (mouseenter)="onhoverActivity(partnerEvent)" (mouseleave)="onhoverActivity(null)">
+                                        <div class="tooltip">
+                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </div>
                         </td>
 
                     </ng-container>

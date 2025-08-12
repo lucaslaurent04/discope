@@ -7,7 +7,9 @@
 */
 namespace sale\booking;
 use core\setting\Setting;
+use equal\data\DataFormatter;
 use equal\orm\Model;
+use identity\Center;
 use identity\CenterOffice;
 use sale\customer\Customer;
 use sale\customer\CustomerNature;
@@ -94,28 +96,22 @@ class Booking extends Model {
                 'onupdate'          => 'onupdateCustomerRateClassId',
             ],
 
-            'organisation_id' => [
-                'type'              => 'computed',
-                'result_type'       => 'many2one',
-                'foreign_object'    => 'identity\Identity',
-                'description'       => "The organisation the establishment belongs to.",
-                'store'             => true,
-                'instant'           => true,
-                'relation'          => ['center_id' => 'organisation_id']
-            ],
-
             'center_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Center',
                 'description'       => "The center to which the booking relates to.",
                 'required'          => true,
-                'onupdate'          => 'onupdateCenterId'
+                'dependents'        => ['organisation_id', 'center_office_id']
             ],
 
             'center_office_id' => [
-                'type'              => 'many2one',
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
                 'foreign_object'    => 'identity\CenterOffice',
                 'description'       => 'Office the invoice relates to (for center management).',
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['center_id' => 'center_office_id']
             ],
 
             'total' => [
@@ -289,8 +285,8 @@ class Booking extends Model {
 
             'payment_status' => [
                 'type'              => 'computed',
-                'usage'             => 'icon',
                 'result_type'       => 'string',
+                'usage'             => 'icon',
                 'selection'         => [
                     'due',
                     'paid'
@@ -514,6 +510,23 @@ class Booking extends Model {
         ];
     }
 
+    public static function getActions() {
+        return [
+            'import_contacts' => [
+                'description'   => 'Import contacts from customer identity.',
+                'policies'      => [],
+                'function'      => 'doImportContacts'
+            ]
+        ];
+    }
+
+    /**
+     * #memo - this is necessary when a Booking is created at once using ::create
+     *
+     */
+    public static function oncreate($self) {
+        $self->do('import_contacts');
+    }
 
     public static function calcName($om, $oids, $lang) {
         $result = [];
@@ -771,16 +784,55 @@ class Booking extends Model {
      *  as 10000000 % 97 = 76
      *  we do (aaa * 76 + bbbbbbb) % 97
      */
-    public static function calcPaymentReference($om, $ids, $lang) {
+    public static function calcPaymentReference($self) {
         $result = [];
-        $bookings = $om->read(self::getType(), $ids, ['name'], $lang);
-        foreach($bookings as $id => $booking) {
-            $booking_code = intval($booking['name']);
+        $self->read(['name', 'customer_identity_id' => ['name', 'id', 'accounting_account']]);
+        foreach($self as $id => $booking) {
             // #memo - arbitrary value : used in the accounting software for identifying payments with a temporary account entry counterpart
-            $code_ref = 150;
-            $control = ((76*$code_ref) + $booking_code) % 97;
-            $control = ($control == 0)?97:$control;
-            $result[$id] = sprintf("%3d%04d%03d%02d", $code_ref, $booking_code / 1000, $booking_code % 1000, $control);
+            $code_ref =  Setting::get_value('sale', 'organization', 'booking.reference.code', 150);
+            $reference_type =  Setting::get_value('sale', 'organization', 'booking.reference.type', 'VCS');
+
+            $booking_code = intval($booking['name']);
+
+            switch($reference_type) {
+                // use Customer accounting_account as reference (from Identity)
+                case 'accounting_account':
+                    $reference_value = $booking['customer_identity_id']['accounting_account'];
+                    break;
+                // ISO-11649
+                case 'RF':
+                    // structure: RFcc nnn... (up to 25 alpha-num chars) (we omit the 'RF' part in the result)
+                    // build a numeric reference
+                    $ref_base = sprintf('%03d%07d', $code_ref, $booking_code);
+                    // append 'RF00' to compute the check
+                    $tmp = $ref_base . 'RF00';
+                    // replace letters with digits
+                    $converted = '';
+                    foreach(str_split($tmp) as $char) {
+                        // #memo - in ISO-11649 'A' = 10
+                        $converted .= ctype_alpha($char) ? (ord($char) - 55) : $char;
+                    }
+                    $mod97 = intval(bcmod($converted, '97'));
+                    $control = str_pad(98 - $mod97, 2, '0', STR_PAD_LEFT);
+                    $reference_value = $control . $ref_base;
+                    break;
+                // FR specific
+                case 'RN':
+                    // structure : RNccxxxxxxxxxxxxxxxxxxxx + key + up to 20 digits (we omit the 'RN' part in the result)
+                    $ref_body = sprintf('%013d%07d', $code_ref, $booking_code);
+                    $control = 97 - intval(bcmod($ref_body, '97'));
+                    $reference_value = str_pad($control, 2, '0', STR_PAD_LEFT) . $ref_body;
+                    break;
+                // BE specific
+                case 'VCS':
+                    // structure: +++xxx/xxxx/xxxcc+++ where cc is the control result (we omit the '+' and '/' chars in the result)
+                default:
+                    $control = ((76 * intval($code_ref)) + $booking_code) % 97;
+                    $control = ($control == 0) ? 97 : $control;
+                    $reference_value = sprintf('%3d%04d%03d%02d', $code_ref, $booking_code / 1000, $booking_code % 1000, $control);
+            }
+
+            $result[$id] = $reference_value;
         }
         return $result;
     }
@@ -788,9 +840,13 @@ class Booking extends Model {
     public static function calcDisplayPaymentReference($om, $ids, $lang) {
         $result = [];
         $bookings = $om->read(self::getType(), $ids, ['payment_reference'], $lang);
+        $reference_type = Setting::get_value('sale', 'organization', 'booking.reference.type', 'VCS');
         foreach($bookings as $id => $booking) {
             $reference = $booking['payment_reference'];
-            $result[$id] = '+++'.substr($reference, 0, 3).'/'.substr($reference, 4, 4).'/'.substr($reference, 8, 5).'+++';
+            if(in_array($reference, ['RN', 'RF', 'VCS'])) {
+                DataFormatter::format($booking['payment_reference'], $reference_type);
+            }
+            $result[$id] = $reference;
         }
         return $result;
     }
@@ -801,7 +857,7 @@ class Booking extends Model {
         foreach($bookings as $oid => $booking) {
             $result[$oid] = false;
             if(count($booking['contracts_ids'])) {
-                $contracts = $om->read(\sale\booking\Contract::getType(), $booking['contracts_ids'], ['is_locked', 'status'], $lang);
+                $contracts = $om->read(Contract::getType(), $booking['contracts_ids'], ['is_locked', 'status'], $lang);
                 foreach($contracts as $contract) {
                     if($contract['status'] != 'cancelled' && $contract['is_locked']) {
                         $result[$oid] = true;
@@ -1146,72 +1202,66 @@ class Booking extends Model {
                 }
                 $om->update(self::getType(), $oid, $values);
             }
-            // import contacts from customer identity
-            $om->callonce(self::getType(), 'createContacts', $oids, [], $lang);
+
         }
     }
 
-    public static function createContacts($om, $oids, $values, $lang) {
-        $bookings = $om->read(self::getType(), $oids, [
-            'customer_identity_id',
-            'contacts_ids'
-        ], $lang);
+    public static function doImportContacts($self, $om) {
+        $self->read(['customer_identity_id', 'contacts_ids']);
 
-        if($bookings > 0) {
-            foreach($bookings as $bid => $booking) {
-                if(is_null($booking['customer_identity_id']) || $booking['customer_identity_id'] <= 0) {
+        foreach($self as $id => $booking) {
+            if(is_null($booking['customer_identity_id']) || $booking['customer_identity_id'] <= 0) {
+                continue;
+            }
+            // ignore special case where customer is the organisation itself
+            if($booking['customer_identity_id'] == 1) {
+                continue;
+            }
+
+            // remove all previously auto created contacts
+            $previous_contacts_ids = $om->search(\sale\booking\Contact::getType(), [ ['booking_id', '=', $id], ['origin', '=', 'auto'] ] );
+            if($previous_contacts_ids > 0) {
+                $om->delete(\sale\booking\Contact::getType(), $previous_contacts_ids, true);
+            }
+
+            $partners_ids = [];
+            $existing_partners_ids = [];
+            // read all contacts (to prevent importing contacts twice)
+            if($booking['contacts_ids'] && count($booking['contacts_ids'] )) {
+                // #memo - we don't remove previously added contacts to keep user's work
+                // $om->delete(Contact::getType(), $booking['contacts_ids'], true);
+                $contacts = $om->read(\sale\booking\Contact::getType(), $booking['contacts_ids'], ['partner_identity_id']);
+                $existing_partners_ids = array_map(function($a) { return $a['partner_identity_id'];}, $contacts);
+            }
+            // if customer has contacts assigned to its identity, import those
+            $identity_contacts_ids = $om->search(\identity\Contact::getType(), [
+                ['owner_identity_id', '=', $booking['customer_identity_id']],
+                ['relationship', '=', 'contact']
+            ]);
+            if($identity_contacts_ids > 0 && count($identity_contacts_ids) > 0) {
+                $contacts = $om->read(\identity\Contact::getType(), $identity_contacts_ids, ['partner_identity_id']);
+                foreach($contacts as $cid => $contact) {
+                    if($contact['partner_identity_id']) {
+                        $partners_ids[] = $contact['partner_identity_id'];
+                    }
+                }
+            }
+            // append customer identity's own contact
+            $partners_ids[] = $booking['customer_identity_id'];
+            // keep only partners_ids not present yet - limit to max 5 contacts
+            // #todo - store MAX value in Settings
+            $partners_ids = array_slice(array_diff($partners_ids, $existing_partners_ids), 0, 5);
+            // create booking contacts
+            foreach($partners_ids as $partner_id) {
+                if(!$partner_id) {
                     continue;
                 }
-                // ignore special case where customer is the organisation itself
-                if($booking['customer_identity_id'] == 1) {
-                    continue;
-                }
-
-                // remove all previously auto created contacts
-                $previous_contacts_ids = $om->search(\sale\booking\Contact::getType(), [ ['booking_id', '=', $bid], ['origin', '=', 'auto'] ] );
-                if($previous_contacts_ids > 0) {
-                    $om->delete(\sale\booking\Contact::getType(), $previous_contacts_ids, true);
-                }
-
-                $partners_ids = [];
-                $existing_partners_ids = [];
-                // read all contacts (to prevent importing contacts twice)
-                if($booking['contacts_ids'] && count($booking['contacts_ids'] )) {
-                    // #memo - we don't remove previously added contacts to keep user's work
-                    // $om->delete(Contact::getType(), $booking['contacts_ids'], true);
-                    $contacts = $om->read(\sale\booking\Contact::getType(), $booking['contacts_ids'], ['partner_identity_id']);
-                    $existing_partners_ids = array_map(function($a) { return $a['partner_identity_id'];}, $contacts);
-                }
-                // if customer has contacts assigned to its identity, import those
-                $identity_contacts_ids = $om->search(\identity\Contact::getType(), [
-                    ['owner_identity_id', '=', $booking['customer_identity_id']],
-                    ['relationship', '=', 'contact']
+                $om->create(\sale\booking\Contact::getType(), [
+                    'booking_id'            => $id,
+                    'owner_identity_id'     => $booking['customer_identity_id'],
+                    'partner_identity_id'   => $partner_id,
+                    'origin'                => 'auto'
                 ]);
-                if($identity_contacts_ids > 0 && count($identity_contacts_ids) > 0) {
-                    $contacts = $om->read(\identity\Contact::getType(), $identity_contacts_ids, ['partner_identity_id']);
-                    foreach($contacts as $cid => $contact) {
-                        if($contact['partner_identity_id']) {
-                            $partners_ids[] = $contact['partner_identity_id'];
-                        }
-                    }
-                }
-                // append customer identity's own contact
-                $partners_ids[] = $booking['customer_identity_id'];
-                // keep only partners_ids not present yet - limit to max 5 contacts
-                // #todo - store MAX value in Settings
-                $partners_ids = array_slice(array_diff($partners_ids, $existing_partners_ids), 0, 5);
-                // create booking contacts
-                foreach($partners_ids as $partner_id) {
-                    if(!$partner_id) {
-                        continue;
-                    }
-                    $om->create(\sale\booking\Contact::getType(), [
-                        'booking_id'            => $bid,
-                        'owner_identity_id'     => $booking['customer_identity_id'],
-                        'partner_identity_id'   => $partner_id,
-                        'origin'                => 'auto'
-                    ]);
-                }
             }
         }
     }
@@ -1220,24 +1270,7 @@ class Booking extends Model {
         $bookings = $om->read(self::getType(), $oids, ['is_invoiced', 'booking_lines_ids']);
         foreach($bookings as $id => $booking) {
             // update all booking lines accordingly to their parent booking
-            $om->update(\sale\booking\BookingLine::getType(), $booking['booking_lines_ids'], ['is_invoiced' => $booking['is_invoiced']]);
-        }
-    }
-
-    public static function onupdateCenterId($om, $oids, $values, $lang) {
-        $bookings = $om->read(self::getType(), $oids, ['booking_lines_ids', 'center_id.center_office_id']);
-
-        if($bookings > 0) {
-            foreach($bookings as $bid => $booking) {
-                $booking_lines_ids = $booking['booking_lines_ids'];
-                if($booking_lines_ids > 0 && count($booking_lines_ids)) {
-                    $om->callonce('sale\booking\BookingLine', 'updatePriceId', $booking_lines_ids, [], $lang);
-                }
-                $center_offices = $om->read(CenterOffice::getType(), $booking['center_id.center_office_id'], ['id', 'organisation_id']);
-                $center_office = reset($center_offices);
-                $om->update(self::getType(), $bid, ['center_office_id' => $booking['center_id.center_office_id'],
-                                                    'organisation_id' => $center_office['organisation_id'] ?? null]);
-            }
+            $om->update(BookingLine::getType(), $booking['booking_lines_ids'], ['is_invoiced' => $booking['is_invoiced']]);
         }
     }
 
@@ -1258,6 +1291,15 @@ class Booking extends Model {
                 $result['date_to'] = $event['date_from'];
             }
         }
+        // try to retrieve nature from an identity
+        if(isset($event['center_id'])) {
+            $center = Center::id($event['center_id'])->read(['organisation_id' => ['id', 'name'], 'center_office_id' => ['id', 'name']])->first();
+            if($center) {
+                $result['organisation_id'] = ['id' => $center['organisation_id']['id'], 'name' => $center['organisation_id']['name']];
+                $result['center_office_id'] = ['id' => $center['center_office_id']['id'], 'name' => $center['center_office_id']['name']];
+            }
+        }
+
         // try to retrieve nature from an identity
         if(isset($event['customer_identity_id'])) {
             $partner = Customer::search([
@@ -1314,7 +1356,7 @@ class Booking extends Model {
      */
     public static function canupdate($om, $oids, $values, $lang) {
 
-        $bookings = $om->read(self::getType(), $oids, ['status', 'customer_id', 'customer_identity_id', 'center_id', 'booking_lines_ids'], $lang);
+        $bookings = $om->read(self::getType(), $oids, ['state', 'status', 'customer_id', 'customer_identity_id', 'center_id', 'booking_lines_ids'], $lang);
 
         // fields that can always be updated
         $allowed_fields = ['status', 'description', 'is_invoiced', 'payment_status'];
@@ -1400,6 +1442,9 @@ class Booking extends Model {
 
         // check for accepted changes based on status
         foreach($bookings as $id => $booking) {
+            if($booking['state'] === 'draft') {
+                continue;
+            }
             if(in_array($booking['status'], ['invoiced', 'debit_balance', 'credit_balance', 'balanced'])) {
                 if(count(array_diff(array_keys($values), $allowed_fields))) {
                     return ['status' => ['non_editable' => 'Invoiced bookings edition is limited.']];
@@ -1885,6 +1930,19 @@ class Booking extends Model {
         $om->update(self::getType(), $id, ['is_price_tbc' => $is_tbc]);
     }
 
+    private static function computeCountBookingYearFiscal($booking_id, $customer_id) {
+        $date_from =  Setting::get_value('finance', 'accounting', 'fiscal_year.date_from');
+        $bookings_ids =Booking::search([
+            ['id', '<>', $booking_id],
+            ['customer_id', '=', $customer_id],
+            ['date_from', '>=',  strtotime($date_from)],
+            ['is_cancelled', '=', false],
+            ['status', 'not in', ['quote', 'option']]
+        ])
+        ->ids();
+        return count($bookings_ids);
+    }
+
     /**
      * This method is called by `update-sojourn-[...]` controllers.
      * It is meant to be called in a context not triggering change events (using `ORM::disableEvents()`).
@@ -1904,7 +1962,8 @@ class Booking extends Model {
             'nb_pers',
             'date_from',
             'date_to',
-            'center_id.autosale_list_category_id'
+            'center_id.autosale_list_category_id',
+            'customer_rate_class_id'
         ]);
 
         if($bookings <= 0) {
@@ -1976,6 +2035,7 @@ class Booking extends Model {
 
             $operands['count_booking_12'] = count($bookings_ids);
 
+            $operands['count_booking_fiscal_year'] = self::computeCountBookingYearFiscal($id, $booking['customer_id']);
             $operands['nb_pers'] = $booking['nb_pers'];
 
             $autosales = $om->read('sale\autosale\AutosaleLine', $autosale_list['autosale_lines_ids'], [
@@ -1985,6 +2045,7 @@ class Booking extends Model {
                 'has_own_qty',
                 'qty',
                 'scope',
+                'rate_class_id',
                 'conditions_ids'
             ]);
 
@@ -1994,6 +2055,9 @@ class Booking extends Model {
             // filter discounts to be applied on whole booking
             foreach($autosales as $autosale_id => $autosale) {
                 if($autosale['scope'] != 'booking') {
+                    continue;
+                }
+                if(isset($autosale['rate_class_id']) && $booking['customer_rate_class_id'] !== $autosale['rate_class_id']) {
                     continue;
                 }
                 $conditions = $om->read('sale\autosale\Condition', $autosale['conditions_ids'], ['operand', 'operator', 'value']);

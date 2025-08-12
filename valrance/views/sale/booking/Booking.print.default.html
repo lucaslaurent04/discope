@@ -11,7 +11,7 @@
 body {
     margin: 0;
     padding: 0;
-    margin-top: 301px;
+    margin-top: 150px;
     margin-bottom: 35px;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.7em;
@@ -82,7 +82,7 @@ div.inner .wrapper table tr:last-child td {
     border-bottom: solid 1px black;
 }
 
-div.inner .intro {
+div.inner .heading {
     margin-top: 20px;
     margin-bottom: 40px;
 }
@@ -102,10 +102,12 @@ div.trailer .wrapper table {
 div.header {
     top: 0;
     left: 0;
-    height: 301px;
+    height: 150px;
+    z-index: 2;
+    background: white;
 }
 
-div.header table.header {
+table.header {
     width: 100%;
     border-spacing: 0px;
     border-collapse: separate;
@@ -183,6 +185,22 @@ hr {
     <!-- spacer -->
     <div style="position: relative; height: 150px; width: 100%;"></div>
 
+</div>
+
+<div class="footer">
+    <p style="text-align: center;">
+        {{ company_name}} - {{ company_address }}
+        <br />
+        {{i18n['company_registry']}}: {{ company_reg_number }} - IBAN : {{ company_iban }}
+        <br />
+        {{i18n['email']}}: {{ company_email }} - Web: {{ company_website }} - {{i18n['phone']}} {{ company_phone }}
+        {% if company_fax %}
+            - {{ company_fax }}
+        {% endif %}
+    </p>
+</div>
+
+<div class="inner">
     <table class="header" cellpadding="0" cellspacing="0">
         <tr valign="top">
             <td colspan="2" style="position: relative; font-size: 20px; text-align: center; border-bottom: solid 1px rgb(204, 204, 204); width: 100%; height: 20px;  padding-left: 7px; overflow: hidden;">
@@ -229,28 +247,13 @@ hr {
         </tr>
     </table>
 
-</div>
-
-<div class="footer">
-    <p style="text-align: center;">
-        {{ company_name}} - {{ company_address }}
-        <br />
-        {{i18n['company_registry']}}: {{ company_reg_number }} - IBAN : {{ company_iban }}
-        <br />
-        {{i18n['email']}}: {{ company_email }} - Web: {{ company_website }} - {{i18n['phone']}} {{ company_phone }}
-        {% if company_fax %}
-            - {{ company_fax }}
-        {% endif %}
-    </p>
-</div>
-
-<div class="inner">
-    <div class="intro">
+    <div class="heading">
         {{ header_html | raw }}
     </div>
-    <div class="intro">
+    <div class="heading">
         {{ service_html | raw }}
     </div>
+    <hr />
     <div class="wrapper">
         <table width="100%" cellpadding="4" cellspacing="0">
             <thead style="border: solid 1px black; border-left: 0px; border-right: 0px;">
@@ -374,7 +377,7 @@ hr {
     </div>
     {% endif %}
 
-    {% if benefit_lines | length > 0  %}
+    {% if benefit_lines is not empty or benefit_freebis is not empty %}
     <div class="important">
         <p><b>{{i18n['advantage_included']}}:</b></p>
         <table style="border: solid 1px black; width: 100%;">
@@ -390,15 +393,29 @@ hr {
                 <td style="text-align: center;">{{ (100*benefit_line.value/price) | round }} %</td>
             </tr>
             {% endfor %}
+
+            {% for benefit_freebie in benefit_freebies %}
+            <tr>
+                <td>{{ benefit_freebie.name }}</td>
+                <td style="text-align: center;">{{ benefit_freebie.value }}</td>
+                <td style="text-align: center;"></td>
+            </tr>
+            {% endfor %}
         </table>
-        <div>
-            {{ advantage_notice_html | raw }}
+        {% if advantage_notice_html is not empty %}
+        <div style="margin-top: 10px;">
+            <table style="border: solid 1px black; width: 100%;">
+                <tr>
+                    <td>{{ advantage_notice_html | raw }}</td>
+                </tr>
+            </table>
         </div>
+        {% endif %}
     </div>
     {% endif %}
 </div>
 {% if show_consumption %}
-    {% if consumptions_tye == 'simple' %}
+    {% if consumptions_type == 'simple' %}
         {% if consumptions_map_simple | length > 0  %}
         <div style="position: relative; margin-top: 30px; margin-bottom: 30px; page-break-inside: avoid;">
             <div class="consumptions">
@@ -443,7 +460,7 @@ hr {
         {% endif %}
     {% endif %}
 
-    {% if consumptions_tye == 'detailed' %}
+    {% if consumptions_type == 'detailed' %}
         {% if consumptions_map_detailed | length > 0 %}
         <div style="position: relative; margin-top: 30px; margin-bottom: 30px; page-break-inside: avoid;">
             <div class="consumptions">
@@ -531,16 +548,21 @@ hr {
 {% endif %}
 
 
-{% if has_footer %}
-    <div>
-        {{ footer_html|raw }}
-    </div>
 
-    <div class="signature-container">
-        {{ signature|raw }}
-    </div>
+<div>
+    {{ footer_html | raw }}
+</div>
 
-{% endif %}
+<hr />
+
+<div style="margin-top: 50px">
+    {{ signature_html | raw }}
+</div>
+
+<div class="signature-container">
+    {{ stamp | raw }}
+</div>
+
 
 {% if is_agreement_html %}
     <table style="border: solid 1px black;border-collapse: collapse;  width: 100%; clear: both;">

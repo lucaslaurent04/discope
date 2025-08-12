@@ -1,0 +1,35 @@
+{
+    "name": "Présences",
+    "plural": "Présences",
+    "description": "Présences d'enfants à des camps.",
+    "model": {
+        "date_from": {
+            "label": "Du",
+            "description": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": ""
+        },
+        "am_daycare": {
+            "label": "Garderie matin",
+            "description": "Garderie avant le début du camp CLSH."
+        },
+        "pm_daycare": {
+            "label": "Garderie après-midi",
+            "description": "Garderie après la fin du camp CLSH."
+        },
+        "child_id": {
+            "label": "Enfant",
+            "description": ""
+        },
+        "camp_id": {
+            "label": "Camp",
+            "description": ""
+        }
+    },
+    "view": {
+    },
+    "error": {
+    }
+}

@@ -1,0 +1,50 @@
+{
+    "name": "Groups",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "5%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "name",
+                "width": "40%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "employee_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "camp_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "activity_group_num",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "max_children",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            }
+        ]
+    }
+}

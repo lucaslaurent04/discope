@@ -34,6 +34,62 @@
             "label": "Types de réservations",
             "help": ""
         },
+        "sales.camp": {
+            "label": "Camps",
+            "help": ""
+        },
+        "sales.camp.camp-models": {
+            "label": "Modèles",
+            "help": ""
+        },
+        "sales.camp.camps": {
+            "label": "Camps",
+            "help": ""
+        },
+        "sales.camp.price-adapters": {
+            "label": "Réductions aides",
+            "help": ""
+        },
+        "sales.camp.ce-enrollments": {
+            "label": "Inscriptions CE",
+            "help": ""
+        },
+        "sales.camp.catalog" : {
+            "label": "Catalogue",
+            "help": ""
+        },
+        "sales.camp.catalog.products" : {
+            "label": "Produits",
+            "help": ""
+        },
+        "sales.camp.catalog.product-models" : {
+            "label": "Modèles",
+            "help": ""
+        },
+        "sales.camp.requirements": {
+            "label": "Exigences",
+            "help": ""
+        },
+        "sales.camp.requirements.skills": {
+            "label": "Compétences",
+            "help": ""
+        },
+        "sales.camp.requirements.documents": {
+            "label": "Documents",
+            "help": ""
+        },
+        "sales.camp.helps": {
+            "label": "Aidants",
+            "help": ""
+        },
+        "sales.camp.helps.sponsors": {
+            "label": "Aides",
+            "help": ""
+        },
+        "sales.camp.helps.works-council": {
+            "label": "CEs",
+            "help": ""
+        },
         "sales.tour_operators": {
             "label": "Tour Opérateurs",
             "help": ""
@@ -198,6 +254,14 @@
             "label": "Tranches horaires",
             "help": ""
         },
+        "sales.catalog.meal_types": {
+            "label": "Types de repas",
+            "help": ""
+        },
+        "sales.catalog.meal_places": {
+            "label": "Lieux des repas",
+            "help": ""
+        },
         "sales.catalog.groupingCode": {
             "label": "Regroupement",
             "help": ""
@@ -324,6 +388,10 @@
         },
         "finance.accounting.account_chart": {
             "label": "Plan comptable",
+            "help": ""
+        },
+        "finance.accounting.analytic_chart": {
+            "label": "Plan analytique",
             "help": ""
         },
         "finance.accounting.accounting_journals": {

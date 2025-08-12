@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ApiService } from 'sb-shared-lib';
 import { BookingLineGroup } from '../../../../../../_models/booking_line_group.model';
 import { FormControl, Validators } from '@angular/forms';
@@ -8,6 +8,7 @@ import { Booking } from '../../../../../../_models/booking.model';
 import { BookingActivity } from '../../../../../../_models/booking_activity.model';
 import { MatDialog } from '@angular/material/dialog';
 import { BookingServicesBookingGroupLinePriceDialogComponent } from '../../../line/_components/price.dialog/price.component';
+import { BookingServicesBookingGroupDayActivitiesActivityDetailsDialogComponent } from './_components/details/details.component';
 
 interface vmModel {
     product: {
@@ -40,7 +41,7 @@ interface vmModel {
     templateUrl: 'activity.component.html',
     styleUrls: ['activity.component.scss']
 })
-export class BookingServicesBookingGroupDayActivitiesActivityComponent {
+export class BookingServicesBookingGroupDayActivitiesActivityComponent implements OnInit, OnChanges {
 
     @Input() activity: BookingActivity | null;
     @Input() date: Date;
@@ -59,6 +60,9 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
 
     public ready: boolean = false;
 
+    // #memo - not for displaying the loader but for knowing if a change is in progress
+    public loading: boolean = false;
+
     public vm: vmModel;
 
     public mapTimeSlotCodeName: any = {
@@ -66,8 +70,6 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
         'PM': 'Après-Midi',
         'EV': 'Soir',
     };
-
-    public providersQty: number = 1;
 
     constructor(
         private api: ApiService,
@@ -101,7 +103,6 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
     }
 
     public ngOnInit() {
-        this.ready = true;
 
         if(!this.activity) {
             // listen to the changes on FormControl objects
@@ -117,11 +118,9 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
             return;
         }
 
-        this.vm.product.name = this.activity.activity_booking_line_id.product_id.name;
-        this.vm.qty.formControl.setValue(this.activity.activity_booking_line_id.qty);
+        this.vm.product.name = this.activity.product_id.name;
 
-        this.providersQty = this.activity.activity_booking_line_id.qty_accounting_method === 'unit' ? this.activity.activity_booking_line_id.qty : 1;
-        for(let i = 0; i < this.providersQty; i++) {
+        for(let i = 0; i < this.activity.qty; i++) {
             let providerId: number | null = null;
             if(this.activity.providers_ids[i]) {
                 providerId = parseInt(this.activity?.providers_ids[i]);
@@ -129,8 +128,25 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
             this.vm.providers.formControls.push(new FormControl(providerId));
         }
 
+        if(!this.activity.activity_booking_line_id) {
+            this.vm.qty.formControl.setValue(this.activity.qty);
+            this.vm.qty.formControl.disable();
+        }
+        else {
+            this.vm.qty.formControl.setValue(this.activity.activity_booking_line_id.qty);
+        }
+
         if(this.activity.rental_unit_id) {
             this.vm.rentalUnit.formControl.setValue(this.activity.rental_unit_id);
+        }
+
+        this.ready = true;
+    }
+
+    public ngOnChanges(changes: SimpleChanges): void {
+        if(changes.hasOwnProperty('activity') && !changes.activity) {
+            this.vm.product.name = '';
+            this.vm.qty.formControl.setValue(0);
         }
     }
 
@@ -142,7 +158,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
         let filtered: any[] = [];
         try {
             let domain = [
-                ['is_activity', '=', true]
+                ['is_activity', '=', true],
+                ['is_billable', '=', true]
             ];
 
             if(!this.allowFulldaySelection) {
@@ -176,78 +193,110 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
         this.vm.product.inputClue.next('');
     }
 
-    private productDisplay(product:any): string {
-        return (product && product.hasOwnProperty('name')) ? product.name : '';
+    private productDisplay(product: any): string {
+        if(!product) {
+             return '';
+        }
+        if(typeof product === 'string') {
+            return product;
+        }
+        return product.name ?? '';
     }
 
     private productReset() {
+        if(this.loading) {
+            return;
+        }
+
         setTimeout(() => {
             this.vm.product.name = '';
         }, 100);
     }
 
     private productRestore() {
+        if(this.loading) {
+            return;
+        }
+
         this.vm.product.formControl.setErrors(null);
-        this.vm.product.name = this.activity?.activity_booking_line_id?.product_id ? this.activity.activity_booking_line_id.product_id.name : '';
+
+        if(!this.activity) {
+            this.vm.product.name = '';
+        }
+        else {
+            this.vm.product.name = this.activity?.activity_booking_line_id?.product_id ? this.activity.activity_booking_line_id.product_id.name : '';
+        }
     }
 
     public async onchangeProduct(event: any) {
         console.log('BookingServicesBookingGroupDayActivitiesActivityComponent::productChange', event)
 
+        if(this.loading) {
+            return;
+        }
+
         // from mat-autocomplete
-        if(event && event.option && event.option.value) {
-            let product = event.option.value;
-            if(
-                product.hasOwnProperty('name')
-                && (typeof product.name === 'string' || product.name instanceof String)
-                && product.name !== '[object Object]'
-            ) {
-                this.vm.product.name = product.name;
-            }
+        if(!event || !event.option || !event.option.value) {
+            return;
+        }
 
+        let product = event.option.value;
+
+        if(
+            product.hasOwnProperty('name')
+            && (typeof product.name === 'string' || product.name instanceof String)
+            && product.name !== '[object Object]'
+        ) {
+            this.vm.product.name = product.name;
+            this.vm.product.formControl.setValue(product, { emitEvent: false });
+            this.vm.qty.formControl.setValue(1);
+        }
+
+        let newLine: any = null;
+
+        // notify back-end about the change
+        try {
             this.loadStart.emit();
-
-            let newLine: any = null;
-
-            // notify back-end about the change
-            try {
-                newLine = await this.api.create('sale\\booking\\BookingLine', {
-                    order: this.group.booking_lines_ids.length + 1,
-                    booking_id: this.booking.id,
-                    booking_line_group_id: this.group.id,
-                    service_date: this.date.getTime() / 1000,
-                    time_slot_id: this.timeSlot.id
-                });
-                await this.api.call('?do=sale_booking_update-bookingline-product', {
-                    id: newLine.id,
-                    product_id: product.id
-                });
-                this.vm.product.formControl.setErrors(null);
-
-                this.loadEnd.emit();
-
-                // relay change to parent component
-                this.updated.emit();
+            this.loading = true;
+            newLine = await this.api.create('sale\\booking\\BookingLine', {
+                order: this.group.booking_lines_ids.length + 1,
+                booking_id: this.booking.id,
+                booking_line_group_id: this.group.id
+            });
+            await this.api.call('?do=sale_booking_update-bookingline-activity', {
+                id: newLine.id,
+                product_id: product.id,
+                service_date: this.date.getTime() / 1000,
+                time_slot_id: this.timeSlot.id
+            });
+            this.vm.product.formControl.setErrors(null);
+        }
+        catch(response: any) {
+            if(newLine) {
+                this.deleteLine.emit(newLine.id);
             }
-            catch(response: any) {
-                if(newLine) {
-                    this.deleteLine.emit(newLine.id);
-                }
-
-                this.loadEnd.emit();
-
-                this.api.errorFeedback(response);
-            }
+            this.api.errorFeedback(response);
+        }
+        finally {
+            this.loading = false;
+            // relay change to parent component
+            this.updated.emit();
         }
     }
 
     public async qtyChange() {
+
+        if(this.loading) {
+            return;
+        }
+
         if(!this.activity?.activity_booking_line_id || this.activity.activity_booking_line_id.qty == this.vm.qty.formControl.value) {
             return;
         }
 
         // notify back-end about the change
         try {
+            this.loading = true;
             await this.api.update('sale\\booking\\BookingLine', [this.activity.activity_booking_line_id.id], {qty: this.vm.qty.formControl.value});
             // relay change to parent component
             this.updated.emit();
@@ -255,9 +304,17 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
         catch(response) {
             this.api.errorFeedback(response);
         }
+        finally {
+            this.loading = false;
+        }
     }
 
     public async providerChange() {
+
+        if(this.loading) {
+            return;
+        }
+
         let providersIds: number[] = [];
         for(let providerId of this.activity.providers_ids) {
             providersIds.push(-providerId)
@@ -270,18 +327,26 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
 
         // notify back-end about the change
         try {
+            this.loading = true;
             await this.api.update('sale\\booking\\BookingActivity', [this.activity.id], {providers_ids: providersIds});
             // relay change to parent component
-            this.updated.emit();
+            setTimeout(() => this.updated.emit());
         }
         catch(response) {
             this.api.errorFeedback(response);
         }
+        finally {
+            this.loading = false;
+        }
     }
 
     public async rentalUnitChange() {
+        if(this.loading) {
+            return;
+        }
         // notify back-end about the change
         try {
+            this.loading = true;
             await this.api.update('sale\\booking\\BookingActivity', [this.activity.id], {rental_unit_id: this.vm.rentalUnit.formControl.value});
             // relay change to parent component
             this.updated.emit();
@@ -289,10 +354,18 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
         catch(response) {
             this.api.errorFeedback(response);
         }
+        finally {
+            this.loading = true;
+        }
     }
 
     public async oncreateTransport() {
+        if(this.loading) {
+            return;
+        }
+
         try {
+            this.loading = true;
             await this.api.create('sale\\booking\\BookingLine', {
                 order: this.group.booking_lines_ids.length + 1,
                 booking_id: this.booking.id,
@@ -309,10 +382,18 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
         catch(response) {
             this.api.errorFeedback(response);
         }
+        finally {
+            this.loading = false;
+        }
     }
 
     public async oncreateSupply() {
+        if(this.loading) {
+            return;
+        }
+
         try {
+            this.loading = true;
             await this.api.create('sale\\booking\\BookingLine', {
                 order: this.group.booking_lines_ids.length + 1,
                 booking_id: this.booking.id,
@@ -329,10 +410,13 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
         catch(response) {
             this.api.errorFeedback(response);
         }
+        finally {
+            this.loading = false;
+        }
     }
 
     public ondeleteActivityLine(lineId: number) {
-        this.deleteLine.emit(lineId);
+        setTimeout(() => this.deleteLine.emit(lineId));
     }
 
     public openPriceEdition() {
@@ -356,6 +440,45 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent {
                 if(line.unit_price != result.unit_price || line.vat != result.vat_rate) {
                     try {
                         await this.api.update('sale\\booking\\BookingLine', [line.id], {unit_price: result.unit_price, vat_rate: result.vat_rate});
+                        // relay change to parent component
+                        this.updated.emit();
+                    }
+                    catch(response) {
+                        this.api.errorFeedback(response);
+                    }
+                }
+            }
+        });
+    }
+
+    public openActivityDetails() {
+        if(this.group.is_locked) {
+            return;
+        }
+
+        if(!this.activity) {
+            return;
+        }
+
+        const dialogRef = this.dialog.open(BookingServicesBookingGroupDayActivitiesActivityDetailsDialogComponent, {
+            width: '500px',
+            height: '500px',
+            data: { ...this.activity }
+        });
+
+        dialogRef.afterClosed().subscribe(async (result) => {
+            if(result) {
+                const scheduleFrom = result.vm.schedule_from.formControl.value;
+                const scheduleTo = result.vm.schedule_to.formControl.value;
+                const description = result.vm.description.formControl.value;
+
+                if(this.activity.schedule_from != scheduleFrom || this.activity.schedule_to != scheduleTo || this.activity.description != description) {
+                    try {
+                        await this.api.update('sale\\booking\\BookingActivity', [this.activity.id], {
+                            schedule_from: scheduleFrom,
+                            schedule_to: scheduleTo,
+                            description: description
+                        });
                         // relay change to parent component
                         this.updated.emit();
                     }

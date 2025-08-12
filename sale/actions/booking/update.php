@@ -6,8 +6,10 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-[$params, $providers] = announce([
-    'description'   => "Update hook for Bookings: makes additional checks and relay to model update controller.",
+use sale\booking\Booking;
+
+[$params, $providers] = eQual::announce([
+    'description'   => "Update hook for Booking creation: init values and makes additional checks.",
     'extends'       => 'core_model_update',
     'params'        => [
        'entity' =>  [
@@ -50,13 +52,13 @@
     'access'        => [
         'visibility' => 'protected'
     ],
-    'providers'     => ['context']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
  * @var \equal\php\Context $context
  */
-['context' => $context] = $providers;
+['context' => $context, 'orm' => $orm] = $providers;
 
 if(isset($params['id']) && $params['id'] > 0) {
     $booking_id = $params['id'];
@@ -71,15 +73,39 @@ else {
     throw new Exception("missing_object_identifier", QN_ERROR_INVALID_PARAM);
 }
 
-/*
-    This controller is meant to intercept booking creation.
-    We run a series of checks: each of those raises an Exception not passing.
-*/
+
+// This controller is meant to intercept booking creation.
+// we run a series of checks: each of those raises an Exception not passing.
+
 
 // 1) update the booking according to the received data
 
-$result = eQual::run('do', 'model_update', $params, true);
+// At this stage only basic information has been given: prevent onupdate events
 
+// Callbacks are defined on Booking, BookingLine, and BookingLineGroup to ensure consistency across these entities.
+// While these callbacks are useful for maintaining data integrity (they and are used in tests),
+// they need to be disabled here to prevent recursive cycles that could lead to deep cycling issues.
+$orm->disableEvents();
+
+$orm->update(Booking::getType(), $booking_id, [
+        'customer_nature_id'    => $params['fields']['customer_nature_id'],
+        'center_id'             => $params['fields']['center_id'],
+        'date_from'             => strtotime($params['fields']['date_from']),
+        'date_to'               => strtotime($params['fields']['date_to']),
+        'has_tour_operator'     => ($params['fields']['has_tour_operator'] ?? '') === 'true',
+        'tour_operator_id'      => $params['fields']['tour_operator_id'] ?? null,
+        'tour_operator_ref'     => $params['fields']['tour_operator_ref'] ?? ''
+    ]);
+
+
+// restore events in case this controller is chained with others
+$orm->enableEvents();
+
+Booking::id($booking_id)
+    // assign identity & sync with customer
+    ->update(['customer_identity_id'  => $params['fields']['customer_identity_id']])
+    // re-create contacts
+    ->do('import_contacts');
 
 // 2) check customer history
 

@@ -1,0 +1,41 @@
+{
+    "name": "Recherche avancée de prix.",
+    "description": "Contrôleur proposant une recherche avancée des sessions des caisses.",
+    "model": {
+        "name": {
+            "label": "Libellé",
+            "description": "",
+            "help": ""
+        },
+        "product_id": {
+            "label": "Produit",
+            "description": "",
+            "help": ""
+        },
+        "price_list_id": {
+            "label": "Liste de prix",
+            "description": "",
+            "help": ""
+        },
+        "grouping_code_id": {
+            "label": "Code de regroupement",
+            "description": "",
+            "help": ""
+        },
+        "center_id": {
+            "label": "Centre",
+            "description": "",
+            "help": ""
+        },
+        "is_active": {
+            "label": "Actif",
+            "description": "",
+            "help": ""
+        },
+        "rate_class_id": {
+            "label": "Classe tarifaire",
+            "description": "",
+            "help": ""
+        }
+    }
+}

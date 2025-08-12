@@ -1,0 +1,53 @@
+{
+    "name": "Search Manage Camps Attending Children",
+    "description": "",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "layout": {
+        "groups": [
+            {
+                "sections": [
+                    {
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "date_from",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "date_to",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "only_weekend",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "only_birthday",
+                                                "width": "15%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

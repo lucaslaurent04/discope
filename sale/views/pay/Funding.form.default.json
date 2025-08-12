@@ -4,13 +4,59 @@
     "access": {
         "groups": ["sale.default.user"]
      },
+    "actions": [
+        {
+            "id": "action.mark-as-paid",
+            "label": "Marquer comme payé",
+            "description": "Marquer le financement comme payé même sans avoir reçu tous les paiments.",
+            "controller": "sale_pay_funding_do-mark-as-paid",
+            "access": {
+                "groups": ["finance.default.administrator", "finance.default.user"]
+            },
+            "visible": [
+                ["is_paid", "=", false],
+                ["enrollment_id", "<>", null]
+            ]
+        }
+    ],
     "layout": {
         "groups": [
             {
                 "sections": [
                     {
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "name",
+                                                "width": "50%",
+                                                "widget": {
+                                                    "heading": true,
+                                                    "readonly": true
+                                                }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "description",
+                                                "width": "50%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "sections": [
+                    {
                         "label": "General Info",
-                        "id": "section.funding_section",
+                        "id": "section.funding",
                         "rows": [
                             {
                                 "columns": [
@@ -19,35 +65,67 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "label": "Enrollment",
+                                                "value": "enrollment_id",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "readonly": true
+                                                }
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "type",
-                                                "width": "50%"
+                                                "width": "33%",
+                                                "widget": {
+                                                    "readonly": true
+                                                }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "status",
+                                                "width": "33%",
+                                                "widget": {
+                                                    "readonly": true
+                                                }
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "is_paid",
-                                                "width": "50%"
+                                                "width": "33%",
+                                                "widget": {
+                                                    "readonly": true
+                                                }
                                             },
                                             {
                                                 "type": "field",
-                                                "label": "Amount Due",
+                                                "value": "paid_amount",
+                                                "width": "33%",
+                                                "widget": {
+                                                    "readonly": true
+                                                }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "center_office_id",
+                                                "visible": false,
+                                                "width": "0",
+                                                "widget": {
+                                                    "readonly": true
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
                                                 "value": "due_amount",
                                                 "width": "50%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "due_date",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "label": "Payment Deadline",
-                                                "value": "payment_deadline_id",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "label": "Invoice",
-                                                "value": "invoice_id",
                                                 "width": "50%"
                                             }
                                         ]
@@ -58,7 +136,7 @@
                     },
                     {
                         "label": "Payments",
-                        "id": "section.payments_section",
+                        "id": "section.payments",
                         "rows": [
                             {
                                 "columns": [
@@ -68,6 +146,36 @@
                                             {
                                                 "type": "field",
                                                 "value": "payments_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "domain": ["status", "=", "paid"],
+                                                    "view": "list.funding",
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE" : false
+                                                        },
+                                                        "selection": false
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Bank Checks",
+                        "id": "section.bankchecks",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "bank_check_ids",
                                                 "width": "100%"
                                             }
                                         ]

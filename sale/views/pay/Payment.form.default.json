@@ -19,6 +19,16 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "value": "enrollment_id",
+                                                "width": "50%",
+                                                "widget": {
+                                                    "fields": ["customer_id.bookings_ids"],
+                                                    "heading": true
+                                                },
+                                                "visible": ["enrollment_id", "<>", null]
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "amount",
                                                 "width": "50%"
                                             },

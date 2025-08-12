@@ -1,5 +1,27 @@
 <!-- template vars -->
-<div #vGroup="var" [var]="{identification: {folded: displaySettings.identification_folded}, products: {folded: displaySettings.products_folded}, activities: {show: displaySettings.activities_show, folded: displaySettings.activities_folded}, accommodations: {folded: displaySettings.accommodations_folded}, meals: {show: displaySettings.meals_show, folded: displaySettings.meals_folded}}"></div>
+<div #vGroup="var" [var]="{
+    identification: {
+        folded: displaySettings.identification_folded
+    },
+    products: {
+        folded: displaySettings.products_folded
+    },
+    activities: {
+        show: displaySettings.activities_visible,
+        folded: displaySettings.activities_folded
+    },
+    meals: {
+        show: displaySettings.meals_show,
+        folded: displaySettings.meals_folded
+    },
+    accommodations: {
+        folded: displaySettings.accommodations_folded
+    },
+    meals_prefs: {
+        show: displaySettings.meals_prefs_visible,
+        folded: displaySettings.meals_prefs_folded
+    }
+}"></div>
 
 <div [class.hidden]="!ready">
 
@@ -95,7 +117,8 @@
                             (keyup.enter)="onblurGroupNbPers()"
                             (keyup.esc)="onblurGroupNbPers()"
                             [value]="instance.nb_pers"
-                            [formControl]="vm.participants_count.formControl">
+                            [formControl]="vm.participants_count.formControl"
+                            [disabled]="instance.age_range_assignments_ids?.length > 1">
                     </mat-form-field>
                 </div>
             </div>
@@ -109,9 +132,12 @@
     <!-- expanded pane : all details of group / sojourn -->
     <div [class.hidden]="folded">
 
+        <!--
+        #memo - loader should only be displayed at Booking level, through `loadStart` event
         <div class="loader-overlay" *ngIf="loading">
             <div class="loader"><mat-spinner></mat-spinner></div>
         </div>
+        -->
 
         <!-- identification-->
         <div class="part">
@@ -168,7 +194,8 @@
                                 matInput
                                 (blur)="onchangeNbPers()"
                                 [value]="instance.nb_pers"
-                                [formControl]="vm.participants_count.formControl">
+                                [formControl]="vm.participants_count.formControl"
+                                [disabled]="instance.age_range_assignments_ids?.length > 1">
                             <mat-hint>Nombre de personnes</mat-hint>
                             <mat-error *ngIf="vm.participants_count.formControl.hasError('required')">
                                 Doit être supérieur à 0.
@@ -358,8 +385,7 @@
                         <mat-form-field>
                             <mat-label>Type de séjour</mat-label>
                             <mat-select [ngModel]="vm.sojourn_type.value"
-                                        (selectionChange)="onchangeSojournType($event)"
-                            >
+                                        (selectionChange)="onchangeSojournType($event)">
                                 <mat-option *ngFor="let sojournType of sojournTypes " [value]="sojournType.name">
                                     {{sojournType.name}}
                                 </mat-option>
@@ -371,13 +397,20 @@
                 <div class="row" [class.hidden]="vGroup.identification.folded">
                     <div>
                         <div style="padding-left: 12px;">
-                            Âges des participants
+                            Participants
                             <button mat-mini-fab
                                 color="primary"
                                 style="transform: scale(0.66);"
                                 (click)="oncreateAgeRange();"
                                 title="Ajouter une tranche d'âge">
                                 <mat-icon>add</mat-icon>
+                            </button>
+                            <button mat-mini-fab
+                                color="primary"
+                                style="transform: scale(0.66);"
+                                (click)="oneditParticipantsOptions();"
+                                title="Editer les options des participants">
+                                <mat-icon>info_outline</mat-icon>
                             </button>
                         </div>
                         <div style="padding-left: 12px;">
@@ -517,12 +550,12 @@
                         <div class="products-header">
                             <div style="display: flex; width: 100%; margin-bottom: 6px; padding-left: 1px;">
                                 <div class="product-cell" style="text-align: left;">SKU</div>
-                                <div class="product-cell">QTÉ</div>
-                                <div class="product-cell">GTÉ</div>
-                                <div class="product-cell">P.U.</div>
-                                <div class="product-cell">RÉDUC</div>
-                                <div class="product-cell">TVA</div>
-                                <div class="product-cell">PRIX</div>
+                                <div class="product-cell" title="Quantité">QTÉ</div>
+                                <div class="product-cell" title="Gratuités accordées">GTÉ</div>
+                                <div class="product-cell" title="Prix unitaire">P.U.</div>
+                                <div class="product-cell" title="Pourcentage réduction">RÉDUC</div>
+                                <div class="product-cell" title="Taux TVA appliqué">TVA</div>
+                                <div class="product-cell" title="Prix TVAC">PRIX</div>
                                 <!-- actions -->
                                 <div class="product-cell" style="max-width: 35px;"></div>
                             </div>
@@ -545,7 +578,9 @@
                                     [group]="instance"
                                     [booking]="booking"
                                     [time_slots]="timeSlots"
+                                    [displaySettings]="displaySettings"
                                     (updated)="onupdateLine()"
+                                    (loadStart)="loadStart.emit()"
                                 ></booking-services-booking-group-line>
                             </div>
                         </div>
@@ -573,7 +608,7 @@
                         <span>Activités ({{instance.booking_activities_ids.length}})</span>
                     </div>
                     <div class="row-activities-price" style="height: 50px;"><!-- activity price is included in services --></div>
-                    </div>
+                </div>
                 <div class="row" [class.hidden]="vGroup.activities.folded">
                     <div style="width: 100%;">
                         <div class="activities-header">
@@ -606,10 +641,74 @@
                                     (loadStart)="loadStart.emit()"
                                     (loadEnd)="loadEnd.emit()"
                                     (updated)="onupdateActivity()"
-                                    (deleteLine)="ondeleteLine($event)"
+                                    (deleteActivity)="ondeleteActivity($event)"
                                     (closeActivity)="onCloseActivity($event)"
                                     (openActivity)="onOpenActivity($event)"
                                 ></booking-services-booking-group-day-activities>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- meals -->
+        <div class="part" *ngIf="vGroup.meals.show && instance.group_type === 'sojourn'">
+            <div class="part-toggle" [class.highlight]="!vGroup.meals.folded">
+                <button mat-icon-button *ngIf="!vGroup.meals.folded" (click)="vGroup.meals.folded = !vGroup.meals.folded; sectionFold('meals')">
+                    <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
+                </button>
+                <button mat-icon-button *ngIf="vGroup.meals.folded" (click)="vGroup.meals.folded = !vGroup.meals.folded; sectionUnfold('meals')">
+                    <mat-icon style="font-size: 15px;">keyboard_arrow_right</mat-icon>
+                </button>
+            </div>
+
+            <div class="part-container" [class.highlight]="!vGroup.meals.folded">
+                <div class="row">
+                    <div class="row-booking-meals-title" style="flex: 0 1 150px;">
+                        Repas ({{providedMealsQty}})
+                    </div>
+                    <mat-slide-toggle
+                            [(ngModel)]="mealsShowSnack"
+                            style="margin-left: 20px; transform: scale(0.8);">
+                        {{ mealsShowSnack ? 'Masquer les collations' : 'Montrer les collations' }}
+                    </mat-slide-toggle>
+
+                </div>
+                <div class="row" [class.hidden]="vGroup.meals.folded">
+                    <div style="width: 100%;">
+                        <div class="booking-meals-header">
+                            <div style="display: flex; width: 100%; margin-bottom: 6px; padding-left: 1px;">
+                                <div class="day-date-cells-wrapper">
+                                    <div class="booking-meals-cell">Jour</div>
+                                    <div class="booking-meals-cell">Date</div>
+                                </div>
+                                <div class="booking-meals-cell moment-cell">Moment</div>
+                                <div class="meal-wrapper">
+                                    <div class="booking-meals-cell">Type</div>
+                                    <div class="booking-meals-cell">Lieu</div>
+                                    <div class="booking-meals-cell">Non fourni</div>
+                                    <!-- actions -->
+                                    <div class="booking-meals-cell"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="booking-meals-list">
+                            <!-- booking-meals -->
+                            <div class="booking-meal-item" *ngFor="let bookingMealDay of bookingMealsDays">
+                                <booking-services-booking-group-day-meals
+                                        *ngIf="instance.booking_meals_ids.length > 0"
+                                        [bookingMealDay]="bookingMealDay"
+                                        [booking]="booking"
+                                        [group]="instance"
+                                        [timeSlots]="timeSlots"
+                                        [mealTypes]="mealTypes"
+                                        [mealPlaces]="mealPlaces"
+                                        [mealsShowSnack]="mealsShowSnack"
+                                        (loadStart)="loadStart.emit()"
+                                        (loadEnd)="loadEnd.emit()"
+                                        (updated)="onupdateMeal()">
+                                </booking-services-booking-group-day-meals>
                             </div>
                         </div>
                     </div>
@@ -654,6 +753,7 @@
                             [group]="instance"
                             [booking]="booking"
                             [mode]="mode"
+                            [settings]="rentalUnitsSettings"
                             (updated)="onupdateAccomodation()"
                         ></booking-services-booking-group-rentalunitassignment>
                     </div>
@@ -662,13 +762,13 @@
         </div>
 
         <!-- meals preferences (for hostels only / 'GA')-->
-        <div class="part" *ngIf="vGroup.meals.show && ((instance?.is_sojourn && instance?.sojourn_type_id == 1) || instance.group_type == 'event')">
+        <div class="part" *ngIf="vGroup.meals_prefs.show && ((instance?.is_sojourn && instance?.sojourn_type_id == 1) || instance.group_type == 'event')">
 
             <div class="part-toggle" style="padding-top: 12px;">
-                <button mat-icon-button *ngIf="!vGroup.meals.folded" (click)="vGroup.meals.folded = true; sectionFold('meals')">
+                <button mat-icon-button *ngIf="!vGroup.meals_prefs.folded" (click)="vGroup.meals_prefs.folded = true; sectionFold('meals_prefs')">
                     <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
                 </button>
-                <button mat-icon-button *ngIf="vGroup.meals.folded" (click)="vGroup.meals.folded = false; sectionUnfold('meals')">
+                <button mat-icon-button *ngIf="vGroup.meals_prefs.folded" (click)="vGroup.meals_prefs.folded = false; sectionUnfold('meals_prefs')">
                     <mat-icon style="font-size: 15px;">keyboard_arrow_right</mat-icon>
                 </button>
             </div>
@@ -680,12 +780,12 @@
                             <button mat-mini-fab
                                     color="primary"
                                     style="transform: scale(0.66);"
-                                    (click)="vGroup.meals.folded = false; oncreateMealPref()">
+                                    (click)="vGroup.meals_prefs.folded = false; oncreateMealPref()">
                                 <mat-icon>add</mat-icon>
                         </button>
                     </div>
                 </div>
-                <div class="row" *ngIf="!vGroup.meals.folded" style="display: block;">
+                <div class="row" *ngIf="!vGroup.meals_prefs.folded" style="display: block;">
                     <div *ngFor="let preference of instance.meal_preferences_ids; let index = index;" style="display: flex;">
                         <div class="mealpref-item">
                             <booking-services-booking-group-mealpref

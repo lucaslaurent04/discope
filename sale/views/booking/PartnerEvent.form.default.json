@@ -48,6 +48,13 @@
                                                 "type": "field",
                                                 "value": "partner_id",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "camp_group_id",
+                                                "width": "50%",
+                                                "readonly": true,
+                                                "visible": ["camp_group_id", "<>", null]
                                             }
                                         ]
                                     }

@@ -74,6 +74,15 @@ list($params, $providers) = announce([
 
 list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
 
+$lodging_booking_print_booking_formatMember = function($booking) {
+    $id = $booking['customer_identity_id']['id'];
+    return ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
+};
+
+$lodging_booking_print_booking_formatName = function($booking) {
+    $code = (string) $booking['name'];
+    return substr($code, 0, 3) . '.' .substr($code, 3, 3);
+};
 
 // check query consistency
 if(!isset($params['params']['date_from'])) {
@@ -257,11 +266,11 @@ $values = [
 // retrieve contact details
 foreach($bookings as $booking) {
     $item = [
-        'name'              => lodging_booking_print_booking_formatName($booking),
+        'name'              => $lodging_booking_print_booking_formatName($booking),
         'description'       => str_replace(['<p><br></p>', '<p>', '</p>'], ['<br />', '<span>', '</span><br />'], $booking['description']),
         'from'              => date('d/m/Y @ H:i', $booking['date_from'] + $booking['time_from']),
         'to'                => date('d/m/Y @ H:i', $booking['date_to'] + $booking['time_to']),
-        'member'            => lodging_booking_print_booking_formatMember($booking),
+        'member'            => $lodging_booking_print_booking_formatMember($booking),
         'contacts'          => [],
         'sojourns'          => [],
         'rental_units'      => [],
@@ -397,15 +406,3 @@ $context->httpResponse()
         ->header('Content-Disposition', 'inline; filename="document.pdf"')
         ->body($output)
         ->send();
-
-
-
-function lodging_booking_print_booking_formatMember($booking) {
-    $id = $booking['customer_identity_id']['id'];
-    return ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
-}
-
-function lodging_booking_print_booking_formatName($booking) {
-    $code = (string) $booking['name'];
-    return substr($code, 0, 3) . '.' .substr($code, 3, 3);
-}

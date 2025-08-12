@@ -35,8 +35,7 @@ class PartnerEvent extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Partner',
                 'description'       => "Partner the event is related to.",
-                'required'          => true,
-                'readonly'          => true
+                'required'          => true
             ],
 
             'partner_event_set_id' => [
@@ -58,7 +57,19 @@ class PartnerEvent extends Model {
                 'description'       => "Specific day time slot on which the service is delivered.",
                 'required'          => true,
                 'domain'            => ['code', 'in', ['AM', 'PM', 'EV']]
-            ]
+            ],
+
+            'camp_group_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\CampGroup',
+                'description'       => "The camp group the partner event is for, if any."
+            ],
+
+            'booking_activity_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\booking\BookingActivity',
+                'description'       => "The camp activity, if any."
+            ],
 
         ];
     }

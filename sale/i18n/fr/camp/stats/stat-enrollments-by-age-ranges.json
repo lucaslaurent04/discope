@@ -1,0 +1,60 @@
+{
+    "name": "Statistiques quantités d'inscriptions par tranches d'age.",
+    "plural": "",
+    "description": "Statistiques quantités d'inscriptions par tranches d'age.",
+    "model": {
+        "all_centers": {
+            "label": "Tous les centres"
+        },
+        "center_id": {
+            "label": "Centre"
+        },
+        "date_from": {
+            "label": "Du"
+        },
+        "date_to": {
+            "label": "Au"
+        },
+        "center": {
+            "label": "Centre",
+            "description": "",
+            "help": ""
+        },
+        "age_range": {
+            "label": "Tranche d'age",
+            "description": "",
+            "help": ""
+        },
+        "qty": {
+            "label": "Qté",
+            "description": "",
+            "help": ""
+        },
+        "status": {
+            "label": "Status",
+            "selection": {
+                "all": "Toutes",
+                "validated": "Validées",
+                "confirmed": "Confirmées",
+                "pending": "Pré-inscription",
+                "waitlisted": "En attentes",
+                "cancelled": "Annulées"
+            },
+            "description": "",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "",
+            "description": "",
+            "layout": {}
+        },
+        "list.default": {
+            "name": "Quantités d'inscriptions par tranches d'age",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

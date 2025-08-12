@@ -1,0 +1,89 @@
+{
+    "name": "Group",
+    "layout": {
+        "groups": [
+            {
+                "sections": [
+                    {
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "name",
+                                                "width": "80%",
+                                                "widget": {
+                                                    "heading": true
+                                                }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "employee_id",
+                                                "width": "40%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "camp_id",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "max_children",
+                                                "width": "33%",
+                                                "readonly": true,
+                                                "visible": ["state", "<>", "draft"]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "activity_group_num",
+                                                "width": "33%",
+                                                "readonly": true,
+                                                "visible": ["state", "<>", "draft"]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "sections": [
+                    {
+                        "id": "section.activities",
+                        "label": "Activities",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "booking_activities_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.camp"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

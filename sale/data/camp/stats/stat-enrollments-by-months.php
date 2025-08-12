@@ -1,0 +1,209 @@
+<?php
+/*
+    This file is part of the Discope property management software <https://github.com/discope-pms/discope>
+    Some Rights Reserved, Discope PMS, 2020-2025
+    Original author(s): Yesbabylon SRL
+    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+*/
+
+use identity\Center;
+use identity\User;
+use sale\camp\Camp;
+use sale\camp\Sponsor;
+
+[$params, $providers] = eQual::announce([
+    'description'   => "Data about children's participation to camps.",
+    'params'        => [
+        'all_centers' => [
+            'type'              => 'boolean',
+            'description'       => "Mark all the centers of the children quantities.",
+            'default'           => false
+        ],
+        'center_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'identity\Center',
+            'description'       => "Center for the children quantities.",
+            'default'           => 1
+        ],
+        'date_from' => [
+            'type'              => 'date',
+            'description'       => "Date interval lower limit (defaults to first day of the current month).",
+            'default'           => fn() => strtotime('first day of this month')
+        ],
+        'date_to' => [
+            'type'              => 'date',
+            'description'       => "Date interval upper limit (defaults to last day of the current month).",
+            'default'           => fn() => strtotime('last day of this month')
+        ],
+        'status' => [
+            'type'              => 'string',
+            'description'       => "The status of the enrollments.",
+            'selection'         => [
+                'all',
+                'validated',
+                'confirmed',
+                'pending',
+                'waitlisted',
+                'cancelled'
+            ],
+            'default'           => 'validated'
+        ],
+
+        /* parameters used as properties of virtual entity */
+        'center' => [
+            'type'              => 'string',
+            'description'       => "Name of the center for the enrollments quantities."
+        ],
+        'month' => [
+            'type'              => 'string',
+            'description'       => "Month of the year."
+        ],
+        'qty_pending' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of pending enrollments of the month."
+        ],
+        'qty_waitlisted' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of waitlisted enrollments of the month."
+        ],
+        'qty_confirmed' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of confirmed enrollments of the month."
+        ],
+        'qty_validated' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of validated enrollments of the month."
+        ],
+        'qty_cancelled' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of cancelled enrollments of the month."
+        ],
+        'qty' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of enrollments of the month."
+        ]
+    ],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.user'],
+    ],
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
+    ],
+    'providers'     => ['context', 'adapt' , 'auth']
+]);
+
+/**
+ * @var \equal\php\Context                  $context
+ * @var \equal\data\adapt\AdapterProvider   $adapter_provider
+ * @var \equal\auth\AuthenticationManager   $auth
+ */
+['context' => $context, 'adapt' => $adapter_provider, 'auth' => $auth] = $providers;
+
+/** @var \equal\data\adapt\DataAdapterJson $json_adapter */
+$json_adapter = $adapter_provider->get('json');
+
+$domain = [
+    ['date_from', '>=', $params['date_from']],
+    ['date_from', '<=', $params['date_to']],
+    ['status', '<>', 'cancelled']
+];
+
+if($params['all_centers']) {
+    $user_id = $auth->userId();
+    if($user_id <= 0) {
+        throw new Exception("unknown_user", EQ_ERROR_NOT_ALLOWED);
+    }
+    $user = User::id($user_id)->read(['centers_ids'])->first();
+    if(is_null($user)) {
+        throw new Exception("unexpected_error", EQ_ERROR_INVALID_USER);
+    }
+    $domain[] = ['center_id', 'in', $user['centers_ids']];
+}
+elseif(isset($params['center_id']) && $params['center_id'] > 0) {
+    $domain[] = ['center_id', '=', $params['center_id']];
+}
+
+$result = [];
+
+$camps = Camp::search($domain)
+    ->read([
+        'center_id',
+        'date_from',
+        'enrollments_ids' => [
+            'status'
+        ]
+    ])
+    ->get(true);
+
+$map_center_months_statuses_enrollments_qty = [];
+
+foreach($camps as $camp) {
+    if(!isset($map_center_months_statuses_enrollments_qty[$camp['center_id']])) {
+        $map_center_months_statuses_enrollments_qty[$camp['center_id']] = [];
+    }
+
+    foreach($camp['enrollments_ids'] as $enrollment) {
+        $month = date('Y-m', $camp['date_from']);
+
+        if(!isset($map_center_months_statuses_enrollments_qty[$camp['center_id']][$month])) {
+            $map_center_months_statuses_enrollments_qty[$camp['center_id']][$month] = [];
+        }
+
+        if(!isset($map_center_months_statuses_enrollments_qty[$camp['center_id']][$month][$enrollment['status']])) {
+            $map_center_months_statuses_enrollments_qty[$camp['center_id']][$month][$enrollment['status']] = 0;
+        }
+
+        $map_center_months_statuses_enrollments_qty[$camp['center_id']][$month][$enrollment['status']]++;
+    }
+}
+
+$center_ids = array_keys($map_center_months_statuses_enrollments_qty);
+
+$centers = Center::search(['id', 'in', $center_ids])
+    ->read(['name'])
+    ->get();
+
+foreach($map_center_months_statuses_enrollments_qty as $center_id => $map_months_statuses_enrollments_qty) {
+    $center = null;
+    foreach ($centers as $c) {
+        if ($c['id'] === $center_id) {
+            $center = $c['name'];
+            break;
+        }
+    }
+
+    foreach($map_months_statuses_enrollments_qty as $month => $map_statuses_enrollments_qty) {
+        $qty_pending = $map_statuses_enrollments_qty['pending'] ?? 0;
+        $qty_waitlisted = $map_statuses_enrollments_qty['waitlisted'] ?? 0;
+        $qty_confirmed = $map_statuses_enrollments_qty['confirmed'] ?? 0;
+        $qty_validated = $map_statuses_enrollments_qty['validated'] ?? 0;
+        $qty_cancelled = $map_statuses_enrollments_qty['cancelled'] ?? 0;
+
+        $result[] = [
+            'center'            => $center,
+            'month'             => $month,
+            'qty_pending'       => $qty_pending,
+            'qty_waitlisted'    => $qty_waitlisted,
+            'qty_confirmed'     => $qty_confirmed,
+            'qty_validated'     => $qty_validated,
+            'qty_cancelled'     => $qty_cancelled,
+            'qty'               => $qty_pending + $qty_waitlisted + $qty_confirmed + $qty_validated + $qty_cancelled
+        ];
+    }
+}
+
+usort($result, function($a, $b) {
+    $result = strcmp($a['center'], $b['center']);
+    if($result === 0) {
+        return strcmp($a['month'], $b['month']);
+    }
+    return $result;
+});
+
+$context->httpResponse()
+        ->header('X-Total-Count', count($result))
+        ->body($result)
+        ->send();

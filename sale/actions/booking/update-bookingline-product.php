@@ -7,8 +7,8 @@
 */
 
 use sale\booking\BookingLine;
+use sale\booking\BookingLineGroup;
 
-// announce script and fetch parameters values
 [$params, $providers] = eQual::announce([
     'description'	=> "Updates a Booking Line by changed its product. This script is meant to be called by the `booking/services` UI.",
     'params' 		=> [
@@ -62,11 +62,25 @@ else {
 }
 
 if(!$found) {
-    throw new Exception("missing_price", QN_ERROR_INVALID_PARAM);
+    throw new Exception("missing_price", EQ_ERROR_INVALID_PARAM);
 }
 
 // step-2 - attempt to update line
 BookingLine::id($line_id)->update(['product_id' => $params['product_id']]);
+
+// Callbacks are defined on Booking, BookingLine, and BookingLineGroup to ensure consistency across these entities.
+// While these callbacks are useful for maintaining data integrity (they and are used in tests),
+// they need to be disabled here to prevent recursive cycles that could lead to deep cycling issues.
+$orm->disableEvents();
+
+$line = BookingLine::id($line_id)
+    ->read(['booking_line_group_id'])
+    ->first();
+
+BookingLineGroup::refreshMeals($orm, $line['booking_line_group_id']);
+
+// restore events in case this controller is chained with others
+$orm->enableEvents();
 
 $context->httpResponse()
         ->status(204)

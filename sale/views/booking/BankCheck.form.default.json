@@ -8,7 +8,7 @@
         {
             "id": "action.transition.add.payment",
             "label": "Add Payment",
-            "controller": "sale_booking_bankCheck_do-pay",
+            "controller": "sale_booking_bankcheck_do-pay",
             "access": {
                 "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
             },
@@ -19,7 +19,7 @@
         {
             "id": "action.transition.remove.payment",
             "label": "Remove Payment",
-            "controller": "sale_booking_bankCheck_remove-pay",
+            "controller": "sale_booking_bankcheck_remove-pay",
             "access": {
                 "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
             },
@@ -28,7 +28,7 @@
         {
             "id": "action.transition.delete",
             "label": "Delete Bank Check",
-            "controller": "sale_booking_bankCheck_remove-bankCheck",
+            "controller": "sale_booking_bankcheck_remove-bank-check",
             "access": {
                 "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
             },
@@ -44,7 +44,8 @@
                 "ids": []
             },
             "visible": [
-                ["status", "<>", "rejected"]
+                ["status", "<>", "rejected"],
+                ["status", "<>", "paid"]
             ]
         }
     ],

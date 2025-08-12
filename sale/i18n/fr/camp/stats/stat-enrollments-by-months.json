@@ -1,0 +1,72 @@
+{
+    "name": "Statistiques quantités d'inscriptions par mois.",
+    "plural": "",
+    "description": "Statistiques quantités d'inscriptions par mois.",
+    "model": {
+        "all_centers": {
+            "label": "Tous les centres"
+        },
+        "center_id": {
+            "label": "Centre"
+        },
+        "date_from": {
+            "label": "Du"
+        },
+        "date_to": {
+            "label": "Au"
+        },
+        "center": {
+            "label": "Centre",
+            "description": "",
+            "help": ""
+        },
+        "month": {
+            "label": "Mois",
+            "description": "",
+            "help": ""
+        },
+        "qty_pending": {
+            "label": "Qté pré-inscriptions",
+            "description": "",
+            "help": ""
+        },
+        "qty_waitlisted": {
+            "label": "Qté en attentes",
+            "description": "",
+            "help": ""
+        },
+        "qty_confirmed": {
+            "label": "Qté confirmées",
+            "description": "",
+            "help": ""
+        },
+        "qty_validated": {
+            "label": "Qté validées",
+            "description": "",
+            "help": ""
+        },
+        "qty_cancelled": {
+            "label": "Qté annulées",
+            "description": "",
+            "help": ""
+        },
+        "qty": {
+            "label": "Qté",
+            "description": "",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "",
+            "description": "",
+            "layout": {}
+        },
+        "list.default": {
+            "name": "Quantités d'inscriptions par mois",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

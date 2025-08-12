@@ -22,7 +22,9 @@ class Condition extends Model {
                 'selection'         => [
                     'nb_pers',
                     'nb_nights',
-                    'count_booking_12'
+                    'nb_adults',
+                    'count_booking_12',
+                    'count_booking_fiscal_year'
                 ],
                 'required'          => true
             ],

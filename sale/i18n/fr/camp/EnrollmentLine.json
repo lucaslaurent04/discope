@@ -1,0 +1,64 @@
+{
+    "name": "Ligne d'inscription",
+    "plural": "Lignes d'inscription",
+    "description": "Un produit vendu pour une inscription d'un enfant à un camp.",
+    "model": {
+        "enrollment_id": {
+            "label": "Inscription",
+            "description": "L'inscription à laquelle la ligne appartient.",
+            "help": ""
+        },
+        "product_id": {
+            "label": "Produit",
+            "description": "Le produit vendu.",
+            "help": ""
+        },
+        "price_id": {
+            "label": "Prix",
+            "description": "Prix du produit.",
+            "help": ""
+        },
+        "qty": {
+            "label": "Quantité",
+            "description": "Quantité de produits.",
+            "help": ""
+        },
+        "unit_price": {
+            "label": "Prix unitaire",
+            "description": "Prix d'un produit.",
+            "help": ""
+        },
+        "total": {
+            "label": "Prix (HTVA)",
+            "description": "Prix (Hors TVA).",
+            "help": ""
+        },
+        "vat_rate": {
+            "label": "Taux TVA",
+            "description": "Taux TVA à appliquer.",
+            "help": ""
+        },
+        "price": {
+            "label": "Prix (TVAC)",
+            "description": "Prix (TVA comprise).",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "",
+            "description": "",
+            "layout": []
+        },
+        "list.default": {
+            "name": "",
+            "description": "",
+            "layout": []
+        }
+    },
+    "error": {
+        "camp_id": {
+            "locked_enrollment": "Impossible de modifier une ligne d'une inscription verrouillée."
+        }
+    }
+}

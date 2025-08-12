@@ -10,7 +10,7 @@ use sale\booking\Booking;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 
 // announce script and fetch parameters values
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'	=>	'Provide a fully loaded tree for a given booking.',
     'params' 		=>	[
         'id' => [
@@ -28,11 +28,13 @@ list($params, $providers) = announce([
         'charset'           => 'utf-8',
         'accept-origin'     => '*'
     ],
-    'providers' => ['context']
+    'providers' => ['context', 'auth']
 ]);
 
-list($context) = [$providers['context']];
+['context' => $context, 'auth' => $auth] = $providers;
 
+// #memo - processing of this controller might be heavy, so we make sure AC does not check permissions for each single consumption
+$auth->su();
 
 $tree = [
     'id', 'name', 'created', 'date_from', 'date_to', 'status', 'total', 'price', 'is_locked', 'nb_pers',
@@ -68,6 +70,8 @@ $tree = [
         'booking_id',
         'sojourn_type_id',
         'activity_group_num',
+        'has_person_with_disability',
+        'person_disability_description',
         'pack_id' => [
             'id',
             'name'
@@ -78,7 +82,7 @@ $tree = [
             'description'
         ],
         'age_range_assignments_ids' => [
-            'age_range_id', 'qty', 'age_from', 'age_to'
+            'age_range_id', 'qty', 'free_qty', 'age_from', 'age_to'
         ],
         'sojourn_product_models_ids' => [
             'id',
@@ -182,11 +186,27 @@ $tree = [
             'counter',
             'total',
             'price',
+            'qty',
             'is_virtual',
             'activity_date',
             'time_slot_id',
+            'schedule_from',
+            'schedule_to',
             'providers_ids',
-            'rental_unit_id'
+            'rental_unit_id',
+            'description',
+            'product_id' => [
+                'name',
+                'sku'
+            ],
+        ],
+        'booking_meals_ids' => [
+            'date',
+            'time_slot_id',
+            'is_self_provided',
+            'meal_type_id',
+            'meal_place_id',
+            'booking_lines_ids'
         ]
     ]
 ];

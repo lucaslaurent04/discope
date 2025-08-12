@@ -48,6 +48,12 @@ class BookingLineGroupAgeRangeAssignment extends Model {
                 'onupdate'          => 'onupdateQty'
             ],
 
+            'free_qty' => [
+                'type'              => 'integer',
+                'description'       => "Quantity of freebies for the booking lines with a product linked to this age range.",
+                'default'           => 0
+            ],
+
             'age_range_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\AgeRange',

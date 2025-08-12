@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ViewChildren, QueryList, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ViewChildren, QueryList, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ApiService, TreeComponent, SbDialogConfirmDialog } from 'sb-shared-lib';
 import { BookingLineGroup } from '../../../../_models/booking_line_group.model';
@@ -9,6 +9,7 @@ import { BehaviorSubject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { BookingServicesBookingGroupAccomodationAssignmentComponent } from './_components/assignment.component';
 import { BookingServicesBookingGroupAccomodationAssignmentsEditorComponent } from './_components/assignmentseditor/assignmentseditor.component';
+import { RentalUnitsSettings } from '../../../../../../services.component';
 
 // declaration of the interface for the map associating relational Model fields with their components
 interface BookingLineAccomodationComponentsMap {
@@ -20,12 +21,13 @@ interface BookingLineAccomodationComponentsMap {
     templateUrl: 'accomodation.component.html',
     styleUrls: ['accomodation.component.scss']
 })
-export class BookingServicesBookingGroupAccomodationComponent extends TreeComponent<BookingAccomodation, BookingLineAccomodationComponentsMap> implements OnInit, AfterViewInit  {
+export class BookingServicesBookingGroupAccomodationComponent extends TreeComponent<BookingAccomodation, BookingLineAccomodationComponentsMap> implements OnInit, AfterViewInit, OnChanges {
     // server-model relayed by parent
     @Input() set model(values: any) { this.update(values) }
     @Input() group: BookingLineGroup;
     @Input() booking: Booking;
     @Input() mode: string = 'view';
+    @Input() settings: RentalUnitsSettings;
 
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
@@ -119,6 +121,17 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
             });
     }
 
+    public async ngOnChanges(changes: SimpleChanges) {
+        if(changes.settings) {
+            if(this.settings.show === 'parents') {
+                this.showOnlyParents$.next(true);
+            }
+            else if(this.settings.show === 'children') {
+                this.showOnlyChildren$.next(true);
+            }
+        }
+    }
+
     private refreshFilteredRentalUnits() {
         let rentalUnits = this.rentalUnits;
 
@@ -210,10 +223,34 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
 
     public leftShowOnlyParents(checked: boolean) {
         this.showOnlyParents$.next(checked);
+
+        if(this.settings.store_rental_units_settings) {
+            this.storeShow(checked ? 'parents' : 'all');
+        }
     }
 
     public leftShowOnlyChildren(checked: boolean) {
         this.showOnlyChildren$.next(checked);
+
+        if(this.settings.store_rental_units_settings) {
+            this.storeShow(checked ? 'children' : 'all');
+        }
+    }
+
+    private storeShow(show: 'all'|'parents'|'children') {
+        let stored_map_bookings_rental_units_settings: string | null = localStorage.getItem('map_bookings_rental_units_settings');
+        if(stored_map_bookings_rental_units_settings === null) {
+            stored_map_bookings_rental_units_settings = '{}';
+        }
+
+        const map_bookings_rental_units_settings: {[key: number]: RentalUnitsSettings} = JSON.parse(stored_map_bookings_rental_units_settings);
+        if(!map_bookings_rental_units_settings[this.booking.id]) {
+            map_bookings_rental_units_settings[this.booking.id] = JSON.parse(JSON.stringify(this.settings));
+        }
+
+        map_bookings_rental_units_settings[this.booking.id].show = show;
+
+        localStorage.setItem('map_bookings_rental_units_settings', JSON.stringify(map_bookings_rental_units_settings));
     }
 
     public leftSelectRentalUnit(checked: boolean, rental_unit_id: number) {

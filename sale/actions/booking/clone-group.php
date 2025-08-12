@@ -130,6 +130,7 @@ $group = BookingLineGroup::id($params['id'])
             'booking_id',
             'activity_booking_line_id',
             'providers_ids',
+            'description',
             'counter',
             'total',
             'price',
@@ -227,6 +228,7 @@ foreach($group['booking_activities_ids'] as $activity) {
             'booking_id'                => $activity['booking_id'],
             'activity_booking_line_id'  => $map_old_booking_line_id_to_new[$activity['activity_booking_line_id']],
             'providers_ids'             => $activity['providers_ids'],
+            'description'               => $activity['description'],
             'counter'                   => $activity['counter'],
             'total'                     => $activity['total'],
             'price'                     => $activity['price'],
@@ -251,9 +253,10 @@ foreach($group['sojourn_product_models_ids'] as $spm) {
 }
 
 Booking::refreshPrice($orm, $group['booking_id']['id']);
-BookingLineGroup::refreshActivityGroupNumber($group['booking_id']['id']);
 
 $orm->enableEvents();
+
+BookingLineGroup::resetActivityGroupNumber($group['booking_id']['id']);
 
 $context->httpResponse()
         ->status(201)

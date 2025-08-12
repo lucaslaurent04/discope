@@ -1,0 +1,22 @@
+{
+    "description": "Transfer une inscription vers un autre camp.",
+    "model": {
+        "id": {
+            "label": "Inscription",
+            "description": "Inscription à transférer.",
+            "help": ""
+        },
+        "camp_id": {
+            "label": "Camp",
+            "description": "Le camp vers lequel transférer l'inscription.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "unknown_enrollment": "Inscription n'existe pas.",
+            "same_camp": "Transfer vers un camp identitque.",
+            "cancelled_camp": "Camp annulé."
+        }
+    }
+}

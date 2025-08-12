@@ -18,6 +18,7 @@
                 <div *ngFor="let group of groups"
                      class="group-activity"
                      [class.group-selected]="dateString === selectedDay && timeSlotCode === selectedTimeSlot && group.id === selectedGroup.id"
+                     [class.group-disabled]="!dateInGroup(dateString, group)"
                      (click)="selectGroupActivity(dateString, timeSlotCode, group)"
                 >
                 <span class="group-num">

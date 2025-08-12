@@ -52,6 +52,12 @@ class ProductModel extends Model {
                 'description'       => 'Statistics section to which relates the product, if any.'
             ],
 
+            'analytic_section_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'finance\accounting\AnalyticSection',
+                'description'       => 'Analytic section the product model relates to, if any.'
+            ],
+
             'can_buy' => [
                 'type'              => 'boolean',
                 'description'       => "Can this product be purchassed?",
@@ -189,14 +195,14 @@ class ProductModel extends Model {
 
             'description_delivery' => [
                 'type'              => 'string',
-                'usage'             => 'text/plain',
+                'usage'             => 'text/html',
                 'description'       => "Description for delivery notes.",
                 'multilang'         => true
             ],
 
             'description_receipt' => [
                 'type'              => 'string',
-                'usage'             => 'text/plain',
+                'usage'             => 'text/html',
                 'description'       => "Description for reception vouchers.",
                 'multilang'         => true
             ],
@@ -263,14 +269,14 @@ class ProductModel extends Model {
                 'description'       => 'Is the product a rental_unit?',
                 'default'           => false,
                 'onupdate'          => 'onupdateIsRentalUnit',
-                'visible'           => [ ['type', '=', 'service'], ['is_meal', '=', false] , ['is_snack', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_meal', '=', false] , ['is_snack', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false], ['is_camp', '=', false] ]
             ],
 
             'is_meal' => [
                 'type'              => 'boolean',
                 'description'       => 'Is the product a meal? (meals might be part of the board / included services of the stay).',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false] , ['is_snack', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ] ,
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false] , ['is_snack', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false], ['is_camp', '=', false] ] ,
                 'dependents'        => [ 'products_ids' => 'is_meal']
             ],
 
@@ -278,7 +284,7 @@ class ProductModel extends Model {
                 'type'              => 'boolean',
                 'description'       => 'Is the product a snack?.',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ],
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false], ['is_camp', '=', false] ],
                 'dependents'        => [ 'products_ids' => 'is_snack']
             ],
 
@@ -286,24 +292,32 @@ class ProductModel extends Model {
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the product is an activity or animation.',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ],
-                'dependents'        => [ 'products_ids' => 'is_activity']
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_transport', '=', false], ['is_supply', '=', false], ['is_camp', '=', false] ],
+                'dependents'        => [ 'products_ids' => 'is_activity' ]
             ],
 
             'is_transport' => [
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the product is an activity transport service (transport to and back from an activity).',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_supply', '=', false] ] ,
-                'dependents'        => [ 'products_ids'  => ['is_transport']]
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_supply', '=', false], ['is_camp', '=', false] ] ,
+                'dependents'        => [ 'products_ids'  => 'is_transport' ]
             ],
 
             'is_supply' => [
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the product is an activity supply service (supply to rent for an activity).',
                 'default'           => false,
-                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_transport', '=', false] ] ,
-                'dependents'        => [ 'products_ids'  => ['is_supply']]
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_camp', '=', false] ] ,
+                'dependents'        => [ 'products_ids'  => 'is_supply' ]
+            ],
+
+            'is_camp' => [
+                'type'              => 'boolean',
+                'description'       => 'Indicates whether the product is related to camp.',
+                'default'           => false,
+                'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false] ] ,
+                'dependents'        => [ 'products_ids'  => 'is_camp' ]
             ],
 
             'activity_scope' => [
@@ -336,6 +350,14 @@ class ProductModel extends Model {
                 'description'       => 'Indicates whether the activity requires transport.',
                 'default'           => false,
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+            ],
+
+            'is_exclusive' => [
+                'type'              => 'boolean',
+                'description'       => "Is the activity exclusive to the employee's time slot?",
+                'help'              => "Multiple non exclusive activities can be assigned to an employee's time slot.",
+                'default'           => true,
+                'visible'           => ['is_activity', '=', true]
             ],
 
             'transport_product_model_id' => [
@@ -393,7 +415,8 @@ class ProductModel extends Model {
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the activity is billable (generates a service line in invoicing).',
                 'default'           => true,
-                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
+                'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ],
+                'dependents'        => ['product_id' => 'is_billable']
             ],
 
             'has_staff_required' => [
@@ -458,9 +481,9 @@ class ProductModel extends Model {
             ],
 
             'nutritional_coefficient' => [
-                'type'              => 'integer',
+                'type'              => 'float',
                 'description'       => "The nutritional coefficient of the meal.",
-                'default'           => 1,
+                'default'           => 1.0,
                 'visible'           => ['is_meal', '=', true]
             ],
 

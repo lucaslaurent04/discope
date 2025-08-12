@@ -101,10 +101,9 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
                 }
 
                 const providersFormControls = [];
-                const providersQty = this.activity.activity_booking_line_id.qty_accounting_method === 'unit' ? this.activity.activity_booking_line_id.qty : 1;
-                for(let i = 0; i < providersQty; i++) {
+                for(let i = 0; i < this.activity.qty; i++) {
                     let providerId: number | null = null;
-                    if(this.activity?.providers_ids?.[i]) {
+                    if(this.activity.providers_ids?.[i]) {
                         providerId = +this.activity.providers_ids[i];
                     }
                     providersFormControls.push(new FormControl(providerId));
@@ -117,14 +116,7 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
     private async filterProducts(name: string): Promise<any> {
         let filtered: any[] = [];
         try {
-            let domain = [
-                ['is_activity', '=', true]
-            ];
-
-            if(this.timeSlot === 'EV') {
-                domain.push(['is_fullday', '=', false]);
-            }
-
+            let domain = [];
             if(name && name.length) {
                 domain.push(['name', 'ilike', `%${name}%`]);
             }
@@ -132,11 +124,9 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
             const productCollectParams: any = {
                 center_id: this.booking.center_id,
                 domain: JSON.stringify(domain),
-                date_from: this.booking.date_from.toISOString(),
-                date_to: this.booking.date_to.toISOString()
             };
 
-            filtered = await this.api.fetch('?get=sale_catalog_product_collect', productCollectParams);
+            filtered = await this.api.fetch('?get=sale_catalog_product_activity-collect', productCollectParams);
         }
         catch(response) {
             console.log(response);

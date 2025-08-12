@@ -1,0 +1,60 @@
+{
+    "name": "Statistiques quantités d'inscriptions par CEs.",
+    "plural": "",
+    "description": "Statistiques quantités d'inscriptions par CEs.",
+    "model": {
+        "all_centers": {
+            "label": "Tous les centres"
+        },
+        "center_id": {
+            "label": "Centre"
+        },
+        "date_from": {
+            "label": "Du"
+        },
+        "date_to": {
+            "label": "Au"
+        },
+        "center": {
+            "label": "Centre",
+            "description": "",
+            "help": ""
+        },
+        "works_council_id": {
+            "label": "CE",
+            "description": "",
+            "help": ""
+        },
+        "qty": {
+            "label": "Qté",
+            "description": "",
+            "help": ""
+        },
+        "status": {
+            "label": "Status",
+            "selection": {
+                "all": "Toutes",
+                "validated": "Validées",
+                "confirmed": "Confirmées",
+                "pending": "Pré-inscription",
+                "waitlisted": "En attentes",
+                "cancelled": "Annulées"
+            },
+            "description": "",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "",
+            "description": "",
+            "layout": {}
+        },
+        "list.default": {
+            "name": "Quantités d'inscriptions par CEs",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

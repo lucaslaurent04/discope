@@ -11,10 +11,12 @@
 		"operand": {
 			"label": "Opérande",
 			"description": "L'opérand de la condition.",
-			"selection": { 
-                "nb_pers" : "nb_pers", 
-                "nb_nights": "nb_nuits", 
-                "count_booking_12": "compte_réservation_12"
+			"selection": {
+                "nb_pers" : "nb_pers",
+                "nb_nights": "nb_nuits",
+                "nb_adults": "nb_adults",
+                "count_booking_12": "compte_réservation_12",
+                "count_booking_fiscal_year": "compte_réservation_fiscal_year"
             },
 			"help": ""
 		},

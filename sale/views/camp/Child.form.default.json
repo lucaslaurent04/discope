@@ -1,0 +1,215 @@
+{
+    "name": "Child",
+    "description": "Form view for Child.",
+    "layout": {
+        "groups": [
+            {
+                "sections": [
+                    {
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "firstname",
+                                                "width": "40%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "lastname",
+                                                "width": "40%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "birthdate",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "gender",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "10%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "camp_class",
+                                                "width": "25%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "is_cpa_member",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "cpa_club",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_foster",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "institution_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_license_ffe",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "license_ffe",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "year_license_ffe",
+                                                "width": "33%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "sections": [
+                    {
+                        "id": "section.guardians",
+                        "label": "Guardians",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "main_guardian_id",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "guardians_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.enrollments",
+                        "label": "Enrollments",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "enrollments_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.presences",
+                        "label": "Presences",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "presences_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.child",
+                                                    "header": {
+                                                        "selection": {
+                                                            "default": false
+                                                        },
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.EDIT": false
+                                                        }
+                                                    }
+                                                },
+                                                "actions": false
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.skills",
+                        "label": "Skills",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "skills_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

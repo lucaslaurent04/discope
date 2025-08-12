@@ -6,6 +6,8 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use core\setting\Setting;
+use equal\orm\Field;
 use hr\employee\Employee;
 use identity\Identity;
 use identity\Partner;
@@ -14,6 +16,8 @@ use sale\booking\BookingActivity;
 use sale\booking\BookingLineGroupAgeRangeAssignment;
 use sale\booking\PartnerEvent;
 use sale\booking\channelmanager\BookingLineGroup;
+use sale\camp\Camp;
+use sale\camp\CampGroup;
 use sale\catalog\ProductModel;
 use sale\customer\Customer;
 use sale\provider\Provider;
@@ -32,12 +36,12 @@ use sale\provider\Provider;
             'default'       => []
         ],
         'date_from' => [
-            'description'   => 'Start of time-range for the lookup.',
+            'description'   => 'Start of time-range for the lookup (included).',
             'type'          => 'date',
             'required'      => true
         ],
         'date_to' => [
-            'description'   => 'End of time-range for the lookup.',
+            'description'   => 'End of time-range for the lookup (excluded).',
             'type'          => 'date',
             'required'      => true
         ]
@@ -50,22 +54,23 @@ use sale\provider\Provider;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context', 'orm', 'auth', 'adapt']
 ]);
 
 /**
- * @var \equal\php\Context                   $context
- * @var \equal\orm\ObjectManager             $orm
- * @var \equal\auth\AuthenticationManager    $auth
+ * @var \equal\php\Context                  $context
+ * @var \equal\orm\ObjectManager            $orm
+ * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\data\adapt\AdapterProvider   $dap
  */
-['context' => $context, 'orm' => $orm, 'auth' => $auth] = $providers;
+['context' => $context, 'orm' => $orm, 'auth' => $auth, 'adapt' => $dap] = $providers;
 
 // #memo - processing of this controller might be heavy, so we make sure AC does not check permissions for each single consumption
 $auth->su();
 
 $domain = [
     ['activity_date', '>=', $params['date_from']],
-    ['activity_date', '<=', $params['date_to']]
+    ['activity_date', '<', $params['date_to']]
 ];
 if(!empty($params['product_model_ids'])) {
     $domain[] = ['product_model_id', 'in', $params['product_model_ids']];
@@ -95,7 +100,8 @@ if(!empty($params['partners_ids'])) {
 
     if(!empty($employees_ids)) {
         $domain[] = [
-            ['id', 'in', $activities_ids],
+            ['activity_date', '>=', $params['date_from']],
+            ['activity_date', '<', $params['date_to']],
             ['employee_id', 'in', $employees_ids]
         ];
 
@@ -130,13 +136,19 @@ $activities = $orm->read(BookingActivity::getType(), $activities_ids, [
         'name',
         'has_staff_required',
         'employee_id',
+        'has_provider',
+        'qty',
         'providers_ids',
         'activity_date',
         'time_slot_id',
+        'is_exclusive',
+        'schedule_from',
+        'schedule_to',
         'booking_id',
         'booking_line_group_id',
         'product_model_id',
         'activity_booking_line_id',
+        'camp_id',
         'group_num',
         'counter',
         'counter_total'
@@ -145,6 +157,7 @@ $activities = $orm->read(BookingActivity::getType(), $activities_ids, [
 // read additional fields for the view
 $map_bookings = [];
 $map_groups = [];
+$map_camps = [];
 $map_employees = [];
 $map_providers = [];
 $map_product_models = [];
@@ -153,6 +166,7 @@ $map_product_models = [];
 foreach($activities as $id => $activity) {
     $map_bookings[$activity['booking_id']] = true;
     $map_groups[$activity['booking_line_group_id']] = true;
+    $map_camps[$activity['camp_id']] = true;
     $map_employees[$activity['employee_id']] = true;
     foreach($activity['providers_ids'] as $provider_id) {
         $map_providers[$provider_id] = true;
@@ -162,10 +176,11 @@ foreach($activities as $id => $activity) {
 
 // load all foreign objects at once
 $bookings = $orm->read(Booking::getType(), array_keys($map_bookings), ['id', 'name', 'description', 'status', 'payment_status', 'customer_id', 'date_from', 'date_to', 'nb_pers']);
-$booking_groups = $orm->read(BookingLineGroup::getType(), array_keys($map_groups), ['id', 'nb_pers', 'age_range_assignments_ids', 'has_person_with_disability']);
+$booking_groups = $orm->read(BookingLineGroup::getType(), array_keys($map_groups), ['id', 'nb_pers', 'age_range_assignments_ids', 'has_person_with_disability', 'person_disability_description']);
+$camps = $orm->read(Camp::getType(), array_keys($map_camps), ['id', 'name', 'short_name', 'date_from', 'date_to', 'min_age', 'max_age', 'enrollments_qty', 'employee_ratio']);
 $employees = $orm->read(Employee::getType(), array_keys($map_employees), ['id', 'name', 'relationship']);
 $providers = $orm->read(Provider::getType(), array_keys($map_providers), ['id', 'name', 'relationship']);
-$product_models = $orm->read(ProductModel::getType(), array_keys($map_product_models), ['id', 'name', 'description']);
+$product_models = $orm->read(ProductModel::getType(), array_keys($map_product_models), ['id', 'name', 'providers_ids']);
 
 $map_customers = [];
 foreach($bookings as $id => $booking) {
@@ -185,30 +200,75 @@ foreach($booking_groups as $group) {
 }
 $age_range_assignments = $orm->read(BookingLineGroupAgeRangeAssignment::getType(), array_unique($age_range_assignments_ids), ['id', 'booking_line_group_id', 'age_from', 'age_to', 'qty']);
 
+$date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
+
+/** @var equal\data\adapt\DataAdapterJson $adapter */
+$adapter = $dap->get('json');
+
 $result = [];
 // build result: enrich and adapt consumptions
 foreach($activities as $id => $activity) {
     $date_index = date('Y-m-d', $activity['activity_date']);
     $time_slot = [1 => 'AM', 3 => 'PM', 6 => 'EV'][$activity['time_slot_id']];
 
-    $booking = isset($activity['booking_id'], $bookings[$activity['booking_id']]) ? $bookings[$activity['booking_id']]->toArray() : null;
-    $booking['date_from'] = date('d/m/y', $booking['date_from']);
-    $booking['date_to'] = date('d/m/y', $booking['date_to']);
+    // common
+    $product_model = isset($activity['product_model_id'], $product_models[$activity['product_model_id']]) ? $product_models[$activity['product_model_id']]->toArray() : null;
 
-    $booking_group = isset($activity['booking_line_group_id'], $booking_groups[$activity['booking_line_group_id']]) ? $booking_groups[$activity['booking_line_group_id']]->toArray() : null;
-
+    // booking
+    $booking = null;
+    $booking_group = null;
+    $customer = null;
+    $identity = null;
     $group_age_range_assignments = [];
-    foreach($age_range_assignments as $age_range_assignment) {
-        if($age_range_assignment['booking_line_group_id'] === $booking_group['id']) {
-            $group_age_range_assignments[] = $age_range_assignment->toArray();
+
+    // camp
+    $camp = null;
+
+    if(!is_null($activity['booking_id'])) {
+        $booking = isset($activity['booking_id'], $bookings[$activity['booking_id']]) ? $bookings[$activity['booking_id']]->toArray() : null;
+        if(is_null($booking)) {
+            continue;
         }
+        $booking['date_from'] = date($date_format, $booking['date_from']);
+        $booking['date_to'] = date($date_format, $booking['date_to']);
+
+        $booking_group = isset($activity['booking_line_group_id'], $booking_groups[$activity['booking_line_group_id']]) ? $booking_groups[$activity['booking_line_group_id']]->toArray() : null;
+
+        foreach($age_range_assignments as $age_range_assignment) {
+            if($age_range_assignment['booking_line_group_id'] === $booking_group['id']) {
+                $group_age_range_assignments[] = $age_range_assignment->toArray();
+            }
+        }
+
+        $customer = isset($booking['customer_id'], $customers[$booking['customer_id']]) ? $customers[$booking['customer_id']]->toArray() : null;
+        $identity = isset($customer['partner_identity_id'], $identities[$customer['partner_identity_id']]) ? $identities[$customer['partner_identity_id']]->toArray() : null;
+    }
+    elseif(!is_null($activity['camp_id'])) {
+        $camp = isset($activity['camp_id'], $camps[$activity['camp_id']]) ? $camps[$activity['camp_id']]->toArray() : null;
+        $camp['date_from'] = date($date_format, $camp['date_from']);
+        $camp['date_to'] = date($date_format, $camp['date_to']);
     }
 
-    $product_model = isset($activity['product_model_id'], $product_models[$activity['product_model_id']]) ? $product_models[$activity['product_model_id']]->toArray() : null;
-    $customer = isset($booking['customer_id'], $customers[$booking['customer_id']]) ? $customers[$booking['customer_id']]->toArray() : null;
-    $identity = isset($customer['partner_identity_id'], $identities[$customer['partner_identity_id']]) ? $identities[$customer['partner_identity_id']]->toArray() : null;
+    $activity_date = $adapter->adaptOut($activity['activity_date'], Field::MAP_TYPE_USAGE['date']);
+    $schedule_from = $adapter->adaptOut($activity['schedule_from'], Field::MAP_TYPE_USAGE['time']);
+    $schedule_to = $adapter->adaptOut($activity['schedule_to'], Field::MAP_TYPE_USAGE['time']);
 
-    $partner_id = null;
+    $data = [
+        'is_partner_event'          => false,
+        'activity_date'             => $activity_date,
+        'time_slot'                 => $time_slot,
+        'schedule_from'             => $schedule_from,
+        'schedule_to'               => $schedule_to,
+        'booking_id'                => $booking,
+        'booking_line_group_id'     => $booking_group,
+        'camp_id'                   => $camp,
+        'product_model_id'          => $product_model,
+        'customer_id'               => $customer,
+        'partner_identity_id'       => $identity,
+        'age_range_assignments_ids' => $group_age_range_assignments,
+        'partner_id'                => null
+    ];
+
     if($activity['has_staff_required']) {
         // #memo - we use employee_id 0 for unassigned activities
         $partner_id = intval($activity['employee_id']);
@@ -217,36 +277,22 @@ foreach($activities as $id => $activity) {
         }
         $employee = isset($activity['employee_id'], $employees[$activity['employee_id']]) ? $employees[$activity['employee_id']]->toArray() : null;
 
-        $result[$partner_id][$date_index][$time_slot][] = array_merge($activity->toArray(), [
-            'activity_date'             => date('c', $activity['activity_date']),
-            'time_slot'                 => $time_slot,
-            'booking_id'                => $booking,
-            'booking_line_group_id'     => $booking_group,
-            'product_model_id'          => $product_model,
-            'customer_id'               => $customer,
-            'partner_id'                => $employee,
-            'partner_identity_id'       => $identity,
-            'age_range_assignments_ids' => $group_age_range_assignments
-        ]);
+        $result[$partner_id][$date_index][$time_slot][] = array_merge($activity->toArray(), $data, ['partner_id' => $employee]);
     }
-    else {
-        foreach($activity['providers_ids'] as $provider_id) {
-            $provider = isset($providers[$provider_id]) ? $providers[$provider_id]->toArray() : null;
-            if(!is_null($provider)) {
-                $map_partners[$provider_id] = true;
-            }
+    elseif($activity['has_provider']) {
+        for($i = 0; $i < $activity['qty']; $i++) {
+            $provider_id = intval($activity['providers_ids'][$i] ?? null);
+            if($provider_id > 0) {
+                $provider = isset($providers[$provider_id]) ? $providers[$provider_id]->toArray() : null;
+                if(!is_null($provider)) {
+                    $map_partners[$provider_id] = true;
+                }
 
-            $result[$provider_id][$date_index][$time_slot][] = array_merge($activity->toArray(), [
-                'activity_date'             => date('c', $activity['activity_date']),
-                'time_slot'                 => $time_slot,
-                'booking_id'                => $booking,
-                'booking_line_group_id'     => $booking_group,
-                'product_model_id'          => $product_model,
-                'customer_id'               => $customer,
-                'partner_id'                => $provider,
-                'partner_identity_id'       => $identity,
-                'age_range_assignments_ids' => $group_age_range_assignments
-            ]);
+                $result[$provider_id][$date_index][$time_slot][] = array_merge($activity->toArray(), $data, ['partner_id' => $provider]);
+            }
+            else {
+                $result[$provider_id][$date_index][$time_slot][] = array_merge($activity->toArray(), $data);
+            }
         }
     }
 }
@@ -262,21 +308,52 @@ if(!empty($params['partners_ids'])) {
 $activity_partner_activities_ids = $orm->search(PartnerEvent::getType(), $domain);
 
 if(!empty($activity_partner_activities_ids)) {
-    $partner_activities = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'description', 'partner_id', 'event_date', 'time_slot_id']);
+    $partner_activities = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'description', 'partner_id', 'event_date', 'time_slot_id', 'camp_group_id']);
+
+    $map_camp_groups = [];
+    // retrieve all foreign objects identifiers
+    foreach($partner_activities as $id => $activity) {
+        if(isset($activity['camp_group_id'])) {
+            $map_camp_groups[$activity['camp_group_id']] = true;
+        }
+    }
+    $camp_groups = $orm->read(CampGroup::getType(), array_keys($map_camp_groups), ['id', 'name', 'camp_id', 'activity_group_num']);
+
+    $map_camps = [];
+    // retrieve all foreign objects identifiers
+    foreach($camp_groups as $id => $camp_group) {
+        if(isset($camp_group['camp_id'])) {
+            $map_camps[$camp_group['camp_id']] = true;
+        }
+    }
+    $camps = $orm->read(Camp::getType(), array_keys($map_camps), ['id', 'name', 'short_name', 'date_from', 'date_to', 'min_age', 'max_age', 'enrollments_qty', 'employee_ratio']);
 
     foreach($partner_activities as $partner_activity) {
         $date_index = date('Y-m-d', $partner_activity['event_date']);
         $time_slot = [1 => 'AM', 3 => 'PM', 6 => 'EV'][$partner_activity['time_slot_id']];
 
+        $camp_group = null;
+        $camp = null;
+        if(isset($partner_activity['camp_group_id'], $camp_groups[$partner_activity['camp_group_id']])) {
+            $camp_group = $camp_groups[$partner_activity['camp_group_id']]->toArray();
+            if(isset($camp_group, $camps[$camp_group['camp_id']])) {
+                $camp = $camps[$camp_group['camp_id']]->toArray();
+                $camp['date_from'] = date($date_format, $camp['date_from']);
+                $camp['date_to'] = date($date_format, $camp['date_to']);
+            }
+        }
+
         $result[$partner_activity['partner_id']][$date_index][$time_slot][] = array_merge($partner_activity->toArray(), [
             'is_partner_event'          => true,
             'booking_id'                => null,
             'booking_line_group_id'     => null,
+            'camp_id'                   => $camp,
+            'group_num'                 => $camp_group['activity_group_num'] ?? null,
             'product_model_id'          => null,
             'customer_id'               => null,
-            'partner_id'                => null,
             'partner_identity_id'       => null,
-            'age_range_assignments_ids' => []
+            'age_range_assignments_ids' => [],
+            'partner_id'                => null,
         ]);
     }
 }

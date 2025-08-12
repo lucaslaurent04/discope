@@ -22,10 +22,10 @@
         "errors": {
             "missing_has_signature": "Le chèque doit être marqué comme ayant une signature",
             "unknown_funding": "Financement introuvable.",
-            "unknown_bankCheck": "Chèque bancaire introuvable.",
+            "unknown_bankcheck": "Chèque bancaire introuvable.",
             "nothing_to_pay": "Le financement est déjà entièrement réglé.",
             "funding_already_associated": "Ce chèque bancaire est déjà associé à un financement.",
-            "error_bankCheck_payment": "Une erreur est survenue lors du paiement du chèque bancaire."
+            "error_bank_check_payment": "Une erreur est survenue lors du paiement du chèque bancaire."
         }
     }
 }

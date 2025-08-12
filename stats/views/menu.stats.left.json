@@ -299,6 +299,125 @@
                         }
                     }
                 ]
+            },
+            {
+                "id": "stats.camps",
+                "icon": "query_stats",
+                "type": "parent",
+                "label": "Camps values",
+                "description": "",
+                "children": [
+                    {
+                        "id": "stats.camps.camps",
+                        "icon": "",
+                        "type": "parent",
+                        "label": "Camps",
+                        "description": "",
+                        "children": [
+                            {
+                                "id": "stats.camps.camps.children-distribution",
+                                "type": "entry",
+                                "label": "Children distribution",
+                                "description": "Children gender, new/old and week/weekend distribution by camps.",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-camps-children-distribution",
+                                    "view": "list.default"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "stats.camps.children",
+                        "icon": "",
+                        "type": "parent",
+                        "label": "Children",
+                        "description": "",
+                        "children": [
+                            {
+                                "id": "stats.camps.children.by-weeks",
+                                "type": "entry",
+                                "label": "By week/weekend",
+                                "description": "Children attending camps during weeks and weekends.",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-children-by-weeks",
+                                    "view": "list.default"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "stats.camps.enrollments",
+                        "icon": "",
+                        "type": "parent",
+                        "label": "Enrollments",
+                        "description": "",
+                        "children": [
+                            {
+                                "id": "stats.camps.enrollments.by-areas",
+                                "label": "By areas",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-areas",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.camps.enrollments.by-tariffs",
+                                "label": "By tariffs",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-tariffs",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.camps.enrollments.by-sponsors",
+                                "label": "By sponsors",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-sponsors",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.camps.enrollments.by-works-councils",
+                                "label": "By works councils",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-works-councils",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.camps.enrollments.by-sojourn-types",
+                                "label": "By sojourn types",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-sojourn-types",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.camps.enrollments.by-age-ranges",
+                                "label": "By age ranges",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-age-ranges",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.camps.enrollments.by-months",
+                                "label": "By months",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-months",
+                                    "view": "list.default"
+                                }
+                            }
+                        ]
+                    }
+                ]
             }
         ]
     }

@@ -27,4 +27,19 @@
             <mat-error *ngIf="ageToFormControl.hasError('minAgeFrom')">Min {{mapGroupAgeRangeAssignment[group.id].age_from}}.</mat-error>
         </mat-form-field>
     </ng-container>
+
+    <mat-slide-toggle class="has-person-with-disability"
+                      [formControl]="hasPersonWithDisabilityFormControl"
+                      (change)="onHasPersonWithDisabilityChanges()"
+                      style="margin-left: 20px; transform: scale(0.8);"
+    >
+        Handicap
+    </mat-slide-toggle>
+
+    <mat-icon *ngIf="group.has_person_with_disability"
+              (click)="onclickParticipantsInfo()"
+              style="cursor: pointer; transform: scale(0.8)"
+    >
+        info_outline
+    </mat-icon>
 </ng-container>

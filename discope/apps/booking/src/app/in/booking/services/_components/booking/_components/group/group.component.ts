@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ChangeDetectorRef, ViewChildren, QueryList, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ChangeDetectorRef, ViewChildren, QueryList, ViewChild, OnChanges } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { ApiService, AuthService, ContextService, TreeComponent, SbDialogConfirmDialog } from 'sb-shared-lib';
 import { BookingLineGroup } from '../../_models/booking_line_group.model';
@@ -13,13 +13,20 @@ import { BookingServicesBookingGroupAgeRangeComponent } from './_components/ager
 
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { from, Observable, ReplaySubject } from 'rxjs';
-import { debounceTime, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { debounceTime, filter, map, switchMap } from 'rxjs/operators';
 import { BookingMealPref } from '../../_models/booking_mealpref.model';
 import { BookingAgeRangeAssignment } from '../../_models/booking_agerange_assignment.model';
 import { MatAutocomplete } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
 import { BookingActivityDay } from './_components/day-activities/day-activities.component';
-import { BookedServicesDisplaySettings } from '../../../../services.component';
+import { BookingActivity } from '../../_models/booking_activity.model';
+
+import { BookingMealDay } from './_components/day-meals/day-meals.component';
+import { BookingMeal } from '../../_models/booking_meal.model';
+
+import { BookedServicesDisplaySettings, RentalUnitsSettings } from '../../../../services.component';
+
+import { BookingServicesBookingGroupDialogParticipantsOptionsComponent } from './_components/dialog-participants-options/dialog-participants-options.component';
 
 
 // declaration of the interface for the map associating relational Model fields with their components
@@ -92,29 +99,43 @@ interface vmModel {
     templateUrl: 'group.component.html',
     styleUrls: ['group.component.scss']
 })
-export class BookingServicesBookingGroupComponent extends TreeComponent<BookingLineGroup, BookingLineGroupComponentsMap> implements OnInit, AfterViewInit  {
+export class BookingServicesBookingGroupComponent
+    extends TreeComponent<BookingLineGroup, BookingLineGroupComponentsMap>
+    implements OnInit, OnChanges, AfterViewInit  {
+
     // server-model relayed by parent
-    @Input() set model(values: any) { this.update(values) }
+    @Input() set model(values: any) { this._model = values; this.is_update_pending = true; }
     @Input() booking: Booking;
     @Input() timeSlots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[];
     @Input() sojournTypes: { id: number, name: 'GA'|'GG' }[] = [];
-    @Input() bookingActivitiesDays: BookingActivityDay[];
+    @Input() mealTypes: { id: number, name: string, code: string }[] = [];
+    @Input() mealPlaces: { id: number, name: string, code: string }[] = [];
     @Input() displaySettings: BookedServicesDisplaySettings;
+    @Input() rentalUnitsSettings: RentalUnitsSettings;
 
     @Output() loadStart = new EventEmitter();
-    @Output() loadEnd   = new EventEmitter();
+    // #deprecated
+    @Output() loadEnd = new EventEmitter();
     @Output() updated = new EventEmitter();
-    @Output() deleted = new EventEmitter();
     @Output() toggle  = new EventEmitter();
+
+    private _model: any;
+    // flag signaling that an update was requested while the component was not ready
+    private is_update_pending: boolean = false;
+
+    public bookingActivitiesDays: BookingActivityDay[];
+    public bookingMealsDays: BookingMealDay[];
 
     public user: UserClass = null;
 
-    public folded:boolean = true;
-    public groupSummaryOpen:boolean = false;
-    public groupTypeOpen:boolean = false;
+    public folded: boolean = true;
+    public groupSummaryOpen: boolean = false;
+    public groupTypeOpen: boolean = false;
     public groupNbPersOpen: boolean = false;
     public groupDatesOpen: boolean = false;
     public openedActivityIds: number[] = [];
+    public providedMealsQty: number = 0;
+    public mealsShowSnack: boolean = false;
 
     public action_in_progress: boolean = false;
 
@@ -127,7 +148,12 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     @ViewChildren(BookingServicesBookingGroupMealPrefComponent) bookingServicesBookingGroupMealPrefComponents: QueryList<BookingServicesBookingGroupMealPrefComponent>;
     @ViewChildren(BookingServicesBookingGroupAgeRangeComponent) bookingServicesBookingGroupAgeRangeComponents: QueryList<BookingServicesBookingGroupAgeRangeComponent>;
 
+    // By convention, `ready` is set to true once the component has completed its
+    // initial lifecycle phase: constructor + first ngOnChanges (if any) + ngOnInit + ngAfterViewInit,
+    // At this point, the view has been initialized and all @Input values are available and the component is rendered in the DOM.
     public ready: boolean = false;
+
+    // #memo - not for displaying the loader but for knowing if a change is in progress
     public loading: boolean = false;
 
     private packRequestCounter = 0;
@@ -136,7 +162,6 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     public vm: vmModel;
 
     constructor(
-        private cd: ChangeDetectorRef,
         private api: ApiService,
         private auth: AuthService,
         private dialog: MatDialog,
@@ -202,18 +227,36 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         };
     }
 
+    public ngOnChanges() {
+        if(!this.ready) {
+            return;
+        }
+
+        if(this.is_update_pending) {
+            this.update(this._model);
+        }
+    }
+
     public ngAfterViewInit() {
+        console.debug('BookingServicesBookingGroupComponent::ngAfterViewInit');
         // init local componentsMap
-        let map:BookingLineGroupComponentsMap = {
+        this.componentsMap = {
             booking_lines_ids: this.bookingServicesBookingLineComponents,
             meal_preferences_ids: this.bookingServicesBookingGroupMealPrefComponents,
             age_range_assignments_ids: this.bookingServicesBookingGroupAgeRangeComponents,
             sojourn_product_models_ids: this.bookingServicesBookingGroupAccomodationComponents
-        };
-        this.componentsMap = map;
+        } as BookingLineGroupComponentsMap;
+
+        this.ready = true;
+
+        if(this.is_update_pending) {
+            this.update(this._model);
+        }
+
     }
 
     public ngOnInit() {
+        console.debug('BookingServicesBookingGroupComponent::ngOnInit');
         if(this.booking.status == 'quote' || (this.instance.is_extra && !this.instance.has_consumptions)) {
             this.mode = 'edit';
         }
@@ -256,10 +299,97 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
             this.onchangeTimeTo();
         });
 
-        this.ready = true;
     }
 
-    public update(values:any) {
+    private initBookingActivitiesDays() {
+
+        this.bookingActivitiesDays = [];
+        let date = new Date(this.instance.date_from);
+        const dateTo = new Date(this.instance.date_to);
+        while(date <= dateTo) {
+            const bookingActivityDay: BookingActivityDay = {
+                date: new Date(date),
+                AM: null,
+                PM: null,
+                EV: null
+            };
+
+            for(let bookingActivity of this.instance.booking_activities_ids as BookingActivity[]) {
+                let activityDate = new Date(bookingActivity.activity_date).toISOString().split('T')[0];
+                if(activityDate !== date.toISOString().split('T')[0]) {
+                    continue;
+                }
+
+                let activityBookingLine: BookingLine | undefined = this.instance.booking_lines_ids.find(
+                    (bookingLine: BookingLine) => bookingLine.id === bookingActivity.activity_booking_line_id
+                );
+
+                if(activityBookingLine && !activityBookingLine.service_date) {
+                    continue;
+                }
+
+                const timeSlot = this.timeSlots.find((timeSlot: any) => timeSlot.id === bookingActivity.time_slot_id);
+                if(!timeSlot || !['AM', 'PM', 'EV'].includes(timeSlot.code)) {
+                    continue;
+                }
+
+                bookingActivityDay[timeSlot.code as 'AM'|'PM'|'EV'] = {
+                    ...bookingActivity,
+                    entity: 'sale\\booking\\BookingActivity',
+                    activity_booking_line_id: activityBookingLine ?? null,
+                    transports_booking_lines_ids: this.instance.booking_lines_ids.filter(
+                        (bookingLine: BookingLine) => bookingActivity.transports_booking_lines_ids.map(Number).includes(bookingLine.id)
+                    ),
+                    supplies_booking_lines_ids: this.instance.booking_lines_ids.filter(
+                        (bookingLine: BookingLine) => bookingActivity.supplies_booking_lines_ids.map(Number).includes(bookingLine.id)
+                    )
+                };
+            }
+
+            this.bookingActivitiesDays.push(bookingActivityDay);
+
+            date.setDate(date.getDate() + 1);
+        }
+
+    }
+
+    private initBookingMealsDays() {
+        this.bookingMealsDays = [];
+        let date = new Date(this.instance.date_from);
+        const dateTo = new Date(this.instance.date_to);
+        while(date <= dateTo) {
+            const bookingMealDay: BookingMealDay = {
+                date: new Date(date),
+                B: null,
+                AM: null,
+                L: null,
+                PM: null,
+                D: null
+            };
+
+            for(let bookingMeal of this.instance.booking_meals_ids as BookingMeal[]) {
+                let mealDate = new Date(bookingMeal.date).toISOString().split('T')[0];
+                if(mealDate !== date.toISOString().split('T')[0]) {
+                    continue;
+                }
+
+                const timeSlot = this.timeSlots.find((timeSlot: any) => timeSlot.id === bookingMeal.time_slot_id);
+                if(!timeSlot || !['B', 'AM', 'L', 'PM', 'D'].includes(timeSlot.code)) {
+                    continue;
+                }
+
+                bookingMealDay[timeSlot.code as 'B'|'AM'|'L'|'PM'|'D'] = bookingMeal;
+            }
+
+            this.bookingMealsDays.push(bookingMealDay);
+
+            date.setDate(date.getDate() + 1);
+        }
+    }
+
+    public update(values: any) {
+        console.debug('BookingServicesBookingGroupComponent::update');
+        this.is_update_pending = false;
         super.update(values);
         // assign VM values
         this.vm.name.formControl.setValue(this.instance.name);
@@ -274,6 +404,16 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         this.vm.participants_count.formControl.setValue(this.instance.nb_pers);
         this.vm.price.value = this.instance.price;
         this.vm.sojourn_type.value = (this.instance.sojourn_type_id == 1)?'GA':'GG';
+
+        this.providedMealsQty = 0;
+        for(let bookingMeal of this.instance.booking_meals_ids) {
+            if(!bookingMeal.is_self_provided) {
+                this.providedMealsQty++;
+            }
+        }
+
+        this.initBookingActivitiesDays();
+        this.initBookingMealsDays();
 
         // #workaround - force age_ranges update (since it cannot be done in update())
         this.instance.age_range_assignments_ids = values.age_range_assignments_ids;
@@ -349,20 +489,80 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         }
     }
 
+    public async ondeleteActivity(activity_id: number) {
+        if(this.loading) {
+            return;
+        }
+
+        // optimistic UI - remove activity
+        const activity: BookingActivity = this.instance.booking_activities_ids.find(
+            (e: any) => e.id === activity_id
+        );
+
+        const timeSlot = this.timeSlots.find((timeSlot: any) => timeSlot.id === activity?.time_slot_id);
+        if(!timeSlot || !['AM', 'PM', 'EV'].includes(timeSlot.code)) {
+            return;
+        }
+
+        this.bookingActivitiesDays.forEach( (bookingActivitiesDay: BookingActivityDay) => {
+            const targetActivity: BookingActivity = bookingActivitiesDay[timeSlot.code as 'AM'|'PM'|'EV'];
+            if(targetActivity && targetActivity.id == activity_id) {
+                bookingActivitiesDay[timeSlot.code as 'AM'|'PM'|'EV'] = null;
+            }
+        });
+
+        try {
+            this.loading = true;
+            await this.api.remove('sale\\booking\\BookingActivity', [activity_id]);
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+        finally {
+            this.loading = false;
+            // #memo - activity might be linked to a booking line, with a price : full reload is necessary
+            this.updated.emit();
+        }
+    }
+
     public async ondeleteLine(line_id:number) {
-        this.loading = true;
-        setTimeout( async () => {
+        try {
+            if(this.instance.has_pack) {
+                const dialog = this.dialog.open(SbDialogConfirmDialog, {
+                    width: '33vw',
+                    data: {
+                        title: "Supression produit",
+                        message: "Ce produit est peut-être lié à un <b>pack</b>, êtes-vous certains de vouloir le supprimer ?",
+                        yes: 'Oui',
+                        no: 'Non'
+                    }
+                });
+
+                await new Promise( async(resolve, reject) => {
+                    dialog.afterClosed().subscribe( async (result) => (result) ? resolve(true) : reject() );
+                });
+            }
+
+            this.instance.booking_lines_ids = this.instance.booking_lines_ids.filter((l: BookingLine) => l.id !== line_id);
+
             try {
-                // #todo #refresh - this triggers onupdateBookingLinesIds, which triggers _resetPrices
+                this.loading = true;
                 await this.api.update(this.instance.entity, [this.instance.id], {booking_lines_ids: [-line_id]});
-                // relay to parent
-                this.updated.emit();
             }
             catch(response) {
                 this.api.errorFeedback(response);
             }
-            this.loading = false;
-        });
+            finally {
+                this.loading = false;
+
+                // re-load line
+                this.updated.emit();
+            }
+
+        }
+        catch(e) {
+            // user discarded the dialog (selected 'no')
+        }
     }
 
     public onupdateLine() {
@@ -371,6 +571,11 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     }
 
     public onupdateActivity() {
+        // relay to parent
+        this.updated.emit();
+    }
+
+    public onupdateMeal() {
         // relay to parent
         this.updated.emit();
     }
@@ -463,8 +668,8 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     public async onchangeNbPers() {
         console.log('BookingEditCustomerComponent::nbPersChange');
         if(this.vm.participants_count.formControl.value != this.instance.nb_pers) {
-            this.loading = true;
             try {
+                this.loading = true;
                 await this.api.fetch('?do=sale_booking_update-sojourn-nbpers', {
                         id: this.instance.id,
                         nb_pers: this.vm.participants_count.formControl.value
@@ -472,7 +677,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
 
                 // relay change to parent component
                 this.updated.emit();
-                this.loading = false;
+
             }
             catch(response) {
                 console.log(response);
@@ -481,6 +686,8 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
                 // display error
                 // this.api.errorSnack('nb_pers', "Le nombre de personnes ne correspond pas aux tranches d'âge");
                 this.api.errorFeedback(response);
+            }
+            finally {
                 this.loading = false;
             }
         }
@@ -499,13 +706,15 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         }
     }
 
-    public onchangeDateRange() {
+    public async onchangeDateRange() {
         this.groupDatesOpen = false;
 
         let start = this.vm.daterange.start.formControl.value;
         let end = this.vm.daterange.end.formControl.value;
 
-        if(!start || !end) return;
+        if(!start || !end) {
+            return;
+        }
 
         if(typeof start == 'string') {
             start = new Date(start);
@@ -518,38 +727,36 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         let diff = Math.round((Date.parse(end.toString()) - Date.parse(start.toString())) / (60*60*24*1000));
 
         if(diff >= 0) {
-            this.vm.daterange.nights_count = (diff < 0)?0:diff;
+            this.vm.daterange.nights_count = (diff < 0) ? 0 : diff;
             // relay change to parent component
             if((start.getTime() != this.instance.date_from.getTime() || end.getTime() != this.instance.date_to.getTime())) {
-                this.loading = true;
-                setTimeout( async () => {
-                    // make dates UTC @ 00:00:00
-                    let timestamp, offset_tz;
-                    timestamp = start.getTime();
-                    offset_tz = start.getTimezoneOffset()*60*1000;
-                    let date_from = (new Date(timestamp-offset_tz)).toISOString().substring(0, 10)+'T00:00:00Z';
-                    timestamp = end.getTime();
-                    offset_tz = end.getTimezoneOffset()*60*1000;
-                    let date_to = (new Date(timestamp-offset_tz)).toISOString().substring(0, 10)+'T00:00:00Z';
+                // make dates UTC @ 00:00:00
+                let timestamp, offset_tz;
+                timestamp = start.getTime();
+                offset_tz = start.getTimezoneOffset()*60*1000;
+                let date_from = (new Date(timestamp-offset_tz)).toISOString().substring(0, 10)+'T00:00:00Z';
+                timestamp = end.getTime();
+                offset_tz = end.getTimezoneOffset()*60*1000;
+                let date_to = (new Date(timestamp-offset_tz)).toISOString().substring(0, 10)+'T00:00:00Z';
 
-                    try {
-                        await this.api.fetch('?do=sale_booking_update-sojourn-dates', {
-                                id: this.instance.id,
-                                date_from: date_from,
-                                date_to: date_to
-                            });
-                        this.updated.emit();
-                        this.loading = false;
-                    }
-                    catch(response) {
-                        this.api.errorFeedback(response);
-                        // #todo - improve to rollback non-updatable fields only
-                        // force refresh
-                        this.updated.emit();
-                        this.loading = false;
-                    }
+                try {
+                    this.loading = true;
+                    this.loadStart.emit();
+                    await this.api.fetch('?do=sale_booking_update-sojourn-dates', {
+                            id: this.instance.id,
+                            date_from: date_from,
+                            date_to: date_to
+                        });
+                }
+                catch(response) {
+                    this.api.errorFeedback(response);
+                    // #todo - improve to rollback non-updatable fields only
+                }
+                finally {
+                    this.loading = false;
+                    this.updated.emit();
+                }
 
-                });
             }
             // update VM values until refresh
             // this.instance.date_from = start;
@@ -560,9 +767,9 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     public async onchangeHasPack(has_pack: any) {
         if(this.instance.has_pack != has_pack) {
             let fields: any = {has_pack: has_pack};
-            this.loading = true;
 
             try {
+                this.loading = true;
                 if(has_pack === false) {
                     await this.api.fetch('?do=sale_booking_update-sojourn-pack-remove', {id: this.instance.id});
                 }
@@ -571,10 +778,11 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
                 }
                 // relay change to parent component
                 this.updated.emit();
-                this.loading = false;
             }
             catch(response) {
                 this.api.errorFeedback(response);
+            }
+            finally {
                 this.loading = false;
             }
         }
@@ -583,16 +791,19 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     public async onchangePackId(pack: any) {
         if(!this.instance.pack_id || this.instance.pack_id.id != pack.id) {
             this.vm.pack.name = pack.name;
-            this.loading = true;
+
             try {
+                this.loading = true;
+                this.loadStart.emit();
                 await this.api.fetch('?do=sale_booking_update-sojourn-pack-set', {id: this.instance.id, pack_id: pack.id});
                 // relay change to parent component
                 this.updated.emit();
-                this.loading = false;
             }
             catch(response) {
-                this.loading = false;
                 this.api.errorFeedback(response);
+            }
+            finally {
+                this.loading = false;
             }
         }
     }
@@ -601,12 +812,16 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         if(this.instance.is_locked != locked) {
             this.vm.pack.is_locked = locked;
             try {
+                this.loading = true;
                 await this.api.update(this.instance.entity, [this.instance.id], {is_locked: locked});
                 // relay change to parent component
-                this.updated.emit();
             }
             catch(response) {
                 this.api.errorFeedback(response);
+            }
+            finally {
+                this.updated.emit();
+                this.loading = false;
             }
         }
     }
@@ -665,35 +880,74 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         }
     }
 
-    public async ondeleteAgeRange(age_range_assignment_id:number) {
-        this.loading = true;
-        setTimeout( async () => {
-            try {
-                await this.api.fetch('?do=sale_booking_update-sojourn-agerange-remove', {
-                        id: this.instance.id,
-                        age_range_assignment_id: age_range_assignment_id,
-                    });
-                this.instance.age_range_assignments_ids.splice(this.instance.age_range_assignments_ids.findIndex((e:any) => e.id == age_range_assignment_id),1);
-                // relay to parent
-                this.updated.emit();
+    public async oneditParticipantsOptions() {
+        const dialogRef = this.dialog.open(BookingServicesBookingGroupDialogParticipantsOptionsComponent, {
+            width: '33vw',
+            data: {
+                has_person_with_disability: this.instance.has_person_with_disability,
+                person_disability_description: this.instance.person_disability_description
             }
-            catch(response) {
-                this.api.errorFeedback(response);
+        });
+
+        dialogRef.afterClosed().subscribe(async (result) => {
+            if(result) {
+                if(this.instance.has_person_with_disability != result.has_person_with_disability || this.instance.person_disability_description != result.person_disability_description) {
+
+                    try {
+                        this.loading = true;
+                        await this.api.update('sale\\booking\\BookingLineGroup', [this.instance.id], {
+                            has_person_with_disability: result.has_person_with_disability,
+                            person_disability_description: result.person_disability_description
+                        });
+
+                        // relay change to parent component
+                        this.updated.emit();
+                    }
+                    catch(response) {
+                        this.api.errorFeedback(response);
+                    }
+                    finally {
+                        this.loading = false;
+                    }
+                }
             }
-            this.loading = false;
         });
     }
 
-    public async onchangeSojournType(event:any) {
-        this.vm.sojourn_type.value = event.value;
-        // update model
+    public async ondeleteAgeRange(age_range_assignment_id:number) {
+
         try {
-            await this.api.update(this.instance.entity, [this.instance.id], {sojourn_type_id: (event.value=='GA')?1:2});
-            // relay change to parent component
+            this.loading = true;
+            await this.api.fetch('?do=sale_booking_update-sojourn-agerange-remove', {
+                    id: this.instance.id,
+                    age_range_assignment_id: age_range_assignment_id,
+                });
+            this.instance.age_range_assignments_ids.splice(this.instance.age_range_assignments_ids.findIndex((e:any) => e.id == age_range_assignment_id),1);
+            // relay to parent
             this.updated.emit();
         }
         catch(response) {
             this.api.errorFeedback(response);
+        }
+        finally {
+            this.loading = false;
+        }
+
+    }
+
+    public async onchangeSojournType(event: any) {
+        this.vm.sojourn_type.value = event.value;
+        // update model
+        try {
+            this.loading = true;
+            await this.api.update(this.instance.entity, [this.instance.id], {sojourn_type_id: (event.value=='GA')?1:2});
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+        finally {
+            this.updated.emit();
+            this.loading = false;
         }
     }
 
@@ -705,12 +959,15 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         if(rate_class && rate_class.hasOwnProperty('id') && rate_class.id) {
             this.vm.rate_class.name = rate_class.name + ' - ' + rate_class.description;
             try {
+                this.loading = true;
                 await this.api.update(this.instance.entity, [this.instance.id], {rate_class_id: rate_class.id});
-                // relay change to parent component
-                this.updated.emit();
             }
             catch(response) {
                 this.api.errorFeedback(response);
+            }
+            finally {
+                this.updated.emit();
+                this.loading = true;
             }
         }
     }
@@ -781,27 +1038,31 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
     }
 
     public async selectedGroupSummaryProduct(product:any) {
+        // apply commit-rollback logic
+
+        // save previous values
         let prev_product_name = this.instance.name;
-        // immediate view update (before refresh)
+
+        // optimistic UI - immediate view update (before refresh)
         this.groupSummaryOpen = false;
         this.instance.name = product.name;
-        this.loadStart.emit();
 
-        this.api.fetch('/?do=sale_booking_update-sojourn-product', {
-            id: this.instance.id,
-            product_id: product.id
-        })
-        .then( () => {
-            this.loadEnd.emit();
-            // relay change to parent component
-            this.updated.emit();
-        })
-        .catch(response => {
+        try {
+            this.loading = true;
+            await this.api.fetch('/?do=sale_booking_update-sojourn-product', {
+                id: this.instance.id,
+                product_id: product.id
+            });
+        }
+        catch(response) {
             // rollback
             this.instance.name = prev_product_name;
-            this.loadEnd.emit();
             this.api.errorFeedback(response);
-        });
+        }
+        finally {
+            this.updated.emit();
+            this.loading = false;
+        }
     }
 
     public onblurGroupSummarySelect() {
@@ -816,27 +1077,27 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
         this.groupTypeOpen = false;
     }
 
-    public onchangeGroupType(value: any) {
+    public async onchangeGroupType(value: any) {
         this.groupTypeOpen = false;
 
         let prev_group_type = this.instance.group_type;
-
         this.instance.group_type = value;
-        this.loading = true;
 
-        setTimeout( async () => {
-            try {
-                await this.api.fetch('?do=sale_booking_update-sojourn-type', {id: this.instance.id, group_type: this.instance.group_type});
-                // relay change to parent component
-                this.updated.emit();
-            }
-            catch(response) {
-                // rollback
-                this.instance.group_type = prev_group_type;
-                this.api.errorFeedback(response);
-            }
+        try {
+            this.loading = true;
+            await this.api.fetch('?do=sale_booking_update-sojourn-type', {id: this.instance.id, group_type: this.instance.group_type});
+        }
+        catch(response) {
+            // rollback
+            this.instance.group_type = prev_group_type;
+            this.api.errorFeedback(response);
+        }
+        finally {
+            // relay change to parent component
+            this.updated.emit();
             this.loading = false;
-        });
+        }
+
     }
 
     public onclickGroupNbPers() {
@@ -899,7 +1160,7 @@ export class BookingServicesBookingGroupComponent extends TreeComponent<BookingL
 
     public onCloseActivity(activityId: number) {
         const activityIdIndex = this.openedActivityIds.indexOf(activityId);
-        if(activityIdIndex !== undefined) {
+        if(activityIdIndex >= 0) {
             this.openedActivityIds.splice(activityIdIndex, 1);
         }
     }

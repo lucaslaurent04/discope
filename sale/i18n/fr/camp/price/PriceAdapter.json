@@ -1,0 +1,83 @@
+{
+    "name": "Réduction",
+    "plural": "Réductions",
+    "description": "Réduction sur une inscription à un camp.",
+    "model": {
+        "enrollment_id": {
+            "label": "Inscription",
+            "description": "Inscription sur laquelle la réduction est appliquée.",
+            "help": ""
+        },
+        "is_manual_discount": {
+            "label": "Remise manuelle?",
+            "description": "Réduction manuelle.",
+            "help": ""
+        },
+        "price_adapter_type": {
+            "label": "Type",
+            "description": "Type de réduction, pourcentage ou montant.",
+            "help": "",
+            "selection": {
+                "percent": "Pourcentage",
+                "amount": "Montant"
+            }
+        },
+        "origin_type": {
+            "label": "Origine",
+            "description": "Type de l'origine de la réduction.",
+            "help": "",
+            "selection": {
+                "other": "Autre",
+                "commune": "Aide commune",
+                "community-of-communes": "Aide communauté de communes",
+                "department-caf": "Aide CAF",
+                "department-msa": "Aide MSA",
+                "loyalty-discount": "Réduction fidélité"
+            }
+        },
+        "description": {
+            "label": "Description",
+            "description": "Information supplémentaires sur la réduction.",
+            "help": ""
+        },
+        "value": {
+            "label": "Valeur",
+            "description": "Montant/pourcentage à retirer au prix de l'inscription.",
+            "help": ""
+        },
+        "sponsor_id": {
+            "label": "Aide",
+            "description": "Origine de l'aide.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Réduction",
+            "description": "",
+            "layout": {}
+        },
+        "list.default": {
+            "name": "Réductions",
+            "description": "",
+            "header": {
+                "action.invoice-sponsor": {
+                    "label": "Facturer aidant"
+                }
+            },
+            "layout": {}
+        }
+    },
+    "error": {
+        "price_adapter_type": {
+            "must_be_amount": "Doit être un montant quand liée à une aide.",
+            "already_percent": "Une seule réduction de prix 'Pourcentage' est autorisé pour une inscription."
+        },
+        "is_manual_discount": {
+            "cannot_be_manual": "Ne peut pas être manuelle quand liée à une aide."
+        },
+        "origin_type": {
+            "same_as_sponsor": "Doit avoir le même type que l'aide liée."
+        }
+    }
+}

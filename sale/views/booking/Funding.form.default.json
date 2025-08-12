@@ -163,7 +163,18 @@
                                                 "width": "100%",
                                                 "widget": {
                                                     "readonly": true
-                                                }
+                                                },
+                                                "visible": ["booking_id", "<>", null]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Enrollment",
+                                                "value": "enrollment_id",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "readonly": true
+                                                },
+                                                "visible": ["enrollment_id", "<>", null]
                                             },
                                             {
                                                 "type": "field",

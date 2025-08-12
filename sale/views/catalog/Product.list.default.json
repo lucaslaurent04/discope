@@ -16,6 +16,22 @@
             ]
         }
     },
+    "actions": [
+        {
+            "id": "action.export-prices-csv",
+            "label": "Export prices CSV",
+            "description": "Export the products prices in a CSV file.",
+            "controller": "sale_catalog_product_export-prices-csv",
+            "confirm": false
+        },
+        {
+            "id": "action.import-prices-csv",
+            "label": "Import prices CSV",
+            "description": "Import the products prices form a CSV file.",
+            "controller": "sale_catalog_product_import-prices-csv",
+            "confirm": false
+        }
+    ],
     "layout": {
         "items": [
             {
@@ -56,6 +72,13 @@
             },
             {
                 "type": "field",
+                "label": "Analytic",
+                "value": "analytic_section_id",
+                "width": "15%",
+                "sortable": true
+            },
+            {
+                "type": "field",
                 "value": "is_pack",
                 "width": "10%",
                 "sortable": true
@@ -68,15 +91,44 @@
             },
             {
                 "type": "field",
+                "value": "family_id",
+                "width": "10%"
+            },
+            {
+                "type": "field",
                 "value": "is_meal",
                 "width": "10%",
-                "sortable": true
+                "visible": true
             },
             {
                 "type": "field",
                 "value": "is_snack",
                 "width": "10%",
-                "sortable": true
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "is_activity",
+                "width": "10%",
+                "visible": true
+            },
+            {
+                "type": "field",
+                "value": "is_transport",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "is_supply",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "is_camp",
+                "width": "10%",
+                "visible": false
             }
         ]
     }

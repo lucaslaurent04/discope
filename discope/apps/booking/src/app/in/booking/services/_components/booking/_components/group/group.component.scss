@@ -72,6 +72,7 @@
             .row {
                 width: 100%;
                 display: flex;
+                align-items: center;
                 padding: 5px 0;
                 flex: 1;
                 overflow: hidden;
@@ -82,7 +83,8 @@
                 }
 
                 .row-products-title,
-                .row-activities-title {
+                .row-activities-title,
+                .row-booking-meals-title {
                     flex: 1;
                     height: 40px;
                     line-height: 40px;
@@ -243,8 +245,8 @@
             display: flex;
             flex: 1;
 
-            .activity-cell:first-child {
-                flex: 0 1 40%;
+            .activity-cell {
+                flex: 0 1 33%;
                 text-align: left;
             }
 
@@ -262,6 +264,75 @@
         width: 100%;
 
         .activity-item {
+            position: relative;
+            background-color: white;
+            margin: 10px 0;
+            border-radius: 10px;
+        }
+    }
+
+    .booking-meals-header {
+        padding: 0 12px 0 0;
+        width: 100%;
+        margin-bottom: 1px;
+
+        .booking-meals-cell {
+            padding: 0 10px;
+            margin-right: 15px;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, .2);
+            outline-color: transparent;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            font-weight: 600;
+            line-height: 34px;
+            position: relative;
+            flex: 1 0 8%;
+        }
+
+        .day-date-cells-wrapper {
+            display: flex;
+            min-width: 210px;
+            max-width: 210px;
+
+            .booking-meals-cell:first-child {
+                min-width: 80px;
+                max-width: 80px;
+            }
+
+            .booking-meals-cell:nth-child(2) {
+                min-width: 100px;
+                max-width: 100px;
+                text-align: center;
+            }
+        }
+
+        .moment-cell {
+            min-width: 160px;
+            max-width: 160px;
+            text-align: center;
+        }
+
+        .meal-wrapper {
+            display: flex;
+            flex: 1;
+
+            .booking-meals-cell:last-child {
+                outline: none;
+                box-shadow: none;
+                max-width: 35px;
+            }
+        }
+    }
+
+    .booking-meals-list {
+        position: relative;
+        padding: 0 12px 0 0;
+        width: 100%;
+
+        .booking-meal-item {
             position: relative;
             background-color: white;
             margin: 10px 0;

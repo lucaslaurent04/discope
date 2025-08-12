@@ -4,7 +4,7 @@
     "access": {
         "groups": ["booking.default.user"]
     },
-    "controller": "sale_booking_bankCheck_collect",
+    "controller": "sale_booking_bankcheck_collect",
     "layout": {
         "items": [
             {

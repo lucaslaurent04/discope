@@ -1,0 +1,23 @@
+{
+    "name": "Inscription",
+    "plural": "Inscriptions",
+    "description": "Inscription d'un enfant à un camp.",
+    "model": {
+        "works_council_id": {
+            "label": "CE",
+            "description": ""
+        },
+        "date_from": {
+            "label": "Du",
+            "description": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": ""
+        }
+    },
+    "view": {
+    },
+    "error": {
+    }
+}

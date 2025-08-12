@@ -102,7 +102,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
 
                 await this.loadWeekActivities();
 
-                if(this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num]) {
+                if(this.planning?.[this.selectedDay]?.[this.selectedTimeSlot]?.[this.selectedGroup.activity_group_num]) {
                     this.selectedActivity = this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num];
                 }
 
@@ -150,8 +150,6 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                 }
                 this.weekStartDate = weekStartDate;
 
-                this.selectedDay = this.formatDayIndex(this.weekStartDate);
-
                 const weekEndDate = new Date(this.weekStartDate);
                 weekEndDate.setDate(weekEndDate.getDate() + 6);
                 this.weekEndDate = weekEndDate;
@@ -188,8 +186,12 @@ export class BookingActivitiesPlanningComponent implements OnInit {
             this.activityGroups = await this.api.collect('sale\\booking\\BookingLineGroup', domain, fields, 'activity_group_num', 'asc');
 
             for(let group of this.activityGroups) {
+                group.date_from = new Date(group.date_from);
+                group.date_to = new Date(group.date_to);
+
                 if(group.activity_group_num === 1) {
                     this.selectedGroup = group;
+                    this.selectedDay = this.formatDayIndex(this.selectedGroup.date_from);
                 }
             }
 
@@ -227,7 +229,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         try {
             const domain = ['relationship','=', 'employee'];
 
-            this.employees = await this.api.collect('hr\\employee\\Employee', domain, fields);
+            this.employees = await this.api.collect('hr\\employee\\Employee', domain, fields, 'name', 'asc', 0, 1000);
         }
         catch(response) {
             console.log('unexpected error', response);
@@ -252,11 +254,19 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         weekStartDate.setDate(weekStartDate.getDate() - 7);
         this.weekStartDate = weekStartDate;
 
-        this.selectedDay = this.formatDayIndex(this.weekStartDate);
+        if(this.weekStartDate < this.booking.date_from) {
+            this.selectedDay = this.formatDayIndex(this.booking.date_from);
+        }
+        else {
+            this.selectedDay = this.formatDayIndex(this.weekStartDate);
+        }
 
         const weekEndDate = new Date(this.weekStartDate);
         weekEndDate.setDate(weekEndDate.getDate() + 6);
         this.weekEndDate = weekEndDate;
+
+        this.showPrevBtn = this.weekStartDate.getTime() > this.booking.date_from.getTime();
+        this.showNextBtn = this.weekEndDate.getTime() < this.booking.date_to.getTime();
 
         await this.loadWeekActivities();
 
@@ -282,6 +292,9 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         const weekEndDate = new Date(this.weekStartDate);
         weekEndDate.setDate(weekEndDate.getDate() + 6);
         this.weekEndDate = weekEndDate;
+
+        this.showPrevBtn = this.weekStartDate.getTime() > this.booking.date_from.getTime();
+        this.showNextBtn = this.weekEndDate.getTime() < this.booking.date_to.getTime();
 
         await this.loadWeekActivities();
 
@@ -434,12 +447,42 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         this.loading = false;
     }
 
+    public async onHasPersonWithDisabilityChanged(hasPersonWithDisability: boolean) {
+        this.loading = true;
+
+        try {
+            await this.api.update('sale\\booking\\BookingLineGroup', [this.selectedGroup.id], {
+                has_person_with_disability: hasPersonWithDisability
+            });
+
+            this.selectedGroup.has_person_with_disability = hasPersonWithDisability;
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+
+        this.loading = false;
+    }
+
+    public async onParticipantsOptionsChanged(participantsOptions: { person_disability_description: string }) {
+        this.loading = true;
+
+        try {
+            await this.api.update('sale\\booking\\BookingLineGroup', [this.selectedGroup.id], participantsOptions);
+
+            this.selectedGroup.person_disability_description = participantsOptions.person_disability_description;
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+
+        this.loading = false;
+    }
+
     public async onProductSelected(product: Product) {
         this.loading = true;
 
-        let newLine: any = null;
-
-        // notify back-end about the change
+        // notify backend about the change
         try {
             let timeSlotId: number = null;
             for(let [id, code] of Object.entries(this.mapTimeSlotIdCode)) {
@@ -448,21 +491,12 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                 }
             }
 
-            const domain = [
-                ['booking_line_group_id', '=', this.selectedGroup.id]
-            ];
-            const bookingLines = await this.api.collect('sale\\booking\\BookingLine', domain, ['id']);
-
-            newLine = await this.api.create('sale\\booking\\BookingLine', {
-                order: bookingLines.length + 1,
+            await this.api.create('sale\\booking\\BookingActivity', {
                 booking_id: this.booking.id,
                 booking_line_group_id: this.selectedGroup.id,
-                service_date: (new Date(this.selectedDay)).getTime() / 1000,
+                product_id: product.id,
+                activity_date: (new Date(this.selectedDay)).getTime() / 1000,
                 time_slot_id: timeSlotId
-            });
-            await this.api.call('?do=sale_booking_update-bookingline-product', {
-                id: newLine.id,
-                product_id: product.id
             });
 
             await this.loadWeekActivities();
@@ -472,9 +506,6 @@ export class BookingActivitiesPlanningComponent implements OnInit {
             }
         }
         catch(response: any) {
-            if(newLine) {
-                // this.deleteLine.emit(newLine.id);
-            }
             this.api.errorFeedback(response);
         }
 
@@ -485,7 +516,12 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         this.loading = true;
 
         try {
-            await this.api.update('sale\\booking\\BookingLineGroup', [this.selectedGroup.id], {booking_lines_ids: [-this.selectedActivity.activity_booking_line_id.id]});
+            if(this.selectedActivity.activity_booking_line_id) {
+                await this.api.update('sale\\booking\\BookingLineGroup', [this.selectedGroup.id], {booking_lines_ids: [-this.selectedActivity.activity_booking_line_id.id]});
+            }
+            else {
+                await this.api.remove('sale\\booking\\BookingActivity', [this.selectedActivity.id], true);
+            }
 
             await this.loadWeekActivities();
 

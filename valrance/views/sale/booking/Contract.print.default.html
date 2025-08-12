@@ -11,7 +11,7 @@
 body {
     margin: 0;
     padding: 0;
-    margin-top: 301px;
+    margin-top: 150px;
     margin-bottom: 35px;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.7em;
@@ -82,8 +82,8 @@ div.inner .wrapper table tr:last-child td {
     border-bottom: solid 1px black;
 }
 
-div.inner .intro {
-    margin-top: 20px;
+div.inner .heading {
+    margin-top: 30px;
 }
 
 div.trailer {
@@ -101,10 +101,12 @@ div.trailer .wrapper table {
 div.header {
     top: 0;
     left: 0;
-    height: 301px;
+    height: 150px;
+    z-index: 2;
+    background: white;
 }
 
-div.header table.header {
+table.header {
     width: 100%;
     border-spacing: 0px;
     border-collapse: separate;
@@ -122,12 +124,19 @@ div.footer {
     font-size: 0.8em !important;
 }
 
-hr {
-    page-break-after: always;
-    border: 0;
+.signature-container {
+    max-width: 200px;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+    float: right;
 }
-.page-break {
-    page-break-before: always;
+
+.signature-container img {
+    max-width: 200px;
+    width: 100%;
+    height: auto;
+    display: block;
 }
 </style>
 
@@ -172,6 +181,26 @@ hr {
     <!-- spacer -->
     <div style="position: relative; height: 150px; width: 100%;"></div>
 
+</div>
+
+
+
+<div class="footer">
+    <p style="text-align: center;">
+        {{ company_name}} - {{ company_address }}
+        <br />
+        {{i18n['company_registry']}}: {{ company_reg_number }} - IBAN : {{ company_iban }}
+        <br />
+        Email: {{ company_email }} - Web: {{ company_website }} - Tel {{ company_phone }}
+        {% if company_fax %}
+            - {{ company_fax }}
+        {% endif %}
+    </p>
+</div>
+
+
+
+<div class="inner">
     <table class="header" cellpadding="0" cellspacing="0">
         <tr valign="top">
             <td colspan="2" style="position: relative; font-size: 20px; text-align: center; border-bottom: solid 1px rgb(204, 204, 204); width: 100%; height: 20px;  padding-left: 7px; overflow: hidden;">
@@ -214,38 +243,19 @@ hr {
         </tr>
     </table>
 
-</div>
-
-<div class="footer">
-    <p style="text-align: center;">
-        {{ company_name}} - {{ company_address }}
-        <br />
-        {{i18n['company_registry']}}: {{ company_reg_number }} - IBAN : {{ company_iban }}
-        <br />
-        Email: {{ company_email }} - Web: {{ company_website }} - Tel {{ company_phone }}
-        {% if company_fax %}
-            - {{ company_fax }}
-        {% endif %}
-    </p>
-</div>
-
-<div class="inner">
-    <div class="intro">
+    <div class="heading">
         {{ contract_header_html | raw }}
     </div>
-    <div class="intro">
+    <div class="heading">
         {{ contract_service_html | raw }}
-        <ul>
-            <li >{{ service_beds }}</li>
-        </ul>
-        {% if has_service_transport %}
-            <ul>
-                <li >{{ service_transport }}</li>
-            </ul>
-        {% endif %}
     </div>
-    <div class="page-break">
+
+    <div class="heading">
         {{ contract_engage_html | raw }}
+    </div>
+
+    <div class="heading">
+        <b>CONDITIONS FINANCIÈRES:</b>
     </div>
     <div class="wrapper">
         <table width="100%" cellpadding="4" cellspacing="0">
@@ -322,8 +332,9 @@ hr {
             {% endfor %}
         </table>
     </div>
-</div>
 
+    <!-- content should be here -->
+</div>
 <div class="trailer">
     <div class="wrapper" style="margin-top: -1px;">
         <table width="100%" style="border: 0px; border-right: solid 1px black;" cellpadding="4" cellspacing="0">
@@ -358,7 +369,7 @@ hr {
         </table>
     </div>
 
-    {% if benefit_lines | length > 0  %}
+    {% if benefit_lines is not empty or benefit_freebis is not empty %}
     <div class="important">
         <p><b>{{i18n['advantage_included']}}:</b></p>
         <table style="border: solid 1px black; width: 100%;">
@@ -374,10 +385,24 @@ hr {
                 <td style="text-align: center;">{{ (100*benefit_line.value/(price+benefit_line.value)) | round }} %</td>
             </tr>
             {% endfor %}
+
+            {% for benefit_freebie in benefit_freebies %}
+            <tr>
+                <td>{{ benefit_freebie.name }}</td>
+                <td style="text-align: center;">{{ benefit_freebie.value }}</td>
+                <td style="text-align: center;"></td>
+            </tr>
+            {% endfor %}
         </table>
-        <div>
-            {{ advantage_notice_html | raw }}
+        {% if advantage_notice_html is not empty %}
+        <div style="margin-top: 10px;">
+            <table style="border: solid 1px black; width: 100%;">
+                <tr>
+                    <td>{{ advantage_notice_html | raw }}</td>
+                </tr>
+            </table>
         </div>
+        {% endif %}
     </div>
     {% endif %}
 
@@ -433,8 +458,30 @@ hr {
 </div>
 {% endif %}
 
+<div class="heading">{{ contract_payment_html | raw }}</div>
+
+{% if installment_amount > 0 %}
+<div style="position: relative; margin-top: 40px; border: solid 2px black; height: 180px; page-break-inside: avoid;">
+    <div style="padding-top: 15px; font-size: 15px; padding-left: 15px; ">
+        {{i18n['the_amount_of']}} <b>{{ installment_amount | format_money() }}</b> {{i18n['must_be_paid_before']}} <b>{{ installment_date}}</b>
+    </div>
+    <div style="padding-top: 10px; padding-left: 15px; font-size: 15px;">
+        <b style="text-transform: uppercase;">{{i18n['communication']}}</b><b> : {{ installment_reference }}</b><br />
+        IBAN : {{ company_iban }}<br />
+        BIC : {{ company_bic }}<br />
+    </div>
+    <div style="padding-top: 10px; padding-left: 15px; font-size: 15px;">
+        {{ company_name}}<br />
+        {{ company_address }}<br />
+    </div>
+    <div style="position: absolute; right: 10px; top: 15px;">
+        <img src="{{ installment_qr_url }}" width= "150" height="150" />
+    </div>
+</div>
+{% endif %}
+
 {% if show_consumption %}
-    {% if consumptions_tye == 'simple' %}
+    {% if consumptions_type == 'simple' %}
         {% if consumptions_map_simple | length > 0  %}
         <div style="position: relative; margin-top: 30px; margin-bottom: 30px; page-break-inside: avoid;">
             <div class="consumptions">
@@ -479,7 +526,7 @@ hr {
         {% endif %}
     {% endif %}
 
-    {% if consumptions_tye == 'detailed' %}
+    {% if consumptions_type == 'detailed' %}
         {% if consumptions_map_detailed | length > 0 %}
         <div style="position: relative; margin-top: 30px; margin-bottom: 30px; page-break-inside: avoid;">
             <div class="consumptions">
@@ -567,37 +614,16 @@ hr {
 {% endif %}
 
 
-<div class="intro">{{ contract_notice_html | raw }}</div>
-<div class="intro">{{ contract_payment_html | raw }}</div>
 
-{% if installment_amount > 0 %}
-<div style="position: relative; margin-top: 40px; border: solid 2px black; height: 180px; page-break-inside: avoid;">
-    <div style="padding-top: 15px; font-size: 15px; padding-left: 15px; ">
-        {{i18n['the_amount_of']}} <b>{{ installment_amount | format_money() }}</b> {{i18n['must_be_paid_before']}} <b>{{ installment_date}}</b>
-    </div>
-    <div style="padding-top: 10px; padding-left: 15px; font-size: 15px;">
-        <b style="text-transform: uppercase;">{{i18n['communication']}}</b><b> : {{ installment_reference }}</b><br />
-        IBAN : {{ company_iban }}<br />
-        BIC : {{ company_bic }}<br />
-    </div>
-    <div style="padding-top: 10px; padding-left: 15px; font-size: 15px;">
-        {{ company_name}}<br />
-        {{ company_address }}<br />
-    </div>
-    <div style="position: absolute; right: 10px; top: 15px;">
-        <img src="{{ installment_qr_url }}" width= "150" height="150" />
-    </div>
-</div>
-{% endif %}
+<div class="heading" style="margin-top: 40px;">{{ contract_notice_html | raw }}</div>
 
+<div class="heading">{{ contract_withdrawal_html | raw }}</div>
+<div class="heading">{{ contract_cancellation_html | raw }}</div>
+<div class="heading">{{ contract_authorization_html | raw }}</div>
 
-<div class="intro">{{ contract_cancellation_html | raw }}</div>
+<div class="heading">{{ contract_misc_provisions_html | raw }}</div>
 
-<div class="page-break">
-    {{ contract_authorization_html|raw }}
-</div>
-
-<div class="page-break" style="margin-top: 50px;">
+<div class="heading" style="page-break-inside: avoid;">
     <table style="width: 100%; page-break-inside: avoid;">
         <tr>
             <td style="width: 60%;">
@@ -627,7 +653,6 @@ hr {
         </div>
     {% endif %}
 </div>
-
 
 
 

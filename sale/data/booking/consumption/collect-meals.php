@@ -138,8 +138,8 @@ foreach ($result as &$item) {
 
 if(in_array('time_slot_id.name', $params['fields'])) {
     $dates = array_map(function ($a) { return $a['date'];}, $result);
-    $time_slots = array_map(function ($a) { return $a['time_slot_id']['id'];}, $result);
-    // sort by date and then by time_slot_id
+    $time_slots = array_map(function ($a) { return $a['time_slot_id']['order'];}, $result);
+    // sort by date and then by time_slot order
     array_multisort($dates, SORT_ASC, $time_slots, SORT_ASC, $result);
 }
 

@@ -70,7 +70,7 @@
                                 "context": {
                                     "entity": "identity\\Identity",
                                     "view": "list.default",
-                                    "domain": ["id", "in", [1,2,3,4,100]]
+                                    "domain": ["id", "in", [1,2,3,4]]
                                 }
                             },
                             {
@@ -237,6 +237,152 @@
                                     "entity": "sale\\booking\\BookingType",
                                     "view": "list.default"
                                 }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "sales.camp",
+                        "label": "Camps",
+                        "description": "",
+                        "icon": "forest",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "sales.camp.camp-models",
+                                "type": "entry",
+                                "label": "Camp Models",
+                                "description": "",
+                                "icon": "cabin",
+                                "context": {
+                                    "entity": "sale\\camp\\CampModel",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "sales.camp.camps",
+                                "type": "entry",
+                                "label": "Camps",
+                                "description": "",
+                                "icon": "holiday_village",
+                                "context": {
+                                    "entity": "sale\\camp\\Camp",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "sales.camp.price-adapters",
+                                "type": "entry",
+                                "label": "Price adapters",
+                                "description": "",
+                                "icon": "money",
+                                "context": {
+                                    "entity": "sale\\camp\\price\\PriceAdapter",
+                                    "view": "list.sponsor-search"
+                                }
+                            },
+                            {
+                                "id": "sales.camp.ce-enrollments",
+                                "type": "entry",
+                                "label": "Work councils enrollments",
+                                "description": "",
+                                "icon": "money",
+                                "context": {
+                                    "entity": "sale\\camp\\Enrollment",
+                                    "view": "list.work-council-search"
+                                }
+                            },
+                            {
+                                "id": "sales.camp.catalog",
+                                "label": "Catalog",
+                                "description": "",
+                                "icon": "library_books",
+                                "type": "parent",
+                                "children": [
+                                    {
+                                        "id": "sales.camp.catalog.products",
+                                        "type": "entry",
+                                        "label": "Products",
+                                        "description": "",
+                                        "context": {
+                                            "entity": "sale\\camp\\catalog\\Product",
+                                            "view": "list.default",
+                                            "domain": ["is_camp", "=", true]
+                                        }
+                                    },
+                                    {
+                                        "id": "sales.camp.catalog.product-models",
+                                        "type": "entry",
+                                        "label": "Products Models",
+                                        "description": "",
+                                        "context": {
+                                            "entity": "sale\\camp\\catalog\\ProductModel",
+                                            "view": "list.default",
+                                            "domain": ["is_camp", "=", true]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "sales.camp.requirements",
+                                "label": "Requirements",
+                                "description": "",
+                                "icon": "checklist_rtl",
+                                "type": "parent",
+                                "children": [
+                                    {
+                                        "id": "sales.camp.requirements.skills",
+                                        "type": "entry",
+                                        "label": "Skills",
+                                        "description": "",
+                                        "icon": "sports_handball",
+                                        "context": {
+                                            "entity": "sale\\camp\\Skill",
+                                            "view": "list.default"
+                                        }
+                                    },
+                                    {
+                                        "id": "sales.camp.requirements.documents",
+                                        "type": "entry",
+                                        "label": "Documents",
+                                        "description": "",
+                                        "icon": "task",
+                                        "context": {
+                                            "entity": "sale\\camp\\Document",
+                                            "view": "list.default"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "sales.camp.helps",
+                                "label": "Helpers",
+                                "description": "",
+                                "icon": "payments",
+                                "type": "parent",
+                                "children": [
+                                    {
+                                        "id": "sales.camp.helps.sponsors",
+                                        "type": "entry",
+                                        "label": "Sponsors",
+                                        "description": "",
+                                        "icon": "domain",
+                                        "context": {
+                                            "entity": "sale\\camp\\Sponsor",
+                                            "view": "list.default"
+                                        }
+                                    },
+                                    {
+                                        "id": "sales.camp.helps.works-council",
+                                        "type": "entry",
+                                        "label": "Works Council",
+                                        "description": "",
+                                        "icon": "work",
+                                        "context": {
+                                            "entity": "sale\\camp\\WorksCouncil",
+                                            "view": "list.default"
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -668,6 +814,28 @@
                                 ]
                             },
                             {
+                                "id": "sales.catalog.meal_types",
+                                "type": "entry",
+                                "icon": "restaurant",
+                                "label": "Meal Types",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\MealType",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "sales.catalog.meal_places",
+                                "type": "entry",
+                                "icon": "restaurant",
+                                "label": "Meal Places",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\MealPlace",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
                                 "id": "sales.catalog.groupingCode",
                                 "type": "entry",
                                 "icon": "group",
@@ -946,6 +1114,26 @@
                                 "description": "",
                                 "context": {
                                     "entity": "finance\\accounting\\AccountChart",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "finance.accounting.analytic_chart",
+                                "type": "entry",
+                                "label": "Analytic Chart",
+                                "description": "",
+                                "context": {
+                                    "entity": "finance\\accounting\\AnalyticChart",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "finance.accounting.analytic_sections",
+                                "type": "entry",
+                                "label": "Analytic Sections",
+                                "description": "",
+                                "context": {
+                                    "entity": "finance\\accounting\\AnalyticSection",
                                     "view": "list.default"
                                 }
                             },

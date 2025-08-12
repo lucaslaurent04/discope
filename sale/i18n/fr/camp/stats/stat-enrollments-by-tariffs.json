@@ -1,0 +1,60 @@
+{
+    "name": "Statistiques quantités d'inscriptions par tariffs.",
+    "plural": "",
+    "description": "Statistiques quantités d'inscriptions par tariffs.",
+    "model": {
+        "all_centers": {
+            "label": "Tous les centres"
+        },
+        "center_id": {
+            "label": "Centre"
+        },
+        "date_from": {
+            "label": "Du"
+        },
+        "date_to": {
+            "label": "Au"
+        },
+        "center": {
+            "label": "Centre",
+            "description": "",
+            "help": ""
+        },
+        "product_id": {
+            "label": "Tarif",
+            "description": "",
+            "help": ""
+        },
+        "qty": {
+            "label": "Qté",
+            "description": "",
+            "help": ""
+        },
+        "status": {
+            "label": "Status",
+            "selection": {
+                "all": "Toutes",
+                "validated": "Validées",
+                "confirmed": "Confirmées",
+                "pending": "Pré-inscription",
+                "waitlisted": "En attentes",
+                "cancelled": "Annulées"
+            },
+            "description": "",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "",
+            "description": "",
+            "layout": {}
+        },
+        "list.default": {
+            "name": "Quantités d'inscriptions par tarifs",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

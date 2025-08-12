@@ -10,7 +10,10 @@
             {
                 "type": "field",
                 "value": "name",
-                "width": "25%"
+                "width": "25%",
+                "widget": {
+                    "wrap": true
+                }
             },
             {
                 "type": "field",
@@ -28,7 +31,10 @@
                 "type": "field",
                 "label": "Type",
                 "value": "customer_type_id",
-                "width": "15%"
+                "width": "15%",
+                "widget": {
+                    "wrap": true
+                }
             },
             {
                 "type": "field",

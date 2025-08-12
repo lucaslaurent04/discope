@@ -1,0 +1,46 @@
+{
+    "name": "Sponsors",
+    "description": "List of sponsors.",
+    "order": "name",
+    "sort": "asc",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "5%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "name",
+                "width": "25%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "sponsor_type",
+                "width": "25%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "complete_name",
+                "width": "25%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "amount",
+                "width": "25%",
+                "sortable": false,
+                "readonly": true
+            }
+        ]
+    }
+}

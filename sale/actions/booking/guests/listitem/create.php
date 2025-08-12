@@ -95,8 +95,8 @@ foreach($guest_list['guest_list_items_ids'] as $guest_list_item) {
     }
 }
 
-if($group_guest_list_item_qty >= $booking_line_group['nb_pers']) {
-    throw new Exception("booking_line_group_enough_guest_list_items", QN_ERROR_INVALID_PARAM);
+if($group_guest_list_item_qty > $booking_line_group['nb_pers']) {
+    throw new Exception("booking_line_group_nb_pers_exceeded", QN_ERROR_INVALID_PARAM);
 }
 
 $params['fields']['guest_list_id'] = $params['guest_list_id'];

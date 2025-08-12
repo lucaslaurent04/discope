@@ -1,0 +1,320 @@
+{
+    "name": "Inscription",
+    "plural": "Inscriptions",
+    "description": "L'inscription d'un enfant à un camp.",
+    "model": {
+        "child_id": {
+            "label": "Enfant",
+            "description": "L'enfant à inscrire.",
+            "help": ""
+        },
+        "child_remarks": {
+            "label": "Remarques",
+            "description": "Remarques à propos de l'enfant, de sa santé au moment de l'inscription, ...",
+            "help": ""
+        },
+        "child_age": {
+            "label": "Age enfant",
+            "description": "Age de l'enfant au moment du camp.",
+            "help": ""
+        },
+        "family_quotient": {
+            "label": "Quotient familial",
+            "description": "Indicateur de mesure des ressources mensuelles de la famille de l'enfant.",
+            "help": "Utilisé pour sélectionner le prix à payer pour un camp CLSH."
+        },
+        "camp_id": {
+            "label": "Camp",
+            "description": "Camp auquel l'enfant s'inscrit.",
+            "help": ""
+        },
+        "date_from": {
+            "label": "Début camp",
+            "description": "Date de début du camp.",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Fin camp",
+            "description": "Date de fin du camp.",
+            "help": ""
+        },
+        "weekend_extra": {
+            "label": "Week-end extra",
+            "selection": {
+                "none": "Aucun",
+                "full": "Hébergement tout le weekend",
+                "saturday-morning": "Hébergement jusqu'à samedi matin"
+            },
+            "description": "L'enfant reste tout le week-end ou une partie du week-end.",
+            "help": ""
+        },
+        "is_clsh": {
+            "label": "CLSH",
+            "description": "Centre loisir sans hébergement.",
+            "help": ""
+        },
+        "clsh_type": {
+            "label": "Durée",
+            "description": "Type de camp CLSH.",
+            "help": "",
+            "selection": {
+                "5-days": "5 jours",
+                "4-days": "4 jours"
+            }
+        },
+        "presence_day_1": {
+            "label": "Présent jour 1",
+            "description": "Enfant présent le 1er jour du camp."
+        },
+        "presence_day_2": {
+            "label": "Présent jour 2",
+            "description": "Enfant présent le 2ème jour du camp."
+        },
+        "presence_day_3": {
+            "label": "Présent jour 3",
+            "description": "Enfant présent le 3ème jour du camp."
+        },
+        "presence_day_4": {
+            "label": "Présent jour 4",
+            "description": "Enfant présent le 4ème jour du camp."
+        },
+        "presence_day_5": {
+            "label": "Présent jour 5",
+            "description": "Enfant présent le 5ème jour du camp."
+        },
+        "daycare_day_1": {
+            "label": "Garderie jour 1",
+            "description": "Garderie de l'enfant pour le 1er jour.",
+            "selection": {
+                "none": "Aucune",
+                "am": "Matin",
+                "pm": "Soir",
+                "full": "Matin et soir"
+            }
+        },
+        "daycare_day_2": {
+            "label": "Garderie jour 2",
+            "description": "Garderie de l'enfant pour le 2ème jour.",
+            "selection": {
+                "none": "Aucune",
+                "am": "Matin",
+                "pm": "Soir",
+                "full": "Matin et soir"
+            }
+        },
+        "daycare_day_3": {
+            "label": "Garderie jour 3",
+            "description": "Garderie de l'enfant pour le 3ème jour.",
+            "selection": {
+                "none": "Aucune",
+                "am": "Matin",
+                "pm": "Soir",
+                "full": "Matin et soir"
+            }
+        },
+        "daycare_day_4": {
+            "label": "Garderie jour 4",
+            "description": "Garderie de l'enfant pour le 4ème jour.",
+            "selection": {
+                "none": "Aucune",
+                "am": "Matin",
+                "pm": "Soir",
+                "full": "Matin et soir"
+            }
+        },
+        "daycare_day_5": {
+            "label": "Garderie jour 5",
+            "description": "Garderie de l'enfant pour le 5ème jour.",
+            "selection": {
+                "none": "Aucune",
+                "am": "Matin",
+                "pm": "Soir",
+                "full": "Matin et soir"
+            }
+        },
+        "camp_class": {
+            "label": "Classe camp de l'enfant",
+            "description": "La classe du camp de l'enfant pour l'inscription, pour savoir quel prix utiliser.",
+            "help": "",
+            "selection": {
+                "other": "Autre",
+                "member": "Membre",
+                "close-member": "Membre proche"
+            }
+        },
+        "status": {
+            "label": "Status",
+            "description": "Status de l'inscription.",
+            "help": "",
+            "selection": {
+                "pending": "Pré-inscription",
+                "waitlisted": "En attente",
+                "confirmed": "Confirmée",
+                "validated": "Validée",
+                "cancelled": "Annulée"
+            }
+        },
+        "is_ase": {
+            "label": "ASE",
+            "description": "Est \"aide sociale à l'enfance\".",
+            "help": ""
+        },
+        "total": {
+            "label": "Prix (HTVA)",
+            "description": "Prix de l'inscription (Hors TVA).",
+            "help": ""
+        },
+        "price": {
+            "label": "Prix (TVAC)",
+            "description": "Prix de l'inscription (TVA comprise).",
+            "help": ""
+        },
+        "is_locked": {
+            "label": "Verrouillée",
+            "description": "Est-ce que l'inscription peut-être modifiée?",
+            "help": ""
+        },
+        "works_council_id": {
+            "label": "Conseil d'entreprise",
+            "description": "Le conseil d'entreprise qui va rehausser la classe du camp d'un niveau.",
+            "help": ""
+        },
+        "all_documents_received": {
+            "label": "Tous les documents reçus",
+            "description": "Tous les documents requis pour le camp ont bien été reçus.",
+            "help": ""
+        },
+        "paid_amount": {
+            "label": "Reçu",
+            "description": "Montant reçu pour l'inscription.",
+            "help": ""
+        },
+        "payment_status": {
+            "label": "Paiements",
+            "description": "Situation des paiements attendus.",
+            "selection": {
+                "paid": "Payé",
+                "due": "Dû"
+            },
+            "help": ""
+        },
+        "main_guardian_id": {
+            "label": "Responsable",
+            "description": "Le tuteur principal responsable de l'enfant.",
+            "help": "Utilisé pour savoir quelle adresse utiliser pour la facturation."
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Inscription",
+            "description": "",
+            "actions": {
+                "action.transition.pending": {
+                    "label": "En cours"
+                },
+                "action.transition.confirm": {
+                    "label": "Confirmer"
+                },
+                "action.transition.cancel": {
+                    "label": "Annuler"
+                },
+                "action.transfer": {
+                    "label": "Transférer"
+                }
+            },
+            "layout": {
+                "section.lines": {
+                    "label": "Lignes"
+                },
+                "section.reductions": {
+                    "label": "Réductions"
+                },
+                "section.daycare": {
+                    "label": "Garderie"
+                },
+                "section.child-remarks": {
+                    "label": "Remarques enfant"
+                },
+                "section.mails": {
+                    "label": "E-mails"
+                },
+                "section.fundings": {
+                    "label": "Financements"
+                }
+            }
+        },
+        "form.camp": {
+            "actions": {
+                "action.transition.pending": {
+                    "label": "En cours"
+                },
+                "action.transition.confirm": {
+                    "label": "Confirmer"
+                },
+                "action.transition.cancel": {
+                    "label": "Annuler"
+                },
+                "action.transfer": {
+                    "label": "Transférer"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Inscriptions",
+            "description": "",
+            "layout": {}
+        },
+        "list.confirmed": {
+            "name": "Inscriptions à valider",
+            "description": "",
+            "header": {
+                "action.transition.validate": {
+                    "label": "Valider"
+                }
+            },
+            "layout": {}
+        },
+        "list.pending": {
+            "name": "Pré-inscriptions",
+            "description": "",
+            "header": {
+                "action.transition.confirm": {
+                    "label": "Confirmer"
+                }
+            },
+            "layout": {
+            }
+        }
+    },
+    "error": {
+        "is_locked": {
+            "locked_enrollment": "Impossible de modifier une inscription verrouillée."
+        },
+        "camp_id": {
+            "cancelled_camp": "Inscription à un camp annulé impossible.",
+            "full": "Le camp est complet.",
+            "day_1_full": "Le 1er jour du camp est complet.",
+            "day_2_full": "Le 2ème jour du camp est complet.",
+            "day_3_full": "Le 3ème jour du camp est complet.",
+            "day_4_full": "Le 4ème jour du camp est complet.",
+            "day_5_full": "Le 5ème jour du camp est complet."
+        },
+        "child_id": {
+            "missing_institution": "Institution manquante.",
+            "missing_main_guardian": "Tuteur principal manquant.",
+            "already_enrolled": "L'enfant est déjà inscrit à ce camp.",
+            "already_enrolled_to_other_camp": "L'enfant est déjà inscrit à un autre camp pendant cette période.",
+            "missing_skill": "L'enfant n'a pas toutes les compétences requises pour ce camp."
+        },
+        "is_ase": {
+            "too_many_ase_children": "Le quota d'enfants de cette catégorie est plein."
+        },
+        "is_clsh": {
+            "needs_at_least_one_present_day": "L'enfant doit être présent à un jour du camp."
+        },
+        "validate": {
+            "missing_document": "Il manque au moins un document pour l'inscription à ce camp.",
+            "not_paid": "L'inscription n'est pas complètement payée."
+        }
+    }
+}

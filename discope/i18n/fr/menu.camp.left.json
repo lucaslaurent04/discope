@@ -1,0 +1,70 @@
+{
+    "name": "Menu Camp",
+    "description": "",
+    "view": {
+        "camp-models": {
+            "label": "Modèles",
+            "help": ""
+        },
+        "camps" : {
+            "label": "Camps",
+            "help": ""
+        },
+        "enrollments" : {
+            "label": "Inscriptions",
+            "help": ""
+        },
+        "presences" : {
+            "label": "Présences",
+            "help": ""
+        },
+        "meals": {
+            "label": "Repas",
+            "help": ""
+        },
+        "people" : {
+            "label": "Participants",
+            "help": ""
+        },
+        "people.children" : {
+            "label": "Enfants",
+            "help": ""
+        },
+        "people.guardians" : {
+            "label": "Tuteurs",
+            "help": ""
+        },
+        "people.institutes" : {
+            "label": "Institutions",
+            "help": ""
+        },
+        "requirements": {
+            "label": "Exigences",
+            "help": ""
+        },
+        "pending": {
+            "label": "En cours",
+            "help": ""
+        },
+        "pending.camps": {
+            "label": "Camps",
+            "help": ""
+        },
+        "pending.camps.attending-children": {
+            "label": "Enfants participant",
+            "help": ""
+        },
+        "pending.enrollments": {
+            "label": "Inscriptions",
+            "help": ""
+        },
+        "pending.enrollments.pending": {
+            "label": "Pré-inscriptions",
+            "help": ""
+        },
+        "pending.enrollments.confirmed": {
+            "label": "À valider",
+            "help": ""
+        }
+    }
+}

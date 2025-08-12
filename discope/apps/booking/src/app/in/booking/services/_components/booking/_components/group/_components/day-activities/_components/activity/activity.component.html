@@ -1,8 +1,10 @@
 <div class="part" [class.hidden]="!ready">
     <div class="part-toggle">
-        <span>{{ mapTimeSlotCodeName?.[timeSlot?.code] || 'Inconnu' }}</span>
+        <span [style]="activity ? 'cursor: pointer;' : ''" (click)="openActivityDetails()">
+            {{ mapTimeSlotCodeName?.[timeSlot?.code] || 'Inconnu' }}
+        </span>
 
-        <button mat-icon-button [disabled]="!activity || activity?.is_virtual" (click)="toggleOpen()">
+        <button mat-icon-button [disabled]="!activity || !activity.activity_booking_line_id || activity.is_virtual" (click)="toggleOpen()">
             <mat-icon style="font-size: 15px;">
                 <span *ngIf="opened">keyboard_arrow_up</span>
                 <span *ngIf="!opened">keyboard_arrow_right</span>
@@ -13,7 +15,7 @@
     <div class="part-container">
         <div class="row row-first">
             <div class="cell">
-                <mat-form-field *ngIf="!activity?.activity_booking_line_id || (activity.activity_booking_line_id.product_id | json) == '{}' || activity.activity_booking_line_id.product_id.id == 0">
+                <mat-form-field *ngIf="!activity?.product_id?.id">
                     <mat-label>Activité</mat-label>
                     <input *ngIf="!group.is_locked"
                            matInput
@@ -36,13 +38,13 @@
                         </div>
                     </mat-autocomplete>
                 </mat-form-field>
-                <mat-form-field *ngIf="activity?.activity_booking_line_id?.product_id?.id > 0">
+                <mat-form-field *ngIf="activity?.product_id?.id">
                     <mat-label>Activité</mat-label>
                     <input matInput [disabled]="group.is_locked" type="text" [value]="vm.product.name" readonly="readonly" />
                     <mat-hint [align]="'end'">
-                        <span *ngIf="activity.activity_booking_line_id.qty_accounting_method == 'accomodation'">au logement</span>
-                        <span *ngIf="activity.activity_booking_line_id.qty_accounting_method == 'person'">à la personne</span>
-                        <span *ngIf="activity.activity_booking_line_id.qty_accounting_method == 'unit'">à l'unité</span>
+                        <span *ngIf="activity?.activity_booking_line_id?.qty_accounting_method == 'accomodation'">au logement</span>
+                        <span *ngIf="activity?.activity_booking_line_id?.qty_accounting_method == 'person'">à la personne</span>
+                        <span *ngIf="(activity && !activity.activity_booking_line_id) || activity?.activity_booking_line_id?.qty_accounting_method == 'unit'">à l'unité</span>
                     </mat-hint>
                 </mat-form-field>
             </div>
@@ -59,17 +61,17 @@
                 </mat-form-field>
             </div>
             <div class="cell cell-right" style="cursor: pointer; padding-top: 11px" (click)="openPriceEdition()">
-                <span *ngIf="!group.is_locked && !activity?.is_virtual">
+                <span *ngIf="!group.is_locked && activity && activity.activity_booking_line_id && !activity.is_virtual">
                     {{(activity?.activity_booking_line_id?.unit_price ? activity.activity_booking_line_id.unit_price : 0) | number: '1.2-2'}} €
                 </span>
             </div>
             <div class="cell cell-right" style="cursor: pointer; padding-top: 11px" (click)="openPriceEdition()">
-                <span *ngIf="!group.is_locked && !activity?.is_virtual">
+                <span *ngIf="!group.is_locked && activity && activity.activity_booking_line_id && !activity.is_virtual">
                     {{(activity?.activity_booking_line_id?.vat_rate ? activity.activity_booking_line_id.vat_rate : 0) | percent: '1.2-2'}}
                 </span>
             </div>
             <div class="cell cell-text cell-right">
-                <span *ngIf="!group.is_locked && !activity?.is_virtual">
+                <span *ngIf="!group.is_locked && activity && activity.activity_booking_line_id && !activity.is_virtual">
                     {{(activity?.activity_booking_line_id?.price ? activity.activity_booking_line_id.price : 0) | number: '1.2-2'}} €
                 </span>
             </div>
@@ -122,6 +124,7 @@
                     [line]="transport_line"
                     [group]="group"
                     [booking]="booking"
+                    [activity]="activity"
                     (loadStart)="loadStart.emit()"
                     (loadEnd)="loadEnd.emit()"
                     (updated)="updated.emit()"
@@ -146,6 +149,7 @@
                     [line]="supply_line"
                     [group]="group"
                     [booking]="booking"
+                    [activity]="activity"
                     (updated)="updated.emit()"
                 ></booking-services-booking-group-day-activities-activity-line>
             </div>

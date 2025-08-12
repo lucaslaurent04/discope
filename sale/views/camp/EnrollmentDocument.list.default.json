@@ -1,0 +1,37 @@
+{
+    "name": "Enrollment documents",
+    "description": "List view for Enrollment documents.",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "10%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "enrollment_id",
+                "width": "33%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "document_id",
+                "width": "33%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "received",
+                "width": "33%",
+                "sortable": false,
+                "readonly": false
+            }
+        ]
+    }
+}

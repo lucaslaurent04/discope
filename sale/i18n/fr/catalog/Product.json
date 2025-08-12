@@ -25,12 +25,12 @@
         },
         "description": {
             "label": "Description",
-            "description": "Description du produit variant (spécificités).",
+            "description": "Description de la variante de produit (spécificités).",
             "help": ""
         },
         "product_model_id": {
             "label": "Modèle de produit",
-            "description": "Modèle de produit du variant.",
+            "description": "Modèle de produit de la variante.",
             "help": ""
         },
         "prices_ids": {
@@ -42,16 +42,6 @@
             "label": "Pack",
             "description": "Contient d'autres produits.",
             "help": ""
-        },
-        "is_meal": {
-            "label": "Est un repas",
-            "description": "Le produit est-il un repas ?",
-            "help": "Le produit est-il un repas ? (les repas peuvent faire partie de la pension / services inclus du séjour)."
-        },
-        "is_snack": {
-            "label": "Est une collation",
-            "description": "Le produit est-il une collation ?",
-            "help": "Le produit est-il une collation ?"
         },
         "is_rental_unit": {
             "label": "Unité Locative",
@@ -78,6 +68,11 @@
             "description": "Produit visible et sélectionnable ?",
             "help": ""
         },
+        "is_freebie_allowed": {
+            "label": "Gratuité autorisée",
+            "description": "Le produit peut-il être offert gratuitement ?",
+            "help": ""
+        },
         "stat_section_id": {
             "label": "Statistiques",
             "description": "Section statistique associée au produit.",
@@ -100,11 +95,21 @@
         },
         "has_age_range": {
             "label": "Tranche d'âge?",
-            "description": "Assigné à une tranche d'âge spécifique.",
+            "description": "Tranche d'âge spécifique.",
             "help": ""
         },
         "age_range_id": {
-            "label": "Age (tranche)",
+            "label": "Tranche d'âge",
+            "description": "Tranche d'âge à laquelle est limité le produit.",
+            "help": ""
+        },
+        "has_rate_class": {
+            "label": "Catégorie tarifaire?",
+            "description": "Catégorie tarifaire spécifique.",
+            "help": ""
+        },
+        "rate_class_id": {
+            "label": "Catégorie tarifaire",
             "description": "Tranche d'âge cible du produit.",
             "help": ""
         },
@@ -122,6 +127,46 @@
             "label": "Regroupement",
             "description": "Code de regroupement spécifique auquel ce modèle de produit est associé, le cas échéant.",
             "help": ""
+        },
+        "is_snack": {
+            "label": "Est une collation",
+            "description": "Le produit est-il une collation ?",
+            "help": "Le produit est-il une collation ?"
+        },
+        "is_meal": {
+            "label": "Est un repas",
+            "description": "Le produit est-il un repas ?",
+            "help": "Le produit est-il un repas ? (les repas peuvent faire partie de la pension / services inclus du séjour)."
+        },
+        "is_transport": {
+            "label": "Est un transport",
+            "description": "Le produit est-il un service de transport ?",
+            "help": "Le produit est-il un service de transport ? (ceci inclut les transferts entre lieux, les navettes, etc.)"
+        },
+        "is_supply": {
+            "label": "Est un matériel",
+            "description": "Le produit est-il un service de location de matériel ?",
+            "help": ""
+        },
+        "is_camp": {
+            "label": "Est un camp",
+            "description": "Le produit est-il un camp ?",
+            "help": ""
+        },
+        "is_activity": {
+            "label": "Est une activité",
+            "description": "Le produit est-il une activité ?",
+            "help": "Le produit est-il une activité ? (cela inclut des activités comme des jeux, des ateliers, etc.)"
+        },
+        "is_fullday": {
+            "label": "Activité journée complète",
+            "description": "Indique si l'activité dure toute la journée. Si vrai, les assignations doivent inclure AM et PM ; sinon, l'une ou l'autre.",
+            "help": "L'activité se déroule-t-elle sur toute la journée ? Si oui, il faut prévoir des assignations pour le matin (AM) et l'après-midi (PM)."
+        },
+        "is_billable": {
+            "label": "Est facturable",
+            "description": "L'activité est-elle facturable ? (génère une ligne de service lors de la facturation).",
+            "help": "Permet d'indiquer si une activité est facturable, ce qui entraînera la création d'une ligne de service dans la facturation."
         }
     },
     "view": {
@@ -134,6 +179,9 @@
                 },
                 "section.prices_section": {
                     "label": "Prix"
+                },
+                "section.activity": {
+                    "label": "Activité"
                 },
                 "section.attributes": {
                     "label": "Attributs"
@@ -152,6 +200,14 @@
         "list.default": {
             "name": "Produits",
             "description": "Liste des produits.",
+            "actions": {
+                "action.export-prices-csv": {
+                    "label": "Exporter prix CSV"
+                },
+                "action.import-prices-csv": {
+                    "label": "Importer prix CSV"
+                }
+            },
             "layout": {}
         }
     },

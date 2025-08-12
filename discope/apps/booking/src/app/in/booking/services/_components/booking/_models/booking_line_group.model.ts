@@ -37,6 +37,9 @@ export class BookingLineGroup {
         public age_range_assignments_ids: any[] = [],
         public sojourn_product_models_ids: any[] = [],
         public booking_activities_ids: any[] = [],
-        public activity_group_num: number = 0
+        public activity_group_num: number = 0,
+        public booking_meals_ids: any[] = [],
+        public has_person_with_disability: boolean = false,
+        public person_disability_description: string = ''
     ) {}
 }

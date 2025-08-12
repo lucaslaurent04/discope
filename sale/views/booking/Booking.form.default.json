@@ -145,9 +145,11 @@
             "id": "action.import-contacts",
             "label": "Import contacts",
             "description": "The contacts from the selected customer will be (re) imported to the booking.",
-            "controller": "sale_booking_import-contacts",
+            "controller": "core_model_do",
             "params": {
-                "id": "object.id"
+                "entity": "sale\\booking\\Booking",
+                "action": "import_contacts",
+                "ids": []
             },
             "confirm": true
         }
@@ -180,6 +182,16 @@
             "icon": "view_week",
             "route": "/booking/object.id/activities-planning",
             "visible": [true, "=", "env.sale.features.booking.activity_schedule_table"]
+        },
+        {
+            "id": "item.booking.activities-program",
+            "label": "Print Activities program",
+            "description": "",
+            "icon": "list_alt",
+            "route": "/?get=sale_booking_print-booking-activity&id=object.id",
+            "target": "_blank",
+            "absolute": true,
+            "visible": [true, "=", "env.sale.features.booking.activity"]
         },
         {
             "id": "item.booking.composition",
@@ -328,7 +340,7 @@
                                                 "value": "is_from_channelmanager",
                                                 "label": "channel manager",
                                                 "width": "33%",
-                                                "visible": ["is_from_channelmanager", "=", true],
+                                                "visible": [[true, "=", "env.sale.features.booking.channel_manager"]],
                                                 "widget": {
                                                     "readonly": true
                                                 }
@@ -338,7 +350,7 @@
                                                 "value": "extref_reservation_id",
                                                 "label": "Channel manager ID",
                                                 "width": "33%",
-                                                "visible": ["is_from_channelmanager", "=", true],
+                                                "visible": [[true, "=", "env.sale.features.booking.channel_manager"], ["is_from_channelmanager", "=", true]],
                                                 "widget": {
                                                     "readonly": true
                                                 }
@@ -348,7 +360,7 @@
                                                 "value": "guarantee_id",
                                                 "label": "Guarantee",
                                                 "width": "33%",
-                                                "visible": ["is_from_channelmanager", "=", true],
+                                                "visible": [[true, "=", "env.sale.features.booking.channel_manager"], ["is_from_channelmanager", "=", true]],
                                                 "widget": {
                                                     "readonly": true
                                                 }
@@ -425,6 +437,18 @@
                                                 "label": "Center",
                                                 "value": "center_id",
                                                 "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "center_office_id",
+                                                "width": "0%",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "organisation_id",
+                                                "width": "0%",
+                                                "visible": false
                                             },
                                             {
                                                 "type": "field",

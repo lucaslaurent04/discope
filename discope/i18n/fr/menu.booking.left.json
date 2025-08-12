@@ -109,6 +109,10 @@
             "label": "Prestataires",
             "help": ""
         },
+        "item.planning.partners.partner-planning-summary": {
+            "label": "Récapitulatifs",
+            "help": ""
+        },
         "item.planning.meals.stat": {
             "label": "Consolidé",
             "help": ""

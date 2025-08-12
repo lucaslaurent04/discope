@@ -1,0 +1,111 @@
+{
+    "name": "Manage Camps Attending Children",
+    "description": "",
+    "controller": "sale_camp_collect-attending-children",
+    "header": {
+        "actions": {
+            "ACTION.CREATE" : false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "group_by": [
+        { "field": "camp_id", "open": true }
+    ],
+    "order": "asc",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "5%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "camp_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "firstname",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "lastname",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "gender",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "has_camp_birthday",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "birthdate",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "remarks",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "main_guardian_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "is_foster",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "institution_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "is_ase",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            }
+        ]
+    }
+}

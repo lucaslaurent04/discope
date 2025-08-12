@@ -1,0 +1,89 @@
+{
+    "name": "Pending enrollments",
+    "order": "child_id",
+    "sort": "asc",
+    "domain": ["status", "=", "pending"],
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false,
+            "ACTION.EDIT": false
+        },
+        "selection": {
+            "default": false,
+            "actions": [
+                {
+                    "id": "action.transition.confirm",
+                    "label": "Confirm",
+                    "controller": "model_transition",
+                    "params": {
+                        "entity": "sale\\camp\\Enrollment",
+                        "transition": "confirm",
+                        "ids": []
+                    }
+                }
+            ]
+        }
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "5%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "child_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "camp_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "date_from",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "date_to",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "status",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "is_ase",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "price",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            }
+        ]
+    }
+}

@@ -14,6 +14,7 @@ use Dompdf\Options as DompdfOptions;
 use equal\data\DataFormatter;
 use sale\booking\Booking;
 use sale\booking\BookingActivity;
+use sale\booking\BookingMeal;
 use sale\booking\Consumption;
 use sale\booking\TimeSlot;
 use Twig\Environment as TwigEnvironment;
@@ -50,6 +51,11 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
             'type'          => 'string',
             'selection'     => ['pdf', 'html'],
             'default'       => 'pdf'
+        ],
+        'booking_line_group_id' => [
+            'type'          => 'many2one',
+            'foreign_object'=> 'sale\booking\BookingLineGroup',
+            'description'   => 'Identifier of the booking line group (sojourn) to print.'
         ]
     ],
     'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
@@ -226,7 +232,7 @@ $days_names = array_map(function($day) use ($params) {
 
 $activities_map = [];
 
-$time_slots_activities = TimeSlot::search(["is_meal", "=", false])->read(['id', 'name','code', 'order' ,'schedule_from', 'schedule_to'], $params['lang'])->get();
+$time_slots_activities = TimeSlot::search(["is_meal", "=", false])->read(['id', 'name','code', 'order'], $params['lang'])->get();
 usort($time_slots_activities, function ($a, $b) {
     return $a['order'] <=> $b['order'];
 });
@@ -239,7 +245,10 @@ $booking_activities = BookingActivity::search(['booking_id', '=', $booking['id']
     ->read([
         'id',
         'name',
+        'description',
         'activity_date',
+        'schedule_from', 'schedule_to',
+        'product_model_id' => ['name'],
         'activity_booking_line_id' => ['id', 'description', 'product_id' => ['id','name', 'description'] ],
         'booking_line_group_id' => ['id', 'name', 'nb_pers', 'nb_children'],
         'time_slot_id' => ['id', 'code','name'],
@@ -252,11 +261,54 @@ usort($booking_activities, function ($a, $b) {
         ?: $a['activity_date'] <=> $b['activity_date'];
 });
 
-foreach ($booking_activities as $activity) {
-    $group = $activity['booking_line_group_id']['id'];
 
-    if (!isset($activities_map[$group])) {
-        $activities_map[$group] = [
+
+$map_meals = [];
+
+$meals = BookingMeal::search(['booking_id', '=', $booking['id']])
+    ->read(['date', 'time_slot_id' => ['code'], 'is_self_provided', 'meal_type_id' => ['code', 'name'], 'meal_place_id' => ['place_type']]);
+
+foreach($meals as $meal_id => $meal) {
+    $time_slot_code = ['B' => 'AM', 'L' => 'PM', 'D' => 'EV'][$meal['time_slot_id']['code']] ?? $meal['time_slot_id']['code'];
+    $date = date('d/m/Y', $meal['date']) . ' ' . $days_names[date('w', $meal['date'])];
+
+    $meal_name = '';
+    $meal_place = '';
+    $meal_provided = $meal['is_self_provided'] ? 'par vos soins' : '';
+
+    if(in_array($meal['time_slot_id']['code'], ['B', 'L', 'D'])) {
+        if($meal['meal_type_id']['code'] == 'regular') {
+            $meal_name = ['AM' => 'Petit déjeuner', 'PM' => 'Déjeuner', 'EV' => 'Dîner'][$time_slot_code];
+        }
+        else {
+            $meal_name = $meal['meal_type_id']['name'];
+        }
+    }
+    else {
+        $meal_name = 'Goûter';
+    }
+    if($meal['meal_place_id']['place_type'] != 'offsite') {
+        if(!$meal['is_self_provided']) {
+            $meal_place = 'au centre';
+        }
+    }
+    else {
+        $meal_place = 'en déplacement';
+    }
+
+    $map_meals[$date][$time_slot_code][] = trim($meal_name . ' ' . $meal_place . ' ' . $meal_provided);
+
+}
+
+foreach($booking_activities as $activity) {
+    $group_id = $activity['booking_line_group_id']['id'];
+
+    if(isset($params['booking_line_group_id']) && $params['booking_line_group_id'] != $group_id) {
+        continue;
+    }
+
+    if(!isset($activities_map[$group_id])) {
+        $activities_map[$group_id] = [
             'info' => [
                 'name' => $activity['booking_line_group_id']['name'],
                 'nb_pers' => $activity['booking_line_group_id']['nb_pers'],
@@ -266,46 +318,70 @@ foreach ($booking_activities as $activity) {
         ];
     }
 
-    $date = date('d/m/Y', $activity['activity_date']) . ' (' . $days_names[date('w', $activity['activity_date'])] . ')';
-    if (!isset($activities_map[$group]['dates'][$date])) {
-        $activities_map[$group]['dates'][$date] = [
+    $date = date('d/m/Y', $activity['activity_date']) . ' ' . $days_names[date('w', $activity['activity_date'])];
+    if(!isset($activities_map[$group_id]['dates'][$date])) {
+        $activities_map[$group_id]['dates'][$date] = [
             'time_slots' => []
         ];
 
-        foreach ($time_slots_activities as $time_slot) {
-            $activities_map[$group]['dates'][$date]['time_slots'][$time_slot['code']] = [];
+        foreach($time_slots_activities as $time_slot) {
+            $activities_map[$group_id]['dates'][$date]['time_slots'][$time_slot['code']] = [];
         }
     }
 
-    $time_slot_name = $activity['time_slot_id']['code'];
-    if (isset($activities_map[$group]['dates'][$date]['time_slots'][$time_slot_name])) {
-        $activities_map[$group]['dates'][$date]['time_slots'][$time_slot_name] = [
-            'activity' => $activity['name'],
-            'description' => $activity['activity_booking_line_id']['description'],
-            'product' => $activity['activity_booking_line_id']['product_id']['description']
+    $time_slot_code = $activity['time_slot_id']['code'];
+    if(isset($activities_map[$group_id]['dates'][$date]['time_slots'][$time_slot_code])) {
+        $activities_map[$group_id]['dates'][$date]['time_slots'][$time_slot_code] = [
+            'meal'                  => implode(', ', $map_meals[$date][$time_slot_code] ?? []),
+            'activity'              => $activity['product_model_id']['name'],
+            'schedule_from'         => $activity['schedule_from'],
+            'schedule_to'           => $activity['schedule_to'],
+            'description'           => $activity['description'],
+            /*
+            'activity_description'  => $activity['description'],
+            'product_description'   => $activity['activity_booking_line_id']['product_id']['description'],
+            'service_description'   => $activity['activity_booking_line_id']['description']
+            */
         ];
     }
 }
 
 $values['activities_map'] = $activities_map;
 
+$template_comments = Template::search([
+        ['code', '=', 'activity.doc'],
+        ['category_id', '=', $booking['center_id']['template_category_id']],
+        ['type', '=', 'planning']
+    ])
+    ->read(['parts_ids' => ['name', 'value']])
+    ->first();
+
+$values['comments'] = [];
+if(!is_null($template_comments)) {
+    foreach($template_comments['parts_ids'] as $part) {
+        if(!empty($part['value'])) {
+            $values['comments'][$part['name']] = $part['value'];
+        }
+    }
+}
+
 try {
-    $loader = new TwigFilesystemLoader(QN_BASEDIR."/packages/{$package}/views/");
+    $loader = new TwigFilesystemLoader(EQ_BASEDIR . "/packages/{$package}/views/");
 
     $twig = new TwigEnvironment($loader);
     /**  @var ExtensionInterface **/
     $extension  = new IntlExtension();
     $twig->addExtension($extension);
     $filter = new \Twig\TwigFilter('format_money', function ($value) {
-        return number_format((float)($value),2,",",".").' €';
+        return number_format((float)($value), 2, ",", ".") . ' €';
     });
     $twig->addFilter($filter);
     $template = $twig->load("{$class_path}.{$params['view_id']}.html");
     $html = $template->render($values);
 }
 catch(Exception $e) {
-    trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
-    throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
+    trigger_error("ORM::error while parsing template - ".$e->getMessage(), EQ_REPORT_DEBUG);
+    throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
 }
 
 if($params['output'] == 'html') {

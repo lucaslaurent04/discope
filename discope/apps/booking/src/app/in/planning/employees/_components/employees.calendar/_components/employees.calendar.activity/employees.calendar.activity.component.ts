@@ -42,8 +42,8 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
     }
 
 
-    public onShowBooking(booking: any) {
-       this.selected.emit(booking);
+    public onShowBooking(activity: any) {
+       this.selected.emit(activity);
     }
 
     public onEnterActivity(activity:any) {
@@ -64,11 +64,12 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
             red: '#c80651',
             grey: '#988a7d',
             dark_grey: '#655c58',
+            light_grey: '#baa9a2',
             purple: '#7733aa'
         };
 
-        if(this.activity?.is_partner_event){
-            return colors['dark_grey'];
+        if(this.activity.is_partner_event){
+            return colors['light_grey'];
         }
         else if(this.activity.type == 'ooo') {
             return colors['red'];
@@ -92,6 +93,10 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
         else if(this.activity.booking_id?.status == 'checkedout') {
             return colors['grey'];
         }
+        else if(this.activity.camp_id) {
+            return colors['dark_grey'];
+        }
+
         // invoiced and beyond
         return colors['purple'];
     }

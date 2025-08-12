@@ -1,0 +1,182 @@
+{
+    "name": "Camp menu",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "layout": {
+        "items": [
+            {
+                "id": "camps",
+                "type": "entry",
+                "label": "Camps",
+                "description": "",
+                "icon": "holiday_village",
+                "route": "/camps",
+                "context": {
+                    "entity": "sale\\camp\\Camp",
+                    "view": "list.default",
+                    "domain": [
+                        ["date_from", ">=", "date.this.year.first"],
+                        ["date_from", "<=", "date.this.year.last"]
+                    ]
+                }
+            },
+            {
+                "id": "enrollments",
+                "type": "entry",
+                "label": "Enrollments",
+                "description": "",
+                "icon": "app_registration",
+                "route": "/camps",
+                "context": {
+                    "entity": "sale\\camp\\Enrollment",
+                    "view": "list.default"
+                }
+            },
+            {
+                "id": "presences",
+                "type": "entry",
+                "label": "Presences",
+                "description": "",
+                "icon": "calendar_month",
+                "route": "/camps",
+                "context": {
+                    "entity": "sale\\camp\\Presence",
+                    "view": "list.default"
+                }
+            },
+            {
+                "id": "meals",
+                "type": "entry",
+                "label": "Meals",
+                "description": "",
+                "icon": "restaurant",
+                "route": "/camps",
+                "context": {
+                    "entity": "sale\\booking\\BookingMeal",
+                    "view": "list.camp-collect"
+                }
+            },
+            {
+                "id": "people",
+                "label": "People",
+                "description": "",
+                "icon": "family_restroom",
+                "type": "parent",
+                "children": [
+                    {
+                        "id": "people.children",
+                        "type": "entry",
+                        "label": "Children",
+                        "description": "",
+                        "icon": "boy",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\camp\\Child",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "people.guardians",
+                        "type": "entry",
+                        "label": "Guardians",
+                        "description": "",
+                        "icon": "escalator_warning",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\camp\\Guardian",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "people.institutes",
+                        "type": "entry",
+                        "label": "Institutions",
+                        "description": "",
+                        "icon": "supervisor_account",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\camp\\Institution",
+                            "view": "list.default"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "pending",
+                "label": "Pending",
+                "description": "Manage pending camps, the children attending them and enrollments that need to be handled.",
+                "icon": "pending_actions",
+                "type": "parent",
+                "children": [
+                    {
+                        "id": "pending.camps",
+                        "label": "Camps",
+                        "description": "Manage pending camps, the children attending them.",
+                        "icon": "holiday_village",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "pending.camps.camps",
+                                "type": "entry",
+                                "label": "Camps",
+                                "description": "List of pending camps (camps of week).",
+                                "icon": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\Camp",
+                                    "view": "list.pending"
+                                }
+                            },
+                            {
+                                "id": "pending.camps.attending-children",
+                                "type": "entry",
+                                "label": "Children",
+                                "description": "List children by camps with birthdate + other info, add filter show only weekend (camps of week).",
+                                "icon": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\AttendingChild",
+                                    "view": "list.default"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "pending.enrollments",
+                        "label": "Enrollments",
+                        "description": "Manage pending and confirmed enrollments that need to be handled.",
+                        "icon": "app_registration",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "pending.enrollments.pending",
+                                "type": "entry",
+                                "label": "Pending enrollments",
+                                "description": "List all pending enrollments (should generally come from website)",
+                                "icon": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\Enrollment",
+                                    "view": "list.pending"
+                                }
+                            },
+                            {
+                                "id": "pending.enrollments.confirmed",
+                                "type": "entry",
+                                "label": "Confirmed enrollments",
+                                "description": "List all confirmed enrollments with missing documents or payments.",
+                                "icon": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\Enrollment",
+                                    "view": "list.confirmed"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

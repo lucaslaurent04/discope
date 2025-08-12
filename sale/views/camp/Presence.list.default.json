@@ -1,0 +1,51 @@
+{
+    "name": "Presences",
+    "description": "Child presences to camps.",
+    "group_by": ["presence_date"],
+    "order": "presence_date",
+    "controller": "sale_camp_collect-presences",
+    "header": {
+        "actions": {
+            "ACTION.CREATE" : false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "5%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "presence_date",
+                "width": "25%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "child_id",
+                "width": "25%"
+            },
+            {
+                "type": "field",
+                "value": "camp_id",
+                "width": "25%"
+            },
+            {
+                "type": "field",
+                "value": "am_daycare",
+                "width": "25%"
+            },
+            {
+                "type": "field",
+                "value": "pm_daycare",
+                "width": "25%"
+            }
+        ]
+    }
+}

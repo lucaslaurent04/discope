@@ -1,0 +1,26 @@
+{
+    "name": "Suppression d’un paiement",
+    "description": "Cette action supprime le paiement. Le statut du financement est réinitialisé à 'en attente' si applicable.",
+    "model": {
+        "id": {
+            "label": "Identifiant",
+            "description": "Identifiant unique du chèque bancaire cible.",
+            "help": ""
+        },
+        "confirm": {
+            "label": "Confirmer",
+            "description": "Confirmation explicite requise pour procéder.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "missing_confirmation": "La confirmation de cette action est requise.",
+            "unknown_bankcheck": "Chèque bancaire inconnu.",
+            "booking_balanced": "Impossible de modifier la réservation car elle est déjà équilibrée.",
+            "unknown_funding": "Financement inconnu.",
+            "unknown_payment": "Paiement inconnu.",
+            "payment_not_manual": "Le paiement ne peut pas être supprimé car il n'est pas manuel."
+        }
+    }
+}
