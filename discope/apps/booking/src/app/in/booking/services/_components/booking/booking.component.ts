@@ -58,7 +58,7 @@ export class BookingServicesBookingComponent
     // At this point, the view has been initialized and all @Input values are available and the component is rendered in the DOM.
     public ready: boolean = false;
     public loading: boolean = true;
-    private loadingStartTime: number;
+    private loadingStartTime: number = Date.now();
 
     public maximized_group_id: number = 0;
     public time_slots: { id: number, name: string, code: 'B'|'AM'|'L'|'PM'|'D'|'EV' }[] = [];
@@ -273,7 +273,7 @@ export class BookingServicesBookingComponent
             return;
         }
 
-        const elapsed = Date.now() - (this.loadingStartTime ??  Date.now());
+        const elapsed = Date.now() - this.loadingStartTime;
         const remaining = minDuration - elapsed;
         if(remaining > 0) {
             setTimeout(() => this.onLoadEndGroup(), remaining);
