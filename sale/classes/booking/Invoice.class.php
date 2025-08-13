@@ -142,7 +142,13 @@ class Invoice extends \finance\accounting\Invoice {
 
     public static function cancreate($om, $values, $lang='en') {
         // the partner must be the same for all booking's invoices
-        $other_invoices_ids = $om->search(self::getType(), ['booking_id', '=', $values['booking_id']], ['created' => 'asc']);
+        $domain = [
+            ['booking_id', '=', $values['booking_id']],
+            ['status', '<>', 'cancelled'],
+            ['is_deposit', '=', true],
+            ['type', '=', 'invoice']
+        ];
+        $other_invoices_ids = $om->search(self::getType(), $domain, ['created' => 'asc']);
         if(!empty($other_invoices_ids)) {
             $other_invoices = $om->read(self::getType(), $other_invoices_ids, ['partner_id']);
             if(!empty($other_invoices)) {
@@ -165,9 +171,11 @@ class Invoice extends \finance\accounting\Invoice {
                 foreach($invoices as $id => $invoice) {
                     $domain = [
                         ['id', '<>', $id],
-                        ['booking_id', '=', $invoice['booking_id']]
+                        ['booking_id', '=', $invoice['booking_id']],
+                        ['status', '<>', 'cancelled'],
+                        ['is_deposit', '=', true],
+                        ['type', '=', 'invoice']
                     ];
-
                     $other_invoices_ids = $om->search(self::getType(), $domain, ['created' => 'asc']);
                     if(!empty($other_invoices_ids)) {
                         $other_invoices = $om->read(self::getType(), $other_invoices_ids, ['partner_id']);
