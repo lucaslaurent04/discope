@@ -318,6 +318,8 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
             // notify back-end about the change
             try {
                 this.loading = true;
+                // display parent loader
+                this.loadStart.emit();
                 await this.api.call('?do=sale_booking_update-bookingline-product', {
                         id: this.instance.id,
                         product_id: product.id

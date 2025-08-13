@@ -142,7 +142,7 @@ export class BookingServicesBookingComponent
         }
         finally {
             // if loading was set (init or loadStart), make sure it is reverted
-            setTimeout( () => this.loading = false, 250);
+            this.onLoadEndGroup();
         }
     }
 
@@ -267,17 +267,20 @@ export class BookingServicesBookingComponent
      * enact loading end from sub components while forcing a minimum duration
      */
     public onLoadEndGroup() {
-        if(!this.loadingStartTime) { this.loading = false; return; }
-        const elapsed = Date.now() - this.loadingStartTime;
         const minDuration = 250;
-        const remaining = minDuration - elapsed;
 
-        if (remaining > 0) {
-            setTimeout(() => this.loading = false, remaining);
+        if(!this.loading) {
+            return;
         }
-        else {
-            this.loading = false;
+
+        const elapsed = Date.now() - (this.loadingStartTime ??  Date.now());
+        const remaining = minDuration - elapsed;
+        if(remaining > 0) {
+            setTimeout(() => this.onLoadEndGroup(), remaining);
+            return;
         }
+
+        this.loading = false;
     }
 
     public hasActivity(group_id: number): boolean {
