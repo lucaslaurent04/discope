@@ -121,6 +121,10 @@
             "label": "Nettoyages",
             "help": ""
         },
+        "item.planning.transports": {
+            "label": "Transports",
+            "help": ""
+        },
         "item.planning.occupancies": {
             "label": "Occupations",
             "help": ""

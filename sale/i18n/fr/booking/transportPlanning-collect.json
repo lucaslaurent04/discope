@@ -1,0 +1,64 @@
+{
+    "name": "Planning",
+    "description": "Planning des transports.",
+    "model": {
+        "product": {
+            "label": "Produit",
+            "description": "",
+            "help": ""
+        },
+        "date": {
+            "label": "Date",
+            "description": "",
+            "help": ""
+        },
+        "time_slot": {
+            "label": "Tranche horaire",
+            "description": "",
+            "help": ""
+        },
+        "booking": {
+            "label": "Réservation",
+            "description": "",
+            "help": ""
+        },
+        "group": {
+            "label": "Groupe",
+            "description": "",
+            "help": ""
+        },
+        "nb_pers": {
+            "label": "Qty personnes",
+            "description": "",
+            "help": ""
+        },
+        "nb_children": {
+            "label": "Qty enfants",
+            "description": "",
+            "help": ""
+        },
+        "customer": {
+            "label": "Client",
+            "description": "",
+            "help": ""
+        },
+        "booking_activity": {
+            "label": "Activité",
+            "description": "",
+            "help": ""
+        },
+        "description": {
+            "label": "Description",
+            "description": "",
+            "help": ""
+        }
+    },
+    "view": {
+        "list.default": {
+            "name": "Planning transports",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

@@ -350,7 +350,6 @@ export class BookingServicesBookingGroupComponent
 
             date.setDate(date.getDate() + 1);
         }
-
     }
 
     private initBookingMealsDays() {
@@ -412,12 +411,14 @@ export class BookingServicesBookingGroupComponent
             }
         }
 
-        this.initBookingActivitiesDays();
-        this.initBookingMealsDays();
-
-        // #workaround - force age_ranges update (since it cannot be done in update())
+        // #workaround - force age_ranges/lines/activities/meals update (since it cannot be done in update())
         this.instance.age_range_assignments_ids = values.age_range_assignments_ids;
         this.instance.booking_lines_ids = values.booking_lines_ids;
+        this.instance.booking_activities_ids = values.booking_activities_ids;
+        this.instance.booking_meals_ids = values.booking_meals_ids;
+
+        this.initBookingActivitiesDays();
+        this.initBookingMealsDays();
 
         // refresh the lists of available rental units for all SPM
         if(this.bookingServicesBookingGroupAccomodationComponents && typeof this.bookingServicesBookingGroupAccomodationComponents[Symbol.iterator] === 'function') {

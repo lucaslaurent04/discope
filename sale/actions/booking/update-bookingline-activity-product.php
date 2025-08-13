@@ -6,6 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use sale\booking\Booking;
 use sale\booking\BookingActivity;
 use sale\booking\BookingLine;
 use sale\catalog\Product;
@@ -56,7 +57,7 @@ use sale\catalog\Product;
 
 // check line param
 $line = BookingLine::id($params['id'])
-    ->read(['name'])
+    ->read(['name', 'booking_id' => ['has_transport']])
     ->first();
 
 if(is_null($line)) {
@@ -113,6 +114,12 @@ BookingLine::id($line['id'])
     ])
     ->do('update-price-id')
     ->do('update-qty');
+
+// update booking has_transport field if needed
+if($product['is_transport'] && !$line['booking_id']['has_transport']) {
+    Booking::id($line['booking_id']['id'])
+        ->update(['has_transport' => true]);
+}
 
 // re-enable events to previous state
 $orm->enableEvents($events_mask);
