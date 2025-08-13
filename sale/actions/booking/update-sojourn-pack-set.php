@@ -52,7 +52,7 @@ $group = BookingLineGroup::id($params['id'])
         'name',
         'nb_pers',
         'date_from',
-        'booking_id' => ['id', 'status']
+        'booking_id' => ['id', 'status', 'center_id' => ['name']]
     ])
     ->first(true);
 
@@ -87,8 +87,10 @@ BookingLineGroup::id($group['id'])
         'pack_id' => $params['pack_id']
     ]);
 
+$default_group_name = "Services {$group['booking_id']['center_id']['name']}";
+
 // if group has default name : update group name based on pack
-if(strpos($group['name'], 'Services ') === 0 && isset($pack['product_model_id']['name'])) {
+if($group['name'] === $default_group_name && isset($pack['product_model_id']['name'])) {
     BookingLineGroup::id($group['id'])
         ->update([
             'name' => $pack['product_model_id']['name']
