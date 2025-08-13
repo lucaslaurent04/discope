@@ -105,5 +105,9 @@
             }
         }
     },
-    "error": {}
+    "error": {
+        "partner_id": {
+            "must_be_same_partner_id": "Toutes les factures d'une réservation doivent être destinées à un même client."
+        }
+    }
 }

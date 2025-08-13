@@ -147,6 +147,20 @@ if($proforma) {
 // remember all booking lines involved
 $booking_lines_ids = [];
 
+$partner_id = $booking['customer_id']['id'];
+if(isset($params['partner_id']) && $params['partner_id'] > 0) {
+    $partner_id = $params['partner_id'];
+}
+else {
+    $other_invoice = Invoice::search(['booking_id', '=', $params['id']], ['sort' => [ 'created' => 'asc']])
+        ->read(['partner_id'])
+        ->first();
+
+    if(!is_null($other_invoice)) {
+        $partner_id = $other_invoice['partner_id'];
+    }
+}
+
 // create invoice and invoice lines
 $invoice = Invoice::create([
         'date'              => time(),
@@ -154,8 +168,8 @@ $invoice = Invoice::create([
         'booking_id'        => $params['id'],
         'center_office_id'  => $booking['center_office_id']['id'],
         'status'            => 'proforma',
-        // allow to invoice to a "payer" partner distinct from customer
-        'partner_id'        => (isset($params['partner_id']) && $params['partner_id'] > 0)?$params['partner_id']:$booking['customer_id']['id']
+        // allow invoicing for a "payer" partner distinct from customer (but the partner must be the same for all the invoices)
+        'partner_id'        => $partner_id
     ])
     ->read(['id', 'partner_id'])
     ->first(true);

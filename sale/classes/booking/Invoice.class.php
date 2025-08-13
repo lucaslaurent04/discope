@@ -139,4 +139,49 @@ class Invoice extends \finance\accounting\Invoice {
             }
         }
     }
+
+    public static function cancreate($om, $values, $lang='en') {
+        // the partner must be the same for all booking's invoices
+        $other_invoices_ids = $om->search(self::getType(), ['booking_id', '=', $values['booking_id']], ['created' => 'asc']);
+        if(!empty($other_invoices_ids)) {
+            $other_invoices = $om->read(self::getType(), $other_invoices_ids, ['partner_id']);
+            if(!empty($other_invoices)) {
+                $other_invoice = reset($other_invoices);
+                if($values['partner_id'] !== $other_invoice['partner_id']) {
+                    return ['partner_id' => ['must_be_same_partner_id' => "All booking's invoices must target the same customer."]];
+                }
+            }
+        }
+
+        return parent::cancreate($om, $values, $lang);
+    }
+
+    public static function canupdate($om, $oids, $values, $lang='en') {
+        // the partner must be the same for all booking's invoices
+        if(isset($values['partner_id'])) {
+            $invoices = $om->read(self::getType(), $oids, ['booking_id']);
+
+            if($invoices > 0) {
+                foreach($invoices as $id => $invoice) {
+                    $domain = [
+                        ['id', '<>', $id],
+                        ['booking_id', '=', $invoice['booking_id']]
+                    ];
+
+                    $other_invoices_ids = $om->search(self::getType(), $domain, ['created' => 'asc']);
+                    if(!empty($other_invoices_ids)) {
+                        $other_invoices = $om->read(self::getType(), $other_invoices_ids, ['partner_id']);
+                        if(!empty($other_invoices)) {
+                            $other_invoice = reset($other_invoices);
+                            if($values['partner_id'] !== $other_invoice['partner_id']) {
+                                return ['partner_id' => ['must_be_same_partner_id' => "All booking's invoices must target the same customer."]];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return parent::canupdate($om, $oids, $values, $lang);
+    }
 }
