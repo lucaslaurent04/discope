@@ -113,7 +113,7 @@
             "description": "This will complete the fundings with a manual payment (card) and fundings will be marked as paid.",
             "controller": "sale_booking_do-pay-instant",
             "confirm": true,
-            "visible": [ ["status", "in", ["debit_balance", "credit_balance"]] ]
+            "visible": [ ["status", "in", ["checkedout", "debit_balance", "credit_balance"]] ]
         },
         {
             "id": "action.reimbursed",
