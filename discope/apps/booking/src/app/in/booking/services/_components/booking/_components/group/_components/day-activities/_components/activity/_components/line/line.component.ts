@@ -3,7 +3,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { Observable, ReplaySubject } from 'rxjs';
 import { BookingLineGroup } from '../../../../../../../../_models/booking_line_group.model';
 import { Booking } from '../../../../../../../../_models/booking.model';
-import { ApiService } from 'sb-shared-lib';
+import { ApiService, EnvService } from 'sb-shared-lib';
 import { BookingLine } from '../../../../../../../../_models/booking_line.model';
 import { debounceTime, map, mergeMap } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
@@ -48,9 +48,12 @@ export class BookingServicesBookingGroupDayActivitiesActivityLineComponent imple
 
     public vm: vmModel;
 
+    private transportProductSku = '';
+
     constructor(
         private api: ApiService,
-        public dialog: MatDialog
+        public dialog: MatDialog,
+        private env: EnvService
     ) {
         this.vm = {
             product: {
@@ -69,6 +72,12 @@ export class BookingServicesBookingGroupDayActivitiesActivityLineComponent imple
                 change: () => this.qtyChange()
             }
         };
+
+        this.env.getEnv().then((e: any) => {
+            if(e?.['sale.organization.sku.transport']) {
+                this.transportProductSku = e?.['sale.organization.sku.transport'];
+            }
+        });
     }
 
     public ngOnInit() {
@@ -94,6 +103,11 @@ export class BookingServicesBookingGroupDayActivitiesActivityLineComponent imple
 
             if(this.line.is_transport) {
                 domain.push(['is_transport', '=', true]);
+
+                if(this.transportProductSku) {
+                    // Don't allow use of round-trip transport product for activities
+                    domain.push(['sku', '<>', this.transportProductSku]);
+                }
             }
             else {
                 domain.push(['is_supply', '=', true]);
