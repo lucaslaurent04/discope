@@ -834,10 +834,12 @@ class BookingLine extends Model {
             'product_id.product_model_id.has_duration',
             'product_id.product_model_id.duration',
             'product_id.product_model_id.is_repeatable',
+            'product_id.product_model_id.is_transport',
             'product_id.has_age_range',
             'product_id.age_range_id',
             'product_id.description',
             'booking_id',
+            'booking_id.has_transport',
             'booking_line_group_id',
             'booking_line_group_id.is_sojourn',
             'booking_line_group_id.is_event',
@@ -860,6 +862,11 @@ class BookingLine extends Model {
             // if model of chosen product has a non-generic booking type, update the booking of the line accordingly
             if(isset($line['product_id.product_model_id.booking_type_id']) && $line['product_id.product_model_id.booking_type_id'] != 1) {
                 $om->update(Booking::getType(), $line['booking_id'], ['type_id' => $line['product_id.product_model_id.booking_type_id']]);
+            }
+
+            // if model of chosen product is a transport, update the booking of the line accordingly
+            if($line['product_id.product_model_id.is_transport'] && !$line['booking_id.has_transport']) {
+                $om->update(Booking::getType(), $line['booking_id'], ['has_transport' => true]);
             }
 
             // if line is a rental unit, use its related product info to update parent group schedule, if possible

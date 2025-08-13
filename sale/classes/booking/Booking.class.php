@@ -409,6 +409,14 @@ class Booking extends Model {
                 'onupdate'          => 'onupdateIsInvoiced'
             ],
 
+            'has_transport' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => 'Mark the booking as completed by a Tour Operator.',
+                'store'             => true,
+                'function'          => 'calcHasTransport'
+            ],
+
             'has_tour_operator' => [
                 'type'              => 'boolean',
                 'description'       => 'Mark the booking as completed by a Tour Operator.',
@@ -686,6 +694,24 @@ class Booking extends Model {
             }
 
             $result[$id] = $nb_pers;
+        }
+
+        return $result;
+    }
+
+    public static function calcHasTransport($self): array {
+        $result = [];
+        $self->read(['booking_lines_ids' => ['product_model_id' => ['is_transport']]]);
+        foreach($self as $id => $booking) {
+            $has_transport = false;
+            foreach($booking['booking_lines_ids'] as $line) {
+                if($line['product_model_id']['is_transport'] ?? false) {
+                    $has_transport = true;
+                    break;
+                }
+            }
+
+            $result[$id] = $has_transport;
         }
 
         return $result;

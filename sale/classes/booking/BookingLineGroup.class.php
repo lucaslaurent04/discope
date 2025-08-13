@@ -709,11 +709,19 @@ class BookingLineGroup extends Model {
         $om->callonce(self::getType(), '_resetPrices', $oids, [], $lang);
         // reset rental units assignments
         $om->callonce(self::getType(), 'createRentalUnitsAssignments', $oids, [], $lang);
-        // force parent booking to recompute times and prices
+        // force parent booking to recompute times, prices and has transport
         $groups = $om->read(self::getType(), $oids, ['booking_id'], $lang);
         if($groups > 0) {
             $bookings_ids = array_map(function($a) {return $a['booking_id'];}, $groups);
-            $om->update(Booking::getType(), $bookings_ids, ['time_from' => null, 'time_to' => null, 'total' => null, 'price' => null]);
+            $om->update(Booking::getType(), $bookings_ids, [
+                'time_from'     => null,
+                'time_to'       => null,
+                'total'         => null,
+                'price'         => null,
+                'has_transport' => null
+            ]);
+            // force instant recompute of has transport
+            $om->read(Booking::getType(), $bookings_ids, ['has_transport']);
         }
         // refresh meals
         foreach($oids as $oid) {

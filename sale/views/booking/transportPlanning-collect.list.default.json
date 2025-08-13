@@ -1,0 +1,80 @@
+{
+    "name": "Transport planning",
+    "description": "Advanced collector for transports booking lines planning.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "controller": "sale_booking_transportPlanning-collect",
+    "group_by": ["product"],
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "product",
+                "width": "20%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "date",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "time_slot",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "customer",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "booking",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "group",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "nb_pers",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "nb_children",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "booking_activity",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "description",
+                "width": "20%",
+                "visible": false
+            }
+        ]
+    }
+}

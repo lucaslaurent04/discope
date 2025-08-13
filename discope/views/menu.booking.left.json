@@ -403,6 +403,17 @@
                         ]
                     },
                     {
+                        "id": "item.planning.transports",
+                        "type": "entry",
+                        "label": "Transports",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\booking\\transportPlanning-collect",
+                            "view": "list.default"
+                        }
+
+                    },
+                    {
                         "id": "item.planning.cleanups",
                         "type": "entry",
                         "label": "Cleanups",
