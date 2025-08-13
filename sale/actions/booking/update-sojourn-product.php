@@ -47,8 +47,9 @@ list($context, $orm) = [ $providers['context'], $providers['orm']];
 // read BookingLineGroup object
 $group = BookingLineGroup::id($params['id'])
     ->read([
+        'name',
         'is_extra',
-        'booking_id' => ['id', 'status'],
+        'booking_id' => ['id', 'status', 'center_id' => ['name']],
     ])
     ->first(true);
 
@@ -86,8 +87,11 @@ foreach($product['pack_lines_ids'] as $lid => $line) {
     }
 }
 
-// update group name
-BookingLineGroup::id($params['id'])->update(['name' => $product['name']]);
+$default_group_name = "Services {$group['booking_id']['center_id']['name']}";
+if($group['name'] === $default_group_name) {
+    // update group name, it will be overwritten if pack_id updated below
+    BookingLineGroup::id($params['id'])->update(['name' => $product['name']]);
+}
 
 // empty group's BookingLines, if any
 BookingLine::search(['booking_line_group_id', '=', $params['id']])->delete(true);

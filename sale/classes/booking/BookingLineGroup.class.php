@@ -521,6 +521,7 @@ class BookingLineGroup extends Model {
         $groups = $om->read(self::getType(), $oids, [
             'name',
             'booking_id',
+            'booking_id.center_id.name',
             'date_from',
             'nb_pers',
             'is_locked',
@@ -569,8 +570,10 @@ class BookingLineGroup extends Model {
 
             $updated_fields = ['vat_rate' => null];
 
+            $default_group_name = "Services {$group['booking_id.center_id.name']}";
+
             // assign the name of the selected pack as group name
-            if($group['pack_id'] && isset($group['pack_id.product_model_id.name'])) {
+            if($group['pack_id'] && isset($group['pack_id.product_model_id.name']) && $group['name'] === $default_group_name) {
                 $updated_fields['name'] = $group['pack_id.product_model_id.name'];
             }
 
