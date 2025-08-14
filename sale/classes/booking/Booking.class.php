@@ -219,7 +219,8 @@ class Booking extends Model {
                     'validated',                // signed contract and first installment have been received
                     'checkedin',                // host is currently occupying the booked rental unit
                     'checkedout',               // host has left the booked rental unit
-                    'invoiced',
+                    'proforma',                 // balance invoice created but not emitted yet
+                    'invoiced',                 // balance invoice emitted
                     'debit_balance',            // customer still has to pay something
                     'credit_balance',           // a reimbursement to customer is required
                     'balanced'                  // booking is over and balance is cleared
