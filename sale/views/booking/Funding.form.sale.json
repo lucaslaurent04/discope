@@ -41,7 +41,7 @@
             "controller": "sale_booking_funding_do-paid",
             "confirm": true,
             "access": {
-                "groups": ["admins"]
+                "groups": ["admins", "finance.accounting.administrator"]
             },
             "visible": ["is_paid", "=", false]
         },
@@ -52,7 +52,7 @@
             "controller": "sale_booking_funding_do-unpaid",
             "confirm": true,
             "access": {
-                "groups": ["admins"]
+                "groups": ["admins", "finance.accounting.administrator"]
             },
             "visible": ["is_paid", "=", true]
         }
