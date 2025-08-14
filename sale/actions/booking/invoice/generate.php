@@ -299,52 +299,35 @@ if($fundings) {
             }
             // consider only invoices created from funding
             else {
+                if($funding_invoice['status'] === 'cancelled') {
+                    continue;
+                }
+
                 if($funding_invoice['type'] == 'invoice' && $funding_invoice['is_deposit']) {
-                    // payer and customer must be the same for the considered invoices
-                    // #memo - this test is independent from the customer of the booking
-                    if($funding_invoice['partner_id'] == $invoice['partner_id']) {
-                        // #memo - there should be only one line
-                        foreach($funding_invoice['invoice_lines_ids'] as $lid => $line) {
-                            if($line['price'] == 0.0) {
-                                // ignore lines with nul amount
-                                continue;
-                            }
-                            $i_line = [
-                                'invoice_id'                => $invoice['id'],
-                                'name'                      => $installment_label.' '.$funding_invoice['name'],
-                                // product should be the downpayment product
-                                'product_id'                => $line['product_id'],
-                                // vat_rate depends on the organization : VAT is due with arbitrary amount (default VAT rate applied)
-                                'vat_rate'                  => $line['vat_rate'],
-                                // #memo - by convention, price is always a positive value (so that price, credit and debit remain positive at all time)
-                                'unit_price'                => $line['unit_price'],
-                                // and quantity is set as negative value when something is deducted
-                                'qty'                       => -$line['qty'],
-                                // mark the line as issued from an invoice
-                                'downpayment_invoice_id'    => $funding['invoice_id'],
-                                // #memo - we don't assign a price_id : downpayments will be identified as such and use a specific accounting rule
-                            ];
-                            $new_line = InvoiceLine::create($i_line)
-                                ->read(['id'])
-                                ->first(true);
-                            $i_lines_ids[] = $new_line['id'];
+                    // #memo - there should be only one line
+                    foreach($funding_invoice['invoice_lines_ids'] as $lid => $line) {
+                        if($line['price'] == 0.0) {
+                            // ignore lines with nul amount
+                            continue;
                         }
-                    }
-                    // payer and customer are distinct
-                    else {
-                        // consider the invoice as a paid downpayment
                         $i_line = [
                             'invoice_id'                => $invoice['id'],
-                            'description'               => ucfirst($installment_label) . ' ' .date('Y-m', $funding_invoice['created']),
-                            'product_id'                => $downpayment_product_id,
-                            'vat_rate'                  => 0.0,
+                            'name'                      => $installment_label.' '.$funding_invoice['name'],
+                            // product should be the downpayment product
+                            'product_id'                => $line['product_id'],
+                            // vat_rate depends on the organization : VAT is due with arbitrary amount (default VAT rate applied)
+                            'vat_rate'                  => $line['vat_rate'],
                             // #memo - by convention, price is always a positive value (so that price, credit and debit remain positive at all time)
-                            'unit_price'                => $funding_invoice['price'],
+                            'unit_price'                => $line['unit_price'],
                             // and quantity is set as negative value when something is deducted
-                            'qty'                       => -1
-                            // #memo - we don't assign a price : downpayments will be identified as such and use a specific accounting rule
+                            'qty'                       => -$line['qty'],
+                            // mark the line as issued from an invoice
+                            'downpayment_invoice_id'    => $funding['invoice_id'],
+                            // #memo - we don't assign a price_id : downpayments will be identified as such and use a specific accounting rule
                         ];
-                        $new_line = InvoiceLine::create($i_line)->read(['id'])->first(true);
+                        $new_line = InvoiceLine::create($i_line)
+                            ->read(['id'])
+                            ->first(true);
                         $i_lines_ids[] = $new_line['id'];
                     }
                 }
