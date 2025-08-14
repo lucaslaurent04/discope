@@ -61,7 +61,7 @@ if(!$group) {
     throw new Exception("unknown_sojourn", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-if(in_array($group['booking_id']['status'], ['invoiced', 'debit_balance', 'credit_balance', 'balanced'])) {
+if(in_array($group['booking_id']['status'], ['proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced'])) {
     throw new Exception("non_modifiable_booking", EQ_ERROR_NOT_ALLOWED);
 }
 

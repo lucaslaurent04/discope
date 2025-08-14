@@ -1472,7 +1472,7 @@ class Booking extends Model {
             if($booking['state'] === 'draft') {
                 continue;
             }
-            if(in_array($booking['status'], ['invoiced', 'debit_balance', 'credit_balance', 'balanced'])) {
+            if(in_array($booking['status'], ['proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced'])) {
                 if(count(array_diff(array_keys($values), $allowed_fields))) {
                     return ['status' => ['non_editable' => 'Invoiced bookings edition is limited.']];
                 }

@@ -98,7 +98,7 @@
             "description": "Adaptations are still required and the proforma invoice will have to be regenerated.",
             "controller": "sale_booking_do-checkout",
             "confirm": true,
-            "visible": [["is_invoiced", "=", false], ["status", "in", ["invoiced", "debit_balance", "credit_balance", "balanced"]]]
+            "visible": [["is_invoiced", "=", false], ["status", "in", ["proforma", "invoiced", "debit_balance", "credit_balance", "balanced"]]]
         },
         {
             "id": "action.cancel",
@@ -109,7 +109,7 @@
                 "id": "object.id"
             },
             "confirm": true,
-            "visible": [ ["status", "not in", ["invoiced", "debit_balance", "credit_balance", "balanced"]], ["is_from_channelmanager", "=", false] ]
+            "visible": [ ["status", "not in", ["proforma", "invoiced", "debit_balance", "credit_balance", "balanced"]], ["is_from_channelmanager", "=", false] ]
         },
         {
             "id": "action.release-rentalunits",
