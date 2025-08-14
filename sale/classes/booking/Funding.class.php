@@ -396,93 +396,98 @@ class Funding extends \sale\pay\Funding {
         ],
             $lang);
 
-        if($fundings > 0) {
-
-            foreach($fundings as $fid => $funding) {
-
-                // retrieve downpayment product
-                $downpayment_product_id = 0;
-
-                $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$funding['booking_id.center_id.organisation_id']);
-                if($downpayment_sku) {
-                    $products_ids = $om->search(Product::getType(), ['sku', '=', $downpayment_sku]);
-                    if($products_ids > 0 && count($products_ids)) {
-                        $downpayment_product_id = reset($products_ids);
-                    }
-                }
-                else {
-                    $downpayment_sku = 'downpayment';
-                }
-
-                $partner_id = (isset($values['partner_id']))?$values['partner_id']:$funding['booking_id.customer_id'];
-
-                // create a new proforma deposit invoice
-                $invoice_id = $om->create(Invoice::getType(), [
-                    'organisation_id'   => $funding['booking_id.center_id.organisation_id'],
-                    'center_office_id'  => $funding['booking_id.center_id.center_office_id'],
-                    'booking_id'        => $funding['booking_id'],
-                    'partner_id'        => $partner_id,
-                    'funding_id'        => $fid,
-                    'is_deposit'        => true
-                ], $lang);
-
-                /*
-                    Find vat rule, based on Price for product from applicable price list
-                */
-                $vat_rate = 0.0;
-
-                // find suitable price list
-                $price_lists_ids = $om->search('sale\price\PriceList', [
-                    ['price_list_category_id', '=', $funding['booking_id.center_id.price_list_category_id']],
-                    ['date_from', '<=', $funding['booking_id.date_from']],
-                    ['date_to', '>=', $funding['booking_id.date_from']],
-                    ['status', 'in', ['published']]
-                ],
-                    ['is_active' => 'desc']
-                );
-
-                // search for a matching Price within the found Price List
-                foreach($price_lists_ids as $price_list_id) {
-                    // there should be one or zero matching pricelist with status 'published', if none of the found pricelist
-                    $prices_ids = $om->search('sale\price\Price', [ ['price_list_id', '=', $price_list_id], ['product_id', '=', $downpayment_product_id]]);
-                    if($prices_ids > 0 && count($prices_ids)) {
-                        $prices = $om->read(Price::getType(), $prices_ids, ['vat_rate'], $lang);
-                        $price = reset($prices);
-                        $vat_rate = $price['vat_rate'];
-                    }
-                }
-
-                // #memo - funding already includes the VAT, if any (funding due_amount cannot be changed)
-                $unit_price = $funding['due_amount'];
-
-                if($vat_rate > 0) {
-                    // deduct VAT from due amount
-                    $unit_price = round($unit_price / (1+$vat_rate), 4);
-                }
-
-                // create a single invoice line group
-                $invoice_line_group_id = $om->create(InvoiceLineGroup::getType(), [
-                    'invoice_id' => $invoice_id,
-                    'name'       => $downpayment_sku
-                ]);
-
-                // create a single invoice line related to the downpayment
-                $invoice_line_id = $om->create(InvoiceLine::getType(), [
-                    'invoice_id'                => $invoice_id,
-                    'product_id'                => $downpayment_product_id,
-                    'invoice_line_group_id'     => $invoice_line_group_id,
-                ]);
-
-                $om->update(InvoiceLine::getType(), $invoice_line_id, [
-                    'vat_rate'                  => $vat_rate,
-                    'unit_price'                => $unit_price,
-                    'qty'                       => 1
-                ]);
-
-                // convert funding to 'invoice' type
-                $om->update(Funding::getType(), $fid, ['type' => 'invoice', 'invoice_id' => $invoice_id]);
-            }
+        if(empty($fundings)) {
+            return false;
         }
-    }
 
+        foreach($fundings as $fid => $funding) {
+
+            // retrieve downpayment product
+            $downpayment_product_id = 0;
+
+            $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$funding['booking_id.center_id.organisation_id']);
+            if($downpayment_sku) {
+                $products_ids = $om->search(Product::getType(), ['sku', '=', $downpayment_sku]);
+                if($products_ids > 0 && count($products_ids)) {
+                    $downpayment_product_id = reset($products_ids);
+                }
+            }
+            else {
+                $downpayment_sku = 'downpayment';
+            }
+
+            $partner_id = (isset($values['partner_id']))?$values['partner_id']:$funding['booking_id.customer_id'];
+
+            $invoice = Invoice::create([
+                'organisation_id'   => $funding['booking_id.center_id.organisation_id'],
+                'center_office_id'  => $funding['booking_id.center_id.center_office_id'],
+                'booking_id'        => $funding['booking_id'],
+                'partner_id'        => $partner_id,
+                'funding_id'        => $fid,
+                'is_deposit'        => true
+            ])
+                ->read(['id'])
+                ->first();
+
+            $invoice_id = $invoice['id'];
+
+            /*
+                Find vat rule, based on Price for product from applicable price list
+            */
+            $vat_rate = 0.0;
+
+            // find suitable price list
+            $price_lists_ids = $om->search('sale\price\PriceList', [
+                ['price_list_category_id', '=', $funding['booking_id.center_id.price_list_category_id']],
+                ['date_from', '<=', $funding['booking_id.date_from']],
+                ['date_to', '>=', $funding['booking_id.date_from']],
+                ['status', 'in', ['published']]
+            ],
+                ['is_active' => 'desc']
+            );
+
+            // search for a matching Price within the found Price List
+            foreach($price_lists_ids as $price_list_id) {
+                // there should be one or zero matching pricelist with status 'published', if none of the found pricelist
+                $prices_ids = $om->search('sale\price\Price', [ ['price_list_id', '=', $price_list_id], ['product_id', '=', $downpayment_product_id]]);
+                if($prices_ids > 0 && count($prices_ids)) {
+                    $prices = $om->read(Price::getType(), $prices_ids, ['vat_rate'], $lang);
+                    $price = reset($prices);
+                    $vat_rate = $price['vat_rate'];
+                }
+            }
+
+            // #memo - funding already includes the VAT, if any (funding due_amount cannot be changed)
+            $unit_price = $funding['due_amount'];
+
+            if($vat_rate > 0) {
+                // deduct VAT from due amount
+                $unit_price = round($unit_price / (1+$vat_rate), 4);
+            }
+
+            // create a single invoice line group
+            $invoice_line_group_id = $om->create(InvoiceLineGroup::getType(), [
+                'invoice_id' => $invoice_id,
+                'name'       => $downpayment_sku
+            ]);
+
+            // create a single invoice line related to the downpayment
+            $invoice_line_id = $om->create(InvoiceLine::getType(), [
+                'invoice_id'                => $invoice_id,
+                'product_id'                => $downpayment_product_id,
+                'invoice_line_group_id'     => $invoice_line_group_id,
+            ]);
+
+            $om->update(InvoiceLine::getType(), $invoice_line_id, [
+                'vat_rate'                  => $vat_rate,
+                'unit_price'                => $unit_price,
+                'qty'                       => 1
+            ]);
+
+            // convert funding to 'invoice' type
+            $om->update(Funding::getType(), $fid, ['type' => 'invoice', 'invoice_id' => $invoice_id]);
+        }
+
+        return true;
+    }
 }

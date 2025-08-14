@@ -1,11 +1,10 @@
-import { Component, AfterContentInit, OnInit, NgZone } from '@angular/core';
-import { ActivatedRoute, Router, RouterEvent, NavigationEnd } from '@angular/router';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, AfterContentInit, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 
-import { ApiService, EnvService, AuthService, ContextService, SbDialogConfirmDialog } from 'sb-shared-lib';
+import { ApiService, ContextService, SbDialogConfirmDialog } from 'sb-shared-lib';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { FormControl, Validators } from '@angular/forms';
-import { EditorChangeContent, EditorChangeSelection } from 'ngx-quill';
+import { FormControl } from '@angular/forms';
 
 
 class Booking {
@@ -251,7 +250,6 @@ export class BookingFundingInvoiceComponent implements OnInit, AfterContentInit 
             });
 
             this.loading = true;
-            this.is_converted = true;
 
             try {
                 await this.api.fetch('/?do=sale_booking_funding_convert', {
@@ -259,9 +257,16 @@ export class BookingFundingInvoiceComponent implements OnInit, AfterContentInit 
                     partner_id: partner_id,
                     payment_terms_id: this.payment_terms.id
                 });
+
+                this.is_converted = true;
             }
-            catch(error) {
-                // something went wrong while saving
+            catch(error: any) {
+                if(error?.error?.errors?.NOT_ALLOWED === "partner_not_allowed") {
+                    this.snack.open("Ce client ne peut pas être sélectionné car des factures sont attribuées à un autre.");
+                }
+                else {
+                    console.log(error);
+                }
             }
             this.loading = false;
         }
