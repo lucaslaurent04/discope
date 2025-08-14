@@ -141,20 +141,26 @@ class Invoice extends \finance\accounting\Invoice {
     }
 
     public static function cancreate($om, $values, $lang='en') {
-        // the partner must be the same for all booking's invoices
-        $domain = [
-            ['booking_id', '=', $values['booking_id']],
-            ['status', '<>', 'cancelled'],
-            ['is_deposit', '=', true],
-            ['type', '=', 'invoice']
-        ];
-        $other_invoices_ids = $om->search(self::getType(), $domain, ['created' => 'asc']);
-        if(!empty($other_invoices_ids)) {
-            $other_invoices = $om->read(self::getType(), $other_invoices_ids, ['partner_id']);
-            if(!empty($other_invoices)) {
-                $other_invoice = reset($other_invoices);
-                if($values['partner_id'] !== $other_invoice['partner_id']) {
-                    return ['partner_id' => ['must_be_same_partner_id' => "All booking's invoices must target the same customer."]];
+        $bookings = $om->read(Booking::getType(), [$values['booking_id']], ['center_office_id.has_vat']);
+        if(!empty($bookings)) {
+            $booking = reset($bookings);
+            if($booking['center_office_id.has_vat']) {
+                // the partner must be the same for all booking's invoices
+                $domain = [
+                    ['booking_id', '=', $values['booking_id']],
+                    ['status', '<>', 'cancelled'],
+                    ['is_deposit', '=', true],
+                    ['type', '=', 'invoice']
+                ];
+                $other_invoices_ids = $om->search(self::getType(), $domain, ['created' => 'asc']);
+                if(!empty($other_invoices_ids)) {
+                    $other_invoices = $om->read(self::getType(), $other_invoices_ids, ['partner_id']);
+                    if(!empty($other_invoices)) {
+                        $other_invoice = reset($other_invoices);
+                        if($values['partner_id'] !== $other_invoice['partner_id']) {
+                            return ['partner_id' => ['must_be_same_partner_id' => "All booking's invoices must target the same customer."]];
+                        }
+                    }
                 }
             }
         }
@@ -163,12 +169,16 @@ class Invoice extends \finance\accounting\Invoice {
     }
 
     public static function canupdate($om, $oids, $values, $lang='en') {
-        // the partner must be the same for all booking's invoices
         if(isset($values['partner_id'])) {
-            $invoices = $om->read(self::getType(), $oids, ['booking_id']);
+            $invoices = $om->read(self::getType(), $oids, ['booking_id', 'booking_id.center_office_id.has_vat']);
 
             if($invoices > 0) {
                 foreach($invoices as $id => $invoice) {
+                    if(!$invoice['booking_id.center_office_id.has_vat']) {
+                        continue;
+                    }
+
+                    // the partner must be the same for all booking's invoices
                     $domain = [
                         ['id', '<>', $id],
                         ['booking_id', '=', $invoice['booking_id']],
