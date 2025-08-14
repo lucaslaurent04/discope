@@ -75,7 +75,7 @@ if($funding['type'] == 'invoice') {
 }
 
 
-if(in_array($funding['booking_id']['status'], ['proforma', 'invoiced','debit_balance','credit_balance','balanced'])) {
+if(in_array($funding['booking_id']['status'], ['proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced'])) {
     // deposit invoice cannot be emitted after balance invoice
     throw new Exception("incompatible_booking_status", QN_ERROR_INVALID_PARAM);
 }
