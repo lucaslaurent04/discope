@@ -81,7 +81,15 @@ if(in_array($funding['booking_id']['status'], ['invoiced','debit_balance','credi
 }
 
 // convert the installment to a proforma invoice
-$orm->call(Funding::getType(), '_convertToInvoice', $params['id'], $params);
+$res = $orm->call(Funding::getType(), '_convertToInvoice', $params['id'], $params);
+if($res !== true) {
+    if($res === EQ_ERROR_NOT_ALLOWED) {
+        throw new Exception("partner_not_allowed", EQ_ERROR_NOT_ALLOWED);
+    }
+    else {
+        throw new Exception("error_while_converting", EQ_ERROR_UNKNOWN);
+    }
+}
 
 // #memo - we avoid emitting invoices automatically because it prevents choosing the date for newer invoices
 

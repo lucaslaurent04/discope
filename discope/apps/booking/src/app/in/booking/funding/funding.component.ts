@@ -232,16 +232,22 @@ export class BookingFundingComponent implements OnInit, AfterContentInit {
             });
 
             this.loading = true;
-            this.is_converted = true;
 
             try {
                 await this.api.fetch('/?do=sale_booking_funding_convert', {
                     id: this.funding.id,
                     partner_id: partner_id
                 });
+
+                this.is_converted = true;
             }
-            catch(error) {
-                // something went wrong while saving
+            catch(error: any) {
+                if(error?.error?.errors?.NOT_ALLOWED === "partner_not_allowed") {
+                    this.snack.open("Ce client ne peut pas être sélectionné car des factures sont attribuées à un autre.");
+                }
+                else {
+                    console.log(error);
+                }
             }
             this.loading = false;
         }
