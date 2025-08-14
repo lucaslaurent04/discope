@@ -141,10 +141,10 @@ class Invoice extends \finance\accounting\Invoice {
     }
 
     public static function cancreate($om, $values, $lang='en') {
-        $bookings = $om->read(Booking::getType(), [$values['booking_id']], ['center_office_id.has_vat']);
+        $bookings = $om->read(Booking::getType(), [$values['booking_id']], ['organisation_id.has_vat']);
         if(!empty($bookings)) {
             $booking = reset($bookings);
-            if($booking['center_office_id.has_vat']) {
+            if($booking['organisation_id.has_vat']) {
                 // the partner must be the same for all booking's invoices
                 $domain = [
                     ['booking_id', '=', $values['booking_id']],
@@ -170,11 +170,11 @@ class Invoice extends \finance\accounting\Invoice {
 
     public static function canupdate($om, $oids, $values, $lang='en') {
         if(isset($values['partner_id'])) {
-            $invoices = $om->read(self::getType(), $oids, ['booking_id', 'booking_id.center_office_id.has_vat']);
+            $invoices = $om->read(self::getType(), $oids, ['booking_id', 'booking_id.organisation_id.has_vat']);
 
             if($invoices > 0) {
                 foreach($invoices as $id => $invoice) {
-                    if(!$invoice['booking_id.center_office_id.has_vat']) {
+                    if(!$invoice['booking_id.organisation_id.has_vat']) {
                         continue;
                     }
 
