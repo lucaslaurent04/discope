@@ -124,7 +124,7 @@ foreach($fundings as $funding) {
 eQual::run('do', 'sale_booking_invoice_generate', $params);
 
 // update booking status
-Booking::id($params['id'])->update(['status' => 'invoiced']);
+Booking::id($params['id'])->update(['status' => 'proforma']);
 
 $context->httpResponse()
         ->status(204)

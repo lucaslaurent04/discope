@@ -47,7 +47,14 @@ if(!$booking) {
 }
 
 // a booking cannot switch back to "checkedout" if it has a non-cancelled balance invoice
-$balance_invoice = Invoice::search([['booking_id', '=', $params['id']], ['is_deposit', '=', false], ['type', '=', 'invoice'], ['status', '=', 'invoice']])->read(['id'])->first(true);
+$balance_invoice = Invoice::search([
+    ['booking_id', '=', $params['id']],
+    ['is_deposit', '=', false],
+    ['type', '=', 'invoice'],
+    ['status', '<>', 'cancelled']
+])
+    ->read(['id'])
+    ->first(true);
 
 if($balance_invoice) {
     throw new Exception("emitted_balance_invoice", QN_ERROR_INVALID_PARAM);
