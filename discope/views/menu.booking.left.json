@@ -85,7 +85,7 @@
                         "context": {
                             "entity": "sale\\booking\\Booking",
                             "view": "list.default",
-                            "domain": ["status", "=", "checkedout"]
+                            "domain": ["status", "in", ["checkedout", "proforma"]]
                         }
                     },
                     {
@@ -102,7 +102,7 @@
                     {
                         "id": "item.bookings.checkedout_cancelled",
                         "type": "entry",
-                        "label": "Cancelled Bookings",
+                        "label": "Cancelled bookings",
                         "description": "",
                         "route": "/bookings",
                         "context": {
@@ -114,7 +114,7 @@
                     {
                         "id": "item.bookings.invoiced",
                         "type": "entry",
-                        "label": "Bookings in progress",
+                        "label": "Invoiced bookings",
                         "description": "",
                         "route": "/bookings",
                         "context": {

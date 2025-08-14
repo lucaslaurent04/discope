@@ -354,7 +354,7 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
                                 }
                                 else {
                                     ++this.mapStats['departures_expected'][date_index];
-                                    if(['checkedout', 'invoiced', 'debit_balance', 'credit_balance', 'balanced'].indexOf(consumption.booking_id.status) > -1) {
+                                    if(['checkedout', 'proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced'].indexOf(consumption.booking_id.status) > -1) {
                                         ++this.mapStats['departures_confirmed'][date_index];
                                     }
                                 }
