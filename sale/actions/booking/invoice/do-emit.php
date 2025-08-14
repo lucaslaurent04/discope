@@ -177,17 +177,15 @@ elseif(!is_null($invoice['booking_id'])) {
 
     if($invoice['type'] == 'invoice' && !$invoice['is_deposit']) {
         // mark the booking as invoiced (will trigger updating booking lines as is_invoiced)
-        Booking::id($invoice['booking_id'])->update([
-            'status'        => 'invoiced',
-            'is_invoiced'   => true
-        ]);
+        Booking::id($invoice['booking_id'])
+            ->update(['status' => 'invoiced'])
+            ->update(['is_invoiced' => true]);
     }
     elseif($invoice['type'] == 'credit_note' && !$invoice['is_deposit']) {
         // mark the booking as not invoiced (will trigger updating booking lines as is_invoiced)
-        Booking::id($invoice['booking_id'])->update([
-            'status'        => 'checkedout',
-            'is_invoiced'   => false
-        ]);
+        Booking::id($invoice['booking_id'])
+            ->update(['status' => 'checkedout'])
+            ->update(['is_invoiced' => false]);
     }
 
     Booking::updateStatusFromFundings($om, (array) $invoice['booking_id'], [], 'en');
