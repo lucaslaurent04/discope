@@ -381,7 +381,11 @@
                     </div>
 
                     <!-- sojourn type -->
-                    <div *ngIf="instance.is_sojourn && sojournTypes.length > 1" class="cell" style="flex: 0.5 1 0; max-width: 120px; min-width: 60px;">
+                    <!-- #memo - this impacts possible products and should not be limited to `instance.is_sojourn` -->
+                    <div *ngIf="sojournTypes.length > 1"
+                            class="cell"
+                            style="flex: 0.5 1 0; max-width: 120px; min-width: 60px;">
+
                         <mat-form-field>
                             <mat-label>Type de séjour</mat-label>
                             <mat-select [ngModel]="vm.sojourn_type.value"
