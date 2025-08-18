@@ -411,9 +411,11 @@ export class BookingServicesBookingGroupComponent
             }
         }
 
-        // #workaround - force age_ranges/lines/activities/meals update (since it cannot be done in update())
-        this.instance.age_range_assignments_ids = values.age_range_assignments_ids;
-        this.instance.booking_lines_ids = values.booking_lines_ids;
+        // #memo - do not manually update child TreeComponents since it would break the silent refresh performed through super.update()
+        // this.instance.age_range_assignments_ids = values.age_range_assignments_ids;
+        // this.instance.booking_lines_ids = values.booking_lines_ids;
+
+        // force activities/meals update (since it is not done in update() - these are no TreeComponent)
         this.instance.booking_activities_ids = values.booking_activities_ids;
         this.instance.booking_meals_ids = values.booking_meals_ids;
 
