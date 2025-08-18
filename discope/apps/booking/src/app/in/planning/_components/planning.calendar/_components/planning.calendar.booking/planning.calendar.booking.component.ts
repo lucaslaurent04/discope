@@ -151,7 +151,8 @@ export class PlanningCalendarBookingComponent implements OnChanges  {
             violet: '#9575cd',
             red: '#c80651',
             grey: '#988a7d',
-            purple: '#7733aa'
+            purple: '#7733aa',
+            light_purple: '#8c58b8'
         };
 
         if(this.consumption.type == 'ooo') {
@@ -165,6 +166,7 @@ export class PlanningCalendarBookingComponent implements OnChanges  {
             validated: colors['green'],
             checkedin: colors['turquoise'],
             checkedout: colors['grey'],
+            proforma: colors['light_purple']
         };
 
         if(!this.consumption.booking_id?.status || !statuses[this.consumption.booking_id.status]) {

@@ -39,7 +39,7 @@ list($params, $providers) = announce([
 list($context, $orm, $cron, $auth) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['auth']];
 
 $invoice = Invoice::id($params['id'])
-    ->read(['id', 'status', 'type', 'is_deposit', 'funding_id', 'fundings_ids'])
+    ->read(['id', 'status', 'type', 'is_deposit', 'funding_id', 'fundings_ids', 'booking_id'])
     ->first(true);
 
 if($invoice['status'] != 'proforma') {
@@ -52,6 +52,10 @@ Funding::ids($invoice['fundings_ids'])->update(['invoice_id' => null]);
 // if invoice had been created to convert an installment to a downpayment, revert the related funding
 if($invoice['is_deposit']) {
     Funding::id($invoice['funding_id'])->update(['invoice_id' => null, 'type' => 'installment']);
+}
+// if balanced proforma invoice deleted, set the status back to "checkedout"
+elseif($invoice['type'] === 'invoice') {
+    Booking::id($invoice['booking_id'])->update(['status' => 'checkedout']);
 }
 
 $invoice = Invoice::id($params['id'])->delete(true);

@@ -65,7 +65,8 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
             grey: '#988a7d',
             dark_grey: '#655c58',
             light_grey: '#baa9a2',
-            purple: '#7733aa'
+            purple: '#7733aa',
+            light_purple: '#8c58b8'
         };
 
         if(this.activity.is_partner_event){
@@ -92,6 +93,9 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
         }
         else if(this.activity.booking_id?.status == 'checkedout') {
             return colors['grey'];
+        }
+        else if(this.activity.booking_id?.status == 'proforma') {
+            return colors['light_purple'];
         }
         else if(this.activity.camp_id) {
             return colors['dark_grey'];

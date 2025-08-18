@@ -68,6 +68,7 @@
                 "validated": "validée",
                 "checkedin": "en cours",
                 "checkedout": "terminée",
+                "proforma": "pro forma",
                 "invoiced": "facturée",
                 "debit_balance": "solde débiteur",
                 "credit_balance": "solde créditeur",

@@ -155,7 +155,7 @@ export class BookingServicesBookingComponent
     }
 
     public cancreateGroup() {
-        if(['quote', 'checkedin','checkedout'].indexOf(this.instance.status) >= 0) {
+        if(['quote', 'checkedin', 'checkedout'].indexOf(this.instance.status) >= 0) {
             return true;
         }
         // locked booking cannot be reverted to quote but should allow modification
