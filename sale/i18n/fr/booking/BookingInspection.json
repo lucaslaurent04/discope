@@ -23,7 +23,7 @@
             "description": "Le type de l'inspection.",
             "selection": {
                 "checkedin": "En cours",
-                "checkedout": "terminée"
+                "checkedout": "Terminée"
             },
             "help": ""
         },

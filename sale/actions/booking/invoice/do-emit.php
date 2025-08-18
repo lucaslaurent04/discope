@@ -119,7 +119,7 @@ elseif(!is_null($invoice['booking_id'])) {
     }
 
     // #memo - a booking might have several invoices (several deposit invoices, but only one balance invoice / credit note can be emitted at any time)
-    if(!$invoice['is_deposit'] && $invoice['type'] == 'invoice' && $booking['status'] != 'invoiced') {
+    if(!$invoice['is_deposit'] && $invoice['type'] == 'invoice' && $booking['status'] != 'proforma') {
         throw new Exception("incompatible_booking_status", QN_ERROR_INVALID_PARAM);
     }
 
@@ -176,12 +176,16 @@ elseif(!is_null($invoice['booking_id'])) {
     eQual::run('do', 'sale_booking_invoice_do-funding', ['id' => $params['id']]);
 
     if($invoice['type'] == 'invoice' && !$invoice['is_deposit']) {
-        // mark the booking as invoiced, whatever its status (will trigger updating booking lines as is_invoiced)
-        Booking::id($invoice['booking_id'])->update(['is_invoiced' => true]);
+        // mark the booking as invoiced (will trigger updating booking lines as is_invoiced)
+        Booking::id($invoice['booking_id'])
+            ->update(['status' => 'invoiced'])
+            ->update(['is_invoiced' => true]);
     }
     elseif($invoice['type'] == 'credit_note' && !$invoice['is_deposit']) {
         // mark the booking as not invoiced (will trigger updating booking lines as is_invoiced)
-        Booking::id($invoice['booking_id'])->update(['is_invoiced' => false]);
+        Booking::id($invoice['booking_id'])
+            ->update(['status' => 'checkedout'])
+            ->update(['is_invoiced' => false]);
     }
 
     Booking::updateStatusFromFundings($om, (array) $invoice['booking_id'], [], 'en');
