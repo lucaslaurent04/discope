@@ -295,6 +295,10 @@
                 "action.invoice_instant": {
                     "label": "Facture rapide",
                     "description": "Une facture de solde sera émise et le financement correspondant sera généré. Lorsque les paiements ont déjà été reçus, cette action aboutit à la clôture de la réservation.\n\nATTENTION: En cas d'erreur, la facture ne pourra être annulée que via une note de crédit."
+                },
+                "action.clone": {
+                    "label": "Cloner",
+                    "description": "Cloner la réservation."
                 }
             },
             "routes": {
@@ -429,6 +433,10 @@
                 "action.invoice_instant": {
                     "label": "Facture rapide",
                     "description": "Une facture de solde sera émise et le financement correspondant sera généré. Lorsque les paiements ont déjà été reçus, cette action aboutit à la clôture de la réservation.\n\nATTENTION: En cas d'erreur, la facture ne pourra être annulée que via une note de crédit."
+                },
+                "action.clone": {
+                    "label": "Cloner",
+                    "description": "Cloner la réservation."
                 }
             },
             "routes": {
@@ -579,6 +587,10 @@
                 "action.invoice_instant": {
                     "label": "Facture rapide",
                     "description": "Une facture de solde sera émise et le financement correspondant sera généré. Lorsque les paiements ont déjà été reçus, cette action aboutit à la clôture de la réservation.\n\nATTENTION: En cas d'erreur, la facture ne pourra être annulée que via une note de crédit."
+                },
+                "action.clone": {
+                    "label": "Cloner",
+                    "description": "Cloner la réservation."
                 }
             },
             "routes": {
