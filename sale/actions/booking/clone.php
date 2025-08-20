@@ -244,7 +244,7 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
     foreach($fields_to_clone['booking_lines_groups_ids'] as $group_field) {
         // ignore booking_lines_ids, age_range_assignments_ids and sojourn_product_models_ids, they're handled below
         // ignore date_from and date_to, must be shifted
-        if(is_string($group_field) && !in_array($group_field, ['date_from', 'date_to', 'pack_id', 'has_pack', 'is_locked'])) {
+        if(is_string($group_field) && !in_array($group_field, ['date_from', 'date_to', 'is_locked'])) {
             $group_data[$group_field] = $group[$group_field];
         }
     }
@@ -299,29 +299,9 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
         SojournProductModel::create($sojourn_pm_data);
     }
 
-    $pack_lines = [];
-    if($group['has_pack'] && !is_null($group['pack_id'])) {
-        \eQual::run('do', 'sale_booking_update-sojourn-pack-set', [
-            'id'        => $cloned_group['id'],
-            'pack_id'   => $group['pack_id']
-        ]);
-
-        $pack_lines = BookingLine::search(['booking_line_group_id', '=', $cloned_group['id']])
-            ->read(['product_id'])
-            ->get(true);
-    }
-
     $map_activities_lines = [];
     $map_old_to_new_lines = [];
     foreach($group['booking_lines_ids'] as $line) {
-        // TODO: Handle multiple same product can exist (e.g., for supplies of different activities)
-
-        foreach($pack_lines as $pack_line) {
-            if($pack_line['product_id'] === $line['product_id']) {
-                continue 2;
-            }
-        }
-
         $line_data = [
             'booking_id'            => $cloned_booking['id'],
             'booking_line_group_id' => $cloned_group['id'],
