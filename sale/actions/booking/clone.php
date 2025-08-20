@@ -15,6 +15,7 @@ use sale\booking\BookingLineGroupAgeRangeAssignment;
 use sale\booking\Contact;
 use sale\booking\MealPreference;
 use sale\booking\SojournProductModel;
+use sale\catalog\Product;
 use sale\customer\Customer;
 use sale\provider\Provider;
 
@@ -177,6 +178,22 @@ if(is_null($center)) {
     throw new Exception("unknown_center", EQ_ERROR_UNKNOWN);
 }
 
+$map_products = [];
+foreach($booking['booking_lines_groups_ids'] as $group) {
+    foreach($group['booking_lines_ids'] as $line) {
+        $map_products[$line['product_id']] = true;
+    }
+}
+$products = Product::ids(array_keys($map_products))
+    ->read(['id'])
+    ->get(true);
+$not_deleted_product_id = array_map(fn($product) => $product['id'], $products);
+
+
+if(count($products) !== count($not_deleted_product_id)) {
+    trigger_error("ORM::some booking lines cannot be cloned because some products are deleted.", EQ_REPORT_WARNING);
+}
+
 $target_customer_id = $params['customer_id'] ?? $booking['customer_id'];
 $same_customer = $target_customer_id === $booking['customer_id'];
 
@@ -293,6 +310,10 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
     $map_activities_lines = [];
     $map_old_to_new_lines = [];
     foreach($group['booking_lines_ids'] as $line) {
+        if(!in_array($line['product_id'], $not_deleted_product_id)) {
+            continue;
+        }
+
         $line_data = [
             'booking_id'            => $cloned_booking['id'],
             'booking_line_group_id' => $cloned_group['id'],
@@ -336,6 +357,10 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
     }
 
     foreach($group['booking_activities_ids'] as $activity) {
+        if(!in_array($activity['product_id'], $not_deleted_product_id)) {
+            continue;
+        }
+
         $supplies_ids = array_map(fn($supply_id) => $map_old_to_new_lines[$supply_id], $activity['supplies_booking_lines_ids']);
         $transports_ids = array_map(fn($transport_id) => $map_old_to_new_lines[$transport_id], $activity['transports_booking_lines_ids']);
 
