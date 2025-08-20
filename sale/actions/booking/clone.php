@@ -60,12 +60,15 @@ use sale\provider\Provider;
  */
 ['context' => $context, 'orm' => $orm] = $providers;
 
-$fields_to_clone = [
+$fields = [
     'center_id',
     'center_office_id',
     'description',
     'type_id',
+    'date_from',
+    'date_to',
     'customer_nature_id',
+    'customer_rate_class_id',
     'contacts_ids' => [
         'owner_identity_id',
         'partner_identity_id',
@@ -154,7 +157,7 @@ $fields_to_clone = [
 ];
 
 $booking = Booking::id($params['id'])
-    ->read(array_merge($fields_to_clone, ['date_from', 'date_to', 'customer_id']))
+    ->read($fields)
     ->first();
 
 if(is_null($booking)) {
@@ -202,10 +205,10 @@ $data = [
     'customer_rate_class_id'    => $customer['rate_class_id'] ?? $booking['customer_rate_class_id']
 ];
 
-foreach($fields_to_clone as $booking_field) {
-    // ignore booking_lines_groups_ids, it's handled below
-    // ignore customer_nature_id and customer_rate_class_id, they're handled above
-    if(is_string($booking_field) && !in_array($booking_field, ['customer_nature_id', 'customer_rate_class_id'])) {
+foreach($fields as $booking_field) {
+    // ignore relationship fields
+    // ignore dates/customer data because they depend on the given params
+    if(is_string($booking_field) && !in_array($booking_field, ['date_from', 'date_to', 'customer_nature_id', 'customer_rate_class_id'])) {
         $data[$booking_field] = $booking[$booking_field];
     }
 }
@@ -220,7 +223,7 @@ foreach($booking['contacts_ids'] as $contact) {
     $contact_data = [
         'booking_id' => $cloned_booking['id']
     ];
-    foreach($fields_to_clone['contacts_ids'] as $contact_field) {
+    foreach($fields['contacts_ids'] as $contact_field) {
         $contact_data[$contact_field] = $contact[$contact_field];
     }
 
@@ -241,7 +244,7 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
         'date_from'     => $params['date_from'] + $diff_group_date_from,
         'date_to'       => $date_to - $diff_group_date_to
     ];
-    foreach($fields_to_clone['booking_lines_groups_ids'] as $group_field) {
+    foreach($fields['booking_lines_groups_ids'] as $group_field) {
         // ignore booking_lines_ids, age_range_assignments_ids and sojourn_product_models_ids, they're handled below
         // ignore date_from and date_to, must be shifted
         if(is_string($group_field) && !in_array($group_field, ['date_from', 'date_to', 'is_locked'])) {
@@ -259,32 +262,19 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
     BookingLineGroup::search([['booking_id', '=', $cloned_booking['id']], ['id', 'not in', $cloned_groups_ids]])->delete(true);
     BookingLine::search([['booking_id', '=', $cloned_booking['id']], ['booking_line_group_id', 'not in', $cloned_groups_ids]])->delete(true);
 
+    // Remove age range assignment that was automatically created
+    BookingLineGroupAgeRangeAssignment::search(['booking_line_group_id', '=', $cloned_group['id']])->delete(true);
+
     foreach($group['age_range_assignments_ids'] as $age_range_assign) {
-        $age_range_data = [];
-        foreach($fields_to_clone['booking_lines_groups_ids']['age_range_assignments_ids'] as $age_range_field) {
+        $age_range_data = [
+            'booking_id'            => $cloned_booking['id'],
+            'booking_line_group_id' => $cloned_group['id']
+        ];
+        foreach($fields['booking_lines_groups_ids']['age_range_assignments_ids'] as $age_range_field) {
             $age_range_data[$age_range_field] = $age_range_assign[$age_range_field];
         }
 
-        $existing_age_range = BookingLineGroupAgeRangeAssignment::search([
-            ['booking_line_group_id', '=', $cloned_group['id']],
-            ['age_range_id', '=', $age_range_assign['age_range_id']]
-        ])
-            ->read(['id'])
-            ->first();
-
-        // update existing age range
-        if(!is_null($existing_age_range)) {
-            unset($age_range_data['age_range_id']);
-
-            BookingLineGroupAgeRangeAssignment::id($existing_age_range['id'])->update($age_range_data);
-        }
-        // create a new age range
-        else {
-            BookingLineGroupAgeRangeAssignment::create(array_merge(
-                $age_range_data,
-                ['booking_id' => $cloned_booking['id'], 'booking_line_group_id' => $cloned_group['id']]
-            ));
-        }
+        BookingLineGroupAgeRangeAssignment::create($age_range_data);
     }
 
     foreach($group['sojourn_product_models_ids'] as $sojourn_pm) {
@@ -292,7 +282,7 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
             'booking_id'            => $cloned_booking['id'],
             'booking_line_group_id' => $cloned_group['id']
         ];
-        foreach($fields_to_clone['booking_lines_groups_ids']['sojourn_product_models_ids'] as $sojourn_pm_field) {
+        foreach($fields['booking_lines_groups_ids']['sojourn_product_models_ids'] as $sojourn_pm_field) {
             $sojourn_pm_data[$sojourn_pm_field] = $sojourn_pm[$sojourn_pm_field];
         }
 
@@ -307,7 +297,7 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
             'booking_line_group_id' => $cloned_group['id'],
             'service_date'          => $line['service_date'] + $diff_date_from
         ];
-        foreach($fields_to_clone['booking_lines_groups_ids']['booking_lines_ids'] as $line_field) {
+        foreach($fields['booking_lines_groups_ids']['booking_lines_ids'] as $line_field) {
             if(!in_array($line_field, ['booking_activity_id', 'service_date', 'unit_price', 'vat_rate'])) {
                 $line_data[$line_field] = $line[$line_field];
             }
@@ -367,7 +357,7 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
             'providers_ids'                 => $providers_ids
         ];
 
-        foreach($fields_to_clone['booking_activities_ids'] as $activity_field) {
+        foreach($fields['booking_activities_ids'] as $activity_field) {
             if(!in_array($activity_field, ['activity_booking_line_id', 'activity_date', 'supplies_booking_lines_ids', 'transports_booking_lines_ids', 'product_model_id'])) {
                 $activity_data[$activity_field] = $activity[$activity_field];
             }
