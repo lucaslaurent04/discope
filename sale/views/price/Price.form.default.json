@@ -55,6 +55,14 @@
                                                 "value": "accounting_rule_id",
                                                 "width": "100%"
                                             },
+
+                                            {
+                                                "type": "field",
+                                                "label": "Analytic section",
+                                                "value": "analytic_section_id",
+                                                "width": "100%"
+                                            },
+
                                             {
                                                 "type": "field",
                                                 "label": "Type",

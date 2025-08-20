@@ -47,6 +47,11 @@
             "description": "Règle comptable de vente. Elle remplace la règle du produit.",
             "help": "Règle comptable de vente. Si défini, remplace la règle du produit."
         },
+        "analytic_section_id": {
+            "label": "Section analytique",
+            "description": "Section analytique spécifique à ce prix.",
+            "help": ""
+        },
         "product_id": {
             "label": "Produit",
             "description": "Le produit (sku) auquel le prix s'applique.",
