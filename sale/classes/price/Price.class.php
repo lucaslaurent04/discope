@@ -74,6 +74,12 @@ class Price extends Model {
                 'onupdate'          => 'onupdateAccountingRuleId'
             ],
 
+            'analytic_section_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'finance\accounting\AnalyticSection',
+                'description'       => 'Analytic section (overloads the product model one, if any).'
+            ],
+
             'product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\catalog\Product',
