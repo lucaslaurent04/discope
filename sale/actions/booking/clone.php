@@ -23,9 +23,9 @@ use sale\provider\Provider;
     'params'        => [
 
         'id' => [
-            'type'          => 'integer',
-            'description'   => "Identifier of the booking to clone.",
-            'required'      => true
+            'type'              => 'integer',
+            'description'       => "Identifier of the booking to clone.",
+            'required'          => true
         ],
 
         'customer_id' => [
