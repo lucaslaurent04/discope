@@ -79,7 +79,7 @@ if(!$pack) {
 // Callbacks are defined on Booking, BookingLine, and BookingLineGroup to ensure consistency across these entities.
 // While these callbacks are useful for maintaining data integrity (they and are used in tests),
 // they need to be disabled here to prevent deep cycling that can lead to performance issues.
-$event_mask = $orm->disableEvents();
+$orm->disableEvents();
 
 BookingLineGroup::id($group['id'])
     ->update([
@@ -166,7 +166,7 @@ Booking::refreshPrice($orm, $group['booking_id']['id']);
 Booking::refreshIsTbc($orm, $group['booking_id']['id']);
 
 // restore events in case this controller is chained with others
-$orm->enableEvents($event_mask);
+$orm->enableEvents();
 
 $context->httpResponse()
         ->status(204)
