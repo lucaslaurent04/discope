@@ -32,6 +32,7 @@ use sale\provider\Provider;
             'type'              => 'many2one',
             'foreign_object'    => 'sale\customer\Customer',
             'description'       => "Customer of the cloned booking.",
+            'domain'            => ['relationship', '=', 'customer'],
             'required'          => true
         ],
 
