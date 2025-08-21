@@ -254,6 +254,10 @@ $providers = Provider::search()
 
 $cloned_groups_ids = [];
 foreach($booking['booking_lines_groups_ids'] as $group) {
+    if($group['is_extra']) {
+        continue;
+    }
+
     $diff_group_date_from = $group['date_from'] - $booking['date_from'];
     $diff_group_date_to = $booking['date_to'] - $group['date_to'];
 
