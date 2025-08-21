@@ -136,6 +136,13 @@
             "icon": "list_alt",
             "controller": "sale_booking_print-booking-activity",
             "confirm": true
+        },
+        {
+            "id": "action.clone",
+            "label": "Clone",
+            "description": "Clone the booking.",
+            "controller": "sale_booking_clone",
+            "visible": ["is_from_channelmanager", "=", false]
         }
     ],
     "routes": [

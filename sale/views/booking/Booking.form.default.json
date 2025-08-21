@@ -152,6 +152,13 @@
                 "ids": []
             },
             "confirm": true
+        },
+        {
+            "id": "action.clone",
+            "label": "Clone",
+            "description": "Clone the booking.",
+            "controller": "sale_booking_clone",
+            "visible": ["is_from_channelmanager", "=", false]
         }
     ],
     "routes": [
