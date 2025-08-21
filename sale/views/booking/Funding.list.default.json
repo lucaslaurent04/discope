@@ -30,6 +30,18 @@
             },
             {
                 "type": "field",
+                "label": "Customer",
+                "value": "customer_identity_id",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "label": "Customer IBAN",
+                "value": "customer_iban",
+                "width": "20%"
+            },
+            {
+                "type": "field",
                 "value": "type",
                 "width": "10%"
             },

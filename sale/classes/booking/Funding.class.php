@@ -30,7 +30,26 @@ class Funding extends \sale\pay\Funding {
                 'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'Booking the contract relates to.',
                 'ondelete'          => 'cascade',        // delete funding when parent booking is deleted
-                'onupdate'          => 'onupdateBookingId'
+                'onupdate'          => 'onupdateBookingId',
+                'dependents'        => ['customer_identity_id', 'customer_iban']
+            ],
+
+            'customer_identity_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'identity\Identity',
+                'description'       => "The identity of the customer whom the booking's funding relates to.",
+                'store'             => true,
+                'relation'          => ['booking_id' => 'customer_identity_id']
+            ],
+
+            'customer_iban' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'usage'             => 'uri/urn:iban',
+                'description'       => "Number of the customer's bank account.",
+                'store'             => true,
+                'relation'          => ['booking_id' => ['customer_identity_id' => 'bank_account_iban']]
             ],
 
             // override to use custom onupdateDueAmount
@@ -99,7 +118,7 @@ class Funding extends \sale\pay\Funding {
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\BankCheck',
                 'foreign_field'     => 'funding_id'
-            ],
+            ]
 
         ];
     }
