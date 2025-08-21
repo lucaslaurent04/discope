@@ -673,19 +673,22 @@ class Invoice extends Model {
     }
 
     /**
-     * Check wether the invoice can be deleted.
+     * Check whether the invoice can be deleted.
      *
      * @param  \equal\orm\ObjectManager    $om         ObjectManager instance.
      * @param  array                       $oids       List of objects identifiers.
      * @return array                       Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be deleted.
      */
     public static function candelete($om, $oids) {
-        $res = $om->read(get_called_class(), $oids, [ 'status' ]);
+        $res = $om->read(get_called_class(), $oids, ['status', 'type']);
 
         if($res > 0) {
             foreach($res as $oids => $odata) {
                 if($odata['status'] != 'proforma') {
-                    return ['status' => ['non_removable' => 'Invoice can only be deleted while its status is proforma.']];
+                    return ['status' => ['non_removable' => "An invoice can only be deleted while its status is proforma."]];
+                }
+                if($odata['type'] == 'credit_note') {
+                    return ['type' => ['non_removable' => "An invoice of type \"credit note\" can't be deleted."]];
                 }
             }
         }
