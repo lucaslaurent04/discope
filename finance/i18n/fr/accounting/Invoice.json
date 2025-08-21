@@ -155,5 +155,12 @@
             }
         }
     },
-    "error": {}
+    "error": {
+        "status": {
+            "non_removable": "Une facture ne peut-être supprimée que si son status est pro-forma."
+        },
+        "type": {
+            "non_removable": "Une facture de type \"note de crédit\" ne peut pas être supprimée."
+        }
+    }
 }

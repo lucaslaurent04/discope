@@ -28,7 +28,10 @@
             "description": "The proforma invoice will be deleted.",
             "controller": "sale_booking_invoice_do-delete",
             "confirm": true,
-            "visible": ["status", "=", "proforma"],
+            "visible": [
+                ["status", "=", "proforma"],
+                ["type", "<>", "credit_note"]
+            ],
             "access": {
                 "groups": ["admins", "booking.default.administrator", "sale.default.administrator", "finance.default.administrator"]
             }
