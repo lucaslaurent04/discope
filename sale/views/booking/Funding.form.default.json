@@ -178,6 +178,26 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "label": "Customer",
+                                                "value": "customer_identity_id",
+                                                "width": "50%",
+                                                "widget": {
+                                                    "readonly": true
+                                                },
+                                                "visible": ["booking_id", "<>", null]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Customer IBAN",
+                                                "value": "customer_iban",
+                                                "width": "50%",
+                                                "widget": {
+                                                    "readonly": true
+                                                },
+                                                "visible": ["booking_id", "<>", null]
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "type",
                                                 "width": "33%",
                                                 "widget": {
