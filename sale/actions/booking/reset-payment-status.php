@@ -28,7 +28,7 @@ list($context) = [$providers['context']];
 /*
     Update booking status for all bookings that are not balanced yet.
 */
-Booking::search([['state', '=', 'instance'], ['status', '<>', 'balanced']])->update(['payment_status' => null]);
+Booking::search([['state', '=', 'instance'], ['status', 'not in', ['balanced', 'cancelled']]])->update(['payment_status' => null]);
 
 $context->httpResponse()
         ->status(204)

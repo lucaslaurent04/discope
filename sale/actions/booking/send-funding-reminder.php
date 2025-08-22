@@ -110,7 +110,7 @@ if(in_array($contract['status'], ['pending', 'cancelled'])) {
     throw new Exception('sending_skipped', 0);
 }
 
-if ($booking['date_from'] >= time() || in_array($booking['status'], ['credit_balance', 'balanced'])) {
+if($booking['date_from'] >= time() || in_array($booking['status'], ['credit_balance', 'balanced', 'cancelled'])) {
     // reminder is not necessary
     throw new Exception('sending_skipped', 0);
 }

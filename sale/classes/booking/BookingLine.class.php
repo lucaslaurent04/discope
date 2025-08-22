@@ -613,7 +613,7 @@ class BookingLine extends Model {
                 $booking = reset($bookings);
                 $group = reset($groups);
 
-                if( in_array($booking['status'], ['proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced'])
+                if( in_array($booking['status'], ['proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced', 'cancelled'])
                     || ($booking['status'] != 'quote' && !$group['is_extra']) ) {
                     return ['status' => ['non_editable' => 'Non-extra service lines cannot be changed for non-quote bookings.']];
                 }

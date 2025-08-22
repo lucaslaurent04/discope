@@ -8,25 +8,27 @@
 
 use core\setting\Setting;
 use sale\booking\Booking;
+use sale\booking\BookingLine;
 use sale\booking\Consumption;
 use sale\booking\BookingLineGroup;
 use sale\booking\Contract;
-use sale\booking\Funding;
+use sale\booking\Invoice;
+use sale\catalog\Product;
 
 list($params, $providers) = eQual::announce([
     'description'   => "This will cancel the booking, whatever its current status. Balance will be adjusted if cancellation fees apply.",
     'params'        => [
         'id' =>  [
-            'description'   => 'Identifier of the targeted booking.',
-            'type'          => 'integer',
-            'min'           => 1,
-            'required'      => true
+            'description'       => 'Identifier of the targeted booking.',
+            'type'              => 'integer',
+            'min'               => 1,
+            'required'          => true
         ],
-        // this must remain synced with field definition Booking::cancellation_reason and transaltions in do-cancel.json
+        // this must remain synced with field definition Booking::cancellation_reason and translations in do-cancel.json
         'reason' =>  [
-            'description'   => 'Reason of the booking cancellation.',
-            'type'          => 'string',
-            'selection'     => [
+            'description'       => 'Reason of the booking cancellation.',
+            'type'              => 'string',
+            'selection'         => [
                 'other',                    // customer cancelled for a non-listed reason or without mentioning the reason (cancellation fees might apply)
                 'overbooking',              // the booking was cancelled due to failure in delivery of the service
                 'duplicate',                // several contacts of the same group made distinct bookings for the same sojourn
@@ -35,59 +37,72 @@ list($params, $providers) = eQual::announce([
                 'health_impediment',        // cancellation for medical or mourning reason
                 'ota'                       // cancellation was made through the channel manager
             ],
-            'required'       => true
+            'required'          => true
+        ],
+        'cancellation_fee' => [
+            'description'       => 'The amount of the cancellation fee.',
+            'help'              => "If the cancellation fee is 0 then the status of the booking will be set to \"cancelled\", because it doesn't need to be invoiced.",
+            'type'              => 'float',
+            'usage'             => 'amount/money:2',
+            'default'           => 0
         ]
     ],
-    'access' => [
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'groups'        => ['booking.default.user'],
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'cron', 'dispatch']
+    'providers'     => ['context', 'orm', 'cron', 'dispatch']
 ]);
 
 /**
  * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
  * @var \equal\cron\Scheduler       $cron
  * @var \equal\dispatch\Dispatcher  $dispatch
  */
-['context' => $context, 'cron' => $cron, 'dispatch' => $dispatch] = $providers;
+['context' => $context, 'orm' => $orm, 'cron' => $cron, 'dispatch' => $dispatch] = $providers;
 
-// read booking object
 $booking = Booking::id($params['id'])
-    ->read(['id', 'name', 'is_cancelled', 'status', 'paid_amount', 'date_from', 'date_to'])
+    ->read([
+        'date_from',
+        'date_to',
+        'is_cancelled',
+        'status',
+        'paid_amount',
+        'booking_lines_groups_ids',
+        'customer_id'       => ['rate_class_id'],
+        'center_office_id'  => ['organisation_id']
+    ])
     ->first(true);
 
-if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+if(is_null($booking)) {
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-// booking already cancelled
 if($booking['is_cancelled']) {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
-if(in_array($booking['status'], ['debit_balance', 'credit_balance', 'balanced'])) {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+if(in_array($booking['status'], ['proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced', 'cancelled'])) {
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
-// revert booking to quote if necessary
-// #memo - this doesn't work for booking at advanced stage (cancelling a "checkedin" booking will raise an error)
-/*
-if($booking['status'] != 'quote') {
-    $json = run('do', 'sale_booking_do-quote', ['id' => $params['id'], 'free_rental_units' => true]);
-    $data = json_decode($json, true);
-    if(isset($data['errors'])) {
-        // raise an exception with returned error code
-        foreach($data['errors'] as $name => $message) {
-            throw new Exception($message, qn_error_code($name));
-        }
+if($params['cancellation_fee'] == 0) {
+    $proforma_credit_notes_ids = Invoice::search([
+        ['booking_id', '=', $booking['id']],
+        ['status', '=', 'proforma'],
+        ['type', '=', 'credit_note']
+    ])
+        ->ids();
+
+    if(count($proforma_credit_notes_ids) > 0) {
+        throw new Exception("proforma_credit_note_exists", EQ_ERROR_INVALID_PARAM);
     }
 }
-*/
 
 $channelmanager_enabled = Setting::get_value('sale', 'features', 'booking.channel_manager', false);
 if($channelmanager_enabled) {
@@ -97,7 +112,7 @@ if($channelmanager_enabled) {
 
     // retrieve rental units impacted by this operation
     $map_rental_units_ids = [];
-    $consumptions = Consumption::search(['booking_id', '=', $params['id']])->read(['id', 'is_accomodation', 'rental_unit_id'])->get(true);
+    $consumptions = Consumption::search(['booking_id', '=', $booking['id']])->read(['id', 'is_accomodation', 'rental_unit_id'])->get(true);
 
     foreach($consumptions as $consumption) {
         if($consumption['is_accomodation'] && $consumption['rental_unit_id'] !== null) {
@@ -109,7 +124,7 @@ if($channelmanager_enabled) {
     // #memo - since there is a delay between 2 sync (during which availability might be impacted) we need to set back the channelmanager availabilities
     if(count($map_rental_units_ids) /*&& $params['reason'] != 'ota'*/) {
         $cron->schedule(
-            "channelmanager.check-contingencies.{$params['id']}",
+            "channelmanager.check-contingencies.{$booking['id']}",
             time(),
             'sale_booking_check-contingencies',
             [
@@ -122,49 +137,100 @@ if($channelmanager_enabled) {
 
     // if the cancellation was made by the OTA/channel manager, cancel all contracts
     if($params['reason'] == 'ota') {
-        Contract::search(['booking_id', '=', $params['id']])->update(['status' => 'cancelled']);
+        Contract::search(['booking_id', '=', $booking['id']])->update(['status' => 'cancelled']);
     }
 }
 
 // release rental units (remove consumptions, if any)
-Consumption::search(['booking_id', '=', $params['id']])->delete(true);
+Consumption::search(['booking_id', '=', $booking['id']])->delete(true);
 
 // mark the booking as cancelled
-Booking::id($params['id'])
+Booking::id($booking['id'])
     ->update([
         'is_noexpiry'           => false,
         'is_cancelled'          => true,
         'cancellation_reason'   => $params['reason']
     ]);
 
-// if booking status was more advanced than quote, set it as checkedout (to allow manual modifications)
-if($booking['status'] != 'quote' || round($booking['paid_amount'], 2) > 0) {
-    Booking::id($params['id'])
-        ->update(['status' => 'checkedout']);
-}
+if($params['cancellation_fee'] > 0) {
+    // if booking's status was more advanced than quote, set it as checkedout (to allow manual modifications)
+    if($booking['status'] != 'quote' || round($booking['paid_amount'], 2) > 0) {
+        Booking::id($booking['id'])
+            ->update(['status' => 'checkedout']);
+    }
 
-// #memo - user is left in charge to handle cancellation fees if applicable
-$booking = Booking::id($params['id'])
-    ->read([
-        'booking_lines_groups_ids',
-        'fundings_ids' => ['is_paid', 'paid_amount']
-    ])
-    ->first(true);
+    // delete fundings that have paid_amount = 0
+    Booking::id($booking['id'])->do('delete_unpaid_fundings');
 
-// delete non-paid fundings
-if(count($booking['fundings_ids'])) {
-    foreach($booking['fundings_ids'] as $fid => $funding) {
-        // if some amount has been received, leave the funding as is and let user deal with reimbursement
-        if($funding['paid_amount'] > 0 || $funding['is_paid']) {
-            continue;
+    // mark all sojourns as 'extra' to allow custom changes (there are many possible situations between none and some of the services actually consumed)
+    if(count($booking['booking_lines_groups_ids'])) {
+        BookingLineGroup::ids($booking['booking_lines_groups_ids'])->update(['is_extra' => true]);
+    }
+
+    // create a group with one line for the cancellation product
+    $cancellation_fee_sku = Setting::get_value('sale', 'organization', 'sku.cancellation_fee.'.$booking['center_office_id']['organisation_id']);
+    if(!is_null($cancellation_fee_sku)) {
+        $cancellation_fee_product = Product::search(['sku', '=', $cancellation_fee_sku])
+            ->read(['name'])
+            ->first();
+
+        if(!is_null($cancellation_fee_product)) {
+            $cancellation_group = BookingLineGroup::create([
+                'booking_id'    => $booking['id'],
+                'is_sojourn'    => false,
+                'group_type'    => 'simple',
+                'has_pack'      => false,
+                'name'          => $cancellation_fee_product['name'],
+                'order'         => count($booking['booking_lines_groups_ids']) + 1,
+                'rate_class_id' => $booking['customer_id']['rate_class_id'],
+                'is_extra'      => true,
+                'is_event'      => false,
+                'is_locked'     => false,
+                'nb_pers'       => 1
+            ])
+                ->read(['id'])
+                ->first();
+
+            $cancellation_line = BookingLine::create([
+                'order'                 => 1,
+                'booking_id'            => $booking['id'],
+                'booking_line_group_id' => $cancellation_group['id']
+            ])
+                ->read(['id'])
+                ->first();
+
+            \eQual::run('do', 'sale_booking_update-bookingline-product', [
+                'id'            => $cancellation_line['id'],
+                'product_id'    => $cancellation_fee_product['id']
+            ]);
+
+            BookingLine::id($cancellation_line['id'])
+                ->update([
+                    'has_manual_unit_price' => true,
+                    'unit_price'            => $params['cancellation_fee']
+                ]);
+
+            BookingLine::refreshPrice($orm, $cancellation_line['id']);
+            Booking::refreshPrice($orm, $booking['id']);
+
+            // Some groups' type field may have been automatically reset to is_extra = false
+            $automatically_added_groups_ids = BookingLineGroup::search([['booking_id', '=', $booking['id']], ['is_extra', '=', false]])->ids();
+            $orm->update(BookingLineGroup::getType(), $automatically_added_groups_ids, ['is_extra' => true]);
         }
-        Funding::id($fid)->delete(true);
     }
 }
+else {
+    // set booking status as "cancelled"
+    Booking::id($booking['id'])->update(['status' => 'cancelled']);
 
-// mark all sojourns as 'extra' to allow custom changes (there are many possible situations between none and some of the services actually consumed)
-if(count($booking['booking_lines_groups_ids'])) {
-    BookingLineGroup::ids($booking['booking_lines_groups_ids'])->update(['is_extra' => true]);
+    // delete fundings that have paid_amount = 0
+    Booking::id($booking['id'])->do('delete_unpaid_fundings');
+
+    // set due_amount to paid_amount value of remaining partially paid funding
+    Booking::id($booking['id'])->do('update_fundings_due_to_paid');
+
+    // set due_amount to paid_amount value of remaining partially paid funding
+    Booking::id($booking['id'])->do('create_negative_funding_for_reimbursement');
 }
 
 // remove pending alerts relating to booking checks, if any

@@ -102,7 +102,7 @@ export class SessionOrderLinesSelectionComponent implements OnInit {
             ['name', 'ilike', `%${filter}%`],
             // #todo - to remove
             ['is_cancelled', '=', false],
-            ['status', 'not in', ['quote', 'credit_balance', 'balanced']],
+            ['status', 'not in', ['quote', 'credit_balance', 'balanced', 'cancelled']],
             ['center_id', '=', this.order.session_id.center_id.id]
         ];
 

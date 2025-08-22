@@ -30,16 +30,17 @@ class Booking extends \sale\booking\Booking {
                     'invoiced',                 // balance invoice emitted
                     'debit_balance',            // customer still has to pay something
                     'credit_balance',           // a reimbursement to customer is required
-                    'balanced'                  // booking is over and balance is cleared
+                    'balanced',                 // booking is over and balance is cleared
+                    'cancelled'                 // booking is over because cancelled without fees, nothing to invoice to customer
                 ],
                 'description'       => 'Status of the booking.',
                 'default'           => 'quote'
             ],
 
             'is_invoiced' => [
-                "type"              => "boolean",
-                "description"       => "Marks the booking has having a non-cancelled balance invoice.",
-                "default"           => false
+                'type'              => 'boolean',
+                'description'       => "Marks the booking has having a non-cancelled balance invoice.",
+                'default'           => false
             ],
 
             'customer_id' => [

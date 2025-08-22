@@ -1112,7 +1112,7 @@ class BookingLineGroup extends Model {
             if($bookings) {
                 $booking = reset($bookings);
 
-                if( in_array($booking['status'], ['proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced'])
+                if( in_array($booking['status'], ['proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced', 'cancelled'])
                     || ($booking['status'] != 'quote' && (!isset($values['is_extra']) || !$values['is_extra'])) ) {
                     return ['status' => ['non_editable' => 'Non-extra service lines cannot be changed for non-quote bookings.']];
                 }
@@ -1157,7 +1157,7 @@ class BookingLineGroup extends Model {
             if($groups > 0) {
                 foreach($groups as $group) {
                     // booking can never be updated once it has been invoiced
-                    if(in_array($group['booking_id.status'], ['proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced'])) {
+                    if(in_array($group['booking_id.status'], ['proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced', 'cancelled'])) {
                         return ['status' => ['non_editable' => 'Booking services cannot be changed after invoicing.']];
                     }
                     // #memo - for GG, the number of persons does not impact the booking (GG only has pricing by_accomodation), so we allow change of nb_pers under specific circumstances

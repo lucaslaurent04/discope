@@ -281,7 +281,7 @@ class Funding extends \sale\pay\Funding {
                 if($funding['booking_id']) {
                     $map_bookings_ids[$funding['booking_id']] = true;
                     $orm->update(self::getType(), $id, ['center_office_id' => $funding['booking_id.center_id.center_office_id']]);
-                    if(in_array($funding['booking_id.status'], ['proforma', 'invoiced', 'credit_balance', 'debit_balance', 'balanced'])) {
+                    if(in_array($funding['booking_id.status'], ['proforma', 'invoiced', 'credit_balance', 'debit_balance', 'balanced', 'cancelled'])) {
                         $invoices_ids = $orm->search(Invoice::getType(), [['booking_id', '=', $funding['booking_id']], ['is_deposit', '=', false], ['status', '<>', 'cancelled']], ['id' => 'desc'], 0, 1);
                         if($invoices_ids > 0 && count($invoices_ids)) {
                             $invoice_id = reset($invoices_ids);
