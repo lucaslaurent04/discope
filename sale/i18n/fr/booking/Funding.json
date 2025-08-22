@@ -32,7 +32,17 @@
                 "paid": "Payé"
             },
             "help": ""
-        }
+        },
+		"customer_identity_id": {
+			"label": "Client",
+			"description": "Client de la réservation.",
+			"help": ""
+		},
+		"customer_iban": {
+			"label": "Compte IBAN",
+			"description": "Numéro de compte IBAN du client.",
+			"help": ""
+		}
 	},
 	"view": {
 		"form.default": {
