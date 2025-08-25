@@ -9,6 +9,7 @@ export class BookingLineGroup {
         public is_locked: boolean = false,
         public has_person_with_disability: boolean = false,
         public person_disability_description: string = '',
-        public age_range_assignments_ids: number[] = []
+        public age_range_assignments_ids: number[] = [],
+        public rate_class_id: number|null = null
     ) {}
 }

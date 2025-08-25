@@ -31,6 +31,15 @@ use sale\catalog\ProductModel;
             'foreign_object'    => 'identity\Center',
             'description'       => "The center to which the booking relates to.",
             'required'          => true
+        ],
+        'name' => [
+            'type'              => 'string',
+            'description'       => "The name of the product to use as a filter."
+        ],
+        'rate_class_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\customer\RateClass',
+            'description'       => "The rate class of the group to filter the products."
         ]
     ],
     'response'      => [
@@ -63,18 +72,32 @@ if(!$center) {
 }
 
 // 1) create general domain (reduce to activities)
-$domain = new Domain($params['domain']);
-
 $activities_product_models_ids = ProductModel::search([
     ['is_activity', '=', true],
     ['is_fullday', '=', false]
 ])
     ->ids();
 
-$domain->addCondition(new DomainCondition('product_model_id', 'in', $activities_product_models_ids));
+$domain = [
+    ['product_model_id', 'in', $activities_product_models_ids]
+];
+
+if(!empty($params['name'])) {
+    // filter by name
+    $domain[] = ['name', 'like', "%{$params['name']}%"];
+}
+
+if(isset($params['rate_class_id'])) {
+    $domain = [
+        // always return products without rate_class
+        array_merge($domain, [['rate_class_id', 'is', null]]),
+        // filter by rate class
+        array_merge($domain, [['rate_class_id', '=', $params['rate_class_id']]])
+    ];
+}
 
 // 2) read products
-$products = Product::search($domain->toArray())
+$products = Product::search($domain)
     ->read($fields)
     ->adapt('json')
     ->get(true);
