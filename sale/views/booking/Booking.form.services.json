@@ -198,7 +198,7 @@
             "label": "Send contract",
             "description": "",
             "icon": "drive_file_rename_outline",
-            "route": "/booking/object.id/contract",
+            "route": "/booking/object.id/contract/object.current_contract_id",
             "visible": [["has_contract", "=", true], ["status", "=", "confirmed"]]
         },
         {
@@ -283,6 +283,11 @@
                                             {
                                                 "type": "field",
                                                 "value": "has_contract",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "current_contract_id",
                                                 "visible": false
                                             },
                                             {
