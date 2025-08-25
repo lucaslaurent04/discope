@@ -48,7 +48,8 @@ $result = [];
 $httpResponse = $context->httpResponse()->status(200);
 
 if(!$booking['has_contract'] || empty($booking['contracts_ids'])) {
-    $status = 'unknown';
+    // #memo - when no contract, simulate a 'signed' one, to void any pending alert
+    $status = 'signed';
     $contract_id = 0;
 }
 else {
