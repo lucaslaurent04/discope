@@ -78,7 +78,8 @@ export class BookingServicesComponent implements OnInit, AfterViewInit  {
         'invoiced': 'Facturée',
         'debit_balance': 'Solde débiteur',
         'credit_balance': 'Solde créditeur',
-        'balanced': 'Soldée'
+        'balanced': 'Soldée',
+        'cancelled': 'Annulée'
     }
 
     constructor(

@@ -51,7 +51,8 @@ use sale\customer\Customer;
                 'invoiced'          => 'Facturée',
                 'debit_balance'     => 'Solde débiteur',
                 'credit_balance'    => 'Solde créditeur',
-                'balanced'          => 'Clôturée'
+                'balanced'          => 'Clôturée',
+                'cancelled'         => 'Annulée'
             ],
             'description'       => 'Status of the booking.',
             'default'           => 'all'

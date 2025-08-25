@@ -36,7 +36,8 @@ class TaskEvent extends \core\followup\TaskEvent {
                     'invoiced',
                     'debit_balance',
                     'credit_balance',
-                    'balanced'
+                    'balanced',
+                    'cancelled'
                 ],
                 'visible'           => ['event_type', '=', 'status_change'],
                 'default'           => 'quote'
@@ -102,7 +103,8 @@ class TaskEvent extends \core\followup\TaskEvent {
                     'function'  => function ($entity_status, $values) {
                         return in_array($entity_status, [
                             'quote', 'option', 'confirmed', 'validated', 'checkedin', 'checkedout',
-                            'proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced'
+                            'proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced',
+                            'cancelled'
                         ]);
                     }
                 ]

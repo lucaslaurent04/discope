@@ -54,7 +54,7 @@ if($params['entity'] !== Booking::getType()) {
 
 $map_unpaid_booking_ids = [];
 
-$domain = Domain::conditionAdd($params['domain'], ['status', 'not in', ['quote', 'option', 'balanced']]);
+$domain = Domain::conditionAdd($params['domain'], ['status', 'not in', ['quote', 'option', 'balanced', 'cancelled']]);
 $bookings_ids = Booking::search($domain, ['sort' => [$params['order'] => $params['sort']]])->ids();
 
 $fundings = Funding::search(['booking_id', 'in', $bookings_ids])

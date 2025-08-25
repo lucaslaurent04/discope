@@ -101,6 +101,18 @@
                         }
                     },
                     {
+                        "id": "item.bookings.cancelled",
+                        "type": "entry",
+                        "label": "Cancelled bookings",
+                        "description": "",
+                        "route": "/bookings",
+                        "context": {
+                            "entity": "sale\\booking\\Booking",
+                            "view": "list.default",
+                            "domain": ["status", "=", "cancelled"]
+                        }
+                    },
+                    {
                         "id": "item.bookings.archives",
                         "type": "entry",
                         "label": "Archived Bookings",

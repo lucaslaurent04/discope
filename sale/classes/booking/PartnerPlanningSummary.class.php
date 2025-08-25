@@ -169,7 +169,8 @@ class PartnerPlanningSummary extends Model {
                 'invoiced'          => 'Facturée',
                 'debit_balance'     => 'Solde débiteur',
                 'credit_balance'    => 'Solde créditeur',
-                'balanced'          => 'Soldée'
+                'balanced'          => 'Soldée',
+                'cancelled'         => 'Annulée'
             ];
 
             $planned_activities = [];

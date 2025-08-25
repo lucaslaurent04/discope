@@ -72,7 +72,8 @@
                 "invoiced": "facturée",
                 "debit_balance": "solde débiteur",
                 "credit_balance": "solde créditeur",
-                "balanced": "clôturée"
+                "balanced": "clôturée",
+                "cancelled": "annulée"
             },
             "help": ""
         },

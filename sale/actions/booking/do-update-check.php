@@ -32,7 +32,7 @@ list($context, $dispatch) = [ $providers['context'], $providers['dispatch']];
 
 $booking = Booking::search([
         ['id', '=', $params['id']],
-        ['status' , '=', 'balanced']
+        ['status' , 'in', ['balanced', 'cancelled']]
     ])
     ->read( ['id'])
     ->first(true);

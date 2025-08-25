@@ -44,7 +44,7 @@ if(!$booking) {
     throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
 }
 
-if($booking['status'] == 'balanced') {
+if(in_array($booking['status'], ['balanced', 'cancelled'])) {
     throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
 }
 

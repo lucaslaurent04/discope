@@ -10,7 +10,6 @@ use core\setting\Setting;
 use equal\data\DataFormatter;
 use equal\orm\Model;
 use identity\Center;
-use identity\CenterOffice;
 use sale\customer\Customer;
 use sale\customer\CustomerNature;
 
@@ -223,7 +222,8 @@ class Booking extends Model {
                     'invoiced',                 // balance invoice emitted
                     'debit_balance',            // customer still has to pay something
                     'credit_balance',           // a reimbursement to customer is required
-                    'balanced'                  // booking is over and balance is cleared
+                    'balanced',                 // booking is over and balance is cleared
+                    'cancelled'                 // booking is over because cancelled without fees, nothing to invoice to customer
                 ],
                 'description'       => 'Status of the booking.',
                 'default'           => 'quote',
@@ -519,12 +519,33 @@ class Booking extends Model {
         ];
     }
 
-    public static function getActions() {
+    public static function getActions(): array {
         return [
             'import_contacts' => [
                 'description'   => 'Import contacts from customer identity.',
                 'policies'      => [],
                 'function'      => 'doImportContacts'
+            ],
+
+            'delete_unpaid_fundings' => [
+                'description'   => 'Removes booking\'s fundings that haven\'t received any payment.',
+                'help'          => 'Used when a booking is cancelled.',
+                'policies'      => [],
+                'function'      => 'doDeleteUnpaidFundings'
+            ],
+
+            'update_fundings_due_to_paid' => [
+                'description'   => 'Sets partially paid fundings due_amount to the value of paid_amount.',
+                'help'          => 'Used when a booking is cancelled.',
+                'policies'      => [],
+                'function'      => 'doUpdateFundingsDueToPaid'
+            ],
+
+            'create_negative_funding_for_reimbursement' => [
+                'description'   => 'Creates a negative funding entry for reimbursement.',
+                'help'          => 'Used when a booking is cancelled.',
+                'policies'      => [],
+                'function'      => 'doCreateNegativeFundingForReimbursement'
             ]
         ];
     }
@@ -1293,6 +1314,57 @@ class Booking extends Model {
         }
     }
 
+    public static function doDeleteUnpaidFundings($self) {
+        $self->read(['fundings_ids' => ['is_paid', 'paid_amount']]);
+        foreach($self as $booking) {
+            foreach($booking['fundings_ids'] as $funding_id => $funding) {
+                if($funding['paid_amount'] > 0 || $funding['is_paid']) {
+                    continue;
+                }
+
+                Funding::id($funding_id)->delete(true);
+            }
+        }
+    }
+
+    public static function doUpdateFundingsDueToPaid($self) {
+        $self->read(['fundings_ids' => ['due_amount', 'paid_amount']]);
+        foreach($self as $booking) {
+            foreach($booking['fundings_ids'] as $funding_id => $funding) {
+                if($funding['due_amount'] <= 0) {
+                    continue;
+                }
+
+                Funding::id($funding_id)
+                    ->update(['due_amount' => $funding['paid_amount']]);
+            }
+        }
+    }
+
+    public static function doCreateNegativeFundingForReimbursement($self) {
+        $self->read(['center_office_id', 'fundings_ids' => ['paid_amount']]);
+        foreach($self as $id => $booking) {
+            $total_paid_amount = 0;
+            foreach($booking['fundings_ids'] as $funding) {
+                $total_paid_amount += $funding['paid_amount'];
+            }
+
+            if($total_paid_amount > 0) {
+                Funding::create([
+                    'description'       => "Remboursement annulation",
+                    'booking_id'        => $id,
+                    'center_office_id'  => $booking['center_office_id'],
+                    'due_amount'        => round(-$total_paid_amount, 2),
+                    'is_paid'           => false,
+                    'type'              => 'installment',
+                    'order'             => count($booking['fundings_ids']) + 1,
+                    'issue_date'        => time(),
+                    'due_date'          => time()
+                ]);
+            }
+        }
+    }
+
     public static function onupdateIsInvoiced($om, $oids, $values, $lang) {
         $bookings = $om->read(self::getType(), $oids, ['is_invoiced', 'booking_lines_ids']);
         foreach($bookings as $id => $booking) {
@@ -1472,7 +1544,7 @@ class Booking extends Model {
             if($booking['state'] === 'draft') {
                 continue;
             }
-            if(in_array($booking['status'], ['proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced'])) {
+            if(in_array($booking['status'], ['proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced', 'cancelled'])) {
                 if(count(array_diff(array_keys($values), $allowed_fields))) {
                     return ['status' => ['non_editable' => 'Invoiced bookings edition is limited.']];
                 }

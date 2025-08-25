@@ -38,7 +38,7 @@
             "help": ""
         },
         "item.bookings.checkedout_cancelled": {
-            "label": "Annulées",
+            "label": "Terminées (annulées)",
             "help": ""
         },
         "item.bookings.invoiced": {
@@ -47,6 +47,10 @@
         },
         "item.bookings.balanced": {
             "label": "Cloturées",
+            "help": ""
+        },
+        "item.bookings.cancelled": {
+            "label": "Annulées",
             "help": ""
         },
         "item.bookings.credit_balance": {
