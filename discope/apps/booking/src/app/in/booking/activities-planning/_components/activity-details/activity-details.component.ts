@@ -116,15 +116,13 @@ export class BookingActivitiesPlanningActivityDetailsComponent implements OnInit
     private async filterProducts(name: string): Promise<any> {
         let filtered: any[] = [];
         try {
-            let domain = [];
-            if(name && name.length) {
-                domain.push(['name', 'ilike', `%${name}%`]);
-            }
-
             const productCollectParams: any = {
                 center_id: this.booking.center_id,
-                domain: JSON.stringify(domain),
+                rate_class_id: this.group.rate_class_id
             };
+            if(name && name.length) {
+                productCollectParams.name = name;
+            }
 
             filtered = await this.api.fetch('?get=sale_catalog_product_activity-collect', productCollectParams);
         }
