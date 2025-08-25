@@ -66,7 +66,7 @@ $tests = [
                 ->read(['id','status','is_cancelled'])
                 ->first(true);
 
-            return ($booking['status'] == 'quote' && $booking['is_cancelled'] == true );
+            return ($booking['status'] == 'cancelled' && $booking['is_cancelled'] == true);
         },
 
         'rollback' =>  function () {
@@ -230,11 +230,11 @@ $tests = [
 
         'assert' => function ($booking_id) {
             $booking = Booking::id($booking_id)
-                ->read(['id','status','is_cancelled', 'cancellation_reason'])
+                ->read(['id', 'status', 'is_cancelled', 'cancellation_reason'])
                 ->first(true);
 
             return (
-                $booking['status'] == 'checkedout' &&
+                $booking['status'] == 'cancelled' &&
                 $booking['is_cancelled'] == true &&
                 $booking['cancellation_reason'] == 'other'
             );
