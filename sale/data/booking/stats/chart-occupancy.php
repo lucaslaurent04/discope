@@ -69,6 +69,36 @@ list($params, $providers) = announce([
  */
 list($context, $orm, $adapter, $auth) = [ $providers['context'], $providers['orm'], $providers['adapt'] , $providers['auth']];
 
+$occupanciesGetDateIndex = function($date, $interval) {
+    switch($interval) {
+        case 'week':
+            return date('Y-W', $date);
+        case 'month':
+            return date('Y-m', $date);
+        case 'year':
+        default:
+            return date('Y', $date);
+    }
+};
+
+/**
+ * Compute the next date according to the interval type.
+ * We add one day so that the diff includes all nights of the period (ex. 1 to 31 = 31 nights)
+ * #memo - dates are expressed in seconds (mind leap seconds).
+ */
+$occupanciesGetNextDate = function($date, $interval) {
+    switch($interval) {
+        case 'week':
+            $day = date("w", $date);
+            // convert to ISO day index (1: Mo, 7: Su)
+            $day = ($day == 0)?7:$day;
+            return $date + ((8-$day)*86400);
+        case 'month':
+            return strtotime(date("Y-m-t", $date)) + 86400;
+        case 'year':
+            return strtotime((date('Y', $date) + 1).'-01-01');
+    }
+};
 
 /*
 This controller computes capacity rate of the centers.
@@ -118,9 +148,9 @@ if($centers_ids) {
         $index_map = [];
         $next_date = $params['range_from'];
         while($next_date < $params['range_to']) {
-            $index = _occupancies_get_date_index($next_date, $params['range_interval']);
+            $index = $occupanciesGetDateIndex($next_date, $params['range_interval']);
             $prev_date = $next_date;
-            $next_date = _occupancies_get_next_date($next_date, $params['range_interval']);
+            $next_date = $occupanciesGetNextDate($next_date, $params['range_interval']);
             // compute number of days
             $index_map[$index] = round( ($next_date-$prev_date)/86400 );
         }
@@ -162,7 +192,7 @@ if($centers_ids) {
                 'booking_id.status'
             ])
             ->get(true);
-        $date_index = _occupancies_get_date_index($d, $params['range_interval']);
+        $date_index = $occupanciesGetDateIndex($d, $params['range_interval']);
 
         foreach($consumptions as $consumption) {
 
@@ -233,35 +263,3 @@ if($centers_ids) {
 $context->httpResponse()
         ->body($results)
         ->send();
-
-
-
-function _occupancies_get_date_index($date, $interval) {
-    switch($interval) {
-        case 'week':
-            return date('Y-W', $date);
-        case 'month':
-            return date('Y-m', $date);
-        case 'year':
-            return date('Y', $date);
-    }
-}
-
-/**
- * Compute the next date according to the interval type.
- * We add one day so that the diff includes all nights of the period (ex. 1 to 31 = 31 nights)
- * #memo - dates are expressed in seconds (mind leap seconds).
- */
-function _occupancies_get_next_date($date, $interval) {
-    switch($interval) {
-        case 'week':
-            $day = date("w", $date);
-            // convert to ISO day index (1: Mo, 7: Su)
-            $day = ($day == 0)?7:$day;
-            return $date + ((8-$day)*86400);
-        case 'month':
-            return strtotime(date("Y-m-t", $date)) + 86400;
-        case 'year':
-            return strtotime((date('Y', $date) + 1).'-01-01');
-    }
-}
