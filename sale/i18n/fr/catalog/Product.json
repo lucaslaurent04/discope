@@ -105,12 +105,12 @@
         },
         "has_rate_class": {
             "label": "Catégorie tarifaire?",
-            "description": "Catégorie tarifaire spécifique.",
+            "description": "Indique si le produit est limité à une catégorie tarifaire spécifique.",
             "help": ""
         },
         "rate_class_id": {
             "label": "Catégorie tarifaire",
-            "description": "Tranche d'âge cible du produit.",
+            "description": "Catégorie tarifaire cible du produit.",
             "help": ""
         },
         "ref_pack_lines_ids": {
