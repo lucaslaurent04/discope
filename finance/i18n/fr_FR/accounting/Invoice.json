@@ -1,0 +1,29 @@
+{
+    "model": {
+        "type": {
+            "label": "Type",
+            "description": "Type de document comptable.",
+            "selection": {
+                "invoice": "facture",
+                "credit_note": "avoir"
+            },
+            "help": ""
+        },
+        "reversed_invoice_id": {
+            "label": "Facture liée",
+            "description": "La facture symétrique (facture annulée ou avoir).",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "actions": {
+                "action.reverse": {
+                    "label": "Note de crédit",
+                    "description": "Annuler la facture par un avoir."
+                }
+            }
+        }
+    },
+    "error": {}
+}
