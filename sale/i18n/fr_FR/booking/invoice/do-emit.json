@@ -1,0 +1,7 @@
+{
+    "error": {
+        "errors": {
+            "pending_credit_note": "Un avoir est toujours en attente d'émission."
+        }
+    }
+}
