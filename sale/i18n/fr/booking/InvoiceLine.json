@@ -11,36 +11,14 @@
     },
     "view": {
         "form.default": {
-            "name": "Facture",
+            "name": "Ligne de facture",
             "description": "",
-            "actions": {
-                "action.invoice": {
-                    "label": "Émettre la facture",
-                    "description": "Générer une facture sur base de la version proforma."
-                },
-                "action.reverse": {
-                    "label": "Note de crédit",
-                    "description": "Annuler la facture par une note de crédit."
-                },
-                "action.refresh_paid": {
-                    "label": "Rafraîchir le statut",
-                    "description": "Forcer la vérification du statut des paiements."
-                }
-            },
-            "layout": {
-                "sections.invoice.lines": {
-                    "label": "Lignes de facture"
-                },
-                "sections.invoice.entries": {
-                    "label": "Écritures comptables"
-                }
-            }
+            "help": ""
         },
         "list.default": {
             "name": "Lignes de facture",
-            "description": "Liste des lignes de facture.",
-            "layout": {
-            }
+            "description": "",
+            "help": ""
         }
     },
     "error": {}

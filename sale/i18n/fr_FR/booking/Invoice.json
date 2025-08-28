@@ -1,0 +1,27 @@
+{
+    "model": {
+        "reversed_invoice_id": {
+            "description": "Facture annulée ou avoir.",
+            "help": "La facture symétrique : facture annulée pour un avoir; et avoir pour facture annulée."
+        }
+    },
+    "view": {
+        "form.default": {
+            "actions": {
+                "action.reverse": {
+                    "label": "Avoir",
+                    "description": "Annuler la facture par un avoir."
+                }
+            }
+        },
+        "form.booking": {
+            "actions": {
+                "action.reverse": {
+                    "label": "Avoir",
+                    "description": "Annuler la facture par un avoir."
+                }
+            }
+        }
+    },
+    "error": {}
+}
