@@ -23,7 +23,10 @@
             "description": "Rental units will no longer be reserved and will be available for other bookings.",
             "controller": "sale_booking_do-quote",
             "confirm": true,
-            "visible": [ ["status", "in", ["option", "confirmed", "validated"]], ["is_from_channelmanager", "=", false] ]
+            "visible": [
+                [["status", "in", ["option", "confirmed", "validated"]], ["is_from_channelmanager", "=", false]],
+                [["status", "in", ["checkedin", "checkedout"]], ["is_from_channelmanager", "=", false], [true, "=", "object.checkedout_revert_to_quote"]]
+            ]
         },
         {
             "id": "action.option",
@@ -285,6 +288,11 @@
                                             {
                                                 "type": "field",
                                                 "value": "nb_pers",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "checkedout_revert_to_quote",
                                                 "visible": false
                                             },
                                             {
