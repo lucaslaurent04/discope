@@ -114,6 +114,15 @@ class Booking extends Model {
                 'relation'          => ['center_id' => 'center_office_id']
             ],
 
+            'checkedout_revert_to_quote' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => "Allow to revert the status from checkedin/checkedout to quote.",
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['center_office_id' => 'checkedout_revert_to_quote']
+            ],
+
             'total' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',

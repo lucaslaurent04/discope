@@ -150,6 +150,11 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "checkedout_revert_to_quote",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "freebies_manual_assignment",
                                                 "width": "50%",
                                                 "visible": false
