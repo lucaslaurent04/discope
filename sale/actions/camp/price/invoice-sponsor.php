@@ -22,7 +22,7 @@ use sale\camp\Sponsor;
     ],
     'access'        => [
         'visibility'        => 'protected',
-        'groups'            => ['camp.default.user'],
+        'groups'            => ['camp.default.administrator'],
     ],
     'response'      => [
         'content-type'      => 'application/zip',

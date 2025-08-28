@@ -1,5 +1,12 @@
 {
     "name": "Sponsors",
+    "header": {
+        "actions": {
+            "ACTION.CREATE": {
+                "visible": ["camp.default.administrator", "in", "user.groups"]
+            }
+        }
+    },
     "description": "List of sponsors.",
     "order": "name",
     "sort": "asc",

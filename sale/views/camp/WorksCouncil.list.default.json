@@ -1,5 +1,12 @@
 {
     "name": "Works Council",
+    "header": {
+        "actions": {
+            "ACTION.CREATE": {
+                "visible": ["camp.default.administrator", "in", "user.groups"]
+            }
+        }
+    },
     "description": "List of works councils.",
     "order": "name",
     "sort": "asc",
