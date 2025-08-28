@@ -80,9 +80,19 @@ if($booking['booking_lines_groups_ids']) {
     $values['order'] = count((array) $booking['booking_lines_groups_ids']) + 1;
 }
 
-BookingLineGroup::create($values);
+$group = BookingLineGroup::create($values)
+    ->read(['id'])
+    ->first();
 
 Booking::refreshNbPers($orm, $booking['id']);
+
+// if first group set type to "sojourn"
+if(count($booking['booking_lines_groups_ids']) === 0) {
+    eQual::run('do', 'sale_booking_update-sojourn-type', [
+        'id'            => $group['id'],
+        'group_type'    => 'sojourn'
+    ]);
+}
 
 // restore events in case this controller is chained with others
 $orm->enableEvents();
