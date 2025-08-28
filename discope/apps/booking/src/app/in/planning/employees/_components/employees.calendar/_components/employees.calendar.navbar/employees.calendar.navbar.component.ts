@@ -111,7 +111,8 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
                         'hr\\employee\\Employee',
                         [
                             ['center_id', 'in', user.centers_ids],
-                            ['relationship', '=', 'employee']
+                            ['relationship', '=', 'employee'],
+                            ['is_active', '=', true]
                         ],
                         ['id'],
                         'name', 'asc', 0, 500
