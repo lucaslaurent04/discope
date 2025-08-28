@@ -161,7 +161,16 @@ foreach($invoices as $invoice) {
         // invoice product line
         foreach($line['price_id']['accounting_rule_id']['accounting_rule_line_ids'] as $rule_line) {
             // get analytic section from model, product or price
-            $analytic_section_code = $line['product_id']['product_model_id']['analytic_section_id']['code'] ?? ($line['product_id']['analytic_section_id']['code'] ?? ($line['price_id']['analytic_section_id']['code'] ?? ''));
+            $analytic_section_code = '';
+            if(!empty($line['price_id']['analytic_section_id']['code'])) {
+                $analytic_section_code = $line['price_id']['analytic_section_id']['code'];
+            }
+            elseif(!empty($line['product_id']['analytic_section_id']['code'])) {
+                $analytic_section_code = $line['product_id']['analytic_section_id']['code'];
+            }
+            elseif(!empty($line['product_id']['product_model_id']['analytic_section_id']['code'])) {
+                $analytic_section_code = $line['product_id']['product_model_id']['analytic_section_id']['code'];
+            }
 
             $lines[] = [
                 'writing_number'        => $writing_number,
