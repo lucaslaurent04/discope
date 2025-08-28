@@ -408,7 +408,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         try {
             const employees_domain = [
                 ['relationship', '=', 'employee'],
-                ['id', 'in', this.params.partners_ids]
+                ['id', 'in', this.params.partners_ids],
+                ['is_active', '=', true]
             ];
 
             const employees = await this.api.collect(
