@@ -504,19 +504,22 @@
                                                 "type": "field",
                                                 "label": "Via Tour Operator?",
                                                 "value": "has_tour_operator",
-                                                "width": "100%"
+                                                "width": "100%",
+                                                "visible": [true, "=", "env.sale.features.booking.channel_manager"]
                                             },
                                             {
                                                 "type": "field",
                                                 "label": "Tour Operator",
                                                 "value": "tour_operator_id",
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "visible": [true, "=", "env.sale.features.booking.channel_manager"]
                                             },
                                             {
                                                 "type": "field",
                                                 "label": "Reference",
                                                 "value": "tour_operator_ref",
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "visible": [true, "=", "env.sale.features.booking.channel_manager"]
                                             }
                                         ]
                                     }
