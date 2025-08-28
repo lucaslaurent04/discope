@@ -6,7 +6,9 @@
     "color": "#690c75",
     "access": {
         "groups": [
-            "camp.default.user"
+            "camp.default.user",
+            "camp.default.administrator",
+            "camp.default.guest"
         ]
     },
     "show_in_apps": true

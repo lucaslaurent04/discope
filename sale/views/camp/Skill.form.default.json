@@ -1,5 +1,12 @@
 {
     "name": "Skill",
+    "header": {
+        "actions": {
+            "ACTION.EDIT": {
+                "visible": ["camp.default.administrator", "in", "user.groups"]
+            }
+        }
+    },
     "layout": {
         "groups": [
             {
