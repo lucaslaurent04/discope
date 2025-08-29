@@ -23,10 +23,18 @@
             "description": "Rental units will no longer be reserved and will be available for other bookings.",
             "controller": "sale_booking_do-quote",
             "confirm": true,
-            "visible": [
-                [["status", "in", ["option", "confirmed", "validated"]], ["is_from_channelmanager", "=", false]],
-                [["status", "in", ["checkedin", "checkedout"]], ["is_from_channelmanager", "=", false], [true, "=", "object.checkedout_revert_to_quote"]]
-            ]
+            "visible": [["status", "in", ["option", "confirmed", "validated"]], ["is_from_channelmanager", "=", false]]
+        },
+        {
+            "id": "action.quote-from-checkedout",
+            "label": "Revert to Quote",
+            "description": "Rental units will no longer be reserved and will be available for other bookings.",
+            "controller": "sale_booking_do-quote",
+            "confirm": true,
+            "visible": [["status", "in", ["checkedin", "checkedout"]], ["is_from_channelmanager", "=", false], [true, "=", "object.checkedout_revert_to_quote"]],
+            "params": {
+                "free_rental_units": false
+            }
         },
         {
             "id": "action.option",
@@ -45,22 +53,6 @@
             "visible": [["status", "=", "quote"], ["is_price_tbc", "=", false], ["status_before_revert_to_quote", "is", null]]
         },
         {
-            "id": "action.quote-checkedin",
-            "label": "Back to Check In",
-            "description": "The Booking status is set back to its previous checkedin status.",
-            "controller": "sale_booking_do-checkin-quote",
-            "confirm": true,
-            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "=", "checkedin"]]
-        },
-        {
-            "id": "action.quote-checkedout",
-            "label": "Back to Check Out",
-            "description": "The Booking status is set back to its previous checkedout status.",
-            "controller": "sale_booking_do-checkout-quote",
-            "confirm": true,
-            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "=", "checkedout"]]
-        },
-        {
             "id": "action.confirm",
             "label": "Confirm Booking",
             "description": "Rental units will be reserved and the invoicing plan will be set up.",
@@ -77,12 +69,28 @@
             "visible": ["status", "in", ["confirmed", "validated"]]
         },
         {
+            "id": "action.checkin-from-quote",
+            "label": "Back to Check In",
+            "description": "The Booking status is set back to its previous checkedin status.",
+            "controller": "sale_booking_do-checkin-quote",
+            "confirm": true,
+            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "=", "checkedin"]]
+        },
+        {
             "id": "action.checkout",
             "label": "Check Out",
             "description": "The host is leaving: the rental units will be marked for cleaning.",
             "controller": "sale_booking_do-checkout",
             "confirm": true,
             "visible": ["status", "in", ["checkedin"]]
+        },
+        {
+            "id": "action.checkout-from-quote",
+            "label": "Back to Check Out",
+            "description": "The Booking status is set back to its previous checkedout status.",
+            "controller": "sale_booking_do-checkout-quote",
+            "confirm": true,
+            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "=", "checkedout"]]
         },
         {
             "id": "action.invoice",
