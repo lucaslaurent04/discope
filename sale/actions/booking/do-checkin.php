@@ -8,6 +8,7 @@
 
 use sale\booking\Booking;
 use sale\booking\Consumption;
+use sale\booking\Contract;
 
 list($params, $providers) = announce([
     'description'   => "Sets booking as checked in.",
@@ -33,6 +34,11 @@ list($params, $providers) = announce([
             'type'          => 'boolean',
             'default'       => false
         ],
+        'sign_contract' => [
+            'description'   => 'Mark the pending contract as signed.',
+            'type'          => 'boolean',
+            'default'       => false
+        ]
     ],
     'access' => [
         'visibility'        => 'protected',
@@ -63,6 +69,22 @@ if(!$booking) {
     throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
 }
 
+/*
+    Sign the contract if given param sign_contract is true and if it isn't already done
+*/
+
+if($params['sign_contract']) {
+    $pending_contract = Contract::search([
+        ['booking_id', '=', $booking['id']],
+        ['status', '=','pending']
+    ])
+        ->read(['id'])
+        ->first();
+
+    if(!is_null($pending_contract)) {
+        eQual::run('do', 'sale_contract_signed', ['id' => $pending_contract['id']]);
+    }
+}
 
 /*
     Check booking consistency

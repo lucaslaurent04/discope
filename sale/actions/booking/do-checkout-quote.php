@@ -61,20 +61,12 @@ eQual::run('do', 'sale_booking_do-option-confirm', [
     'instant_payment'   => false
 ]);
 
-$pending_contract = Contract::search([
-    ['booking_id', '=', $booking['id']],
-    ['status', '=','pending']
-])
-    ->read(['id'])
-    ->first();
-
-eQual::run('do', 'sale_contract_signed', ['id' => $pending_contract['id']]);
-
 eQual::run('do', 'sale_booking_do-checkin', [
     'id'                        => $params['id'],
     'no_payment'                => true,
     'no_composition'            => true,
-    'no_rental_unit_cleaned'    => true
+    'no_rental_unit_cleaned'    => true,
+    'sign_contract'             => true
 ]);
 
 eQual::run('do', 'sale_booking_do-checkout', ['id' => $params['id']]);
