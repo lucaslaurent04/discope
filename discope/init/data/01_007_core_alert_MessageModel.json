@@ -142,6 +142,48 @@
                 "label": "Divergence entre ouverture et fermeture",
                 "description": "Une différence a été constatée entre le montant d'ouverture et le montant de fermeture de la caisse.",
                 "type": "pos"
+            },
+            {
+                "id": 27,
+                "name": "lodging.booking.funding.payment_reminder_failed",
+                "label": "Send a funding payment reminder email to booking \"contract\" contact.",
+                "description": "",
+                "type": "booking"
+            },
+            {
+                "id": 28,
+                "name": "lodging.booking.funding.payment_reminder_sent",
+                "label": "Send a funding payment reminder email to booking \"contract\" contact.",
+                "description": "",
+                "type": "booking"
+            },
+            {
+                "id": 29,
+                "name": "lodging.booking.contract.reminder.sent",
+                "label": "Send an email to remind them about the signed contract.",
+                "description": "",
+                "type": "booking"
+            },
+            {
+                "id": 30,
+                "name": "lodging.booking.contract.reminder.failed",
+                "label": "Check if the contract sent has been signed by the client 10 days after sending it.",
+                "description": "",
+                "type": "booking"
+            },
+            {
+                "id": 31,
+                "name": "lodging.booking.guest.reminder.failed",
+                "label": "Check if the guest List sent has been sent by the client 10 days after sending it.",
+                "description": "",
+                "type": "booking"
+            },
+            {
+                "id": 32,
+                "name": "sale.booking.check-reverted-from-checkout",
+                "label": "Status devrait être \"En cours\" ou \"Terminée\"",
+                "description": "Statut incohérent : la réservation, repassée en \"Devis\" pour modification, devrait être en \"En cours\" ou \"Terminée\".",
+                "type": "booking"
             }
         ]
     }
