@@ -123,6 +123,12 @@ class Booking extends Model {
                 'relation'          => ['center_office_id' => 'checkedout_revert_to_quote']
             ],
 
+            'status_before_revert_to_quote' => [
+                'type'              => 'string',
+                'selection'         => ['checkedin', 'checkedout'],
+                'description'       => "The status of the booking before it was reverted to quote from checkedin or checkedout status."
+            ],
+
             'total' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
