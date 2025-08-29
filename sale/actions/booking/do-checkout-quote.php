@@ -41,11 +41,19 @@ use sale\booking\Contract;
 ['context' => $context] = $providers;
 
 $booking = Booking::id($params['id'])
-    ->read(['id'])
+    ->read(['status', 'status_before_revert_to_quote'])
     ->first();
 
 if (is_null($booking)) {
     throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
+}
+
+if($booking['status'] !== 'quote') {
+    throw new Exception("invalid_status", EQ_ERROR_INVALID_PARAM);
+}
+
+if($booking['status_before_revert_to_quote'] !== 'checkedout') {
+    throw new Exception("invalid_status", EQ_ERROR_INVALID_PARAM);
 }
 
 eQual::run('do', 'sale_booking_do-option-confirm', [
