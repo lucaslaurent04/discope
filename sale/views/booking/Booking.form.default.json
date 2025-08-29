@@ -34,7 +34,7 @@
             "description": "Rental units will be reserved but no funding will be claimed yet.",
             "controller": "sale_booking_do-option",
             "confirm": true,
-            "visible": ["status", "=", "quote"]
+            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "is", null]]
         },
         {
             "id": "action.option-confirm",
@@ -42,7 +42,23 @@
             "description": "Rental units will be reserved and the invoicing plan will be set up.",
             "controller": "sale_booking_do-option-confirm",
             "confirm": true,
-            "visible": [["status", "=", "quote"], ["is_price_tbc", "=", false]]
+            "visible": [["status", "=", "quote"], ["is_price_tbc", "=", false], ["status_before_revert_to_quote", "is", null]]
+        },
+        {
+            "id": "action.quote-checkedin",
+            "label": "Back to Check In",
+            "description": "The Booking status is set back to its previous checkedin status.",
+            "controller": "sale_booking_do-checkin-quote",
+            "confirm": true,
+            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "=", "checkedin"]]
+        },
+        {
+            "id": "action.quote-checkedout",
+            "label": "Back to Check Out",
+            "description": "The Booking status is set back to its previous checkedout status.",
+            "controller": "sale_booking_do-checkout-quote",
+            "confirm": true,
+            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "=", "checkedout"]]
         },
         {
             "id": "action.confirm",
@@ -120,7 +136,7 @@
             "description": "Rental units will be released if they haven't been yet.",
             "controller": "sale_booking_release-rentalunits",
             "confirm": true,
-            "visible": ["status", "=", "quote"]
+            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "is", null]]
         },
         {
             "id": "action.pay_instant",
@@ -293,6 +309,11 @@
                                             {
                                                 "type": "field",
                                                 "value": "checkedout_revert_to_quote",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "status_before_revert_to_quote",
                                                 "visible": false
                                             },
                                             {

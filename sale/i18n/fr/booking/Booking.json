@@ -235,6 +235,14 @@
                     "label": "Repasser en devis",
                     "description": "Les unités locatives ne seront plus réservées et pourront être occupées pour d'autres réservation. Les services liées à la réservation pourront à nouveau être modifiés."
                 },
+                "action.quote-checkedin": {
+                    "label": "Repasser en check in",
+                    "description": "Repasser le status de la réservation à son status précédent check in, le nouveau contrat sera automatiquement marqué comme signé."
+                },
+                "action.quote-checkedout": {
+                    "label": "Repasser en check out",
+                    "description": "Repasser le status de la réservation à son status précédent check out, le nouveau contrat sera automatiquement marqué comme signé."
+                },
                 "action.option": {
                     "label": "Placer une option",
                     "description": "Les unités locatives seront réservées pendant une courte période. Aucun paiement ne sera demandé."

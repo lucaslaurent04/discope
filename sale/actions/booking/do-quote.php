@@ -63,6 +63,11 @@ if($booking['is_locked']) {
     throw new Exception("locked_contract", EQ_ERROR_INVALID_PARAM);
 }
 
+if(in_array($booking['status'], ['checkedin', 'checkedout'])) {
+    // allows to set status back after modification in quote status are done
+    Booking::id($params['id'])->update(['status_before_revert_to_quote' => $booking['status']]);
+}
+
 /*
     Update booking status
     // #memo - this must be done first in order to allow updates on sub-objects (which might be prohibited on non-quote bookings)
