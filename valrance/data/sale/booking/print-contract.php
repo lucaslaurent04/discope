@@ -31,7 +31,7 @@ use sale\booking\BookingMeal;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 
 list($params, $providers) = announce([
-    'description'   => "Render a contract given its ID as a PDF document.",
+    'description'   => "Render a contract given its ID as a PDF document, for Valrance.",
     'params'        => [
         'id' => [
             'description'   => 'Identifier of the contract to print.',
@@ -240,55 +240,79 @@ $fields = [
             'payment_deadline_id' => ['name']
         ],
         'booking_lines_groups_ids' => [
-            'id',
             'name',
-            'has_pack',
-            'group_type',
-            'is_locked',
             'is_sojourn',
-            'pack_id'  => ['label'],
-            'qty',
-            'unit_price',
-            'vat_rate',
-            'total',
-            'price',
-            'fare_benefit',
-            'rate_class_id' => ['id', 'name', 'description'],
-            'date_from',
-            'date_to',
-            'nb_pers',
-            'age_range_assignments_ids'=> ['id', 'age_range_id' =>['id', 'name'], 'booking_line_group_id', 'qty'],
+            'group_type',
+            'age_range_assignments_ids'    => [
+                'qty',
+                'age_range_id' => [
+                    'name',
+                    'qty'
+                ]
+            ],
             'booking_lines_ids' => [
                 'name',
+                'description',
+                'qty',
+                'free_qty',
+                'unit_price',
+                'price',
+                'total',
                 'is_activity',
-                'is_transport',
                 'is_supply',
+                'is_transport',
                 'product_id' => [
-                    'id',
-                    'label' ,
+                    'label',
+                    'grouping',
                     'age_range_id',
-                    'grouping_code_id' => ['id', 'code', 'name'],
-                    'product_model_id' => ['id', 'name', 'grouping_code_id' => ['id', 'code', 'name']]
+                    'grouping_code_id' => [
+                        'name',
+                        'code',
+                        'has_age_range',
+                        'age_range_id'
+                    ],
+                    'product_model_id' => [
+                        'grouping_code_id' => [
+                            'name',
+                            'code',
+                            'has_age_range',
+                            'age_range_id'
+                        ]
+                    ]
                 ],
                 'booking_activity_id' => [
-                        'id', 'name', 'total', 'price',
-                        'supplies_booking_lines_ids' => ['id', 'qty', 'total', 'price'],
-                        'transports_booking_lines_ids' => ['id', 'qty', 'total', 'price']
+                    'activity_booking_line_id' => [
+                        'name',
+                        'description',
+                        'qty',
+                        'free_qty',
+                        'unit_price',
+                        'price',
+                        'total',
+                        'is_activity',
+                        'is_supply',
+                        'is_transport',
+                        'product_id' => [
+                            'label',
+                            'grouping',
+                            'age_range_id',
+                            'grouping_code_id' => [
+                                'name',
+                                'code',
+                                'has_age_range',
+                                'age_range_id'
+                            ],
+                            'product_model_id' => [
+                                'grouping_code_id' => [
+                                    'name',
+                                    'code',
+                                    'has_age_range',
+                                    'age_range_id'
+                                ]
+                            ]
+                        ]
+                    ]
                 ],
-                'description',
-                'is_accomodation',
-                'qty',
-                'unit_price',
-                'free_qty',
-                'discount',
-                'total',
-                'price',
-                'vat_rate',
-                'qty_accounting_method',
-                'qty_vars',
-                'has_own_qty',
-                'own_duration',
-                'price_adapters_ids' => ['type', 'value', 'is_manual_discount']
             ]
         ]
     ],
@@ -411,115 +435,115 @@ $has_activities_transport = (bool) $transport;
 
 
 $values = [
-    'attn_address1'               => '',
-    'attn_address2'               => '',
-    'attn_name'                   => '',
-    'benefit_lines'               => [],
-    'benefit_freebies'            => [],
-    'center'                      => $booking['center_id']['name'],
-    'center_address'              => $booking['center_id']['address_street'].' - '.$booking['center_id']['address_zip'].' '.$booking['center_id']['address_city'],
-    'center_contact1'             => (isset($booking['center_id']['manager_id']['name']))?$booking['center_id']['manager_id']['name']:'',
-    'center_contact2'             => DataFormatter::format($booking['center_id']['phone'], 'phone').' - '.$booking['center_id']['email'],
-    'center_email'                => $booking['center_id']['email'],
-    'center_office'               => $center_office_code,
-    'center_phone'                => DataFormatter::format($booking['center_id']['phone'], 'phone'),
-    'center_signature'            => $booking['center_id']['organisation_id']['signature'],
-    'code'                        => sprintf("%03d.%03d", intval($booking['name']) / 1000, intval($booking['name']) % 1000),
-    'company_address'             => sprintf("%s %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
-    'company_bic'                 => DataFormatter::format($booking['center_id']['organisation_id']['bank_account_bic'], 'bic'),
-    'company_email'               => $booking['center_id']['organisation_id']['email'],
-    'company_fax'                 => DataFormatter::format($booking['center_id']['organisation_id']['fax'], 'phone'),
-    'company_has_vat'             => $booking['center_id']['organisation_id']['has_vat'],
-    'company_iban'                => DataFormatter::format($booking['center_id']['organisation_id']['bank_account_iban'], 'iban'),
-    'company_name'                => $booking['center_id']['organisation_id']['legal_name'],
-    'company_phone'               => DataFormatter::format($booking['center_id']['organisation_id']['phone'], 'phone'),
-    'company_reg_number'          => $booking['center_id']['organisation_id']['registration_number'],
-    'company_vat_number'          => $booking['center_id']['organisation_id']['vat_number'],
-    'company_website'             => $booking['center_id']['organisation_id']['website'],
-    'contact_email'               => $booking['customer_id']['partner_identity_id']['email'],
-    'contact_name'                => '',
-    'contact_phone'               => (strlen($booking['customer_id']['partner_identity_id']['phone']))?$booking['customer_id']['partner_identity_id']['phone']:$booking['customer_id']['partner_identity_id']['mobile'],
-    'consumptions_map_detailed'   => [],
-    'consumptions_map_simple'     => [],
-    'consumptions_type'           => isset($booking['type_id']['booking_schedule_layout'])?$booking['type_id']['booking_schedule_layout']:'simple',
-    'contract_authorization_html' => '',
-    'contract_header_html'        => '',
-    'contract_service_html'       => '',
-    'contract_engage_html'        => '',
-    'contract_notice_html'        => '',
-    'contract_payment_html'       => '',
-    'contract_withdrawal_html'    => '',
-    'contract_cancellation_html'  => '',
-    'contract_misc_provisions_html'=> '',
-    'customer_address1'           => $booking['customer_id']['partner_identity_id']['address_street'],
-    'customer_address2'           => $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'].(($booking['customer_id']['partner_identity_id']['address_country'] != 'BE')?(' - '.$booking['customer_id']['partner_identity_id']['address_country']):''),
-    'customer_address_dispatch'   => $booking['customer_id']['partner_identity_id']['address_dispatch'],
-    'customer_country'            => $booking['customer_id']['partner_identity_id']['address_country'],
-    'customer_has_vat'            => (int) $booking['customer_id']['partner_identity_id']['has_vat'],
-    'customer_name'               => $customer_name,
-    'customer_vat'                => $booking['customer_id']['partner_identity_id']['vat_number'],
-    'date'                        => date('d/m/Y', $contract['created']),
-    'fundings'                    => [],
-    'has_contract_approved'       => 0,
-    'has_roundtrip_transport'     => $has_roundtrip_transport,
-    'has_activities_transport'    => $has_activities_transport,
-    'header_img_url'              => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
-    'installment_amount'          => 0,
-    'installment_date'            => '',
-    'installment_qr_url'          => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
-    'installment_reference'       => '',
-    'lines'                       => [],
-    'member'                      => substr($member_name, 0, 33) . ((strlen($member_name) > 33) ? '...' : ''),
-    'period'                      => date('d/m/Y', $booking['date_from']).' '.date('H:i', $booking['time_from']).' - '.date('d/m/Y', $booking['date_to']).' '.date('H:i', $booking['time_to']),
-    'postal_address'              => $postal_address,
-    'price'                       => $contract['price'],
-    'tax_lines'                   => [],
-    'total'                       => $contract['total'],
-    'has_activity'               => $has_activity,
-    'activities_map'             => '',
-    'show_consumption'           => $consumption_table_show
+    'attn_address1'                 => '',
+    'attn_address2'                 => '',
+    'attn_name'                     => '',
+    'benefit_lines'                 => [],
+    'benefit_freebies'              => [],
+    'center'                        => $booking['center_id']['name'],
+    'center_address'                => $booking['center_id']['address_street'].' - '.$booking['center_id']['address_zip'].' '.$booking['center_id']['address_city'],
+    'center_contact1'               => (isset($booking['center_id']['manager_id']['name']))?$booking['center_id']['manager_id']['name']:'',
+    'center_contact2'               => DataFormatter::format($booking['center_id']['phone'], 'phone').' - '.$booking['center_id']['email'],
+    'center_email'                  => $booking['center_id']['email'],
+    'center_office'                 => $center_office_code,
+    'center_phone'                  => DataFormatter::format($booking['center_id']['phone'], 'phone'),
+    'center_signature'              => $booking['center_id']['organisation_id']['signature'],
+    'code'                          => sprintf("%03d.%03d", intval($booking['name']) / 1000, intval($booking['name']) % 1000),
+    'company_address'               => sprintf("%s %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
+    'company_bic'                   => DataFormatter::format($booking['center_id']['organisation_id']['bank_account_bic'], 'bic'),
+    'company_email'                 => $booking['center_id']['organisation_id']['email'],
+    'company_fax'                   => DataFormatter::format($booking['center_id']['organisation_id']['fax'], 'phone'),
+    'company_has_vat'               => $booking['center_id']['organisation_id']['has_vat'],
+    'company_iban'                  => DataFormatter::format($booking['center_id']['organisation_id']['bank_account_iban'], 'iban'),
+    'company_name'                  => $booking['center_id']['organisation_id']['legal_name'],
+    'company_phone'                 => DataFormatter::format($booking['center_id']['organisation_id']['phone'], 'phone'),
+    'company_reg_number'            => $booking['center_id']['organisation_id']['registration_number'],
+    'company_vat_number'            => $booking['center_id']['organisation_id']['vat_number'],
+    'company_website'               => $booking['center_id']['organisation_id']['website'],
+    'contact_email'                 => $booking['customer_id']['partner_identity_id']['email'],
+    'contact_name'                  => '',
+    'contact_phone'                 => (strlen($booking['customer_id']['partner_identity_id']['phone']))?$booking['customer_id']['partner_identity_id']['phone']:$booking['customer_id']['partner_identity_id']['mobile'],
+    'consumptions_map_detailed'     => [],
+    'consumptions_map_simple'       => [],
+    'consumptions_type'             => isset($booking['type_id']['booking_schedule_layout'])?$booking['type_id']['booking_schedule_layout']:'simple',
+    'contract_authorization_html'   => '',
+    'contract_header_html'          => '',
+    'contract_service_html'         => '',
+    'contract_engage_html'          => '',
+    'contract_notice_html'          => '',
+    'contract_payment_html'         => '',
+    'contract_withdrawal_html'      => '',
+    'contract_cancellation_html'    => '',
+    'contract_misc_provisions_html' => '',
+    'customer_address1'             => $booking['customer_id']['partner_identity_id']['address_street'],
+    'customer_address2'             => $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'].(($booking['customer_id']['partner_identity_id']['address_country'] != 'BE')?(' - '.$booking['customer_id']['partner_identity_id']['address_country']):''),
+    'customer_address_dispatch'     => $booking['customer_id']['partner_identity_id']['address_dispatch'],
+    'customer_country'              => $booking['customer_id']['partner_identity_id']['address_country'],
+    'customer_has_vat'              => (int) $booking['customer_id']['partner_identity_id']['has_vat'],
+    'customer_name'                 => $customer_name,
+    'customer_vat'                  => $booking['customer_id']['partner_identity_id']['vat_number'],
+    'date'                          => date('d/m/Y', $contract['created']),
+    'fundings'                      => [],
+    'has_contract_approved'         => 0,
+    'has_roundtrip_transport'       => $has_roundtrip_transport,
+    'has_activities_transport'      => $has_activities_transport,
+    'header_img_url'                => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
+    'installment_amount'            => 0,
+    'installment_date'              => '',
+    'installment_qr_url'            => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
+    'installment_reference'         => '',
+    'lines'                         => [],
+    'member'                        => substr($member_name, 0, 33) . ((strlen($member_name) > 33) ? '...' : ''),
+    'period'                        => date('d/m/Y', $booking['date_from']).' '.date('H:i', $booking['time_from']).' - '.date('d/m/Y', $booking['date_to']).' '.date('H:i', $booking['time_to']),
+    'postal_address'                => $postal_address,
+    'price'                         => $contract['price'],
+    'tax_lines'                     => [],
+    'total'                         => $contract['total'],
+    'has_activity'                  => $has_activity,
+    'activities_map'                => '',
+    'show_consumption'              => $consumption_table_show
 ];
 
 /*
     retrieve terms translations
 */
 $values['i18n'] = [
-    'invoice'           => Setting::get_value('lodging', 'locale', 'i18n.invoice', null, [], $params['lang']),
-    'quote'             => Setting::get_value('lodging', 'locale', 'i18n.quote', null, [], $params['lang']),
-    'option'            => Setting::get_value('lodging', 'locale', 'i18n.option', null, [], $params['lang']),
-    'contract'          => Setting::get_value('lodging', 'locale', 'i18n.contract', null, [], $params['lang']),
-    'booking_invoice'   => Setting::get_value('lodging', 'locale', 'i18n.booking_invoice', null, [], $params['lang']),
-    'booking_quote'     => Setting::get_value('lodging', 'locale', 'i18n.booking_quote', null, [], $params['lang']),
-    'booking_contract'  => Setting::get_value('lodging', 'locale', 'i18n.booking_contract', null, [], $params['lang']),
-    'credit_note'       => Setting::get_value('lodging', 'locale', 'i18n.credit_note', null, [], $params['lang']),
-    'company_registry'  => Setting::get_value('lodging', 'locale', 'i18n.company_registry', null, [], $params['lang']),
-    'vat_number'        => Setting::get_value('lodging', 'locale', 'i18n.vat_number', null, [], $params['lang']),
-    'vat'               => Setting::get_value('lodging', 'locale', 'i18n.vat', null, [], $params['lang']),
-    'your_stay_at'      => Setting::get_value('lodging', 'locale', 'i18n.your_stay_at', null, [], $params['lang']),
-    'contact'           => Setting::get_value('lodging', 'locale', 'i18n.contact', null, [], $params['lang']),
-    'period'            => Setting::get_value('lodging', 'locale', 'i18n.period', null, [], $params['lang']),
-    'member'            => Setting::get_value('lodging', 'locale', 'i18n.member', null, [], $params['lang']),
-    'phone'             => Setting::get_value('lodging', 'locale', 'i18n.phone', null, [], $params['lang']),
-    'email'             => Setting::get_value('lodging', 'locale', 'i18n.email', null, [], $params['lang']),
-    'booking_ref'       => Setting::get_value('lodging', 'locale', 'i18n.booking_ref', null, [], $params['lang']),
-    'your_reference'    => Setting::get_value('lodging', 'locale', 'i18n.your_reference', null, [], $params['lang']),
-    'number_short'      => Setting::get_value('lodging', 'locale', 'i18n.number_short', null, [], $params['lang']),
-    'date'              => Setting::get_value('lodging', 'locale', 'i18n.date', null, [], $params['lang']),
-    'status'            => Setting::get_value('lodging', 'locale', 'i18n.status', null, [], $params['lang']),
-    'paid'              => Setting::get_value('lodging', 'locale', 'i18n.paid', null, [], $params['lang']),
-    'to_pay'            => Setting::get_value('lodging', 'locale', 'i18n.to_pay', null, [], $params['lang']),
-    'to_refund'         => Setting::get_value('lodging', 'locale', 'i18n.to_refund', null, [], $params['lang']),
-    'product_label'     => Setting::get_value('lodging', 'locale', 'i18n.product_label', null, [], $params['lang']),
-    'quantity_short'    => Setting::get_value('lodging', 'locale', 'i18n.quantity_short', null, [], $params['lang']),
-    'freebies_short'    => Setting::get_value('lodging', 'locale', 'i18n.freebies_short', null, [], $params['lang']),
-    'unit_price'        => Setting::get_value('lodging', 'locale', 'i18n.unit_price', null, [], $params['lang']),
-    'discount_short'    => Setting::get_value('lodging', 'locale', 'i18n.discount_short', null, [], $params['lang']),
-    'taxes'             => Setting::get_value('lodging', 'locale', 'i18n.taxes', null, [], $params['lang']),
-    'price'             => Setting::get_value('lodging', 'locale', 'i18n.price', null, [], $params['lang']),
-    'total'             => Setting::get_value('lodging', 'locale', 'i18n.total', null, [], $params['lang']),
-    'price_tax_excl'    => Setting::get_value('lodging', 'locale', 'i18n.price_tax_excl', null, [], $params['lang']),
-    'total_tax_excl'    => Setting::get_value('lodging', 'locale', 'i18n.total_tax_excl', null, [], $params['lang']),
-    'total_tax_incl'    => Setting::get_value('lodging', 'locale', 'i18n.total_tax_incl', null, [], $params['lang']),
+    'invoice'               => Setting::get_value('lodging', 'locale', 'i18n.invoice', null, [], $params['lang']),
+    'quote'                 => Setting::get_value('lodging', 'locale', 'i18n.quote', null, [], $params['lang']),
+    'option'                => Setting::get_value('lodging', 'locale', 'i18n.option', null, [], $params['lang']),
+    'contract'              => Setting::get_value('lodging', 'locale', 'i18n.contract', null, [], $params['lang']),
+    'booking_invoice'       => Setting::get_value('lodging', 'locale', 'i18n.booking_invoice', null, [], $params['lang']),
+    'booking_quote'         => Setting::get_value('lodging', 'locale', 'i18n.booking_quote', null, [], $params['lang']),
+    'booking_contract'      => Setting::get_value('lodging', 'locale', 'i18n.booking_contract', null, [], $params['lang']),
+    'credit_note'           => Setting::get_value('lodging', 'locale', 'i18n.credit_note', null, [], $params['lang']),
+    'company_registry'      => Setting::get_value('lodging', 'locale', 'i18n.company_registry', null, [], $params['lang']),
+    'vat_number'            => Setting::get_value('lodging', 'locale', 'i18n.vat_number', null, [], $params['lang']),
+    'vat'                   => Setting::get_value('lodging', 'locale', 'i18n.vat', null, [], $params['lang']),
+    'your_stay_at'          => Setting::get_value('lodging', 'locale', 'i18n.your_stay_at', null, [], $params['lang']),
+    'contact'               => Setting::get_value('lodging', 'locale', 'i18n.contact', null, [], $params['lang']),
+    'period'                => Setting::get_value('lodging', 'locale', 'i18n.period', null, [], $params['lang']),
+    'member'                => Setting::get_value('lodging', 'locale', 'i18n.member', null, [], $params['lang']),
+    'phone'                 => Setting::get_value('lodging', 'locale', 'i18n.phone', null, [], $params['lang']),
+    'email'                 => Setting::get_value('lodging', 'locale', 'i18n.email', null, [], $params['lang']),
+    'booking_ref'           => Setting::get_value('lodging', 'locale', 'i18n.booking_ref', null, [], $params['lang']),
+    'your_reference'        => Setting::get_value('lodging', 'locale', 'i18n.your_reference', null, [], $params['lang']),
+    'number_short'          => Setting::get_value('lodging', 'locale', 'i18n.number_short', null, [], $params['lang']),
+    'date'                  => Setting::get_value('lodging', 'locale', 'i18n.date', null, [], $params['lang']),
+    'status'                => Setting::get_value('lodging', 'locale', 'i18n.status', null, [], $params['lang']),
+    'paid'                  => Setting::get_value('lodging', 'locale', 'i18n.paid', null, [], $params['lang']),
+    'to_pay'                => Setting::get_value('lodging', 'locale', 'i18n.to_pay', null, [], $params['lang']),
+    'to_refund'             => Setting::get_value('lodging', 'locale', 'i18n.to_refund', null, [], $params['lang']),
+    'product_label'         => Setting::get_value('lodging', 'locale', 'i18n.product_label', null, [], $params['lang']),
+    'quantity_short'        => Setting::get_value('lodging', 'locale', 'i18n.quantity_short', null, [], $params['lang']),
+    'freebies_short'        => Setting::get_value('lodging', 'locale', 'i18n.freebies_short', null, [], $params['lang']),
+    'unit_price'            => Setting::get_value('lodging', 'locale', 'i18n.unit_price', null, [], $params['lang']),
+    'discount_short'        => Setting::get_value('lodging', 'locale', 'i18n.discount_short', null, [], $params['lang']),
+    'taxes'                 => Setting::get_value('lodging', 'locale', 'i18n.taxes', null, [], $params['lang']),
+    'price'                 => Setting::get_value('lodging', 'locale', 'i18n.price', null, [], $params['lang']),
+    'total'                 => Setting::get_value('lodging', 'locale', 'i18n.total', null, [], $params['lang']),
+    'price_tax_excl'        => Setting::get_value('lodging', 'locale', 'i18n.price_tax_excl', null, [], $params['lang']),
+    'total_tax_excl'        => Setting::get_value('lodging', 'locale', 'i18n.total_tax_excl', null, [], $params['lang']),
+    'total_tax_incl'        => Setting::get_value('lodging', 'locale', 'i18n.total_tax_incl', null, [], $params['lang']),
     'stay_total_tax_incl'   => Setting::get_value('lodging', 'locale', 'i18n.stay_total_tax_incl', null, [], $params['lang']),
     'balance_of'            => Setting::get_value('lodging', 'locale', 'i18n.balance_of', null, [], $params['lang']),
     'to_be_paid_before'     => Setting::get_value('lodging', 'locale', 'i18n.to_be_paid_before', null, [], $params['lang']),
@@ -673,7 +697,7 @@ if($booking['center_id']['template_category_id']) {
                 $service_beds = Setting::get_value('lodging', 'locale', 'i18n.not_bed_linens', null, [], $params['lang']);
             }
             else {
-                if($booking_option['has_make_beds']) {
+                if($booking_options['has_make_beds']) {
                     $service_beds = Setting::get_value('lodging', 'locale', 'i18n.make_beds', null, [], $params['lang']);
                 }
                 else {
@@ -989,278 +1013,97 @@ if($template_part) {
     feed lines
 */
 
-$lines = [];
+$map_groupings = [];
+foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
+    foreach($booking_line_group['booking_lines_ids'] as $booking_line) {
+        $product = $booking_line['product_id'];
+        $product_model = $product['product_model_id'];
+        if(isset($booking_line['booking_activity_id']) && ($booking_line['is_transport'] || $booking_line['is_supply'])) {
+            $product = $booking_line['booking_activity_id']['activity_booking_line_id']['product_id'];
+            $product_model = $product['product_model_id'];
+        }
 
-// all lines are in groups
-foreach($contract['contract_line_groups_ids'] as $contract_line_group) {
-    // generate group label
-    $group_label = (strlen($contract_line_group['name']))?$contract_line_group['name']:'';
-
-    if($contract_line_group['is_pack']) {
-        // group is a product pack (bundle) with own price: add a single line with details
-        $group_is_pack = true;
-
-        $line = [
-            'name'          => $group_label,
-            'price'         => $contract_line_group['contract_line_id']['price'],
-            'total'         => $contract_line_group['contract_line_id']['total'],
-            'unit_price'    => $contract_line_group['contract_line_id']['unit_price'],
-            'vat_rate'      => $contract_line_group['contract_line_id']['vat_rate'],
-            'qty'           => $contract_line_group['contract_line_id']['qty'],
-            'free_qty'      => $contract_line_group['contract_line_id']['free_qty'],
-            'discount'      => $contract_line_group['contract_line_id']['discount'],
-            'is_group'      => false,
-            'is_pack'       => true
-        ];
-        $lines[] = $line;
-
-        if($params['mode'] == 'detailed') {
-            foreach($contract_line_group['contract_lines_ids'] as $contract_line) {
-                $line = [
-                    'name'          => $contract_line['name'],
-                    'qty'           => $contract_line['qty'],
-                    'price'         => null,
-                    'total'         => null,
-                    'unit_price'    => null,
-                    'vat_rate'      => null,
-                    'discount'      => null,
-                    'free_qty'      => null,
-                    'is_group'      => false,
-                    'is_pack'       => false
-                ];
-                $lines[] = $line;
+        $group_name = $booking_line['product_id']['label'];
+        $group_age_range_id = null;
+        if(isset($product['grouping_code_id']['code'])) {
+            if($product['grouping_code_id']['code'] === 'invisible') {
+                continue;
+            }
+            $group_name = $product['grouping_code_id']['name'];
+            if($product['grouping_code_id']['has_age_range']) {
+                $group_age_range_id = $product['grouping_code_id']['age_range_id'];
             }
         }
-    }
-    else {
-        // group is a pack with no own price
-        $group_is_pack = false;
+        elseif(isset($product_model['grouping_code_id']['code'])) {
+            if($product_model['grouping_code_id']['code'] === 'invisible') {
+                continue;
+            }
+            $group_name = $product_model['grouping_code_id']['name'];
+            if($product_model['grouping_code_id']['has_age_range']) {
+                $group_age_range_id = $product_model['grouping_code_id']['age_range_id'];
+            }
+        }
+        elseif(!empty($booking_line['description'])) {
+            $group_name = $booking_line['description'];
+        }
 
-        if($params['mode'] == 'grouped') {
-            $line = [
-                'name'          => $group_label,
-                'price'         => $contract_line_group['price'],
-                'total'         => $contract_line_group['total'],
-                'unit_price'    => $contract_line_group['total'],
-                'vat_rate'      => (floatval($contract_line_group['price'])/floatval($contract_line_group['total']) - 1.0),
-                'qty'           => 1,
-                'free_qty'      => 0,
-                'discount'      => 0,
-                'is_group'      => true,
-                'is_pack'       => false
+        if(!isset($map_groupings[$group_name])) {
+            $name = $group_name;
+            if($booking_line_group['is_sojourn'] && !is_null($group_age_range_id)) {
+                foreach($booking_line_group['age_range_assignments_ids'] as $age_range_assignment) {
+                    if($age_range_assignment['age_range_id']['id'] === $group_age_range_id) {
+                        $name .= " - {$age_range_assignment['qty']}p.";
+                        break;
+                    }
+                }
+            }
+
+            $map_groupings[$group_name] = [
+                'name'          => $name,
+                'price'         => 0,
+                'total'         => 0,
+                'is_activity'   => $booking_line['is_activity'],
+                'free_qty'      => $booking_line['free_qty'],
+                'lines'         => []
             ];
         }
-        else {
-            $line = [
-                'name'          => $group_label,
-                'price'         => null,
-                'total'         => null,
-                'unit_price'    => null,
-                'vat_rate'      => null,
-                'qty'           => null,
-                'free_qty'      => null,
-                'discount'      => null,
-                'is_group'      => true
-            ];
-        }
-        $lines[] = $line;
 
-        $group_lines = [];
-
-        foreach($contract_line_group['contract_lines_ids'] as $contract_line) {
-
-            if($params['mode'] == 'grouped') {
-                $line = [
-                    'name'          => (strlen($contract_line['description']) > 0)?$contract_line['description']:$contract_line['name'],
-                    'price'         => null,
-                    'total'         => null,
-                    'unit_price'    => null,
-                    'vat_rate'      => null,
-                    'qty'           => $contract_line['qty'],
-                    'discount'      => null,
-                    'free_qty'      => null,
-                    'is_group'      => false,
-                    'is_pack'       => false
-                ];
-            }
-            else {
-                $line = [
-                    'name'          => (strlen($contract_line['description']) > 0)?$contract_line['description']:$contract_line['name'],
-                    'price'         => $contract_line['price'],
-                    'total'         => $contract_line['total'],
-                    'unit_price'    => $contract_line['unit_price'],
-                    'vat_rate'      => $contract_line['vat_rate'],
-                    'qty'           => $contract_line['qty'],
-                    'discount'      => $contract_line['discount'],
-                    'free_qty'      => $contract_line['free_qty'],
-                    'is_group'      => false,
-                    'is_pack'       => false
-                ];
-
-            }
-
-            $group_lines[] = $line;
-        }
-
-        if($params['mode'] == 'detailed' || $params['mode'] == 'grouped') {
-            foreach($group_lines as $line) {
-                $lines[] = $line;
-            }
-        }
-        // mode is 'simple' : group lines by VAT rate
-        else {
-            $group_tax_lines = [];
-            foreach($group_lines as $line) {
-                $vat_rate = strval($line['vat_rate']);
-                if(!isset($group_tax_lines[$vat_rate])) {
-                    $group_tax_lines[$vat_rate] = 0;
-                }
-                $group_tax_lines[$vat_rate] += $line['total'];
-            }
-
-            if(count(array_keys($group_tax_lines)) <= 1) {
-                $pos = count($lines)-1;
-                foreach($group_tax_lines as $vat_rate => $total) {
-                    $lines[$pos]['qty'] = 1;
-                    $lines[$pos]['vat_rate'] = $vat_rate;
-                    $lines[$pos]['total'] = $total;
-                    $lines[$pos]['price'] = $total * (1 + $vat_rate);
-                }
-            }
-            else {
-                foreach($group_tax_lines as $vat_rate => $total) {
-                    $line = [
-                        'name'      => 'Services avec TVA '.($vat_rate*100).'%',
-                        'qty'       => 1,
-                        'vat_rate'  => $vat_rate,
-                        'total'     => $total,
-                        'price'     => $total * (1 + $vat_rate)
-                    ];
-                    $lines[] = $line;
-                }
-            }
-        }
+        $map_groupings[$group_name]['total'] += $booking_line['total'];
+        $map_groupings[$group_name]['price'] += $booking_line['price'];
+        $map_groupings[$group_name]['lines'][] = $booking_line;
     }
 }
 
+$lines = [];
+foreach($map_groupings as $group_name => $group) {
+    $lines[] = [
+        'name'          => $group['name'],
+        'qty'           => $params['mode'] === 'grouped' ? 1 : null,
+        'free_qty'      => null,
+        'unit_price'    => $params['mode'] === 'grouped' ? $group['price'] : null,
+        'vat_rate'      => null,
+        'total'         => $params['mode'] === 'grouped' ? $group['total'] : null,
+        'price'         => $params['mode'] === 'grouped' ? $group['price'] : null,
+        'is_group'      => true
+    ];
 
-$lines_map = [];
-
-if($params['mode'] == 'grouped') {
-    $lines = [];
-    foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
-        foreach($booking_line_group['booking_lines_ids'] as $booking_line) {
-            if($booking_line['is_transport'] && !empty($booking_line['booking_activity_id'])){
-                continue;
-            }
-
-            if($booking_line['is_supply'] && !empty($booking_line['booking_activity_id'])){
-                continue;
-            }
-
-            $booking_line_group_id = $booking_line_group['id'];
-            $product = $booking_line['product_id'];
-
-            $grouping_code = $booking_line['product_id']['label'];
-
-            if(isset($product['grouping_code_id']['name'])) {
-                if($product['grouping_code_id']['code'] === 'invisible') {
-                    continue;
-                }
-                $grouping_code = $product['grouping_code_id']['name'];
-            }
-            elseif(isset($product['product_model_id']['grouping_code_id']['name'])) {
-                if($product['product_model_id']['grouping_code_id']['code'] === 'invisible') {
-                    continue;
-                }
-                $grouping_code = $product['product_model_id']['grouping_code_id']['name'];
-            }
-            elseif(strlen($booking_line['description']) > 0) {
-                $grouping_code = $booking_line['description'];
-            }
-
-            if(!isset($lines_map[$booking_line_group_id])) {
-                $lines_map[$booking_line_group_id] = [];
-            }
-            if(!isset($lines_map[$booking_line_group_id][$grouping_code])) {
-                $lines_map[$booking_line_group_id][$grouping_code] = [];
-            }
-
-            if(!isset($lines_map[$booking_line_group_id][$grouping_code][$product['id']])) {
-                $lines_map[$booking_line_group_id][$grouping_code][$product['id']] = [
-                    'name'          => $booking_line['name'],
-                    'price'         => null,
-                    'total'         => null,
-                    'unit_price'    => null,
-                    'vat_rate'      => null,
-                    'qty'           => $booking_line['qty'],
-                    'discount'      => null,
-                    'has_pack'      => $booking_line_group['has_pack'],
-                    'is_activity'   => $booking_line['is_activity'],
-                    'free_qty'      => $booking_line['free_qty'],
-                    'grouping'      => $grouping_code
-                ];
-
-                if( $booking_line['booking_activity_id'] &&
-                    (
-                        !empty($booking_line['booking_activity_id']['supplies_booking_lines_ids']) ||
-                        !empty($booking_line['booking_activity_id']['transports_booking_lines_ids'])
-                    )
-                ) {
-                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] += $booking_line['booking_activity_id']['price'];
-                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] += $booking_line['booking_activity_id']['total'];
-                }
-                else {
-                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['unit_price'] = $booking_line['unit_price'];
-                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] = $booking_line['price'];
-                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] = $booking_line['total'];
-                }
-            }
-            else {
-                $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] += $booking_line['price'];
-                $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] += $booking_line['total'];
-                $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['qty'] += $booking_line['qty'];
-            }
+    if($params['mode'] === 'detailed') {
+        foreach($group['lines'] as $line) {
+            $lines[] = [
+                'name'          => $line['name'],
+                'qty'           => $line['qty'],
+                'free_qty'      => $line['free_qty'],
+                'unit_price'    => $line['unit_price'],
+                'vat_rate'      => $line['vat_rate'],
+                'total'         => $line['total'],
+                'price'         => $line['price'],
+                'is_group'      => false
+            ];
         }
     }
-    foreach($lines_map as $booking_line_group_id => $groupings) {
-        foreach($groupings as $grouping_code_id => $products) {
-            foreach($products as $product_id => $product) {
-                if(!isset($lines[$grouping_code_id])) {
-                        $lines[$grouping_code_id] = [
-                            'name'          => $product['grouping'],
-                            'unit_price'    => 0,
-                            'vat_rate'      => 0,
-                            'free_qty'      => 0,
-                            'qty'           => 0,
-                            'price'         => 0,
-                            'total'         => 0,
-                            'is_group'      => false,
-                            'is_pack'       => false
-                        ];
-                }
-
-                $lines[$grouping_code_id]['price'] += $product['price'];
-                $lines[$grouping_code_id]['total'] += $product['total'];
-
-                if($product['has_pack']){
-                    $lines[$grouping_code_id]['qty'] = $product['qty'];
-                    $lines[$grouping_code_id]['free_qty'] = $product['free_qty'];
-                    $lines[$grouping_code_id]['unit_price'] += $product['unit_price'];
-                }
-
-                if($product['is_activity']){
-                    $lines[$grouping_code_id]['qty'] = 1;
-                    $lines[$grouping_code_id]['unit_price'] = $product['total'];
-                }
-            }
-        }
-    }
-
 }
 
 $values['lines'] = $lines;
-
 
 /*
     compute fare benefit detail
