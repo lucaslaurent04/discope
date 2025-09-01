@@ -77,7 +77,7 @@ class RentalUnit extends Model {
 
             'extra' => [
                 'type'              => 'integer',
-                'usage'             => 'number/integer{0,2}',
+                'usage'             => 'number/integer{0,5}',
                 'description'       => 'The number of extra children that may stay in the unit.',
                 'default'           => 0
             ],
@@ -353,10 +353,10 @@ class RentalUnit extends Model {
                         return ($qty >= 0);
                     }
                 ],
-                'gt_two' => [
-                    'message'       => 'Extra capacity must be a lower than two.',
+                'gt_five' => [
+                    'message'       => 'Extra capacity must be a lower than 5.',
                     'function'      => function ($qty, $values) {
-                        return ($qty <= 2);
+                        return ($qty <= 5);
                     }
                 ]
             ]
