@@ -65,8 +65,31 @@ list($params, $providers) = announce([
     'providers'     => ['context', 'orm']
 ]);
 
-
 list($context, $orm) = [$providers['context'], $providers['orm']];
+
+$output = null;
+
+// steer towards custom controller, if any
+$has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
+if($has_custom_package) {
+    $custom_package = Setting::get_value('discope', 'features', 'custom_package');
+    if(!$custom_package) {
+        trigger_error('APP::Missing customization package setting (despite `discope.features.has_custom_package`)', EQ_REPORT_WARNING);
+    }
+    elseif($custom_package !== 'sale') {
+        if(file_exists(EQ_BASEDIR."/packages/{$custom_package}/data/sale/booking/print-invoice.php")) {
+            $output = eQual::run('get', "{$custom_package}_sale_booking_print-invoice", $params, true);
+
+            $context->httpResponse()
+                    // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
+                    ->header('Content-Disposition', 'inline; filename="document.pdf"')
+                    ->body($output)
+                    ->send();
+
+            exit(0);
+        }
+    }
+}
 
 /*
     Retrieve the requested template
