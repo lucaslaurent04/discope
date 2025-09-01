@@ -122,7 +122,7 @@ $map_employees = [];
 $map_providers = [];
 $map_product_models = [];
 
-// retrieve all foreign objects identifiers
+// pass-1 - retrieve all foreign objects identifiers
 foreach($activities as $id => $activity) {
     $map_bookings[$activity['booking_id']] = true;
     $map_groups[$activity['booking_line_group_id']] = true;
@@ -166,7 +166,7 @@ $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
 $adapter = $dap->get('json');
 
 $result = [];
-// build result: enrich and adapt consumptions
+// pass-2 - build result: enrich and adapt consumptions
 foreach($activities as $id => $activity) {
     if(isset($activity['employee_id']) && !empty($params['partners_ids'])) {
         if(!isset($map_employees_ids[$activity['employee_id']])) {
