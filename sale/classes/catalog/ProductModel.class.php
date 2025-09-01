@@ -422,7 +422,8 @@ class ProductModel extends Model {
             'has_staff_required' => [
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the activity requires dedicated staff to be assigned.',
-                'default'           => false,
+                'help'              => 'This field has no effect for non-activities.',
+                'default'           => true,
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
             ],
 
