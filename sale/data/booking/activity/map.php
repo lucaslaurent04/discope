@@ -7,6 +7,7 @@
 */
 
 use core\setting\Setting;
+use equal\orm\Domain;
 use equal\orm\Field;
 use hr\employee\Employee;
 use identity\Identity;
@@ -72,62 +73,21 @@ $domain = [
     ['activity_date', '>=', $params['date_from']],
     ['activity_date', '<', $params['date_to']]
 ];
+
 if(!empty($params['product_model_ids'])) {
     $domain[] = ['product_model_id', 'in', $params['product_model_ids']];
 }
 
 $activities_ids = $orm->search(BookingActivity::getType(), $domain);
 
-$domain = [];
+
+// #memo - do not filter on partners, but remember the list of displayed employees
+$map_employees_ids = [];
+
 if(!empty($params['partners_ids'])) {
-    $partners_ids = $orm->search(Partner::getType(), [
-        ['id', 'in', $params['partners_ids']],
-        ['relationship', 'in', ['employee', 'provider']]
-    ]);
-
-    $partners = $orm->read(Partner::getType(), $partners_ids, ['id', 'name', 'relationship']);
-
-    $employees_ids = [];
-    $providers_ids = [];
-    foreach($partners as $partner) {
-        if($partner['relationship'] === 'employee') {
-            $employees_ids[] = $partner['id'];
-        }
-        else {
-            $providers_ids[] = $partner['id'];
-        }
+    foreach($params['partners_ids'] as $partner_id) {
+        $map_employees_ids[$partner_id] = true;
     }
-
-    if(!empty($employees_ids)) {
-        $domain[] = [
-            ['activity_date', '>=', $params['date_from']],
-            ['activity_date', '<', $params['date_to']],
-            ['employee_id', 'in', $employees_ids]
-        ];
-
-        $domain[] = [
-            ['id', 'in', $activities_ids],
-            ['employee_id', '=', null]
-        ];
-    }
-    if(!empty($providers_ids)) {
-        $activities = $orm->read(BookingActivity::getType(), $activities_ids, ['id', 'providers_ids']);
-
-        $providers_activities_ids = [];
-        foreach($activities as $activity) {
-            if(count(array_intersect($activity['providers_ids'], $providers_ids)) > 0) {
-                $providers_activities_ids[] = $activity['id'];
-            }
-        }
-
-        $domain[] = [
-            ['id', 'in', $providers_activities_ids]
-        ];
-    }
-}
-
-if(!empty($domain)) {
-    $activities_ids = $orm->search(BookingActivity::getType(), $domain);
 }
 
 // #memo - we use the ORM to prevent recursion and bypass permission check
@@ -162,7 +122,7 @@ $map_employees = [];
 $map_providers = [];
 $map_product_models = [];
 
-// retrieve all foreign objects identifiers
+// pass-1 - retrieve all foreign objects identifiers
 foreach($activities as $id => $activity) {
     $map_bookings[$activity['booking_id']] = true;
     $map_groups[$activity['booking_line_group_id']] = true;
@@ -206,8 +166,15 @@ $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
 $adapter = $dap->get('json');
 
 $result = [];
-// build result: enrich and adapt consumptions
+// pass-2 - build result: enrich and adapt consumptions
 foreach($activities as $id => $activity) {
+    if(isset($activity['employee_id']) && !empty($params['partners_ids'])) {
+        if(!isset($map_employees_ids[$activity['employee_id']])) {
+            // ignore Booking Activities linked to a non-displayed employee
+            continue;
+        }
+    }
+
     $date_index = date('Y-m-d', $activity['activity_date']);
     $time_slot = [1 => 'AM', 3 => 'PM', 6 => 'EV'][$activity['time_slot_id']];
 

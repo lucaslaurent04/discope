@@ -21,6 +21,11 @@
             "label": "Ignorer le nettoyage des unités locatives",
             "description": "Faire le checkin même sans nettoyage.",
             "help": ""
+        },
+        "sign_contract": {
+            "label": "Marquer contract comme signé",
+            "description": "Marquer le contrat en cours comme signé, s'il ne l'est pas déjà.",
+            "help": ""
         }
     },
     "error": {

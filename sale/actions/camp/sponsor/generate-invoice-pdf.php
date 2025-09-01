@@ -28,13 +28,13 @@ use Twig\TwigFilter;
         ]
 
     ],
+    'access'        => [
+        'visibility'        => 'protected',
+        'groups'            => ['camp.default.administrator'],
+    ],
     'response'      => [
         'content-type'      => 'application/pdf',
         'accept-origin'     => '*'
-    ],
-    'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.user'],
     ],
     'providers'     => ['context']
 ]);

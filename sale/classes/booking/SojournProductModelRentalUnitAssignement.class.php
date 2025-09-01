@@ -55,9 +55,17 @@ class SojournProductModelRentalUnitAssignement extends Model {
                 'onupdate'          => 'onupdateQty'
             ],
 
+            'name' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'relation'          => ['rental_unit_id' => 'name'],
+                'store'             => true
+            ],
+
             'rental_unit_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'realestate\RentalUnit',
+                'dependents'        => ['name'],
                 'description'       => 'Rental unit assigned to booking line.',
                 'ondelete'          => 'null',
                 'onupdate'          => 'onupdateRentalUnitId'

@@ -95,7 +95,9 @@ $tree = [
                 'qty_accounting_method'
             ],
             'rental_unit_assignments_ids' => [
+                '@sort' => ['name' => 'asc'],
                 'id',
+                'name',
                 'qty',
                 'use_extra',
                 'booking_line_group_id',

@@ -53,7 +53,8 @@ class SojournProductModel extends Model {
                 'foreign_field'     => 'sojourn_product_model_id',
                 'description'       => 'Rental unit assigned to booking line.',
                 'ondetach'          => 'delete',
-                'onupdate'          => 'onupdateRentalUnitAssignmentsIds'
+                'onupdate'          => 'onupdateRentalUnitAssignmentsIds',
+                'order'             => 'name'
             ],
 
             'qty' => [

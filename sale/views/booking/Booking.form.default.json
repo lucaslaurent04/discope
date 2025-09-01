@@ -23,7 +23,18 @@
             "description": "Rental units will no longer be reserved and will be available for other bookings.",
             "controller": "sale_booking_do-quote",
             "confirm": true,
-            "visible": [ ["status", "in", ["option", "confirmed", "validated"]], ["is_from_channelmanager", "=", false] ]
+            "visible": [["status", "in", ["option", "confirmed", "validated"]], ["is_from_channelmanager", "=", false]]
+        },
+        {
+            "id": "action.quote-from-checkedout",
+            "label": "Revert to Quote",
+            "description": "Rental units will no longer be reserved and will be available for other bookings.",
+            "controller": "sale_booking_do-quote",
+            "confirm": true,
+            "visible": [["status", "in", ["checkedin", "checkedout"]], ["is_from_channelmanager", "=", false], [true, "=", "object.checkedout_revert_to_quote"]],
+            "params": {
+                "free_rental_units": false
+            }
         },
         {
             "id": "action.option",
@@ -31,7 +42,7 @@
             "description": "Rental units will be reserved but no funding will be claimed yet.",
             "controller": "sale_booking_do-option",
             "confirm": true,
-            "visible": ["status", "=", "quote"]
+            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "is", null]]
         },
         {
             "id": "action.option-confirm",
@@ -39,7 +50,7 @@
             "description": "Rental units will be reserved and the invoicing plan will be set up.",
             "controller": "sale_booking_do-option-confirm",
             "confirm": true,
-            "visible": [["status", "=", "quote"], ["is_price_tbc", "=", false]]
+            "visible": [["status", "=", "quote"], ["is_price_tbc", "=", false], ["status_before_revert_to_quote", "is", null]]
         },
         {
             "id": "action.confirm",
@@ -58,12 +69,28 @@
             "visible": ["status", "in", ["confirmed", "validated"]]
         },
         {
+            "id": "action.checkin-from-quote",
+            "label": "Back to Check In",
+            "description": "The Booking status is set back to its previous checkedin status.",
+            "controller": "sale_booking_do-checkin-quote",
+            "confirm": true,
+            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "=", "checkedin"]]
+        },
+        {
             "id": "action.checkout",
             "label": "Check Out",
             "description": "The host is leaving: the rental units will be marked for cleaning.",
             "controller": "sale_booking_do-checkout",
             "confirm": true,
             "visible": ["status", "in", ["checkedin"]]
+        },
+        {
+            "id": "action.checkout-from-quote",
+            "label": "Back to Check Out",
+            "description": "The Booking status is set back to its previous checkedout status.",
+            "controller": "sale_booking_do-checkout-quote",
+            "confirm": true,
+            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "=", "checkedout"]]
         },
         {
             "id": "action.invoice",
@@ -117,7 +144,7 @@
             "description": "Rental units will be released if they haven't been yet.",
             "controller": "sale_booking_release-rentalunits",
             "confirm": true,
-            "visible": ["status", "=", "quote"]
+            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "is", null]]
         },
         {
             "id": "action.pay_instant",
@@ -292,6 +319,16 @@
                                             {
                                                 "type": "field",
                                                 "value": "nb_pers",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "checkedout_revert_to_quote",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "status_before_revert_to_quote",
                                                 "visible": false
                                             },
                                             {
@@ -511,19 +548,22 @@
                                                 "type": "field",
                                                 "label": "Via Tour Operator?",
                                                 "value": "has_tour_operator",
-                                                "width": "100%"
+                                                "width": "100%",
+                                                "visible": [true, "=", "env.sale.features.booking.channel_manager"]
                                             },
                                             {
                                                 "type": "field",
                                                 "label": "Tour Operator",
                                                 "value": "tour_operator_id",
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "visible": [true, "=", "env.sale.features.booking.channel_manager"]
                                             },
                                             {
                                                 "type": "field",
                                                 "label": "Reference",
                                                 "value": "tour_operator_ref",
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "visible": [true, "=", "env.sale.features.booking.channel_manager"]
                                             }
                                         ]
                                     }

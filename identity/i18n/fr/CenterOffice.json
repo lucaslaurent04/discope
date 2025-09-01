@@ -98,6 +98,11 @@
             "description": "Force l'assignation manuelle des unités locatives.",
             "help": ""
         },
+        "checkedout_revert_to_quote": {
+            "label": "Repasser en devis depuis 'En cours' ou 'Terminée'",
+            "description": "Autoriser de repasser en devis depuis les status 'En cours' ou 'Terminée'.",
+            "help": ""
+        },
         "freebies_manual_assignment": {
             "label": "Gratuités manuelles",
             "description": "Force l'assignation manuelle des gratuités.",
