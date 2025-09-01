@@ -13,7 +13,9 @@
             <span class="day-name">{{ dayName(dateString) }}</span> <span class="date">{{ dateComplete(dateString) }}</span>
         </div>
 
-        <div *ngFor="let timeSlotCode of ['AM', 'PM', 'EV']" class="time-slot-activities" [style]="'gap: '+gapBetweenGroupLine+'px;'">
+        <!-- #memo - removed as per request CPA Lathus 2025-09-01 -->
+        <!-- <div *ngFor="let timeSlotCode of ['AM', 'PM', 'EV']" class="time-slot-activities" [style]="'gap: '+gapBetweenGroupLine+'px;'"> -->
+        <div *ngFor="let timeSlotCode of ['AM', 'PM']" class="time-slot-activities" [style]="'gap: '+gapBetweenGroupLine+'px;'">
             <ng-container *ngIf="dateInBooking(dateString)">
                 <div *ngFor="let group of groups"
                      class="group-activity"
