@@ -252,7 +252,8 @@ class BookingActivity extends Model {
             'is_exclusive' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
-                'description'       => "Is the activity exclusive to the employee's time slot?",
+                'description'       => 'Is the activity exclusive to the employee\'s time slot?',
+                'help'              => "When activitiy is exclusive, a single activity can be assigned to the employee, whatever the start and end times.",
                 'store'             => true,
                 'instant'           => true,
                 'relation'          => ['product_model_id' => 'is_exclusive']
