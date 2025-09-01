@@ -80,6 +80,12 @@ class Booking extends Model {
                 'required'          => true
             ],
 
+            'organisation_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\Identity',
+                'description'       => "The organisation the establishment belongs to."
+            ],
+
             'customer_nature_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\CustomerNature',
