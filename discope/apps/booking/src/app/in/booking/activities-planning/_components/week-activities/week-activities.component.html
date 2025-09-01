@@ -4,8 +4,11 @@
         <mat-icon class="time-slot-icon">wb_twilight</mat-icon>
         <div [style]="'min-height:'+timeSlotIconSeparatorHeight()+'px'"></div>
         <mat-icon class="time-slot-icon">sunny</mat-icon>
+        <!-- #memo - removed as per request CPA Lathus 2025-09-01 -->
+        <!--
         <div [style]="'min-height:'+timeSlotIconSeparatorHeight()+'px'"></div>
         <mat-icon class="time-slot-icon">nights_stay</mat-icon>
+        -->
     </div>
 
     <div *ngFor="let dateString of days" class="day-activities" [class.day-disabled]="!dateInBooking(dateString)" [style]="'gap: '+gapBetweenTimeSlot+'px;'">
