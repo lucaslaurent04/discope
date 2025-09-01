@@ -1,5 +1,12 @@
 {
     "name": "Skills",
+    "header": {
+        "actions": {
+            "ACTION.CREATE": {
+                "visible": ["camp.default.administrator", "in", "user.groups"]
+            }
+        }
+    },
     "layout": {
         "items": [
             {

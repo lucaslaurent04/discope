@@ -79,6 +79,11 @@ $invoices = Invoice::search(
             'product_id'        => [
                 'analytic_section_id' => [
                     'code'
+                ],
+                'product_model_id' => [
+                    'analytic_section_id' => [
+                        'code'
+                    ]
                 ]
             ],
             'price_id'          => [
@@ -87,6 +92,9 @@ $invoices = Invoice::search(
                         'account',
                         'share'
                     ]
+                ],
+                'analytic_section_id' => [
+                    'code'
                 ]
             ]
         ]
@@ -152,12 +160,24 @@ foreach($invoices as $invoice) {
     foreach($invoice['invoice_lines_ids'] as $line) {
         // invoice product line
         foreach($line['price_id']['accounting_rule_id']['accounting_rule_line_ids'] as $rule_line) {
+            // get analytic section from model, product or price
+            $analytic_section_code = '';
+            if(!empty($line['price_id']['analytic_section_id']['code'])) {
+                $analytic_section_code = $line['price_id']['analytic_section_id']['code'];
+            }
+            elseif(!empty($line['product_id']['analytic_section_id']['code'])) {
+                $analytic_section_code = $line['product_id']['analytic_section_id']['code'];
+            }
+            elseif(!empty($line['product_id']['product_model_id']['analytic_section_id']['code'])) {
+                $analytic_section_code = $line['product_id']['product_model_id']['analytic_section_id']['code'];
+            }
+
             $lines[] = [
                 'writing_number'        => $writing_number,
                 'writing_line_number'   => ++$writing_line_number,
                 'date'                  => $invoice_date,
                 'general_account'       => $rule_line['account'],
-                'analytic_account'      => $line['product_id']['analytic_section_id']['code'] ?? '',
+                'analytic_account'      => $analytic_section_code,
                 'journal_account'       => 'VA',
                 'file_type'             => '',
                 'file_number'           => $invoice['number'],

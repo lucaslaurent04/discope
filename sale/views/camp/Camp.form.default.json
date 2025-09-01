@@ -2,6 +2,9 @@
     "name": "Camp",
     "header": {
         "actions": {
+            "ACTION.EDIT": {
+                "visible": ["camp.default.administrator", "in", "user.groups"]
+            },
             "ACTION.SAVE": [
                 {
                     "id": "SAVE_AND_CONTINUE"
@@ -23,7 +26,8 @@
                 "ids": []
             },
             "visible": [
-                ["status", "=", "draft"]
+                ["status", "=", "draft"],
+                ["camp.default.administrator", "in", "user.groups"]
             ]
         },
         {
@@ -36,7 +40,8 @@
                 "ids": []
             },
             "visible": [
-                ["status", "in", ["draft", "published"]]
+                ["status", "in", ["draft", "published"]],
+                ["camp.default.administrator", "in", "user.groups"]
             ]
         },
         {
@@ -48,7 +53,8 @@
             },
             "visible": [
                 ["status", "in", ["draft", "published"]],
-                ["camp_group_qty", ">", 0]
+                ["camp_group_qty", ">", 0],
+                ["camp.default.administrator", "in", "user.groups"]
             ]
         }
     ],

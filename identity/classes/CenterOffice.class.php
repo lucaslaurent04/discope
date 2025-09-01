@@ -107,6 +107,12 @@ class CenterOffice extends \identity\Establishment {
                 'setting_default'   => false
             ],
 
+            'checkedout_revert_to_quote' => [
+                'type'              => 'boolean',
+                'description'       => "Allow to revert a Booking status from checkedin/checkedout to quote.",
+                'default'           => false
+            ],
+
             'accounting_journals_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'finance\accounting\AccountingJournal',

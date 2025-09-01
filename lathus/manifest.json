@@ -13,7 +13,8 @@
             "access": {
                 "groups": [
                     "stats.default.user",
-                    "stats.default.administrator"
+                    "stats.default.administrator",
+                    "stats.default.guest"
                 ]
             },
             "params": {

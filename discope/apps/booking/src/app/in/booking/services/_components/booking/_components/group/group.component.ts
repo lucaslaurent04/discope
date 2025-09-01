@@ -1013,9 +1013,17 @@ export class BookingServicesBookingGroupComponent
     private async filterPacks(name: string) {
         let filtered:any[] = [];
         try {
-            let domain = [];
+            let domain = [
+                [
+                    ['rate_class_id', '=', this.instance.rate_class_id.id]
+                ],
+                [
+                    ['rate_class_id', 'is', null]
+                ]
+            ];
             if(name && name.length) {
-                domain.push(['name', 'ilike', '%'+name+'%']);
+                domain[0].push(['name', 'ilike', '%'+name+'%']);
+                domain[1].push(['name', 'ilike', '%'+name+'%']);
             }
 
             const data:any[] = await this.api.fetch('?get=sale_catalog_product_collect-pack', {

@@ -235,6 +235,10 @@
                     "label": "Repasser en devis",
                     "description": "Les unités locatives ne seront plus réservées et pourront être occupées pour d'autres réservation. Les services liées à la réservation pourront à nouveau être modifiés."
                 },
+                "action.quote-from-checkedout": {
+                    "label": "Repasser en devis",
+                    "description": "Repasser en devis afin de pouvoir modifier la réservation."
+                },
                 "action.option": {
                     "label": "Placer une option",
                     "description": "Les unités locatives seront réservées pendant une courte période. Aucun paiement ne sera demandé."
@@ -251,9 +255,17 @@
                     "label": "Check in",
                     "description": "L'hôte occupe désormais l'hébergement: les unités locatives seront marquées comme occupées."
                 },
+                "action.checkin-from-quote": {
+                    "label": "Repasser en check in",
+                    "description": "Repasser le status de la réservation à son status précédent check in, le nouveau contrat sera automatiquement marqué comme signé."
+                },
                 "action.checkout": {
                     "label": "Checkout client",
                     "description": "L'hôte quitte l'hébergement: les unités locatives seront marquées pour le nettoyage."
+                },
+                "action.checkout-from-quote": {
+                    "label": "Repasser en check out",
+                    "description": "Repasser le status de la réservation à son status précédent check out, le nouveau contrat sera automatiquement marqué comme signé."
                 },
                 "action.invoice": {
                     "label": "Facturer le solde",
