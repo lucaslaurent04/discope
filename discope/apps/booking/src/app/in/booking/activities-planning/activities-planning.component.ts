@@ -183,7 +183,15 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                 ['group_type', '=', 'camp'],
                 ['booking_id', '=', this.bookingId]
             ];
-            this.activityGroups = await this.api.collect('sale\\booking\\BookingLineGroup', domain, fields, 'activity_group_num', 'asc');
+            this.activityGroups = await this.api.collect(
+                    'sale\\booking\\BookingLineGroup',
+                    domain,
+                    fields,
+                    'activity_group_num',
+                    'asc',
+                    0,
+                    100
+                );
 
             for(let group of this.activityGroups) {
                 group.date_from = new Date(group.date_from);
@@ -229,7 +237,15 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         try {
             const domain = ['relationship','=', 'employee'];
 
-            this.employees = await this.api.collect('hr\\employee\\Employee', domain, fields, 'name', 'asc', 0, 1000);
+            this.employees = await this.api.collect(
+                    'hr\\employee\\Employee',
+                    domain,
+                    fields,
+                    'name',
+                    'asc',
+                    0,
+                    1000
+                );
         }
         catch(response) {
             console.log('unexpected error', response);
@@ -240,7 +256,15 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         try {
             const domain = ['relationship','=', 'provider'];
 
-            this.providers = await this.api.collect('sale\\provider\\Provider', domain, fields);
+            this.providers = await this.api.collect(
+                    'sale\\provider\\Provider',
+                    domain,
+                    fields,
+                    'id',
+                    'asc',
+                    0,
+                    500
+                );
         }
         catch(response) {
             console.log('unexpected error', response);
@@ -318,12 +342,28 @@ export class BookingActivitiesPlanningComponent implements OnInit {
                 ['activity_date', '>=', weekStartDate],
                 ['activity_date', '<=', weekEndDate]
             ];
-            const activitiesPromise = this.api.collect('sale\\booking\\BookingActivity', domainActivities, Object.getOwnPropertyNames(new Activity()));
+            const activitiesPromise = this.api.collect(
+                    'sale\\booking\\BookingActivity',
+                    domainActivities,
+                    Object.getOwnPropertyNames(new Activity()),
+                    'id',
+                    'asc',
+                    0,
+                    500
+                );
 
             const domainBookingLines = [
                 ['booking_id', '=', this.bookingId]
             ];
-            const bookingLinesPromise = this.api.collect('sale\\booking\\BookingLine', domainBookingLines, Object.getOwnPropertyNames(new BookingLine()));
+            const bookingLinesPromise = this.api.collect(
+                    'sale\\booking\\BookingLine',
+                    domainBookingLines,
+                    Object.getOwnPropertyNames(new BookingLine()),
+                    'id',
+                    'asc',
+                    0,
+                    500
+                );
 
             const [activities, bookingLines] = await Promise.all([activitiesPromise, bookingLinesPromise]);
 
