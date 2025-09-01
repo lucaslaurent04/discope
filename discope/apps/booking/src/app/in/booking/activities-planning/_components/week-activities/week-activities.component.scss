@@ -1,8 +1,7 @@
 :host {
     display: inline-block;
     width: 100%;
-    max-height: calc(100% - 350px);
-    overflow: auto;
+    overflow-x: auto;
 
     .week-activities {
         display: flex;

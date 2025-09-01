@@ -163,6 +163,15 @@ class Booking extends Model {
                 'description'       => 'List of contracts relating to the booking, if any.'
             ],
 
+            'current_contract_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\booking\Contract',
+                'function'          => 'calcCurrentContractId',
+                'store'             => false,
+                'description'       => 'Most recent contract, if any.'
+            ],
+
             'booking_lines_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\BookingLine',
@@ -955,6 +964,20 @@ class Booking extends Model {
             }
             else {
                 $result[$oid] = 'success';
+            }
+        }
+        return $result;
+    }
+
+    public static function calcCurrentContractId($self) {
+        $result = [];
+        $self->read(['contracts_ids']);
+        foreach($self as $id => $booking) {
+            if(count($booking['contracts_ids'])) {
+                $result[$id] = current($booking['contracts_ids']);
+            }
+            else {
+                $result[$id] = null;
             }
         }
         return $result;

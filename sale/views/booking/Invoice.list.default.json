@@ -47,6 +47,13 @@
             },
             {
                 "type": "field",
+                "value": "is_exported",
+                "width": "15%",
+                "sortable": true,
+                "readonly": true
+            },
+            {
+                "type": "field",
                 "value": "is_paid",
                 "width": "10%",
                 "sortable": true

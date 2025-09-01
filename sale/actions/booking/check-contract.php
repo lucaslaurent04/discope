@@ -35,7 +35,8 @@ list($params, $providers) = eQual::announce([
 list($context, $dispatch) = [ $providers['context'], $providers['dispatch']];
 
 // ensure booking object exists and is readable
-$booking = Booking::id($params['id'])->read(['id', 'name', 'center_office_id', 'status', 'has_contract', 'contracts_ids'])->first(true);
+$booking = Booking::id($params['id'])
+    ->read(['id', 'name', 'center_office_id', 'is_cancelled', 'status', 'has_contract', 'contracts_ids'])->first(true);
 
 if(!$booking) {
     throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
@@ -48,7 +49,8 @@ $result = [];
 $httpResponse = $context->httpResponse()->status(200);
 
 if(!$booking['has_contract'] || empty($booking['contracts_ids'])) {
-    $status = 'unknown';
+    // #memo - when no contract, simulate a 'signed' one, to void any pending alert
+    $status = 'signed';
     $contract_id = 0;
 }
 else {
@@ -56,6 +58,11 @@ else {
     $contract_id = array_shift($booking['contracts_ids']);
     $contract = Contract::id($contract_id)->read(['status'])->first(true);
     $status = $contract['status'];
+
+    if($booking['status'] === 'cancelled' || $booking['is_cancelled']) {
+        // ignore non-signed contract for cancelled bookings
+        $status = 'signed';
+    }
 }
 
 

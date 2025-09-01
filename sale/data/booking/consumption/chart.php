@@ -95,7 +95,31 @@ list($params, $providers) = announce([
 
 list($context) = [ $providers['context'] ];
 
+$getDateIndex = function($date, $interval) {
+    switch($interval) {
+        case 'week':
+            return date('Y-W', $date);
+        case 'month':
+            return date('Y-m', $date);
+        case 'year':
+        default:
+            return date('Y', $date);
+    }
+};
 
+$getNextDate = function($date, $interval) {
+    switch($interval) {
+        case 'week':
+            $day = date("w", $date);
+            $day = ($day == 0)?7:$day;
+            return $date + ((8-$day)*24*3600);
+        case 'month':
+            return strtotime(date("Y-m-t", $date)) + (48*3600);
+        case 'year':
+        default:
+            return strtotime((date('Y', $date) + 1).'-01-02');
+    }
+};
 
 if(!class_exists($params['entity'])) {
     throw new Exception("unknown_entity", QN_ERROR_UNKNOWN_OBJECT);
@@ -171,9 +195,9 @@ $results_map = [];
 if($params['group_by'] == 'range') {
     $date = $params['range_from'];
     while($date < $params['range_to']) {
-        $index = _get_date_index($date, $params['range_interval']);
+        $index = $getDateIndex($date, $params['range_interval']);
         $results_map[$index] = [];
-        $date = _get_next_date($date, $params['range_interval']);
+        $date = $getNextDate($date, $params['range_interval']);
     }
 }
 else {
@@ -216,7 +240,7 @@ foreach($datasets as $index => $dataset) {
         // group objects by date interval
         foreach($objects as $oid => $object) {
             if($params['group_by'] == 'range') {
-                $group_index = _get_date_index($object[$params['field']], $params['range_interval']);
+                $group_index = $getDateIndex($object[$params['field']], $params['range_interval']);
             }
             else {
                 // #todo - check value of param 1
@@ -288,28 +312,3 @@ if($params['mode'] == 'grid') {
 $context->httpResponse()
         ->body($result)
         ->send();
-
-
-function _get_date_index($date, $interval) {
-    switch($interval) {
-        case 'week':
-            return date('Y-W', $date);
-        case 'month':
-            return date('Y-m', $date);
-        case 'year':
-            return date('Y', $date);
-    }
-}
-
-function _get_next_date($date, $interval) {
-    switch($interval) {
-        case 'week':
-            $day = date("w", $date);
-            $day = ($day == 0)?7:$day;
-            return $date + ((8-$day)*24*3600);
-        case 'month':
-            return strtotime(date("Y-m-t", $date)) + (48*3600);
-        case 'year':
-            return strtotime( (date('Y', $date) + 1).'-01-02');
-    }
-}

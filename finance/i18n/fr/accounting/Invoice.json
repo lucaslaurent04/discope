@@ -111,6 +111,11 @@
             "label": "Facture d'acompte",
             "description": "La facture est une facture d'acompte.",
             "help": ""
+        },
+        "is_exported": {
+            "label": "Exportée",
+            "description": "La facture a été exportée",
+            "help": ""
         }
     },
     "view": {

@@ -5,6 +5,8 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use core\setting\Setting;
 use sale\booking\Funding;
 use sale\booking\Invoice;
 use sale\booking\Booking;
@@ -134,9 +136,11 @@ if(is_null($invoice['funding_id'])) {
             }, 0);
 
         if($paid_amount > 0) {
+            $credit_note_label = Setting::get_value('lodging', 'locale', 'i18n.credit_note');
+
             // create a new funding relating to the invoice
             $funding = [
-                'description'           => 'Note de crédit',
+                'description'           => $credit_note_label,
                 'booking_id'            => $invoice['booking_id'],
                 'invoice_id'            => $invoice['id'],
                 'center_office_id'      => $invoice['center_office_id'],

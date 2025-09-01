@@ -52,7 +52,7 @@ class Invoice extends \finance\accounting\Invoice {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Invoice',
                 'description'       => "Symmetrical link between credit note and cancelled invoice, if any.",
-                'visible'           => [[['status', '=', 'cancelled']], [['type', '=', 'credit_note']]]
+                'visible'           => [[['is_cancelled', '=', true]], [['type', '=', 'credit_note']]]
             ],
 
             'partner_id' => [
