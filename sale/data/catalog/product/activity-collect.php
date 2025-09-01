@@ -84,7 +84,7 @@ $domain = [
 
 if(!empty($params['name'])) {
     // filter by name
-    $domain[] = ['name', 'like', "%{$params['name']}%"];
+    $domain[] = ['name', 'ilike', "%{$params['name']}%"];
 }
 
 if(isset($params['rate_class_id'])) {
