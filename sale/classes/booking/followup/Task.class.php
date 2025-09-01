@@ -25,7 +25,9 @@ class Task extends \core\followup\Task {
             'task_model_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\followup\TaskModel',
-                'description'       => "The model used to create the task."
+                'description'       => 'The model used to create the task.',
+                'help'              => 'Based on model or arbitrary',
+                'required'          => false
             ],
 
             'entity' => [
@@ -49,6 +51,20 @@ class Task extends \core\followup\Task {
                 'foreign_object'    => 'sale\booking\Booking',
                 'description'       => "Booking the task relates to.",
                 'readonly'          => true
+            ],
+
+            'object_class' => [
+                'type'              => 'string',
+                'description'       => 'Namespace of the concerned entity.',
+                'required'          => false,
+                'help'              => 'overloaded to make if optional'
+            ],
+
+            'object_id' => [
+                'type'              => 'integer',
+                'description'       => 'Id of the associated entity.',
+                'required'          => false,
+                'help'              => 'overloaded to make if optional'
             ]
 
         ];
