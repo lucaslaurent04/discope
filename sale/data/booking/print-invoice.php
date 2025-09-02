@@ -67,8 +67,6 @@ list($params, $providers) = announce([
 
 list($context, $orm) = [$providers['context'], $providers['orm']];
 
-$output = null;
-
 // steer towards custom controller, if any
 $has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
 if($has_custom_package) {

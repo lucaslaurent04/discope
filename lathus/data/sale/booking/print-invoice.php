@@ -22,6 +22,7 @@ use sale\booking\Invoice;
 use communication\TemplatePart;
 use equal\data\DataFormatter;
 use core\setting\Setting;
+use Twig\TwigFilter;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Render an invoice given its ID as a PDF document, for Valrance.",
@@ -82,7 +83,7 @@ use core\setting\Setting;
     1) retrieve the requested template
 */
 
-$entity = 'valrance\sale\booking\Invoice';
+$entity = 'lathus\sale\booking\Invoice';
 $parts = explode('\\', $entity);
 $package = array_shift($parts);
 $class_path = implode('/', $parts);
@@ -331,7 +332,18 @@ if($logo_document_data) {
     $img_url = "data:{$content_type};base64, ".base64_encode($logo_document_data);
 }
 
+$map_days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+
+$map_months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+
+$period = 'Séjour du '.$map_days[date('w', $booking['date_from'])].' '.date('j', $booking['date_from']);
+if(date('m', $booking['date_from']) !== date('m', $booking['date_to'])) {
+    $period .= ' '.$map_months[date('n', $booking['date_from'])];
+}
+$period .= ' au '.$map_days[date('w', $booking['date_to'])].' '.date('j', $booking['date_to']).' '.$map_months[date('n', $booking['date_to'])].' '.date('Y', $booking['date_to']);
+
 $values = [
+    'name'                      => $invoice['name'],
     'header_img_url'            => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
     'signature'                 => $invoice['organisation_id']['signature'] ?? '',
     'invoice_header_html'       => '',
@@ -356,7 +368,7 @@ $values = [
     'customer_vat'              => $invoice['partner_id']['partner_identity_id']['vat_number'],
     'customer_ref'              => substr($invoice['customer_ref'], 0, 115),
 
-    'date'                      => date('d/m/Y', $invoice['date']),
+    'date'                      => $invoice['date'],
     'code'                      => $invoice['name'],
     'is_paid'                   => $invoice['is_paid'],
     'status'                    => $invoice['status'],
@@ -373,7 +385,7 @@ $values = [
     'center_email'              => $booking['center_id']['email'],
     'center_signature'          => $invoice['organisation_id']['signature'],
 
-    'period'                    => date('d/m/Y', $booking['date_from']).' - '.date('d/m/Y', $booking['date_to']),
+    'period'                    => $period,
     'price'                     => round($invoice['accounting_price'], 2),
     'total'                     => round($invoice['accounting_total'], 2),
 
@@ -801,8 +813,14 @@ try {
     $extension  = new IntlExtension();
     $twig->addExtension($extension);
     // do not rely on system locale (LC_*)
-    $filter = new \Twig\TwigFilter('format_money', function ($value) {
+    $filter = new TwigFilter('format_money', function ($value) {
         return number_format((float)($value),2,",",".").' €';
+    });
+    $twig->addFilter($filter);
+
+    $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
+    $filter = new TwigFilter('format_date', function ($value) use($date_format) {
+        return date($date_format, $value);
     });
     $twig->addFilter($filter);
 
@@ -852,7 +870,7 @@ $canvas->page_text(530, $canvas->get_height() - 35, "p. {PAGE_NUM} / {PAGE_COUNT
 $output = $dompdf->output();
 
 $context->httpResponse()
-    // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
-    ->header('Content-Disposition', 'inline; filename="document.pdf"')
-    ->body($output)
-    ->send();
+        // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
+        ->header('Content-Disposition', 'inline; filename="document.pdf"')
+        ->body($output)
+        ->send();
