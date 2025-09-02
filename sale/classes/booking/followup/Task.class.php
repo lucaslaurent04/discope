@@ -39,7 +39,7 @@ class Task extends \core\followup\Task {
             'entity_id' => [
                 'type'              => 'computed',
                 'result_type'       => 'integer',
-                'description'       => "Id of the associated entity. In this case it is the booking id.",
+                'description'       => 'Id of the associated entity. In this case it is the booking id.',
                 'store'             => true,
                 'instant'           => true,
                 'function'          => 'calcEntityId',
@@ -49,7 +49,7 @@ class Task extends \core\followup\Task {
             'booking_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
-                'description'       => "Booking the task relates to.",
+                'description'       => 'Booking the task relates to.',
                 'readonly'          => true
             ],
 
@@ -57,14 +57,14 @@ class Task extends \core\followup\Task {
                 'type'              => 'string',
                 'description'       => 'Namespace of the concerned entity.',
                 'required'          => false,
-                'help'              => 'overloaded to make if optional'
+                'help'              => 'Overloaded to make field optional.'
             ],
 
             'object_id' => [
                 'type'              => 'integer',
                 'description'       => 'Id of the associated entity.',
                 'required'          => false,
-                'help'              => 'overloaded to make if optional'
+                'help'              => 'Overloaded to make field optional.'
             ]
 
         ];
