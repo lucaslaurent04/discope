@@ -10,12 +10,8 @@ use core\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
 use identity\Identity;
+use sale\booking\Booking;
 use sale\booking\BookingLine;
-use sale\booking\BookingLineGroup;
-use sale\booking\BookingMeal;
-use sale\booking\Contract;
-use sale\booking\ContractLine;
-use sale\booking\SojournProductModelRentalUnitAssignement;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
@@ -34,6 +30,12 @@ use Twig\TwigFilter;
             'description'   => 'The identifier of the view <type.name>.',
             'type'          => 'string',
             'default'       => 'print.default'
+        ],
+        'mode' =>  [
+            'description'   => 'Mode in which document has to be rendered: simple or detailed.',
+            'type'          => 'string',
+            'selection'     => ['grouped', 'detailed'],
+            'default'       => 'grouped'
         ],
         'output' =>  [
             'description'   => 'Output format of the document.',
@@ -62,7 +64,7 @@ use Twig\TwigFilter;
     1) retrieve the requested template
 */
 
-$entity = 'lathus\sale\booking\Contract';
+$entity = 'lathus\sale\booking\Booking';
 $parts = explode('\\', $entity);
 $package = array_shift($parts);
 $class_path = implode('/', $parts);
@@ -75,37 +77,32 @@ if(!file_exists($file)) {
 }
 
 /*
-    2) check contract exists
+    2) check booking exists
 */
 
-$contract = Contract::id($params['id'])
+$booking = Booking::id($params['id'])
     ->read(['id'])
     ->first();
 
-if(is_null($contract)) {
-    throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
+if(is_null($booking)) {
+    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
     3) create valus array to inject data in template
 */
 
-$contract = Contract::id($contract['id'])
+$booking = Booking::id($booking['id'])
     ->read([
-        'booking_id' => [
-            'date_from',
-            'date_to',
-            'time_from',
-            'time_to',
-            'rental_unit_assignments_ids',
-            'price',
-            'center_id'     => ['organisation_id'],
-            'customer_id'   => ['partner_identity_id']
-        ]
+        'date_from',
+        'date_to',
+        'time_from',
+        'time_to',
+        'price',
+        'center_id'     => ['organisation_id'],
+        'customer_id'   => ['partner_identity_id']
     ])
-    ->first(true);
-
-$booking = $contract['booking_id'];
+    ->first();
 
 /*
       3.1) get customer data
@@ -116,11 +113,11 @@ $customer = Identity::id($booking['customer_id']['partner_identity_id'])
     ->first();
 
 /*
-      3.2) handle img url and signature
+      3.2) handle img url
 */
 
 $organisation = Identity::id($booking['center_id']['organisation_id'])
-    ->read(['logo_document_id' => ['data', 'type'], 'signature'])
+    ->read(['logo_document_id' => ['data', 'type']])
     ->first();
 
 $img_url = '';
@@ -131,168 +128,11 @@ if($logo_document_data) {
     $img_url = "data:{$content_type};base64, ".base64_encode($logo_document_data);
 }
 
-$signature_html = $organisation['signature'];
-
 /*
-      3.3) handle children and adults qty
+    3.3) handle lines
 */
 
-$sojourn_groups = BookingLineGroup::search([
-    ['booking_id', '=', $booking['id']],
-    ['group_type', '=', 'sojourn']
-])
-    ->read(['age_range_assignments_ids' => ['age_to', 'qty']])
-    ->get();
-
-$children_qty = 0;
-$adult_qty = 0;
-foreach($sojourn_groups as $group) {
-    foreach($group['age_range_assignments_ids'] as $age_range_assignment) {
-        if($age_range_assignment['age_to'] <= 18) {
-            $children_qty += $age_range_assignment['qty'];
-        }
-        else {
-            $adult_qty += $age_range_assignment['qty'];
-        }
-    }
-}
-
-/*
-      3.4) handle hosting
-*/
-
-$hosting_conf = [
-    'hosted'    => false,
-    'marabout'  => false,
-    'camping'   => false,
-    'other'     => false
-];
-
-if(!empty($booking['rental_unit_assignments_ids'])) {
-    $ru_assignments = SojournProductModelRentalUnitAssignement::search([
-        ['id', 'in', $booking['rental_unit_assignments_ids']],
-    ])
-        ->read(['is_accomodation', 'rental_unit_id' => ['rental_unit_category_id' => ['code']]])
-        ->get();
-
-    $hosting_conf['hosted'] = !empty($ru_assignments);
-
-    foreach($ru_assignments as $ru_assignment) {
-        if($ru_assignment['is_accomodation']) {
-            $hosting_conf['hosted'] = true;
-        }
-        switch($ru_assignment['rental_unit_id']['rental_unit_category_id']['code']) {
-            case 'MB':
-                $hosting_conf['marabout'] = true;
-                break;
-            case 'CP':
-                $hosting_conf['camping'] = true;
-                break;
-            default:
-                $hosting_conf['other'] = true;
-                break;
-        }
-    }
-}
-
-/*
-      3.5) handle meals
-*/
-
-$meals = BookingMeal::search(
-    [['booking_id', '=', $booking['id']], ['is_self_provided', '=', false]],
-    ['sort' => ['date' => 'asc', 'time_slot_order' => 'asc']]
-)
-    ->read(['date', 'time_slot_id' => ['code']])
-    ->get(true);
-
-$map_meals_names = [
-    'B'     => 'petit-déjeuner',
-    'L'     => 'déjeuner',
-    'PM'    => 'goûter',
-    'D'     => 'diner'
-];
-
-$first = null;
-if(!is_null($meals[0])) {
-    $first = [
-        'date'      => $meals[0]['date'],
-        'moment'    => $map_meals_names[$meals[0]['time_slot_id']['code']],
-    ];
-}
-
-$last = null;
-if(!is_null($meals[count($meals) - 1])) {
-    $last = [
-        'date'      => $meals[count($meals) - 1]['date'],
-        'moment'    => $map_meals_names[$meals[count($meals) - 1]['time_slot_id']['code']],
-    ];
-}
-
-$meals_conf = [
-    'has_meals'     => !empty($meals),
-    'first'         => $first,
-    'last'          => $last,
-    'has_breakfast' => false,
-    'has_lunch'     => false,
-    'has_dinner'     => false,
-    'has_snack'     => false
-];
-
-foreach($meals as $meal) {
-    switch($meal['time_slot_id']['code']) {
-        case 'B':
-            $meals_conf['has_breakfast'] = true;
-            break;
-        case 'L':
-            $meals_conf['has_lunch'] = true;
-            break;
-        case 'PM':
-            $meals_conf['has_snack'] = true;
-            break;
-        case 'D':
-            $meals_conf['has_dinner'] = true;
-            break;
-    }
-}
-
-/*
-      3.6) handle has activities or not
-*/
-
-$activities_ids = BookingLine::search([
-    ['booking_id', '=', $booking['id']],
-    ['is_activity', '=', true]
-])
-    ->ids();
-
-/*
-      3.7) TODO: handle booking
-*/
-
-$booking_conf = [
-    'downpayment'   => false, // downpayment of 1500 euros needed
-    'deposit'       => false, // if damages done to Lathus equipments
-    'order_form'    => false  // order form if school or local
-];
-
-/*
-      3.8) TODO: handle cancellation
-             - "l'acompte versé restera acquis au CPA Lathus, à titre de dédit" or "le groupe devra au CPA Lathus la somme de 1500 € à titre de dédit"
-*/
-
-$cancellation_conf = [
-    'deposit'       => false,
-    'amount_1500'   => false
-];
-
-$has_activities = !empty($activities_ids);
-
-/*
-    3.9) handle lines
-*/
-
-$contract_lines = ContractLine::search(['contract_id', '=', $contract['id']])
+$booking_lines = BookingLine::search(['booking_id', '=', $booking['id']])
     ->read([
         'product_id' => [
             'grouping_code_id' => [
@@ -310,7 +150,7 @@ $contract_lines = ContractLine::search(['contract_id', '=', $contract['id']])
     ->get();
 
 $map_products_groupings = [];
-foreach($contract_lines as $line) {
+foreach($booking_lines as $line) {
     if(isset($map_products_groupings[$line['product_id']['id']])) {
         continue;
     }
@@ -330,7 +170,7 @@ foreach($contract_lines as $line) {
     $map_products_groupings[$line['product_id']['id']] = $grouping_code;
 }
 
-$contract_lines = ContractLine::search(['contract_id', '=', $contract['id']])
+$booking_lines = BookingLine::search(['booking_id', '=', $booking['id']])
     ->read([
         'name',
         'description',
@@ -342,10 +182,10 @@ $contract_lines = ContractLine::search(['contract_id', '=', $contract['id']])
         'price',
         'product_id' => ['label']
     ])
-    ->get(true);
+    ->get();
 
 $map_groupings_lines = [];
-foreach($contract_lines as $line) {
+foreach($booking_lines as $line) {
     $grouping_name = $line['product_id']['label'];
     if(isset($map_products_groupings[$line['product_id']['id']])) {
         $grouping_name = $map_products_groupings[$line['product_id']['id']]['name'];
@@ -363,36 +203,61 @@ foreach($contract_lines as $line) {
 
 $lines = [];
 foreach($map_groupings_lines as $grouping_name => $grouping_lines) {
-    $total = 0;
-    $price = 0;
-    foreach($grouping_lines as $line) {
-        $total += $line['total'];
-        $price += $line['price'];
-    }
+    switch($params['mode']) {
+        case 'grouped':
+            $total = 0;
+            $price = 0;
+            foreach($grouping_lines as $line) {
+                $total += $line['total'];
+                $price += $line['price'];
+            }
 
-    $lines[] = [
-        'name'          => $grouping_name,
-        'qty'           => 1,
-        'free_qty'      => null,
-        'unit_price'    => $total,
-        'vat_rate'      => null,
-        'total'         => $total,
-        'price'         => $price,
-        'is_group'      => true
-    ];
+            $lines[] = [
+                'name'          => $grouping_name,
+                'qty'           => 1,
+                'free_qty'      => null,
+                'unit_price'    => $total,
+                'vat_rate'      => null,
+                'total'         => $total,
+                'price'         => $price,
+                'is_group'      => true
+            ];
+            break;
+        case 'detailed':
+            $lines[] = [
+                'name'          => $grouping_name,
+                'qty'           => null,
+                'free_qty'      => null,
+                'unit_price'    => null,
+                'vat_rate'      => null,
+                'total'         => null,
+                'price'         => null,
+                'is_group'      => true
+            ];
+
+            foreach($grouping_lines as $line) {
+                $lines[] = [
+                    'name'          => $line['name'],
+                    'qty'           => $line['qty'],
+                    'free_qty'      => $line['free_qty'],
+                    'unit_price'    => $line['unit_price'],
+                    'vat_rate'      => $line['vat_rate'],
+                    'total'         => $line['total'],
+                    'price'         => $line['price'],
+                    'is_group'      => false
+                ];
+            }
+            break;
+    }
 }
 
 /*
-      3.10) set values
+      3.4) set values
 */
 
 $today = time();
 
-$values = compact(
-    'booking', 'customer', 'img_url', 'signature_html', 'children_qty', 'hosting_conf',
-    'adult_qty', 'meals_conf', 'map_meals_names', 'has_activities', 'booking_conf',
-    'today', 'lines'
-);
+$values = compact('booking', 'customer', 'img_url', 'today', 'lines');
 
 /*
     4) inject all values into the template
@@ -426,7 +291,7 @@ try {
     $twig->addFilter($date_filter);
 
     $date_filter = new TwigFilter('format_time', function($value) {
-        return sprintf('%02d:%02d', $value / 3600, $value / 60 % 60);
+        return sprintf('%02dh%02d', $value / 3600, $value / 60 % 60);
     });
     $twig->addFilter($date_filter);
 
@@ -477,3 +342,4 @@ $context->httpResponse()
         ->header('Content-Disposition', 'inline; filename="document.pdf"')
         ->body($output)
         ->send();
+
