@@ -38,6 +38,18 @@
                 "name": "AC - Mobilier, accessoires et équipement",
                 "code": "AC",
                 "description": "Mobilier, accessoires et équipement"
+            },
+            {
+                "id": 7,
+                "name": "CP - Camping",
+                "code": "CP",
+                "description": "Espace dans un camping où le client peut installer sa tente"
+            },
+            {
+                "id": 8,
+                "name": "MB - Marabout",
+                "code": "MB",
+                "description": "Tentes fournies"
             }
         ]
     },
@@ -68,6 +80,14 @@
             {
                 "id": 6,
                 "description": "Furniture, accessories, and equipment"
+            },
+            {
+                "id": 7,
+                "description": "Space in a camping where customers can setup their tents"
+            },
+            {
+                "id": 8,
+                "description": "Provided tents"
             }
         ]
     }

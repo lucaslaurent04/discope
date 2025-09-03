@@ -1,0 +1,402 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>
+    Convention de séjour
+</title>
+<style type="text/css">
+@page {
+    margin: 1cm 1.1cm;
+}
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.7em;
+    text-align: justify;
+    width: 100%;
+}
+
+h2 {
+    margin-top: 8px;
+    margin-bottom: 0;
+    font-size: 21px;
+}
+
+h3 {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 15px;
+}
+
+div, table, table tr td {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.section {
+    margin-bottom: 20px;
+    font-size: 0.8rem;
+    page-break-inside: avoid;
+}
+
+.section .title {
+    margin-bottom: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: underline;
+}
+
+.lines-table {
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.lines-table th,
+.lines-table td {
+    border: 1px solid black;
+}
+</style>
+</head>
+<body>
+
+<img src="{{ img_url }}" style="position: absolute; max-width: 120px; width: 100%; height: auto;" border="0" alt="Header Image" />
+
+<div style="width: 100%; margin-bottom: 100px; text-align: center;">
+    <h2 style="text-decoration: underline; text-transform: uppercase; margin-top: 60px;">Convention de séjour</h2>
+</div>
+
+<div style="font-size: 0.8rem;">
+    <div>Entre</div>
+    <div style="margin-left: 25px;">
+        <div style="font-weight: bold;">le CPA Lathus</div>
+        <table style="font-size: 0.725rem;">
+            <tr>
+                <td style="vertical-align: top;">Agréments :</td>
+                <td>
+                    <div style="margin-bottom: 4px;">- Education Nationale : IA 86 120 01 26</div>
+                    <div style="margin-bottom: 4px;">- Jeunesse et éducation populaire n° 86-058-04J</div>
+                    <div style="margin-bottom: 4px;">- Local avec hébergement n° 86 12 01 002</div>
+                </td>
+            </tr>
+        </table>
+        <div>domicilié : "La Voulzie", C.S. 40005, 86390 Lathus Saint-Rémy</div>
+        <div style="font-weight: bold;">représenté par Yoan Guyonneau</div>
+    </div>
+    <div>et</div>
+    <div style="margin-left: 25px;">
+        <div style="font-weight: bold;">{{ customer.display_name }}</div>
+        <div>{{ customer.address_street }}</div>
+        {% if customer.address_dispatch|length > 0 %}
+            <div>{{ customer.address_dispatch }}</div>
+        {% endif %}
+        <div>{{ customer.address_zip }} {{ customer.address_city }}</div>
+
+        <table style="margin-top: 20px;">
+            <tr>
+                <td style="font-weight: bold;">Référant sur place lors du séjour :</td>
+                <td style="width: 180px; border-bottom: 2px solid black;"></td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="margin-top: 40px; margin-bottom: 50px;">
+        Il a été convenu ce qui suit :
+    </div>
+</div>
+
+<div class="section">
+    <div class="title">Article 1 / Accueil</div>
+
+    <div>Le CPA Lathus assurera l'accueil de {{ children_qty }} personnes et {{ adult_qty }} accompagnateurs</div>
+    <div style="margin-top: 7px;">aux dates suivantes : {{ booking.date_from|format_date() }} à {{ booking.time_from|format_time() }} au {{ booking.date_to|format_date() }} à {{ booking.time_to|format_time() }}</div>
+</div>
+
+<div class="section">
+    <div class="title">Article 2 / Hébergement / Ménage / Linge de toilette </div>
+
+    {% if hosting_conf.hosted %}
+        <div>Le groupe sera hébergé :</div>
+        <div style="margin-top: 5px; padding-left: 20px;">
+            <table>
+                <tr>
+                    <td><input type="checkbox" {% if hosting_conf.other %} checked {% endif %}/></td>
+                    <td>en chambres de 2 à 5 lits, avec sanitaires privatifs</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" {% if hosting_conf.marabout %} checked {% endif %}/></td>
+                    <td>en marabout et le groupe devra apporter matelas et duvets</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" {% if hosting_conf.camping %} checked {% endif %}/></td>
+                    <td>en camping et le groupe devra apporter tentes, matelas et duvets</td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="margin-top: 10px;">
+            Les chambres seront prêtes à 17h et devront être libérées avant 14h, les lits seront faits.
+        </div>
+        <div style="margin-top: 5px;">
+            Le ménage des sanitaires, salles et couloirs sera assuré, tous les jours, par le CPA Lathus.
+        </div>
+        <div style="margin-top: 5px;">
+            Le groupe apportera son linge de toilette. Les lits seront faits par le CPA Lathus.
+        </div>
+    {% else %}
+        <div>Le groupe ne sera pas hébergé.</div>
+    {% endif %}
+</div>
+
+<div class="section">
+    <div class="title">Article 3 / Restauration</div>
+
+    {% if meals_conf.has_meals %}
+        <div>Le groupe a réservé, à partir du {{ meals_conf.first.date|format_date() }} ({{ meals_conf.first.moment }}) au {{ meals_conf.last.date|format_date() }} ({{ meals_conf.last.moment }}), les repas suivants :</div>
+        <div style="margin-top: 5px; padding-left: 20px;">
+            <table>
+                <tr>
+                    <td><input type="checkbox" {% if meals_conf.has_breakfast %} checked {% endif %}/></td>
+                    <td><label>petits-déjeuners</label></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" {% if meals_conf.has_lunch %} checked {% endif %}/></td>
+                    <td><label>repas de midi</label></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" {% if meals_conf.has_snack %} checked {% endif %}/></td>
+                    <td><label>goûters</label></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" {% if meals_conf.has_dinner %} checked {% endif %}/></td>
+                    <td><label>repas du soir</label></td>
+                </tr>
+            </table>
+        </div>
+    {% else %}
+        <div>Le groupe n'a pas réservé de repas</div>
+    {% endif %}
+</div>
+
+<div class="section">
+    <div class="title">Article 4 / Activités</div>
+
+    {% if has_activities %}
+        <div>Le groupe a réservé des activités. Elles seront encadrées par les animateurs qualifiés du CPA Lathus.</div>
+        <div style="margin-top: 10px;">
+            En cas d’imprévu rendant impossible la réalisation d’une activité, le CPA Lathus proposera au groupe soit une activité alternative, soit le report de l’activité initialement prévue à une autre date.
+        </div>
+    {% else %}
+        <div>Le groupe n'a pas réservé d'activités</div>
+    {% endif %}
+</div>
+
+<div class="section">
+    <div class="title">Article 5 / Accompagnement</div>
+
+    <div>Si le groupe est composé d'enfants, ils devront être accompagnés d'au moins un adulte.</div>
+    <div style="margin-top: 10px;">Cet adulte devra être présent lors des activités.</div>
+    <div style="margin-top: 10px;">En dehors des activités, les enfants seront sous la responsabilité de cet adulte.</div>
+</div>
+
+<div class="section">
+    <div class="title">Article 6 / Réservation</div>
+
+    <div style="width: 95%;">
+        La réservation sera considérée comme effective seulement lors du retour de la présente convention signée et accompagnée :
+    </div>
+
+    <div style="margin-top: 5px; padding-left: 20px;">
+        <table>
+            <tr>
+                <td style="vertical-align: top;"><input type="checkbox" {% if booking_conf.downpayment %} checked {% endif %}/></td>
+                <td style="padding-left: 5px; padding-top: 3px;">
+                    <div>d'un chèque d'acompte de 1500 €</div>
+                    <div>(en cas de désistement, reste acquis à titre de faculté de dédit)</div>
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align: top;"><input type="checkbox" {% if booking_conf.deposit %} checked {% endif %}/></td>
+                <td style="padding-left: 5px; padding-top: 3px;">
+                    <div>d'un chèque de caution de 305 €</div>
+                    <div>(non encaissé et restitué après le règlement du séjour sauf cas de dégradation)</div>
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align: top;"><input type="checkbox" {% if booking_conf.order_form %} checked {% endif %}/></td>
+                <td style="padding: 3px 5px;">
+                    <div>du bon de commande (pour les collectivités locales et les collèges-lycées)</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="section">
+    <div class="title">Article 7 / Conditions d'annulation ou de report de séjour</div>
+    <div>En cas d'annulation du séjour par le groupe</div>
+
+    <div style="margin-top: 5px; padding-left: 20px;">
+        <table>
+            <tr>
+                <td style="vertical-align: top;"><input type="checkbox" {% if cancellation_conf.deposit %} checked {% endif %}/></td>
+                <td style="padding-left: 5px; padding-top: 3px;">
+                    l'acompte versé restera acquis au CPA Lathus, à titre de dédit
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align: top;"><input type="checkbox" {% if cancellation_conf.amount_1500 %} checked {% endif %}/></td>
+                <td style="padding-left: 5px; padding-top: 3px;">
+                    le groupe devra au CPA Lathus la somme de 1500 € à titre de dédit
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="margin-top: 10px;">
+        Le séjour ne pourra être reporté que dans le cas d'un accord entre les deux parties, accord faisant l'objet d'un avenant.
+    </div>
+</div>
+
+<div class="section">
+    <div class="title">Article 8 / Facturation</div>
+
+    <div>
+        La facturation sera établie <span style="font-weight: bold;">en fonction des effectifs prévus dans la convention</span>,
+        effectifs réels sont supérieurs à ceux de la réservation.
+    </div>
+
+    <div style="margin-top: 10px;">
+        Les éventuels dégâts faits par le groupe seront facturés sur la base des coûts de réparation ou de changement du matériel.
+    </div>
+</div>
+
+<div class="section">
+    <div class="title">Article 9 / Règlement</div>
+
+    <div>Le règlement de la facture sera effectué au plus tard un mois après la fin du séjour.</div>
+</div>
+
+<div class="section">
+    <div class="title">Article 10 / Divers</div>
+
+    <div style="padding-left: 10px;">
+        <div>- Le groupe apportera sa propre pharmacie</div>
+        <div>- Les animaux ne sont pas admis dans le centre</div>
+        <div>- Il est interdit de fumer dans les bâtiments et espaces du CPA Lathus (Loi du 1er février 2007)</div>
+    </div>
+</div>
+
+
+<div style="width: 100%; margin-bottom: 20px; text-align: center; page-break-before: always;">
+    <h2 style="text-decoration: underline; text-transform: uppercase; margin-top: 60px;">Décompte du séjour</h2>
+</div>
+
+<table style="font-size: 0.9rem;">
+    <tr>
+        <td>Nom du groupe :</td>
+        <td style="padding-left: 10px; font-weight: bold;">{{ customer.display_name }}</td>
+    </tr>
+    <tr>
+        <td>Dates du séjour :</td>
+        <td style="padding-left: 10px;">{{ booking.date_from|format_date() }} à {{ booking.time_from|format_time() }} au {{ booking.date_to|format_date() }} à {{ booking.time_to|format_time() }}</td>
+    </tr>
+</table>
+
+<table class="lines-table" width="100%" cellpadding="4" cellspacing="0">
+    <thead style="border: solid 1px black; border-left: 0px; border-right: 0px;">
+    <tr>
+        <th width="64%" style="padding-left: 7px; font-weight: bold; text-align: left;">
+            Désignation
+        </th>
+        <th width="10%" style="font-weight: bold; text-align: center;  border-left: solid 1px black; padding-right: 7px;">
+            Qté
+        </th>
+        <th width="13%" style="font-weight: bold; text-align: right;  border-left: solid 1px black; padding-right: 7px;">
+            Prix unit.
+        </th>
+        <th width="13%" style="font-weight: bold; text-align: right;  border-left: solid 1px black; padding-right: 7px;">
+            Prix
+        </th>
+    </tr>
+    </thead>
+    <!-- for each line -->
+    {% for line in lines %}
+    <tr valign="top">
+        <td width="64%">
+            {% if line.is_group %}
+                <b>{{ line.name }}</b>
+            {% else %}
+                {{ line.name }}
+            {% endif %}
+        </td>
+        <td width="10%" style="text-align: center;">
+            {{ line.qty }}
+        </td>
+        <td width="13%" style="text-align: right;">
+            {% if line.unit_price is not null %}
+                {{ line.unit_price | format_money() }}
+            {% endif %}
+        </td>
+        <td width="13%" style="text-align: right;">
+            {% if line.total is not null %}
+                {{ line.total | format_money() }}
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<table width="100%" style="border: 0; border-right: solid 1px black;" cellpadding="4" cellspacing="0">
+    <tr>
+        <td width="87%" style="text-align: right; padding-right: 10px;">
+            Total
+        </td>
+        <td width="13%" style="text-align: right; border-left: solid 1px black; border-bottom: solid 1px black;">
+            {{ booking.price|format_money() }}
+        </td>
+    </tr>
+</table>
+
+<div style="font-size: 0.9rem; margin-top: 80px;">
+    <div>Sont cochées les prestations retenues par le groupe.</div>
+    <div style="margin-top: 5px;">
+        Si vous pensez avoir retenu des prestations qui ne figurent pas sur cette convention ou si des prestations
+        non retenues figurent sur cette convention, appelez rapidement notre service de réservation au <i>05.49.91.83.30</i>.
+    </div>
+</div>
+
+<div style="page-break-inside: avoid;">
+    <table style="width: 100%; margin-top: 50px; font-size: 0.9rem;">
+        <tr>
+            <td style="width: 50%; vertical-align: top;">
+                <div style="padding-bottom: 10px;">LATHUS, le {{ today|format_date_long() }},</div>
+                <div style="padding-bottom: 10px;">Pour le CPA Lathus,</div>
+                <div style="padding-bottom: 10px;">Yoan Guyonneau</div>
+            </td>
+            <td style="width: 50%; vertical-align: top;">
+                <div style="padding-bottom: 10px;">
+                    <div style="padding-bottom: 10px;">Pour le groupe,</div>
+                    <div style="padding-bottom: 10px;">
+                        <i>Veuillez indiquer ci-dessous : Fait à [lieu], le [date], suivi de la mention ‘Lu et approuvé’, puis votre nom, prénom et signature</i>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="height: 200px; text-align: center;">
+                {{ signature_html|raw }}
+            </td>
+            <td></td>
+        </tr>
+    </table>
+
+    <div style="font-size: 0.7rem">
+        <div>Les informations présentes dans ce document font l'objet d'un traitement informatique et sont destinées au CPA Lathus.</div>
+        <div style="margin-top: 10px;">Conformément à la loi "Informatique et libertés" du 6 janvier 1978, vous bénéficiez d'un droit d'accès et de rectification aux informations qui vous concernent.</div>
+    </div>
+</div>
+
+</body>
+</html>

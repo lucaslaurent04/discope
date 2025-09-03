@@ -16,6 +16,7 @@ use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelMedium;
 use equal\data\DataFormatter;
 use sale\booking\Consumption;
 use sale\booking\Contract;
+use sale\booking\ContractLine;
 use sale\booking\TimeSlot;
 use SepaQr\Data;
 use Twig\Environment as TwigEnvironment;
@@ -1013,93 +1014,122 @@ if($template_part) {
     feed lines
 */
 
-$map_groupings = [];
-foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
-    foreach($booking_line_group['booking_lines_ids'] as $booking_line) {
-        $product = $booking_line['product_id'];
-        $product_model = $product['product_model_id'];
-        if(isset($booking_line['booking_activity_id']) && ($booking_line['is_transport'] || $booking_line['is_supply'])) {
-            $product = $booking_line['booking_activity_id']['activity_booking_line_id']['product_id'];
-            $product_model = $product['product_model_id'];
-        }
+$contract_lines = ContractLine::search(['contract_id', '=', $contract['id']])
+    ->read([
+        'product_id' => [
+            'grouping_code_id' => [
+                'name',
+                'code'
+            ],
+            'product_model_id' => [
+                'grouping_code_id' => [
+                    'name',
+                    'code'
+                ]
+            ]
+        ]
+    ])
+    ->get();
 
-        $group_name = $booking_line['product_id']['label'];
-        $group_age_range_id = null;
-        if(isset($product['grouping_code_id']['code'])) {
-            if($product['grouping_code_id']['code'] === 'invisible') {
-                continue;
-            }
-            $group_name = $product['grouping_code_id']['name'];
-            if($product['grouping_code_id']['has_age_range']) {
-                $group_age_range_id = $product['grouping_code_id']['age_range_id'];
-            }
-        }
-        elseif(isset($product_model['grouping_code_id']['code'])) {
-            if($product_model['grouping_code_id']['code'] === 'invisible') {
-                continue;
-            }
-            $group_name = $product_model['grouping_code_id']['name'];
-            if($product_model['grouping_code_id']['has_age_range']) {
-                $group_age_range_id = $product_model['grouping_code_id']['age_range_id'];
-            }
-        }
-        elseif(!empty($booking_line['description'])) {
-            $group_name = $booking_line['description'];
-        }
-
-        if(!isset($map_groupings[$group_name])) {
-            $name = $group_name;
-            if($booking_line_group['is_sojourn'] && !is_null($group_age_range_id)) {
-                foreach($booking_line_group['age_range_assignments_ids'] as $age_range_assignment) {
-                    if($age_range_assignment['age_range_id']['id'] === $group_age_range_id) {
-                        $name .= " - {$age_range_assignment['qty']}p.";
-                        break;
-                    }
-                }
-            }
-
-            $map_groupings[$group_name] = [
-                'name'          => $name,
-                'price'         => 0,
-                'total'         => 0,
-                'is_activity'   => $booking_line['is_activity'],
-                'free_qty'      => $booking_line['free_qty'],
-                'lines'         => []
-            ];
-        }
-
-        $map_groupings[$group_name]['total'] += $booking_line['total'];
-        $map_groupings[$group_name]['price'] += $booking_line['price'];
-        $map_groupings[$group_name]['lines'][] = $booking_line;
+$map_products_groupings = [];
+foreach($contract_lines as $line) {
+    if(isset($map_products_groupings[$line['product_id']['id']])) {
+        continue;
     }
+
+    $grouping_code = null;
+    if(isset($line['product_id']['grouping_code_id'])) {
+        $grouping_code = $line['product_id']['grouping_code_id'];
+    }
+    elseif(isset($line['product_id']['product_model_id']['grouping_code_id'])) {
+        $grouping_code = $line['product_id']['product_model_id']['grouping_code_id'];
+    }
+
+    if(is_null($grouping_code) || $grouping_code['code'] === 'invisible') {
+        continue;
+    }
+
+    $map_products_groupings[$line['product_id']['id']] = $grouping_code;
+}
+
+$contract_lines = ContractLine::search(['contract_id', '=', $contract['id']])
+    ->read([
+        'name',
+        'description',
+        'qty',
+        'free_qty',
+        'unit_price',
+        'vat_rate',
+        'total',
+        'price',
+        'product_id' => ['label']
+    ])
+    ->get(true);
+
+$map_groupings_lines = [];
+foreach($contract_lines as $line) {
+    $grouping_name = $line['product_id']['label'];
+    if(isset($map_products_groupings[$line['product_id']['id']])) {
+        $grouping_name = $map_products_groupings[$line['product_id']['id']]['name'];
+    }
+    elseif(!empty($line['description'])) {
+        $grouping_name = $line['description'];
+    }
+
+    if(!isset($map_groupings_lines[$grouping_name])) {
+        $map_groupings_lines[$grouping_name] = [];
+    }
+
+    $map_groupings_lines[$grouping_name][] = $line;
 }
 
 $lines = [];
-foreach($map_groupings as $group_name => $group) {
-    $lines[] = [
-        'name'          => $group['name'],
-        'qty'           => $params['mode'] === 'grouped' ? 1 : null,
-        'free_qty'      => null,
-        'unit_price'    => $params['mode'] === 'grouped' ? $group['price'] : null,
-        'vat_rate'      => null,
-        'total'         => $params['mode'] === 'grouped' ? $group['total'] : null,
-        'price'         => $params['mode'] === 'grouped' ? $group['price'] : null,
-        'is_group'      => true
-    ];
+foreach($map_groupings_lines as $grouping_name => $grouping_lines) {
+    switch($params['mode']) {
+        case 'grouped':
+            $total = 0;
+            $price = 0;
+            foreach($grouping_lines as $line) {
+                $total += $line['total'];
+                $price += $line['price'];
+            }
 
-    if($params['mode'] === 'detailed') {
-        foreach($group['lines'] as $line) {
             $lines[] = [
-                'name'          => $line['name'],
-                'qty'           => $line['qty'],
-                'free_qty'      => $line['free_qty'],
-                'unit_price'    => $line['unit_price'],
-                'vat_rate'      => $line['vat_rate'],
-                'total'         => $line['total'],
-                'price'         => $line['price'],
-                'is_group'      => false
+                'name'          => $grouping_name,
+                'qty'           => 1,
+                'free_qty'      => null,
+                'unit_price'    => $total,
+                'vat_rate'      => null,
+                'total'         => $total,
+                'price'         => $price,
+                'is_group'      => true
             ];
-        }
+            break;
+        case 'detailed':
+            $lines[] = [
+                'name'          => $grouping_name,
+                'qty'           => null,
+                'free_qty'      => null,
+                'unit_price'    => null,
+                'vat_rate'      => null,
+                'total'         => null,
+                'price'         => null,
+                'is_group'      => true
+            ];
+
+            foreach($grouping_lines as $line) {
+                $lines[] = [
+                    'name'          => $line['name'],
+                    'qty'           => $line['qty'],
+                    'free_qty'      => $line['free_qty'],
+                    'unit_price'    => $line['unit_price'],
+                    'vat_rate'      => $line['vat_rate'],
+                    'total'         => $line['total'],
+                    'price'         => $line['price'],
+                    'is_group'      => false
+                ];
+            }
+            break;
     }
 }
 
