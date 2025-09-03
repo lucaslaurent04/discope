@@ -43,7 +43,7 @@ use Twig\TwigFilter;
         'mode' =>  [
             'description'   => 'Mode in which document has to be rendered: simple (default) or detailed.',
             'type'          => 'string',
-            'selection'     => ['simple', 'grouped', 'detailed'],
+            'selection'     => ['grouped', 'detailed'],
             'default'       => 'grouped'
         ],
 
