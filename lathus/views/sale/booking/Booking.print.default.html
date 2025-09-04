@@ -34,6 +34,27 @@ div, table, table tr td {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+div.header,
+div.footer {
+    box-sizing: border-box;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    width: 100%;
+    overflow: hidden;
+    background-color: white;
+}
+
+div.footer {
+    bottom: 0;
+    left: 0;
+    height: 60px;
+    overflow: visible;
+    z-index: 200;
+    font-size: 0.8em !important;
+}
+
 .lines-table {
     margin-top: 20px;
     border-collapse: collapse;
@@ -43,9 +64,21 @@ div, table, table tr td {
 .lines-table td {
     border: 1px solid black;
 }
+
+.extra-info-table td {
+    padding: 3px 20px;
+}
 </style>
 </head>
 <body>
+
+<div class="footer">
+    <p style="text-align: center;">Exonération de TVA selon Art. 261-7-1° du C.G.I. et 293B du C.G.I</p>
+    <p style="text-align: center; padding: 0 50px;">
+        Les informations présentes dans ce document font l'objet d'un traitement informatique et sont destinées au Centre de Plein Air de Lathus. Conformément à la loi
+        "Informatique et libertés" du 6 janvier 1978, vous bénéficiez d'un droit d'accès et de rectification aux informations qui vous concernent.
+    </p>
+</div>
 
 <img src="{{ img_url }}" style="position: absolute; max-width: 90px; width: 100%; height: auto;" border="0" alt="Header Image" />
 
@@ -100,66 +133,103 @@ div, table, table tr td {
     </tr>
 </table>
 
-<table class="lines-table" width="100%" cellpadding="4" cellspacing="0">
-    <thead style="border: solid 1px black; border-left: 0px; border-right: 0px;">
-    <tr>
-        <th width="54%" style="padding-left: 7px; font-weight: bold; text-align: left;">
-            Désignation
-        </th>
-        <th width="10%" style="font-weight: bold; text-align: center;  border-left: solid 1px black; padding-right: 7px;">
-            Qté
-        </th>
-        <th width="10%" style="font-weight: bold; text-align: center;  border-left: solid 1px black; padding-right: 7px;">
-            Gté
-        </th>
-        <th width="13%" style="font-weight: bold; text-align: right;  border-left: solid 1px black; padding-right: 7px;">
-            Prix unit.
-        </th>
-        <th width="13%" style="font-weight: bold; text-align: right;  border-left: solid 1px black; padding-right: 7px;">
-            Prix
-        </th>
-    </tr>
-    </thead>
-    <!-- for each line -->
-    {% for line in lines %}
-    <tr valign="top">
-        <td width="54%">
-            {% if line.is_group %}
+<div style="page-break-inside: avoid;">
+    <table class="lines-table" width="100%" cellpadding="4" cellspacing="0">
+        <thead>
+        <tr>
+            <th width="54%" style="padding-left: 7px; text-align: left; border-top: none; border-left: none; font-weight: normal;">
+                <div>Nombre de personnes : <b>{{ people_qty  }}</b></div>
+                <div>dont <b>{{ adults_qty }}</b> accompagnateurs</div>
+            </th>
+            <th width="10%" style="font-weight: bold; text-align: center;  border-left: solid 1px black; padding-right: 7px;">
+                Qté
+            </th>
+            <th width="10%" style="font-weight: bold; text-align: center;  border-left: solid 1px black; padding-right: 7px;">
+                Gté
+            </th>
+            <th width="13%" style="font-weight: bold; text-align: right;  border-left: solid 1px black; padding-right: 7px;">
+                Prix unit.
+            </th>
+            <th width="13%" style="font-weight: bold; text-align: right;  border-left: solid 1px black; padding-right: 7px;">
+                Prix
+            </th>
+        </tr>
+        </thead>
+        <!-- for each line -->
+        {% for line in lines %}
+        <tr valign="top">
+            <td width="54%">
+                {% if line.is_group %}
                 <b>{{ line.name }}</b>
-            {% else %}
+                {% else %}
                 {{ line.name }}
-            {% endif %}
-        </td>
-        <td width="10%" style="text-align: center;">
-            {{ line.qty }}
-        </td>
-        <td width="10%" style="text-align: center;">
-            {{ line.free_qty }}
-        </td>
-        <td width="13%" style="text-align: right;">
-            {% if line.unit_price is not null %}
+                {% endif %}
+            </td>
+            <td width="10%" style="text-align: center;">
+                {{ line.qty }}
+            </td>
+            <td width="10%" style="text-align: center;">
+                {{ line.free_qty }}
+            </td>
+            <td width="13%" style="text-align: right;">
+                {% if line.unit_price is not null %}
                 {{ line.unit_price | format_money() }}
-            {% endif %}
-        </td>
-        <td width="13%" style="text-align: right;">
-            {% if line.total is not null %}
+                {% endif %}
+            </td>
+            <td width="13%" style="text-align: right;">
+                {% if line.total is not null %}
                 {{ line.total | format_money() }}
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
 
-<table width="100%" style="border: 0; border-right: solid 1px black;" cellpadding="4" cellspacing="0">
-    <tr>
-        <td width="87%" style="text-align: right; padding-right: 10px;">
-            Total
-        </td>
-        <td width="13%" style="text-align: right; border-left: solid 1px black; border-bottom: solid 1px black;">
-            {{ booking.price|format_money() }}
-        </td>
-    </tr>
-</table>
+    <table width="100%" style="margin-bottom: 100px; border: 0; border-right: solid 1px black;" cellpadding="4" cellspacing="0">
+        <tr>
+            <td width="87%" style="text-align: right; padding-right: 10px;">
+                Total
+            </td>
+            <td width="13%" style="text-align: right; border-left: solid 1px black; border-bottom: solid 1px black;">
+                {{ booking.price|format_money() }}
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div style="page-break-inside: avoid;">
+    <table class="extra-info-table" style="margin-bottom: 10px; width: 100%;">
+        <tr>
+            <td style="width: 55%; font-weight: bold;">Attention !!! Cette proposition n'est valable que jusqu'au</td>
+            <td style="width: 45%; font-weight: bold; font-size: 1rem;">
+                {{ booking.date_expiry|format_date() }}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="font-size: 0.7rem;">
+                Au-delà de cette date, nous considèrerons que vous ne donnez pas suite à votre projet de séjour.
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="font-size: 0.7rem;">
+                Si vous souhaitez plus de précisions pour mener à bien votre projet, notre équipe est à votre disposition au
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align: center; font-weight: bold;">
+                05 49 91 83 30
+            </td>
+        </tr>
+    </table>
+
+    <p style="font-size: 0.7rem;">
+        Pour rejoindre notre établissement, nous vous invitons à utiliser les moyens de transports collectifs à votre disposition : <br/>
+        - par le TGV Atlantique jusqu’à Poitiers, le TER jusqu’à Lathus, un autocar vous déposera enfin au CPA Lathus <br/>
+        - en autocar. Nous avons passé un accord de partenariat avec un transporteur voisin, M Moreau. Il vous proposera des tarifs privilégiés et <br/>
+        des véhicules dotés d’une nouvelle technologie qui permet de réduire de 5 % la consommation de gazole et de 85 % les émissions <br/>
+        d’oxydes d’azote. Vous pourrez le contacter au 02 54 39 07 39 pour qu’il vous établisse un devis.
+    </p>
+</div>
 
 </body>
 </html>

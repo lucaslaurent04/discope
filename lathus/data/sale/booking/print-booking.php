@@ -12,6 +12,7 @@ use Dompdf\Options as DompdfOptions;
 use identity\Identity;
 use sale\booking\Booking;
 use sale\booking\BookingLine;
+use sale\booking\BookingLineGroup;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
@@ -94,6 +95,7 @@ if(is_null($booking)) {
 
 $booking = Booking::id($booking['id'])
     ->read([
+        'date_expiry',
         'date_from',
         'date_to',
         'time_from',
@@ -252,12 +254,34 @@ foreach($map_groupings_lines as $grouping_name => $grouping_lines) {
 }
 
 /*
+      3.3) handle children and adults qty
+*/
+
+$sojourn_groups = BookingLineGroup::search([
+    ['booking_id', '=', $booking['id']],
+    ['group_type', '=', 'sojourn']
+])
+    ->read(['age_range_assignments_ids' => ['age_to', 'qty']])
+    ->get();
+
+$people_qty = 0;
+$adults_qty = 0;
+foreach($sojourn_groups as $group) {
+    foreach($group['age_range_assignments_ids'] as $age_range_assignment) {
+        if($age_range_assignment['age_to'] > 18) {
+            $adulst_qty += $age_range_assignment['qty'];
+        }
+        $people_qty +=$age_range_assignment['qty'];
+    }
+}
+
+/*
       3.4) set values
 */
 
 $today = time();
 
-$values = compact('booking', 'customer', 'img_url', 'today', 'lines');
+$values = compact('booking', 'customer', 'img_url', 'today', 'lines', 'people_qty', 'adults_qty');
 
 /*
     4) inject all values into the template
