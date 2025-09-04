@@ -7,15 +7,12 @@
 */
 
 use communication\Template;
-use communication\TemplatePart;
 use core\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
-use equal\data\DataFormatter;
 use sale\booking\Booking;
 use sale\booking\BookingActivity;
 use sale\booking\BookingMeal;
-use sale\booking\Consumption;
 use sale\booking\TimeSlot;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
@@ -73,33 +70,11 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 
 ['context' => $context, 'orm' => $orm] = $providers;
 
-// steer towards custom controller, if any
-$has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
-if($has_custom_package) {
-    $custom_package = Setting::get_value('discope', 'features', 'custom_package');
-    if(!$custom_package) {
-        trigger_error('APP::Missing customization package setting (despite `discope.features.has_custom_package`)', EQ_REPORT_WARNING);
-    }
-    elseif($custom_package !== 'sale') {
-        if(file_exists(EQ_BASEDIR."/packages/{$custom_package}/data/sale/booking/print-booking-activity.php")) {
-            $output = eQual::run('get', "{$custom_package}_sale_booking_print-booking-activity", $params, true);
-
-            $context->httpResponse()
-                // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
-                ->header('Content-Disposition', 'inline; filename="document.pdf"')
-                ->body($output)
-                ->send();
-
-            exit(0);
-        }
-    }
-}
-
 /*
     Retrieve the requested template
 */
 
-$entity = 'sale\booking\Booking';
+$entity = 'lathus\sale\booking\Booking';
 $parts = explode('\\', $entity);
 $package = array_shift($parts);
 $class_path = implode('/', $parts);
