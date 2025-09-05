@@ -4,6 +4,7 @@
             [id]="instance.age_range_id"
             [fields]="['age_from','age_to']"
             [placeholder]="'Commencez à taper le nom'"
+            [preloadOnFocus]="true"
             [noResult]="'rien trouvé'"
             [required]="true"
             [disabled]="instance?.age_range_id > 0"
