@@ -593,7 +593,7 @@ foreach($invoice_lines as $line) {
         $grouping_code = $line['product_id']['product_model_id']['grouping_code_id'];
     }
 
-    if(is_null($grouping_code) || $grouping_code['code'] === 'invisible') {
+    if(is_null($grouping_code) || ($grouping_code['code'] === 'invisible' && $line['price'] === 0)) {
         continue;
     }
 
