@@ -789,7 +789,7 @@ foreach($booking_lines as $line) {
         $grouping_code = $line['product_id']['product_model_id']['grouping_code_id'];
     }
 
-    if(is_null($grouping_code) || ($grouping_code['code'] === 'invisible' && $line['price'] <= 0.01)) {
+    if(is_null($grouping_code)) {
         continue;
     }
 
@@ -812,9 +812,15 @@ $booking_lines = BookingLine::search(['booking_id', '=', $booking['id']])
 
 $map_groupings_lines = [];
 foreach($booking_lines as $line) {
+    $product_id = $line['product_id']['id'];
+
+    if(($map_products_groupings[$product_id]['code'] ?? '') === 'invisible' && $line['price'] <= 0.01) {
+        continue;
+    }
+
     $grouping_name = $line['product_id']['label'];
-    if(isset($map_products_groupings[$line['product_id']['id']])) {
-        $grouping_name = $map_products_groupings[$line['product_id']['id']]['name'];
+    if(isset($map_products_groupings[$product_id])) {
+        $grouping_name = $map_products_groupings[$product_id]['name'];
     }
     elseif(!empty($line['description'])) {
         $grouping_name = $line['description'];
