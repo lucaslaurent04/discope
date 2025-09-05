@@ -338,9 +338,9 @@ $map_months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet',
 
 $period = 'Séjour du '.$map_days[date('w', $booking['date_from'])].' '.date('j', $booking['date_from']);
 if(date('m', $booking['date_from']) !== date('m', $booking['date_to'])) {
-    $period .= ' '.$map_months[date('n', $booking['date_from'])];
+    $period .= ' '.$map_months[date('n', $booking['date_from']) - 1];
 }
-$period .= ' au '.$map_days[date('w', $booking['date_to'])].' '.date('j', $booking['date_to']).' '.$map_months[date('n', $booking['date_to'])].' '.date('Y', $booking['date_to']);
+$period .= ' au '.$map_days[date('w', $booking['date_to'])].' '.date('j', $booking['date_to']).' '.$map_months[date('n', $booking['date_to']) - 1].' '.date('Y', $booking['date_to']);
 
 $values = [
     'name'                      => $invoice['name'],
@@ -593,7 +593,7 @@ foreach($invoice_lines as $line) {
         $grouping_code = $line['product_id']['product_model_id']['grouping_code_id'];
     }
 
-    if(is_null($grouping_code) || $grouping_code['code'] === 'invisible') {
+    if(is_null($grouping_code) || ($grouping_code['code'] === 'invisible' && $line['price'] === 0)) {
         continue;
     }
 
