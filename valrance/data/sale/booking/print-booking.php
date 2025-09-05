@@ -14,6 +14,7 @@ use Dompdf\Options as DompdfOptions;
 use equal\data\DataFormatter;
 use sale\booking\Booking;
 use sale\booking\BookingActivity;
+use sale\booking\BookingLine;
 use sale\booking\BookingLineGroupAgeRangeAssignment;
 use sale\booking\Consumption;
 use sale\booking\TimeSlot;
@@ -756,286 +757,123 @@ if($template_part) {
 /*
     feed lines
 */
-$lines = [];
+$booking_lines = BookingLine::search(['booking_id', '=', $booking['id']])
+    ->read([
+        'product_id' => [
+            'grouping_code_id' => [
+                'name',
+                'code'
+            ],
+            'product_model_id' => [
+                'grouping_code_id' => [
+                    'name',
+                    'code'
+                ]
+            ]
+        ]
+    ])
+    ->get();
 
-// all lines are stored in groups
-foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
-
-    // generate group details
-    $group_details = '';
-
-    if($booking_line_group['date_from'] == $booking_line_group['date_to']) {
-        $group_details .= date('d/m/y', $booking_line_group['date_from']);
+$map_products_groupings = [];
+foreach($booking_lines as $line) {
+    if(isset($map_products_groupings[$line['product_id']['id']])) {
+        continue;
     }
-    else {
-        $group_details .= date('d/m/y', $booking_line_group['date_from']).' - '.date('d/m/y', $booking_line_group['date_to']);
+
+    $grouping_code = null;
+    if(isset($line['product_id']['grouping_code_id'])) {
+        $grouping_code = $line['product_id']['grouping_code_id'];
+    }
+    elseif(isset($line['product_id']['product_model_id']['grouping_code_id'])) {
+        $grouping_code = $line['product_id']['product_model_id']['grouping_code_id'];
     }
 
-    $group_details .= ' - '.$booking_line_group['nb_pers'].'p.';
-
-    if($booking_line_group['has_pack'] && $booking_line_group['is_locked']) {
-        // group is a product pack (bundle) with own price
-        $group_is_pack = true;
-
-        $line = [
-            'name'          => $booking_line_group['name'],
-            'details'       => $group_details,
-            'description'   => $booking_line_group['pack_id']['label'],
-            'price'         => $booking_line_group['price'],
-            'total'         => $booking_line_group['total'],
-            'unit_price'    => $booking_line_group['unit_price'],
-            'vat_rate'      => $booking_line_group['vat_rate'],
-            'qty'           => $booking_line_group['qty'],
-            'free_qty'      => $booking_line_group['free_qty'],
-            'discount'      => $booking_line_group['discount'],
-            'is_group'      => true,
-            'is_pack'       => true
-        ];
-        $lines[] = $line;
-
-        if($params['mode'] == 'detailed') {
-            foreach($booking_line_group['booking_lines_ids'] as $booking_line) {
-                $line = [
-                    'name'          => $booking_line['name'],
-                    'qty'           => $booking_line['qty'],
-                    'price'         => null,
-                    'total'         => null,
-                    'unit_price'    => null,
-                    'vat_rate'      => null,
-                    'discount'      => null,
-                    'free_qty'      => null,
-                    'is_group'      => false,
-                    'is_pack'       => false
-                ];
-                $lines[] = $line;
-            }
-        }
+    if(is_null($grouping_code) || ($grouping_code['code'] === 'invisible' && $line['price'] === 0)) {
+        continue;
     }
-    else {
 
-        // group is a pack with no own price
-        $group_is_pack = false;
-
-        $vat_rate = floatval($booking_line_group['total']) ? (floatval($booking_line_group['price']) / floatval($booking_line_group['total']) - 1.0) : 0;
-
-        if($params['mode'] == 'grouped') {
-            $line = [
-                'name'          => $booking_line_group['name'],
-                'details'       => $group_details,
-                'price'         => $booking_line_group['price'],
-                'total'         => $booking_line_group['total'],
-                'unit_price'    => $booking_line_group['total'],
-                'vat_rate'      => $vat_rate,
-                'qty'           => 1,
-                'free_qty'      => 0,
-                'discount'      => 0,
-                'is_group'      => true,
-                'is_pack'       => false
-            ];
-        }
-        else {
-            $line = [
-                'name'          => $booking_line_group['name'],
-                'details'       => $group_details,
-                'price'         => null,
-                'total'         => null,
-                'unit_price'    => null,
-                'vat_rate'      => null,
-                'qty'           => null,
-                'free_qty'      => null,
-                'discount'      => null,
-                'is_group'      => true,
-                'is_pack'       => false
-            ];
-        }
-        $lines[] = $line;
-
-
-        $group_lines = [];
-
-        foreach($booking_line_group['booking_lines_ids'] as $booking_line) {
-
-            if($params['mode'] == 'grouped') {
-                $line = [
-                    'name'          => (strlen($booking_line['description']) > 0) ? $booking_line['description']:$booking_line['product_id']['label'],
-                    'price'         => null,
-                    'total'         => null,
-                    'unit_price'    => null,
-                    'vat_rate'      => null,
-                    'qty'           => $booking_line['qty'],
-                    'discount'      => null,
-                    'free_qty'      => $booking_line['free_qty'],
-                    'is_group'      => false,
-                    'is_pack'       => false
-                ];
-            }
-            else {
-                $line = [
-                    'name'          => (strlen($booking_line['description']) > 0) ? $booking_line['description'] : $booking_line['product_id']['label'],
-                    'price'         => $booking_line['price'],
-                    'total'         => $booking_line['total'],
-                    'unit_price'    => $booking_line['unit_price'],
-                    'vat_rate'      => $booking_line['vat_rate'],
-                    'qty'           => $booking_line['qty'],
-                    'discount'      => $booking_line['discount'],
-                    'free_qty'      => $booking_line['free_qty'],
-                    'is_group'      => false,
-                    'is_pack'       => false
-                ];
-            }
-
-            $group_lines[] = $line;
-        }
-        if($params['mode'] == 'detailed' || $params['mode'] == 'grouped') {
-            foreach($group_lines as $line) {
-                $lines[] = $line;
-            }
-        }
-        // mode is 'simple' : group lines by VAT rate
-        else {
-            $group_tax_lines = [];
-            foreach($group_lines as $line) {
-                $vat_rate = strval($line['vat_rate']);
-                if(!isset($group_tax_lines[$vat_rate])) {
-                    $group_tax_lines[$vat_rate] = 0;
-                }
-                $group_tax_lines[$vat_rate] += $line['total'];
-            }
-
-            if(count(array_keys($group_tax_lines)) <= 1) {
-                $pos = count($lines)-1;
-                foreach($group_tax_lines as $vat_rate => $total) {
-                    $lines[$pos]['qty'] = 1;
-                    $lines[$pos]['vat_rate'] = $vat_rate;
-                    $lines[$pos]['total'] = $total;
-                    $lines[$pos]['price'] = $total * (1 + $vat_rate);
-                }
-            }
-            else {
-                foreach($group_tax_lines as $vat_rate => $total) {
-                    $line = [
-                        'name'      => 'Services avec TVA '.($vat_rate*100).'%',
-                        'qty'       => 1,
-                        'vat_rate'  => $vat_rate,
-                        'total'     => $total,
-                        'price'     => $total * (1 + $vat_rate)
-                    ];
-                    $lines[] = $line;
-                }
-            }
-        }
-    }
+    $map_products_groupings[$line['product_id']['id']] = $grouping_code;
 }
 
-$lines_map = [];
+$booking_lines = BookingLine::search(['booking_id', '=', $booking['id']])
+    ->read([
+        'name',
+        'description',
+        'qty',
+        'free_qty',
+        'unit_price',
+        'vat_rate',
+        'total',
+        'price',
+        'product_id' => ['label']
+    ])
+    ->get();
 
-if($params['mode'] === 'grouped') {
-    $lines = [];
-    foreach ($booking['booking_lines_groups_ids'] as $booking_line_group) {
-        foreach ($booking_line_group['booking_lines_ids'] as $booking_line) {
-            /*
-            // #memo - even if part of an activity - transports must be grouped distinctively
-            if ($booking_line['is_transport'] && !empty($booking_line['booking_activity_id'])){
-                continue;
-            }
-            */
+$map_groupings_lines = [];
+foreach($booking_lines as $line) {
+    $grouping_name = $line['product_id']['label'];
+    if(isset($map_products_groupings[$line['product_id']['id']])) {
+        $grouping_name = $map_products_groupings[$line['product_id']['id']]['name'];
+    }
+    elseif(!empty($line['description'])) {
+        $grouping_name = $line['description'];
+    }
 
-            if ($booking_line['is_supply'] && !empty($booking_line['booking_activity_id'])){
-                continue;
-            }
+    if(!isset($map_groupings_lines[$grouping_name])) {
+        $map_groupings_lines[$grouping_name] = [];
+    }
 
-            $booking_line_group_id = $booking_line_group['id'];
-            $product = $booking_line['product_id'];
+    $map_groupings_lines[$grouping_name][] = $line;
+}
 
-            $grouping_code = $booking_line['product_id']['label'];
-
-            if(isset($product['grouping_code_id']['name'])) {
-                if($product['grouping_code_id']['code'] === 'invisible') {
-                    continue;
-                }
-                $grouping_code = $product['grouping_code_id']['name'];
-            }
-            elseif(isset($product['product_model_id']['grouping_code_id']['name'])) {
-                if($product['product_model_id']['grouping_code_id']['code'] === 'invisible') {
-                    continue;
-                }
-                $grouping_code = $product['product_model_id']['grouping_code_id']['name'];
-            }
-            elseif(strlen($booking_line['description']) > 0) {
-                $grouping_code = $booking_line['description'];
-            }
-
-            if(!isset($lines_map[$booking_line_group_id])) {
-                $lines_map[$booking_line_group_id] = [];
-            }
-            if(!isset($lines_map[$booking_line_group_id][$grouping_code])) {
-                $lines_map[$booking_line_group_id][$grouping_code] = [];
+$lines = [];
+foreach($map_groupings_lines as $grouping_name => $grouping_lines) {
+    switch($params['mode']) {
+        case 'grouped':
+            $total = 0;
+            $price = 0;
+            foreach($grouping_lines as $line) {
+                $total += $line['total'];
+                $price += $line['price'];
             }
 
-            if(!isset($lines_map[$booking_line_group_id][$grouping_code][$product['id']])) {
-                $lines_map[$booking_line_group_id][$grouping_code][$product['id']] = [
-                    'name'          => $booking_line['name'],
-                    'price'         => null,
-                    'total'         => null,
-                    'unit_price'    => null,
-                    'vat_rate'      => null,
-                    'qty'           => $booking_line['qty'],
-                    'discount'      => null,
-                    'has_pack'      => $booking_line_group['has_pack'],
-                    'is_activity'   => $booking_line['is_activity'],
-                    'free_qty'      => $booking_line['free_qty'],
-                    'grouping'      => $grouping_code
+            $lines[] = [
+                'name'          => $grouping_name,
+                'qty'           => 1,
+                'free_qty'      => null,
+                'unit_price'    => $total,
+                'vat_rate'      => null,
+                'total'         => $total,
+                'price'         => $price,
+                'is_group'      => true
+            ];
+            break;
+        case 'detailed':
+            $lines[] = [
+                'name'          => $grouping_name,
+                'qty'           => null,
+                'free_qty'      => null,
+                'unit_price'    => null,
+                'vat_rate'      => null,
+                'total'         => null,
+                'price'         => null,
+                'is_group'      => true
+            ];
+
+            foreach($grouping_lines as $line) {
+                $lines[] = [
+                    'name'          => $line['name'],
+                    'qty'           => $line['qty'],
+                    'free_qty'      => $line['free_qty'],
+                    'unit_price'    => $line['unit_price'],
+                    'vat_rate'      => $line['vat_rate'],
+                    'total'         => $line['total'],
+                    'price'         => $line['price'],
+                    'is_group'      => false
                 ];
-
-                if($booking_line['booking_activity_id'] &&
-                    !empty($booking_line['booking_activity_id']['supplies_booking_lines_ids'])
-                ) {
-                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] += $booking_line['booking_activity_id']['price'];
-                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] += $booking_line['booking_activity_id']['total'];
-                }
-                else {
-                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['unit_price'] = $booking_line['unit_price'];
-                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] = $booking_line['price'];
-                    $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] = $booking_line['total'];
-                }
             }
-            else {
-                $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['price'] += $booking_line['price'];
-                $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['total'] += $booking_line['total'];
-                $lines_map[$booking_line_group_id][$grouping_code][$product['id']]['qty'] += $booking_line['qty'];
-            }
-        }
+            break;
     }
-    foreach($lines_map as $booking_line_group_id => $groupings) {
-        foreach($groupings as $grouping_code_id => $products) {
-            foreach($products as $product_id => $product) {
-                if(!isset($lines[$grouping_code_id])) {
-                        $lines[$grouping_code_id] = [
-                            'name'          => $product['grouping'],
-                            'unit_price'    => 0,
-                            'vat_rate'      => 0,
-                            'free_qty'      => 0,
-                            'qty'           => 1,
-                            'price'         => 0,
-                            'total'         => 0,
-                            'is_group'      => false,
-                            'is_pack'       => false
-                        ];
-                }
-
-                $lines[$grouping_code_id]['total'] += $product['total'];
-                $lines[$grouping_code_id]['price'] += $product['price'];
-                $lines[$grouping_code_id]['unit_price'] += $product['total'];
-            }
-            /*
-            // #memo - we must display all grouping lines, even if the price is 0.0 (to show the customer what is included, even if free)
-            if($lines[$grouping_code_id]['price'] == 0.0) {
-                unset($lines[$grouping_code_id]);
-            }
-            */
-        }
-    }
-
 }
 
 $values['lines'] = $lines;
