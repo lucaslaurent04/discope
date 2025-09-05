@@ -759,6 +759,7 @@ if($template_part) {
 */
 $booking_lines = BookingLine::search(['booking_id', '=', $booking['id']])
     ->read([
+        'price',
         'product_id' => [
             'grouping_code_id' => [
                 'name',
