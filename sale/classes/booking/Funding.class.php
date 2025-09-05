@@ -424,18 +424,19 @@ class Funding extends \sale\pay\Funding {
             // retrieve downpayment product
             $downpayment_product_id = 0;
 
-            $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$funding['booking_id.center_id.organisation_id']);
+            $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$funding['booking_id.center_id.organisation_id'], 'downpayment');
             if($downpayment_sku) {
                 $products_ids = $om->search(Product::getType(), ['sku', '=', $downpayment_sku]);
                 if($products_ids > 0 && count($products_ids)) {
                     $downpayment_product_id = reset($products_ids);
                 }
             }
-            else {
-                $downpayment_sku = 'downpayment';
+
+            if(!$downpayment_product_id) {
+                throw new \Exception("missing_mandatory_downpayment_product", EQ_ERROR_INVALID_CONFIG);
             }
 
-            $partner_id = (isset($values['partner_id']))?$values['partner_id']:$funding['booking_id.customer_id'];
+            $partner_id = (isset($values['partner_id'])) ? $values['partner_id'] : $funding['booking_id.customer_id'];
 
             $invoice = Invoice::create([
                 'organisation_id'   => $funding['booking_id.center_id.organisation_id'],
