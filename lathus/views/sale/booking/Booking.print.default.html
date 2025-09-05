@@ -44,6 +44,7 @@ div.footer {
     width: 100%;
     overflow: hidden;
     background-color: white;
+    text-align: center;
 }
 
 div.footer {
@@ -53,6 +54,33 @@ div.footer {
     overflow: visible;
     z-index: 200;
     font-size: 0.8em !important;
+}
+
+div.footer p {
+    margin: 5px;
+}
+
+.sojourn-dates {
+    position: absolute;
+    left: 300px;
+    top: 70px;
+}
+
+.sojourn-dates p {
+    margin: 1px;
+}
+
+.company-info {
+    margin-top: 5px;
+    font-size: 0.65rem;
+}
+
+.company-info p {
+    margin: 0;
+}
+
+.participating-people-info p {
+    margin: 0;
 }
 
 .lines-table {
@@ -68,16 +96,35 @@ div.footer {
 .extra-info-table td {
     padding: 3px 20px;
 }
+
+.expiry-info {
+    margin-bottom: 30px;
+    width: 100%;
+    font-size: 0.75rem;
+}
+
+.expiry-info p {
+    margin: 5px;
+}
+
+.transportation-info {
+    font-size: 0.7rem;
+}
+
+.transportation-info p {
+    margin: 2px;
+}
+
+.transportation-info ul {
+    margin: 2px;
+    padding-left: 20px;
+}
 </style>
 </head>
 <body>
 
 <div class="footer">
-    <p style="text-align: center;">Exonération de TVA selon Art. 261-7-1° du C.G.I. et 293B du C.G.I</p>
-    <p style="text-align: center; padding: 0 50px;">
-        Les informations présentes dans ce document font l'objet d'un traitement informatique et sont destinées au Centre de Plein Air de Lathus. Conformément à la loi
-        "Informatique et libertés" du 6 janvier 1978, vous bénéficiez d'un droit d'accès et de rectification aux informations qui vous concernent.
-    </p>
+    {{ parts.footer|raw }}
 </div>
 
 <img src="{{ img_url }}" style="position: absolute; max-width: 90px; width: 100%; height: auto;" border="0" alt="Header Image" />
@@ -86,33 +133,28 @@ div.footer {
     <h2 style="text-transform: uppercase; margin-top: 10px;">Devis estimatif</h2>
 </div>
 
-<div style="position: absolute; left: 300px; top: 70px;">
-    <div>Dates du séjour envisagé :</div>
-    <div style="margin-left: 5px; margin-top: 5px;">du {{ booking.date_from|format_date_long() }} à {{ booking.time_from|format_time() }}</div>
-    <div style="margin-left: 5px; margin-top: 5px;">au {{ booking.date_to|format_date_long() }} à {{ booking.time_to|format_time() }}</div>
+<div class="sojourn-dates">
+    {{ parts.sojourn_dates|raw }}
 </div>
 
 <table style="width: 100%">
     <tr>
         <td width="70%" style="vertical-align: top; font-size: 1rem;">
             <div style="font-weight: bold;">
-                <div>CPA Lathus</div>
-                <div>La Voulzie</div>
-                <div>C.S. 40005</div>
-                <div>86390 Lathus Saint-Rémy</div>
+                <div>{{ organisation.name }}</div>
+                <div>{{ organisation.address_street }}</div>
+                {% if organisation.address_dispatch|length > 0 %}
+                    <div>{{ organisation.address_dispatch }}</div>
+                {% endif %}
+                <div>{{ organisation.address_zip }} {{ organisation.address_city }}</div>
             </div>
             <div style="margin-top: 3px; font-size: 0.8rem;">
-                <div>Tél : 05 49 91 83 30</div>
-                <div>accueil@cpa-lathus.asso.fr</div>
-                <div>www.cpa-lathus.asso.fr</div>
+                <div>Tél : {{ center.phone }}</div>
+                <div>{{ center.email }}</div>
+                <div>{{ organisation.website }}</div>
             </div>
-            <div style="margin-top: 5px; font-size: 0.65rem;">
-                <div>Association loi 1901 - RNA N° W862000036</div>
-                <div>Agrément Jeunesse et Sports : 086120003</div>
-                <div>Agrément Education Nationale : IA 86 120 01 26</div>
-                <div>SIRET 331 320 507 000 14 - APE 9312 Z</div>
-                <div>IBAN : FR76 1027 8364 1200 0100 1050 374</div>
-                <div>BIC : CMCIFR2A</div>
+            <div class="company-info">
+                {{ parts.company_info|raw }}
             </div>
         </td>
         <td width="30%" style="vertical-align: top;">
@@ -138,8 +180,7 @@ div.footer {
         <thead>
         <tr>
             <th width="54%" style="padding-left: 7px; text-align: left; border-top: none; border-left: none; font-weight: normal;">
-                <div>Nombre de personnes : <b>{{ people_qty  }}</b></div>
-                <div>dont <b>{{ adults_qty }}</b> accompagnateurs</div>
+                <div class="participating-people-info">{{ parts.participating_people_info|raw }}</div>
             </th>
             <th width="10%" style="font-weight: bold; text-align: center;  border-left: solid 1px black; padding-right: 7px;">
                 Qté
@@ -160,9 +201,9 @@ div.footer {
         <tr valign="top">
             <td width="54%">
                 {% if line.is_group %}
-                <b>{{ line.name }}</b>
+                    <b>{{ line.name }}</b>
                 {% else %}
-                {{ line.name }}
+                    {{ line.name }}
                 {% endif %}
             </td>
             <td width="10%" style="text-align: center;">
@@ -173,12 +214,12 @@ div.footer {
             </td>
             <td width="13%" style="text-align: right;">
                 {% if line.unit_price is not null %}
-                {{ line.unit_price | format_money() }}
+                    {{ line.unit_price | format_money() }}
                 {% endif %}
             </td>
             <td width="13%" style="text-align: right;">
                 {% if line.total is not null %}
-                {{ line.total | format_money() }}
+                    {{ line.total | format_money() }}
                 {% endif %}
             </td>
         </tr>
@@ -187,10 +228,10 @@ div.footer {
 
     <table width="100%" style="margin-bottom: 100px; border: 0; border-right: solid 1px black;" cellpadding="4" cellspacing="0">
         <tr>
-            <td width="87%" style="text-align: right; padding-right: 10px;">
+            <td width="87%" style="text-align: right; padding-right: 10px; font-weight: bold;">
                 Total
             </td>
-            <td width="13%" style="text-align: right; border-left: solid 1px black; border-bottom: solid 1px black;">
+            <td width="13%" style="text-align: right; font-weight: bold; border-left: solid 1px black; border-bottom: solid 1px black;">
                 {{ booking.price|format_money() }}
             </td>
         </tr>
@@ -198,37 +239,13 @@ div.footer {
 </div>
 
 <div style="page-break-inside: avoid;">
-    <table class="extra-info-table" style="margin-bottom: 10px; width: 100%;">
-        <tr>
-            <td style="width: 55%; font-weight: bold;">Attention !!! Cette proposition n'est valable que jusqu'au</td>
-            <td style="width: 45%; font-weight: bold; font-size: 1rem;">
-                {{ booking.date_expiry|format_date() }}
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2" style="font-size: 0.7rem;">
-                Au-delà de cette date, nous considèrerons que vous ne donnez pas suite à votre projet de séjour.
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2" style="font-size: 0.7rem;">
-                Si vous souhaitez plus de précisions pour mener à bien votre projet, notre équipe est à votre disposition au
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2" style="text-align: center; font-weight: bold;">
-                05 49 91 83 30
-            </td>
-        </tr>
-    </table>
+    <div class="expiry-info">
+        {{ parts.expiry_info|raw }}
+    </div>
 
-    <p style="font-size: 0.7rem;">
-        Pour rejoindre notre établissement, nous vous invitons à utiliser les moyens de transports collectifs à votre disposition : <br/>
-        - par le TGV Atlantique jusqu’à Poitiers, le TER jusqu’à Lathus, un autocar vous déposera enfin au CPA Lathus <br/>
-        - en autocar. Nous avons passé un accord de partenariat avec un transporteur voisin, M Moreau. Il vous proposera des tarifs privilégiés et <br/>
-        des véhicules dotés d’une nouvelle technologie qui permet de réduire de 5 % la consommation de gazole et de 85 % les émissions <br/>
-        d’oxydes d’azote. Vous pourrez le contacter au 02 54 39 07 39 pour qu’il vous établisse un devis.
-    </p>
+    <div class="transportation-info">
+        {{ parts.transportation_info|raw }}
+    </div>
 </div>
 
 </body>

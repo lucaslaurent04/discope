@@ -6,9 +6,12 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use communication\Template;
 use core\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
+use equal\data\DataFormatter;
+use identity\Center;
 use identity\Identity;
 use sale\booking\Booking;
 use sale\booking\BookingLine;
@@ -61,6 +64,40 @@ use Twig\TwigFilter;
  */
 ['context' => $context] = $providers;
 
+/**
+ * Methods
+ */
+
+$date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
+$formatDate = fn($value) => date($date_format, $value);
+
+$map_days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+$map_months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+$formatDateLong = function($value) use($map_days, $map_months) {
+    return $map_days[date('w', $value)].' '.date('j', $value).' '.$map_months[date('n', $value) - 1].' '.date('Y', $value);
+};
+
+$formatTime = fn($value) => sprintf('%02dh%02d', $value / 3600, $value / 60 % 60);
+
+$formatPhone = function($value) {
+    if(strlen($value) === 10) {
+        return sprintf("%s %s %s %s %s",
+            substr($value, 0, 2),
+            substr($value, 2, 2),
+            substr($value, 4, 2),
+            substr($value, 6, 2),
+            substr($value, 8)
+        );
+    }
+
+    return DataFormatter::format($value, 'phone');
+};
+
+/**
+ * Data controller
+ */
+
+
 /*
     1) retrieve the requested template
 */
@@ -93,34 +130,76 @@ if(is_null($booking)) {
     3) create valus array to inject data in template
 */
 
-$booking = Booking::id($booking['id'])
-    ->read([
-        'date_expiry',
-        'date_from',
-        'date_to',
-        'time_from',
-        'time_to',
-        'price',
-        'center_id'     => ['organisation_id'],
-        'customer_id'   => ['partner_identity_id']
-    ])
-    ->first();
+$data_to_inject = [
+    'booking' => [
+        'date_expiry', 'date_from', 'date_to', 'time_from', 'time_to', 'price',
+    ],
+    'customer' => [
+        'display_name', 'address_street', 'address_zip', 'address_dispatch', 'address_city'
+    ],
+    'center' => [
+        'name', 'address_street', 'address_dispatch', 'address_zip', 'address_city', 'address_country', 'email', 'phone'
+    ],
+    'organisation' => [
+        'name', 'address_street', 'address_dispatch', 'address_zip', 'address_city', 'address_country', 'email', 'fax', 'phone',
+        'bank_account_iban', 'bank_account_bic', 'registration_number', 'vat_number', 'website'
+    ]
+];
 
 /*
-      3.1) get customer data
+      3.1) get booking data and format dates
+*/
+
+$booking = Booking::id($booking['id'])
+    ->read(array_merge(
+        $data_to_inject['booking'],
+        [
+            'center_id'     => ['organisation_id'],
+            'customer_id'   => ['partner_identity_id']
+        ]
+    ))
+    ->first(true);
+
+$booking['date_from_long'] = $formatDateLong($booking['date_from']);
+$booking['date_from_long'] = $formatDateLong($booking['date_from']);
+$booking['date_to_long'] = $formatDateLong($booking['date_to']);
+$booking['date_from'] = $formatDate($booking['date_from']);
+$booking['date_to'] = $formatDate($booking['date_to']);
+$booking['date_expiry'] = $formatDate($booking['date_expiry']);
+$booking['time_from'] = $formatTime($booking['time_from']);
+$booking['time_to'] = $formatTime($booking['time_to']);
+
+/*
+      3.2) get customer data
 */
 
 $customer = Identity::id($booking['customer_id']['partner_identity_id'])
-    ->read(['display_name', 'address_street', 'address_zip', 'address_dispatch', 'address_city'])
-    ->first();
+    ->read($data_to_inject['customer'])
+    ->first(true);
 
 /*
-      3.2) handle img url
+      3.3) get center data
+*/
+
+$center = Center::id($booking['center_id']['id'])
+    ->read($data_to_inject['center'])
+    ->first(true);
+
+$center['phone'] = $formatPhone($center['phone']);
+
+/*
+      3.4) get organisation data and handle img url
 */
 
 $organisation = Identity::id($booking['center_id']['organisation_id'])
-    ->read(['logo_document_id' => ['data', 'type']])
-    ->first();
+    ->read(array_merge(
+        $data_to_inject['organisation'],
+        ['logo_document_id' => ['data', 'type']]
+    ))
+    ->first(true);
+
+$organisation['bank_account_iban'] = DataFormatter::format($organisation['bank_account_iban'], 'iban');
+$organisation['phone'] = $formatPhone($organisation['phone']);
 
 $img_url = '';
 
@@ -131,7 +210,7 @@ if($logo_document_data) {
 }
 
 /*
-    3.3) handle lines
+    3.5) handle lines
 */
 
 $booking_lines = BookingLine::search(['booking_id', '=', $booking['id']])
@@ -254,7 +333,7 @@ foreach($map_groupings_lines as $grouping_name => $grouping_lines) {
 }
 
 /*
-      3.3) handle children and adults qty
+      3.6) handle people qty
 */
 
 $sojourn_groups = BookingLineGroup::search([
@@ -262,33 +341,88 @@ $sojourn_groups = BookingLineGroup::search([
     ['group_type', '=', 'sojourn']
 ])
     ->read(['age_range_assignments_ids' => ['age_to', 'qty']])
-    ->get();
+    ->get(true);
 
-$people_qty = 0;
-$adults_qty = 0;
+$nb_pers = 0;
+$nb_adults = 0;
+$nb_children = 0;
 foreach($sojourn_groups as $group) {
     foreach($group['age_range_assignments_ids'] as $age_range_assignment) {
-        if($age_range_assignment['age_to'] > 18) {
-            $adulst_qty += $age_range_assignment['qty'];
+        $nb_pers +=$age_range_assignment['qty'];
+        if($age_range_assignment['age_to'] <= 18) {
+            $nb_children += $age_range_assignment['qty'];
         }
-        $people_qty +=$age_range_assignment['qty'];
+        else {
+            $nb_adults += $age_range_assignment['qty'];
+        }
     }
 }
 
 /*
-      3.4) set values
+      3.7) set values
 */
 
 $today = time();
 
-$values = compact('booking', 'customer', 'img_url', 'today', 'lines', 'people_qty', 'adults_qty');
+$values = compact(
+    'booking',
+    'customer',
+    'center',
+    'organisation',
+    'img_url',
+    'lines',
+    'today',
+    'nb_pers',
+    'nb_adults',
+    'nb_children'
+);
+
+/*
+    3.8) Handle template parts
+*/
+
+$booking = Booking::id($booking['id'])
+    ->read(['center_id' => ['template_category_id']])
+    ->first();
+
+$template = Template::search([
+    ['category_id', '=', $booking['center_id']['template_category_id']],
+    ['code', '=', 'quote'],
+    ['type', '=', 'quote']
+])
+    ->read( ['id','parts_ids' => ['name', 'value']], $params['lang'])
+    ->first(true);
+
+$parts = [];
+foreach($template['parts_ids'] as $part) {
+    $value = $part['value'];
+    foreach($data_to_inject as $object => $fields) {
+        foreach($fields as $field) {
+            $value = str_replace('{'.$object.'.'.$field.'}', $values[$object][$field], $value);
+        }
+    }
+
+    $extra_fields = ['today', 'nb_pers', 'nb_adults', 'nb_children'];
+    foreach($extra_fields as $field) {
+        $value = str_replace('{'.$field.'}', $values[$field], $value);
+    }
+
+    $booking_extra_fields = ['date_from_long', 'date_to_long'];
+    foreach($booking_extra_fields as $field) {
+        $value = str_replace('{booking.'.$field.'}', $values['booking'][$field], $value);
+    }
+
+    $parts[$part['name']] = $value;
+}
+
+$values['parts'] = $parts;
 
 /*
     4) inject all values into the template
 */
 
 try {
-    $loader = new TwigFilesystemLoader(QN_BASEDIR."/packages/{$package}/views/");
+    $loader = new TwigFilesystemLoader(EQ_BASEDIR."/packages/$package/views/");
 
     $twig = new TwigEnvironment($loader);
     /**  @var ExtensionInterface **/
@@ -301,22 +435,13 @@ try {
     });
     $twig->addFilter($filter);
 
-    $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
-    $date_filter = new TwigFilter('format_date', function($value) use($date_format) {
-        return date($date_format, $value);
-    });
+    $date_filter = new TwigFilter('format_date', $formatDate);
     $twig->addFilter($date_filter);
 
-    $map_days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-    $map_months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-    $date_filter = new TwigFilter('format_date_long', function($value) use($map_days, $map_months) {
-        return $map_days[date('w', $value)].' '.date('j', $value).' '.$map_months[date('n', $value) - 1].' '.date('Y', $value);
-    });
+    $date_filter = new TwigFilter('format_date_long', $formatDateLong);
     $twig->addFilter($date_filter);
 
-    $date_filter = new TwigFilter('format_time', function($value) {
-        return sprintf('%02dh%02d', $value / 3600, $value / 60 % 60);
-    });
+    $date_filter = new TwigFilter('format_time', $formatTime);
     $twig->addFilter($date_filter);
 
     $template = $twig->load("{$class_path}.{$params['view_id']}.html");
