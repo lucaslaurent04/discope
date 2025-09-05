@@ -921,18 +921,19 @@ export class BookingServicesBookingGroupComponent
 
         try {
             this.loading = true;
+            this.loadStart.emit();
             await this.api.fetch('?do=sale_booking_update-sojourn-agerange-remove', {
                     id: this.instance.id,
                     age_range_assignment_id: age_range_assignment_id,
                 });
             this.instance.age_range_assignments_ids.splice(this.instance.age_range_assignments_ids.findIndex((e:any) => e.id == age_range_assignment_id),1);
-            // relay to parent
-            this.updated.emit();
         }
         catch(response) {
             this.api.errorFeedback(response);
         }
         finally {
+            // relay to parent
+            this.updated.emit();
             this.loading = false;
         }
 
