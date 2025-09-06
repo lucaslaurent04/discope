@@ -245,7 +245,7 @@
                     "label": "Placer une option",
                     "description": "Les unités locatives seront réservées pendant une courte période. Aucun paiement ne sera demandé."
                 },
-                "action.option-confirm": {
+                "action.option_confirm": {
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et une facture proforma sera éditée."
                 },
@@ -277,7 +277,7 @@
                     "label": "Facturer le solde",
                     "description": "L'unité locative a été vérifiée et les services complémentaires ont été ajoutés. Une facture pro-forma sera créée. (Si une facture de solde proforma existe, elle sera réinitialisée.)"
                 },
-                "action.invoice-back": {
+                "action.invoice_back": {
                     "label": "Repasser en Terminée",
                     "description": "Des adaptations sont encore nécessaire et la facture proforma devra être regénérée."
                 },
@@ -285,11 +285,11 @@
                     "label": "Annuler",
                     "description": "La réservation sera annulée et les unités locatives seront libérées. Les éventuels frais d'annulation seront appliqués."
                 },
-                "action.import-contacts": {
+                "action.import_contacts": {
                     "label": "Importer les contacts",
                     "description": "Les contacts du client sélectionné seront (ré)importés dans les contacts de la réservations."
                 },
-                "action.release-rentalunits": {
+                "action.release_rentalunits": {
                     "label": "Libérer les unités loc.",
                     "description": "Ceci supprimera les consommations précédemment créés. Les éventuelles unités locatives bloquées seront libérées."
                 },
@@ -391,7 +391,7 @@
                     "label": "Placer une option",
                     "description": "Les unités locatives seront réservées pendant une courte période. Aucun paiement ne sera demandé."
                 },
-                "action.option-confirm": {
+                "action.option_confirm": {
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et une facture proforma sera éditée."
                 },
@@ -415,7 +415,7 @@
                     "label": "Facturer le solde",
                     "description": "L'unité locative a été vérifiée et les services complémentaires ont été ajoutés. Une facture pro-forma sera créée. (Si une facture de solde proforma existe, elle sera réinitialisée.)"
                 },
-                "action.invoice-back": {
+                "action.invoice_back": {
                     "label": "Repasser en Terminée",
                     "description": "Des adaptations sont encore nécessaire et la facture proforma devra être regénérée."
                 },
@@ -423,11 +423,11 @@
                     "label": "Annuler",
                     "description": "La réservation sera annulée et les unités locatives seront libérées. Les éventuels frais d'annulation seront appliqués."
                 },
-                "action.import-contacts": {
+                "action.import_contacts": {
                     "label": "Importer les contacts",
                     "description": "Les contacts du client sélectionné seront (ré)importés dans les contacts de la réservations."
                 },
-                "action.release-rentalunits": {
+                "action.release_rentalunits": {
                     "label": "Libérer les unités loc.",
                     "description": "Ceci supprimera les consommations précédemment créés. Les éventuelles unités locatives bloquées seront libérées."
                 },
@@ -545,7 +545,7 @@
                     "label": "Placer une option",
                     "description": "Les unités locatives seront réservées pendant une courte période. Aucun paiement ne sera demandé."
                 },
-                "action.option-confirm": {
+                "action.option_confirm": {
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et une facture proforma sera éditée."
                 },
@@ -569,7 +569,7 @@
                     "label": "Facturer le solde",
                     "description": "L'unité locative a été vérifiée et les services complémentaires ont été ajoutés. Une facture pro-forma sera créée. (Si une facture de solde proforma existe, elle sera réinitialisée.)"
                 },
-                "action.invoice-back": {
+                "action.invoice_back": {
                     "label": "Repasser en Terminée",
                     "description": "Des adaptations sont encore nécessaire et la facture proforma devra être regénérée."
                 },
@@ -577,11 +577,11 @@
                     "label": "Annuler",
                     "description": "La réservation sera annulée et les unités locatives seront libérées. Les éventuels frais d'annulation seront appliqués."
                 },
-                "action.import-contacts": {
+                "action.import_contacts": {
                     "label": "Importer les contacts",
                     "description": "Les contacts du client sélectionné seront (ré)importés dans les contacts de la réservations."
                 },
-                "action.release-rentalunits": {
+                "action.release_rentalunits": {
                     "label": "Libérer les unités loc.",
                     "description": "Ceci supprimera les consommations précédemment créés. Les éventuelles unités locatives bloquées seront libérées."
                 },

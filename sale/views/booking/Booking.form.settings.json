@@ -42,7 +42,7 @@
             "visible": ["status", "=", "quote"]
         },
         {
-            "id": "action.option-confirm",
+            "id": "action.option_confirm",
             "label": "Confirm Booking",
             "description": "Rental units will be reserved and the invoicing plan will be set up.",
             "controller": "sale_booking_do-option-confirm",
@@ -82,7 +82,7 @@
             "visible": ["status", "=", "checkedout"]
         },
         {
-            "id": "action.invoice-back",
+            "id": "action.invoice_back",
             "label": "Back to Check Out",
             "description": "Adaptations are still required and the proforma invoice will have to be regenerated.",
             "controller": "sale_booking_do-checkout",
@@ -101,7 +101,7 @@
             "visible": [ ["status", "not in", ["proforma", "invoiced", "debit_balance", "credit_balance", "balanced"]]]
         },
         {
-            "id": "action.import-contacts",
+            "id": "action.import_contacts",
             "label": "Import contacts",
             "description": "The contacts from the selected customer will be (re) imported to the booking.",
             "controller": "core_model_do",
@@ -113,7 +113,7 @@
             "confirm": true
         },
         {
-            "id": "action.release-rentalunits",
+            "id": "action.release_rentalunits",
             "label": "Release rental units",
             "description": "Rental units will be released if they haven't been yet.",
             "controller": "sale_booking_release-rentalunits",
