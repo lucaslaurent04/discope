@@ -6,11 +6,13 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use communication\Template;
 use core\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
 use equal\data\DataFormatter;
 use identity\Identity;
+use sale\booking\Booking;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\booking\BookingMeal;
@@ -130,14 +132,22 @@ if(is_null($contract)) {
     3) create valus array to inject data in template
 */
 
+$data_to_inject = [
+    'booking' => [
+        'date_from', 'date_to', 'time_from', 'time_to', 'price'
+    ],
+    'organisation' => [
+        'name', 'phone', 'address_street', 'address_dispatch', 'address_zip', 'address_city'
+    ]
+];
+
+/*
+      3.1) get contract data
+*/
+
 $contract = Contract::id($contract['id'])
     ->read([
         'booking_id' => [
-            'date_from',
-            'date_to',
-            'time_from',
-            'time_to',
-            'price',
             'contacts_ids',
             'rental_unit_assignments_ids',
             'center_id'     => ['organisation_id'],
@@ -146,23 +156,42 @@ $contract = Contract::id($contract['id'])
     ])
     ->first(true);
 
-$booking = $contract['booking_id'];
-
 /*
-      3.1) get customer data
+      3.2) get booking data
 */
 
-$customer = Identity::id($booking['customer_id']['partner_identity_id'])
+$booking = Booking::id($contract['booking_id']['id'])
+    ->read($data_to_inject['booking'])
+    ->first(true);
+
+$booking['date_from_long'] = $formatDateLong($booking['date_from']);
+$booking['date_from_long'] = $formatDateLong($booking['date_from']);
+$booking['date_to_long'] = $formatDateLong($booking['date_to']);
+$booking['date_from'] = $formatDate($booking['date_from']);
+$booking['date_to'] = $formatDate($booking['date_to']);
+$booking['time_from'] = $formatTime($booking['time_from']);
+$booking['time_to'] = $formatTime($booking['time_to']);
+
+/*
+      3.3) get customer data
+*/
+
+$customer = Identity::id($contract['booking_id']['customer_id']['partner_identity_id'])
     ->read(['display_name', 'address_street', 'address_zip', 'address_dispatch', 'address_city'])
     ->first();
 
 /*
-      3.2) handle img url and signature
+      3.4) handle img url and signature
 */
 
-$organisation = Identity::id($booking['center_id']['organisation_id'])
-    ->read(['logo_document_id' => ['data', 'type'], 'signature'])
-    ->first();
+$organisation = Identity::id($contract['booking_id']['center_id']['organisation_id'])
+    ->read(array_merge(
+        $data_to_inject['organisation'],
+        ['logo_document_id' => ['data', 'type'], 'signature']
+    ))
+    ->first(true);
+
+$organisation['phone'] = $formatPhone($organisation['phone']);
 
 $img_url = '';
 
@@ -175,10 +204,10 @@ if($logo_document_data) {
 $signature_html = $organisation['signature'];
 
 /*
-    3.3) handle contact
+    3.5) handle contact
 */
 
-$contacts = Contact::search(['id', 'in', $booking['contacts_ids']])
+$contacts = Contact::search(['id', 'in', $contract['booking_id']['contacts_ids']])
     ->read(['type', 'name'])
     ->get(true);
 
@@ -191,31 +220,33 @@ foreach($contacts as $contact) {
 }
 
 /*
-      3.4) handle children and adults qty
+      3.6) handle children and adults qty
 */
 
 $sojourn_groups = BookingLineGroup::search([
-    ['booking_id', '=', $booking['id']],
+    ['booking_id', '=', $contract['booking_id']['id']],
     ['group_type', '=', 'sojourn']
 ])
     ->read(['age_range_assignments_ids' => ['age_to', 'qty']])
     ->get();
 
-$children_qty = 0;
-$adult_qty = 0;
+$nb_pers = 0;
+$nb_adults = 0;
+$nb_children = 0;
 foreach($sojourn_groups as $group) {
     foreach($group['age_range_assignments_ids'] as $age_range_assignment) {
+        $nb_pers +=$age_range_assignment['qty'];
         if($age_range_assignment['age_to'] <= 18) {
-            $children_qty += $age_range_assignment['qty'];
+            $nb_children += $age_range_assignment['qty'];
         }
         else {
-            $adult_qty += $age_range_assignment['qty'];
+            $nb_adults += $age_range_assignment['qty'];
         }
     }
 }
 
 /*
-      3.5) handle hosting
+      3.7) handle hosting
 */
 
 $hosting_conf = [
@@ -225,9 +256,9 @@ $hosting_conf = [
     'CP' => false
 ];
 
-if(!empty($booking['rental_unit_assignments_ids'])) {
+if(!empty($contract['booking_id']['rental_unit_assignments_ids'])) {
     $ru_assignments = SojournProductModelRentalUnitAssignement::search([
-        ['id', 'in', $booking['rental_unit_assignments_ids']],
+        ['id', 'in', $contract['booking_id']['rental_unit_assignments_ids']],
     ])
         ->read(['is_accomodation', 'rental_unit_id' => ['rental_unit_category_id' => ['code']]])
         ->get();
@@ -247,11 +278,11 @@ if(!empty($booking['rental_unit_assignments_ids'])) {
 }
 
 /*
-      3.6) handle meals
+      3.8) handle meals
 */
 
 $meals = BookingMeal::search(
-    [['booking_id', '=', $booking['id']], ['is_self_provided', '=', false]],
+    [['booking_id', '=', $contract['booking_id']['id']], ['is_self_provided', '=', false]],
     ['sort' => ['date' => 'asc', 'time_slot_order' => 'asc']]
 )
     ->read(['date', 'time_slot_id' => ['code']])
@@ -267,7 +298,7 @@ $map_meals_names = [
 $first = null;
 if(!is_null($meals[0])) {
     $first = [
-        'date'      => $meals[0]['date'],
+        'date'      => $formatDate($meals[0]['date']),
         'moment'    => $map_meals_names[$meals[0]['time_slot_id']['code']],
     ];
 }
@@ -275,7 +306,7 @@ if(!is_null($meals[0])) {
 $last = null;
 if(!is_null($meals[count($meals) - 1])) {
     $last = [
-        'date'      => $meals[count($meals) - 1]['date'],
+        'date'      => $formatDate($meals[count($meals) - 1]['date']),
         'moment'    => $map_meals_names[$meals[count($meals) - 1]['time_slot_id']['code']],
     ];
 }
@@ -308,7 +339,7 @@ foreach($meals as $meal) {
 }
 
 /*
-      3.7) handle has activities or not
+      3.9) handle has activities or not
 */
 
 $activities_ids = BookingLine::search([
@@ -335,7 +366,7 @@ if(!$has_activities) {
 }
 
 /*
-      3.8) TODO: handle booking
+      3.10) handle booking
 */
 
 $cont = Contract::id($params['id'])
@@ -373,8 +404,7 @@ foreach($cont['booking_id']['fundings_ids'] as $invoice) {
 }
 
 /*
-      3.9) TODO: handle cancellation
-             - "l'acompte versé restera acquis au CPA Lathus, à titre de dédit" or "le groupe devra au CPA Lathus la somme de 1500 € à titre de dédit"
+      3.11) handle cancellation
 */
 
 $cancellation_conf = [
@@ -390,7 +420,7 @@ foreach($cont['booking_id']['invoices_ids'] as $invoice) {
 }
 
 /*
-    3.10) handle lines
+    3.12) handle lines
 */
 
 $contract_lines = ContractLine::search(['contract_id', '=', $contract['id']])
@@ -484,16 +514,57 @@ foreach($map_groupings_lines as $grouping_name => $grouping_lines) {
 }
 
 /*
-      3.11) set values
+      3.13) set values
 */
 
-$today = time();
+$today = $formatDate(time());
+$today_long = $formatDateLong(time());
 
 $values = compact(
-    'booking', 'customer', 'img_url', 'signature_html', 'sojourn_contact_name', 'children_qty',
-    'hosting_conf', 'cancellation_conf', 'adult_qty', 'meals_conf', 'map_meals_names', 'has_activities',
-    'booking_conf', 'today', 'lines'
+    'booking', 'organisation', 'customer', 'img_url', 'signature_html', 'sojourn_contact_name',
+    'nb_pers', 'nb_adults', 'nb_children', 'hosting_conf', 'cancellation_conf', 'meals_conf', 'map_meals_names', 'has_activities',
+    'booking_conf', 'today', 'today_long', 'lines'
 );
+
+/*
+      3.14) set values
+*/
+
+$contract = Contract::id($params['id'])
+    ->read(['booking_id' => ['center_id' => ['template_category_id']]])
+    ->first();
+
+$template = Template::search([
+    ['category_id', '=', $contract['booking_id']['center_id']['template_category_id']],
+    ['code', '=', 'contract'],
+    ['type', '=', 'contract']
+])
+    ->read(['id','parts_ids' => ['name', 'value']], $params['lang'])
+    ->first(true);
+
+$template_parts = [];
+foreach($template['parts_ids'] as $part) {
+    $value = $part['value'];
+    foreach($data_to_inject as $object => $fields) {
+        foreach($fields as $field) {
+            $value = str_replace('{'.$object.'.'.$field.'}', $values[$object][$field], $value);
+        }
+    }
+
+    $extra_fields = ['today', 'today_long', 'nb_pers', 'nb_adults', 'nb_children'];
+    foreach($extra_fields as $field) {
+        $value = str_replace('{'.$field.'}', $values[$field], $value);
+    }
+
+    $booking_extra_fields = ['date_from_long', 'date_to_long'];
+    foreach($booking_extra_fields as $field) {
+        $value = str_replace('{booking.'.$field.'}', $values['booking'][$field], $value);
+    }
+
+    $template_parts[$part['name']] = $value;
+}
+
+$values['parts'] = $template_parts;
 
 /*
     4) inject all values into the template

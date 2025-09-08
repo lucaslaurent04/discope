@@ -538,7 +538,7 @@ $template = Template::search([
     ->read( ['id','parts_ids' => ['name', 'value']], $params['lang'])
     ->first(true);
 
-$parts = [];
+$template_parts = [];
 foreach($template['parts_ids'] as $part) {
     $value = $part['value'];
     foreach($data_to_inject as $object => $fields) {
@@ -557,10 +557,10 @@ foreach($template['parts_ids'] as $part) {
         $value = str_replace('{booking.'.$field.'}', $values['booking'][$field], $value);
     }
 
-    $parts[$part['name']] = $value;
+    $template_parts[$part['name']] = $value;
 }
 
-$values['parts'] = $parts;
+$values['parts'] = $template_parts;
 
 /*
     5) inject all values into the template
