@@ -93,12 +93,14 @@ div, table, table tr td {
         {% endif %}
         <div>{{ customer.address_zip }} {{ customer.address_city }}</div>
 
-        <table style="margin-top: 20px;">
-            <tr>
-                <td style="font-weight: bold;">Référant sur place lors du séjour :</td>
-                <td style="width: 180px; border-bottom: 2px solid black;"></td>
-            </tr>
-        </table>
+        {% if sojourn_contact_name|length > 0 %}
+            <table style="margin-top: 20px;">
+                <tr>
+                    <td style="font-weight: bold;">Référant sur place lors du séjour :</td>
+                    <td>{{ sojourn_contact_name }}</td>
+                </tr>
+            </table>
+        {% endif %}
     </div>
 
     <div style="margin-top: 40px; margin-bottom: 50px;">
@@ -118,22 +120,12 @@ div, table, table tr td {
 
     {% if hosting_conf.hosted %}
         <div>Le groupe sera hébergé :</div>
-        <div style="margin-top: 5px; padding-left: 20px;">
-            <table>
-                <tr>
-                    <td><input type="checkbox" {% if hosting_conf.other %} checked {% endif %}/></td>
-                    <td>en chambres de 2 à 5 lits, avec sanitaires privatifs</td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" {% if hosting_conf.marabout %} checked {% endif %}/></td>
-                    <td>en marabout et le groupe devra apporter matelas et duvets</td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" {% if hosting_conf.camping %} checked {% endif %}/></td>
-                    <td>en camping et le groupe devra apporter tentes, matelas et duvets</td>
-                </tr>
-            </table>
-        </div>
+        <ul style="margin-top: 5px; padding-left: 20px;">
+            {% if hosting_conf.CH %}<li>en chambres de 2 à 5 lits, avec sanitaires privatifs</li>{% endif %}
+            {% if hosting_conf.CC %}<li>en chambres collectives de 3 à 4 lits, avec sanitaires dans le couloir</li>{% endif %}
+            {% if hosting_conf.MB %}<li>en marabout et le groupe devra apporter matelas et duvets</li>{% endif %}
+            {% if hosting_conf.CP %}<li>en camping et le groupe devra apporter tentes, matelas et duvets</li>{% endif %}
+        </ul>
 
         <div style="margin-top: 10px;">
             Les chambres seront prêtes à 17h et devront être libérées avant 14h, les lits seront faits.
@@ -154,26 +146,12 @@ div, table, table tr td {
 
     {% if meals_conf.has_meals %}
         <div>Le groupe a réservé, à partir du {{ meals_conf.first.date|format_date() }} ({{ meals_conf.first.moment }}) au {{ meals_conf.last.date|format_date() }} ({{ meals_conf.last.moment }}), les repas suivants :</div>
-        <div style="margin-top: 5px; padding-left: 20px;">
-            <table>
-                <tr>
-                    <td><input type="checkbox" {% if meals_conf.has_breakfast %} checked {% endif %}/></td>
-                    <td><label>petits-déjeuners</label></td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" {% if meals_conf.has_lunch %} checked {% endif %}/></td>
-                    <td><label>repas de midi</label></td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" {% if meals_conf.has_snack %} checked {% endif %}/></td>
-                    <td><label>goûters</label></td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" {% if meals_conf.has_dinner %} checked {% endif %}/></td>
-                    <td><label>repas du soir</label></td>
-                </tr>
-            </table>
-        </div>
+        <ul style="margin-top: 5px; padding-left: 20px;">
+            {% if meals_conf.has_breakfast %}<li>petits-déjeuners</li>{% endif %}
+            {% if meals_conf.has_lunch %}<li>repas de midi</li>{% endif %}
+            {% if meals_conf.has_snack %}<li>goûters</li>{% endif %}
+            {% if meals_conf.has_dinner %}<li>repas du soi</li>{% endif %}
+        </ul>
     {% else %}
         <div>Le groupe n'a pas réservé de repas</div>
     {% endif %}
@@ -203,55 +181,34 @@ div, table, table tr td {
 <div class="section">
     <div class="title">Article 6 / Réservation</div>
 
-    <div style="width: 95%;">
-        La réservation sera considérée comme effective seulement lors du retour de la présente convention signée et accompagnée :
-    </div>
+    <div style="width: 95%;">La réservation sera considérée comme effective seulement lors du retour de la présente convention signée et accompagnée :</div>
 
-    <div style="margin-top: 5px; padding-left: 20px;">
-        <table>
-            <tr>
-                <td style="vertical-align: top;"><input type="checkbox" {% if booking_conf.downpayment %} checked {% endif %}/></td>
-                <td style="padding-left: 5px; padding-top: 3px;">
-                    <div>d'un chèque d'acompte de 1500 €</div>
-                    <div>(en cas de désistement, reste acquis à titre de faculté de dédit)</div>
-                </td>
-            </tr>
-            <tr>
-                <td style="vertical-align: top;"><input type="checkbox" {% if booking_conf.deposit %} checked {% endif %}/></td>
-                <td style="padding-left: 5px; padding-top: 3px;">
-                    <div>d'un chèque de caution de 305 €</div>
-                    <div>(non encaissé et restitué après le règlement du séjour sauf cas de dégradation)</div>
-                </td>
-            </tr>
-            <tr>
-                <td style="vertical-align: top;"><input type="checkbox" {% if booking_conf.order_form %} checked {% endif %}/></td>
-                <td style="padding: 3px 5px;">
-                    <div>du bon de commande (pour les collectivités locales et les collèges-lycées)</div>
-                </td>
-            </tr>
-        </table>
-    </div>
+    <ul>
+        {% for deposit in booking_conf.deposits %}
+            <li>du paiement d'un acompte de {{ deposit.price }}</li>
+        {% endfor %}
+        {% if booking_conf.security_deposit_check > 0 %}
+            <li style="margin-top: 2px;">
+                <div>d'un chèque de caution de {{ booking_conf.security_deposit_check }}</div>
+                <div>(non encaissé et restitué après le règlement du séjour sauf cas de dégradation)</div>
+            </li>
+        {% endif %}
+        <li style="margin-top: 2px;">
+            <div>du bon de commande</div>
+            <div>(pour les collectivités locales et les collèges-lycées)</div>
+        </li>
+    </ul>
 </div>
 
 <div class="section">
     <div class="title">Article 7 / Conditions d'annulation ou de report de séjour</div>
-    <div>En cas d'annulation du séjour par le groupe</div>
-
-    <div style="margin-top: 5px; padding-left: 20px;">
-        <table>
-            <tr>
-                <td style="vertical-align: top;"><input type="checkbox" {% if cancellation_conf.deposit %} checked {% endif %}/></td>
-                <td style="padding-left: 5px; padding-top: 3px;">
-                    l'acompte versé restera acquis au CPA Lathus, à titre de dédit
-                </td>
-            </tr>
-            <tr>
-                <td style="vertical-align: top;"><input type="checkbox" {% if cancellation_conf.amount_1500 %} checked {% endif %}/></td>
-                <td style="padding-left: 5px; padding-top: 3px;">
-                    le groupe devra au CPA Lathus la somme de 1500 € à titre de dédit
-                </td>
-            </tr>
-        </table>
+    <div>
+        En cas d'annulation du séjour par le groupe
+        {% if cancellation_conf.type == 'keep_deposit' %}
+            l'acompte versé restera acquis au CPA Lathus, à titre de dédit.
+        {% else %}
+            le groupe devra au CPA Lathus la somme de {{ cancellation_conf.amount }}, à titre de dédit.
+        {% endif %}
     </div>
 
     <div style="margin-top: 10px;">

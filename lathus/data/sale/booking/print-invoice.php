@@ -86,6 +86,11 @@ use Twig\TwigFilter;
  * Methods
  */
 
+$currency = Setting::get_value('core', 'locale', 'currency', '€');
+$formatMoney = function ($value) use($currency) {
+    return number_format((float)($value), 2, ",", ".") . ' ' .$currency;
+};
+
 $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
 $formatDate = fn($value) => date($date_format, $value);
 
@@ -568,11 +573,10 @@ try {
     /**  @var ExtensionInterface **/
     $extension  = new IntlExtension();
     $twig->addExtension($extension);
-    $currency = Setting::get_value('core', 'locale', 'currency', '€');
+
     // do not rely on system locale (LC_*)
-    $filter = new TwigFilter('format_money', function ($value) use($currency) {
-        return number_format((float)($value), 2, ",", ".") . ' ' .$currency;
-    });
+
+    $filter = new TwigFilter('format_money', $formatMoney);
     $twig->addFilter($filter);
 
     $date_filter = new TwigFilter('format_date', $formatDate);

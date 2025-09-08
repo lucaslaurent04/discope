@@ -668,6 +668,12 @@ class Identity extends Model {
                 'description'       => 'Mark a customer with a disturbances history.'
             ],
 
+            'flag_trusted' => [
+                'type'              => 'boolean',
+                'default'           => false,
+                'description'       => 'Mark a customer as trusted.'
+            ],
+
             // handle duplicate
             'has_duplicate_clue' => [
                 'type'              => 'boolean',

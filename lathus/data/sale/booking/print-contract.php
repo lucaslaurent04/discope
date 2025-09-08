@@ -9,10 +9,12 @@
 use core\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
+use equal\data\DataFormatter;
 use identity\Identity;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\booking\BookingMeal;
+use sale\booking\Contact;
 use sale\booking\Contract;
 use sale\booking\ContractLine;
 use sale\booking\SojournProductModelRentalUnitAssignement;
@@ -58,6 +60,44 @@ use Twig\TwigFilter;
  */
 ['context' => $context] = $providers;
 
+/**
+ * Methods
+ */
+
+$currency = Setting::get_value('core', 'locale', 'currency', '€');
+$formatMoney = function ($value) use($currency) {
+    return number_format((float)($value), 2, ",", ".") . ' ' .$currency;
+};
+
+$date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
+$formatDate = fn($value) => date($date_format, $value);
+
+$map_days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+$map_months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+$formatDateLong = function($value) use($map_days, $map_months) {
+    return $map_days[date('w', $value)].' '.date('j', $value).' '.$map_months[date('n', $value) - 1].' '.date('Y', $value);
+};
+
+$formatTime = fn($value) => sprintf('%02dh%02d', $value / 3600, $value / 60 % 60);
+
+$formatPhone = function($value) {
+    if(strlen($value) === 10) {
+        return sprintf("%s %s %s %s %s",
+            substr($value, 0, 2),
+            substr($value, 2, 2),
+            substr($value, 4, 2),
+            substr($value, 6, 2),
+            substr($value, 8)
+        );
+    }
+
+    return DataFormatter::format($value, 'phone');
+};
+
+/**
+ * Data controller
+ */
+
 /*
     1) retrieve the requested template
 */
@@ -97,8 +137,9 @@ $contract = Contract::id($contract['id'])
             'date_to',
             'time_from',
             'time_to',
-            'rental_unit_assignments_ids',
             'price',
+            'contacts_ids',
+            'rental_unit_assignments_ids',
             'center_id'     => ['organisation_id'],
             'customer_id'   => ['partner_identity_id']
         ]
@@ -134,7 +175,23 @@ if($logo_document_data) {
 $signature_html = $organisation['signature'];
 
 /*
-      3.3) handle children and adults qty
+    3.3) handle contact
+*/
+
+$contacts = Contact::search(['id', 'in', $booking['contacts_ids']])
+    ->read(['type', 'name'])
+    ->get(true);
+
+$sojourn_contact_name = '';
+foreach($contacts as $contact) {
+    if($contact['type'] === 'sojourn') {
+        $sojourn_contact_name = $contact['name'];
+        break;
+    }
+}
+
+/*
+      3.4) handle children and adults qty
 */
 
 $sojourn_groups = BookingLineGroup::search([
@@ -158,14 +215,14 @@ foreach($sojourn_groups as $group) {
 }
 
 /*
-      3.4) handle hosting
+      3.5) handle hosting
 */
 
 $hosting_conf = [
-    'hosted'    => false,
-    'marabout'  => false,
-    'camping'   => false,
-    'other'     => false
+    'CH' => false,
+    'CC' => false,
+    'MB' => false,
+    'CP' => false
 ];
 
 if(!empty($booking['rental_unit_assignments_ids'])) {
@@ -178,25 +235,19 @@ if(!empty($booking['rental_unit_assignments_ids'])) {
     $hosting_conf['hosted'] = !empty($ru_assignments);
 
     foreach($ru_assignments as $ru_assignment) {
-        if($ru_assignment['is_accomodation']) {
-            $hosting_conf['hosted'] = true;
+        if(!$ru_assignment['is_accomodation']) {
+            continue;
         }
-        switch($ru_assignment['rental_unit_id']['rental_unit_category_id']['code']) {
-            case 'MB':
-                $hosting_conf['marabout'] = true;
-                break;
-            case 'CP':
-                $hosting_conf['camping'] = true;
-                break;
-            default:
-                $hosting_conf['other'] = true;
-                break;
+
+        $hosting_conf['hosted'] = true;
+        if(isset($hosting_conf[$ru_assignment['rental_unit_id']['rental_unit_category_id']['code']])) {
+            $hosting_conf[$ru_assignment['rental_unit_id']['rental_unit_category_id']['code']] = true;
         }
     }
 }
 
 /*
-      3.5) handle meals
+      3.6) handle meals
 */
 
 $meals = BookingMeal::search(
@@ -257,7 +308,7 @@ foreach($meals as $meal) {
 }
 
 /*
-      3.6) handle has activities or not
+      3.7) handle has activities or not
 */
 
 $activities_ids = BookingLine::search([
@@ -266,30 +317,80 @@ $activities_ids = BookingLine::search([
 ])
     ->ids();
 
+$has_activities = !empty($activities_ids);
+
+if(!$has_activities) {
+    $contract = Contract::id($contract['id'])
+        ->read([
+            'booking_id' => ['booking_lines_ids' => ['product_id' => ['sku']]]
+        ])
+        ->first();
+
+    foreach($contract['booking_id']['booking_lines_ids'] as $line) {
+        if(isset($line['product_id']['sku']) && strpos($line['product_id']['sku'], '-MAP') !== false) {
+            $has_activities = true;
+            break;
+        }
+    }
+}
+
 /*
-      3.7) TODO: handle booking
+      3.8) TODO: handle booking
 */
 
+$cont = Contract::id($params['id'])
+    ->read([
+        'booking_id' => [
+            'invoices_ids' => [
+                'is_deposit',
+                'is_paid',
+                'price'
+            ],
+            'customer_id' => [
+                'partner_identity_id' => [
+                    'flag_trusted'
+                ]
+            ]
+        ]
+    ])
+    ->first(true);
+
 $booking_conf = [
-    'downpayment'   => false, // downpayment of 1500 euros needed
-    'deposit'       => false, // if damages done to Lathus equipments
-    'order_form'    => false  // order form if school or local
+    'security_deposit_check'    => 0,
+    'deposits'                  => []
 ];
 
+if(!$cont['booking_id']['customer_id']['partner_identity_id']['flag_trusted']) {
+    $booking_conf['security_deposit_check'] = $formatMoney(305);
+}
+
+foreach($cont['booking_id']['fundings_ids'] as $invoice) {
+    if($invoice['is_deposit']) {
+        $booking_conf['deposits'][] = [
+            'price' => $formatMoney($invoice['price'])
+        ];
+    }
+}
+
 /*
-      3.8) TODO: handle cancellation
+      3.9) TODO: handle cancellation
              - "l'acompte versé restera acquis au CPA Lathus, à titre de dédit" or "le groupe devra au CPA Lathus la somme de 1500 € à titre de dédit"
 */
 
 $cancellation_conf = [
-    'deposit'       => false,
-    'amount_1500'   => false
+    'type'      => 'pay_amount',
+    'amount'    => $formatMoney(1500)
 ];
 
-$has_activities = !empty($activities_ids);
+foreach($cont['booking_id']['invoices_ids'] as $invoice) {
+    if($invoice['is_deposit'] && $invoice['is_paid']) {
+        $cancellation_conf['type'] = 'keep_deposit';
+        break;
+    }
+}
 
 /*
-    3.9) handle lines
+    3.10) handle lines
 */
 
 $contract_lines = ContractLine::search(['contract_id', '=', $contract['id']])
@@ -383,15 +484,15 @@ foreach($map_groupings_lines as $grouping_name => $grouping_lines) {
 }
 
 /*
-      3.10) set values
+      3.11) set values
 */
 
 $today = time();
 
 $values = compact(
-    'booking', 'customer', 'img_url', 'signature_html', 'children_qty', 'hosting_conf',
-    'adult_qty', 'meals_conf', 'map_meals_names', 'has_activities', 'booking_conf',
-    'today', 'lines'
+    'booking', 'customer', 'img_url', 'signature_html', 'sojourn_contact_name', 'children_qty',
+    'hosting_conf', 'cancellation_conf', 'adult_qty', 'meals_conf', 'map_meals_names', 'has_activities',
+    'booking_conf', 'today', 'lines'
 );
 
 /*
@@ -405,29 +506,19 @@ try {
     /**  @var ExtensionInterface **/
     $extension  = new IntlExtension();
     $twig->addExtension($extension);
-    $currency = Setting::get_value('core', 'locale', 'currency', '€');
+
     // do not rely on system locale (LC_*)
-    $filter = new TwigFilter('format_money', function ($value) use($currency) {
-        return number_format((float)($value), 2, ",", ".") . ' ' .$currency;
-    });
+
+    $filter = new TwigFilter('format_money', $formatMoney);
     $twig->addFilter($filter);
 
-    $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
-    $date_filter = new TwigFilter('format_date', function($value) use($date_format) {
-        return date($date_format, $value);
-    });
+    $date_filter = new TwigFilter('format_date', $formatDate);
     $twig->addFilter($date_filter);
 
-    $map_days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-    $map_months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-    $date_filter = new TwigFilter('format_date_long', function($value) use($map_days, $map_months) {
-        return $map_days[date('w', $value)].' '.date('j', $value).' '.$map_months[date('n', $value) - 1].' '.date('Y', $value);
-    });
+    $date_filter = new TwigFilter('format_date_long', $formatDateLong);
     $twig->addFilter($date_filter);
 
-    $date_filter = new TwigFilter('format_time', function($value) {
-        return sprintf('%02d:%02d', $value / 3600, $value / 60 % 60);
-    });
+    $date_filter = new TwigFilter('format_time', $formatTime);
     $twig->addFilter($date_filter);
 
     $template = $twig->load("{$class_path}.{$params['view_id']}.html");
