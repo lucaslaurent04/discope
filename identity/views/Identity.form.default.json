@@ -326,6 +326,11 @@
                                                 "type": "field",
                                                 "value": "flag_nuisance",
                                                 "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "flag_trusted",
+                                                "width": "100%"
                                             }
                                         ]
                                     },
