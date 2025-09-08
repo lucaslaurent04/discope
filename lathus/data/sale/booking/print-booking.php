@@ -402,7 +402,7 @@ foreach($template['parts_ids'] as $part) {
         }
     }
 
-    $extra_fields = ['today', 'nb_pers', 'nb_adults', 'nb_children'];
+    $extra_fields = ['nb_pers', 'nb_adults', 'nb_children'];
     foreach($extra_fields as $field) {
         $value = str_replace('{'.$field.'}', $values[$field], $value);
     }
