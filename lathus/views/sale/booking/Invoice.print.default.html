@@ -4,10 +4,10 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 
 <title>
-{% if type == 'invoice'  %}
-    {{i18n['booking_invoice']}}
+{% if invoice.type == 'invoice'  %}
+    Facture
 {% else %}
-    {{i18n['credit_note']}}
+    Avoir
 {% endif %}
 </title>
 <style type="text/css">
@@ -116,6 +116,7 @@ div.footer {
     bottom: 0;
     left: 0;
     height: 60px;
+    text-align: center;
     overflow: visible;
     z-index: 200;
     font-size: 0.8em !important;
@@ -124,6 +125,15 @@ div.footer {
 hr {
     page-break-after: always;
     border: 0;
+}
+
+.company-info {
+    margin-top: 20px;
+    font-size: 0.65rem;
+}
+
+.company-info p {
+    margin: 0;
 }
 
 .signature-container {
@@ -151,24 +161,21 @@ hr {
             <td colspan="2" style="width: 50%;">
                 <div style="position: absolute;">
                     <div style="font-size: 1.4rem; font-weight: 500; text-align: left; margin-left: 30px;">
-                        <div>CPA LATHUS</div>
-                        <div>La Voulzie</div>
-                        <div>C.S. 40005</div>
-                        <div>86390 Lathus Saint-Rémy</div>
+                        <div>{{ organisation.name }}</div>
+                        <div>{{ organisation.address_street }}</div>
+                        {% if organisation.address_dispatch|length > 0 %}
+                            <div>{{ organisation.address_dispatch }}</div>
+                        {% endif %}
+                        <div>{{ organisation.address_zip }} {{ organisation.address_city }}</div>
                     </div>
 
                     <div style="margin-top: 10px; margin-left: 50px; font-size: 0.8rem;">
-                        <div>Tél: 05.49.91.72.60</div>
-                        <div style="margin-left: 26px;">05.49.91.87.11 (comptablité)</div>
+                        <div>Tél: {{ center.phone }}</div>
+                        <div style="margin-left: 26px;">05 49 91 87 11 (comptablité)</div>
                     </div>
 
-                    <div style="margin-top: 20px; margin-left: 35px; font-size: 0.8rem;">
-                        <div>
-                            <div>Association loi 1901 - RNA N°W862000036</div>
-                            <div>SIRET 331 320 507 000 14 - APE 9312 Z</div>
-                            <div>IBAN: FR76 1027 8364 1200 0100 1050 374</div>
-                            <div>BIC: CMCIFR2A</div>
-                        </div>
+                    <div class="company-info">
+                        {{ parts.company_info|raw }}
                     </div>
                 </div>
             </td>
@@ -184,23 +191,19 @@ hr {
                     </tr>
                     <tr>
                         <td style="text-align: center; border: 1px solid black;">{{ date|format_date() }}</td>
-                        <td style="text-align: center; border: 1px solid black;">{{ name }}</td>
-                        <td style="text-align: center; border: 1px solid black;">{{ customer_id }}</td>
+                        <td style="text-align: center; border: 1px solid black;">{{ invoice.number }}</td>
+                        <td style="text-align: center; border: 1px solid black;">{{ customer.id }}</td>
                     </tr>
                 </table>
 
                 <div style="position: absolute; top: 130px; right: 0; height: 120px; width: 340px; border: 1px solid black; font-size: 0.9rem;">
                     <div style="padding: 20px;">
-                        {{ customer_name }}<br />
-                        {% if customer_address1|length > 0 %}
-                            {{ customer_address1 }}<br />
+                        {{ customer.display_name }}<br />
+                        {{ customer.address_street }}<br />
+                        {% if customer.address_dispatch|length > 0 %}
+                            {{ customer.address_dispatch }}<br />
                         {% endif %}
-                        {% if customer_address_dispatch|length > 0 %}
-                            {{ customer_address_dispatch }}<br />
-                        {% endif %}
-                        {% if customer_address2|length > 0 %}
-                            {{ customer_address2 }}<br />
-                        {% endif %}
+                        {{ customer.address_zip }} {{ customer.address_city }}
                     </div>
                 </div>
             </td>
@@ -223,11 +226,7 @@ hr {
 </div>
 
 <div class="footer">
-    <p style="text-align: center;">Exonération de TVA selon Art. 261-7-1° du C.G.I. et 293B du C.G.I</p>
-    <p style="text-align: center; padding: 0 50px;">
-        Les informations présentes dans ce document font l'objet d'un traitement informatique et sont destinées au Centre de Plein Air de Lathus. Conformément à la loi
-        "Informatique et libertés" du 6 janvier 1978, vous bénéficiez d'un droit d'accès et de rectification aux informations qui vous concernent.
-    </p>
+    {{ parts.footer|raw }}
 </div>
 
 <div class="inner">
@@ -242,20 +241,16 @@ hr {
                     Désignation
                 </th>
                 <th width="8%" style="font-weight: bold; text-align: left;  border-left: solid 1px black; padding-right: 7px;">
-                    {{i18n['quantity_short']}}
+                    Qté
                 </th>
                 <th width="8%" style="font-weight: bold; text-align: left;  border-left: solid 1px black; padding-right: 7px;">
-                    {{i18n['freebies_short']}}
+                    Gté
                 </th>
                 <th width="13%" style="font-weight: bold; text-align: right;  border-left: solid 1px black; padding-right: 7px;">
-                    {{i18n['unit_price']}}
+                    Prix unit.
                 </th>
                 <th width="8%" style="display: none; font-weight: bold; text-align: right;  border-left: solid 1px black; padding-right: 7px;">
-                    {% if (company_has_vat == false) or (company_vat_number is null) or (company_vat_number == '') %}
-                        {{i18n['taxes']}}
-                    {% else %}
-                        {{i18n['vat']}}
-                    {% endif %}
+                    Montant HT
                 </th>
                 <th width="13%" style="font-weight: bold; text-align: right;  border-left: solid 1px black; padding-right: 7px;">
                     Montant TTC
@@ -286,11 +281,6 @@ hr {
                         {{ line.unit_price | format_money() }}
                     {% endif %}
                 </td>
-                <td width="8%" style="display: none; text-align: right;">
-                    {% if line.vat_rate is not null and company_has_vat %}
-                        {{ line.vat_rate | format_number(style='percent') }}
-                    {% endif %}
-                </td>
                 <td width="13%" style="text-align: right;">
                     {% if line.total is not null %}
                         {{ line.total | format_money() }}
@@ -305,185 +295,158 @@ hr {
 <div class="trailer">
     <div class="wrapper" style="margin-top: -1px;">
         <table width="100%" style="border: 0px; border-right: solid 1px black;" cellpadding="4" cellspacing="0">
-            <!--
-            <tr valign="top">
-                <td width="87%" style="text-align: right; padding-right: 10px;">
-                    {{i18n['total_tax_excl']}}
-                </td>
-                <td width="13%" style="text-align: right; border-left: solid 1px black; border-bottom: solid 1px black;">
-                    {{ total | format_money() }}
-                </td>
-            </tr>
-            {% for tax_label, tax_total in tax_lines %}
-                {% if (tax_total != 0.0) %}
-                <tr>
-                    <td style="text-align: right; padding-right: 10px;">
-                        {{ tax_label }}
-                    </td>
-                    <td style="text-align: right; border-left: solid 1px black; border-bottom: solid 1px black;">
-                        {{ tax_total | format_money() }}
-                    </td>
-                </tr>
-                {% endif %}
-            {% endfor %}
-            -->
             <tr>
                 <td width="87%" style="text-align: right; padding-right: 10px;">
-                    <strong>{{i18n['stay_total_tax_incl']}}</strong>
+                    <strong>TOTAL DU SÉJOUR TTC</strong>
                 </td>
                 <td width="13%" style="text-align: right; border-left: solid 1px black; border-bottom: solid 1px black;">
-                    <strong>{{ price | format_money() }}</strong>
+                    <strong>{{ invoice.price | format_money() }}</strong>
                 </td>
             </tr>
         </table>
-        {% if status != 'proforma' and type != 'credit_note' and ( not has_orders)%}
-        <table width="100%" style="border-right: 1px solid white; border: 0px; margin-top: 20px;" cellpadding="4" cellspacing="0">
-            {% if (total_remaining < 0.0) %}
-            <tr valign="top">
-                <td width="87%" style="text-align: right; padding-right: 10px;">
-                    <strong>{{i18n['amount_to_be_refunded']}}:</strong>
-                </td>
-                <td width="13%" style="text-align: right; border: 0px;">
-                    <strong>{{ total_remaining | abs | format_money() }}</strong>
-                </td>
-            </tr>
-            {% elseif (total_remaining > 0.0) %}
-            <tr valign="top">
-                <td width="87%" style="text-align: right; padding-right: 10px;">
-                    <strong>{{i18n['left_to_pay']}}:</strong>
-                </td>
-                <td width="13%" style="text-align: right; border: 0px;">
-                    <strong>{{ total_remaining | format_money() }}</strong>
-                </td>
-            </tr>
-            {% endif %}
-        </table>
+
+        {% if invoice.status != 'proforma' and invoice.type != 'credit_note' and (not invoice.has_orders) %}
+            <table width="100%" style="border-right: 1px solid white; border: 0px; margin-top: 20px;" cellpadding="4" cellspacing="0">
+                {% if (total_remaining < 0.0) %}
+                    <tr valign="top">
+                        <td width="87%" style="text-align: right; padding-right: 10px;">
+                            <strong>Le montant suivant vous sera remboursé prochainement :</strong>
+                        </td>
+                        <td width="13%" style="text-align: right; border: 0px;">
+                            <strong>{{ total_remaining | abs | format_money() }}</strong>
+                        </td>
+                    </tr>
+                {% elseif (total_remaining > 0.0) %}
+                    <tr valign="top">
+                        <td width="87%" style="text-align: right; padding-right: 10px;">
+                            <strong>Restant à payer :</strong>
+                        </td>
+                        <td width="13%" style="text-align: right; border: 0px;">
+                            <strong>{{ total_remaining | format_money() }}</strong>
+                        </td>
+                    </tr>
+                {% endif %}
+            </table>
         {% endif %}
     </div>
 </div>
 
 <div style="margin-top: 50px; page-break-inside: avoid;"></div>
 
-<div class="notice">
-    {{ invoice_notice_html | raw }}
-</div>
-
 <!-- funding plan -->
-{% if fundings | length > 0  and (price > 0.0) and (status != 'proforma') %}
-<div style="margin-top: 50px; page-break-inside: avoid;">
-    <div style="margin: 0px 0px 20px 0px;"><b><u>{{i18n['payments_schedule']}} ({{date_fundings_update}}):</u></b></div>
-    <table width="100%" cellpadding="4" cellspacing="0" style="border: solid 1px black; border-collapse: collapse; page-break-inside: avoid;">
-        <tr valign="top">
-            <th width="20%" style="text-align: left;">
-                <b style="text-transform: uppercase;">{{i18n['payment']}}</b>
-            </th>
-            <th width="15%">
-                <b style="text-transform: uppercase;">{{i18n['amount']}}</b>
-            </th>
-            <th width="15%">
-                <b style="text-transform: uppercase;">{{i18n['to_be_paid_before']}}</b>
-            </th>
-            <th width="20%" style="text-align: right;">
-                <b style="text-transform: uppercase;">{{i18n['already_paid']}}</b>
-            </th>
-            <th width="20%" style="text-align: right;">
-                <b style="text-transform: uppercase;">{{i18n['left_to_pay']}}</b>
-            </th>
-        </tr>
-
-        <!-- for each line -->
-        {% for funding in fundings %}
+{% if fundings | length > 0  and (invoice.price > 0.0) and (invoice.status != 'proforma') %}
+    <div style="margin-top: 50px; page-break-inside: avoid;">
+        <div style="margin: 0px 0px 20px 0px; font-weight: bold; text-decoration: underline">Échéancier des paiements ({{ date_fundings_update }}):</div>
+        <table width="100%" cellpadding="4" cellspacing="0" style="border: solid 1px black; border-collapse: collapse; page-break-inside: avoid;">
             <tr valign="top">
-                <td width="20%">
-                    {{ funding.name }}
-                </td>
-                <td width="15%" style="text-align: center;">
-                    {{ funding.due_amount | format_money() }}
-                </td>
-                <td width="15%" style="text-align: center;">
-                    {{ funding.due_date }}
-                </td>
-                <td width="20%" style="text-align: right;">
-                    {{ funding.paid_amount | format_money() }}
-                </td>
-                <td width="20%" style="text-align: right;">
-                    {{ funding.remaining | format_money() }}
-                </td>
+                <th width="20%" style="text-align: left;">
+                    <b style="text-transform: uppercase;">PAIEMENT</b>
+                </th>
+                <th width="15%">
+                    <b style="text-transform: uppercase;">MONTANT</b>
+                </th>
+                <th width="15%">
+                    <b style="text-transform: uppercase;">À PAYER AVANT LE</b>
+                </th>
+                <th width="20%" style="text-align: right;">
+                    <b style="text-transform: uppercase;">DÉJÀ PAYÉ</b>
+                </th>
+                <th width="20%" style="text-align: right;">
+                    <b style="text-transform: uppercase;">RESTANT À PAYER</b>
+                </th>
             </tr>
-        {% endfor %}
-    </table>
-</div>
+
+            <!-- for each line -->
+            {% for funding in fundings %}
+                <tr valign="top">
+                    <td width="20%">
+                        {{ funding.name }}
+                    </td>
+                    <td width="15%" style="text-align: center;">
+                        {{ funding.due_amount | format_money() }}
+                    </td>
+                    <td width="15%" style="text-align: center;">
+                        {{ funding.due_date }}
+                    </td>
+                    <td width="20%" style="text-align: right;">
+                        {{ funding.paid_amount | format_money() }}
+                    </td>
+                    <td width="20%" style="text-align: right;">
+                        {{ funding.remaining | format_money() }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 {% endif %}
 
-{% if (total_remaining > 0.0) and (status != 'proforma') and (type != 'credit_note') and ( not has_orders) %}
-<div style="position: relative; margin-top: 40px; border: solid 2px black; height: 180px; page-break-inside: avoid;">
-    <div style="font-size: 15px; padding-left: 15px; padding-top: 15px;">
-        {{i18n['balance_of']}} <b>{{ total_remaining | format_money() }}</b> {{i18n['must_be_paid_before']}} <b>{{ payment_deadline }}</b>
+{% if (total_remaining > 0.0) and (invoice.status != 'proforma') and (invoice.type != 'credit_note') and (not invoice.has_orders) %}
+    <div style="position: relative; margin-top: 40px; border: solid 2px black; height: 180px; page-break-inside: avoid;">
+        <div style="font-size: 15px; padding-left: 15px; padding-top: 15px;">
+            Solde de <b>{{ total_remaining | format_money() }}</b> doit être versé avant le <b>{{ invoice.due_date }}</b>
+        </div>
+        <div style="padding-top: 20px; padding-left: 15px; font-size: 15px;">
+            <b style="text-transform: uppercase;">COMMUNICATION</b><b> : {{ invoice.payment_reference }}</b><br />
+            IBAN : {{ organisation.bank_account_iban }}<br />
+            BIC : {{ organisation.bank_account_bic }}<br />
+            <br />
+            {{ organisation.legal_name }}<br />
+            {{ organisation.address_street }} {{ organisation.address_zip }} {{ organisation.address_city }}<br />
+        </div>
+        <div style="position: absolute; right: 10px; top: 15px;">
+            <img src="{{ payment_qr_uri }}" width= "150" height="150" />
+        </div>
     </div>
-    <div style="padding-top: 20px; padding-left: 15px; font-size: 15px;">
-        <b style="text-transform: uppercase;">{{i18n['communication']}}</b><b> : {{ payment_reference }}</b><br />
-        IBAN : {{ company_iban }}<br />
-        BIC : {{ company_bic }}<br />
-        <br />
-        {{ company_name }}<br />
-        {{ company_address }}<br />
-    </div>
-    <div style="position: absolute; right: 10px; top: 15px;">
-        <img src="{{ payment_qr_uri }}" width= "150" height="150" />
-    </div>
-</div>
 {% endif %}
 
-{% if status == 'proforma' %}
-<div style="position: relative; margin-top: 40px; page-break-inside: avoid;">
-    <div style="font-size: 13px; padding: 10px 35px; border: solid 1px black;">
-        {{ invoice_proforma_notice_html | raw }}
+{% if invoice.status == 'proforma' %}
+    <div style="position: relative; margin-top: 40px; page-break-inside: avoid;">
+        <div style="font-size: 13px; padding: 10px 35px; border: solid 1px black;">
+            {{ parts.proforma_notice | raw }}
+        </div>
     </div>
-</div>
 {% endif %}
 
 
 <!-- payments history -->
-{% if fundings_payments | length > 0  and (price > 0.0) %}
-<div style="margin-top: 50px; page-break-inside: avoid;">
-    <div style="margin: 0px 0px 20px 0px;"><b><u>{{i18n['payments_history']}} ({{date_fundings_update}}):</u></b></div>
-    <table width="100%" cellpadding="4" cellspacing="0" style="border: solid 1px black; border-collapse: collapse; page-break-inside: avoid;">
-        <tr valign="top">
-            <th width="25%" style="text-align: left;">
-                <b style="text-transform: uppercase;">{{i18n['date']}}</b>
-            </th>
-            <th width="20%">
-                <b style="text-transform: uppercase;">{{i18n['origin']}}</b>
-            </th>
-            <th width="65%" style="text-align: right;">
-                <b style="text-transform: uppercase;">{{i18n['received']}}</b>
-            </th>
-        </tr>
-
-        <!-- for each line -->
-        {% for payment in fundings_payments %}
+{% if fundings_payments | length > 0  and (invoice.price > 0.0) %}
+    <div style="margin-top: 50px; page-break-inside: avoid;">
+        <div style="margin: 0px 0px 20px 0px;"><b><u>Historique des paiements ({{ date_fundings_update }}):</u></b></div>
+        <table width="100%" cellpadding="4" cellspacing="0" style="border: solid 1px black; border-collapse: collapse; page-break-inside: avoid;">
             <tr valign="top">
-                <td width="25%">
-                    {{ payment.receipt_date }}
-                </td>
-                <td width="20%" style="text-align: center;">
-                    {{ payment.payment_origin }}
-                </td>
-                <td width="65%" style="text-align: right;">
-                    {{ payment.amount | format_money() }}
-                </td>
+                <th width="25%" style="text-align: left;">
+                    <b style="text-transform: uppercase;">Date</b>
+                </th>
+                <th width="20%">
+                    <b style="text-transform: uppercase;">Origine</b>
+                </th>
+                <th width="55%" style="text-align: right;">
+                    <b style="text-transform: uppercase;">Reçu</b>
+                </th>
             </tr>
-        {% endfor %}
-    </table>
-</div>
+
+            <!-- for each line -->
+            {% for payment in fundings_payments %}
+                <tr valign="top">
+                    <td width="25%">
+                        {{ payment.receipt_date }}
+                    </td>
+                    <td width="20%" style="text-align: center;">
+                        {{ payment.payment_origin }}
+                    </td>
+                    <td width="55%" style="text-align: right;">
+                        {{ payment.amount | format_money() }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 {% endif %}
 
-<br>
-
-{% if status != 'proforma' %}
-<div style="display: none;" class="signature-container">
-    {{ signature|raw }}
-</div>
+{% if invoice.status != 'proforma' %}
+    <div style="display: none;" class="signature-container">
+        {{ organisation.signature|raw }}
+    </div>
 {% endif %}
 
 <div style="margin-top: 50px;">
@@ -494,7 +457,6 @@ hr {
         </tr>
     </table>
 </div>
-
 
 </body>
 </html>
