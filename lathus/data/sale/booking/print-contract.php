@@ -138,6 +138,9 @@ $data_to_inject = [
     ],
     'organisation' => [
         'name', 'phone', 'address_street', 'address_dispatch', 'address_zip', 'address_city'
+    ],
+    'customer' => [
+        'display_name', 'address_street', 'address_zip', 'address_dispatch', 'address_city'
     ]
 ];
 
@@ -177,7 +180,7 @@ $booking['time_to'] = $formatTime($booking['time_to']);
 */
 
 $customer = Identity::id($contract['booking_id']['customer_id']['partner_identity_id'])
-    ->read(['display_name', 'address_street', 'address_zip', 'address_dispatch', 'address_city'])
+    ->read($data_to_inject['customer'])
     ->first();
 
 /*
@@ -551,7 +554,7 @@ foreach($template['parts_ids'] as $part) {
         }
     }
 
-    $extra_fields = ['today', 'today_long', 'nb_pers', 'nb_adults', 'nb_children'];
+    $extra_fields = ['today', 'today_long', 'sojourn_contact_name', 'nb_pers', 'nb_adults', 'nb_children'];
     foreach($extra_fields as $field) {
         $value = str_replace('{'.$field.'}', $values[$field], $value);
     }
