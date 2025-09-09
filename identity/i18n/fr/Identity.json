@@ -224,7 +224,12 @@
         },
         "flag_nuisance": {
             "label": "Attention nuisances",
-            "description": "Le client a déjà occasionné des nuisances lors de ses réservations",
+            "description": "Le client a déjà occasionné des nuisances lors de ses réservations.",
+            "help": ""
+        },
+        "flag_trusted": {
+            "label": "Client de confiance",
+            "description": "Le client est considéré comme de confiance.",
             "help": ""
         },
         "email_secondary": {

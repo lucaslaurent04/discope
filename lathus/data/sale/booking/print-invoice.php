@@ -86,6 +86,11 @@ use Twig\TwigFilter;
  * Methods
  */
 
+$currency = Setting::get_value('core', 'locale', 'currency', '€');
+$formatMoney = function ($value) use($currency) {
+    return number_format((float)($value), 2, ",", ".") . ' ' .$currency;
+};
+
 $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
 $formatDate = fn($value) => date($date_format, $value);
 
@@ -533,7 +538,7 @@ $template = Template::search([
     ->read( ['id','parts_ids' => ['name', 'value']], $params['lang'])
     ->first(true);
 
-$parts = [];
+$template_parts = [];
 foreach($template['parts_ids'] as $part) {
     $value = $part['value'];
     foreach($data_to_inject as $object => $fields) {
@@ -552,10 +557,10 @@ foreach($template['parts_ids'] as $part) {
         $value = str_replace('{booking.'.$field.'}', $values['booking'][$field], $value);
     }
 
-    $parts[$part['name']] = $value;
+    $template_parts[$part['name']] = $value;
 }
 
-$values['parts'] = $parts;
+$values['parts'] = $template_parts;
 
 /*
     5) inject all values into the template
@@ -568,11 +573,10 @@ try {
     /**  @var ExtensionInterface **/
     $extension  = new IntlExtension();
     $twig->addExtension($extension);
-    $currency = Setting::get_value('core', 'locale', 'currency', '€');
+
     // do not rely on system locale (LC_*)
-    $filter = new TwigFilter('format_money', function ($value) use($currency) {
-        return number_format((float)($value), 2, ",", ".") . ' ' .$currency;
-    });
+
+    $filter = new TwigFilter('format_money', $formatMoney);
     $twig->addFilter($filter);
 
     $date_filter = new TwigFilter('format_date', $formatDate);
