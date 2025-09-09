@@ -2073,16 +2073,15 @@ class Booking extends Model {
     }
 
     private static function computeCountBookingYearFiscal($booking_id, $customer_id) {
-        $date_from =  Setting::get_value('finance', 'accounting', 'fiscal_year.date_from');
-        $bookings_ids =Booking::search([
-            ['id', '<>', $booking_id],
-            ['customer_id', '=', $customer_id],
-            ['date_from', '>=',  strtotime($date_from)],
-            ['is_cancelled', '=', false],
-            ['status', 'not in', ['quote', 'option']]
-        ])
-        ->ids();
-        return count($bookings_ids);
+        $date_from = strtotime(Setting::get_value('finance', 'accounting', 'fiscal_year.date_from'));
+        return Booking::search([
+                ['id', '<>', $booking_id],
+                ['customer_id', '=', $customer_id],
+                ['date_from', '>=',  $date_from],
+                ['is_cancelled', '=', false],
+                ['status', 'not in', ['quote', 'option']]
+            ])
+            ->count();
     }
 
     /**

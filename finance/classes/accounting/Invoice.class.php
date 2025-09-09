@@ -332,22 +332,33 @@ class Invoice extends Model {
 
             $organisation_id = $invoice['organisation_id'];
             $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format', '%05d{sequence}');
-            $fiscal_year = Setting::get_value('finance', 'accounting', 'fiscal_year');
-            $year = date('Y', $invoice['date']);
 
-            $sequence = Setting::fetch_and_add('sale', 'accounting', 'invoice.sequence.'.$invoice['center_office_id.code']);
+            $fiscal_year = Setting::get_value('finance', 'accounting', 'fiscal_year');
+            $fiscal_date_from = Setting::get_value('finance', 'accounting', 'fiscal_year.date_from');
+            $fiscal_date_to = Setting::get_value('finance', 'accounting', 'fiscal_year.date_to');
+
+            if(!$fiscal_year || !$fiscal_date_from || !$fiscal_date_to) {
+                trigger_error('APP::unable to retrieve sequence for invoice', EQ_REPORT_ERROR);
+                throw new \Exception('missing_mandatory_fiscal_config', EQ_ERROR_INVALID_CONFIG);
+            }
+
+            if($invoice['date'] < strtotime($fiscal_date_from) || $invoice['date'] > strtotime($fiscal_date_to)) {
+                throw new \Exception('invoice_outside_fiscal_year', EQ_ERROR_INVALID_CONFIG);
+            }
+
+            $sequence = Setting::fetch_and_add('sale', 'accounting', 'invoice.sequence.' . $invoice['center_office_id.code']);
+
             if(!$sequence) {
                 throw new \Exception('APP::unable to retrieve sequence for invoice', EQ_ERROR_INVALID_CONFIG);
             }
 
-            if(intval($year) == intval($fiscal_year) && $sequence) {
-                $result[$id] = Setting::parse_format($format, [
-                    'year'      => $year,
-                    'office'    => $invoice['center_office_id.code'],
-                    'org'       => $organisation_id,
-                    'sequence'  => $sequence
-                ]);
-            }
+            $result[$id] = Setting::parse_format($format, [
+                'year'      => $fiscal_year,
+                'office'    => $invoice['center_office_id.code'],
+                'org'       => $organisation_id,
+                'sequence'  => $sequence
+            ]);
+
         }
         return $result;
     }

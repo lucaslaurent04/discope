@@ -59,13 +59,15 @@ if(count($invoice['invoice_lines_ids']) <= 0) {
 $year = date('Y', $invoice['date']);
 
 $fiscal_year = Setting::get_value('finance', 'accounting', 'fiscal_year');
+$fiscal_date_from = Setting::get_value('finance', 'accounting', 'fiscal_year.date_from');
+$fiscal_date_to = Setting::get_value('finance', 'accounting', 'fiscal_year.date_to');
 
-if(!$fiscal_year) {
+if(!$fiscal_year || !$fiscal_date_from || !$fiscal_date_to) {
     throw new Exception('missing_fiscal_year', EQ_ERROR_INVALID_CONFIG);
 }
 
-if(intval($year) != intval($fiscal_year)) {
-    throw new Exception('fiscal_year_mismatch', EQ_ERROR_CONFLICT_OBJECT);
+if($invoice['date'] < strtotime($fiscal_date_from) || $invoice['date'] > strtotime($fiscal_date_to)) {
+    throw new \Exception('fiscal_year_mismatch', EQ_ERROR_INVALID_CONFIG);
 }
 
 if($invoice['has_orders']) {
