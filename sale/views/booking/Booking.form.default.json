@@ -136,7 +136,27 @@
                 "id": "object.id"
             },
             "confirm": true,
-            "visible": [ ["status", "not in", ["proforma", "invoiced", "debit_balance", "credit_balance", "balanced"]], ["is_from_channelmanager", "=", false] ]
+            "visible": [
+                ["status", "not in", ["proforma", "invoiced", "debit_balance", "credit_balance", "balanced", "cancelled"]],
+                ["is_from_channelmanager", "=", false],
+                ["is_cancelled", "=", false]
+            ]
+        },
+        {
+            "id": "action.cancel-ota-without-fee",
+            "label": "Cancel without fee",
+            "description": "Cancel a channel manager booking without a fee.",
+            "controller": "sale_booking_do-cancel-without-fee",
+            "params": {
+                "id": "object.id",
+                "reason": "ota"
+            },
+            "confirm": true,
+            "visible": [
+                ["status", "=", "checkedout"],
+                ["is_from_channelmanager", "=", true],
+                ["is_cancelled", "=", true]
+            ]
         },
         {
             "id": "action.release_rentalunits",
