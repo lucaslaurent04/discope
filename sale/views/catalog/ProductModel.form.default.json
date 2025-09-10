@@ -282,6 +282,11 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "activity_color",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "is_billable",
                                                 "width": "100%"
                                             },
