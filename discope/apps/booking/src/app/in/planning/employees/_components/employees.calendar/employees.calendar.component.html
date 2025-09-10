@@ -294,7 +294,7 @@
                                         (selected)="onSelectedActivity($event)"
                                     ></planning-employees-calendar-activity>
 
-                                    <div *ngIf="hovered_activity == partnerEvent" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getPartnerEventDescription(partnerEvent)}" (mouseenter)="onhoverActivity(partnerEvent)" (mouseleave)="onhoverActivity(null)">
+                                    <div *ngIf="hovered_activity == partnerEvent" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getPartnerEventDescription(partnerEvent)}" (mouseenter)="onhoverActivity(partnerEvent)" (mouseleave)="onhoverActivity(null)">
                                         <div class="tooltip">
                                             <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></div>
                                         </div>

@@ -275,7 +275,7 @@ if(!empty($params['partners_ids'])) {
 $activity_partner_activities_ids = $orm->search(PartnerEvent::getType(), $domain);
 
 if(!empty($activity_partner_activities_ids)) {
-    $partner_activities = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'description', 'partner_id', 'event_date', 'time_slot_id', 'camp_group_id']);
+    $partner_activities = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'description', 'partner_id', 'event_date', 'time_slot_id', 'event_type', 'camp_group_id']);
 
     $map_camp_groups = [];
     // retrieve all foreign objects identifiers

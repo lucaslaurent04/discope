@@ -69,8 +69,18 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
             light_purple: '#8c58b8'
         };
 
-        if(this.activity.is_partner_event){
-            return colors['light_grey'];
+        if(this.activity.is_partner_event) {
+            const mapPartnerEventColors: any = {
+                camp_activity: '#7A8F78',
+                leave: '#BFA58A',
+                time_off: '#8C6E5E',
+                other: '#6C7A91',
+                rest: '#6F5B4D',
+                trainer: '#C27A5A',
+                training: '#8F4E3A'
+            };
+
+            return mapPartnerEventColors[this.activity.event_type];
         }
         else if(this.activity.type == 'ooo') {
             return colors['red'];

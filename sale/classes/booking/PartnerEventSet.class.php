@@ -53,6 +53,20 @@ class PartnerEventSet extends Model {
                 'onupdate'          => 'onupdateDateTo'
             ],
 
+            'event_type' => [
+                'type'              => 'string',
+                'description'       => "Type of the partner event.",
+                'selection'         => [
+                    'leave',            // The employee is absent because of leave absence
+                    'other',            // The event concerns none of the other types
+                    'rest',             // The employee is absent because of rest
+                    'time_off',         // The employee is absent because of time off
+                    'trainer',          // The employee is absent because is a trainer
+                    'training'          // The employee is absent because follows a training
+                ],
+                'default'           => 'other'
+            ],
+
             'partner_events_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\PartnerEvent',
@@ -74,7 +88,7 @@ class PartnerEventSet extends Model {
     }
 
     public static function doRegeneratePartnerEvent($self) {
-        $self->read(['name', 'description', 'date_from', 'date_to', 'partner_id', 'partner_events_ids' => ['event_date', 'time_slot_id']]);
+        $self->read(['name', 'description', 'date_from', 'date_to', 'partner_id', 'event_type', 'partner_events_ids' => ['event_date', 'time_slot_id']]);
         foreach($self as $id => $partner_event_set) {
             // Remove linked partner events
             $partner_events_ids = [];
@@ -112,6 +126,7 @@ class PartnerEventSet extends Model {
                         'partner_id'            => $partner_event_set['partner_id'],
                         'partner_event_set_id'  => $id,
                         'event_date'            => strtotime($date),
+                        'event_type'            => $partner_event_set['event_type'],
                         'time_slot_id'          => $time_slots_id,
                     ]);
                 }
