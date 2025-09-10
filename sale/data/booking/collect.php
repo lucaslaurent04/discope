@@ -29,13 +29,21 @@ use sale\booking\SojournProductModelRentalUnitAssignement;
         'date_from' => [
             'type'          => 'date',
             'description'   => "First date of the time interval.",
-            'default'       => function () { $default = Setting::get_value('finance', 'accounting', 'fiscal_year.date_from'); return ($default) ? strtotime($default) : null; }
+            'default'       => function () {
+                $active = Setting::get_value('sale', 'features', 'ui.booking.filter_on_fiscal_year', false);
+                $default = Setting::get_value('finance', 'accounting', 'fiscal_year.date_from');
+                return ($active && $default) ? strtotime($default) : null;
+            }
         ],
 
         'date_to' => [
             'type'          => 'date',
             'description'   => "Last date of the time interval.",
-            'default'       => function () { $default = Setting::get_value('finance', 'accounting', 'fiscal_year.date_to'); return ($default) ? strtotime($default) : null; }
+            'default'       => function () {
+                $active = Setting::get_value('sale', 'features', 'ui.booking.filter_on_fiscal_year', false);
+                $default = Setting::get_value('finance', 'accounting', 'fiscal_year.date_to');
+                return ($active && $default) ? strtotime($default) : null;
+            }
         ],
 
         'bank_account_iban' => [
