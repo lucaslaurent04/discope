@@ -61,6 +61,20 @@
             ]
         },
         {
+            "id": "action.transition.validate",
+            "label": "Validate",
+            "controller": "model_transition",
+            "params": {
+                "entity": "sale\\camp\\Enrollment",
+                "transition": "validate",
+                "ids": []
+            },
+            "visible": [
+                ["status", "=", "confirmed"],
+                ["state", "<>", "draft"]
+            ]
+        },
+        {
             "id": "action.transition.cancel",
             "label": "Cancel",
             "controller": "model_transition",
@@ -246,7 +260,7 @@
                                                 "type": "field",
                                                 "value": "all_documents_received",
                                                 "width": "50%",
-                                                "visible": ["state", "<>", "draft"]
+                                                "visible": false
                                             }
                                         ]
                                     }

@@ -215,6 +215,9 @@
                 "action.transition.confirm": {
                     "label": "Confirmer"
                 },
+                "action.transition.validate": {
+                    "label": "Valider"
+                },
                 "action.transition.cancel": {
                     "label": "Annuler"
                 },
