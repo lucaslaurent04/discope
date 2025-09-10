@@ -176,9 +176,12 @@ class Child extends Model {
         if(isset($values['main_guardian_id'])) {
             $self->read(['guardians_ids']);
             foreach($self as $child) {
+                // #todo - in onupdate add the guardian to the list
+                /*
                 if(!in_array($values['main_guardian_id'], $child['guardians_ids'])) {
                     return ['main_guardian_id' => ['invalid' => "This guardian is not linked to this child."]];
                 }
+                */
             }
         }
 
