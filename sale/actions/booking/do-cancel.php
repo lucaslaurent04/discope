@@ -19,15 +19,15 @@ list($params, $providers) = eQual::announce([
     'description'   => "This will cancel the booking, whatever its current status. Balance will be adjusted if cancellation fees apply.",
     'params'        => [
         'id' =>  [
-            'description'       => 'Identifier of the targeted booking.',
             'type'              => 'integer',
             'min'               => 1,
+            'description'       => "Identifier of the targeted booking.",
             'required'          => true
         ],
         // this must remain synced with field definition Booking::cancellation_reason and translations in do-cancel.json
         'reason' =>  [
-            'description'       => 'Reason of the booking cancellation.',
             'type'              => 'string',
+            'description'       => "Reason of the booking cancellation.",
             'selection'         => [
                 'other',                    // customer cancelled for a non-listed reason or without mentioning the reason (cancellation fees might apply)
                 'overbooking',              // the booking was cancelled due to failure in delivery of the service
@@ -39,11 +39,16 @@ list($params, $providers) = eQual::announce([
             ],
             'required'          => true
         ],
-        'cancellation_fee' => [
-            'description'       => 'The amount of the cancellation fee.',
-            'help'              => "If the cancellation fee is 0 then the status of the booking will be set to \"cancelled\", because it doesn't need to be invoiced.",
+        'with_fee' => [
+            'type'              => "boolean",
+            'description'       => "Should a fee be invoiced to the customer because of the cancellation?",
+            'default'           => false
+        ],
+        'fee_amount' => [
             'type'              => 'float',
             'usage'             => 'amount/money:2',
+            'description'       => "The amount of the cancellation fee.",
+            'help'              => "If the cancellation fee is 0 then the status of the booking will be set to \"cancelled\", because it doesn't need to be invoiced.",
             'default'           => 0
         ]
     ],
@@ -66,6 +71,11 @@ list($params, $providers) = eQual::announce([
  */
 ['context' => $context, 'orm' => $orm, 'cron' => $cron, 'dispatch' => $dispatch] = $providers;
 
+$channelmanager_enabled = Setting::get_value('sale', 'features', 'booking.channel_manager', false);
+if($params['reason'] === 'ota' && !$channelmanager_enabled) {
+    throw new Exception("ota_not_allowed", EQ_ERROR_INVALID_PARAM);
+}
+
 $booking = Booking::id($params['id'])
     ->read([
         'date_from',
@@ -73,6 +83,7 @@ $booking = Booking::id($params['id'])
         'is_cancelled',
         'status',
         'paid_amount',
+        'is_from_channelmanager',
         'booking_lines_groups_ids',
         'customer_id'       => ['rate_class_id'],
         'center_office_id'  => ['organisation_id']
@@ -83,7 +94,14 @@ if(is_null($booking)) {
     throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-if($booking['is_cancelled']) {
+if(($params['reason'] !== 'ota' && $booking['is_from_channelmanager']) || ($params['reason'] === 'ota' && !$booking['is_from_channelmanager'])) {
+    throw new Exception("incompatible_reason", EQ_ERROR_INVALID_PARAM);
+}
+
+// #todo - allow to cancel without a fee a non channel manager booking that was previously cancelled with a fee (if status is still checkedout so nothing invoiced)
+
+// #mnemo - A previously canceled booking cannot be canceled again, except in cases where it was canceled through the channel manager with a fee, and we now want to cancel it without a fee.
+if($booking['is_cancelled'] && (!$booking['is_from_channelmanager'] || $params['with_fee'])) {
     throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
@@ -91,7 +109,7 @@ if(in_array($booking['status'], ['proforma', 'invoiced', 'debit_balance', 'credi
     throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
-if($params['cancellation_fee'] == 0) {
+if(!$params['with_fee']) {
     $proforma_credit_notes_ids = Invoice::search([
         ['booking_id', '=', $booking['id']],
         ['status', '=', 'proforma'],
@@ -141,18 +159,23 @@ if($channelmanager_enabled) {
     }
 }
 
-// release rental units (remove consumptions, if any)
-Consumption::search(['booking_id', '=', $booking['id']])->delete(true);
+if(!$booking['is_cancelled']) {
+    // release rental units (remove consumptions, if any)
+    Consumption::search(['booking_id', '=', $booking['id']])->delete(true);
 
-// mark the booking as cancelled
-Booking::id($booking['id'])
-    ->update([
-        'is_noexpiry'           => false,
-        'is_cancelled'          => true,
-        'cancellation_reason'   => $params['reason']
-    ]);
+    // mark the booking as cancelled
+    Booking::id($booking['id'])
+        ->update([
+            'is_noexpiry'           => false,
+            'is_cancelled'          => true,
+            'cancellation_reason'   => $params['reason']
+        ]);
+}
+else {
+    // Booking was canceled through the channel manager with a fee, and we now want to cancel it without a fee
+}
 
-if($params['cancellation_fee'] > 0) {
+if($params['with_fee']) {
     // if booking's status was more advanced than quote, set it as checkedout (to allow manual modifications)
     if($booking['status'] != 'quote' || round($booking['paid_amount'], 2) > 0) {
         Booking::id($booking['id'])
@@ -207,7 +230,7 @@ if($params['cancellation_fee'] > 0) {
             BookingLine::id($cancellation_line['id'])
                 ->update([
                     'has_manual_unit_price' => true,
-                    'unit_price'            => $params['cancellation_fee']
+                    'unit_price'            => $params['fee_amount']
                 ]);
 
             BookingLine::refreshPrice($orm, $cancellation_line['id']);
