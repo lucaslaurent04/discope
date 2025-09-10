@@ -176,7 +176,7 @@ class Child extends Model {
         if(isset($values['main_guardian_id'])) {
             $self->read(['guardians_ids']);
             foreach($self as $child) {
-                // #todo - in onupdate add the guardian to the list
+                // #memo - do not prevent adding a guardian : if necessary, it is created in onupdate
                 /*
                 if(!in_array($values['main_guardian_id'], $child['guardians_ids'])) {
                     return ['main_guardian_id' => ['invalid' => "This guardian is not linked to this child."]];
@@ -262,10 +262,13 @@ class Child extends Model {
     }
 
     public static function onupdateMainGuardianId($self) {
-        $self->read(['camp_class']);
+        $self->read(['camp_class', 'main_guardian_id', 'guardians_ids']);
         foreach($self as $id => $child) {
             if($child['camp_class'] === 'other') {
                 self::id($id)->update(['camp_class' => null]);
+            }
+            if(!in_array($child['main_guardian_id'], $child['guardians_ids'])) {
+                self::id($id)->update(['guardians_ids' => ["+{$child['main_guardian_id']}"]]);
             }
         }
     }
