@@ -38,6 +38,7 @@ Setting::assert_value('sale', 'features', 'ui.booking.meals_folded', true);
 Setting::assert_value('sale', 'features', 'ui.booking.meal_preferences_folded', true);
 Setting::assert_value('sale', 'features', 'ui.booking.activities_visible', true);
 Setting::assert_value('sale', 'features', 'ui.booking.meal_preferences_visible', true);
+Setting::assert_value('sale', 'features', 'ui.booking.filter_on_fiscal_year', false);
 Setting::assert_value('sale', 'features', 'templates.quote.consumption_table', true);
 Setting::assert_value('sale', 'features', 'templates.quote.activities', false);
 Setting::assert_value('sale', 'features', 'payment.remind.active.1', 1);

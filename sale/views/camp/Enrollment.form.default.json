@@ -26,7 +26,7 @@
                     "id": "SAVE_AND_CONTINUE"
                 },
                 {
-                    "id": "SAVE_AND_CLOSE"
+                    "id": "SAVE_AND_VIEW"
                 }
             ]
         }
@@ -214,7 +214,7 @@
                                                 "type": "field",
                                                 "value": "status",
                                                 "width": "25%",
-                                                "visible": ["state", "=", "draft"]
+                                                "visible": false
                                             },
                                             {
                                                 "type": "label",
