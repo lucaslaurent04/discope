@@ -99,7 +99,7 @@
             },
             "confirm": true,
             "visible": [
-                ["status", "not in", ["proforma", "invoiced", "debit_balance", "credit_balance", "balanced"]],
+                ["status", "not in", ["proforma", "invoiced", "debit_balance", "credit_balance", "balanced", "cancelled"]],
                 ["is_from_channelmanager", "=", false],
                 ["is_cancelled", "=", false]
             ]
