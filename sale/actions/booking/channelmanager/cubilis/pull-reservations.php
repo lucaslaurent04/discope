@@ -173,7 +173,8 @@ try {
                                 // #memo - this will trigger `check-contingencies`
                                 eQual::run('do', 'sale_booking_do-cancel', [
                                         'id'        => $booking['id'],
-                                        'reason'    => 'ota'
+                                        'reason'    => 'ota',
+                                        'with_fee'  => true    // cancel with fee to 0 € now, so we can decide to cancel with or without fee afterward
                                     ]);
                             }
                             catch(Exception $e) {
@@ -915,7 +916,8 @@ try {
                                 // #memo - this will not trigger `check-contingencies` since reason is set to 'ota'
                                 eQual::run('do', 'sale_booking_do-cancel', [
                                         'id'        => $booking['id'],
-                                        'reason'    => 'ota'
+                                        'reason'    => 'ota',
+                                        'with_fee'  => true    // cancel with fee to 0 € now, so we can decide to cancel with or without fee afterward
                                     ]);
                                 // void contract (but keep it)
                                 Contract::search(['booking_id', '=', $booking['id']])->update(['status' => 'cancelled']);

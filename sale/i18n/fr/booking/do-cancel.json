@@ -3,7 +3,7 @@
     "description": "Ceci annulera la réservation, quel que soit son statut courant. La balance sera ajustée si des frais d'annulation sont dus.",
     "model": {
         "id": {
-            "label": "Identifian",
+            "label": "Identifiant",
             "description": "Identifiant de la réservation à annuler.",
             "help": ""
         },
@@ -20,6 +20,16 @@
                 "health_impediment": "Motif médical ou familial",
                 "ota": "Annulé via plateforme externe (OTA)"
             }
+        },
+        "with_fee": {
+            "label": "Avec frais d'annulation",
+            "description": "Annuler avec frais d'annulation.",
+            "help": ""
+        },
+        "fee_amount": {
+            "label": "Montant frais d'annulation",
+            "description": "Montant des frais d'annulation.",
+            "help": ""
         }
     },
     "error": {
