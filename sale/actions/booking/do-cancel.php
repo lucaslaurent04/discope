@@ -98,6 +98,8 @@ if(($params['reason'] !== 'ota' && $booking['is_from_channelmanager']) || ($para
     throw new Exception("incompatible_reason", EQ_ERROR_INVALID_PARAM);
 }
 
+// #todo - allow to cancel without a fee a non channel manager booking that was previously cancelled with a fee (if status is still checkedout so nothing invoiced)
+
 // #mnemo - A previously canceled booking cannot be canceled again, except in cases where it was canceled through the channel manager with a fee, and we now want to cancel it without a fee.
 if($booking['is_cancelled'] && (!$booking['is_from_channelmanager'] || $params['with_fee'])) {
     throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
