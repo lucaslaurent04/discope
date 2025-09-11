@@ -3,7 +3,7 @@ import { Component, Input, Output, EventEmitter, OnInit, ViewChild, OnChanges, S
 import { PlanningEmployeesCalendarParamService } from '../../../../_services/employees.calendar.param.service';
 
 import { ChangeReservationArg } from 'src/app/model/changereservationarg';
-import { AuthService } from 'sb-shared-lib';
+import { AuthService, EnvService } from 'sb-shared-lib';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
@@ -38,6 +38,8 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
     @ViewChild('productModelSelector') productModelSelector: MatSelect;
     @ViewChild('partnerSelector') partnerSelector: MatSelect;
 
+    private environment: any;
+
     private dateFrom: Date;
     private dateTo: Date;
     public duration: number;
@@ -65,6 +67,7 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
 
     constructor(
         private auth: AuthService,
+        private env: EnvService,
         private params: PlanningEmployeesCalendarParamService
     ) {}
 
@@ -148,6 +151,8 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
         });
 
         this.refreshDisplayedProductModels();
+
+        this.environment = await this.env.getEnv();
     }
 
     public refreshDisplayedProductModels() {
@@ -241,21 +246,25 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
     }
 
     private filterPartners() {
-        if(this.params.product_model_ids.length === 0) {
-            return;
-        }
-
-        const employees = this.params.employees.filter((e) => {
-            let hasProductModel = false;
-            for(let activityId of e.activity_product_models_ids) {
-                if(this.params.product_model_ids.includes(activityId)) {
-                    hasProductModel = true;
-                    break;
-                }
+        let employees = this.params.employees;
+        if(this.environment.hasOwnProperty('sale.features.employee.activity_filter') && this.environment['sale.features.employee.activity_filter']) {
+            if(this.params.product_model_ids.length === 0) {
+                employees = [];
             }
+            else {
+                employees = this.params.employees.filter((e) => {
+                    let hasProductModel = false;
+                    for(let activityId of e.activity_product_models_ids) {
+                        if(this.params.product_model_ids.includes(activityId)) {
+                            hasProductModel = true;
+                            break;
+                        }
+                    }
 
-            return hasProductModel;
-        });
+                    return hasProductModel;
+                });
+            }
+        }
 
         this.params.partners_ids = [
             ...employees.map(e => e.id),

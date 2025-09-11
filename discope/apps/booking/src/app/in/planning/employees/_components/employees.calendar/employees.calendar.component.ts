@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Output, EventEmitter, ViewChild, OnInit, OnChanges, ViewChildren, QueryList, ElementRef, AfterViewChecked, Input, SimpleChanges } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Output, EventEmitter, ViewChild, OnInit, OnChanges, ViewChildren, QueryList, ElementRef, AfterViewInit, Input, SimpleChanges } from '@angular/core';
 
 import { ChangeReservationArg } from 'src/app/model/changereservationarg';
 import { HeaderDays } from 'src/app/model/headerdays';
@@ -32,7 +32,7 @@ export class ProductModel {
     styleUrls: ['./employees.calendar.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, AfterViewChecked {
+export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, AfterViewInit {
 
     @Input() rowsHeight: number;
     @Input() mapTimeSlot: {[key: string]: {id: number, name: string, code: 'AM'|'PM'|'EV', schedule_from: string, schedule_to: string}};
@@ -163,11 +163,18 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         this.environment = await this.env.getEnv();
     }
 
-    /**
-     * After refreshing the view with new content, adapt the header and relay new cell_width, if changed
-     */
-    public async ngAfterViewChecked() {
+    public ngAfterViewInit(): void {
+        this.updateTableDimensions();
 
+        const observer = new ResizeObserver(() => {
+            this.updateTableDimensions();
+            this.cd.markForCheck();
+        });
+
+        observer.observe(this.calTable.nativeElement);
+    }
+
+    private updateTableDimensions(): void {
         this.tableRect = this.calTable?.nativeElement.getBoundingClientRect();
 
         if(this.calTableHeadCells) {
@@ -176,10 +183,6 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 break;
             }
         }
-
-
-        // make sure ngOnChanges is triggered on sub-components
-        this.cd.detectChanges();
     }
 
     public onRefresh(full: boolean = true) {
