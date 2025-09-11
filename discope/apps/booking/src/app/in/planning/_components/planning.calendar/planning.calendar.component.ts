@@ -388,7 +388,8 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
 
         const rental_units_domain: any[] = JSON.parse(JSON.stringify(this.params.rental_units_filter));
         if(!rental_units_domain.length) {
-            rental_units_domain.push([['can_rent', '=', true], ["center_id", "in", this.params.centers_ids]]);
+            // #memo - even if cannot rent, a rental unit can have sub-units that can be rented
+            rental_units_domain.push([/*['can_rent', '=', true],*/ ["center_id", "in", this.params.centers_ids]]);
         }
         else {
             for(let i = 0, n = rental_units_domain.length; i < n; ++i) {
