@@ -119,6 +119,7 @@ class CampGroup extends Model {
                     'partner_id'            => $camp_group['employee_id'],
                     'event_date'            => $booking_activity['activity_date'],
                     'time_slot_id'          => $booking_activity['time_slot_id'],
+                    'event_type'            => 'camp_activity',
                     'camp_group_id'         => $camp_group['id'],
                     'booking_activity_id'   => $booking_activity['id']
                 ]);

@@ -44,6 +44,13 @@
                 "width": "20%",
                 "sortable": true,
                 "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "event_type",
+                "width": "20%",
+                "sortable": true,
+                "readonly": true
             }
         ]
     }

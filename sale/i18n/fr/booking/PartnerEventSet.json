@@ -1,27 +1,40 @@
 {
-    "name": "Evénement relation",
-    "plural": "Evénements relation",
-    "description": "Evénements planning activitées d'une relation.",
+    "name": "Série d'événement relation",
+    "plural": "Série d'événements relation",
+    "description": "Série d'événements planning activitées d'une relation.",
     "model": {
         "description": {
             "label": "Description",
-            "description": "",
+            "description": "Description de l'événement.",
             "help": ""
         },
         "partner_id": {
             "label": "Relation",
-            "description": "",
+            "description": "Relation concernée.",
             "help": ""
         },
         "date_from": {
             "label": "De",
-            "description": "",
+            "description": "Date de début de la série d'événements.",
             "help": ""
         },
         "date_to": {
             "label": "A",
-            "description": "",
+            "description": "Date de fin de la série d'événements.",
             "help": ""
+        },
+        "event_type": {
+            "label": "Type",
+            "description": "Type d'événement.",
+            "help": "",
+            "selection": {
+                "leave": "Congé",
+                "other": "Autre",
+                "rest": "Repos",
+                "time_off": "Récupération",
+                "trainer": "Formateur",
+                "training": "Formation"
+            }
         }
     },
     "view": {

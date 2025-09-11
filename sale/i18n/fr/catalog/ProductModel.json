@@ -269,6 +269,33 @@
             },
             "help": "L'activité se déroule-t-elle à l'intérieur de l'entreprise ou nécessite-t-elle une externalisation ?"
         },
+        "activity_color": {
+            "label": "Couleur de l'activité",
+            "description": "Couleur de l'activité dans le planning.",
+            "selection": {
+                "#6F8FAF": "Bleu",
+                "#2F5069": "Bleu foncé",
+                "#4C9085": "Sarcelle",
+                "#2E5D55": "Sarcelle foncé",
+                "#7A9E6D": "Vert",
+                "#46613D": "Vert foncé",
+                "#A3A34A": "Olive",
+                "#6B6B2F": "Olive foncé",
+                "#D1B85C": "Jaune",
+                "#8F7932": "Jaune foncé",
+                "#D07C4B": "Orange",
+                "#8A4F2D": "Brun",
+                "#B55A52": "Rouge",
+                "#722E2A": "Rouge foncé",
+                "#8A6BAF": "Violet",
+                "#553C70": "Violet foncé",
+                "#A67C8C": "Mauve",
+                "#6B4A56": "Mauve foncé",
+                "#8A8D93": "Gris",
+                "#4A4D50": "Gris foncé"
+            },
+            "help": "L'activité se déroule-t-elle à l'intérieur de l'entreprise ou nécessite-t-elle une externalisation ?"
+        },
         "has_activity_duration": {
             "label": "Durée spécifique?",
             "description": "Indique si l'activité a une durée spécifique.",

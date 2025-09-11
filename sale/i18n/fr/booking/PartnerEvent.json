@@ -5,32 +5,51 @@
     "model": {
         "description": {
             "label": "Description",
-            "description": "",
+            "description": "Description de l'événement.",
             "help": ""
         },
         "partner_id": {
             "label": "Relation",
-            "description": "",
+            "description": "Relation concernée",
             "help": ""
         },
         "partner_event_set_id": {
             "label": "Série d'événements",
-            "description": "",
+            "description": "L'événement provient d'une série d'événements.",
             "help": ""
         },
         "event_date": {
             "label": "Date",
-            "description": "",
+            "description": "Date de l'événement.",
             "help": ""
         },
         "time_slot_id": {
             "label": "Créneau horaire",
-            "description": "",
+            "description": "Créneau horaire de l'événement.",
             "help": ""
+        },
+        "event_type": {
+            "label": "Type",
+            "description": "Le type d'événement.",
+            "help": "",
+            "selection": {
+                "camp_activity": "Activité d'un camp",
+                "leave": "Congé",
+                "other": "Autre",
+                "rest": "Repos",
+                "time_off": "Récupération",
+                "trainer": "Formateur",
+                "training": "Formation"
+            }
         },
         "camp_group_id": {
             "label": "Groupe camp",
-            "description": "",
+            "description": "Le groupe du camp dont la relation est responsable.",
+            "help": ""
+        },
+        "booking_activity_id": {
+            "label": "Activité camp",
+            "description": "Une activité d'un groupe d'un camp dont la relation est responsable.",
             "help": ""
         }
     },

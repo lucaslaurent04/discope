@@ -54,55 +54,25 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
         this.hover.emit();
     }
 
-    public getColor() {
-        const colors: any = {
-            yellow: '#ff9633',
-            turquoise: '#0fc4a7',
-            green: '#0fa200',
-            blue: '#0288d1',
-            violet: '#9575cd',
-            red: '#c80651',
-            grey: '#988a7d',
-            dark_grey: '#655c58',
-            light_grey: '#baa9a2',
-            purple: '#7733aa',
-            light_purple: '#8c58b8'
-        };
+    public getColor(): string {
+        if(this.activity.is_partner_event) {
+            const mapPartnerEventColors: any = {
+                camp_activity: '#7A8F78',
+                leave: '#BFA58A',
+                time_off: '#8C6E5E',
+                other: '#6C7A91',
+                rest: '#6F5B4D',
+                trainer: '#C27A5A',
+                training: '#8F4E3A'
+            };
 
-        if(this.activity.is_partner_event){
-            return colors['light_grey'];
+            return mapPartnerEventColors[this.activity.event_type];
         }
-        else if(this.activity.type == 'ooo') {
-            return colors['red'];
-        }
-        else if(this.activity.booking_id?.status == 'quote') {
-            // #memo - reverted to quote but without releasing the rental units
-            return colors['grey'];
-        }
-        else if(this.activity.booking_id?.status == 'option') {
-            return colors['blue'];
-        }
-        else if(this.activity.booking_id?.status == 'confirmed') {
-            return colors['yellow'];
-        }
-        else if(this.activity.booking_id?.status == 'validated') {
-            return colors['green'];
-        }
-        else if(this.activity.booking_id?.status == 'checkedin') {
-            return colors['turquoise'];
-        }
-        else if(this.activity.booking_id?.status == 'checkedout') {
-            return colors['grey'];
-        }
-        else if(this.activity.booking_id?.status == 'proforma') {
-            return colors['light_purple'];
-        }
-        else if(this.activity.camp_id) {
-            return colors['dark_grey'];
+        else if(this.activity.product_model_id.activity_color) {
+            return this.activity.product_model_id.activity_color;
         }
 
-        // invoiced and beyond
-        return colors['purple'];
+        return '#BAA9A2';
     }
 
     public getIcon() {

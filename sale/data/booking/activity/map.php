@@ -7,11 +7,9 @@
 */
 
 use core\setting\Setting;
-use equal\orm\Domain;
 use equal\orm\Field;
 use hr\employee\Employee;
 use identity\Identity;
-use identity\Partner;
 use sale\booking\Booking;
 use sale\booking\BookingActivity;
 use sale\booking\BookingLineGroupAgeRangeAssignment;
@@ -140,7 +138,7 @@ $booking_groups = $orm->read(BookingLineGroup::getType(), array_keys($map_groups
 $camps = $orm->read(Camp::getType(), array_keys($map_camps), ['id', 'name', 'short_name', 'date_from', 'date_to', 'min_age', 'max_age', 'enrollments_qty', 'employee_ratio']);
 $employees = $orm->read(Employee::getType(), array_keys($map_employees), ['id', 'name', 'relationship']);
 $providers = $orm->read(Provider::getType(), array_keys($map_providers), ['id', 'name', 'relationship']);
-$product_models = $orm->read(ProductModel::getType(), array_keys($map_product_models), ['id', 'name', 'providers_ids']);
+$product_models = $orm->read(ProductModel::getType(), array_keys($map_product_models), ['id', 'name', 'activity_color', 'providers_ids']);
 
 $map_customers = [];
 foreach($bookings as $id => $booking) {
@@ -275,7 +273,7 @@ if(!empty($params['partners_ids'])) {
 $activity_partner_activities_ids = $orm->search(PartnerEvent::getType(), $domain);
 
 if(!empty($activity_partner_activities_ids)) {
-    $partner_activities = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'description', 'partner_id', 'event_date', 'time_slot_id', 'camp_group_id']);
+    $partner_activities = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'description', 'partner_id', 'event_date', 'time_slot_id', 'event_type', 'camp_group_id']);
 
     $map_camp_groups = [];
     // retrieve all foreign objects identifiers
