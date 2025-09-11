@@ -3,7 +3,7 @@ import { Component, Input, Output, EventEmitter, OnInit, ViewChild, OnChanges, S
 import { PlanningEmployeesCalendarParamService } from '../../../../_services/employees.calendar.param.service';
 
 import { ChangeReservationArg } from 'src/app/model/changereservationarg';
-import { ApiService, AuthService } from 'sb-shared-lib';
+import { AuthService } from 'sb-shared-lib';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
@@ -64,7 +64,6 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
     };
 
     constructor(
-        private api: ApiService,
         private auth: AuthService,
         private params: PlanningEmployeesCalendarParamService
     ) {}
@@ -87,9 +86,11 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
                 this.vm.date_range.get('date_from').setValue(this.dateFrom);
                 this.vm.date_range.get('date_to').setValue(this.dateTo);
                 if(this.params.product_model_id === null) {
-                    this.vm.product_model_code.setValue('cat_' + this.params.product_category_id);
+                    if(this.vm.product_model_code.value !== ('cat_' + this.params.product_category_id)) {
+                        this.vm.product_model_code.setValue('cat_' + this.params.product_category_id);
+                    }
                 }
-                else {
+                else if(this.vm.product_model_code.value !== ('mod_' + this.params.product_model_id)) {
                     this.vm.product_model_code.setValue('mod_' + this.params.product_model_id);
                 }
                 this.vm.show_only_transport.setValue(this.params.show_only_transport);
@@ -106,57 +107,19 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
                     return;
                 }
 
-                try {
-                    const employees = await this.api.collect(
-                        'hr\\employee\\Employee',
-                        [
-                            ['center_id', 'in', user.centers_ids],
-                            ['relationship', '=', 'employee'],
-                            ['is_active', '=', true]
-                        ],
-                        ['id'],
-                        'name', 'asc', 0, 500
-                    );
+                await this.params.loadPartners(user.centers_ids);
 
-                    if(employees.length === 0) {
-                        return;
-                    }
-
-                    const partners_domain = [
-                        [['id', 'in', employees.map((e: any) => e.id)]],
-                        [['relationship', '=', 'provider']]
-                    ];
-                    const partners = await this.api.collect(
-                        'identity\\Partner',
-                        partners_domain,
-                        ['id', 'name', 'relationship'],
-                        'name', 'asc', 0, 500
-                    );
-
-                    if(partners.length === 0) {
-                        return;
-                    }
-
-                    // value stored in local storage prevails
-                    let stored = localStorage.getItem('partners_ids');
-                    if(stored) {
-                        this.selected_partners_ids = JSON.parse(stored);
-                    }
-                    else {
-                        this.selected_partners_ids = partners.map( (e:any) => e.id );
-                    }
-
-                    this.params.partners_ids = this.selected_partners_ids;
-                    this.partners = partners.sort((a: any, b: any) => {
-                        if (a.relationship !== b.relationship) {
-                            return a.relationship < b.relationship ? -1 : 1;
-                        }
-                        return a.name.localeCompare(b.name);
-                    });
+                const partners = this.params.partners;
+                if(partners.length === 0) {
+                    return;
                 }
-                catch(err) {
-                    console.warn(err) ;
-                }
+
+                this.partners = partners.sort((a: any, b: any) => {
+                    if (a.relationship !== b.relationship) {
+                        return a.relationship < b.relationship ? -1 : 1;
+                    }
+                    return a.name.localeCompare(b.name);
+                });
             });
 
         this.vm.product_model_code.valueChanges.subscribe((value: string) => {
@@ -171,6 +134,7 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
             this.vm.filter_product_models.setValue('');
 
             this.filterProductModels();
+            this.filterPartners();
         });
 
         this.vm.show_only_transport.valueChanges.subscribe((value: boolean) => {
@@ -276,6 +240,39 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
         this.refreshDisplayedProductModels();
     }
 
+    private filterPartners() {
+        if(this.params.product_model_ids.length === 0) {
+            return;
+        }
+
+        const employees = this.params.employees.filter((e) => {
+            let hasProductModel = false;
+            for(let activityId of e.activity_product_models_ids) {
+                if(this.params.product_model_ids.includes(activityId)) {
+                    hasProductModel = true;
+                    break;
+                }
+            }
+
+            return hasProductModel;
+        });
+
+        this.params.partners_ids = [
+            ...employees.map(e => e.id),
+            ...this.params.providers.map(p => p.id)
+        ];
+
+        this.selected_partners_ids = this.params.partners_ids;
+
+        this.partners = [...employees, ...this.params.providers]
+            .sort((a: any, b: any) => {
+                if (a.relationship !== b.relationship) {
+                    return a.relationship < b.relationship ? -1 : 1;
+                }
+                return a.name.localeCompare(b.name);
+            });
+    }
+
     public async onchangeDateRange() {
         let start = this.vm.date_range.get('date_from').value;
         let end = this.vm.date_range.get('date_to').value;
@@ -352,7 +349,6 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
     public onchangeSelectedPartners() {
         console.log('::onchangeSelectedEmployees');
         this.params.partners_ids = this.selected_partners_ids;
-        localStorage.setItem('partners_ids', JSON.stringify(this.selected_partners_ids));
     }
 
     public onclickUnselectAllPartners() {

@@ -5,40 +5,10 @@ import { HeaderDays } from 'src/app/model/headerdays';
 
 
 import { ApiService, EnvService } from 'sb-shared-lib';
-import { PlanningEmployeesCalendarParamService } from '../../_services/employees.calendar.param.service';
+import { PlanningEmployeesCalendarParamService, Partner, Employee, Provider } from '../../_services/employees.calendar.param.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-
-class Partner {
-    constructor(
-        public id: number = 0,
-        public name: string = '',
-        public relationship: 'employee'|'provider' = 'employee',
-        public is_active: boolean = true
-    ) {}
-}
-
-class Employee extends Partner {
-    constructor(
-        public id: number = 0,
-        public name: string = '',
-        public is_active: boolean = true,
-        public activity_product_models_ids: any[] = []
-    ) {
-        super(id, name, 'employee', is_active);
-    }
-}
-
-class Provider extends Partner {
-    constructor(
-        public id: number = 0,
-        public name: string = '',
-        public is_active: boolean = true
-    ) {
-        super(id, name, 'provider');
-    }
-}
 
 export class ProductModelCategory {
     constructor(
@@ -405,37 +375,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     private async onFiltersChange() {
         this.createHeaderDays();
 
-        try {
-            const employees_domain = [
-                ['relationship', '=', 'employee'],
-                ['id', 'in', this.params.partners_ids],
-                ['is_active', '=', true]
-            ];
-
-            const employees = await this.api.collect(
-                'hr\\employee\\Employee',
-                employees_domain,
-                Object.getOwnPropertyNames(new Employee()),
-                'name', 'asc', 0, 500
-            );
-
-            const providers_domain = [
-                ['relationship', '=', 'provider'],
-                ['id', 'in', this.params.partners_ids]
-            ];
-
-            const providers = await this.api.collect(
-                'sale\\provider\\Provider',
-                providers_domain,
-                Object.getOwnPropertyNames(new Provider()),
-                'name', 'asc', 0, 500
-            );
-
-            this.partners = [...employees, ...providers];
-        }
-        catch(response) {
-            console.warn('unable to fetch partners', response);
-        }
+        this.partners = this.params.selected_partners;
 
         try {
             this.activities = await this.api.fetch('?get=sale_booking_activity_map', {
