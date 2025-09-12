@@ -143,6 +143,11 @@ $booking = Booking::id($params['id'])
         ],
         'booking_lines_groups_ids' => [
             'activity_group_num'
+        ],
+        'center_id' => [
+            'organisation_id' => [
+                'logo_document_id' => ['data', 'type']
+            ]
         ]
     ])
     ->first(true);
@@ -194,11 +199,19 @@ if($has_ev_activities) {
     $time_slot_codes[] = 'EV';
 }
 
+$img_url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=';
+
+$logo_document_data = $booking['center_id']['organisation_id']['logo_document_id']['data'] ?? null;
+if($logo_document_data) {
+    $content_type = $booking['center_id']['organisation_id']['logo_document_id']['type'] ?? 'image/png';
+    $img_url = "data:{$content_type};base64, ".base64_encode($logo_document_data);
+}
+
 /*
     Set values
 */
 
-$values = compact('booking', 'map_week_day_timeslot_group_activity', 'time_slot_codes');
+$values = compact('booking', 'map_week_day_timeslot_group_activity', 'time_slot_codes', 'img_url');
 
 /*
     Generate html
