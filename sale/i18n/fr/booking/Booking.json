@@ -349,8 +349,11 @@
                 "item.booking.activities-planning": {
                     "label": "Planning activités"
                 },
-                "item.booking.activities-program": {
-                    "label": "Voir le programme"
+                "item.booking.weeks-activities-program": {
+                    "label": "Programme par semaine"
+                },
+                "item.booking.groups-activities-program": {
+                    "label": "Programme par groupe"
                 }
             },
             "layout": {
@@ -491,8 +494,11 @@
                 "item.booking.activities-planning": {
                     "label": "Planning activités"
                 },
-                "item.booking.activities-program": {
-                    "label": "Voir le programme"
+                "item.booking.weeks-activities-program": {
+                    "label": "Programme par semaines"
+                },
+                "item.booking.groups-activities-program": {
+                    "label": "Programme par groupes"
                 }
             }
         },

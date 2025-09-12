@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+<title>Programme d'activités</title>
+<style type="text/css">
+@page {
+  margin: 1cm;
+}
+body {
+    margin: 80px 0 40px 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.7em;
+    text-align: justify;
+    width: 100%;
+}
+
+h2 {
+    margin-top: 8px;
+    margin-bottom: 0;
+    font-size: 21px;
+}
+
+h3 {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 15px;
+}
+
+div, table, table tr td {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+div.header,
+div.footer {
+    box-sizing: border-box;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    width: 100%;
+    overflow: hidden;
+}
+
+div.header {
+    top: 0;
+    left: 0;
+    height: 70px;
+}
+
+div.header .title {
+    width: 100%;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+div.header .sojourn-info {
+    margin: 10px;
+    padding-left: 50px;
+    font-size: 0.9rem;
+}
+
+div.wrapper {
+
+}
+
+.week-activities-table {
+    margin-top: 10px;
+    border: solid 1px black;
+    border-collapse: collapse;
+}
+
+.week-activities-table th,
+.week-activities-table td {
+    border: solid 1px black;
+}
+
+.week-activities-table .first-col {
+    width: 70px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.week-activities-table .sunday {
+    background: lightgray;
+}
+
+div.footer {
+    bottom: 0;
+    left: 0;
+    height: 30px;
+    overflow: visible;
+    z-index: 200;
+    font-size: 0.8rem !important;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <div class="title">
+        Planning des activités
+    </div>
+
+    <div class="sojourn-info">
+        <div><b>{{ booking.customer_identity_id.name }}</b> ({{ booking.customer_identity_id.address_city }})</div>
+        <div style="margin-top: 5px;">Du {{ booking.date_from|format_date() }} au {{ booking.date_to|format_date() }}</div>
+    </div>
+</div>
+
+<div class="wrapper">
+    {% for week_dates in map_week_day_timeslot_group_activity %}
+        <table class="week-activities-table">
+            <thead>
+            <tr>
+                <th class="first-col"></th>
+                {% for key, value in week_dates %}
+                    {% if loop.index <= 6 %}
+                        <th style="text-transform: capitalize;">{{ key|format_date_index }}</th>
+                    {% else %}
+                        <th class="sunday"></th>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for time_slot_code in time_slot_codes %}
+                <tr>
+                    {% if time_slot_code == 'AM' %}
+                        <td class="first-col">Matin</td>
+                    {% elseif time_slot_code == 'PM' %}
+                        <td class="first-col">Après-midi</td>
+                    {% else %}
+                        <td class="first-col">Soir</td>
+                    {% endif %}
+
+                    {% for date in week_dates %}
+                        {% if loop.index <= 6 %}
+                            <td style="width: {{ 920 / (week_dates|length) }}px; max-width: 200px; padding: 5px; vertical-align: top;">
+                                {% for key, activity in date[time_slot_code] %}
+                                    <table style="border: none;">
+                                        <tr>
+                                            <td style="padding: 0; border: none; vertical-align: top; line-height: 0.8rem;">{{ key }}.</td>
+                                            <td style="padding: 0; border: none; line-height: 0.8rem;">
+                                                {% if activity %}
+                                                    {{ activity.product_id.label }}
+                                                    <span style="color: grey;">({{ activity.schedule_from|format_time }} - {{ activity.schedule_to|format_time }})</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                {% endfor %}
+                            </td>
+                        {% else %}
+                            <td style="width: {{ 920 / (week_dates|length) }}px;" class="sunday"></td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {% if not loop.last  %}
+            <div style="page-break-after: always;"></div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<div class="footer">
+    <table style="width: 80%; margin: 0 10%;">
+        <tr>
+            <td style="width: 50%">Centre de Plein-Air de Lathus</td>
+            <td style="width: 50%; text-align: right">11/09/26</td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>
