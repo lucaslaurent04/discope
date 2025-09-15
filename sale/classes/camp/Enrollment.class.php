@@ -1207,6 +1207,13 @@ class Enrollment extends Model {
                             ]);
                         }
                     }
+
+                    $providers = \eQual::inject(['dispatch']);
+
+                    /** @var \equal\dispatch\Dispatcher $dispatch */
+                    $dispatch = $providers['dispatch'];
+
+                    $dispatch->dispatch('lodging.camp.enrollment.weekend', 'sale\camp\Enrollment', $id, 'warning');
                     break;
                 case 'saturday-morning':
                     EnrollmentLine::search([
