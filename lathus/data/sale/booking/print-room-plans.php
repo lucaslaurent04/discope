@@ -162,6 +162,11 @@ foreach($map_buildings_rental_units as $key => $building_rental_units) {
     if(count($building_rental_units['rental_units']) === 0) {
         unset($map_buildings_rental_units[$key]);
     }
+    else {
+        usort($map_buildings_rental_units[$key]['rental_units'], function($a, $b) {
+            return strcmp($a['name'], $b['name']);
+        });
+    }
 }
 
 $img_url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=';
