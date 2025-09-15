@@ -145,6 +145,7 @@ $booking = Booking::id($params['id'])
         ],
         'center_id' => [
             'organisation_id' => [
+                'name',
                 'logo_document_id' => ['data', 'type']
             ]
         ]
