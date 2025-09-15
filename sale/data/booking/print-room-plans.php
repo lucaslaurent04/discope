@@ -47,6 +47,8 @@ use core\setting\Setting;
 
 ['context' => $context] = $providers;
 
+$output = '';
+
 // steer towards custom controller, if any
 $has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
 if($has_custom_package) {
@@ -57,25 +59,15 @@ if($has_custom_package) {
     elseif($custom_package !== 'sale') {
         if(file_exists(EQ_BASEDIR."/packages/{$custom_package}/data/sale/booking/print-room-plans.php")) {
             $output = eQual::run('get', "{$custom_package}_sale_booking_print-room-plans", $params, true);
-
-            $context->httpResponse()
-                    // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
-                    ->header('Content-Disposition', 'inline; filename="document.pdf"')
-                    ->body($output)
-                    ->send();
-
-            exit(0);
         }
     }
 }
 
-// #todo - handle room plans for most customers (for now only lathus specific is handled)
-
-$output = '';
+if(empty($output)) {
+    // #todo - handle room plans for most customers (for now only lathus specific is handled)
+}
 
 $context->httpResponse()
         ->header('Content-Disposition', 'inline; filename="document.pdf"')
         ->body($output)
         ->send();
-
-
