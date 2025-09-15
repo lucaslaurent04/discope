@@ -101,18 +101,20 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "min_age",
+                                                "value": "age_range",
                                                 "width": "20%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "max_age",
-                                                "width": "20%"
+                                                "value": "min_age",
+                                                "width": "20%",
+                                                "readonly": true
                                             },
                                             {
-                                                "type": "label",
-                                                "value": "",
-                                                "width": "10%"
+                                                "type": "field",
+                                                "value": "max_age",
+                                                "width": "20%",
+                                                "readonly": true
                                             },
                                             {
                                                 "type": "field",

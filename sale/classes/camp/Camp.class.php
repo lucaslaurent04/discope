@@ -179,17 +179,33 @@ class Camp extends Model {
                 'required'          => true
             ],
 
+            'age_range' => [
+                'type'              => 'string',
+                'description'       => "Age range of the accepted participants.",
+                'selection'         => [
+                    '6-to-9',
+                    '10-to-12',
+                    '13-to-16'
+                ],
+                'default'           => '10-to-12',
+                'dependents'        => ['min_age', 'max_age']
+            ],
+
             'min_age' => [
-                'type'              => 'integer',
+                'type'              => 'computed',
+                'result_type'       => 'integer',
                 'description'       => "Minimal age of the participants.",
-                'default'           => 10,
+                'store'             => true,
+                'function'          => 'calcMinAge',
                 'dependents'        => ['name']
             ],
 
             'max_age' => [
-                'type'              => 'integer',
+                'type'              => 'computed',
+                'result_type'       => 'integer',
                 'description'       => "Maximal age of the participants.",
-                'default'           => 12,
+                'store'             => true,
+                'function'          => 'calcMaxAge',
                 'dependents'        => ['name']
             ],
 
@@ -517,6 +533,46 @@ class Camp extends Model {
         $self->read(['sojourn_number']);
         foreach($self as $id => $camp) {
             $result[$id] = str_pad($camp['sojourn_number'], 5, '0', STR_PAD_LEFT);
+        }
+
+        return $result;
+    }
+
+    public static function calcMinAge($self): array {
+        $result = [];
+        $self->read(['age_range']);
+        foreach($self as $id => $camp) {
+            switch($camp['age_range']) {
+                case '6-to-9':
+                    $result[$id] = 6;
+                    break;
+                case '10-to-12':
+                    $result[$id] = 10;
+                    break;
+                case '13-to-16':
+                    $result[$id] = 13;
+                    break;
+            }
+        }
+
+        return $result;
+    }
+
+    public static function calcMaxAge($self): array {
+        $result = [];
+        $self->read(['age_range']);
+        foreach($self as $id => $camp) {
+            switch($camp['age_range']) {
+                case '6-to-9':
+                    $result[$id] = 9;
+                    break;
+                case '10-to-12':
+                    $result[$id] = 12;
+                    break;
+                case '13-to-16':
+                    $result[$id] = 16;
+                    break;
+            }
         }
 
         return $result;
