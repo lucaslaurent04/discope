@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+<title>Programme d'activités</title>
+<style type="text/css">
+@page {
+  margin: 1cm;
+}
+body {
+    margin: 110px 0 40px 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.7em;
+    text-align: justify;
+    width: 100%;
+}
+
+h2 {
+    margin-top: 8px;
+    margin-bottom: 0;
+    font-size: 21px;
+}
+
+h3 {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 15px;
+}
+
+div, table, table tr td {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+div.header,
+div.footer {
+    box-sizing: border-box;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    width: 100%;
+    overflow: hidden;
+}
+
+div.header {
+    top: 0;
+    left: 0;
+    height: 100px;
+}
+
+div.header .title {
+    width: 100%;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+div.header .sojourn-info {
+    width: 100%;
+    margin: 10px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+div.footer {
+    bottom: 0;
+    left: 0;
+    height: 30px;
+    overflow: visible;
+    z-index: 200;
+    font-size: 0.8rem !important;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <img src="{{ img_url }}" style="position: absolute; max-width: 50px; width: 100%; right: 50px; height: auto;" border="0" alt="Header Image" />
+
+    <div class="title">Répartition dans les chambres</div>
+
+    <div class="sojourn-info">
+        <div>Ville de Limoges</div>
+        <div>LIMOGES CEDEX</div>
+        <div>Du {{ booking.date_from|format_date }} au {{ booking.date_to|format_date }}</div>
+    </div>
+</div>
+
+{% for building in map_buildings_rental_units %}
+    <div style="width: 100%; position: relative;">
+        <div style="margin-left: 25px; font-size: 1rem; font-weight: bold;">{{ building.name }}</div>
+        <img src="{{ building.plan_img_url }}" style="max-width: 600px; width: 100%; right: 50px; height: auto;" border="0" alt="Header Image" />
+    </div>
+
+    <div>
+        <div style="text-transform: uppercase; font-size: 0.9rem; font-weight: bold;">
+            Composition des chambres
+        </div>
+        <table style="width: 100%; margin-top: 5px;">
+            <tr>
+                <td style="width: 33%; vertical-align: top; position: relative;">
+                    <table style="width: 80%;">
+                        <thead>
+                        <tr>
+                            <th style="text-align: left;">Chambres</th>
+                            <th>Lits</th>
+                            <th>Lits appoint</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for rental_unit in building.rental_units %}
+                            {% if loop.index <= 12 %}
+                                <tr>
+                                    <td>{{ rental_unit.name }}</td>
+                                    <td style="text-align: center;">{{ rental_unit.capacity }}</td>
+                                    <td style="text-align: center;">{{ rental_unit.extra }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+                <td style="width: 33%; vertical-align: top; position: relative;">
+                    {% if building.rental_units|length > 12 %}
+                        <table style="width: 80%;">
+                            <thead>
+                            <tr>
+                                <th style="text-align: left;">Chambres</th>
+                                <th>Lits</th>
+                                <th>Lits appoint</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for rental_unit in building.rental_units %}
+                                {% if loop.index > 12 and loop.index <= 24 %}
+                                    <tr>
+                                        <td>{{ rental_unit.name }}</td>
+                                        <td style="text-align: center;">{{ rental_unit.capacity }}</td>
+                                        <td style="text-align: center;">{{ rental_unit.extra }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </td>
+                <td style="width: 33%; vertical-align: top; position: relative;">
+                    {% if building.rental_units|length > 24 %}
+                        <table style="width: 80%;">
+                            <thead>
+                            <tr>
+                                <th style="text-align: left;">Chambres</th>
+                                <th>Lits</th>
+                                <th>Lits appoint</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for rental_unit in building.rental_units %}
+                                {% if loop.index > 24 %}
+                                    <tr>
+                                        <td>{{ rental_unit.name }}</td>
+                                        <td style="text-align: center;">{{ rental_unit.capacity }}</td>
+                                        <td style="text-align: center;">{{ rental_unit.extra }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    {% if not loop.last  %}
+        <div style="page-break-after: always;"></div>
+    {% endif %}
+{% endfor %}
+
+<div class="footer">
+    <table style="width: 80%; margin: 0 10%;">
+        <tr>
+            <td style="width: 50%">Centre de Plein-Air de Lathus</td>
+            <td style="width: 50%; text-align: right">{{ today|format_date }}</td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>

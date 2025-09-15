@@ -354,6 +354,9 @@
                 },
                 "item.booking.groups-activities-program": {
                     "label": "Programme par groupe"
+                },
+                "item.booking.room-plans": {
+                    "label": "Plans de chambre"
                 }
             },
             "layout": {
@@ -499,6 +502,9 @@
                 },
                 "item.booking.groups-activities-program": {
                     "label": "Programme par groupes"
+                },
+                "item.booking.room-plans": {
+                    "label": "Plans de chambre"
                 }
             }
         },

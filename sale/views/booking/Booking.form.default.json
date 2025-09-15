@@ -258,6 +258,15 @@
             "visible": [true, "=", "env.sale.features.booking.activity"]
         },
         {
+            "id": "item.booking.room-plans",
+            "label": "Room plans",
+            "description": "",
+            "icon": "map",
+            "route": "/?get=sale_booking_print-room-plans&id=object.id",
+            "target": "_blank",
+            "absolute": true
+        },
+        {
             "id": "item.booking.composition",
             "label": "Hosts details",
             "description": "",
