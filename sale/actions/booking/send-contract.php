@@ -5,6 +5,8 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use core\setting\Setting;
 use equal\email\Email;
 use equal\email\EmailAttachment;
 
@@ -126,13 +128,25 @@ $cron->schedule(
 // generate attachment
 $attachment = eQual::run('get', 'sale_booking_print-contract', [
     'id'        => $contract_id ,
-    'view_id'   =>'print.default',
+    'view_id'   => 'print.default',
     'lang'      => $params['lang'],
     'mode'      => $params['mode']
 ]);
 
 // get 'contract' term translation
 $main_attachment_name = Lang::get_term('sale', 'contract', 'contract', $params['lang']);
+
+// generate room plans attachment if needed
+$room_plans_needed = Setting::get_value('sale', 'features', 'booking.room_plans', false);
+
+$room_plans_attachment = null;
+if($room_plans_needed) {
+    $room_plans_attachment = eQual::run('get', 'sale_booking_print-room-plans', [
+        'id'        => $params['booking_id'],
+        'view_id'   => 'print.room-plans',
+        'lang'      => $params['lang']
+    ]);
+}
 
 // generate signature
 $signature = '';
@@ -154,6 +168,11 @@ $attachments = [];
 
 // push main attachment
 $attachments[] = new EmailAttachment($main_attachment_name.'.pdf', (string) $attachment, 'application/pdf');
+
+// push room plans attachment if required by setting
+if(!is_null($room_plans_attachment)) {
+    $attachments[] = new EmailAttachment('room_plans.pdf', (string) $room_plans_attachment, 'application/pdf');
+}
 
 // add attachments whose ids have been received as param ($params['attachments_ids'])
 if(count($params['attachments_ids'])) {

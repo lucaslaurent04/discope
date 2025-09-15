@@ -114,6 +114,11 @@
             "description": "Couleur pour l'affichage dans le planning.",
             "help": ""
         },
+        "plan_document_id": {
+            "label": "Image du plan",
+            "description": "Image du plan du bâtiment pour la répartition des chambres.",
+            "help": ""
+        },
         "sojourn_type_id": {
             "label": "Type de séjour",
             "description": "Type de séjour par défaut auquel se rapporte le logement.",

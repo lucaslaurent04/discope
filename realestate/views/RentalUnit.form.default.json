@@ -151,6 +151,12 @@
                                                 "type": "field",
                                                 "value": "color",
                                                 "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Plan image",
+                                                "value": "plan_document_id",
+                                                "width": "33%"
                                             }
                                         ]
                                     }
