@@ -403,36 +403,32 @@ $consumption_table_show  = Setting::get_value('sale', 'features', 'templates.quo
 // transport to and from the group to the accommodation
 $setting_transport = Setting::get_value('sale', 'organization', 'sku.transport', 'not_found');
 
-$product_transport = Product::search(['sku', '=', $setting_transport])
-    ->read(['id' , 'product_model_id'])
-    ->first(true);
+$transport_roundtrip_skus = explode(',', $setting_transport);
 
-$transport = BookingLine::search([
-        ['booking_id', '=', $booking['id']],
-        ['product_model_id', '=', $product_transport['product_model_id']]
-    ])
-    ->read(['product_model_id' => ['id', 'name']])
-    ->first(true);
+$transport_roundtrip_product_ids = Product::search(['sku', 'in', $transport_roundtrip_skus])->ids();
 
+$transport_roundtrip_lines_ids = BookingLine::search([
+    ['booking_id', '=', $booking['id']],
+    ['product_id', 'in', $transport_roundtrip_product_ids]
+])
+    ->ids();
 
-$has_roundtrip_transport = (bool) $transport;
-
+$has_roundtrip_transport = count($transport_roundtrip_lines_ids) > 0;
 
 // travel throughout the stay for external activities
-// #todo - put this in settings
-$product_transport = Product::search(['name', 'ilike', 'Transport externe%'])
-    ->read(['id' , 'product_model_id'])
-    ->first(true);
+$setting_transport_activities = Setting::get_value('sale', 'organization', 'sku.transport_activities', 'not_found');
 
-$transport = BookingLine::search([
-        ['booking_id', '=', $booking['id']],
-        ['product_model_id', '=', $product_transport['product_model_id']]
-    ])
-    ->read(['product_model_id' => ['id', 'name']])
-    ->first(true);
+$transport_activities_skus = explode(',', $setting_transport_activities);
 
+$transport_activities_products_ids = Product::search(['sku', 'in', $transport_activities_skus])->ids();
 
-$has_activities_transport = (bool) $transport;
+$transport_activities_lines_ids = BookingLine::search([
+    ['booking_id', '=', $booking['id']],
+    ['product_id', 'in', $transport_activities_products_ids]
+])
+    ->ids();
+
+$has_activities_transport = count($transport_activities_lines_ids) > 0;
 
 
 $values = [
