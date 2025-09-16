@@ -34,7 +34,8 @@ class CampGroup extends Model {
                 'foreign_object'    => 'sale\camp\Camp',
                 'description'       => "The camp this group is part of.",
                 'required'          => true,
-                'readonly'          => true
+                'readonly'          => true,
+                'onupdate'          => 'onupdateCampId'
             ],
 
             'employee_id' => [
@@ -208,7 +209,7 @@ class CampGroup extends Model {
         return parent::canupdate($self, $values);
     }
 
-    public static function onupdate($self) {
+    public static function onupdateCampId($self) {
         $self->read([
             'camp_id' => [
                 'id',
@@ -221,7 +222,7 @@ class CampGroup extends Model {
         foreach($self as $id => $camp_group) {
             if(!isset($map_camp_camp_group_qty[$camp_group['camp_id']['id']])) {
                 $map_camp_camp_group_qty[$camp_group['camp_id']['id']] = [
-                    'original'  => count($camp_group['camp_id']['camp_groups_ids']),
+                    'original'  => $camp_group['camp_id']['camp_group_qty'],
                     'new'       => count($camp_group['camp_id']['camp_groups_ids'])
                 ];
             }
