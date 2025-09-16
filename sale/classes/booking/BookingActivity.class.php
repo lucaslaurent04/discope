@@ -130,14 +130,16 @@ class BookingActivity extends Model {
                 'description'       => "Camp the activity is organised for.",
                 'store'             => true,
                 'relation'          => ['camp_group_id' => 'camp_id'],
-                'readonly'          => true
+                'readonly'          => true,
+                'ondelete'          => 'cascade'
             ],
 
             'camp_group_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\CampGroup',
                 'description'       => "Camp group the activity is organised for.",
-                'readonly'          => true
+                'readonly'          => true,
+                'ondelete'          => 'cascade'
             ],
 
             /**

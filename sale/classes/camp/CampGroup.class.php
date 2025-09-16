@@ -36,7 +36,8 @@ class CampGroup extends Model {
                 'description'       => "The camp this group is part of.",
                 'required'          => true,
                 'readonly'          => true,
-                'onupdate'          => 'onupdateCampId'
+                'onupdate'          => 'onupdateCampId',
+                'ondelete'          => 'cascade'
             ],
 
             'employee_id' => [

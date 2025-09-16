@@ -304,7 +304,8 @@ class Camp extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\BookingActivity',
                 'foreign_field'     => 'camp_id',
-                'description'       => "All Booking Activities this camp relates to."
+                'description'       => "All Booking Activities this camp relates to.",
+                'ondetach'          => 'delete'
             ],
 
             'presences_ids' => [
