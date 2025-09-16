@@ -44,12 +44,14 @@
             {
                 "type": "field",
                 "value": "counter",
-                "width": "20%"
+                "width": "20%",
+                "visible": false
             },
             {
                 "type": "field",
                 "value": "counter_total",
-                "width": "20%"
+                "width": "20%",
+                "visible":  false
             }
         ]
     }

@@ -31,7 +31,7 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
         'date_to' => [
             'type'              => 'date',
             'description'       => 'Date interval Upper limit.',
-            'default'           => fn() => strtotime('Sunday this week')
+            'default'           => fn() => strtotime('Saturday this week')
         ]
     ],
     'constants'     => ['L10N_LOCALE', 'L10N_TIMEZONE'],

@@ -17,6 +17,11 @@
             "label": "Max enfants",
             "description": "Quantité maximal d'enfants qui peuvent faire partie du groupe.",
             "help": ""
+        },
+        "activity_group_num": {
+            "label": "Numéro groupe activités",
+            "description": "Identifiant du groupe d'activités pour le camp.",
+            "help": ""
         }
     },
     "view": {
