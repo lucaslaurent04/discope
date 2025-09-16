@@ -86,8 +86,8 @@ div.footer {
     <div class="title">Répartition dans les chambres</div>
 
     <div class="sojourn-info">
-        <div>Ville de Limoges</div>
-        <div>LIMOGES CEDEX</div>
+        <div>{{ booking.customer_identity_id.name }}</div>
+        <div>{{ booking.customer_identity_id.address_city }}</div>
         <div>Du {{ booking.date_from|format_date }} au {{ booking.date_to|format_date }}</div>
     </div>
 </div>
@@ -113,12 +113,12 @@ div.footer {
         <table style="width: 100%; margin-top: 5px;">
             <tr>
                 <td style="width: 33%; vertical-align: top; position: relative;">
-                    <table style="width: 80%;">
+                    <table style="width: 100%;">
                         <thead>
                         <tr>
                             <th style="text-align: left;">Chambres</th>
-                            <th>Lits</th>
-                            <th>Lits appoint</th>
+                            <th style="width: 40px;">Lits</th>
+                            <th style="text-align: left;">Description</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -127,7 +127,7 @@ div.footer {
                                 <tr>
                                     <td>{{ rental_unit.name }}</td>
                                     <td style="text-align: center;">{{ rental_unit.capacity }}</td>
-                                    <td style="text-align: center;">{{ rental_unit.extra }}</td>
+                                    <td style="text-align: left; width: 120px;">{{ rental_unit.description }}</td>
                                 </tr>
                             {% endif %}
                         {% endfor %}
@@ -136,12 +136,12 @@ div.footer {
                 </td>
                 <td style="width: 33%; vertical-align: top; position: relative;">
                     {% if building.rental_units|length > 16 %}
-                        <table style="width: 80%;">
+                        <table style="width: 100%;">
                             <thead>
                             <tr>
                                 <th style="text-align: left;">Chambres</th>
-                                <th>Lits</th>
-                                <th>Lits appoint</th>
+                                <th style="width: 40px;">Lits</th>
+                                <th style="text-align: left;">Description</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -150,7 +150,7 @@ div.footer {
                                     <tr>
                                         <td>{{ rental_unit.name }}</td>
                                         <td style="text-align: center;">{{ rental_unit.capacity }}</td>
-                                        <td style="text-align: center;">{{ rental_unit.extra }}</td>
+                                        <td style="text-align: left; width: 120px;">{{ rental_unit.description }}</td>
                                     </tr>
                                 {% endif %}
                             {% endfor %}
@@ -160,12 +160,12 @@ div.footer {
                 </td>
                 <td style="width: 33%; vertical-align: top; position: relative;">
                     {% if building.rental_units|length > 32 %}
-                        <table style="width: 80%;">
+                        <table style="width: 100%;">
                             <thead>
                             <tr>
                                 <th style="text-align: left;">Chambres</th>
-                                <th>Lits</th>
-                                <th>Lits appoint</th>
+                                <th style="width: 40px;">Lits</th>
+                                <th style="text-align: left;">Description</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -174,7 +174,7 @@ div.footer {
                                     <tr>
                                         <td>{{ rental_unit.name }}</td>
                                         <td style="text-align: center;">{{ rental_unit.capacity }}</td>
-                                        <td style="text-align: center;">{{ rental_unit.extra }}</td>
+                                        <td style="text-align: left; width: 120px;">{{ rental_unit.description }}</td>
                                     </tr>
                                 {% endif %}
                             {% endfor %}

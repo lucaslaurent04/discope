@@ -100,11 +100,16 @@ $booking = Booking::id($params['id'])
                 ]
             ]
         ],
+        'customer_identity_id' => [
+            'name',
+            'address_city'
+        ],
         'rental_unit_assignments_ids' => [
             'rental_unit_id' => [
                 'name',
                 'capacity',
                 'extra',
+                'description',
                 'parent_id'
             ]
         ]
