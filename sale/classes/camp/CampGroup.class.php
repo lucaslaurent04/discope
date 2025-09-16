@@ -56,7 +56,7 @@ class CampGroup extends Model {
             'activity_group_num' => [
                 'type'              => 'computed',
                 'result_type'       => 'integer',
-                'description'       => "Identifier of the activity group in the booking.",
+                'description'       => "Identifier of the activity group in the camp.",
                 'store'             => true,
                 'instant'           => true,
                 'function'          => 'calcActivityGroupNum'
