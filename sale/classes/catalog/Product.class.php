@@ -290,7 +290,7 @@ class Product extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\catalog\GroupingCode',
-                'function'          => 'calcGroupingCode',
+                'relation'          => ['product_model_id' => 'grouping_code_id'],
                 'description'       => "Specific GroupingCode this Product related to, if any",
                 'instant'           => true,
                 'store'             => true
@@ -298,19 +298,6 @@ class Product extends Model {
         ];
     }
 
-
-    public static function calcGroupingCode($om, $oids, $lang) {
-        $result = [];
-        $lines = $om->read(self::getType(), $oids, [
-            'product_model_id.grouping_code_id'
-        ]);
-        if($lines > 0 && count($lines)) {
-            foreach($lines as $oid => $odata) {
-                $result[$oid] = $odata['product_model_id.grouping_code_id'];
-            }
-        }
-        return $result;
-    }
     /**
      * Computes the display name of the product as a concatenation of Label and SKU.
      *
