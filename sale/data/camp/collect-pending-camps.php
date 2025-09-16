@@ -25,7 +25,7 @@ use equal\orm\DomainCondition;
         'date_to' => [
             'type'              => 'date',
             'description'       => "Date interval upper limit.",
-            'default'           => fn() => strtotime('Sunday this week')
+            'default'           => fn() => strtotime('Saturday this week')
         ]
     ],
     'access'        => [

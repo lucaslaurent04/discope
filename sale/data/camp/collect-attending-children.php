@@ -20,7 +20,7 @@ use sale\camp\Camp;
         'date_to' => [
             'type'              => 'date',
             'description'       => "Date interval upper limit (defaults to last day of the current week).",
-            'default'           => fn() => strtotime('Sunday this week')
+            'default'           => fn() => strtotime('Saturday this week')
         ],
         'only_weekend' => [
             'type'              => 'boolean',
