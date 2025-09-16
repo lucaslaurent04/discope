@@ -258,6 +258,12 @@ class RentalUnit extends Model {
                 'default'     => false
             ],
 
+            'plan_document_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'documents\Document',
+                'description'       => "The plan image of the rental unit."
+            ],
+
             'product_models_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\catalog\ProductModel',

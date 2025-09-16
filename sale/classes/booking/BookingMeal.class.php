@@ -46,7 +46,7 @@ class BookingMeal extends Model {
                 'rel_table'         => 'sale_booking_line_rel_booking_meal',
                 'rel_foreign_key'   => 'booking_line_id',
                 'rel_local_key'     => 'booking_meal_id',
-                'description'       => "All booking lines that are linked the meal (moment).",
+                'description'       => "All booking lines that are linked the meal (moment)."
             ],
 
             'is_self_provided' => [
@@ -62,7 +62,8 @@ class BookingMeal extends Model {
             'camp_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Camp',
-                'description'       => "The camp the meal relates to."
+                'description'       => "The camp the meal relates to.",
+                'ondelete'          => 'cascade'
             ],
 
             /**

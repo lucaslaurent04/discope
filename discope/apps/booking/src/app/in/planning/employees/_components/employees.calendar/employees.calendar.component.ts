@@ -1,44 +1,14 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Output, EventEmitter, ViewChild, OnInit, OnChanges, ViewChildren, QueryList, ElementRef, AfterViewChecked, Input, SimpleChanges } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Output, EventEmitter, ViewChild, OnInit, OnChanges, ViewChildren, QueryList, ElementRef, AfterViewInit, Input, SimpleChanges } from '@angular/core';
 
 import { ChangeReservationArg } from 'src/app/model/changereservationarg';
 import { HeaderDays } from 'src/app/model/headerdays';
 
 
 import { ApiService, EnvService } from 'sb-shared-lib';
-import { PlanningEmployeesCalendarParamService } from '../../_services/employees.calendar.param.service';
+import { PlanningEmployeesCalendarParamService, Partner, Employee, Provider } from '../../_services/employees.calendar.param.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-
-class Partner {
-    constructor(
-        public id: number = 0,
-        public name: string = '',
-        public relationship: 'employee'|'provider' = 'employee',
-        public is_active: boolean = true
-    ) {}
-}
-
-class Employee extends Partner {
-    constructor(
-        public id: number = 0,
-        public name: string = '',
-        public is_active: boolean = true,
-        public activity_product_models_ids: any[] = []
-    ) {
-        super(id, name, 'employee', is_active);
-    }
-}
-
-class Provider extends Partner {
-    constructor(
-        public id: number = 0,
-        public name: string = '',
-        public is_active: boolean = true
-    ) {
-        super(id, name, 'provider');
-    }
-}
 
 export class ProductModelCategory {
     constructor(
@@ -62,7 +32,7 @@ export class ProductModel {
     styleUrls: ['./employees.calendar.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, AfterViewChecked {
+export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, AfterViewInit {
 
     @Input() rowsHeight: number;
     @Input() mapTimeSlot: {[key: string]: {id: number, name: string, code: 'AM'|'PM'|'EV', schedule_from: string, schedule_to: string}};
@@ -193,11 +163,18 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         this.environment = await this.env.getEnv();
     }
 
-    /**
-     * After refreshing the view with new content, adapt the header and relay new cell_width, if changed
-     */
-    public async ngAfterViewChecked() {
+    public ngAfterViewInit(): void {
+        this.updateTableDimensions();
 
+        const observer = new ResizeObserver(() => {
+            this.updateTableDimensions();
+            this.cd.markForCheck();
+        });
+
+        observer.observe(this.calTable.nativeElement);
+    }
+
+    private updateTableDimensions(): void {
         this.tableRect = this.calTable?.nativeElement.getBoundingClientRect();
 
         if(this.calTableHeadCells) {
@@ -206,10 +183,6 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 break;
             }
         }
-
-
-        // make sure ngOnChanges is triggered on sub-components
-        this.cd.detectChanges();
     }
 
     public onRefresh(full: boolean = true) {
@@ -405,37 +378,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     private async onFiltersChange() {
         this.createHeaderDays();
 
-        try {
-            const employees_domain = [
-                ['relationship', '=', 'employee'],
-                ['id', 'in', this.params.partners_ids],
-                ['is_active', '=', true]
-            ];
-
-            const employees = await this.api.collect(
-                'hr\\employee\\Employee',
-                employees_domain,
-                Object.getOwnPropertyNames(new Employee()),
-                'name', 'asc', 0, 500
-            );
-
-            const providers_domain = [
-                ['relationship', '=', 'provider'],
-                ['id', 'in', this.params.partners_ids]
-            ];
-
-            const providers = await this.api.collect(
-                'sale\\provider\\Provider',
-                providers_domain,
-                Object.getOwnPropertyNames(new Provider()),
-                'name', 'asc', 0, 500
-            );
-
-            this.partners = [...employees, ...providers];
-        }
-        catch(response) {
-            console.warn('unable to fetch partners', response);
-        }
+        this.partners = this.params.selected_partners;
 
         try {
             this.activities = await this.api.fetch('?get=sale_booking_activity_map', {

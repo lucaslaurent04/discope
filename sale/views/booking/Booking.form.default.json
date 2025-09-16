@@ -238,14 +238,34 @@
             "visible": [true, "=", "env.sale.features.booking.activity_schedule_table"]
         },
         {
-            "id": "item.booking.activities-program",
-            "label": "Print Activities program",
+            "id": "item.booking.weeks-activities-program",
+            "label": "Weekly activities program",
+            "description": "",
+            "icon": "list_alt",
+            "route": "/?get=sale_booking_print-booking-activity-weekly&id=object.id",
+            "target": "_blank",
+            "absolute": true,
+            "visible": [true, "=", "env.sale.features.booking.activity_schedule_table"]
+        },
+        {
+            "id": "item.booking.groups-activities-program",
+            "label": "Grouped activities program",
             "description": "",
             "icon": "list_alt",
             "route": "/?get=sale_booking_print-booking-activity&id=object.id",
             "target": "_blank",
             "absolute": true,
             "visible": [true, "=", "env.sale.features.booking.activity"]
+        },
+        {
+            "id": "item.booking.room-plans",
+            "label": "Room plans",
+            "description": "",
+            "icon": "map",
+            "route": "/?get=sale_booking_print-room-plans&id=object.id",
+            "target": "_blank",
+            "absolute": true,
+            "visible": [true, "=", "env.sale.features.booking.room_plans"]
         },
         {
             "id": "item.booking.composition",

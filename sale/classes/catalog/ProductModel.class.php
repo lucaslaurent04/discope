@@ -331,6 +331,35 @@ class ProductModel extends Model {
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
             ],
 
+            'activity_color' => [
+                'type'              => 'string',
+                'usage'             => 'color:50',
+                // #todo - will no longer be necessary when usage 'color' will be supported
+                'selection' => [
+                    '#6F8FAF', // blue
+                    '#2F5069', // dark blue
+                    '#4C9085', // teal
+                    '#2E5D55', // dark teal
+                    '#7A9E6D', // green
+                    '#46613D', // dark green
+                    '#A3A34A', // olive
+                    '#6B6B2F', // dark olive
+                    '#D1B85C', // yellow
+                    '#8F7932', // dark yellow
+                    '#D07C4B', // orange
+                    '#8A4F2D', // dark orange
+                    '#B55A52', // red
+                    '#722E2A', // dark red
+                    '#8A6BAF', // purple
+                    '#553C70', // dark purple
+                    '#A67C8C', // mauve
+                    '#6B4A56', // dark mauve
+                    '#8A8D93', // gray
+                    '#4A4D50'  // dark gray
+                ],
+                'description'       => 'Arbitrary color to use for the activity when rendering the employee\'s planning.'
+            ],
+
             'has_activity_duration' => [
                 'type'              => 'boolean',
                 'description'       => 'Indicates whether the activity has a specific duration.',

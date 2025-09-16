@@ -1,7 +1,40 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import { ApiService } from 'sb-shared-lib';
 
 const millisecondsPerDay:number = 24 * 60 * 60 * 1000;
+
+export class Partner {
+    constructor(
+        public id: number = 0,
+        public name: string = '',
+        public relationship: 'employee'|'provider' = 'employee',
+        public is_active: boolean = true
+    ) {}
+}
+
+export class Employee extends Partner {
+    constructor(
+        public id: number = 0,
+        public name: string = '',
+        public relationship: 'employee' = 'employee',
+        public is_active: boolean = true,
+        public activity_product_models_ids: any[] = []
+    ) {
+        super(id, name, relationship, is_active);
+    }
+}
+
+export class Provider extends Partner {
+    constructor(
+        public id: number = 0,
+        public name: string = '',
+        public relationship: 'provider' = 'provider',
+        public is_active: boolean = true
+    ) {
+        super(id, name, relationship, is_active);
+    }
+}
 
 @Injectable({
     providedIn: 'root'
@@ -18,6 +51,10 @@ export class PlanningEmployeesCalendarParamService {
     private _duration: number;
     // selected partners (employees/providers)
     private _partners_ids: number[];
+    // all employees
+    private _employees: Employee[];
+    // all providers
+    private _providers: Provider[];
     // if true display only product models with has_transport_required
     private _show_only_transport: boolean;
     // selected product category
@@ -31,7 +68,9 @@ export class PlanningEmployeesCalendarParamService {
     // current state, for changes detection
     private state: string;
 
-    constructor() {
+    constructor(
+        private api: ApiService
+    ) {
         this.observable = new Subject();
     }
 
@@ -99,6 +138,31 @@ export class PlanningEmployeesCalendarParamService {
         return this.observable;
     }
 
+    public async loadPartners(centers_ids: number[]) {
+        this._employees = await this.api.collect(
+            'hr\\employee\\Employee',
+            [
+                ['center_id', 'in', centers_ids],
+                ['relationship', '=', 'employee'],
+                ['is_active', '=', true]
+            ],
+            Object.getOwnPropertyNames(new Employee()),
+            'name', 'asc', 0, 500
+        );
+
+        this._providers = await this.api.collect(
+            'sale\\provider\\Provider',
+            ['relationship', '=', 'provider'],
+            Object.getOwnPropertyNames(new Provider()),
+            'name', 'asc', 0, 500
+        );
+
+        this.partners_ids = [
+            ...this._employees.map((e) => e.id),
+            ...this._providers.map((p) => p.id)
+        ];
+    }
+
 
     /***********
      * Setters *
@@ -146,6 +210,25 @@ export class PlanningEmployeesCalendarParamService {
 
     public get partners_ids(): number[] {
         return this._partners_ids;
+    }
+
+    public get employees(): Employee[] {
+        return this._employees;
+    }
+
+    public get providers(): Provider[] {
+        return this._providers;
+    }
+
+    public get partners(): Partner[] {
+        return [...this._employees, ...this._providers];
+    }
+
+    public get selected_partners(): Partner[] {
+        return [
+            ...this._employees.filter((e) => this.partners_ids.includes(e.id)),
+            ...this._providers.filter((p) => this.partners_ids.includes(p.id))
+        ];
     }
 
     public get product_model_ids(): number[] {

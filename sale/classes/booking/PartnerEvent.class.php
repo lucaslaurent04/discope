@@ -59,6 +59,21 @@ class PartnerEvent extends Model {
                 'domain'            => ['code', 'in', ['AM', 'PM', 'EV']]
             ],
 
+            'event_type' => [
+                'type'              => 'string',
+                'description'       => "Type of the partner event.",
+                'selection'         => array(
+                    'camp_activity',    // The employee is responsible for a camp group's activity
+                    'leave',            // The employee is absent because of leave absence
+                    'other',            // The event concerns none of the other types
+                    'rest',             // The employee is absent because of rest
+                    'time_off',         // The employee is absent because of time off
+                    'trainer',          // The employee is absent because is a trainer
+                    'training'          // The employee is absent because follows a training
+                ),
+                'default'           => 'other'
+            ],
+
             'camp_group_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\CampGroup',

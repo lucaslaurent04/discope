@@ -1,0 +1,19 @@
+{
+    "name": "Camp",
+    "plural": "Camps",
+    "description": "Camps en cours.",
+    "model": {
+        "date_from": {
+            "label": "Du",
+            "description": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": ""
+        }
+    },
+    "view": {
+    },
+    "error": {
+    }
+}

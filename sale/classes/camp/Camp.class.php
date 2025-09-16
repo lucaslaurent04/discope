@@ -10,6 +10,7 @@ namespace sale\camp;
 
 use core\setting\Setting;
 use equal\orm\Model;
+use sale\booking\BookingActivity;
 use sale\booking\BookingMeal;
 use sale\booking\TimeSlot;
 
@@ -179,17 +180,33 @@ class Camp extends Model {
                 'required'          => true
             ],
 
+            'age_range' => [
+                'type'              => 'string',
+                'description'       => "Age range of the accepted participants.",
+                'selection'         => [
+                    '6-to-9',
+                    '10-to-12',
+                    '13-to-16'
+                ],
+                'default'           => '10-to-12',
+                'dependents'        => ['min_age', 'max_age']
+            ],
+
             'min_age' => [
-                'type'              => 'integer',
+                'type'              => 'computed',
+                'result_type'       => 'integer',
                 'description'       => "Minimal age of the participants.",
-                'default'           => 10,
+                'store'             => true,
+                'function'          => 'calcMinAge',
                 'dependents'        => ['name']
             ],
 
             'max_age' => [
-                'type'              => 'integer',
+                'type'              => 'computed',
+                'result_type'       => 'integer',
                 'description'       => "Maximal age of the participants.",
-                'default'           => 12,
+                'store'             => true,
+                'function'          => 'calcMaxAge',
                 'dependents'        => ['name']
             ],
 
@@ -287,7 +304,8 @@ class Camp extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\BookingActivity',
                 'foreign_field'     => 'camp_id',
-                'description'       => "All Booking Activities this camp relates to."
+                'description'       => "All Booking Activities this camp relates to.",
+                'ondetach'          => 'delete'
             ],
 
             'presences_ids' => [
@@ -321,6 +339,18 @@ class Camp extends Model {
                 'description'   => "Removes the camp's meals.",
                 'policies'      => [],
                 'function'      => 'doRemoveMeals'
+            ],
+
+            'generate-activities' => [
+                'description'   => "Generates the camp's groups activities.",
+                'policies'      => [],
+                'function'      => 'doGenerateActivities'
+            ],
+
+            'remove-activities' => [
+                'description'   => "Removes the camp's groups activities.",
+                'policies'      => [],
+                'function'      => 'doRemoveActivities'
             ]
 
         ];
@@ -396,6 +426,20 @@ class Camp extends Model {
         }
     }
 
+    public static function doGenerateActivities($self) {
+        $self->read(['camp_groups_ids']);
+        foreach($self as $id => $camp) {
+            CampGroup::search(['id', 'in', $camp['camp_groups_ids']])->do('generate-activities');
+        }
+    }
+
+    public static function doRemoveActivities($self) {
+        $self->read(['camp_groups_ids']);
+        foreach($self as $id => $camp) {
+            CampGroup::search(['id', 'in', $camp['camp_groups_ids']])->do('remove-activities');
+        }
+    }
+
     public static function policyPublish($self): array {
         $result = [];
         $self->read(['camp_groups_ids']);
@@ -421,10 +465,12 @@ class Camp extends Model {
 
     public static function onafterPublish($self) {
         $self->do('generate-meals');
+        $self->do('generate-activities');
     }
 
     public static function onafterCancel($self) {
         $self->do('remove-meals');
+        $self->do('remove-activities');
 
         $enrollments_ids = [];
         $self->read(['enrollments_ids']);
@@ -517,6 +563,46 @@ class Camp extends Model {
         $self->read(['sojourn_number']);
         foreach($self as $id => $camp) {
             $result[$id] = str_pad($camp['sojourn_number'], 5, '0', STR_PAD_LEFT);
+        }
+
+        return $result;
+    }
+
+    public static function calcMinAge($self): array {
+        $result = [];
+        $self->read(['age_range']);
+        foreach($self as $id => $camp) {
+            switch($camp['age_range']) {
+                case '6-to-9':
+                    $result[$id] = 6;
+                    break;
+                case '10-to-12':
+                    $result[$id] = 10;
+                    break;
+                case '13-to-16':
+                    $result[$id] = 13;
+                    break;
+            }
+        }
+
+        return $result;
+    }
+
+    public static function calcMaxAge($self): array {
+        $result = [];
+        $self->read(['age_range']);
+        foreach($self as $id => $camp) {
+            switch($camp['age_range']) {
+                case '6-to-9':
+                    $result[$id] = 9;
+                    break;
+                case '10-to-12':
+                    $result[$id] = 12;
+                    break;
+                case '13-to-16':
+                    $result[$id] = 16;
+                    break;
+            }
         }
 
         return $result;
