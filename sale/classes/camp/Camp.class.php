@@ -10,6 +10,7 @@ namespace sale\camp;
 
 use core\setting\Setting;
 use equal\orm\Model;
+use sale\booking\BookingActivity;
 use sale\booking\BookingMeal;
 use sale\booking\TimeSlot;
 
@@ -337,6 +338,18 @@ class Camp extends Model {
                 'description'   => "Removes the camp's meals.",
                 'policies'      => [],
                 'function'      => 'doRemoveMeals'
+            ],
+
+            'generate-activities' => [
+                'description'   => "Generates the camp's groups activities.",
+                'policies'      => [],
+                'function'      => 'doGenerateActivities'
+            ],
+
+            'remove-activities' => [
+                'description'   => "Removes the camp's groups activities.",
+                'policies'      => [],
+                'function'      => 'doRemoveActivities'
             ]
 
         ];
@@ -412,6 +425,20 @@ class Camp extends Model {
         }
     }
 
+    public static function doGenerateActivities($self) {
+        $self->read(['camp_groups_ids']);
+        foreach($self as $id => $camp) {
+            CampGroup::search(['id', 'in', $camp['camp_groups_ids']])->do('generate-activities');
+        }
+    }
+
+    public static function doRemoveActivities($self) {
+        $self->read(['camp_groups_ids']);
+        foreach($self as $id => $camp) {
+            CampGroup::search(['id', 'in', $camp['camp_groups_ids']])->do('remove-activities');
+        }
+    }
+
     public static function policyPublish($self): array {
         $result = [];
         $self->read(['camp_groups_ids']);
@@ -437,10 +464,12 @@ class Camp extends Model {
 
     public static function onafterPublish($self) {
         $self->do('generate-meals');
+        $self->do('generate-activities');
     }
 
     public static function onafterCancel($self) {
         $self->do('remove-meals');
+        $self->do('remove-activities');
 
         $enrollments_ids = [];
         $self->read(['enrollments_ids']);

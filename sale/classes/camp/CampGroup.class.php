@@ -11,6 +11,7 @@ namespace sale\camp;
 use equal\orm\Model;
 use sale\booking\BookingActivity;
 use sale\booking\PartnerEvent;
+use sale\booking\TimeSlot;
 
 class CampGroup extends Model {
 
@@ -88,6 +89,18 @@ class CampGroup extends Model {
                 'description'   => "Refresh the partners events linked to the camp group's activities.",
                 'policies'      => [],
                 'function'      => 'doRefreshPartnerEvents'
+            ],
+
+            'generate-activities' => [
+                'description'   => "Generates the camp's activities.",
+                'policies'      => [],
+                'function'      => 'doGenerateActivities'
+            ],
+
+            'remove-activities' => [
+                'description'   => "Removes the camp's activities.",
+                'policies'      => [],
+                'function'      => 'doRemoveActivities'
             ]
 
         ];
@@ -125,6 +138,54 @@ class CampGroup extends Model {
                     'booking_activity_id'   => $booking_activity['id']
                 ]);
             }
+        }
+    }
+
+    public static function doGenerateActivities($self) {
+        $self->read(['camp_id' => ['is_clsh', 'date_from', 'date_to']]);
+
+        $time_slots = TimeSlot::search([])
+            ->read(['id', 'code'])
+            ->get();
+        $map_time_slots = [];
+        foreach($time_slots as $time_slot) {
+            $map_time_slots[$time_slot['code']] = $time_slot;
+        }
+
+        foreach($self as $id => $camp_group) {
+            $camp = $camp_group['camp_id'];
+            for($date = $camp['date_from']; $date <= $camp['date_to']; $date += 86400) {
+                foreach(['AM', 'PM', 'EV'] as $time_slot_code) {
+                    if(
+                        ($camp['is_clsh'] && $time_slot_code === 'EV')
+                        || (!$camp['is_clsh'] && $date === $camp['date_from'])
+                    ) {
+                        continue;
+                    }
+
+                    $activities_ids = BookingActivity::search([
+                        ['camp_group_id', '=', $id],
+                        ['activity_date', '=', $date],
+                        ['time_slot_id', '=', $map_time_slots[$time_slot_code]['id']]
+                    ])
+                        ->ids();
+
+                    if(count($activities_ids) === 0) {
+                        BookingActivity::create([
+                            'camp_group_id' => $id,
+                            'activity_date' => $date,
+                            'time_slot_id'  => $map_time_slots[$time_slot_code]['id']
+                        ]);
+                    }
+                }
+            }
+        }
+    }
+
+    public static function doRemoveActivities($self) {
+        $self->read([]);
+        foreach($self as $id => $camp_group) {
+            BookingActivity::search(['camp_group_id', '=', $id])->delete(true);
         }
     }
 
@@ -237,6 +298,8 @@ class CampGroup extends Model {
                     ->update(['camp_group_qty' => $new_qty]);
             }
         }
+
+        $self->do('generate-activities');
     }
 
     public static function onupdateEmployeeId($self) {
