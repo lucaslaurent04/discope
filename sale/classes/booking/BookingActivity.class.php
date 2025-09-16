@@ -605,7 +605,7 @@ class BookingActivity extends Model {
         }
 
         // checks if the moment of the activity is free (if activity_booking_line_id the check is done in BookingLine)
-        if(isset($values['booking_line_group_id']) || isset($values['camp_group_id'])) {
+        if((isset($values['booking_line_group_id']) || isset($values['camp_group_id'])) && isset($values['activity_date'], $values['time_slot_id'])) {
             $domain = [
                 ['activity_date', '=', $values['activity_date']],
                 ['time_slot_id', '=', $values['time_slot_id']]
@@ -710,65 +710,65 @@ class BookingActivity extends Model {
         foreach($self as $booking_activity) {
             $employee_id = array_key_exists('employee_id', $values) ? $values['employee_id'] : $booking_activity['employee_id'];
 
-            if(is_null($employee_id)) {
-                continue;
-            }
-
-            // check employee qualification for the given activity
-            $activity_filter = Setting::get_value('sale', 'features', 'employee.activity_filter', false);
-            if($activity_filter) {
-                $employee = Employee::id($employee_id)
-                    ->read(['activity_product_models_ids'])
-                    ->first();
-
-                if($employee && !in_array($booking_activity['product_model_id'], $employee['activity_product_models_ids'])) {
-                    return ['employee_id' => ['not_allowed' => "Employee not qualified for this type of activity."]];
-                }
-            }
-
-            // check current assignment, if any
             $activity_date = $values['activity_date'] ?? $booking_activity['activity_date'];
             $time_slot_id = $values['time_slot_id'] ?? $booking_activity['time_slot_id'];
 
-            $activities_ids = BookingActivity::search([
-                ['activity_date', '=', $activity_date],
-                ['time_slot_id', '=', $time_slot_id],
-                ['employee_id', '=', $employee_id],
-                ['is_exclusive', '=', true]
-            ])
-                ->ids();
+            if(!is_null($employee_id)) {
+                // check employee qualification for the given activity
+                $activity_filter = Setting::get_value('sale', 'features', 'employee.activity_filter', false);
+                if($activity_filter) {
+                    $employee = Employee::id($employee_id)
+                        ->read(['activity_product_models_ids'])
+                        ->first();
 
-            if(!empty($activities_ids)) {
-                return ['employee_id' => ['already_assigned' => "An exclusive activity is already assigned to this employee for that moment."]];
+                    if($employee && !in_array($booking_activity['product_model_id'], $employee['activity_product_models_ids'])) {
+                        return ['employee_id' => ['not_allowed' => "Employee not qualified for this type of activity."]];
+                    }
+                }
+
+                // check current assignment, if any
+                $activities_ids = BookingActivity::search([
+                    ['activity_date', '=', $activity_date],
+                    ['time_slot_id', '=', $time_slot_id],
+                    ['employee_id', '=', $employee_id],
+                    ['is_exclusive', '=', true]
+                ])
+                    ->ids();
+
+                if(!empty($activities_ids)) {
+                    return ['employee_id' => ['already_assigned' => "An exclusive activity is already assigned to this employee for that moment."]];
+                }
             }
 
-            // check that a group doesn't have two activities at the same time (check done in BookingLine if linked to one)
-            if(
-                isset($booking_activity['camp_group_id'])
-                || (isset($booking_activity['booking_line_group_id']) && !isset($booking_activity['activity_booking_line_id']))
-            ) {
-                $domain = [
-                    ['activity_date', '=', $values['activity_date'] ?? $booking_activity['activity_date']],
-                    ['time_slot_id', '=', $values['time_slot_id'] ?? $booking_activity['time_slot_id']],
-                    ['id', '<>', $booking_activity['id']]
-                ];
-
-                if(isset($booking_activity['camp_group_id'])) {
-                    $domain[] = ['camp_group_id', '=', $booking_activity['camp_group_id']];
-                }
-                else {
-                    $domain[] = ['booking_line_group_id', '=', $booking_activity['booking_line_group_id']];
-                }
-
-                $activity = BookingActivity::search($domain)
-                    ->read(['id'])
-                    ->first();
-
-                if(!is_null($activity)) {
-                    return [
-                        'camp_group_id'         => ['group_has_activity' => "The group already has an activity for this date and time slot."],
-                        'booking_line_group_id' => ['group_has_activity' => "The group already has an activity for this date and time slot."],
+            if(isset($activity_date, $time_slot_id)) {
+                // check that a group doesn't have two activities at the same time (check done in BookingLine if linked to one)
+                if(
+                    isset($booking_activity['camp_group_id'])
+                    || (isset($booking_activity['booking_line_group_id']) && !isset($booking_activity['activity_booking_line_id']))
+                ) {
+                    $domain = [
+                        ['activity_date', '=', $activity_date],
+                        ['time_slot_id', '=', $time_slot_id],
+                        ['id', '<>', $booking_activity['id']]
                     ];
+
+                    if(isset($booking_activity['camp_group_id'])) {
+                        $domain[] = ['camp_group_id', '=', $booking_activity['camp_group_id']];
+                    }
+                    else {
+                        $domain[] = ['booking_line_group_id', '=', $booking_activity['booking_line_group_id']];
+                    }
+
+                    $activity = BookingActivity::search($domain)
+                        ->read(['id'])
+                        ->first();
+
+                    if(!is_null($activity)) {
+                        return [
+                            'camp_group_id'         => ['group_has_activity' => "The group already has an activity for this date and time slot."],
+                            'booking_line_group_id' => ['group_has_activity' => "The group already has an activity for this date and time slot."],
+                        ];
+                    }
                 }
             }
         }
