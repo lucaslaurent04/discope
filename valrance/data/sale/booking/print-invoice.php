@@ -588,6 +588,7 @@ foreach($invoice_lines as $line) {
     $map_products_groupings[$line['product_id']['id']] = $grouping_code;
 }
 
+// #memo - we don't have links to booking lines here (nor booking activities)
 $invoice_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
     ->read([
         'name',

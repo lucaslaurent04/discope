@@ -1058,6 +1058,8 @@ $contract_lines = ContractLine::search(['contract_id', '=', $contract['id']])
         'vat_rate',
         'total',
         'price',
+       'is_supply',
+        'booking_activity_id' => ['product_id'],
         'product_id' => ['label']
     ])
     ->get(true);
@@ -1071,11 +1073,19 @@ foreach($contract_lines as $line) {
     }
 
     $grouping_name = $line['product_id']['label'];
+
     if(isset($map_products_groupings[$product_id])) {
         $grouping_name = $map_products_groupings[$product_id]['name'];
     }
     elseif(!empty($line['description'])) {
         $grouping_name = $line['description'];
+    }
+
+    // if a supply is linked to an activity, it must be grouped according to the grouping code of the product linked to the activity (and not the grouping associated with its own product)
+    if($line['is_supply'] && $line['booking_activity_id']) {
+        if(isset($map_products_groupings[$line['booking_activity_id']['product_id']])) {
+            $grouping_name = $map_products_groupings[$line['booking_activity_id']['product_id']]['name'];
+        }
     }
 
     if(!isset($map_groupings_lines[$grouping_name])) {
