@@ -759,10 +759,7 @@ class Camp extends Model {
                 continue;
             }
 
-            CampGroup::create([
-                'camp_id'      => $id,
-                'max_children' => $camp['employee_ratio']
-            ]);
+            CampGroup::create(['camp_id' => $id]);
         }
     }
 
