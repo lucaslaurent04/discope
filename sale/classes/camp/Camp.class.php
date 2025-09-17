@@ -752,7 +752,7 @@ class Camp extends Model {
     /**
      * Creates the first camp group that is necessary.
      */
-    public static function onupdate($self, $values) {
+    public static function onafterupdate($self, $values) {
         $self->read(['camp_groups_ids']);
         foreach($self as $id => $camp) {
             if(count($camp['camp_groups_ids']) > 0) {
