@@ -41,7 +41,6 @@ use sale\camp\catalog\Product;
             'selection'         => [
                 'all',
                 'validated',
-                'confirmed',
                 'pending',
                 'waitlisted',
                 'cancelled'

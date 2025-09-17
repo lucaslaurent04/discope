@@ -44,7 +44,6 @@ use sale\camp\Camp;
             'selection'         => [
                 'all',
                 'validated',
-                'confirmed',
                 'pending',
                 'waitlisted',
                 'cancelled'

@@ -58,13 +58,13 @@
             "label": "Inscriptions",
             "help": ""
         },
-        "pending.enrollments.pending": {
-            "label": "Pré-inscriptions",
-            "help": ""
+        "pending.enrollments.waitlisted": {
+            "label": "En attente",
+            "help": "Inscriptions en liste d'attente, pour transfert ou attente nouveau groupe."
         },
-        "pending.enrollments.confirmed": {
-            "label": "À valider",
-            "help": ""
+        "pending.enrollments.pending": {
+            "label": "En cours",
+            "help": "Inscriptions en cours, récupération des documents et paiements."
         }
     }
 }

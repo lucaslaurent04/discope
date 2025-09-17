@@ -147,9 +147,8 @@
             "description": "Status de l'inscription.",
             "help": "",
             "selection": {
-                "pending": "Pré-inscription",
+                "pending": "En cours",
                 "waitlisted": "En attente",
-                "confirmed": "Confirmée",
                 "validated": "Validée",
                 "cancelled": "Annulée"
             }
@@ -212,8 +211,87 @@
                 "action.transition.pending": {
                     "label": "En cours"
                 },
-                "action.transition.confirm": {
-                    "label": "Confirmer"
+                "action.transition.validate": {
+                    "label": "Valider"
+                },
+                "action.transition.cancel": {
+                    "label": "Annuler"
+                },
+                "action.transfer": {
+                    "label": "Transférer"
+                }
+            },
+            "layout": {
+                "section.followup": {
+                    "label": "Suivi"
+                },
+                "section.lines": {
+                    "label": "Lignes"
+                },
+                "section.reductions": {
+                    "label": "Réductions"
+                },
+                "section.daycare": {
+                    "label": "Garderie"
+                },
+                "section.child-remarks": {
+                    "label": "Remarques enfant"
+                },
+                "section.mails": {
+                    "label": "E-mails"
+                },
+                "section.fundings": {
+                    "label": "Financements"
+                }
+            }
+        },
+        "form.waitlisted": {
+            "name": "Inscription",
+            "description": "",
+            "actions": {
+                "action.transition.pending": {
+                    "label": "En cours"
+                },
+                "action.transition.validate": {
+                    "label": "Valider"
+                },
+                "action.transition.cancel": {
+                    "label": "Annuler"
+                },
+                "action.transfer": {
+                    "label": "Transférer"
+                }
+            },
+            "layout": {
+                "section.followup": {
+                    "label": "Suivi"
+                },
+                "section.lines": {
+                    "label": "Lignes"
+                },
+                "section.reductions": {
+                    "label": "Réductions"
+                },
+                "section.daycare": {
+                    "label": "Garderie"
+                },
+                "section.child-remarks": {
+                    "label": "Remarques enfant"
+                },
+                "section.mails": {
+                    "label": "E-mails"
+                },
+                "section.fundings": {
+                    "label": "Financements"
+                }
+            }
+        },
+        "form.pending": {
+            "name": "Inscription",
+            "description": "",
+            "actions": {
+                "action.transition.pending": {
+                    "label": "En cours"
                 },
                 "action.transition.validate": {
                     "label": "Valider"
@@ -254,9 +332,6 @@
                 "action.transition.pending": {
                     "label": "En cours"
                 },
-                "action.transition.confirm": {
-                    "label": "Confirmer"
-                },
                 "action.transition.cancel": {
                     "label": "Annuler"
                 },
@@ -270,22 +345,22 @@
             "description": "",
             "layout": {}
         },
-        "list.confirmed": {
-            "name": "Inscriptions à valider",
+        "list.waitlisted": {
+            "name": "Inscriptions en attente",
             "description": "",
             "header": {
-                "action.transition.validate": {
-                    "label": "Valider"
+                "action.transition.pending": {
+                    "label": "En cours"
                 }
             },
             "layout": {}
         },
         "list.pending": {
-            "name": "Pré-inscriptions",
+            "name": "Inscriptions en cours",
             "description": "",
             "header": {
-                "action.transition.confirm": {
-                    "label": "Confirmer"
+                "action.transition.validate": {
+                    "label": "Valider"
                 }
             },
             "layout": {

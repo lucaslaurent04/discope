@@ -163,7 +163,7 @@ foreach($camps as $camp) {
     $map_age_data = [];
 
     foreach($camp['enrollments_ids'] as $enrollment) {
-        if(!in_array($enrollment['status'], ['confirmed', 'validated'])) {
+        if($enrollment['status'] !== 'validated') {
             continue;
         }
         if(!isset($map_age_data[$enrollment['child_age']])) {

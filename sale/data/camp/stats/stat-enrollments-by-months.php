@@ -9,7 +9,6 @@
 use identity\Center;
 use identity\User;
 use sale\camp\Camp;
-use sale\camp\Sponsor;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Data about children's participation to camps.",
@@ -41,7 +40,6 @@ use sale\camp\Sponsor;
             'selection'         => [
                 'all',
                 'validated',
-                'confirmed',
                 'pending',
                 'waitlisted',
                 'cancelled'
@@ -178,7 +176,6 @@ foreach($map_center_months_statuses_enrollments_qty as $center_id => $map_months
     foreach($map_months_statuses_enrollments_qty as $month => $map_statuses_enrollments_qty) {
         $qty_pending = $map_statuses_enrollments_qty['pending'] ?? 0;
         $qty_waitlisted = $map_statuses_enrollments_qty['waitlisted'] ?? 0;
-        $qty_confirmed = $map_statuses_enrollments_qty['confirmed'] ?? 0;
         $qty_validated = $map_statuses_enrollments_qty['validated'] ?? 0;
         $qty_cancelled = $map_statuses_enrollments_qty['cancelled'] ?? 0;
 
@@ -187,10 +184,9 @@ foreach($map_center_months_statuses_enrollments_qty as $center_id => $map_months
             'month'             => $month,
             'qty_pending'       => $qty_pending,
             'qty_waitlisted'    => $qty_waitlisted,
-            'qty_confirmed'     => $qty_confirmed,
             'qty_validated'     => $qty_validated,
             'qty_cancelled'     => $qty_cancelled,
-            'qty'               => $qty_pending + $qty_waitlisted + $qty_confirmed + $qty_validated + $qty_cancelled
+            'qty'               => $qty_pending + $qty_waitlisted + $qty_validated + $qty_cancelled
         ];
     }
 }
