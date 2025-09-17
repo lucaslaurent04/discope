@@ -813,7 +813,7 @@ class Camp extends Model {
             foreach($self as $camp) {
                 $enrolled_children_qty = 0;
                 foreach($camp['enrollments_ids'] as $enrollment) {
-                    if(in_array($enrollment['status'], ['confirmed', 'validated'])) {
+                    if(in_array($enrollment['status'], ['pending', 'validated'])) {
                         $enrolled_children_qty++;
                     }
                 }
@@ -871,7 +871,7 @@ class Camp extends Model {
             foreach($self as $camp) {
                 $enrolled_children_qty = 0;
                 foreach($camp['enrollments_ids'] as $enrollment) {
-                    if(in_array($enrollment['status'], ['confirmed', 'validated'])) {
+                    if(in_array($enrollment['status'], ['pending', 'validated'])) {
                         $enrolled_children_qty++;
                     }
                 }

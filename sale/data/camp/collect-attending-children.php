@@ -89,7 +89,7 @@ $result = [];
 
 foreach($camps as $camp) {
     foreach($camp['enrollments_ids'] as $enrollment) {
-        if(!in_array($enrollment['status'], ['confirmed', 'validated'])) {
+        if($enrollment['status'] !== 'validated') {
             continue;
         }
 

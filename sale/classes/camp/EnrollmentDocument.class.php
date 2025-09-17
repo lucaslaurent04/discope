@@ -33,7 +33,7 @@ class EnrollmentDocument extends Model {
                 'type'              => 'boolean',
                 'description'       => "Has the document been received?",
                 'default'           => false,
-                'dependents'        => ['enrollment_id' => 'all_documents_received']
+                'onupdate'          => 'onupdateReceived'
             ]
 
         ];
@@ -43,5 +43,13 @@ class EnrollmentDocument extends Model {
         return [
             ['enrollment_id', 'document_id']
         ];
+    }
+
+    public static function onupdateReceived($self) {
+        $self->read(['enrollment_id']);
+        foreach($self as $enrollment_doc) {
+            Enrollment::id($enrollment_doc['enrollment_id'])
+                ->update(['all_documents_received' => null]);
+        }
     }
 }

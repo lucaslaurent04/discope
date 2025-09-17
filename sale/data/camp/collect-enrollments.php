@@ -33,7 +33,6 @@ use equal\orm\DomainCondition;
                 'all',
                 'pending',
                 'waitlisted',
-                'confirmed',
                 'validated',
                 'cancelled'
             ],

@@ -41,7 +41,6 @@ use sale\camp\WorksCouncil;
             'selection'         => [
                 'all',
                 'validated',
-                'confirmed',
                 'pending',
                 'waitlisted',
                 'cancelled'

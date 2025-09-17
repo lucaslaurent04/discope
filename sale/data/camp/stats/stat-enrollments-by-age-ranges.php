@@ -41,7 +41,6 @@ use sale\camp\Sponsor;
             'selection'         => [
                 'all',
                 'validated',
-                'confirmed',
                 'pending',
                 'waitlisted',
                 'cancelled'

@@ -12,12 +12,12 @@
             "default": false,
             "actions": [
                 {
-                    "id": "action.transition.confirm",
-                    "label": "Confirm",
+                    "id": "action.transition.validate",
+                    "label": "Validate",
                     "controller": "model_transition",
                     "params": {
                         "entity": "sale\\camp\\Enrollment",
-                        "transition": "confirm",
+                        "transition": "validate",
                         "ids": []
                     }
                 }

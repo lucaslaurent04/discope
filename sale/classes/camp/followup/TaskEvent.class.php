@@ -28,7 +28,6 @@ class TaskEvent extends \core\followup\TaskEvent {
                 'selection'         => [
                     'pending',
                     'waitlisted',
-                    'confirmed',
                     'validated',
                     'cancelled'
                 ],
@@ -94,7 +93,7 @@ class TaskEvent extends \core\followup\TaskEvent {
                 'invalid' => [
                     'message'   => 'Invalid Enrollment status.',
                     'function'  => function ($entity_status, $values) {
-                        return in_array($entity_status, ['pending', 'waitlisted', 'confirmed', 'validated', 'cancelled']);
+                        return in_array($entity_status, ['pending', 'waitlisted', 'validated', 'cancelled']);
                     }
                 ]
             ],
