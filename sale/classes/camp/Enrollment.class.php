@@ -96,6 +96,24 @@ class Enrollment extends Model {
                 'relation'          => ['camp_id' => 'date_to']
             ],
 
+            'center_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'identity\Center',
+                'description'       => "The center to which the enrollment relates to.",
+                'store'             => true,
+                'relation'          => ['camp_id' => 'center_id']
+            ],
+
+            'center_office_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'identity\CenterOffice',
+                'description'       => "Office the enrollment relates to (for center management).",
+                'store'             => true,
+                'relation'          => ['center_id' => 'center_office_id']
+            ],
+
             'weekend_extra' => [
                 'type'              => 'string',
                 'selection'         => [
@@ -398,6 +416,13 @@ class Enrollment extends Model {
                 'foreign_object'    => 'sale\camp\EnrollmentDocument',
                 'description'       => "The documents that have been received.",
                 'ondetach'          => 'delete'
+            ],
+
+            'tasks_ids' => [
+                'type'              => 'one2many',
+                'foreign_field'     => 'enrollment_id',
+                'foreign_object'    => 'sale\camp\followup\Task',
+                'description'       => "Follow up tasks that are associated with the enrollment."
             ]
 
         ];
@@ -1268,6 +1293,10 @@ class Enrollment extends Model {
     public static function onupdate($self, $values) {
         if(isset($values['status']) || (isset($values['state']) && $values['state'] === 'instance')) {
             $self->do('reset-camp-enrollments-qty');
+
+            foreach($self as $id => $enrollment) {
+                \eQual::run('do', 'sale_camp_followup_generate-task-status-change', ['enrollment_id' => $id]);
+            }
         }
     }
 

@@ -1474,6 +1474,51 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "id": "tasks.camp-tasks",
+                        "label": "Camp tasks",
+                        "description": "",
+                        "icon": "task",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "tasks.camp-tasks.events",
+                                "type": "entry",
+                                "label": "Events",
+                                "description": "",
+                                "icon": "event",
+                                "context": {
+                                    "entity": "sale\\camp\\followup\\TaskEvent",
+                                    "view": "list.default",
+                                    "domain": ["entity", "=", "sale\\camp\\Enrollment"]
+                                }
+                            },
+                            {
+                                "id": "tasks.camp-tasks.models",
+                                "type": "entry",
+                                "label": "Models",
+                                "description": "",
+                                "icon": "description",
+                                "context": {
+                                    "entity": "sale\\camp\\followup\\TaskModel",
+                                    "view": "list.default",
+                                    "domain": ["entity", "=", "sale\\camp\\Enrollment"]
+                                }
+                            },
+                            {
+                                "id": "tasks.camp-tasks.tasks",
+                                "type": "entry",
+                                "label": "Tasks",
+                                "description": "",
+                                "icon": "task",
+                                "context": {
+                                    "entity": "sale\\camp\\followup\\Task",
+                                    "view": "list.default",
+                                    "domain": ["entity", "=", "sale\\camp\\Enrollment"]
+                                }
+                            }
+                        ]
                     }
                 ]
             },

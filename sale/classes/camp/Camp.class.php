@@ -39,6 +39,15 @@ class Camp extends Model {
                 'default'           => 1
             ],
 
+            'center_office_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'identity\CenterOffice',
+                'description'       => "Office the camp relates to (for center management).",
+                'store'             => true,
+                'relation'          => ['center_id' => 'center_office_id']
+            ],
+
             'short_name' => [
                 'type'              => 'string',
                 'description'       => "Short name of the camp.",

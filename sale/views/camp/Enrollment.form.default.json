@@ -334,6 +334,30 @@
             {
                 "sections": [
                     {
+                        "id": "section.followup",
+                        "label": "Followup",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "tasks_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.enrollment",
+                                                    "domain": ["visible_date", "<=", "date.this.day.first"]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "id": "section.lines",
                         "label": "Lines",
                         "visible": ["state", "<>", "draft"],
