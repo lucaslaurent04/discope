@@ -5,18 +5,18 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use sale\booking\Booking;
-use sale\booking\followup\Task;
-use sale\booking\followup\TaskModel;
+use sale\camp\followup\Task;
+use sale\camp\followup\TaskModel;
+use sale\camp\Enrollment;
 
 [$params, $providers] = eQual::announce([
-    'description'	=> "Generate task models' tasks when a booking status changes.",
+    'description'	=> "Generate task models' tasks when a enrollment status changes.",
     'params' 		=> [
 
-        'booking_id' => [
+        'enrollment_id' => [
             'type'              => 'many2one',
-            'foreign_object'    => 'sale\booking\Booking',
-            'description'       => "Booking the status has just changed.",
+            'foreign_object'    => 'sale\camp\Enrollment',
+            'description'       => "Enrollment the status has just changed.",
             'required'          => true
         ]
 
@@ -37,7 +37,7 @@ use sale\booking\followup\TaskModel;
  */
 ['context' => $context] = $providers;
 
-$task_models = TaskModel::search(['entity', '=', 'sale\booking\Booking'])
+$task_models = TaskModel::search(['entity', '=', 'sale\camp\Enrollment'])
     ->read([
         'name',
         'center_offices_ids',
@@ -71,18 +71,18 @@ if(!empty($task_models)) {
 
     $date_fields = array_keys($map_date_fields);
 
-    $booking = Booking::id($params['booking_id'])
+    $enrollment = Enrollment::id($params['enrollment_id'])
         ->read(array_merge($date_fields, ['center_office_id', 'status']))
         ->first(true);
 
-    if(is_null($booking)) {
+    if(is_null($enrollment)) {
         throw new Exception("unknown_entity", EQ_ERROR_UNKNOWN_OBJECT);
     }
 
     foreach($task_models as $task_model) {
         if(
-            $task_model['trigger_event_id']['entity_status'] !== $booking['status']
-            || !in_array($booking['center_office_id'], $task_model['center_offices_ids'])
+            $task_model['trigger_event_id']['entity_status'] !== $enrollment['status']
+            || !in_array($enrollment['center_office_id'], $task_model['center_offices_ids'])
         ) {
             continue;
         }
@@ -91,8 +91,8 @@ if(!empty($task_models)) {
 
         $deadline_date = null;
         if(isset($task_model['deadline_event_id'])) {
-            if(isset($booking[$task_model['deadline_event_id']['entity_date_field']])) {
-                $deadline_date = $booking[$task_model['deadline_event_id']['entity_date_field']] + (86400 * $task_model['deadline_event_id']['offset']);
+            if(isset($enrollment[$task_model['deadline_event_id']['entity_date_field']])) {
+                $deadline_date = $enrollment[$task_model['deadline_event_id']['entity_date_field']] + (86400 * $task_model['deadline_event_id']['offset']);
             }
             else {
                 // TODO: report problem date not set
@@ -101,7 +101,7 @@ if(!empty($task_models)) {
 
         $task = Task::search([
                 ['task_model_id', '=', $task_model['id']],
-                ['booking_id', '=', $booking['id']]
+                ['enrollment_id', '=', $enrollment['id']]
             ])
             ->read(['notes'])
             ->first();
@@ -119,7 +119,7 @@ if(!empty($task_models)) {
             'visible_date'  => $visible_date,
             'deadline_date' => $deadline_date,
             'task_model_id' => $task_model['id'],
-            'booking_id'    => $booking['id'],
+            'enrollment_id' => $enrollment['id'],
             'notes'         => $notes
         ]);
     }

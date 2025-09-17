@@ -677,6 +677,22 @@
         "tasks.booking-tasks.tasks": {
             "label": "Tâches",
             "help": ""
+        },
+        "tasks.camp-tasks": {
+            "label": "Tâches camp",
+            "help": ""
+        },
+        "tasks.camp-tasks.events": {
+            "label": "Evénements",
+            "help": ""
+        },
+        "tasks.camp-tasks.models": {
+            "label": "Modèles",
+            "help": ""
+        },
+        "tasks.camp-tasks.tasks": {
+            "label": "Tâches",
+            "help": ""
         }
     }
 }
