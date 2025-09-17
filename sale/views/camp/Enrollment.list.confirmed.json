@@ -1,7 +1,7 @@
 {
     "name": "Confirmed enrollments",
-    "order": "child_id",
-    "sort": "",
+    "order": "created",
+    "sort": "asc",
     "domain": ["status", "=", "confirmed"],
     "header": {
         "actions": {
@@ -41,6 +41,14 @@
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "created",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
             },
             {
                 "type": "field",
