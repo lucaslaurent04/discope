@@ -676,11 +676,18 @@ class Camp extends Model {
                 if($camp_model['is_clsh']) {
                     $result['clsh_type'] = $camp_model['clsh_type'];
                     $result['day_product_id'] = $camp_model['day_product_id'];
+
+                    // not clsh fields to default
+                    $result['weekend_product_id'] = null;
+                    $result['saturday_morning_product_id'] = null;
                 }
                 else {
-                    $result['day_product_id'] = null;
                     $result['weekend_product_id'] = $camp_model['weekend_product_id'];
                     $result['saturday_morning_product_id'] = $camp_model['saturday_morning_product_id'];
+
+                    // clsh fields to default
+                    $result['clsh_type'] = '5-days';
+                    $result['day_product_id'] = null;
                 }
 
                 if(empty($values['short_name'])) {

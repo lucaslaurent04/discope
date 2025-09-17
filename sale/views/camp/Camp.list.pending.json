@@ -13,6 +13,11 @@
             }
         }
     },
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false
+        }
+    },
     "actions": [
         {
             "id": "action.print-activities-planning",
