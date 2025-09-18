@@ -112,7 +112,7 @@
                     <ul class="list-activities">
                         {% for group in camp_planning.groups %}
                             {% if day.AM[group.num] %}
-                                {% if camp_planning.groups|length > 1 %}
+                                {% if camp_planning.groups_qty > 1 %}
                                     <li>{{ group.num }}. {{ day.AM[group.num].short_name }}</li>
                                 {% else %}
                                     <li>{{ day.AM[group.num].short_name }}</li>

@@ -109,6 +109,7 @@ class CampGroup extends Model {
 
     public static function doRefreshPartnerEvents($self) {
         $self->read([
+            'name',
             'employee_id',
             'booking_activities_ids'    => ['name', 'activity_date', 'time_slot_id'],
             'partner_events_ids'        => ['name', 'description', 'booking_activity_id']
@@ -128,8 +129,16 @@ class CampGroup extends Model {
                     }
                 }
 
+                $name = $camp_group['name'];
+                if(!empty($partner_event['name'])) {
+                    $name = $partner_event['name'];
+                }
+                elseif(!empty($booking_activity['name'])) {
+                    $name = $booking_activity['name'];
+                }
+
                 PartnerEvent::create([
-                    'name'                  => $partner_event['name'] ?? $booking_activity['name'],
+                    'name'                  => $name,
                     'description'           => $partner_event['description'] ?? null,
                     'partner_id'            => $camp_group['employee_id'],
                     'event_date'            => $booking_activity['activity_date'],

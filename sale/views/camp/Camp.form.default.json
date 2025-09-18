@@ -58,6 +58,17 @@
             ]
         }
     ],
+    "routes": [
+        {
+            "id": "item.camp.planning",
+            "label": "Planning",
+            "description": "",
+            "icon": "list_alt",
+            "route": "/?get=sale_camp_print-activities-planning&camp_id=object.id",
+            "target": "_blank",
+            "absolute": true
+        }
+    ],
     "layout": {
         "groups": [
             {

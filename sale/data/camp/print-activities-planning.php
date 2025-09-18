@@ -32,6 +32,16 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
             'type'              => 'date',
             'description'       => 'Date interval Upper limit.',
             'default'           => fn() => strtotime('Saturday this week')
+        ],
+        'camp_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\camp\Camp',
+            'description'       => "Filter by camp."
+        ],
+        'camp_group_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\camp\CampGroup',
+            'description'       => "Filter by camp group."
         ]
     ],
     'constants'     => ['L10N_LOCALE', 'L10N_TIMEZONE'],
@@ -71,11 +81,18 @@ if(!file_exists($file)) {
     Prepare values for template
 */
 
-$camps = Camp::search([
-    ['date_from', '>=', $params['date_from']],
-    ['date_from', '<=', $params['date_to']],
-    ['status', '=', 'published']
-])
+$domain = [];
+if(isset($params['date_from'])) {
+    $domain[] = ['date_from', '>=', $params['date_from']];
+}
+if(isset($params['date_to'])) {
+    $domain[] = ['date_from', '<=', $params['date_from']];
+}
+if(isset($params['camp_id'])) {
+    $domain[] = ['id', '=', $params['camp_id']];
+}
+
+$camps = Camp::search($domain)
     ->read([
         'date_from',
         'date_to',
@@ -136,6 +153,10 @@ foreach($camps as $camp) {
 
     $groups = [];
     foreach($camp['camp_groups_ids'] as $group) {
+        if(isset($params['camp_group_id']) && $group['id'] !== $params['camp_group_id']) {
+            continue;
+        }
+
         $groups[] = [
             'num'       => $group['activity_group_num'],
             'employee'  => $group['employee_id']['partner_identity_id']['firstname']
@@ -172,7 +193,7 @@ foreach($camps as $camp) {
 
                 $day[$activity['time_slot_id']['code']][$group['activity_group_num']] = array_merge(
                     $activity,
-                    ['short_name' => $short_name]
+                    ['short_name' => ucfirst($short_name)]
                 );
             }
         }
@@ -196,6 +217,7 @@ foreach($camps as $camp) {
         'animators_qty'     => count($camp['camp_groups_ids']),
         'camp_name'         => $camp['short_name'],
         'groups'            => $groups,
+        'groups_qty'        => count($camp['camp_groups_ids']),
         'days'              => $days
     ];
 }
