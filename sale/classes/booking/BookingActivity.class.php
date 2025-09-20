@@ -157,7 +157,8 @@ class BookingActivity extends Model {
                     ['is_activity', '=', true],
                     ['can_sell', '=', true]
                 ],
-                'dependents'        => ['name']
+                'dependents'        => ['name'],
+                'onupdate'          => 'onupdateProductId'
             ],
 
             'product_model_id' => [
@@ -435,6 +436,18 @@ class BookingActivity extends Model {
         }
 
         return $result;
+    }
+
+    public static function onupdateProductId($self) {
+        $self->read(['camp_group_id', 'partner_event_id', 'product_id' => ['name']]);
+        foreach($self as $id => $booking_activity) {
+            if(is_null($booking_activity['camp_group_id'])) {
+                continue;
+            }
+
+            PartnerEvent::search(['booking_activity_id', '=', $id])
+                ->update(['name' => $booking_activity['product_id']['name']]);
+        }
     }
 
     public static function onupdateActivityDate($self) {

@@ -1,16 +1,6 @@
 {
-    "name": "Group",
-    "routes": [
-        {
-            "id": "item.camp.planning",
-            "label": "Planning",
-            "description": "",
-            "icon": "list_alt",
-            "route": "/?get=sale_camp_print-activities-planning&camp_group_id=object.id",
-            "target": "_blank",
-            "absolute": true
-        }
-    ],
+    "name": "Task",
+    "description": "A task that needs to be completed.",
     "layout": {
         "groups": [
             {
@@ -25,15 +15,22 @@
                                             {
                                                 "type": "field",
                                                 "value": "name",
-                                                "width": "80%",
+                                                "width": "75%",
                                                 "widget": {
                                                     "heading": true
                                                 }
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "employee_id",
-                                                "width": "40%"
+                                                "label": "Enrollment",
+                                                "value": "enrollment_id",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Task Model",
+                                                "value": "task_model_id",
+                                                "width": "50%"
                                             }
                                         ]
                                     },
@@ -42,22 +39,33 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "camp_id",
+                                                "value": "",
                                                 "width": "33%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "max_children",
-                                                "width": "33%",
-                                                "readonly": true,
-                                                "visible": ["state", "<>", "draft"]
+                                                "value": "visible_date",
+                                                "width": "33%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "activity_group_num",
-                                                "width": "33%",
-                                                "readonly": true,
-                                                "visible": ["state", "<>", "draft"]
+                                                "value": "deadline_date",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_done",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "done_by",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "done_date",
+                                                "width": "33%"
                                             }
                                         ]
                                     }
@@ -70,22 +78,18 @@
             {
                 "sections": [
                     {
-                        "id": "section.activities",
-                        "label": "Activities",
-                        "visible": ["state", "<>", "draft"],
+                        "id": "section.notes",
+                        "label": "Notes",
                         "rows": [
                             {
                                 "columns": [
                                     {
-                                        "width": "100%",
+                                        "width": "50%",
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "booking_activities_ids",
-                                                "width": "100%",
-                                                "widget": {
-                                                    "view": "list.camp"
-                                                }
+                                                "value": "notes",
+                                                "width": "100%"
                                             }
                                         ]
                                     }

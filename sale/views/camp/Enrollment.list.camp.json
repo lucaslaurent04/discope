@@ -19,6 +19,13 @@
             },
             {
                 "type": "field",
+                "value": "created",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
                 "value": "status",
                 "width": "20%",
                 "sortable": false,

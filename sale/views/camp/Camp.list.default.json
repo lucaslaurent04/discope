@@ -15,9 +15,12 @@
     },
     "header": {
         "actions": {
-            "ACTION.CREATE": {
-                "visible": ["camp.default.administrator", "in", "user.groups"]
-            }
+            "ACTION.CREATE": [
+                {
+                    "visible": ["camp.default.administrator", "in", "user.groups"],
+                    "view": "form.create"
+                }
+            ]
         }
     },
     "layout": {

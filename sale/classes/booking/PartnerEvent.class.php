@@ -62,7 +62,7 @@ class PartnerEvent extends Model {
             'event_type' => [
                 'type'              => 'string',
                 'description'       => "Type of the partner event.",
-                'selection'         => array(
+                'selection'         => [
                     'camp_activity',    // The employee is responsible for a camp group's activity
                     'leave',            // The employee is absent because of leave absence
                     'other',            // The event concerns none of the other types
@@ -70,7 +70,7 @@ class PartnerEvent extends Model {
                     'time_off',         // The employee is absent because of time off
                     'trainer',          // The employee is absent because is a trainer
                     'training'          // The employee is absent because follows a training
-                ),
+                ],
                 'default'           => 'other'
             ],
 
@@ -84,7 +84,7 @@ class PartnerEvent extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingActivity',
                 'description'       => "The camp activity, if any."
-            ],
+            ]
 
         ];
     }

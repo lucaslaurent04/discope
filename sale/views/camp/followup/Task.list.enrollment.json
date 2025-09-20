@@ -1,0 +1,45 @@
+{
+    "name": "Tasks",
+    "description": "List of follow up tasks related to enrollments.",
+    "access": {
+        "groups": ["camp.default.user"]
+    },
+    "order": "deadline_date",
+    "sort": "asc",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "40%"
+            },
+            {
+                "type": "field",
+                "label": "Enrollment",
+                "value": "enrollment_id",
+                "width": "20%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "is_done",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "done_by",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "done_date",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "deadline_date",
+                "width": "20%"
+            }
+        ]
+    }
+}

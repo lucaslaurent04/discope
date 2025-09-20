@@ -96,6 +96,24 @@ class Enrollment extends Model {
                 'relation'          => ['camp_id' => 'date_to']
             ],
 
+            'center_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'identity\Center',
+                'description'       => "The center to which the enrollment relates to.",
+                'store'             => true,
+                'relation'          => ['camp_id' => 'center_id']
+            ],
+
+            'center_office_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'identity\CenterOffice',
+                'description'       => "Office the enrollment relates to (for center management).",
+                'store'             => true,
+                'relation'          => ['center_id' => 'center_office_id']
+            ],
+
             'weekend_extra' => [
                 'type'              => 'string',
                 'selection'         => [
@@ -268,7 +286,6 @@ class Enrollment extends Model {
                 'selection'         => [
                     'pending',
                     'waitlisted',
-                    'confirmed',
                     'validated',
                     'cancelled'
                 ],
@@ -398,6 +415,13 @@ class Enrollment extends Model {
                 'foreign_object'    => 'sale\camp\EnrollmentDocument',
                 'description'       => "The documents that have been received.",
                 'ondetach'          => 'delete'
+            ],
+
+            'tasks_ids' => [
+                'type'              => 'one2many',
+                'foreign_field'     => 'enrollment_id',
+                'foreign_object'    => 'sale\camp\followup\Task',
+                'description'       => "Follow up tasks that are associated with the enrollment."
             ]
 
         ];
@@ -730,13 +754,13 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function policyConfirm($self): array {
+    public static function policyPending($self): array {
         $result = [];
         $self->read(['camp_id' => ['max_children', 'enrollments_ids' => ['status']]]);
         foreach($self as $enrollment) {
             $confirmed_enrollments_qty = 0;
             foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
-                if(in_array($en['status'], ['confirmed', 'validated'])) {
+                if(in_array($en['status'], ['pending', 'validated'])) {
                     $confirmed_enrollments_qty++;
                 }
             }
@@ -768,9 +792,9 @@ class Enrollment extends Model {
     public static function getPolicies(): array {
         return [
 
-            'confirm' => [
+            'pending' => [
                 'description'   => "Checks if the camp isn't full yet.",
-                'function'      => "policyConfirm"
+                'function'      => "policyPending"
             ],
 
             'validate' => [
@@ -784,7 +808,7 @@ class Enrollment extends Model {
     /**
      * After status confirm: reset the enrollments qty
      */
-    public static function onafterConfirm($self) {
+    public static function onafterPending($self) {
         $self->do('reset-camp-enrollments-qty');
         $self->do('generate-funding');
     }
@@ -815,31 +839,14 @@ class Enrollment extends Model {
     public static function getWorkflow(): array {
         return [
 
-            'pending' => [
-                'description' => "The enrollment is waiting for confirmation, it usually means that its an application from the website.",
-                'transitions' => [
-                    'confirm' => [
-                        'status'        => 'confirmed',
-                        'description'   => "Confirm the pending enrollment.",
-                        'policies'      => ['confirm'],
-                        'onafter'       => 'onafterConfirm'
-                    ],
-                    'cancel' => [
-                        'status'        => 'cancelled',
-                        'description'   => "Cancel the pending enrollment.",
-                        'onafter'       => 'onafterCancel'
-                    ]
-                ]
-            ],
-
             'waitlisted' => [
-                'description' => "The enrollment is waiting for a confirmation, waiting for a new camp group to be created or to be transferred.",
+                'description' => "The enrollment is on the waiting list, waiting for a new camp group to be created or to be transferred.",
                 'transitions' => [
-                    'confirm' => [
-                        'status'        => 'confirm',
-                        'description'   => "Remove from the waitlist.",
-                        'policies'      => ['confirm'],
-                        'onafter'       => 'onafterConfirm'
+                    'pending' => [
+                        'status'        => 'pending',
+                        'description'   => "Remove from the waiting list.",
+                        'policies'      => ['pending'],
+                        'onafter'       => 'onafterPending'
                     ],
                     'cancel' => [
                         'status'        => 'cancelled',
@@ -849,8 +856,8 @@ class Enrollment extends Model {
                 ]
             ],
 
-            'confirmed' => [
-                'description' => "The enrollment is confirmed, the child can attend the camp.",
+            'pending' => [
+                'description' => "The enrollment is pending, we need to gather all documents and payments to validate it.",
                 'transitions' => [
                     'validate' => [
                         'status'        => 'validated',
@@ -859,7 +866,7 @@ class Enrollment extends Model {
                     ],
                     'cancel' => [
                         'status'        => 'cancelled',
-                        'description'   => "Cancel the confirmed enrollment.",
+                        'description'   => "Cancel the pending enrollment.",
                         'onafter'       => 'onafterCancel'
                     ]
                 ]
@@ -914,7 +921,7 @@ class Enrollment extends Model {
         // Check that camp is not already full and that the child hasn't been enrolled yet
         if(
             isset($values['camp_id'])
-            || (isset($values['status']) && in_array($values['status'], ['confirmed', 'validated']))
+            || (isset($values['status']) && in_array($values['status'], ['pending', 'validated']))
             || isset($values['presence_day_1'])
             || isset($values['presence_day_2'])
             || isset($values['presence_day_3'])
@@ -924,7 +931,7 @@ class Enrollment extends Model {
             foreach($self as $enrollment) {
                 $status = $values['status'] ?? $enrollment['status'];
 
-                if(in_array($status, ['confirmed', 'validated'])) {
+                if(in_array($status, ['pending', 'validated'])) {
                     $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
                         ->read([
                             'is_clsh',
@@ -959,7 +966,7 @@ class Enrollment extends Model {
 
                             $day_confirmed_enrollments_qty = 0;
                             foreach($camp['enrollments_ids'] as $en) {
-                                if($en['presence_day_'.$day] && in_array($en['status'], ['confirmed', 'validated']) && $en['id'] !== $enrollment['id']) {
+                                if($en['presence_day_'.$day] && in_array($en['status'], ['pending', 'validated']) && $en['id'] !== $enrollment['id']) {
                                     $day_confirmed_enrollments_qty++;
                                 }
                             }
@@ -987,7 +994,7 @@ class Enrollment extends Model {
                         $confirmed_enrollments_qty = 0;
 
                         foreach($camp['enrollments_ids'] as $en) {
-                            if(in_array($en['status'], ['confirmed', 'validated']) && $en['id'] !== $enrollment['id']) {
+                            if(in_array($en['status'], ['pending', 'validated']) && $en['id'] !== $enrollment['id']) {
                                 $confirmed_enrollments_qty++;
                             }
                         }
@@ -1101,7 +1108,7 @@ class Enrollment extends Model {
                         $enrollment['id'] !== $en['id']
                         && $camp['date_from'] <= $en['camp_id']['date_to']
                         && $camp['date_to'] >= $en['camp_id']['date_from']
-                        && in_array($en['status'], ['confirmed', 'validated'])
+                        && in_array($en['status'], ['pending', 'validated'])
                     ) {
                         return ['child_id' => ['already_enrolled_to_other_camp' => "Child has already been enrolled to another camp during this period."]];
                     }
@@ -1135,14 +1142,22 @@ class Enrollment extends Model {
     }
 
     public static function onupdateCampId($self) {
+        // prevent state to pass to instance when camp selected and state is "draft"
+        $self->read(['state']);
+        foreach($self as $enrollment) {
+            if($enrollment['state'] === 'draft') {
+                return;
+            }
+        }
+
         $self->do('refresh-camp-product-line');
         $self->do('reset-camp-enrollments-qty');
         $self->do('refresh-required-documents');
 
-        // remove previously generated presences of confirmed enrollment
+        // remove previously generated presences of pending enrollment
         $self->read(['status', 'child_id']);
         foreach($self as $enrollment) {
-            if($enrollment['status'] !== 'confirmed' && $enrollment['status'] !== 'validated') {
+            if($enrollment['status'] !== 'pending' && $enrollment['status'] !== 'validated') {
                 continue;
             }
 
@@ -1268,6 +1283,10 @@ class Enrollment extends Model {
     public static function onupdate($self, $values) {
         if(isset($values['status']) || (isset($values['state']) && $values['state'] === 'instance')) {
             $self->do('reset-camp-enrollments-qty');
+
+            foreach($self as $id => $enrollment) {
+                \eQual::run('do', 'sale_camp_followup_generate-task-status-change', ['enrollment_id' => $id]);
+            }
         }
     }
 

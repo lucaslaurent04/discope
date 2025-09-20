@@ -109,6 +109,7 @@ class CampGroup extends Model {
 
     public static function doRefreshPartnerEvents($self) {
         $self->read([
+            'name',
             'employee_id',
             'booking_activities_ids'    => ['name', 'activity_date', 'time_slot_id'],
             'partner_events_ids'        => ['name', 'description', 'booking_activity_id']
@@ -128,8 +129,16 @@ class CampGroup extends Model {
                     }
                 }
 
+                $name = $camp_group['name'];
+                if(!empty($partner_event['name'])) {
+                    $name = $partner_event['name'];
+                }
+                elseif(!empty($booking_activity['name'])) {
+                    $name = $booking_activity['name'];
+                }
+
                 PartnerEvent::create([
-                    'name'                  => $partner_event['name'] ?? $booking_activity['name'],
+                    'name'                  => $name,
                     'description'           => $partner_event['description'] ?? null,
                     'partner_id'            => $camp_group['employee_id'],
                     'event_date'            => $booking_activity['activity_date'],
@@ -156,11 +165,8 @@ class CampGroup extends Model {
         foreach($self as $id => $camp_group) {
             $camp = $camp_group['camp_id'];
             for($date = $camp['date_from']; $date <= $camp['date_to']; $date += 86400) {
-                foreach(['AM', 'PM', 'EV'] as $time_slot_code) {
-                    if(
-                        ($camp['is_clsh'] && $time_slot_code === 'EV')
-                        || (!$camp['is_clsh'] && $date === $camp['date_from'])
-                    ) {
+                foreach(['AM', 'PM'] as $time_slot_code) {
+                    if(!$camp['is_clsh'] && $date === $camp['date_from']) {
                         continue;
                     }
 
@@ -327,7 +333,7 @@ class CampGroup extends Model {
         foreach($camps as $camp) {
             $enrolled_qty = 0;
             foreach($camp['enrollments_ids'] as $enrollment) {
-                if(in_array($enrollment['status'], ['confirmed', 'validated'])) {
+                if(in_array($enrollment['status'], ['pending', 'validated'])) {
                     $enrolled_qty++;
                 }
             }

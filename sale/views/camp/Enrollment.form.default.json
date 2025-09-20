@@ -8,7 +8,7 @@
             "description": "Envoyer la confirmation de pré-inscription.",
             "icon": "email",
             "route": "/child/object.child_id/preregistration",
-            "visible": ["status", "in", ["pending", "confirmed"]]
+            "visible": ["status", "=", "pending"]
         },
         {
             "id": "item.confirmation.send",
@@ -47,20 +47,6 @@
             ]
         },
         {
-            "id": "action.transition.confirm",
-            "label": "Confirm",
-            "controller": "model_transition",
-            "params": {
-                "entity": "sale\\camp\\Enrollment",
-                "transition": "confirm",
-                "ids": []
-            },
-            "visible": [
-                ["status", "=", "pending"],
-                ["state", "<>", "draft"]
-            ]
-        },
-        {
             "id": "action.transition.validate",
             "label": "Validate",
             "controller": "model_transition",
@@ -70,7 +56,7 @@
                 "ids": []
             },
             "visible": [
-                ["status", "=", "confirmed"],
+                ["status", "=", "pending"],
                 ["state", "<>", "draft"]
             ]
         },
@@ -333,6 +319,30 @@
             },
             {
                 "sections": [
+                    {
+                        "id": "section.followup",
+                        "label": "Followup",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "tasks_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.enrollment",
+                                                    "domain": ["visible_date", "<=", "date.this.day.first"]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
                     {
                         "id": "section.lines",
                         "label": "Lines",

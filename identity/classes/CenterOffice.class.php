@@ -155,6 +155,17 @@ class CenterOffice extends \identity\Establishment {
                 'rel_local_key'     => 'center_office_id',
                 'description'       => "Follow up tasks models that are associated with the center office.",
                 'help'              => "When a booking is created for a center office, follow up tasks are generated depending on its associated models."
+            ],
+
+            'camp_task_models_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\camp\followup\TaskModel',
+                'foreign_field'     => 'center_offices_ids',
+                'rel_table'         => 'identity_center_office_rel_sale_camp_task_model',
+                'rel_foreign_key'   => 'task_models_id',
+                'rel_local_key'     => 'center_office_id',
+                'description'       => "Follow up tasks models that are associated with the center office.",
+                'help'              => "When a camp enrollment is created for a center office, follow up tasks are generated depending on its associated models."
             ]
 
         ];

@@ -10,6 +10,7 @@ use core\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
 use sale\camp\Camp;
+use sale\camp\CampGroup;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
@@ -32,6 +33,16 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
             'type'              => 'date',
             'description'       => 'Date interval Upper limit.',
             'default'           => fn() => strtotime('Saturday this week')
+        ],
+        'camp_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\camp\Camp',
+            'description'       => "Filter by camp."
+        ],
+        'camp_group_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\camp\CampGroup',
+            'description'       => "Filter by camp group."
         ]
     ],
     'constants'     => ['L10N_LOCALE', 'L10N_TIMEZONE'],
@@ -71,11 +82,30 @@ if(!file_exists($file)) {
     Prepare values for template
 */
 
-$camps = Camp::search([
-    ['date_from', '>=', $params['date_from']],
-    ['date_from', '<=', $params['date_to']],
-    ['status', '=', 'published']
-])
+if(isset($params['camp_id']) || isset($params['camp_group_id'])) {
+    $params['date_from'] = null;
+    $params['date_to'] = null;
+}
+
+$domain = [];
+if(isset($params['date_from'])) {
+    $domain[] = ['date_from', '>=', $params['date_from']];
+}
+if(isset($params['date_to'])) {
+    $domain[] = ['date_from', '<=', $params['date_from']];
+}
+if(isset($params['camp_id'])) {
+    $domain[] = ['id', '=', $params['camp_id']];
+}
+if(isset($params['camp_group_id'])) {
+    $camp_group = CampGroup::id($params['camp_group_id'])
+        ->read(['camp_id'])
+        ->first();
+
+    $domain[] = ['id', '=', $camp_group['camp_id']];
+}
+
+$camps = Camp::search($domain)
     ->read([
         'date_from',
         'date_to',
@@ -110,9 +140,22 @@ $formatter = new IntlDateFormatter(
     'EEEE'
 );
 
+$date_from = null;
+$date_to = null;
+
+$camps_planning = [];
+foreach($camps as $camp) {
+    if (is_null($date_from) || $camp['date_from'] < $date_from) {
+        $date_from = $camp['date_from'];
+    }
+    if (is_null($date_to) || $camp['date_to'] > $date_to) {
+        $date_to = $camp['date_to'];
+    }
+}
+
 $days_names = [];
-$date = $params['date_from'];
-while($date <= $params['date_to']) {
+$date = $date_from;
+while($date <= $date_to) {
     if(in_array(date('l', $date), ['Saturday', 'Sunday'])) {
         $date += 86400;
         continue;
@@ -122,20 +165,13 @@ while($date <= $params['date_to']) {
     $date += 86400;
 }
 
-$date_from = null;
-$date_to = null;
-
-$camps_planning = [];
 foreach($camps as $camp) {
-    if(is_null($date_from) || $camp['date_from'] < $date_from) {
-        $date_from = $camp['date_from'];
-    }
-    if(is_null($date_to) || $camp['date_to'] > $date_to) {
-        $date_to = $camp['date_to'];
-    }
-
     $groups = [];
     foreach($camp['camp_groups_ids'] as $group) {
+        if(isset($params['camp_group_id']) && $group['id'] !== $params['camp_group_id']) {
+            continue;
+        }
+
         $groups[] = [
             'num'       => $group['activity_group_num'],
             'employee'  => $group['employee_id']['partner_identity_id']['firstname']
@@ -144,8 +180,8 @@ foreach($camps as $camp) {
 
     $days = [];
 
-    $date = $params['date_from'];
-    while($date <= $params['date_to']) {
+    $date = $date_from;
+    while($date <= $date_to) {
         if(in_array(date('l', $date), ['Saturday', 'Sunday'])) {
             $date += 86400;
             continue;
@@ -172,7 +208,7 @@ foreach($camps as $camp) {
 
                 $day[$activity['time_slot_id']['code']][$group['activity_group_num']] = array_merge(
                     $activity,
-                    ['short_name' => $short_name]
+                    ['short_name' => ucfirst($short_name)]
                 );
             }
         }
@@ -196,6 +232,7 @@ foreach($camps as $camp) {
         'animators_qty'     => count($camp['camp_groups_ids']),
         'camp_name'         => $camp['short_name'],
         'groups'            => $groups,
+        'groups_qty'        => count($camp['camp_groups_ids']),
         'days'              => $days
     ];
 }

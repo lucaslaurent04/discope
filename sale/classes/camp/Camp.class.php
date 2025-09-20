@@ -39,6 +39,15 @@ class Camp extends Model {
                 'default'           => 1
             ],
 
+            'center_office_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'identity\CenterOffice',
+                'description'       => "Office the camp relates to (for center management).",
+                'store'             => true,
+                'relation'          => ['center_id' => 'center_office_id']
+            ],
+
             'short_name' => [
                 'type'              => 'string',
                 'description'       => "Short name of the camp.",
@@ -676,11 +685,18 @@ class Camp extends Model {
                 if($camp_model['is_clsh']) {
                     $result['clsh_type'] = $camp_model['clsh_type'];
                     $result['day_product_id'] = $camp_model['day_product_id'];
+
+                    // not clsh fields to default
+                    $result['weekend_product_id'] = null;
+                    $result['saturday_morning_product_id'] = null;
                 }
                 else {
-                    $result['day_product_id'] = null;
                     $result['weekend_product_id'] = $camp_model['weekend_product_id'];
                     $result['saturday_morning_product_id'] = $camp_model['saturday_morning_product_id'];
+
+                    // clsh fields to default
+                    $result['clsh_type'] = '5-days';
+                    $result['day_product_id'] = null;
                 }
 
                 if(empty($values['short_name'])) {
@@ -745,17 +761,14 @@ class Camp extends Model {
     /**
      * Creates the first camp group that is necessary.
      */
-    public static function onupdate($self, $values) {
+    public static function onafterupdate($self, $values) {
         $self->read(['camp_groups_ids']);
         foreach($self as $id => $camp) {
             if(count($camp['camp_groups_ids']) > 0) {
                 continue;
             }
 
-            CampGroup::create([
-                'camp_id'      => $id,
-                'max_children' => $camp['employee_ratio']
-            ]);
+            CampGroup::create(['camp_id' => $id]);
         }
     }
 
@@ -800,7 +813,7 @@ class Camp extends Model {
             foreach($self as $camp) {
                 $enrolled_children_qty = 0;
                 foreach($camp['enrollments_ids'] as $enrollment) {
-                    if(in_array($enrollment['status'], ['confirmed', 'validated'])) {
+                    if(in_array($enrollment['status'], ['pending', 'validated'])) {
                         $enrolled_children_qty++;
                     }
                 }
@@ -858,7 +871,7 @@ class Camp extends Model {
             foreach($self as $camp) {
                 $enrolled_children_qty = 0;
                 foreach($camp['enrollments_ids'] as $enrollment) {
-                    if(in_array($enrollment['status'], ['confirmed', 'validated'])) {
+                    if(in_array($enrollment['status'], ['pending', 'validated'])) {
                         $enrolled_children_qty++;
                     }
                 }

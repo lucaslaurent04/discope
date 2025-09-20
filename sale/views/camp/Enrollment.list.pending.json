@@ -1,6 +1,6 @@
 {
     "name": "Pending enrollments",
-    "order": "child_id",
+    "order": "created",
     "sort": "asc",
     "domain": ["status", "=", "pending"],
     "header": {
@@ -12,12 +12,12 @@
             "default": false,
             "actions": [
                 {
-                    "id": "action.transition.confirm",
-                    "label": "Confirm",
+                    "id": "action.transition.validate",
+                    "label": "Validate",
                     "controller": "model_transition",
                     "params": {
                         "entity": "sale\\camp\\Enrollment",
-                        "transition": "confirm",
+                        "transition": "validate",
                         "ids": []
                     }
                 }
@@ -40,6 +40,14 @@
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "created",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
             },
             {
                 "type": "field",

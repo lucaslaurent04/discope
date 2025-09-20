@@ -150,27 +150,27 @@
                         "type": "parent",
                         "children": [
                             {
+                                "id": "pending.enrollments.waitlisted",
+                                "type": "entry",
+                                "label": "Waitlisted enrollments",
+                                "description": "List all waitlisted enrollments.",
+                                "icon": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\Enrollment",
+                                    "view": "list.waitlisted"
+                                }
+                            },
+                            {
                                 "id": "pending.enrollments.pending",
                                 "type": "entry",
                                 "label": "Pending enrollments",
-                                "description": "List all pending enrollments (should generally come from website)",
+                                "description": "List all pending enrollments, with missing documents and/or payments.",
                                 "icon": "",
                                 "route": "/camps",
                                 "context": {
                                     "entity": "sale\\camp\\Enrollment",
                                     "view": "list.pending"
-                                }
-                            },
-                            {
-                                "id": "pending.enrollments.confirmed",
-                                "type": "entry",
-                                "label": "Confirmed enrollments",
-                                "description": "List all confirmed enrollments with missing documents or payments.",
-                                "icon": "",
-                                "route": "/camps",
-                                "context": {
-                                    "entity": "sale\\camp\\Enrollment",
-                                    "view": "list.confirmed"
                                 }
                             }
                         ]
