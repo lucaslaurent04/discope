@@ -46,8 +46,9 @@ class Booking extends Model {
             'display_name' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
-                'description'       => "Code booking and name client",
+                'description'       => 'Label to be displayed for identifying the booking.',
                 'function'          => 'calcDisplayName',
+                'store'             => true,
                 'readonly'          => true,
                 'generation'        => 'generateDisplayName'
             ],
@@ -77,7 +78,8 @@ class Booking extends Model {
                 'foreign_object'    => 'identity\Identity',
                 'description'       => "The identity of the customer whom the booking relates to.",
                 'onupdate'          => 'onupdateCustomerIdentityId',
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['name', 'display_name']
             ],
 
             'organisation_id' => [
@@ -106,7 +108,7 @@ class Booking extends Model {
                 'foreign_object'    => 'identity\Center',
                 'description'       => "The center to which the booking relates to.",
                 'required'          => true,
-                'dependents'        => ['organisation_id', 'center_office_id']
+                'dependents'        => ['name', 'display_name', 'organisation_id', 'center_office_id']
             ],
 
             'center_office_id' => [
