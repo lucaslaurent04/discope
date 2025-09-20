@@ -7,6 +7,8 @@
 */
 
 use equal\orm\Domain;
+use identity\Center;
+use identity\CenterOffice;
 use sale\booking\Booking;
 
 list($params, $providers) = eQual::announce([
@@ -31,11 +33,17 @@ list($params, $providers) = eQual::announce([
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Center',
             'description'       => 'The center to which the booking relates to.',
+            'default'           => function() {
+                return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
+            }
         ],
         'center_office_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\CenterOffice',
-            'description'       => 'Office the invoice relates to (for center management).'
+            'description'       => 'Office the invoice relates to (for center management).',
+            'default'           => function() {
+                return ($centerOffices = CenterOffice::search())->count() === 1 ? current($centerOffices->ids()) : null;
+            }
         ],
         'customer_id' => [
             'type'              => 'many2one',

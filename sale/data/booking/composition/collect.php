@@ -7,6 +7,7 @@
 */
 
 use equal\orm\Domain;
+use identity\Center;
 use identity\User;
 use sale\booking\Booking;
 
@@ -22,7 +23,10 @@ list($params, $providers) = eQual::announce([
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Center',
             'description'       => 'Unique identifier for the center associated with the sojourn.',
-            'visible'           => ['all_centers', '=', false]
+            'visible'           => ['all_centers', '=', false],
+            'default'           => function() {
+                return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
+            }
         ],
         'date_from' => [
             'type'              => 'date',

@@ -7,6 +7,7 @@
 */
 
 use equal\orm\Domain;
+use identity\Center;
 use sale\booking\Booking;
 
 list($params, $providers) = eQual::announce([
@@ -35,6 +36,9 @@ list($params, $providers) = eQual::announce([
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Center',
             'description'       => 'The center to which the funding relates to.',
+            'default'           => function() {
+                return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
+            }
         ],
         'payment_reference' => [
             'type'              => 'string',

@@ -7,6 +7,7 @@
 */
 
 use equal\orm\Domain;
+use identity\Center;
 use sale\camp\catalog\Product;
 use sale\camp\catalog\ProductModel;
 use sale\camp\price\Price;
@@ -36,8 +37,11 @@ use sale\catalog\Family;
 
         'center_id' => [
             'type'              => 'many2one',
-            'description'       => "The Center of the Price (Product -> ProductModel -> Family).",
-            'foreign_object'    => 'identity\Center'
+            'description'       => 'The Center of the Price (Product -> ProductModel -> Family).',
+            'foreign_object'    => 'identity\Center',
+            'default'           => function() {
+                return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
+            }
         ],
 
         'product_id' => [

@@ -7,6 +7,7 @@
 */
 
 use equal\orm\Domain;
+use identity\Center;
 use identity\User;
 
 list($params, $providers) = eQual::announce([
@@ -22,7 +23,10 @@ list($params, $providers) = eQual::announce([
         'center_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Center',
-             'description'       => 'The center associated with the rental unit, used for center management.'
+            'description'       => 'The center associated with the rental unit, used for center management.',
+            'default'           => function() {
+                return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
+            }
         ],
 
         'parent_id' => [

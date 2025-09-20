@@ -30,7 +30,10 @@ use sale\catalog\ProductModel;
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Center',
             'description'       => "The center to which the booking relates to.",
-            'required'          => true
+            'required'          => true,
+            'default'           => function() {
+                return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
+            }
         ],
         'name' => [
             'type'              => 'string',
