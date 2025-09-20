@@ -611,13 +611,19 @@ class Booking extends Model {
 
     public static function calcDisplayName($self) {
         $result = [];
-        $customer_assignment = Setting::get_value('sale', 'organization', 'customer.number_assignment', 'id');
-        $self->read(['name', 'customer_identity_id' => ['name', 'id', 'accounting_account']]);
+        // retrieve the field to use as code for identifying the customer
+        $customer_code_assignment = Setting::get_value('sale', 'organization', 'customer.number_assignment', 'id');
+        $self->read(['name', 'customer_identity_id' => ['id', 'name', 'accounting_account', 'address_city']]);
         foreach($self as $id => $booking) {
             $name = $booking['name'] . ' - ' . $booking['customer_identity_id']['name'];
-            if(isset($booking['customer_identity_id'][$customer_assignment])) {
-                $name .= ' (' . $booking['customer_identity_id'][$customer_assignment] . ')' ;
+            if(isset($booking['customer_identity_id'][$customer_code_assignment])) {
+                $name .= ' (' . $booking['customer_identity_id'][$customer_code_assignment] . ')' ;
             }
+            // temporary (quick) feature for adding city in display name for non-Kaleo users
+            if($customer_code_assignment !== 'id') {
+                $name .= ' - ' . $booking['customer_identity_id']['address_city'];
+            }
+
             $result[$id] = $name;
         }
         return $result;
