@@ -615,14 +615,17 @@ class Booking extends Model {
         $result = [];
         // retrieve the field to use as code for identifying the customer
         $customer_code_assignment = Setting::get_value('sale', 'organization', 'customer.number_assignment', 'id');
-        $self->read(['name', 'customer_identity_id' => ['id', 'name', 'accounting_account', 'address_city']]);
+        $self->read(['state', 'name', 'customer_identity_id' => ['id', 'name', 'accounting_account', 'address_city']]);
         foreach($self as $id => $booking) {
+            if($booking['state'] === 'draft') {
+                continue;
+            }
             $name = $booking['name'] . ' - ' . $booking['customer_identity_id']['name'];
             if(isset($booking['customer_identity_id'][$customer_code_assignment])) {
                 $name .= ' (' . $booking['customer_identity_id'][$customer_code_assignment] . ')' ;
             }
             // temporary (quick) feature for adding city in display name for non-Kaleo users
-            if($customer_code_assignment !== 'id') {
+            if($customer_code_assignment !== 'id' && $booking['customer_identity_id']['address_city'] && strlen($booking['customer_identity_id']['address_city']) > 0) {
                 $name .= ' - ' . $booking['customer_identity_id']['address_city'];
             }
 
