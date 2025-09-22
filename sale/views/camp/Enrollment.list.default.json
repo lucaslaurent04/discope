@@ -1,6 +1,6 @@
 {
     "name": "Enrollments",
-    "order": "created",
+    "order": "date_created",
     "sort": "desc",
     "controller": "sale_camp_collect-enrollments",
     "layout": {
@@ -22,7 +22,7 @@
             },
             {
                 "type": "field",
-                "value": "created",
+                "value": "date_created",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true

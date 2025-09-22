@@ -117,16 +117,34 @@ class Camp extends Model {
                 }
             ],
 
-            'product_id' => [
+            'camp_model_id' => [
                 'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\CampModel',
+                'description'       => "Model that was used as a base to create this camp.",
+                'onupdate'          => 'onupdateCampModelId',
+                'required'          => true,
+                'dependents'        => [
+                    'need_license_ffe',
+                    'product_id',
+                    'day_product_id',
+                    'weekend_product_id',
+                    'saturday_morning_product_id'
+                ]
+            ],
+
+            'product_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
                 'description'       => "The product that will be added to the enrollment lines if the child enroll for the full camp.",
-                'required'          => true,
-                'domain'            => ['is_camp', '=', true]
+                'domain'            => ['is_camp', '=', true],
+                'store'             => true,
+                'relation'          => ['camp_model_id' => 'product_id']
             ],
 
             'camp_type' => [
-                'type'              => 'string',
+                'type'              => 'computed',
+                'result_type'       => 'string',
                 'selection'         => [
                     'sport',
                     'circus',
@@ -136,57 +154,63 @@ class Camp extends Model {
                     'recreation'
                 ],
                 'description'       => "Type of camp.",
-                'default'           => 'sport'
+                'store'             => true,
+                'relation'          => ['camp_model_id' => 'camp_type']
             ],
 
             'is_clsh' => [
-                'type'              => 'boolean',
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
                 'description'       => "Is \"Centre loisir sans hébergement\".",
                 'help'              => "If CLSH, the enrollments are per day.",
-                'default'           => false
+                'store'             => true,
+                'relation'          => ['camp_model_id' => 'is_clsh']
             ],
 
             'clsh_type' => [
-                'type'              => 'string',
+                'type'              => 'computed',
+                'result_type'       => 'string',
                 'selection'         => [
                     '5-days',
                     '4-days'
                 ],
                 'description'       => "Is it a camp of 5 or 4 days duration.",
-                'default'           => '5-days',
+                'store'             => true,
+                'relation'          => ['camp_model_id' => 'clsh_type'],
                 'visible'           => ['is_clsh', '=', true]
             ],
 
             'day_product_id' => [
-                'type'              => 'many2one',
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
                 'description'       => "The product that will be added to the enrollment lines if the child enroll for specific days of the camp.",
                 'domain'            => ['is_camp', '=', true],
-                'visible'           => ['is_clsh', '=', true]
+                'visible'           => ['is_clsh', '=', true],
+                'store'             => true,
+                'relation'          => ['camp_model_id' => 'day_product_id']
             ],
 
             'weekend_product_id' => [
-                'type'              => 'many2one',
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
                 'description'       => "The product that will be added to the enrollment lines if the child stays the weekend after the camp.",
                 'domain'            => ['is_camp', '=', true],
-                'visible'           => ['is_clsh', '=', false]
+                'visible'           => ['is_clsh', '=', false],
+                'store'             => true,
+                'relation'          => ['camp_model_id' => 'weekend_product_id']
             ],
 
             'saturday_morning_product_id' => [
-                'type'              => 'many2one',
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
                 'description'       => "The product that will be added to the enrollment lines if the child stays the until Saturday morning after the camp.",
                 'domain'            => ['is_camp', '=', true],
-                'visible'           => ['is_clsh', '=', false]
-            ],
-
-            'camp_model_id' => [
-                'type'              => 'many2one',
-                'foreign_object'    => 'sale\camp\CampModel',
-                'description'       => "Model that was used as a base to create this camp.",
-                'onupdate'          => 'onupdateCampModelId',
-                'required'          => true
+                'visible'           => ['is_clsh', '=', false],
+                'store'             => true,
+                'relation'          => ['camp_model_id' => 'saturday_morning_product_id']
             ],
 
             'age_range' => [
@@ -268,9 +292,11 @@ class Camp extends Model {
             ],
 
             'need_license_ffe' => [
-                'type'              => 'boolean',
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
                 'description'       => "Does the camp requires to child to have a 'licence fédération française équitation'.",
-                'default'           => false
+                'store'             => true,
+                'relation'          => ['camp_model_id' => 'need_license_ffe']
             ],
 
             'camp_groups_ids' => [
@@ -653,50 +679,20 @@ class Camp extends Model {
         return $result;
     }
 
-    public static function onchange($event, $values) {
+    public static function onchange($event, $values): array {
         $result = [];
         if(isset($event['camp_model_id'])) {
             $camp_model = CampModel::id($event['camp_model_id'])
-                ->read([
-                    'name',
-                    'camp_type',
-                    'is_clsh',
-                    'clsh_type',
-                    'employee_ratio',
-                    'need_license_ffe',
-                    'ase_quota',
-                    'accounting_code',
-                    'product_id'                    => ['id', 'name'],
-                    'day_product_id'                => ['id', 'name'],
-                    'weekend_product_id'            => ['id', 'name'],
-                    'saturday_morning_product_id'   => ['id', 'name']
-                ])
+                ->read(['name', 'employee_ratio', 'ase_quota', 'is_clsh', 'clsh_type'])
                 ->first(true);
 
             if(!is_null($camp_model)) {
-                $result['camp_type'] = $camp_model['camp_type'];
                 $result['employee_ratio'] = $camp_model['employee_ratio'];
-                $result['product_id'] = $camp_model['product_id'];
-                $result['need_license_ffe'] = $camp_model['need_license_ffe'];
                 $result['ase_quota'] = $camp_model['ase_quota'];
-                $result['is_clsh'] = $camp_model['is_clsh'];
-                $result['accounting_code'] = $camp_model['accounting_code'];
 
                 if($camp_model['is_clsh']) {
+                    $result['is_clsh'] = $camp_model['is_clsh'];
                     $result['clsh_type'] = $camp_model['clsh_type'];
-                    $result['day_product_id'] = $camp_model['day_product_id'];
-
-                    // not clsh fields to default
-                    $result['weekend_product_id'] = null;
-                    $result['saturday_morning_product_id'] = null;
-                }
-                else {
-                    $result['weekend_product_id'] = $camp_model['weekend_product_id'];
-                    $result['saturday_morning_product_id'] = $camp_model['saturday_morning_product_id'];
-
-                    // clsh fields to default
-                    $result['clsh_type'] = '5-days';
-                    $result['day_product_id'] = null;
                 }
 
                 if(empty($values['short_name'])) {

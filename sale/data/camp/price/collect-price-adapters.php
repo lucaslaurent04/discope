@@ -32,8 +32,7 @@ use sale\camp\Camp;
                 'commune',
                 'community-of-communes',
                 'department-caf',
-                'department-msa',
-                'loyalty-discount'
+                'department-msa'
             ],
             'default' => 'all'
         ],
@@ -71,6 +70,10 @@ $domain = new Domain($params['domain']);
 
 $domain->addCondition(
     new DomainCondition('price_adapter_type', '=', 'amount')
+);
+
+$domain->addCondition(
+    new DomainCondition('origin_type', '<>', 'loyalty-discount')
 );
 
 if(isset($params['sponsor_id'])) {

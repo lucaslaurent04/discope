@@ -27,7 +27,6 @@
             }
         }
     },
-    "domain": ["sponsor_id", "<>", null],
     "group_by": [{"field": "sponsor_id", "operation": ["SUM", "object.value"]}],
     "layout": {
         "items": [
@@ -44,6 +43,7 @@
                 "value": "sponsor_id",
                 "width": "20%",
                 "sortable": false,
+                "visible": false,
                 "readonly": true
             },
             {
@@ -56,6 +56,13 @@
             {
                 "type": "field",
                 "value": "origin_type",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "name",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true

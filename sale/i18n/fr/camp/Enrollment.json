@@ -3,6 +3,11 @@
     "plural": "Inscriptions",
     "description": "L'inscription d'un enfant à un camp.",
     "model": {
+        "date_created": {
+            "label": "Créé",
+            "description": "Date de création de l'objet.",
+            "help": ""
+        },
         "child_id": {
             "label": "Enfant",
             "description": "L'enfant à inscrire.",
