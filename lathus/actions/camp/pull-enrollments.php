@@ -375,9 +375,6 @@ if(!empty($data)) {
                     'price_id'      => $product_price
                 ]);
             }
-            else {
-                // TODO: alert that wasn't able to add saturday line
-            }
 
             // TODO: alert that weekend and saturday should not be selected on same
         }
