@@ -211,6 +211,9 @@
                 "action.transition.pending": {
                     "label": "En cours"
                 },
+                "action.transition.confirm": {
+                    "label": "Confirmer"
+                },
                 "action.transition.validate": {
                     "label": "Valider"
                 },

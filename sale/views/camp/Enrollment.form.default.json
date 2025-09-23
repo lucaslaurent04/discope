@@ -56,6 +56,20 @@
                 "ids": []
             },
             "visible": [
+                ["status", "=", "confirmed"],
+                ["state", "<>", "draft"]
+            ]
+        },
+        {
+            "id": "action.transition.confirm",
+            "label": "Confirm",
+            "controller": "model_transition",
+            "params": {
+                "entity": "sale\\camp\\Enrollment",
+                "transition": "confirm",
+                "ids": []
+            },
+            "visible": [
                 ["status", "=", "pending"],
                 ["state", "<>", "draft"]
             ]

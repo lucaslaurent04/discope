@@ -106,6 +106,27 @@
             {
                 "sections": [
                     {
+                        "id": "section.required-documents",
+                        "label": "Required documents",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "required_documents_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "id": "section.description",
                         "label": "Description",
                         "rows": [
@@ -138,27 +159,6 @@
                                             {
                                                 "type": "field",
                                                 "value": "required_skills_ids",
-                                                "width": "100%"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "section.required-documents",
-                        "label": "Required documents",
-                        "visible": ["state", "<>", "draft"],
-                        "rows": [
-                            {
-                                "columns": [
-                                    {
-                                        "width": "100%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "required_documents_ids",
                                                 "width": "100%"
                                             }
                                         ]

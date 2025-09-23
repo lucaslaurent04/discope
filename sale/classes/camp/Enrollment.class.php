@@ -286,6 +286,7 @@ class Enrollment extends Model {
                 'selection'         => [
                     'pending',
                     'waitlisted',
+                    'confirmed',
                     'validated',
                     'cancelled'
                 ],
@@ -857,6 +858,29 @@ class Enrollment extends Model {
             ],
 
             'pending' => [
+                'description' => "The enrollment is pending, we need to gather all documents and payments to validate it.",
+                'transitions' => [
+                    'confirm' => [
+                        'status'        => 'confirmed',
+                        'description'   => "bloque la place mais tous les docs n'ont pas nécessairement été reçus",
+                        'help'          => "on passe par là pour toutes les inscription (10 jours pour renvoyer les docs pour les inscriptions web).",
+                        // vérifier le nombre de places dispo et critère ASE
+                        'policies'      => [/*'validate'*/]
+                    ],
+                    'validate' => [
+                        'status'        => 'validated',
+                        'description'   => "Mark the enrollment as validated (all docs and payments received).",
+                        'policies'      => ['validate']
+                    ],
+                    'cancel' => [
+                        'status'        => 'cancelled',
+                        'description'   => "Cancel the pending enrollment.",
+                        'onafter'       => 'onafterCancel'
+                    ]
+                ]
+            ],
+
+            'confirmed' => [
                 'description' => "The enrollment is pending, we need to gather all documents and payments to validate it.",
                 'transitions' => [
                     'validate' => [
