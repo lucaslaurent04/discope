@@ -882,12 +882,12 @@ class Enrollment extends Model {
             ],
 
             'pending' => [
-                'description' => "The enrollment is pending, we need to gather all documents and payments to validate it.",
+                'description' => "The enrollment is pending/being created, it doesn't block other enrollments.",
                 'transitions' => [
                     'confirm' => [
                         'status'        => 'confirmed',
-                        'description'   => "bloque la place mais tous les docs n'ont pas nécessairement été reçus",
-                        'help'          => "on passe par là pour toutes les inscription (10 jours pour renvoyer les docs pour les inscriptions web).",
+                        'description'   => "Reserves the spot (not all documents have necessarily been received).",
+                        'help'          => "This step is mandatory for all enrollments (guardians have 10 days to return the documents for web enrollments).",
                         // vérifier le nombre de places dispo et critère ASE
                         'policies'      => [/*'validate'*/]
                     ],
@@ -905,7 +905,7 @@ class Enrollment extends Model {
             ],
 
             'confirmed' => [
-                'description' => "The enrollment is pending, we need to gather all documents and payments to validate it.",
+                'description' => "The enrollment is confirmed, the spot is reserved but not all documents have necessarily been received.",
                 'transitions' => [
                     'validate' => [
                         'status'        => 'validated',
