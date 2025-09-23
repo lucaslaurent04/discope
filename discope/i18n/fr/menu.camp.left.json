@@ -65,6 +65,58 @@
         "pending.enrollments.pending": {
             "label": "En cours",
             "help": "Inscriptions en cours, récupération des documents et paiements."
+        },
+        "financial-helps": {
+            "label": "Aides financières",
+            "help": ""
+        },
+        "financial-helps.price-adapters": {
+            "label": "Réductions aides",
+            "help": ""
+        },
+        "financial-helps.ce-enrollments": {
+            "label": "Inscriptions CE",
+            "help": ""
+        },
+        "settings": {
+            "label": "Paramètres",
+            "help": ""
+        },
+        "settings.catalog": {
+            "label": "Catalogue",
+            "help": ""
+        },
+        "settings.catalog.products" : {
+            "label": "Produits",
+            "help": ""
+        },
+        "settings.catalog.product-models" : {
+            "label": "Modèles",
+            "help": ""
+        },
+        "settings.requirements": {
+            "label": "Exigences",
+            "help": ""
+        },
+        "settings.requirements.skills": {
+            "label": "Compétences",
+            "help": ""
+        },
+        "settings.requirements.documents": {
+            "label": "Documents",
+            "help": ""
+        },
+        "settings.helps": {
+            "label": "Aidants",
+            "help": ""
+        },
+        "settings.helps.sponsors": {
+            "label": "Aides",
+            "help": ""
+        },
+        "settings.helps.works-council": {
+            "label": "CEs",
+            "help": ""
         }
     }
 }
