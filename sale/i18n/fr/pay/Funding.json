@@ -1,6 +1,6 @@
 {
     "name": "Financement",
-    "plural": "FinancementS",
+    "plural": "Financements",
     "description": "",
     "model": {
         "description": {
@@ -92,6 +92,11 @@
         "list.default": {
             "name": "Financements",
             "description": "Liste des financements.",
+            "layout": {}
+        },
+        "list.camp": {
+            "name": "Financements",
+            "description": "Liste des financements liés à des inscriptions à des camps.",
             "layout": {}
         }
     },

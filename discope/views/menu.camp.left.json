@@ -71,6 +71,18 @@
                 }
             },
             {
+                "id": "fundings",
+                "type": "entry",
+                "label": "Fundings",
+                "description": "",
+                "icon": "account_balance",
+                "route": "/camps",
+                "context": {
+                    "entity": "sale\\pay\\Funding",
+                    "view": "list.camp"
+                }
+            },
+            {
                 "id": "people",
                 "label": "People",
                 "description": "",
