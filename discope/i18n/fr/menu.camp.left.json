@@ -22,6 +22,10 @@
             "label": "Repas",
             "help": ""
         },
+        "fundings": {
+            "label": "Financements",
+            "help": ""
+        },
         "people" : {
             "label": "Participants",
             "help": ""
