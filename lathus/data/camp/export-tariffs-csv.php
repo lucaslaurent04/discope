@@ -6,11 +6,10 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use sale\camp\Camp;
 use sale\camp\CampModel;
 
 [$params, $provider] = eQual::announce([
-    'description'   => "Returns camps list in CSV format, for the export to Lathus website.",
+    'description'   => "Returns tariffs list in CSV format, for the export to Lathus website.",
     'params'        => [],
     'access'        => [
         'visibility'            => 'protected'

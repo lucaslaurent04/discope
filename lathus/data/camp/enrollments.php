@@ -32,12 +32,12 @@ use equal\http\HttpRequest;
 
 $api_uri = Setting::get_value('sale', 'integration', 'camp.enrollments.api_uri');
 if(is_null($api_uri)) {
-    throw new \Exception('missing_api_uri', EQ_ERROR_INVALID_CONFIG);
+    throw new \Exception("missing_api_uri", EQ_ERROR_INVALID_CONFIG);
 }
 
 $api_key = Setting::get_value('sale', 'integration', 'camp.enrollments.api_key');
 if(is_null($api_key)) {
-    throw new \Exception('missing_api_key', EQ_ERROR_INVALID_CONFIG);
+    throw new \Exception("missing_api_key", EQ_ERROR_INVALID_CONFIG);
 }
 
 $request = new HttpRequest('GET '.$api_uri);
