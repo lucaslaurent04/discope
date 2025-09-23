@@ -104,7 +104,8 @@ class Camp extends Model {
                 'dependents'        => ['name', 'enrollments_ids' => ['date_from']],
                 'default'           => function() {
                     return strtotime('next sunday');
-                }
+                },
+                'onupdate'          => 'onupdateDateFrom'
             ],
 
             'date_to' => [
@@ -500,7 +501,6 @@ class Camp extends Model {
 
     public static function onafterPublish($self) {
         $self->do('generate-meals');
-        $self->do('generate-activities');
     }
 
     public static function onafterCancel($self) {
@@ -729,6 +729,13 @@ class Camp extends Model {
         }
 
         return $result;
+    }
+
+    public static function onupdateDateFrom($self) {
+        $self->read(['camp_groups_ids']);
+        foreach($self as $camp) {
+            CampGroup::search(['id', 'in', $camp['camp_groups_ids']])->do('refresh-activities-dates');
+        }
     }
 
     /**
