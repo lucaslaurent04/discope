@@ -1,0 +1,18 @@
+{
+    "name": "Prix",
+    "plural": "Prix",
+    "description": "Prix d'un camp.",
+    "model": {
+        "camp_class": {
+            "label": "Classe camp",
+            "description": "La classe du camp, pour savoir quel prix utiliser.",
+            "help": "",
+            "selection": {
+                "other": "Autres",
+                "member": "Habitants Vienne/Partenaires hors Vienne",
+                "close-member": "Adhérents/Partenaires Vienne/Habitants des cantons"
+            }
+        }
+    },
+    "error": {}
+}
