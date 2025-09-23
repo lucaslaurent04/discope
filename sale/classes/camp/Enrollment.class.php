@@ -23,6 +23,15 @@ class Enrollment extends Model {
     public static function getColumns(): array {
         return [
 
+            'date_created' => [
+                'type'              => 'computed',
+                'result_type'       => 'datetime',
+                'description'       => "Creation date, to save the creation date when enrollment imported from external source.",
+                'help'              => "Needed because cannot 'created' field cannot be updated to specific value.",
+                'store'             => true,
+                'function'          => 'calcDateCreated'
+            ],
+
             'name' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
@@ -302,8 +311,7 @@ class Enrollment extends Model {
             'is_ase' => [
                 'type'              => 'boolean',
                 'description'       => "Is \"aide sociale à l'enfance\".",
-                'default'           => false,
-                'onupdate'          => 'onupdateIsAse'
+                'default'           => false
             ],
 
             'total' => [
@@ -343,7 +351,8 @@ class Enrollment extends Model {
                 'foreign_object'    => 'sale\camp\WorksCouncil',
                 'description'       => "The works council that will enhance the camp class by one level.",
                 'dependents'        => ['camp_class'],
-                'visible'           => ['is_clsh', '=', false]
+                'visible'           => ['is_clsh', '=', false],
+                'onupdate'          => 'onupdateWorksCouncilId'
             ],
 
             'payment_status' => [
@@ -374,6 +383,11 @@ class Enrollment extends Model {
                 'description'       => "Total amount that has been received so far.",
                 'function'          => 'calcPaidAmount',
                 'store'             => true
+            ],
+
+            'external_ref' => [
+                'type'              => 'string',
+                'description'       => "External reference for enrollment, if any."
             ],
 
             'fundings_ids' => [
@@ -499,6 +513,16 @@ class Enrollment extends Model {
             $birthdate = (new \DateTime())->setTimestamp($child['birthdate']);
             $date_from = (new \DateTime())->setTimestamp($camp['date_from']);
             $result['child_age'] = $birthdate->diff($date_from)->y;
+        }
+
+        return $result;
+    }
+
+    public static function calcDateCreated($self) {
+        $result = [];
+        $self->read(['created']);
+        foreach($self as $id => $enrollment) {
+            $result[$id] = $enrollment['created'];
         }
 
         return $result;
@@ -1300,6 +1324,10 @@ class Enrollment extends Model {
         $self->do('refresh-camp-product-line');
     }
 
+    public static function onupdateWorksCouncilId($self) {
+        $self->do('refresh-camp-product-line');
+    }
+
     public static function onupdateCampClass($self) {
         $self->do('refresh-camp-product-line');
     }
@@ -1541,7 +1569,7 @@ class Enrollment extends Model {
                             && $enrollment['camp_id']['date_from'] <= $price['price_list_id']['date_to']
                         ) {
                             $camp_price = $price;
-                            break;
+                            break 2;
                         }
                     }
                 }

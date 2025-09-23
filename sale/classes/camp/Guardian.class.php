@@ -231,14 +231,13 @@ class Guardian extends Model {
             'Saint-Savin', 'Saulgé', 'Sillars', 'Thollet', 'Trimouille', 'Usson du Poitou', 'Valdivienne', 'Verrières', 'Vigeant', 'Villemort',
         ];
 
-        $CCVG_cities_normalized = array_map(
-            function($city) {
-                $city = preg_replace("/[^a-zA-Z0-9]/", "", $city);
+        $normalizeCityName = function($city) {
+            $city = iconv('UTF-8', 'ASCII//TRANSLIT', $city);
+            $city = preg_replace("/[^a-zA-Z0-9]/", "", $city);
+            return strtolower($city);
+        };
 
-                return strtolower($city);
-            },
-            $CCVG_cities
-        );
+        $CCVG_cities_normalized = array_map($normalizeCityName, $CCVG_cities);
 
         $self->read(['address_city', 'is_vienne']);
         foreach($self as $id => $guardian) {
@@ -247,9 +246,7 @@ class Guardian extends Model {
                 continue;
             }
 
-            $city = preg_replace("/[^a-zA-Z0-9]/", "", $guardian['address_city']);
-            $city = strtolower($city);
-            $result[$id] = in_array($city, $CCVG_cities_normalized);
+            $result[$id] = in_array($normalizeCityName($guardian['address_city']), $CCVG_cities_normalized);
         }
 
         return $result;

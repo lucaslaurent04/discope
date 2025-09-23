@@ -6,6 +6,19 @@
     "layout": {
         "items": [
             {
+                "id": "camp-models",
+                "type": "entry",
+                "label": "Camp Models",
+                "description": "",
+                "icon": "cabin",
+                "route": "/camps",
+                "visible": ["camp.default.administrator", "in", "user.groups"],
+                "context": {
+                    "entity": "sale\\camp\\CampModel",
+                    "view": "list.default"
+                }
+            },
+            {
                 "id": "camps",
                 "type": "entry",
                 "label": "Camps",
@@ -55,6 +68,18 @@
                 "context": {
                     "entity": "sale\\booking\\BookingMeal",
                     "view": "list.camp-collect"
+                }
+            },
+            {
+                "id": "fundings",
+                "type": "entry",
+                "label": "Fundings",
+                "description": "",
+                "icon": "account_balance",
+                "route": "/camps",
+                "context": {
+                    "entity": "sale\\pay\\Funding",
+                    "view": "list.camp"
                 }
             },
             {
@@ -171,6 +196,149 @@
                                 "context": {
                                     "entity": "sale\\camp\\Enrollment",
                                     "view": "list.pending"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "financial-helps",
+                "label": "Financial helps",
+                "description": "Manage pending given financial helps.",
+                "icon": "money",
+                "type": "parent",
+                "visible": ["camp.default.administrator", "in", "user.groups"],
+                "children": [
+                    {
+                        "id": "financial-helps.price-adapters",
+                        "type": "entry",
+                        "label": "Price adapters",
+                        "description": "",
+                        "icon": "",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\camp\\price\\PriceAdapter",
+                            "view": "list.sponsor-search"
+                        }
+                    },
+                    {
+                        "id": "financial-helps.ce-enrollments",
+                        "type": "entry",
+                        "label": "Work councils enrollments",
+                        "description": "",
+                        "icon": "",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\camp\\Enrollment",
+                            "view": "list.work-council-search"
+                        }
+                    }
+                ]
+            },
+            {
+                "id": "settings",
+                "label": "Settings",
+                "description": "Manage configuration of camps related entities.",
+                "icon": "settings",
+                "type": "parent",
+                "visible": ["camp.default.administrator", "in", "user.groups"],
+                "children": [
+                    {
+                        "id": "settings.catalog",
+                        "label": "Catalog",
+                        "description": "",
+                        "icon": "library_books",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "settings.catalog.products",
+                                "type": "entry",
+                                "label": "Products",
+                                "description": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\catalog\\Product",
+                                    "view": "list.default",
+                                    "domain": ["is_camp", "=", true]
+                                }
+                            },
+                            {
+                                "id": "settings.catalog.product-models",
+                                "type": "entry",
+                                "label": "Products Models",
+                                "description": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\catalog\\ProductModel",
+                                    "view": "list.default",
+                                    "domain": ["is_camp", "=", true]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "settings.requirements",
+                        "label": "Requirements",
+                        "description": "",
+                        "icon": "checklist_rtl",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "settings.requirements.skills",
+                                "type": "entry",
+                                "label": "Skills",
+                                "description": "",
+                                "icon": "sports_handball",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\Skill",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "settings.requirements.documents",
+                                "type": "entry",
+                                "label": "Documents",
+                                "description": "",
+                                "icon": "task",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\Document",
+                                    "view": "list.default"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "settings.helps",
+                        "label": "Helpers",
+                        "description": "",
+                        "icon": "payments",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "settings.helps.sponsors",
+                                "type": "entry",
+                                "label": "Sponsors",
+                                "description": "",
+                                "icon": "domain",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\Sponsor",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "settings.helps.works-council",
+                                "type": "entry",
+                                "label": "Works Council",
+                                "description": "",
+                                "icon": "work",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\WorksCouncil",
+                                    "view": "list.default"
                                 }
                             }
                         ]

@@ -38,6 +38,14 @@
             },
             {
                 "type": "field",
+                "value": "sojourn_number",
+                "width": "5%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
                 "value": "short_name",
                 "width": "33%",
                 "sortable": false,

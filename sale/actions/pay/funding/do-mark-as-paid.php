@@ -9,14 +9,19 @@
 use sale\pay\Funding;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Mark a funding as paid even if not all payments received.",
+    'description'   => "Mark fundings as paid even if not all payments received.",
     'params'        => [
 
         'id' =>  [
             'type'          => 'integer',
             'description'   => "Identifier of the Funding to mark as paid.",
-            'min'           => 1,
-            'required'      => true
+            'min'           => 1
+        ],
+
+        'ids' =>  [
+            'description'   => "List of identifiers of the Fundings to mark as paid.",
+            'type'          => 'array',
+            'default'       => []
         ]
 
     ],
@@ -37,26 +42,37 @@ use sale\pay\Funding;
  */
 ['context' => $context] = $providers;
 
-$funding = Funding::id($params['id'])
-    ->read(['enrollment_id', 'is_paid', 'due_amount'])
-    ->first();
+if(empty($params['ids']) ) {
+    if(!isset($params['id']) || $params['id'] <= 0) {
+        throw new Exception("object_invalid_id", EQ_ERROR_UNKNOWN_OBJECT);
+    }
+    $params['ids'][] = $params['id'];
+}
 
-if(is_null($funding)) {
+$fundings = Funding::ids($params['ids'])
+    ->read(['enrollment_id', 'is_paid', 'due_amount'])
+    ->get();
+
+if(empty($fundings)) {
     throw new Exception("unknown_funding", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-if(is_null($funding['enrollment_id'])) {
-    throw new Exception("not_enrollment_funding", EQ_ERROR_INVALID_PARAM);
+foreach($fundings as $funding) {
+    if(is_null($funding['enrollment_id'])) {
+        throw new Exception("not_enrollment_funding", EQ_ERROR_INVALID_PARAM);
+    }
+
+    if($funding['is_paid']) {
+        throw new Exception("funding_already_paid", EQ_ERROR_INVALID_PARAM);
+    }
 }
 
-if($funding['is_paid']) {
-    throw new Exception("funding_already_paid", EQ_ERROR_INVALID_PARAM);
+foreach($fundings as $id => $funding) {
+    Funding::id($id)->update([
+        'is_paid'       => true,
+        'paid_amount'   => $funding['due_amount']
+    ]);
 }
-
-Funding::id($funding['id'])->update([
-    'is_paid'       => true,
-    'paid_amount'   => $funding['due_amount']
-]);
 
 $context->httpResponse()
         ->status(204)

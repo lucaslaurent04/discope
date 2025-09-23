@@ -1,0 +1,100 @@
+{
+    "name": "Fundings",
+    "description": "This view is intended for displaying the list of fundings for camps.",
+    "domain": ["enrollment_id", "<>", null],
+    "access": {
+        "groups": ["camp.default.user"]
+     },
+    "operations": {
+        "total": {
+            "paid_amount": {
+                "operation": "SUM",
+                "usage": "amount/money:2"
+            }
+        }
+    },
+    "header": {
+        "selection": {
+            "default" : false,
+            "actions" : [
+                {
+                    "id": "action.mark-as-paid",
+                    "label": "Marquer comme payé",
+                    "description": "Marquer le financement comme payé même sans avoir reçu tous les paiements.",
+                    "controller": "sale_pay_funding_do-mark-as-paid",
+                    "access": {
+                        "groups": ["camp.default.user"]
+                    }
+                }
+            ]
+        }
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "25%"
+            },
+            {
+                "type": "field",
+                "value": "enrollment_id",
+                "width": "33%"
+            },
+            {
+                "type": "field",
+                "value": "issue_date",
+                "width": "15%",
+                "widget": {
+                    "usage": "date/short"
+                }
+            },
+            {
+                "type": "field",
+                "value": "invoice_id",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "description",
+                "width": "25%"
+            },
+            {
+                "type": "field",
+                "value": "due_date",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "type",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "label": "Amount Due",
+                "value": "due_amount",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "is_paid",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "amount_share",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "payment_reference",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "paid_amount",
+                "width": "15%"
+            }
+        ]
+    }
+}

@@ -1,6 +1,6 @@
 {
     "name": "Pending enrollments",
-    "order": "created",
+    "order": "date_created",
     "sort": "asc",
     "domain": ["status", "=", "pending"],
     "header": {
@@ -43,7 +43,7 @@
             },
             {
                 "type": "field",
-                "value": "created",
+                "value": "date_created",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true,
