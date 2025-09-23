@@ -102,6 +102,12 @@ class CampGroup extends Model {
                 'description'   => "Removes the camp's activities.",
                 'policies'      => [],
                 'function'      => 'doRemoveActivities'
+            ],
+
+            'refresh-activities-dates' => [
+                'description'   => "Refresh activities dates to match modifications of camp date_from.",
+                'policies'      => [],
+                'function'      => 'doRefreshActivitiesDates'
             ]
 
         ];
@@ -193,6 +199,40 @@ class CampGroup extends Model {
         $self->read([]);
         foreach($self as $id => $camp_group) {
             BookingActivity::search(['camp_group_id', '=', $id])->delete(true);
+        }
+    }
+
+    public static function doRefreshActivitiesDates($self) {
+        $self->read([
+            'camp_id'                   => ['date_from', 'is_clsh'],
+            'booking_activities_ids'    => ['activity_date']
+        ]);
+
+        foreach($self as $camp_group) {
+            $old_date_from = null;
+            foreach($camp_group['booking_activities_ids'] as $activity) {
+                if(is_null($old_date_from) || $activity['activity_date'] < $old_date_from) {
+                    $old_date_from = $activity['activity_date'];
+                }
+            }
+
+            if(!is_null($old_date_from)) {
+                if(!$camp_group['camp_id']['is_clsh']) {
+                    $old_date_from -= 86400;
+                }
+
+                $dates_diff = $camp_group['camp_id']['date_from'] - $old_date_from;
+
+                if($dates_diff !== 0) {
+                    foreach($camp_group['booking_activities_ids'] as $id => $activity) {
+                        $shifted_activity_date = $activity['activity_date'] + $dates_diff;
+
+                        BookingActivity::id($id)->update([
+                            'activity_date' => $shifted_activity_date
+                        ]);
+                    }
+                }
+            }
         }
     }
 
