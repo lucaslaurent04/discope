@@ -30,10 +30,20 @@ use core\setting\Setting;
 $camps_csv = eQual::run('get', 'lathus_camp_export-camps-csv');
 
 $ftp_server = Setting::get_value('sale', 'integration', 'camp.sync_website.ftp_server');
+if(is_null($ftp_server)) {
+    throw new Exception("ftp_server_not_defined", EQ_ERROR_INVALID_CONFIG);
+}
+
 $ftp_user = Setting::get_value('sale', 'integration', 'camp.sync_website.ftp_user');
 $ftp_pass = Setting::get_value('sale', 'integration', 'camp.sync_website.ftp_password');
+if(is_null($ftp_user) || is_null($ftp_pass)) {
+    throw new Exception("ftp_credentials_not_defined", EQ_ERROR_INVALID_CONFIG);
+}
 
 $remote_file = Setting::get_value('sale', 'integration', 'camp.sync_website.ftp_camps_file_path');
+if(is_null($remote_file)) {
+    throw new Exception("ftp_remote_file_path_not_defined", EQ_ERROR_INVALID_CONFIG);
+}
 
 if(!($conn_id = ftp_connect($ftp_server))) {
     throw new Exception("ftp_connection_failed", EQ_ERROR_UNKNOWN);

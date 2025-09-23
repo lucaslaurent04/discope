@@ -55,6 +55,9 @@ if($params['sync_tariffs']) {
 }
 
 $sync_uri = Setting::get_value('sale', 'integration', 'camp.sync_website.sync_uri');
+if(is_null($sync_uri)) {
+    throw new Exception("sync_uri_setting_not_defined", EQ_ERROR_INVALID_CONFIG);
+}
 
 $request = new HttpRequest('GET '.$sync_uri);
 $response = $request->send();
