@@ -284,11 +284,9 @@ class Camp extends Model {
             ],
 
             'accounting_code' => [
-                'type'              => 'computed',
-                'result_type'       => 'string',
+                'type'              => 'string',
                 'description'       => "Specific accounting code for the camp.",
-                'store'             => true,
-                'relation'          => ['camp_model_id' => 'accounting_code'],
+                'default'           => '411C0'
             ],
 
             'need_license_ffe' => [

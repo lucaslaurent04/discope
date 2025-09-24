@@ -26,16 +26,6 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "accounting_code",
-                                                "width": "25%"
-                                            },
-                                            {
-                                                "type": "label",
-                                                "value": "",
-                                                "width": "10%"
-                                            },
-                                            {
-                                                "type": "field",
                                                 "value": "is_clsh",
                                                 "width": "20%"
                                             }

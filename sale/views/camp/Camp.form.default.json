@@ -150,8 +150,7 @@
                                             {
                                                 "type": "field",
                                                 "value": "accounting_code",
-                                                "width": "25%",
-                                                "readonly": true
+                                                "width": "25%"
                                             },
                                             {
                                                 "type": "label",
