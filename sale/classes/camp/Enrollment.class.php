@@ -1121,6 +1121,28 @@ class Enrollment extends Model {
             }
         }
 
+        // Check that the child has the required age
+        if(isset($values['camp_id']) || isset($values['child_id'])) {
+            foreach($self as $enrollment) {
+                $camp = Camp::id($values['camp_id'] ?? $enrollment['camp_id'])
+                    ->read(['min_age', 'max_age', 'date_from'])
+                    ->first();
+
+                $child = Child::id($values['child_id'] ?? $enrollment['child_id'])
+                    ->read(['birthdate'])
+                    ->first();
+
+                $date_from = (new \DateTime())->setTimestamp($camp['date_from']);
+                $birthdate = (new \DateTime())->setTimestamp($child['birthdate']);
+                $child_age = $birthdate->diff($date_from)->y;
+
+                // allow some flexibility with -1 and +1 (a warning will be dispatched if age doesn't exactly meet requirements of min_age and max_age)
+                if($child_age < ($camp['min_age'] - 1) || $child_age > ($camp['max_age'] + 1)) {
+                    return ['child_id' => ['birthdate' => "The child does not fit the camp age requirements."]];
+                }
+            }
+        }
+
         // Check that the child is not already enrolled to another camp at the same time
         if(isset($values['camp_id']) || isset($values['child_id'])) {
             foreach($self as $enrollment) {
