@@ -112,7 +112,7 @@
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": [ {
-                                                                "domain": [ ["amount", "=", "object.remaining_amount"], ["receipt_date", "=", "object.date"] ]
+                                                                "visible": [ ["amount", "=", "object.remaining_amount"], ["receipt_date", "=", "object.date"] ]
                                                             } ]
                                                         }
                                                     }

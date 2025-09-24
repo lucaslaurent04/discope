@@ -274,7 +274,7 @@
                                                 "header": {
                                                     "actions": {
                                                         "ACTION.CREATE": [ {
-                                                            "domain": [ ["center_office_id", "=", "object.center_office_id"] ]
+                                                            "visible": [ ["center_office_id", "=", "object.center_office_id"] ]
                                                         } ]
                                                     }
                                                 }
