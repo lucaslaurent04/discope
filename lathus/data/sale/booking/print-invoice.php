@@ -28,7 +28,7 @@ use core\setting\Setting;
 use Twig\TwigFilter;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Render an invoice given its ID as a PDF document, for Valrance.",
+    'description'   => "Render an invoice given its ID as a PDF document, for Lathus.",
     'params'        => [
 
         'id' => [
@@ -136,7 +136,7 @@ if(!file_exists($file)) {
 }
 
 /*
-    2) check booking exists
+    2) check invoice exists
 */
 
 $invoice = Invoice::id($params['id'])
@@ -523,7 +523,7 @@ $values = compact(
 );
 
 /*
-    3.9) Handle template parts
+    3.9) handle template parts
 */
 
 $booking = Booking::id($booking['id'])
@@ -535,7 +535,7 @@ $template = Template::search([
     ['code', '=', 'invoice'],
     ['type', '=', 'invoice']
 ])
-    ->read( ['id','parts_ids' => ['name', 'value']], $params['lang'])
+    ->read(['id','parts_ids' => ['name', 'value']], $params['lang'])
     ->first(true);
 
 $template_parts = [];
@@ -545,11 +545,6 @@ foreach($template['parts_ids'] as $part) {
         foreach($fields as $field) {
             $value = str_replace('{'.$object.'.'.$field.'}', $values[$object][$field], $value);
         }
-    }
-
-    $extra_fields = [];
-    foreach($extra_fields as $field) {
-        $value = str_replace('{'.$field.'}', $values[$field], $value);
     }
 
     $booking_extra_fields = ['date_from_long', 'date_to_long'];

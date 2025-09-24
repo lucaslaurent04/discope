@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+    <title>Attestation de fin de séjour</title>
+
+    <style type="text/css">
+        @page {
+            margin: 1cm 2cm;
+        }
+
+        body {
+            margin: 350px 0 70px 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 0.7em;
+            text-align: justify;
+            width: 100%;
+        }
+
+        h2 {
+            margin-top: 8px;
+            margin-bottom: 0;
+            font-size: 21px;
+        }
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 0;
+            font-size: 15px;
+        }
+
+        div, table, table tr td {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .header,
+        .footer {
+            box-sizing: border-box;
+            border: 0;
+            margin: 0;
+            padding: 0;
+            position: fixed;
+            width: 100%;
+            overflow: hidden;
+            background-color: white;
+        }
+
+        .header {
+            top: 0;
+            left: 0;
+            height: 340px;
+        }
+
+        .header .phone-info {
+            margin-top: 10px;
+            margin-left: 50px;
+            font-size: 0.8rem;
+        }
+
+        .header .company-info {
+            margin-top: 20px;
+            font-size: 0.65rem;
+        }
+
+        .header .phone-info p,
+        .header .company-info p {
+            margin: 0;
+        }
+
+        .footer {
+            bottom: 0;
+            left: 0;
+            height: 60px;
+            text-align: center;
+            overflow: visible;
+            z-index: 200;
+            font-size: 0.8em !important;
+        }
+
+        .message {
+            font-size: 0.8rem;
+            margin: 50px 0;
+            padding: 0 50px;
+        }
+
+        .message p {
+            margin: 0;
+        }
+
+        .message ul {
+            margin: 2px;
+            padding-left: 20px;
+        }
+
+        .signature p {
+            font-size: 0.8rem;
+            margin: 0;
+            max-width: 150px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <table style="width: 100%;">
+        <tr>
+            <td colspan="2" style="width: 50%; vertical-align: top;">
+                <div>
+                    <div style="width: 220px; text-align: center; font-size: 1.1rem; font-weight: 500;">
+                        <div>{{ organisation.name }}</div>
+                        <div>{{ organisation.address_street }}</div>
+                        {% if organisation.address_dispatch|length > 0 %}
+                            <div>{{ organisation.address_dispatch }}</div>
+                        {% endif %}
+                        <div>{{ organisation.address_zip }} {{ organisation.address_city }}</div>
+                    </div>
+
+                    <div class="phone-info">
+                        {{ parts.phone_info|raw }}
+                    </div>
+
+                    <div class="company-info">
+                        {{ parts.company_info|raw }}
+                    </div>
+                </div>
+            </td>
+            <td colspan="2" style="width: 50%; vertical-align: top; height: 260px;">
+                <div style="margin-top: 20px; font-size: 0.85rem;">
+                    Lathus, le {{ today }}
+                </div>
+
+                <div style="margin-top: 50px; height: 120px; width: 300px; border: 1px solid black; font-size: 0.9rem;">
+                    <div style="padding: 20px;">
+                        {% if institution %}
+                            {{ institution.name }}<br />
+                            {{ institution.address_street }}<br />
+                            {% if institution.address_dispatch|length > 0 %}
+                                {{ institution.address_dispatch }}<br />
+                            {% endif %}
+                            {{ institution.address_zip }} {{ institution.address_city }}
+                        {% else %}
+                            {{ main_guardian.firstname }} {{ main_guardian.lastname }}<br />
+                            {{ main_guardian.address_street }}<br />
+                            {% if main_guardian.address_dispatch|length > 0 %}
+                                {{ main_guardian.address_dispatch }}<br />
+                            {% endif %}
+                            {{ main_guardian.address_zip }} {{ main_guardian.address_city }}
+                        {% endif %}
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 3%; height: 20px; border-bottom: 1px solid black; border-collapse: collapse;"></td>
+            <td colspan="2" style="width: 94%; text-align: center; padding-top: 20px; text-transform: uppercase; font-size: 1.2rem;">
+                Attestation de fin de séjour
+            </td>
+            <td style="width: 3%; border-bottom: 1px solid black;"></td>
+        </tr>
+    </table>
+</div>
+
+<div class="footer">
+</div>
+
+<div class="message">
+    {{ parts.message|raw }}
+</div>
+
+<table style="width: 100%;">
+    <tr>
+        <td style="width: 66%;"></td>
+        <td style="width: 33%;">
+            <div class="signature">
+                {{ parts.signature|raw }}
+            </div>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
