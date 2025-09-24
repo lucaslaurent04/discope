@@ -73,6 +73,7 @@ class SeasonPeriod extends Model {
             'season_category_id' => [
                 'type'              => 'computed',
                 'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\season\SeasonCategory',
                 'description'       => 'The category the season relates to.',
                 'relation'          => ['season_id' => 'season_category_id'],
                 'function'          => 'calcSeasonCategoryId',
