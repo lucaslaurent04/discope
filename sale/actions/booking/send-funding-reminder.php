@@ -88,7 +88,8 @@ if(!$funding) {
     throw new Exception("unknown_funding", QN_ERROR_UNKNOWN_OBJECT);
 }
 
-$payment_remind = Setting::get_value('sale', 'features', 'payment.remind.active'.$funding['booking_id']['center_id']['center_office_id']['code'], 1);
+$payment_remind = Setting::get_value('sale', 'features', 'payment.remind.active.' . $funding['booking_id']['center_id']['center_office_id']['code'], true);
+
 if(!$payment_remind) {
     throw new Exception("payment_remind_feature_disabled", QN_ERROR_UNKNOWN_OBJECT);
 }

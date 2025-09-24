@@ -36,9 +36,18 @@ list($params, $providers) = eQual::announce([
 list($context, $auth, $dispatch) = [ $providers['context'], $providers['auth'], $providers['dispatch'] ];
 
 // switch to root account (access is 'private')
+$user_id = $auth->userId();
 $auth->su();
 
-$funding = Funding::id($params['id'])->read(['id', 'is_paid','due_amount', 'due_date', 'booking_id' => ['id', 'center_office_id' => ['id','code']]])->first(true);
+$funding = Funding::id($params['id'])
+    ->read([
+        'id', 'is_paid','due_amount', 'due_date',
+        'booking_id' => [
+            'id',
+            'center_office_id' => ['id','code']
+        ]
+    ])
+    ->first();
 
 if(!$funding) {
     throw new Exception("unknown_funding", QN_ERROR_UNKNOWN_OBJECT);
@@ -48,17 +57,18 @@ if(!$funding['is_paid'] && $funding['due_amount'] > 0 ) {
     // dispatch a message for notifying users
     $dispatch->dispatch('lodging.booking.payments', 'sale\booking\Booking', $funding['booking_id']['id'], 'warning', null, [], [], null, $funding['booking_id']['center_office_id']['id']);
 
-    $payment_remind = Setting::get_value('sale', 'features', 'payment.remind.active'.$funding['booking_id']['center_office_id']['code'], 1);
-    if (!$payment_remind) {
-        return;
-    }
-    try {
-       eQual::run('do', 'sale_booking_funding_remind-payment', ['id' => $params['id']]);
-    }
-    catch(Exception $e) {
-       // something went wrong : ignore
+    $payment_remind = Setting::get_value('sale', 'features', 'payment.remind.active.' . $funding['booking_id']['center_office_id']['code'], true);
+    if($payment_remind) {
+        try {
+            eQual::run('do', 'sale_booking_funding_remind-payment', ['id' => $params['id']]);
+        }
+        catch(Exception $e) {
+           // something went wrong : ignore
+        }
     }
 }
+
+$auth->su($user_id);
 
 $context->httpResponse()
         ->status(204)

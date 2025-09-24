@@ -58,7 +58,6 @@ $funding = Funding::id($params['id'])
 
 if($funding['is_paid']) {
     $dispatch->cancel('lodging.booking.funding.payment_reminder_failed', 'sale\booking\Booking', $funding['booking_id']['id']);
-
     throw new Exception('funding_already_paid', QN_ERROR_INVALID_PARAM);
 }
 
