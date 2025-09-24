@@ -111,10 +111,13 @@ if(in_array($contract['status'], ['pending', 'cancelled'])) {
     throw new Exception('sending_skipped', 0);
 }
 
+// #memo - a funding is not necessarily linked to the status of a booking and some payment can be due whatever the status of the contract and the time of the booking
+/*
 if($booking['date_from'] >= time() || in_array($booking['status'], ['credit_balance', 'balanced', 'cancelled'])) {
     // reminder is not necessary
     throw new Exception('sending_skipped', 0);
 }
+*/
 
 // by convention the most recent contract is listed first (see schema in sale/classes/booking/Booking.class.php)
 $contract_id = array_shift($booking['contracts_ids']);

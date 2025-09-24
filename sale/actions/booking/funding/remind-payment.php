@@ -48,9 +48,10 @@ $funding = Funding::id($params['id'])
             'id',
             'date_from',
             'date_to',
+            'organisation_id' => ['email'],
             'contacts_ids' => ['type', 'partner_identity_id' => ['email', 'lang_id' => ['code']]],
-            'center_id' => ['name', 'template_category_id'],
-            'center_office_id' => ['id', 'email_bcc'],
+            'center_id' => ['name', 'use_office_details', 'email', 'template_category_id'],
+            'center_office_id' => ['id', 'email', 'email_bcc'],
             'contracts_ids'
         ]
     ])
@@ -141,6 +142,25 @@ $message->setTo($contact['partner_identity_id']['email'])
     ->setSubject($title)
     ->setContentType('text/html')
     ->setBody($body);
+
+$reply_to = '';
+
+// 1) email of the organisation
+if(isset($funding['booking_id']['organisation_id']['email'])) {
+    $reply_to = $funding['booking_id']['organisation_id']['email'];
+}
+
+// 2) email of the center
+if(isset($funding['booking_id']['center_id']['email'])) {
+    $reply_to = $funding['booking_id']['center_id']['email'];
+}
+
+// 3) email of Center's Office, if any
+if(isset($funding['booking_id']['center_id']['use_office_details']) && isset($funding['booking_id']['center_office_id']['email'])) {
+    $reply_to = $funding['booking_id']['center_office_id']['email'];
+}
+
+$message->setReplyTo($reply_to);
 
 if(isset($funding['booking_id']['center_office_id']['email_bcc'])) {
     $message->addBcc($funding['booking_id']['center_office_id']['email_bcc']);
