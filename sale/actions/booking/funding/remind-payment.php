@@ -82,9 +82,12 @@ if(is_null($contact)) {
 $last_contract_id = array_shift($funding['booking_id']['contracts_ids']);
 $contract = Contract::id($last_contract_id)->read(['status'])->first(true);
 
-if(in_array($contract['status'], ['pending', 'cancelled']) || $funding['booking_id']['date_from'] >= time()) {
+// #memo - a funding is not necessarily linked to a contract, and some payment can be due whatever the status of the contract and the time of the booking
+/*
+if(in_array($contract['status'], ['pending', 'cancelled']) || $funding['booking_id']['date_from'] <= time()) {
     throw new Exception("sending_skipped", 0);
 }
+*/
 
 $template = Template::search([
         ['category_id', '=', $funding['booking_id']['center_id']['template_category_id']],
@@ -96,7 +99,6 @@ $template = Template::search([
 
 if(is_null($template)) {
     $dispatch->dispatch('lodging.booking.funding.payment_reminder_failed', 'sale\booking\Booking', $funding['booking_id']['id'], 'important', 'sale_booking_funding_remind-payment', ['id' => $params['id']], [], null, $funding['booking_id']['center_office_id']['id']);
-
     throw new Exception('missing_template', QN_ERROR_UNKNOWN_OBJECT);
 }
 
