@@ -1198,6 +1198,11 @@ class Enrollment extends Model {
             }
         }
 
+        $providers = \eQual::inject(['dispatch']);
+
+        /** @var \equal\dispatch\Dispatcher $dispatch */
+        $dispatch = $providers['dispatch'];
+
         $self->do('refresh-camp-product-line');
         $self->do('reset-camp-enrollments-qty');
         $self->do('refresh-required-documents');
@@ -1211,6 +1216,14 @@ class Enrollment extends Model {
 
             Child::id($enrollment['child_id'])->do('remove-unnecessary-presences');
             Enrollment::id($enrollment['id'])->do('generate-presences');
+        }
+
+        // check child age
+        $self->read(['child_age', 'camp_id' => ['min_age', 'max_age']]);
+        foreach($self as $id => $enrollment) {
+            if($enrollment['child_age'] < $enrollment['camp_id']['min_age'] || $enrollment['child_age'] > $enrollment['camp_id']['max_age']) {
+                $dispatch->dispatch('lodging.camp.enrollment.age_mismatch', 'sale\camp\Enrollment', $id, 'warning');
+            }
         }
     }
 
