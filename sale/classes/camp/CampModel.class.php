@@ -59,17 +59,6 @@ class CampModel extends Model {
                 'default'           => false
             ],
 
-            'clsh_type' => [
-                'type'              => 'string',
-                'selection'         => [
-                    '5-days',
-                    '4-days'
-                ],
-                'description'       => "Is it a camp of 5 or 4 days duration.",
-                'default'           => '5-days',
-                'visible'           => ['is_clsh', '=', true]
-            ],
-
             'day_product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',

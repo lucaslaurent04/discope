@@ -38,11 +38,6 @@
                                                 "type": "field",
                                                 "value": "is_clsh",
                                                 "width": "20%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "clsh_type",
-                                                "width": "20%"
                                             }
                                         ]
                                     },
