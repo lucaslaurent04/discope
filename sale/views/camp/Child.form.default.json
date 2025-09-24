@@ -1,6 +1,17 @@
 {
     "name": "Child",
     "description": "Form view for Child.",
+    "routes": [
+        {
+            "id": "item.print-camp-certificate",
+            "label": "Camp certificate",
+            "description": "",
+            "icon": "approval",
+            "route": "/?get=sale_camp_print-camp-certificate&child_id=object.id",
+            "target": "_blank",
+            "absolute": true
+        }
+    ],
     "layout": {
         "groups": [
             {

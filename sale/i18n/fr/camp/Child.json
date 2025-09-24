@@ -82,6 +82,11 @@
         "form.default": {
             "name": "Enfant",
             "description": "",
+            "routes": {
+                "item.print-camp-certificate": {
+                    "label": "Certificat camp"
+                }
+            },
             "layout": {
                 "section.skills": {
                     "label": "Compétences"
