@@ -88,17 +88,22 @@ class PriceAdapter extends Model {
      */
     public static function onchange($event, $values): array {
         $result = [];
-        if(isset($event['sponsor_id'])) {
-            $sponsor = Sponsor::id($event['sponsor_id'])
-                ->read(['name', 'amount', 'sponsor_type'])
-                ->first();
+        if(array_key_exists('sponsor_id', $event)) {
+            if(is_null($event['sponsor_id'])) {
+                $result['is_manual_discount'] = true;
+            }
+            else {
+                $sponsor = Sponsor::id($event['sponsor_id'])
+                    ->read(['name', 'amount', 'sponsor_type'])
+                    ->first();
 
-            $result['value'] = $sponsor['amount'];
-            $result['origin_type'] = $sponsor['sponsor_type'];
-            $result['price_adapter_type'] = 'amount';
-            $result['is_manual_discount'] = false;
-            if(empty($values['name'])) {
-                $result['name'] = $sponsor['name'];
+                $result['value'] = $sponsor['amount'];
+                $result['origin_type'] = $sponsor['sponsor_type'];
+                $result['price_adapter_type'] = 'amount';
+                $result['is_manual_discount'] = false;
+                if(empty($values['name'])) {
+                    $result['name'] = $sponsor['name'];
+                }
             }
         }
 
@@ -140,6 +145,14 @@ class PriceAdapter extends Model {
         $self->read(['sponsor_id', 'price_adapter_type', 'is_manual_discount', 'origin_type', 'enrollment_id']);
 
         if(isset($values['sponsor_id']) || isset($values['price_adapter_type']) || isset($values['is_manual_discount']) || isset($values['origin_type'])) {
+            foreach($self as $price_adapter) {
+                $origin_type = $values['origin_type'] ?? $price_adapter['origin_type'];
+                $price_adapter_type = $values['price_adapter_type'] ?? $price_adapter['price_adapter_type'];
+                if($origin_type !== 'loyalty-discount' && $price_adapter_type  === 'percent') {
+                    return ['price_adapter_type' => ['must_be_loyalty_discount' => "Must be loyalty discount when percent type."]];
+                }
+            }
+
             foreach($self as $price_adapter) {
                 $sponsor_id = array_key_exists('sponsor_id', $values) ? $values['sponsor_id'] : $price_adapter['sponsor_id'];
                 if(is_null($sponsor_id)) {
