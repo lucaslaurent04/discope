@@ -156,7 +156,7 @@ if(isset($funding['booking_id']['center_id']['email'])) {
 }
 
 // 3) email of Center's Office, if any
-if(isset($funding['booking_id']['center_id']['use_office_details']) && isset($funding['booking_id']['center_office_id']['email'])) {
+if($funding['booking_id']['center_id']['use_office_details'] && isset($funding['booking_id']['center_office_id']['email'])) {
     $reply_to = $funding['booking_id']['center_office_id']['email'];
 }
 
