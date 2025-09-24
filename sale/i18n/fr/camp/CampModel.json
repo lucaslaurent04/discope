@@ -31,15 +31,6 @@
             "description": "Centre loisir sans hébergement.",
             "help": ""
         },
-        "clsh_type": {
-            "label": "Durée",
-            "description": "Type de camp CLSH.",
-            "help": "",
-            "selection": {
-                "5-days": "5 jours",
-                "4-days": "4 jours"
-            }
-        },
         "day_product_id": {
             "label": "Produit à la journée",
             "description": "Le produit de vente du camp CLSH à la journée.",

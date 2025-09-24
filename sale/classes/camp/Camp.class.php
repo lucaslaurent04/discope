@@ -115,7 +115,8 @@ class Camp extends Model {
                 'dependents'        => ['name', 'enrollments_ids' => ['date_to']],
                 'default'           => function() {
                     return strtotime('next sunday +5 days');
-                }
+                },
+                'onupdate'          => 'onupdateDateTo'
             ],
 
             'camp_model_id' => [
@@ -169,15 +170,13 @@ class Camp extends Model {
             ],
 
             'clsh_type' => [
-                'type'              => 'computed',
-                'result_type'       => 'string',
+                'type'              => 'string',
                 'selection'         => [
                     '5-days',
                     '4-days'
                 ],
                 'description'       => "Is it a camp of 5 or 4 days duration.",
-                'store'             => true,
-                'relation'          => ['camp_model_id' => 'clsh_type'],
+                'default'           => '5-days',
                 'visible'           => ['is_clsh', '=', true]
             ],
 
@@ -683,7 +682,7 @@ class Camp extends Model {
         $result = [];
         if(isset($event['camp_model_id'])) {
             $camp_model = CampModel::id($event['camp_model_id'])
-                ->read(['name', 'employee_ratio', 'ase_quota', 'is_clsh', 'clsh_type'])
+                ->read(['name', 'employee_ratio', 'ase_quota', 'is_clsh'])
                 ->first(true);
 
             if(!is_null($camp_model)) {
@@ -692,7 +691,6 @@ class Camp extends Model {
 
                 if($camp_model['is_clsh']) {
                     $result['is_clsh'] = $camp_model['is_clsh'];
-                    $result['clsh_type'] = $camp_model['clsh_type'];
                 }
 
                 if(empty($values['short_name'])) {
@@ -732,6 +730,15 @@ class Camp extends Model {
     }
 
     public static function onupdateDateFrom($self) {
+        $self->read(['camp_groups_ids']);
+        foreach($self as $camp) {
+            CampGroup::search(['id', 'in', $camp['camp_groups_ids']])
+                ->do('refresh-activities-dates')
+                ->do('refresh-partner-events');
+        }
+    }
+
+    public static function onupdateDateTo($self) {
         $self->read(['camp_groups_ids']);
         foreach($self as $camp) {
             CampGroup::search(['id', 'in', $camp['camp_groups_ids']])
@@ -802,14 +809,6 @@ class Camp extends Model {
             ];
             if(count(array_diff(array_keys($values), $allowed_fields)) > 0) {
                 return ['status' => ['non_editable' => "This field can't be modified on a published camp."]];
-            }
-        }
-
-        foreach($self as $camp) {
-            $is_clsh = $values['is_clsh'] ?? $camp['is_clsh'];
-            $day_product_id = $values['day_product_id'] ?? $camp['day_product_id'];
-            if($is_clsh && is_null($day_product_id)) {
-                return ['day_product_id' => ['required' => "Day product required if CLSH camp."]];
             }
         }
 

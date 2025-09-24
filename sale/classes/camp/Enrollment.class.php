@@ -1516,24 +1516,12 @@ class Enrollment extends Model {
                     $enrollment['presence_day_5']
                 ];
 
-                $is_present_whole_camp = false;
-                if($enrollment['clsh_type'] === '4-days' && $present_days[0] && $present_days[1] && $present_days[2] && $present_days[3]) {
-                    $is_present_whole_camp = true;
-                }
-                elseif($enrollment['clsh_type'] === '5-days' && $present_days[0] && $present_days[1] && $present_days[2] && $present_days[3] && $present_days[4]) {
-                    $is_present_whole_camp = true;
-                }
+                $product = $enrollment['camp_id']['day_product_id'];
 
-                $product = $enrollment['camp_id']['product_id'];
-                $qty = 1;
-                if(!$is_present_whole_camp) {
-                    $product = $enrollment['camp_id']['day_product_id'];
-
-                    $qty = 0;
-                    foreach($present_days as $present_day) {
-                        if($present_day) {
-                            $qty++;
-                        }
+                $qty = 0;
+                foreach($present_days as $present_day) {
+                    if($present_day) {
+                        $qty++;
                     }
                 }
 
