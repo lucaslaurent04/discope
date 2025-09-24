@@ -6,15 +6,16 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use lathus\sale\camp\Enrollment as LathusEnrollment;
+use lathus\sale\camp\Guardian as LathusGuardian;
+use lathus\sale\camp\Institution as LathusInstitution;
 use sale\camp\Camp;
 use sale\camp\catalog\Product;
 use sale\camp\Child;
 use sale\camp\Enrollment;
 use sale\camp\EnrollmentLine;
 use sale\camp\Guardian;
-use lathus\sale\camp\Guardian as LathusGuardian;
 use sale\camp\Institution;
-use lathus\sale\camp\Institution as LathusInstitution;
 use sale\camp\price\PriceAdapter;
 use sale\camp\Sponsor;
 use sale\camp\WorksCouncil;
@@ -320,7 +321,7 @@ if(!empty($data)) {
             ->read(['max_children', 'enrollments_qty'])
             ->first();
 
-        $enrollment = Enrollment::create([
+        $enrollment = LathusEnrollment::create([
             'date_created'      => (new DateTime($ext_enrollment['date']))->getTimestamp(),
             'camp_id'           => $camp['id'],
             'child_id'          => $child['id'],
