@@ -76,7 +76,6 @@ class SeasonPeriod extends Model {
                 'foreign_object'    => 'sale\season\SeasonCategory',
                 'description'       => 'The category the season relates to.',
                 'relation'          => ['season_id' => 'season_category_id'],
-                'function'          => 'calcSeasonCategoryId',
                 'store'             => true,
                 'instant'           => true
             ]

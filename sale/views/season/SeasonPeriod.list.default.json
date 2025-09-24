@@ -44,7 +44,7 @@
             },
             {
                 "type": "field",
-                "label": "Type",
+                "label": "Category",
                 "value": "season_category_id",
                 "width": "20%",
                 "visible": false
