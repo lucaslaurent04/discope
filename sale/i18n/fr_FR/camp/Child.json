@@ -14,5 +14,16 @@
             }
         }
     },
+    "view": {
+        "form.default": {
+            "name": "Enfant",
+            "description": "",
+            "routes": {
+                "item.print-camp-certificate": {
+                    "label": "Attestation fin séjour"
+                }
+            }
+        }
+    },
     "error": {}
 }
