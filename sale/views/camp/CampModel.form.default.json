@@ -45,12 +45,6 @@
                                         "width": "50%",
                                         "items": [
                                             {
-                                                "type": "label",
-                                                "value": "",
-                                                "width": "50%",
-                                                "visible": ["is_clsh", "=", false]
-                                            },
-                                            {
                                                 "type": "field",
                                                 "value": "product_id",
                                                 "width": "50%"
@@ -58,6 +52,11 @@
                                             {
                                                 "type": "field",
                                                 "value": "day_product_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
                                                 "width": "50%"
                                             },
                                             {

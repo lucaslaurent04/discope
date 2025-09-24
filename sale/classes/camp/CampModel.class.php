@@ -31,14 +31,6 @@ class CampModel extends Model {
                 'usage'             => 'text/plain'
             ],
 
-            'product_id' => [
-                'type'              => 'many2one',
-                'foreign_object'    => 'sale\camp\catalog\Product',
-                'description'       => "The product that will be added to the enrollment lines if the child enroll for the full camp.",
-                'required'          => true,
-                'domain'            => ['is_camp', '=', true]
-            ],
-
             'camp_type' => [
                 'type'              => 'string',
                 'selection'         => [
@@ -59,12 +51,14 @@ class CampModel extends Model {
                 'default'           => false
             ],
 
-            'day_product_id' => [
+            // Non CLSH products: 'product_id', 'weekend_product_id' and 'saturday_morning_product_id'
+
+            'product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
-                'description'       => "The product that will be added to the enrollment lines if the child enroll for specific days of the camp.",
+                'description'       => "The product that will be added to the enrollment lines if the child enroll for the full camp.",
                 'domain'            => ['is_camp', '=', true],
-                'visible'           => ['is_clsh', '=', true]
+                'visible'           => ['is_clsh', '=', false]
             ],
 
             'weekend_product_id' => [
@@ -81,6 +75,16 @@ class CampModel extends Model {
                 'description'       => "The product that will be added to the enrollment lines if the child stays the until Saturday morning after the camp.",
                 'domain'            => ['is_camp', '=', true],
                 'visible'           => ['is_clsh', '=', false]
+            ],
+
+            // CLSH product: 'day_product_id'
+
+            'day_product_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\catalog\Product',
+                'description'       => "The product that will be added to the enrollment lines if the child enroll for specific days of the camp.",
+                'domain'            => ['is_camp', '=', true],
+                'visible'           => ['is_clsh', '=', true]
             ],
 
             'employee_ratio' => [
@@ -136,6 +140,44 @@ class CampModel extends Model {
             ]
 
         ];
+    }
+
+    public static function canupdate($self, $values): array {
+        $self->read([
+            'is_clsh',
+            'day_product_id',
+            'product_id',
+            'weekend_product_id',
+            'saturday_morning_product_id',
+        ]);
+
+        foreach($self as $camp_model) {
+            $is_clsh = $values['is_clsh'] ?? $camp_model['is_clsh'];
+            if($is_clsh) {
+                $day_product = $values['day_product_id'] ?? $camp_model['day_product_id'];
+                if(is_null($day_product)) {
+                    return ['day_product_id' => ['required_product' => "Product required."]];
+                }
+            }
+            else {
+                $product = $values['product_id'] ?? $camp_model['product_id'];
+                if(is_null($product)) {
+                    return ['product_id' => ['required_product' => "Product required."]];
+                }
+
+                $weekend_product = $values['weekend_product_id'] ?? $camp_model['weekend_product_id'];
+                if(is_null($weekend_product)) {
+                    return ['weekend_product_id' => ['required_product' => "Product required."]];
+                }
+
+                $saturday_morning_product = $values['saturday_morning_product_id'] ?? $camp_model['saturday_morning_product_id'];
+                if(is_null($saturday_morning_product)) {
+                    return ['saturday_morning_product_id' => ['required_product' => "Product required."]];
+                }
+            }
+        }
+
+        return parent::canupdate($self, $values);
     }
 }
 
