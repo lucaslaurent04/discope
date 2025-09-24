@@ -42,7 +42,7 @@ class SeasonPeriod extends Model {
                 'foreign_object'    => 'sale\season\Season',
                 'description'       => "The season the period belongs to.",
                 'required'          => true,
-                'onupdate'          => 'onupdateSeasonId'
+                'dependents'        => ['season_category_id']
             ],
 
             'season_type_id' => [
@@ -72,10 +72,12 @@ class SeasonPeriod extends Model {
 
             'season_category_id' => [
                 'type'              => 'computed',
-                'result_type'       => 'integer',
-                'description'       => "The category the season relates to.",
+                'result_type'       => 'many2one',
+                'description'       => 'The category the season relates to.',
+                'relation'          => ['season_id' => 'season_category_id'],
                 'function'          => 'calcSeasonCategoryId',
-                'store'             => true
+                'store'             => true,
+                'instant'           => true
             ]
 
         ];
@@ -85,12 +87,6 @@ class SeasonPeriod extends Model {
         $om->write(__CLASS__, $oids, ['month' => null, 'year' => null]);
         // force immediate re-computing
         $om->read(__CLASS__, $oids, ['month', 'year']);
-    }
-
-    public static function onupdateSeasonId($om, $oids, $values, $lang) {
-        $om->write(__CLASS__, $oids, ['season_category_id' => null]);
-        // force immediate re-computing
-        $om->read(__CLASS__, $oids, ['season_category_id']);
     }
 
     public static function calcMonth($om, $oids, $lang) {
@@ -107,15 +103,6 @@ class SeasonPeriod extends Model {
         $periods = $om->read(__CLASS__, $oids, ['date_from']);
         foreach($periods as $oid => $odata) {
             $result[$oid] = date('Y', $odata['date_from']);
-        }
-        return $result;
-    }
-
-    public static function calcSeasonCategoryId($om, $oids, $lang) {
-        $result = [];
-        $periods = $om->read(__CLASS__, $oids, ['season_id.season_category_id']);
-        foreach($periods as $oid => $odata) {
-            $result[$oid] = $odata['season_id.season_category_id'];
         }
         return $result;
     }
