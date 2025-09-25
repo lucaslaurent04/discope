@@ -85,7 +85,7 @@ Booking::refreshIsTbc($orm, $booking['id']);
 // restore events (in case this controller is chained with others)
 $orm->enableEvents();
 
-BookingLineGroup::resetActivityGroupNumber($booking['id']);
+Booking::id($booking['id'])->do('refresh_groups_activity_number');
 
 $context->httpResponse()
         ->status(204)

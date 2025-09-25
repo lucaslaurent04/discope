@@ -89,7 +89,7 @@ Booking::refreshNbPers($orm, $group['booking_id']['id']);
 // restore events in case this controller is chained with others
 $orm->enableEvents();
 
-BookingLineGroup::resetActivityGroupNumber($group['booking_id']['id']);
+Booking::id($group['booking_id']['id'])->do('refresh_groups_activity_number');
 
 $context->httpResponse()
         ->status(204)
