@@ -577,6 +577,13 @@ class Booking extends Model {
                 'help'          => 'Used when a booking is cancelled.',
                 'policies'      => [],
                 'function'      => 'doCreateNegativeFundingForReimbursement'
+            ],
+
+            'refresh_groups_activity_number' => [
+                'description'   => 'Refreshes the booking line groups activity number.',
+                'help'          => '',
+                'policies'      => [],
+                'function'      => 'doRefreshGroupsActivityNumber'
             ]
         ];
     }
@@ -1414,6 +1421,31 @@ class Booking extends Model {
                     'order'             => count($booking['fundings_ids']) + 1,
                     'issue_date'        => time(),
                     'due_date'          => time()
+                ]);
+            }
+        }
+    }
+
+    public static function doRefreshGroupsActivityNumber($self) {
+        $self->read(['booking_lines_groups_ids' => ['order', 'group_type']]);
+        foreach($self as $booking) {
+            $groups_ids = [];
+            $map_order_groups_ids = [];
+            foreach($booking['booking_lines_groups_ids'] as $group) {
+                $groups_ids[] = $group['id'];
+                if($group['group_type'] === 'camp') {
+                    $map_order_groups_ids[$group['order']] = $group['id'];
+                }
+            }
+
+            BookingLineGroup::ids($groups_ids)->update([
+                'activity_group_num' => null
+            ]);
+
+            $group_ids = array_values($map_order_groups_ids);
+            foreach($group_ids as $index => $group_id) {
+                BookingLineGroup::id($group_id)->update([
+                    'activity_group_num' => $index + 1
                 ]);
             }
         }
