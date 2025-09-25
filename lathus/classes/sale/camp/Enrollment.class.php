@@ -16,6 +16,24 @@ class Enrollment extends Model {
         return "Override of camp Enrollment to add data fetched from CPA Lathus API.";
     }
 
+    public static function getColumns(): array {
+        return [
+
+            'is_external' => [
+                'type'              => 'string',
+                'description'       => "Does the enrollment comes from an external source, not Discope.",
+                'default'           => true
+            ],
+
+            'external_ref' => [
+                'type'              => 'string',
+                'description'       => "External reference for enrollment, if any.",
+                'required'          => true
+            ]
+
+        ];
+    }
+
     public static function canupdate($self, $values): array {
         return [];
     }
