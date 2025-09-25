@@ -185,6 +185,7 @@ class CampGroup extends Model {
 
                     if(count($activities_ids) === 0) {
                         BookingActivity::create([
+                            'camp_id'       => $camp['id'],
                             'camp_group_id' => $id,
                             'activity_date' => $date,
                             'time_slot_id'  => $map_time_slots[$time_slot_code]['id']
