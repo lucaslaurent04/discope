@@ -1112,7 +1112,7 @@ class BookingLineGroup extends Model {
     public static function canupdate($om, $oids, $values, $lang='en') {
 
         // list of fields that can be updated at any time
-        $allowed_fields = ['is_extra', 'has_schedulable_services', 'has_consumptions', 'has_locked_rental_units'];
+        $allowed_fields = ['is_extra', 'activity_group_num', 'has_schedulable_services', 'has_consumptions', 'has_locked_rental_units'];
 
         if(count(array_diff(array_keys($values), $allowed_fields))) {
 
