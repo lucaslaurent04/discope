@@ -24,7 +24,8 @@ class Enrollment {
         public child_id: number = 0,
         public camp_id: number = 0,
         public total: number = 0,
-        public price: number = 0
+        public price: number = 0,
+        public is_ase: boolean = false
     ) {
     }
 }
@@ -452,13 +453,21 @@ export class ChildPreRegistrationComponent implements OnInit, AfterContentInit {
     private async refreshTemplates() {
         console.log('re-fetch templates');
 
+        let ase = false;
+        for(let enrollment of this.enrollments) {
+            if(enrollment.is_ase) {
+                ase = true;
+                break;
+            }
+        }
+
         try {
             const templates: Template[] = await this.api.collect(
                 "communication\\Template",
                 [
                     ['category_id', '=', this.selectedCenter.template_category_id],
                     ['type', '=', 'camp'],
-                    ['code', '=', 'preregistration']
+                    ['code', '=', ase ? 'preregistration' : 'preregistration_ase']
                 ],
                 Object.getOwnPropertyNames(new Template()),
                 'id', 'asc', 0, 1, this.selectedLanguage.code
