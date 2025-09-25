@@ -271,6 +271,9 @@
                 "action.transition.pending": {
                     "label": "En cours"
                 },
+                "action.transition.confirm": {
+                    "label": "Confirmer"
+                },
                 "action.transition.validate": {
                     "label": "Valider"
                 },
@@ -311,6 +314,53 @@
             "actions": {
                 "action.transition.pending": {
                     "label": "En cours"
+                },
+                "action.transition.confirm": {
+                    "label": "Confirmer"
+                },
+                "action.transition.validate": {
+                    "label": "Valider"
+                },
+                "action.transition.cancel": {
+                    "label": "Annuler"
+                },
+                "action.transfer": {
+                    "label": "Transférer"
+                }
+            },
+            "layout": {
+                "section.followup": {
+                    "label": "Suivi"
+                },
+                "section.lines": {
+                    "label": "Lignes"
+                },
+                "section.reductions": {
+                    "label": "Réductions"
+                },
+                "section.daycare": {
+                    "label": "Garderie"
+                },
+                "section.child-remarks": {
+                    "label": "Remarques enfant"
+                },
+                "section.mails": {
+                    "label": "E-mails"
+                },
+                "section.fundings": {
+                    "label": "Financements"
+                }
+            }
+        },
+        "form.confirmed": {
+            "name": "Inscription",
+            "description": "",
+            "actions": {
+                "action.transition.pending": {
+                    "label": "En cours"
+                },
+                "action.transition.confirm": {
+                    "label": "Confirmer"
                 },
                 "action.transition.validate": {
                     "label": "Valider"
@@ -375,7 +425,18 @@
             "layout": {}
         },
         "list.pending": {
-            "name": "Inscriptions en cours",
+            "name": "Inscriptions à confirmer",
+            "description": "",
+            "header": {
+                "action.transition.validate": {
+                    "label": "Valider"
+                }
+            },
+            "layout": {
+            }
+        },
+        "list.confirmed": {
+            "name": "Inscriptions à valider",
             "description": "",
             "header": {
                 "action.transition.validate": {

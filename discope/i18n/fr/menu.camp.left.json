@@ -67,7 +67,11 @@
             "help": "Inscriptions en liste d'attente, pour transfert ou attente nouveau groupe."
         },
         "pending.enrollments.pending": {
-            "label": "En cours",
+            "label": "À confirmer",
+            "help": "Inscriptions en cours, a confirmer."
+        },
+        "pending.enrollments.confirmed": {
+            "label": "À valider",
             "help": "Inscriptions en cours, récupération des documents et paiements."
         },
         "financial-helps": {

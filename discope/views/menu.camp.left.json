@@ -190,12 +190,24 @@
                                 "id": "pending.enrollments.pending",
                                 "type": "entry",
                                 "label": "Pending enrollments",
-                                "description": "List all pending enrollments, with missing documents and/or payments.",
+                                "description": "List all pending enrollments, not confirmed yet.",
                                 "icon": "",
                                 "route": "/camps",
                                 "context": {
                                     "entity": "sale\\camp\\Enrollment",
                                     "view": "list.pending"
+                                }
+                            },
+                            {
+                                "id": "pending.enrollments.confirmed",
+                                "type": "entry",
+                                "label": "Confirmed enrollments",
+                                "description": "List all confirmed enrollments, with missing documents and/or payments.",
+                                "icon": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\Enrollment",
+                                    "view": "list.confirmed"
                                 }
                             }
                         ]
