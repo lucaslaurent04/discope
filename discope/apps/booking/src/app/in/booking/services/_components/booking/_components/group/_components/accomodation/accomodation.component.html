@@ -46,6 +46,9 @@
 
                 <div style="margin-left: auto; margin-right: 20px;">
                     <b [class.error]="(instance.qty < group.nb_pers)">Total: {{instance.qty}} p.</b>
+                    <button style="transform: scale(0.75)" mat-icon-button (click)="ondeleteAllAssignment()">
+                        <mat-icon>delete</mat-icon>
+                    </button>
                 </div>
             </div>
         </div>
