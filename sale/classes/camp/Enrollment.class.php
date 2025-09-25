@@ -303,6 +303,20 @@ class Enrollment extends Model {
                 'default'           => 'pending'
             ],
 
+            'preregistration_sent' => [
+                'type'              => 'boolean',
+                'description'       => "The preregistration mail asking for documents was sent.",
+                'default'           => false,
+                'visible'           => ['status', 'in', ['confirmed', 'validated']]
+            ],
+
+            'confirmation_sent' => [
+                'type'              => 'boolean',
+                'description'       => "The enrollment confirmation mail was sent.",
+                'default'           => false,
+                'visible'           => ['status', '=', 'validated']
+            ],
+
             'cancellation_date' => [
                 'type'              => 'date',
                 'description'       => "Date of cancellation."

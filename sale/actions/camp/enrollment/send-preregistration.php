@@ -13,6 +13,7 @@ use equal\email\Email;
 use equal\email\EmailAttachment;
 use identity\Center;
 use sale\camp\Child;
+use sale\camp\Enrollment;
 use sale\camp\EnrollmentMail;
 
 [$params, $providers] = eQual::announce([
@@ -233,6 +234,8 @@ EnrollmentMail::create([
     'mail_type'         => 'pre-registration',
     'enrollments_ids'   => $enrollments_ids
 ]);
+
+Enrollment::ids($enrollments_ids)->update(['preregistration_sent' => true]);
 
 $context->httpResponse()
         ->status(204)

@@ -154,9 +154,20 @@
             "selection": {
                 "pending": "En cours",
                 "waitlisted": "En attente",
+                "confirmed": "Confirmée",
                 "validated": "Validée",
                 "cancelled": "Annulée"
             }
+        },
+        "preregistration_sent": {
+            "label": "Pré-inscription envoyée",
+            "description": "Est-ce que le mail de pré-inscription a été envoyé?",
+            "help": ""
+        },
+        "confirmation_sent": {
+            "label": "Confirmation envoyée",
+            "description": "Est-ce que le mail de confirmation d'inscription a été envoyé?",
+            "help": ""
         },
         "is_ase": {
             "label": "ASE",

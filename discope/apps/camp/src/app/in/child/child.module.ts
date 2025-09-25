@@ -7,6 +7,7 @@ import { SharedLibModule, CustomDateAdapter } from 'sb-shared-lib';
 import { ChildRoutingModule } from './child-routing.module';
 
 import { ChildPreRegistrationComponent } from './pre-registration/pre-registration.component';
+import { ChildPreRegistrationReminderComponent } from './pre-registration-reminder/pre-registration-reminder.component';
 
 @NgModule({
     imports: [
@@ -14,7 +15,8 @@ import { ChildPreRegistrationComponent } from './pre-registration/pre-registrati
         ChildRoutingModule
     ],
     declarations: [
-        ChildPreRegistrationComponent
+        ChildPreRegistrationComponent,
+        ChildPreRegistrationReminderComponent
     ],
     providers: [
         { provide: DateAdapter, useClass: CustomDateAdapter, deps: [MAT_DATE_LOCALE, Platform] }
