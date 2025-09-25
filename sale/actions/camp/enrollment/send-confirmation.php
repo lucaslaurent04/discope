@@ -186,6 +186,8 @@ EnrollmentMail::create([
     'enrollments_ids'   => [$enrollment['id']]
 ]);
 
+Enrollment::id($enrollment['id'])->update(['confirmation_sent' => true]);
+
 $context->httpResponse()
         ->status(204)
         ->send();
