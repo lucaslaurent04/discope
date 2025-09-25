@@ -20,6 +20,10 @@ class Enrollment extends Model {
         return "The enrollment of a child to a camp group.";
     }
 
+    public static function getLink(): string {
+        return "/camp/#/enrollment/object.id";
+    }
+
     public static function getColumns(): array {
         return [
 
@@ -1255,10 +1259,10 @@ class Enrollment extends Model {
         }
 
         // check child age
-        $self->read(['child_age', 'camp_id' => ['min_age', 'max_age']]);
+        $self->read(['child_age', 'camp_id' => ['min_age', 'max_age', 'center_office_id']]);
         foreach($self as $id => $enrollment) {
             if($enrollment['child_age'] < $enrollment['camp_id']['min_age'] || $enrollment['child_age'] > $enrollment['camp_id']['max_age']) {
-                $dispatch->dispatch('lodging.camp.enrollment.age_mismatch', 'sale\camp\Enrollment', $id, 'warning');
+                $dispatch->dispatch('lodging.camp.enrollment.age_mismatch', 'sale\camp\Enrollment', $id, 'warning', null, [], [], null, $enrollment['camp_id']['center_office_id']);
             }
         }
     }
@@ -1270,7 +1274,7 @@ class Enrollment extends Model {
     public static function onupdateWeekendExtra($self) {
         $self->read([
             'weekend_extra',
-            'camp_id'               => ['weekend_product_id', 'saturday_morning_product_id', 'date_from', 'date_to'],
+            'camp_id'               => ['weekend_product_id', 'saturday_morning_product_id', 'date_from', 'date_to', 'center_office_id'],
             'enrollment_lines_ids'  => ['product_id']
         ]);
         foreach($self as $id => $enrollment) {
@@ -1325,7 +1329,7 @@ class Enrollment extends Model {
                     /** @var \equal\dispatch\Dispatcher $dispatch */
                     $dispatch = $providers['dispatch'];
 
-                    $dispatch->dispatch('lodging.camp.enrollment.weekend', 'sale\camp\Enrollment', $id, 'warning');
+                    $dispatch->dispatch('lodging.camp.enrollment.weekend', 'sale\camp\Enrollment', $id, 'warning', null, [], [], null, $enrollment['camp_id']['center_office_id']);
                     break;
                 case 'saturday-morning':
                     EnrollmentLine::search([
