@@ -31,6 +31,7 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
 
     @Output() updated = new EventEmitter();
     @Output() deleted = new EventEmitter();
+    @Output() loadStart = new EventEmitter();
 
     @ViewChildren(BookingServicesBookingGroupAccomodationAssignmentComponent) BookingServicesBookingGroupAccomodationAssignmentComponents: QueryList<BookingServicesBookingGroupAccomodationAssignmentComponent>;
     @ViewChild('assignmentsEditor') assignmentsEditor: BookingServicesBookingGroupAccomodationAssignmentsEditorComponent;
@@ -136,9 +137,21 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
         let rentalUnits = this.rentalUnits;
 
         if(this.filterBy.length > 0) {
+            let filterBy = this.filterBy.trim();
+            let qty = 0;
+            const match = filterBy.match(/^(.*?)\s*:\s*(\d+)\s*$/);
+            if(match) {
+                filterBy = match[1].trim();
+                qty = Number(match[2]);
+            }
+
             rentalUnits = rentalUnits.filter((rentalUnit) => {
-                return rentalUnit.name.toLowerCase().includes(this.filterBy.toLowerCase());
+                return rentalUnit.name.toLowerCase().includes(filterBy.toLowerCase());
             });
+
+            if(qty > 0) {
+                rentalUnits = rentalUnits.slice(0, qty);
+            }
         }
 
         if(this.showOnlyParents) {
@@ -196,6 +209,18 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
         try {
             await this.api.update(this.instance.entity, [this.instance.id], {rental_unit_assignments_ids: [-assignment_id]});
             this.instance.rental_unit_assignments_ids.splice(this.instance.rental_unit_assignments_ids.findIndex((e:any)=>e.id == assignment_id),1);
+            // relay to parent
+            this.updated.emit();
+        }
+        catch(response) {
+            this.api.errorFeedback(response);
+        }
+    }
+
+    public async ondeleteAllAssignment() {
+        try {
+            await this.api.update(this.instance.entity, [this.instance.id], {rental_unit_assignments_ids: this.instance.rental_unit_assignments_ids.map((assign: any) => -assign.id)});
+            this.instance.rental_unit_assignments_ids = [];
             // relay to parent
             this.updated.emit();
         }
@@ -274,6 +299,9 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
 
         let remaining_assignments: number = this.group.nb_pers - this.instance.qty;
 
+        if(this.selectedRentalUnits.length >= 10) {
+            this.loadStart.emit();
+        }
         for(let rental_unit_id of this.selectedRentalUnits) {
             const rentalUnit = <RentalUnitClass> this.rentalUnits.find( (item) => item.id == rental_unit_id );
             if(!rentalUnit) {
