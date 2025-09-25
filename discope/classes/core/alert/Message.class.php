@@ -20,12 +20,14 @@ class Message extends \core\alert\Message {
                 'store'             => true,
                 'function'          => 'calcCenterOfficeId'
             ],
+
             'alert' => [
                 'type'              => 'computed',
                 'usage'             => 'icon',
                 'result_type'       => 'string',
                 'function'          => 'calcAlert'
-            ],
+            ]
+
         ];
     }
 
@@ -62,6 +64,4 @@ class Message extends \core\alert\Message {
         }
         return $result;
     }
-
-
 }
