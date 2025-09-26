@@ -58,6 +58,16 @@ use sale\booking\SojournProductModelRentalUnitAssignement;
             'description'   => "Structured message from bank statement."
         ],
 
+        'display_name' => [
+            'type'          => 'string',
+            'description'   => "Complete name of the booking."
+        ],
+
+        'customer_accounting_account' => [
+            'type'          => 'string',
+            'description'   => "Accounting account of the Identity of the customer."
+        ],
+
         'identity_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Identity',
@@ -134,6 +144,10 @@ if(isset($params['date_to'])) {
     $domain = Domain::conditionAdd($domain, ['date_from', '<=', $params['date_to']]);
 }
 
+if(!empty($params['display_name'])) {
+    $domain = Domain::conditionAdd($domain, ['display_name', 'ilike', '%'.$params['display_name'].'%']);
+}
+
 if(isset($params['has_tour_operator']) && $params['has_tour_operator'] === true ) {
     $domain = Domain::conditionAdd($domain, ['has_tour_operator', '=', true]);
 }
@@ -176,6 +190,24 @@ if(isset($params['bank_account_iban']) && strlen($params['bank_account_iban'])) 
     // lookup in identities
     $identities_ids = Identity::search(['bank_account_iban', '=', $params['bank_account_iban']])->ids();
     if(count($identities_ids)) {
+        $domain = Domain::conditionAdd($domain, ['customer_identity_id', 'in', $identities_ids]);
+        $found = true;
+    }
+
+    if(!$found) {
+        // add a constraint to void the result set
+        $bookings_ids = [0];
+    }
+}
+
+/*
+    customer_accounting_code : search identities
+*/
+if(!empty($params['customer_accounting_account'])) {
+    $found = false;
+
+    $identities_ids = Identity::search(['accounting_account', 'ilike', "%{$params['customer_accounting_account']}%"])->ids();
+    if(!empty($identities_ids)) {
         $domain = Domain::conditionAdd($domain, ['customer_identity_id', 'in', $identities_ids]);
         $found = true;
     }
