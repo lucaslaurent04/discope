@@ -153,7 +153,7 @@ hr {
         <div style="margin-left: 8px;">
             <h3>{{ company_name}}</h3>
             {{ company_address }}<br />
-            {{i18n['company_registry']}}: {{ company_reg_number }}<br />
+            <!-- {{i18n['company_registry']}}: {{ company_reg_number }}<br /> -->
             {{i18n['vat_number']}}:
             {% if (company_has_vat == false) or (company_vat_number is null) or (company_vat_number == '') %}
                 N/A
@@ -255,7 +255,7 @@ hr {
                 <div style="margin-bottom: 5px; text-transform: uppercase; font-size: 13px;">
                     {{i18n['date']}}: <strong>{{ date }}</strong>
                 </div>
-                {% if status != 'proforma' %}
+
                 <div style="margin-bottom: 5px; text-transform: uppercase; font-size: 13px; white-space: nowrap;">
                     <span>{{i18n['status']}}:</span>
                     <strong style="font-size: 13px;">
@@ -270,7 +270,7 @@ hr {
                     {% endif %}
                     </strong>
                 </div>
-                {% endif %}
+
             </td>
         </tr>
     </table>
@@ -409,7 +409,7 @@ hr {
                 </td>
             </tr>
         </table>
-        {% if status != 'proforma' and type != 'credit_note' and ( not has_orders)%}
+        {% if type != 'credit_note' and ( not has_orders)%}
         <table width="100%" style="border-right: 1px solid white; border: 0px; margin-top: 20px;" cellpadding="4" cellspacing="0">
             {% if (total_remaining < 0.0) %}
             <tr valign="top">
@@ -442,7 +442,7 @@ hr {
 </div>
 
 <!-- funding plan -->
-{% if fundings | length > 0  and (price > 0.0) and (status != 'proforma') %}
+{% if fundings | length > 0  and (price > 0.0) %}
 <div style="margin-top: 50px; page-break-inside: avoid;">
     <div style="margin: 0px 0px 20px 0px;"><b><u>{{i18n['payments_schedule']}} ({{date_fundings_update}}):</u></b></div>
     <table width="100%" cellpadding="4" cellspacing="0" style="border: solid 1px black; border-collapse: collapse; page-break-inside: avoid;">
@@ -488,7 +488,7 @@ hr {
 </div>
 {% endif %}
 
-{% if (total_remaining > 0.0) and (status != 'proforma') and (type != 'credit_note') and ( not has_orders) %}
+{% if (total_remaining > 0.0) and (type != 'credit_note') and ( not has_orders) %}
 <div style="position: relative; margin-top: 40px; border: solid 2px black; height: 180px; page-break-inside: avoid;">
     <div style="font-size: 15px; padding-left: 15px; padding-top: 15px;">
         {{i18n['balance_of']}} <b>{{ total_remaining | format_money() }}</b> {{i18n['must_be_paid_before']}} <b>{{ payment_deadline }}</b>
@@ -553,11 +553,11 @@ hr {
 
 <br>
 
-{% if status != 'proforma' %}
+
 <div class="signature-container">
     {{ signature|raw }}
 </div>
-{% endif %}
+
 
 
 <div style="margin-top: 50px;">
