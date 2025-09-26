@@ -297,6 +297,9 @@ hr {
     <div class="intro">
         {{ invoice_header_html | raw }}
     </div>
+    <div class="notice" style="font-size: 12px;">
+        {{ invoice_notice_html | raw }}
+    </div>
     <div class="wrapper">
         <table width="100%" cellpadding="4" cellspacing="0">
             <thead style="border: solid 1px black; border-left: 0px; border-right: 0px;">
@@ -435,12 +438,10 @@ hr {
     </div>
 </div>
 
-<div style="margin-top: 10px;"><small>Association loi 1901, non assujetie à la TVA : (article 261-4-40-a 3ème alinéa et 261-7-1er du code général des impôts)</small></div>
-<div style="margin-top: 50px; page-break-inside: avoid;"></div>
+<div style="margin-top: 10px; text-align: center;"><small>Association loi 1901, non assujetie à la TVA : (article 261-4-40-a 3ème alinéa et 261-7-1er du code général des impôts)</small></div>
 
-<div class="notice" style="font-size: 12px;">
-    {{ invoice_notice_html | raw }}
-</div>
+<div style="margin-top: 10px; page-break-inside: avoid;"></div>
+
 
 <!--
 #moved to payment details box
