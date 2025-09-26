@@ -534,7 +534,7 @@ hr {
 {% endif %}
 
 {% if (total_remaining > 0.0) and (type != 'credit_note') and ( not has_orders) %}
-<div style="position: relative; margin-top: 40px; border: solid 2px black; height: 180px; page-break-inside: avoid;">
+<div style="position: relative; margin-top: 40px; border: solid 2px black; height: 170px; page-break-inside: avoid;">
     <div style="font-size: 15px; padding-left: 15px; padding-top: 15px;">
         {{i18n['balance_of']}} <b>{{ total_remaining | format_money() }}</b> {{i18n['must_be_paid_before']}} <b>{{ payment_deadline }}</b>
     </div>
