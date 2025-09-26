@@ -9,6 +9,23 @@
             </mat-form-field>
         </div>
     </div>
+    <div style="display: flex; padding-top: 12px;">
+        <div style="flex: 0 1 150px; line-height: 60px;">Types d'unités</div>
+        <div style="margin-left: auto;">
+            <mat-form-field class="example-full-width" appearance="fill">
+                <mat-label>Types d'untités</mat-label>
+                <mat-select multiple [(ngModel)]="rental_units_types">
+                    <mat-option [value]="'building'">Bâtiment</mat-option>
+                    <mat-option [value]="'bedroom'">Chambre</mat-option>
+                    <mat-option [value]="'bed'">Lit</mat-option>
+                    <mat-option [value]="'meetingroom'">Salle de réunion</mat-option>
+                    <mat-option [value]="'diningroom'">Réfectoire</mat-option>
+                    <mat-option [value]="'room'">Salle</mat-option>
+                    <mat-option [value]="'FFE'">Mobilier, accessoires et équipement</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
     <div style="display: flex; height: 48px; padding-top: 12px;">
         <mat-slide-toggle [checked]="show_parents" [(ngModel)]="show_parents">Afficher les unités parentes</mat-slide-toggle>
     </div>
