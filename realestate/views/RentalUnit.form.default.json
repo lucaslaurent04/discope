@@ -83,6 +83,17 @@
                                                 "type": "field",
                                                 "value": "has_phi_support",
                                                 "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "display_children_in_planning",
+                                                "width": "100%",
+                                                "visible": ["has_children", "=", true]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "display_in_planning",
+                                                "width": "100%"
                                             }
                                         ]
                                     },

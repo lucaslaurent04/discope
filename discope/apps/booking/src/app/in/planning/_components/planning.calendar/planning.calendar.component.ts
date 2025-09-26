@@ -23,7 +23,8 @@ class RentalUnit {
         public is_accomodation: boolean = true,
         public has_children: boolean = false,
         public can_partial_rent: boolean = false,
-        public color: string = ''
+        public color: string = '',
+        public display_in_planning: boolean = true
     ) {}
 }
 
