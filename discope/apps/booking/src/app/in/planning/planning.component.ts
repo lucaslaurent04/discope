@@ -112,6 +112,10 @@ export class PlanningComponent implements OnInit, AfterViewInit, OnDestroy {
         let show_parents = (localStorage.getItem('planning_show_parents') === 'true');
         let show_children = (localStorage.getItem('planning_show_children') === 'true');
         let is_accomodation = (localStorage.getItem('planning_show_accomodations_only') === 'true');
+        let rental_units_types = [];
+        if(localStorage.getItem('planning_rental_units_types')) {
+            rental_units_types = JSON.parse(localStorage.getItem('planning_rental_units_types'));
+        }
 
         if(!show_parents && !show_children) {
             show_parents = true;
@@ -146,6 +150,17 @@ export class PlanningComponent implements OnInit, AfterViewInit, OnDestroy {
             else {
                 for(let i = 0, n = domain.length; i < n; ++i) {
                     domain[i].push(['is_accomodation', '=', true]);
+                }
+            }
+        }
+
+        if(rental_units_types.length > 0) {
+            if(!domain.length) {
+                domain.push([['can_rent', '=', true], ['type', 'in', rental_units_types]])
+            }
+            else {
+                for(let i = 0, n = domain.length; i < n; ++i) {
+                    domain[i].push(['type', 'in', rental_units_types]);
                 }
             }
         }
@@ -192,6 +207,7 @@ export class PlanningComponent implements OnInit, AfterViewInit, OnDestroy {
                 localStorage.setItem('planning_show_parents', result.show_parents.toString());
                 localStorage.setItem('planning_show_children', result.show_children.toString());
                 localStorage.setItem('planning_show_accomodations_only', result.show_accomodations_only.toString());
+                localStorage.setItem('planning_rental_units_types', JSON.stringify(result.rental_units_types));
                 this.applySettings();
             }
         });
