@@ -412,6 +412,43 @@ hr {
                 </td>
             </tr>
         </table>
+
+        <!-- payments history -->
+        {% if fundings_payments | length > 0  and (price > 0.0) %}
+        <div style="margin-top: 50px; page-break-inside: avoid;">
+            <!-- <div style="margin: 0px 0px 20px 0px;"><b><u>{{i18n['payments_history']}} ({{date_fundings_update}}):</u></b></div> -->
+            <table width="100%" cellpadding="4" cellspacing="0" style="border: solid 1px black; border-collapse: collapse; page-break-inside: avoid;">
+                <tr valign="top">
+                    <th width="25%" style="text-align: left;">
+                        <b style="text-transform: uppercase;">{{i18n['date']}}</b>
+                    </th>
+                    <th width="20%">
+                        <b style="text-transform: uppercase;">{{i18n['origin']}}</b>
+                    </th>
+                    <th width="65%" style="text-align: right;">
+                        <b style="text-transform: uppercase;">{{i18n['received']}}</b>
+                    </th>
+                </tr>
+
+                <!-- for each line -->
+                {% for payment in fundings_payments %}
+                    <tr valign="top">
+                        <td width="25%">
+                            {{ payment.receipt_date }}
+                        </td>
+                        <td width="20%" style="text-align: center;">
+                            {{ payment.payment_origin }}
+                        </td>
+                        <td width="65%" style="text-align: right;">
+                            {{ payment.amount | format_money() }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+
+        <!--
         {% if type != 'credit_note' and ( not has_orders)%}
         <table width="100%" style="border-right: 1px solid white; border: 0px; margin-top: 20px;" cellpadding="4" cellspacing="0">
             {% if (total_remaining < 0.0) %}
@@ -435,6 +472,7 @@ hr {
             {% endif %}
         </table>
         {% endif %}
+        -->
     </div>
 </div>
 
@@ -524,41 +562,6 @@ hr {
 </div>
 {% endif %}
 
-
-<!-- payments history -->
-{% if fundings_payments | length > 0  and (price > 0.0) %}
-<div style="margin-top: 50px; page-break-inside: avoid;">
-    <div style="margin: 0px 0px 20px 0px;"><b><u>{{i18n['payments_history']}} ({{date_fundings_update}}):</u></b></div>
-    <table width="100%" cellpadding="4" cellspacing="0" style="border: solid 1px black; border-collapse: collapse; page-break-inside: avoid;">
-        <tr valign="top">
-            <th width="25%" style="text-align: left;">
-                <b style="text-transform: uppercase;">{{i18n['date']}}</b>
-            </th>
-            <th width="20%">
-                <b style="text-transform: uppercase;">{{i18n['origin']}}</b>
-            </th>
-            <th width="65%" style="text-align: right;">
-                <b style="text-transform: uppercase;">{{i18n['received']}}</b>
-            </th>
-        </tr>
-
-        <!-- for each line -->
-        {% for payment in fundings_payments %}
-            <tr valign="top">
-                <td width="25%">
-                    {{ payment.receipt_date }}
-                </td>
-                <td width="20%" style="text-align: center;">
-                    {{ payment.payment_origin }}
-                </td>
-                <td width="65%" style="text-align: right;">
-                    {{ payment.amount | format_money() }}
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
-</div>
-{% endif %}
 
 <br>
 
