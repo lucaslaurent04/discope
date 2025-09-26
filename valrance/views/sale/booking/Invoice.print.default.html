@@ -285,16 +285,8 @@ hr {
 <div class="footer">
     <p style="text-align: center;">
         {{ company_name}} - {{ company_address }}
-        {% if not company_has_vat %}
-            &nbsp;- ASBL assujettie exemptée en vertu de l’article 44 §2, 2° du Code TVA
-        {% endif %}
-        <br />
-        {{i18n['company_registry']}}: {{ company_reg_number }} - IBAN : {{ company_iban }}
         <br />
         Email: {{ company_email }} - Web: {{ company_website }} - Tel {{ company_phone }}
-        {% if company_fax %}
-            - {{ company_fax }}
-        {% endif %}
     </p>
 </div>
 
