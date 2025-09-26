@@ -49,7 +49,7 @@ if(!$params['confirm']) {
 }
 
 $bank_check = BankCheck::id($params['id'])
-    ->read(['id', 'funding_id', 'payment_id', 'amount'])
+    ->read(['id', 'funding_id', 'payment_id', 'amount', 'emission_date'])
     ->first(true);
 
 if(is_null($bank_check)){
@@ -76,14 +76,15 @@ if($remaining_amount <= 0) {
 }
 
 $payment = Payment::create([
-    'enrollment_id'     => $funding['enrollment_id'],
-    'center_office_id'  => $funding['center_office_id'],
-    'bank_check_id'     => $bank_check['id'],
-    'is_manual'         => true,
-    'amount'            => $bank_check['amount'],
-    'payment_origin'    => 'cashdesk',
-    'payment_method'    => 'bank_check'
-])
+        'enrollment_id'     => $funding['enrollment_id'],
+        'center_office_id'  => $funding['center_office_id'],
+        'bank_check_id'     => $bank_check['id'],
+        'is_manual'         => true,
+        'amount'            => $bank_check['amount'],
+        'payment_origin'    => 'cashdesk',
+        'payment_method'    => 'bank_check',
+        'receipt_date'      => $bank_check['emission_date']
+    ])
     // this updated funding paid status
     ->update([
         'funding_id'        => $funding['id']

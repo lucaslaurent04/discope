@@ -14,8 +14,8 @@
             "help": ""
         },
         "emission_date": {
-            "label": "Date d'émission",
-            "description": "La date à laquelle le chèque bancaire a été émis.",
+            "label": "Date de réception",
+            "description": "La date à laquelle le chèque bancaire a été reçu et encodé.",
             "help": ""
         },
         "partner_id": {

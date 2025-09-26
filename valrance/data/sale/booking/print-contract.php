@@ -122,7 +122,7 @@ $lodgingBookingPrintBookingFormatMember = function($booking) {
     if($customer_assignment === 'id') {
         $code = ltrim(sprintf("%3d.%03d.%03d", intval($code) / 1000000, (intval($code) / 1000) % 1000, intval($code)% 1000), '0');
     }
-    return $code . ' - ' . $booking['customer_id']['partner_identity_id']['display_name'];
+    return $code . ' - ' . $booking['customer_id']['partner_identity_id']['legal_name'];
 };
 
 $lodgingBookingPrintAgeRangesText = function($booking, $connection_names) {
@@ -161,6 +161,7 @@ $fields = [
         'customer_identity_id' => [
                 'id',
                 'display_name',
+                'legal_name',
                 'address_street', 'address_dispatch', 'address_city', 'address_zip', 'address_country',
                 'phone',
                 'mobile',
@@ -171,6 +172,7 @@ $fields = [
             'partner_identity_id' => [
                 'id',
                 'display_name',
+                'legal_name',
                 'accounting_account',
                 'type',
                 'address_street', 'address_dispatch', 'address_city', 'address_zip', 'address_country',
@@ -226,6 +228,7 @@ $fields = [
             'type',
             'partner_identity_id' => [
                 'display_name',
+                'legal_name',
                 'phone',
                 'mobile',
                 'email',
@@ -387,7 +390,7 @@ $member_name = $lodgingBookingPrintBookingFormatMember($booking);
 $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
 $postal_address = sprintf("%s - %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']);
-$customer_name = substr($booking['customer_id']['partner_identity_id']['display_name'], 0,  65);
+$customer_name = substr($booking['customer_id']['partner_identity_id']['legal_name'], 0,  65);
 $customer_address = $booking['customer_id']['partner_identity_id']['address_street'] .' '. $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'];
 
 // #memo - client has request no to show activites on booking/contract but always use disctint doc (print-booking-activity)
@@ -577,7 +580,7 @@ $values['i18n'] = [
  */
 
 if($booking['customer_id']['partner_identity_id']['id'] != $booking['customer_identity_id']['id']) {
-    $values['attn_name'] = substr($booking['customer_identity_id']['display_name'], 0, 33);
+    $values['attn_name'] = substr($booking['customer_identity_id']['legal_name'], 0, 33);
     $values['attn_address1'] = $booking['customer_identity_id']['address_street'];
     $values['attn_address2'] = $booking['customer_identity_id']['address_zip'].' '.$booking['customer_identity_id']['address_city'].(($booking['customer_identity_id']['address_country'] != 'BE')?(' - '.$booking['customer_identity_id']['address_country']):'');
 }
