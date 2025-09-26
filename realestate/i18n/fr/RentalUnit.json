@@ -138,6 +138,16 @@
             "label": "PDA",
             "description": "L'unité locative est équipée pour les personnes à déficience auditive, avec la présence d'alarmes visuelles, de sous-titrage ou d'autres aides adaptées.",
             "help": ""
+        },
+        "display_children_in_planning": {
+            "label": "Afficher enfants dans planning",
+            "description": "Afficher les unités locatives enfants dans le planning des réservations.",
+            "help": ""
+        },
+        "display_in_planning": {
+            "label": "Afficher dans planning",
+            "description": "Afficher l'unité locative dans le planning des réservations.",
+            "help": ""
         }
     },
     "view": {

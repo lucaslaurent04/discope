@@ -274,6 +274,21 @@ class RentalUnit extends Model {
                 'description'       => 'Product model related to this Rental Unit.'
             ],
 
+            'display_children_in_planning' => [
+                'type'              => 'boolean',
+                'description'       => "Should the children's rental units be displayed in the bookings' planning.",
+                'default'           => true,
+                'dependents'        => ['children_ids' => 'display_in_planning']
+            ],
+
+            'display_in_planning' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => "Should rental unit be displayed in the bookings' planning.",
+                'store'             => true,
+                'function'          => 'calcDisplayInPlanning'
+            ]
+
         ];
     }
 
@@ -328,7 +343,7 @@ class RentalUnit extends Model {
     }
 
     public static function onupdateParentId($om, $ids, $values, $lang) {
-        $om->update(self::getType(), $ids, ['has_parent' => null]);
+        $om->update(self::getType(), $ids, ['has_parent' => null, 'display_in_planning' => null]);
     }
 
     public static function calcHasParent($om, $oids, $lang) {
@@ -337,6 +352,16 @@ class RentalUnit extends Model {
         foreach($units as $uid => $unit) {
             $result[$uid] = (bool) (!is_null($unit['parent_id']) && $unit['parent_id'] > 0);
         }
+        return $result;
+    }
+
+    public static function calcDisplayInPlanning($self): array {
+        $result = [];
+        $self->read(['parent_id' => ['display_children_in_planning']]);
+        foreach($self as $id => $rental_unit) {
+            $result[$id] = $rental_unit['parent_id']['display_children_in_planning'] ?? true;
+        }
+
         return $result;
     }
 
