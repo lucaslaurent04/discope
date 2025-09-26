@@ -415,7 +415,7 @@ hr {
         <div style="margin-top: 10px; text-align: center;"><small>Association loi 1901, non assujetie à la TVA : (article 261-4-40-a 3ème alinéa et 261-7-1er du code général des impôts)</small></div>
         <!-- payments history -->
         {% if fundings_payments | length > 0  and (price > 0.0) %}
-        <div style="margin-top: 50px; page-break-inside: avoid;">
+        <div style="margin-top: 5px; page-break-inside: avoid;">
             <!-- <div style="margin: 0px 0px 20px 0px;"><b><u>{{i18n['payments_history']}} ({{date_fundings_update}}):</u></b></div> -->
             <table width="100%" cellpadding="4" cellspacing="0" style="border: solid 1px black; border-collapse: collapse; page-break-inside: avoid;">
                 <tr valign="top">
@@ -538,7 +538,7 @@ hr {
     <div style="font-size: 15px; padding-left: 15px; padding-top: 15px;">
         {{i18n['balance_of']}} <b>{{ total_remaining | format_money() }}</b> {{i18n['must_be_paid_before']}} <b>{{ payment_deadline }}</b>
     </div>
-    <div style="padding-top: 20px; padding-left: 15px; font-size: 15px;">
+    <div style="padding-top: 20px; padding-left: 15px; font-size: 13px;">
         <b style="text-transform: uppercase;">{{i18n['communication']}}</b><b> : {{ payment_reference }}</b><br />
         IBAN : {{ company_iban }}<br />
         BIC : {{ company_bic }}<br />
