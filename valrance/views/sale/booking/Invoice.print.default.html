@@ -154,12 +154,15 @@ hr {
             <h3>{{ company_name}}</h3>
             {{ company_address }}<br />
             <!-- {{i18n['company_registry']}}: {{ company_reg_number }}<br /> -->
+            Siret: {{ company_reg_number }}
+            <!--
             {{i18n['vat_number']}}:
             {% if (company_has_vat == false) or (company_vat_number is null) or (company_vat_number == '') %}
                 N/A
             {% else %}
                 {{ company_vat_number }}
             {% endif %}
+            -->
         </div>
     </div>
     <div style="position: absolute; top: 20px; right: 0px; width: 350px; height: 123px; font-size: 13px; text-align: left;">
@@ -220,6 +223,7 @@ hr {
                     <!-- <div style="display: inline-block; width: 100%;">{{i18n['customer_num']}}: <b>{{ customer_id }}</b></div> -->
                 </div>
                 {% endif %}
+                <!--
                 <div>
                     <div class="fa fa-phone" style="display: inline-block;"></div>
                     <div style="display: inline-block;">{{center_phone}}</div>
@@ -228,6 +232,7 @@ hr {
                     <div class="fa fa-envelope-o" style="display: inline-block;"></div>
                     <div style="display: inline-block;">{{center_email}}</div>
                 </div>
+                -->
                 {% if customer_ref|length > 0 %}
                 <table style="margin-top: 5px; width: 100%;">
                     <tr>
