@@ -127,6 +127,7 @@ $booking = Booking::id($params['id'])
     ->read([
         'date_from',
         'date_to',
+        'activity_weeks_descriptions',
         'customer_identity_id' => [
             'name',
             'address_city'
@@ -151,6 +152,10 @@ $booking = Booking::id($params['id'])
         ]
     ])
     ->first(true);
+
+if(!is_null($booking['activity_weeks_descriptions'])) {
+    $booking['activity_weeks_descriptions'] = json_decode($booking['activity_weeks_descriptions']);
+}
 
 $map_week_day_timeslot_group_activity = [];
 

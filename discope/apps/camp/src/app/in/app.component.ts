@@ -18,7 +18,7 @@ export class AppComponent implements OnInit  {
         return {
             context: {
                 "entity": "discope\\core\\alert\\Message",
-                "view": "list.default"
+                "view": "list.camp"
             }
         };
     }

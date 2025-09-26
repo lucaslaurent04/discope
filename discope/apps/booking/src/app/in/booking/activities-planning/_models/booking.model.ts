@@ -7,6 +7,7 @@ export class Booking {
         public date_from: Date = new Date(),
         public date_to: Date = new Date(),
         public center_id: number = 0,
-        public status: string = ''
+        public status: string = '',
+        public activity_weeks_descriptions: string|null = null
     ) {}
 }

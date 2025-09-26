@@ -7,6 +7,7 @@ import { SharedLibModule, CustomDateAdapter } from 'sb-shared-lib';
 import { EnrollmentRoutingModule } from './enrollment-routing.module';
 
 import { EnrollmentConfirmationComponent } from './confirmation/confirmation.component';
+import { EnrollmentComponent } from './enrollment.component';
 
 @NgModule({
     imports: [
@@ -14,6 +15,7 @@ import { EnrollmentConfirmationComponent } from './confirmation/confirmation.com
         EnrollmentRoutingModule
     ],
     declarations: [
+        EnrollmentComponent,
         EnrollmentConfirmationComponent
     ],
     providers: [

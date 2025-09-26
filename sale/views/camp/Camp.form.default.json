@@ -150,8 +150,7 @@
                                             {
                                                 "type": "field",
                                                 "value": "accounting_code",
-                                                "width": "25%",
-                                                "readonly": true
+                                                "width": "25%"
                                             },
                                             {
                                                 "type": "label",
@@ -284,6 +283,30 @@
                                                 "type": "field",
                                                 "value": "camp_groups_ids",
                                                 "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.camp-activities",
+                        "label": "Activities",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "booking_activities_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.camp"
+                                                }
                                             }
                                         ]
                                     }

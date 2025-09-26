@@ -13,6 +13,8 @@ import { BookingLineGroup } from './_models/booking_line_group.model';
 import { BookingLine } from './_models/booking_line.model';
 
 import { BookedServicesDisplaySettings, RentalUnitsSettings } from '../../services.component';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 // declaration of the interface for the map associating relational Model fields with their components
 interface BookingComponentsMap {
@@ -68,6 +70,9 @@ export class BookingServicesBookingComponent
 
     private mapGroupsIdsHasActivity: {[key: number]: boolean};
 
+    // load with debounce
+    private load$ = new Subject();
+
     constructor(
         private dialog: MatDialog,
         private api: ApiService,
@@ -114,6 +119,10 @@ export class BookingServicesBookingComponent
         this.sojourn_types = sojournTypes;
         this.meal_types = mealTypes;
         this.meal_places = mealPlaces;
+
+        this.load$.pipe(debounceTime(500)).subscribe(() => {
+            this.load(this.instance.id);
+        });
     }
 
 
@@ -240,9 +249,15 @@ export class BookingServicesBookingComponent
     public ondropGroup(event:CdkDragDrop<any>) {
         moveItemInArray(this.instance.booking_lines_groups_ids, event.previousIndex, event.currentIndex);
         for(let i = Math.min(event.previousIndex, event.currentIndex), n = Math.max(event.previousIndex, event.currentIndex); i <= n; ++i) {
-            // #todo #refresh
-            this.api.update((new BookingLineGroup()).entity, [this.instance.booking_lines_groups_ids[i].id], {order: i+1})
-            .catch(response => this.api.errorFeedback(response));
+            try {
+                this.api.update((new BookingLineGroup()).entity, [this.instance.booking_lines_groups_ids[i].id], {order: i+1});
+
+                // reload with debounce because ondropGroup called multiple times successively
+                this.load$.next();
+            }
+            catch(response) {
+                this.api.errorFeedback(response);
+            }
         }
     }
 

@@ -72,5 +72,19 @@
                 <span style="margin-top: 5px">Suivant</span> <mat-icon>chevron_right</mat-icon>
             </button>
         </div>
+
+        <div class="week-description">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Description</mat-label>
+                <textarea
+                    matInput
+                    placeholder="Description de la semaine"
+                    rows="2"
+                    [formControl]="weekDescriptionFormControl"
+                    (blur)="onWeekDescriptionChanges()"
+                >
+                </textarea>
+            </mat-form-field>
+        </div>
     </div>
 </div>

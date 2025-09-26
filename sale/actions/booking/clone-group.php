@@ -256,7 +256,7 @@ Booking::refreshPrice($orm, $group['booking_id']['id']);
 
 $orm->enableEvents();
 
-BookingLineGroup::resetActivityGroupNumber($group['booking_id']['id']);
+Booking::id($group['booking_id']['id'])->do('refresh_groups_activity_number');
 
 $context->httpResponse()
         ->status(201)

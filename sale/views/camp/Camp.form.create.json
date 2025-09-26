@@ -63,7 +63,7 @@
                                             {
                                                 "type": "field",
                                                 "value": "accounting_code",
-                                                "visible": false
+                                                "width": "25%"
                                             },
                                             {
                                                 "type": "field",
@@ -98,17 +98,17 @@
                                             {
                                                 "type": "field",
                                                 "value": "day_product_id",
-                                                "visible":  false
+                                                "visible": false
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "weekend_product_id",
-                                                "visible":  false
+                                                "visible": false
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "saturday_morning_product_id",
-                                                "visible":  false
+                                                "visible": false
                                             },
                                             {
                                                 "type": "field",

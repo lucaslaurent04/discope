@@ -20,6 +20,10 @@ class Enrollment extends Model {
         return "The enrollment of a child to a camp group.";
     }
 
+    public static function getLink(): string {
+        return "/camp/#/enrollment/object.id";
+    }
+
     public static function getColumns(): array {
         return [
 
@@ -126,9 +130,9 @@ class Enrollment extends Model {
             'weekend_extra' => [
                 'type'              => 'string',
                 'selection'         => [
-                    'none',
-                    'full',
-                    'saturday-morning'
+                    'none',             // No weekend extra
+                    'full',             // The child stays on the weekend to attend another camp the following week
+                    'saturday-morning'  // The parents come on Saturday morning to fetch their child
                 ],
                 'description'       => "Does the child stays the weekend after the camp.",
                 'help'              => "If child stays full weekend it usually means that he is enrolled to another camp the following week. If child stays saturday morning it means that its guardian cannot pick him/her up on Friday.",
@@ -303,6 +307,20 @@ class Enrollment extends Model {
                 'default'           => 'pending'
             ],
 
+            'preregistration_sent' => [
+                'type'              => 'boolean',
+                'description'       => "The preregistration mail asking for documents was sent.",
+                'default'           => false,
+                'visible'           => ['status', 'in', ['confirmed', 'validated']]
+            ],
+
+            'confirmation_sent' => [
+                'type'              => 'boolean',
+                'description'       => "The enrollment confirmation mail was sent.",
+                'default'           => false,
+                'visible'           => ['status', '=', 'validated']
+            ],
+
             'cancellation_date' => [
                 'type'              => 'date',
                 'description'       => "Date of cancellation."
@@ -385,6 +403,12 @@ class Enrollment extends Model {
                 'store'             => true
             ],
 
+            'is_external' => [
+                'type'              => 'boolean',
+                'description'       => "Does the enrollment comes from an external source, not Discope.",
+                'default'           => false
+            ],
+
             'external_ref' => [
                 'type'              => 'string',
                 'description'       => "External reference for enrollment, if any."
@@ -445,9 +469,8 @@ class Enrollment extends Model {
     public static function onchange($event, $values): array {
         $result = [];
         $is_clsh = null;
-        if(isset($event['camp_id']) || isset($values['camp_id'])) {
-            $camp_id = $event['camp_id'] ?? $values['camp_id'];
-            $camp = Camp::id($camp_id)
+        if(isset($event['camp_id'])) {
+            $camp = Camp::id($event['camp_id'])
                 ->read(['is_clsh'])
                 ->first();
 
@@ -940,9 +963,21 @@ class Enrollment extends Model {
 
     public static function canupdate($self, $values): array {
         $self->read([
-            'is_locked', 'status', 'child_id', 'camp_id',
+            'is_external', 'is_locked', 'status', 'child_id', 'camp_id',
             'presence_day_1', 'presence_day_2', 'presence_day_3', 'presence_day_4', 'presence_day_5'
         ]);
+
+        // If is_external some fields cannot be modified
+        foreach($self as $enrollment) {
+            if($enrollment['is_external']) {
+                foreach(array_keys($values) as $column) {
+                    // weekend_extra can be modified to alter presences, but it'll not affect lines
+                    if(!in_array($column, ['is_locked', 'status', 'cancellation_date', 'enrollment_mails_ids', 'weekend_extra'])) {
+                        return ['is_external' => ['external_enrollment' => "Cannot modify an external enrollment."]];
+                    }
+                }
+            }
+        }
 
         // If is_locked cannot be modified
         foreach($self as $enrollment) {
@@ -1241,10 +1276,10 @@ class Enrollment extends Model {
         }
 
         // check child age
-        $self->read(['child_age', 'camp_id' => ['min_age', 'max_age']]);
+        $self->read(['child_age', 'camp_id' => ['min_age', 'max_age', 'center_office_id']]);
         foreach($self as $id => $enrollment) {
             if($enrollment['child_age'] < $enrollment['camp_id']['min_age'] || $enrollment['child_age'] > $enrollment['camp_id']['max_age']) {
-                $dispatch->dispatch('lodging.camp.enrollment.age_mismatch', 'sale\camp\Enrollment', $id, 'warning');
+                $dispatch->dispatch('lodging.camp.enrollment.age_mismatch', 'sale\camp\Enrollment', $id, 'warning', null, [], [], null, $enrollment['camp_id']['center_office_id']);
             }
         }
     }
@@ -1255,11 +1290,16 @@ class Enrollment extends Model {
 
     public static function onupdateWeekendExtra($self) {
         $self->read([
-            'weekend_extra',
-            'camp_id'               => ['weekend_product_id', 'saturday_morning_product_id', 'date_from', 'date_to'],
+            'weekend_extra', 'is_external',
+            'camp_id'               => ['weekend_product_id', 'saturday_morning_product_id', 'date_from', 'date_to', 'center_office_id'],
             'enrollment_lines_ids'  => ['product_id']
         ]);
         foreach($self as $id => $enrollment) {
+            if($enrollment['is_external']) {
+                // If external we can modify weekend_extra to affect presences generation, but it shouldn't modify the enrollment lines
+                continue;
+            }
+
             switch($enrollment['weekend_extra']) {
                 case 'none':
                     EnrollmentLine::search([
@@ -1311,7 +1351,7 @@ class Enrollment extends Model {
                     /** @var \equal\dispatch\Dispatcher $dispatch */
                     $dispatch = $providers['dispatch'];
 
-                    $dispatch->dispatch('lodging.camp.enrollment.weekend', 'sale\camp\Enrollment', $id, 'warning');
+                    $dispatch->dispatch('lodging.camp.enrollment.weekend', 'sale\camp\Enrollment', $id, 'warning', null, [], [], null, $enrollment['camp_id']['center_office_id']);
                     break;
                 case 'saturday-morning':
                     EnrollmentLine::search([
@@ -1516,24 +1556,12 @@ class Enrollment extends Model {
                     $enrollment['presence_day_5']
                 ];
 
-                $is_present_whole_camp = false;
-                if($enrollment['clsh_type'] === '4-days' && $present_days[0] && $present_days[1] && $present_days[2] && $present_days[3]) {
-                    $is_present_whole_camp = true;
-                }
-                elseif($enrollment['clsh_type'] === '5-days' && $present_days[0] && $present_days[1] && $present_days[2] && $present_days[3] && $present_days[4]) {
-                    $is_present_whole_camp = true;
-                }
+                $product = $enrollment['camp_id']['day_product_id'];
 
-                $product = $enrollment['camp_id']['product_id'];
-                $qty = 1;
-                if(!$is_present_whole_camp) {
-                    $product = $enrollment['camp_id']['day_product_id'];
-
-                    $qty = 0;
-                    foreach($present_days as $present_day) {
-                        if($present_day) {
-                            $qty++;
-                        }
+                $qty = 0;
+                foreach($present_days as $present_day) {
+                    if($present_day) {
+                        $qty++;
                     }
                 }
 

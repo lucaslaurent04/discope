@@ -24,8 +24,7 @@ class Enrollment {
         public child_id: number = 0,
         public camp_id: number = 0,
         public total: number = 0,
-        public price: number = 0,
-        public is_ase: boolean = false
+        public price: number = 0
     ) {
     }
 }
@@ -162,10 +161,10 @@ interface vModel {
 
 @Component({
     selector: 'enrollment-pre-registration',
-    templateUrl: 'pre-registration.component.html',
-    styleUrls: ['pre-registration.component.scss']
+    templateUrl: 'pre-registration-reminder.component.html',
+    styleUrls: ['pre-registration-reminder.component.scss']
 })
-export class ChildPreRegistrationComponent implements OnInit, AfterContentInit {
+export class ChildPreRegistrationReminderComponent implements OnInit, AfterContentInit {
 
     public child: Child = new Child();
 
@@ -453,21 +452,13 @@ export class ChildPreRegistrationComponent implements OnInit, AfterContentInit {
     private async refreshTemplates() {
         console.log('re-fetch templates');
 
-        let ase = false;
-        for(let enrollment of this.enrollments) {
-            if(enrollment.is_ase) {
-                ase = true;
-                break;
-            }
-        }
-
         try {
             const templates: Template[] = await this.api.collect(
                 "communication\\Template",
                 [
                     ['category_id', '=', this.selectedCenter.template_category_id],
                     ['type', '=', 'camp'],
-                    ['code', '=', ase ? 'preregistration' : 'preregistration_ase']
+                    ['code', '=', 'preregistration_reminder']
                 ],
                 Object.getOwnPropertyNames(new Template()),
                 'id', 'asc', 0, 1, this.selectedLanguage.code
@@ -605,7 +596,7 @@ export class ChildPreRegistrationComponent implements OnInit, AfterContentInit {
             });
 
             this.isSent = true;
-            this.snack.open("Confirmation de pré-inscription envoyée avec succès.");
+            this.snack.open("Relance de pré-inscription envoyée avec succès.");
             this.loading = false;
         }
         catch(response: any) {

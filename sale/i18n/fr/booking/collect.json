@@ -51,6 +51,16 @@
             "label": "Réf Cubilis",
             "description": "Numéro Cubilis de la réservation.",
             "help": ""
+        },
+        "display_name": {
+            "label": "Libellé complet",
+            "description": "Libellé complet de la réservation.",
+            "help": ""
+        },
+        "customer_accounting_account": {
+            "label": "Code comptable client",
+            "description": "Libellé complet de la réservation.",
+            "help": ""
         }
     },
     "error": {

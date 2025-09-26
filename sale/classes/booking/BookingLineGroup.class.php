@@ -445,7 +445,7 @@ class BookingLineGroup extends Model {
                     $om->update(self::getType(), $id, ['is_sojourn' => false]);
                     $om->update(self::getType(), $id, ['is_event' => true]);
                 }
-                self::resetActivityGroupNumber($group['booking_id']);
+                Booking::id($group['booking_id'])->do('refresh_groups_activity_number');
                 BookingActivity::ids($group['booking_activities_ids'])->update(['group_num' => null]);
             }
         }
@@ -455,9 +455,8 @@ class BookingLineGroup extends Model {
      * Force resetting other activities 'group_num'
      */
     public static function onupdateActivityGroupNum($self) {
-        $self->read(['booking_id', 'booking_activities_ids']);
+        $self->read(['booking_activities_ids']);
         foreach($self as $group) {
-            self::resetActivityGroupNumber($group['booking_id']);
             BookingActivity::ids($group['booking_activities_ids'])->update(['group_num' => null]);
         }
     }
@@ -602,30 +601,8 @@ class BookingLineGroup extends Model {
     public static function onupdateOrder($self) {
         $self->read(['booking_id', 'booking_activities_ids']);
         foreach($self as $group) {
-            self::resetActivityGroupNumber($group['booking_id']);
+            Booking::id($group['booking_id'])->do('refresh_groups_activity_number');
             BookingActivity::ids($group['booking_activities_ids'])->update(['group_num' => null]);
-        }
-    }
-
-    /**
-     * #todo - this should be changed to a refresh method on the Booking class level, using an ($orm, $id) signature
-     * #memo - this method is used in several `update-[...]` controllers (to be adapted in case of change)
-     */
-    public static function resetActivityGroupNumber($booking_id) {
-        $booking = Booking::id($booking_id)
-            ->read(['booking_lines_groups_ids' => ['order', 'group_type']])
-            ->first();
-
-        $map_order_groups_ids = [];
-        foreach($booking['booking_lines_groups_ids'] as $group) {
-            if($group['group_type'] === 'camp') {
-                $map_order_groups_ids[$group['order']] = $group['id'];
-            }
-        }
-
-        $group_ids = array_values($map_order_groups_ids);
-        foreach($group_ids as $index => $group_id) {
-            self::id($group_id)->update(['activity_group_num' => $index + 1]);
         }
     }
 
@@ -1135,7 +1112,7 @@ class BookingLineGroup extends Model {
     public static function canupdate($om, $oids, $values, $lang='en') {
 
         // list of fields that can be updated at any time
-        $allowed_fields = ['is_extra', 'has_schedulable_services', 'has_consumptions', 'has_locked_rental_units'];
+        $allowed_fields = ['is_extra', 'activity_group_num', 'has_schedulable_services', 'has_consumptions', 'has_locked_rental_units'];
 
         if(count(array_diff(array_keys($values), $allowed_fields))) {
 

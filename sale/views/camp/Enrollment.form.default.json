@@ -8,7 +8,18 @@
             "description": "Envoyer la confirmation de pré-inscription.",
             "icon": "email",
             "route": "/child/object.child_id/preregistration",
-            "visible": ["status", "=", "pending"]
+            "visible": ["status", "=", "confirmed"]
+        },
+        {
+            "id": "item.preregistration-reminder.send",
+            "label": "Relance pré-inscription",
+            "description": "Envoyer la relance de demande de documents manquant pour l'inscription.",
+            "icon": "email",
+            "route": "/child/object.child_id/preregistration-reminder",
+            "visible": [
+                ["status", "=", "confirmed"],
+                ["preregistration_sent", "=", true]
+            ]
         },
         {
             "id": "item.confirmation.send",
@@ -251,12 +262,6 @@
                                                 "readonly": true
                                             },
                                             {
-                                                "type": "label",
-                                                "value": "",
-                                                "width": "50%",
-                                                "visible": ["state", "<>", "draft"]
-                                            },
-                                            {
                                                 "type": "field",
                                                 "value": "all_documents_received",
                                                 "width": "50%",
@@ -283,6 +288,21 @@
                                                 "value": "clsh_type",
                                                 "readonly": true,
                                                 "visible": false
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "preregistration_sent",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "confirmation_sent",
+                                                "width": "50%"
                                             }
                                         ]
                                     }

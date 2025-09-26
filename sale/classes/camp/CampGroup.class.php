@@ -185,6 +185,7 @@ class CampGroup extends Model {
 
                     if(count($activities_ids) === 0) {
                         BookingActivity::create([
+                            'camp_id'       => $camp['id'],
                             'camp_group_id' => $id,
                             'activity_date' => $date,
                             'time_slot_id'  => $map_time_slots[$time_slot_code]['id']
@@ -204,11 +205,19 @@ class CampGroup extends Model {
 
     public static function doRefreshActivitiesDates($self) {
         $self->read([
-            'camp_id'                   => ['date_from', 'is_clsh'],
+            'camp_id'                   => ['date_from', 'date_to', 'is_clsh'],
             'booking_activities_ids'    => ['activity_date']
         ]);
 
-        foreach($self as $camp_group) {
+        $time_slots = TimeSlot::search([])
+            ->read(['id', 'code'])
+            ->get();
+        $map_time_slots = [];
+        foreach($time_slots as $time_slot) {
+            $map_time_slots[$time_slot['code']] = $time_slot;
+        }
+
+        foreach($self as $id => $camp_group) {
             $old_date_from = null;
             foreach($camp_group['booking_activities_ids'] as $activity) {
                 if(is_null($old_date_from) || $activity['activity_date'] < $old_date_from) {
@@ -224,11 +233,37 @@ class CampGroup extends Model {
                 $dates_diff = $camp_group['camp_id']['date_from'] - $old_date_from;
 
                 if($dates_diff !== 0) {
-                    foreach($camp_group['booking_activities_ids'] as $id => $activity) {
+                    foreach($camp_group['booking_activities_ids'] as $activity_id => $activity) {
                         $shifted_activity_date = $activity['activity_date'] + $dates_diff;
 
-                        BookingActivity::id($id)->update([
+                        BookingActivity::id($activity_id)->update([
                             'activity_date' => $shifted_activity_date
+                        ]);
+                    }
+                }
+            }
+
+            if($camp_group['camp_id']['is_clsh']) {
+                // if camp clsh_type was modified from 5-days to 4-days, remove unneeded activities
+                BookingActivity::search([
+                    ['camp_group_id', '=', $id],
+                    ['activity_date', '>', $camp_group['camp_id']['date_to']]
+                ])
+                    ->delete(true);
+
+                // if camp clsh_type was modified from 4-days to 5-days, create the last day activities
+                $last_day_activities_ids = BookingActivity::search([
+                    ['camp_group_id', '=', $id],
+                    ['activity_date', '=', $camp_group['camp_id']['date_to']]
+                ])
+                    ->ids();
+
+                if(empty($last_day_activities_ids)) {
+                    foreach(['AM', 'PM'] as $time_slot_code) {
+                        BookingActivity::create([
+                            'camp_group_id' => $id,
+                            'activity_date' => $camp_group['camp_id']['date_to'],
+                            'time_slot_id'  => $map_time_slots[$time_slot_code]['id']
                         ]);
                     }
                 }

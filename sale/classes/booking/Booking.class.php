@@ -540,6 +540,12 @@ class Booking extends Model {
                 'description'       => "The booking activities that refer to the booking."
             ],
 
+            'activity_weeks_descriptions' => [
+                'type'              => 'string',
+                'usage'             => 'text/json',
+                'description'       => "JSON description of activities per week, for week planning document."
+            ],
+
             'tasks_ids' => [
                 'type'              => 'one2many',
                 'foreign_field'     => 'booking_id',
@@ -577,6 +583,13 @@ class Booking extends Model {
                 'help'          => 'Used when a booking is cancelled.',
                 'policies'      => [],
                 'function'      => 'doCreateNegativeFundingForReimbursement'
+            ],
+
+            'refresh_groups_activity_number' => [
+                'description'   => 'Refreshes the booking line groups activity number.',
+                'help'          => '',
+                'policies'      => [],
+                'function'      => 'doRefreshGroupsActivityNumber'
             ]
         ];
     }
@@ -1419,6 +1432,31 @@ class Booking extends Model {
         }
     }
 
+    public static function doRefreshGroupsActivityNumber($self) {
+        $self->read(['booking_lines_groups_ids' => ['order', 'group_type']]);
+        foreach($self as $booking) {
+            $groups_ids = [];
+            $map_order_groups_ids = [];
+            foreach($booking['booking_lines_groups_ids'] as $group) {
+                $groups_ids[] = $group['id'];
+                if($group['group_type'] === 'camp') {
+                    $map_order_groups_ids[$group['order']] = $group['id'];
+                }
+            }
+
+            BookingLineGroup::ids($groups_ids)->update([
+                'activity_group_num' => null
+            ]);
+
+            $group_ids = array_values($map_order_groups_ids);
+            foreach($group_ids as $index => $group_id) {
+                BookingLineGroup::id($group_id)->update([
+                    'activity_group_num' => $index + 1
+                ]);
+            }
+        }
+    }
+
     public static function onupdateIsInvoiced($om, $oids, $values, $lang) {
         $bookings = $om->read(self::getType(), $oids, ['is_invoiced', 'booking_lines_ids']);
         foreach($bookings as $id => $booking) {
@@ -1512,7 +1550,7 @@ class Booking extends Model {
         $bookings = $om->read(self::getType(), $oids, ['state', 'status', 'customer_id', 'customer_identity_id', 'center_id', 'booking_lines_ids'], $lang);
 
         // fields that can always be updated
-        $allowed_fields = ['status', 'description', 'is_invoiced', 'payment_status'];
+        $allowed_fields = ['status', 'description', 'is_invoiced', 'payment_status', 'activity_weeks_descriptions'];
 
         if(isset($values['status'])) {
             foreach($bookings as $booking) {
