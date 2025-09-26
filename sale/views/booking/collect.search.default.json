@@ -32,6 +32,12 @@
                                                 "label": "Communication",
                                                 "value": "structured_message",
                                                 "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Complete name",
+                                                "value": "display_name",
+                                                "width": "100%"
                                             }
                                         ]
                                     },
@@ -58,6 +64,12 @@
                                                 "type": "field",
                                                 "label": "Rental Unit",
                                                 "value": "rental_unit_id",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Customer accounting account",
+                                                "value": "customer_accounting_account",
                                                 "width": "100%"
                                             }
                                         ]
