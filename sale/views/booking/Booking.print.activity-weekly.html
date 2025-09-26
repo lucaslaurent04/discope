@@ -170,6 +170,15 @@ div.footer {
             </tbody>
         </table>
 
+        {% set week_start_key = week_dates|keys|first %}
+        {% if attribute(booking.activity_weeks_descriptions, week_start_key) is defined and attribute(booking.activity_weeks_descriptions, week_start_key) %}
+            <div style="width: 100%; text-align: center;">
+                <div style="max-width: 500px; margin: auto;">
+                    <p>{{ attribute(booking.activity_weeks_descriptions, week_start_key) }}</p>
+                </div>
+            </div>
+        {% endif %}
+
         {% if not loop.last  %}
             <div style="page-break-after: always;"></div>
         {% endif %}

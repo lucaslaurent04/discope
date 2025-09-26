@@ -540,6 +540,12 @@ class Booking extends Model {
                 'description'       => "The booking activities that refer to the booking."
             ],
 
+            'activity_weeks_descriptions' => [
+                'type'              => 'string',
+                'usage'             => 'text/json',
+                'description'       => "JSON description of activities per week, for week planning document."
+            ],
+
             'tasks_ids' => [
                 'type'              => 'one2many',
                 'foreign_field'     => 'booking_id',
@@ -1544,7 +1550,7 @@ class Booking extends Model {
         $bookings = $om->read(self::getType(), $oids, ['state', 'status', 'customer_id', 'customer_identity_id', 'center_id', 'booking_lines_ids'], $lang);
 
         // fields that can always be updated
-        $allowed_fields = ['status', 'description', 'is_invoiced', 'payment_status'];
+        $allowed_fields = ['status', 'description', 'is_invoiced', 'payment_status', 'activity_weeks_descriptions'];
 
         if(isset($values['status'])) {
             foreach($bookings as $booking) {

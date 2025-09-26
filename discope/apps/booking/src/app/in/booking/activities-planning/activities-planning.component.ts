@@ -13,6 +13,7 @@ import { debounceTime } from 'rxjs/operators';
 import { AgeRangeAssignment } from './_models/age-range-assignment.model';
 import { Partner } from './_models/partner.model';
 import { BookingLine } from './_models/booking-line.model';
+import { FormControl } from '@angular/forms';
 
 type PlanningTimeSlot = {
     [groupNum: number]: Activity;
@@ -49,6 +50,9 @@ export class BookingActivitiesPlanningComponent implements OnInit {
 
     public weekStartDate: Date = null;
     public weekEndDate: Date = null;
+    public weekDescription: string = null;
+
+    public weekDescriptionFormControl: FormControl;
 
     public showPrevBtn: boolean = false;
     public showNextBtn: boolean = false;
@@ -73,7 +77,9 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         private api: BookingApiService,
         private context: ContextService,
         private route: ActivatedRoute
-    ) {}
+    ) {
+        this.weekDescriptionFormControl = new FormControl('');
+    }
 
     public ngOnInit() {
         this.route.params.subscribe(async (params) => {
@@ -125,6 +131,18 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         });
     }
 
+    private updateActivityWeekDescription(activityWeeksDescriptions: string, weekStartDate: Date) {
+        this.weekDescription = '';
+        if(activityWeeksDescriptions) {
+            const weekStartKey = weekStartDate.toISOString().split("T")[0];
+            let map_activity_weeks_descriptions = JSON.parse(activityWeeksDescriptions) as {[key: string]: string};
+            if(map_activity_weeks_descriptions[weekStartKey]) {
+                this.weekDescription = map_activity_weeks_descriptions[weekStartKey];
+            }
+        }
+        this.weekDescriptionFormControl.setValue(this.weekDescription);
+    }
+
     private async loadBooking(fields: string[]) {
         try {
             const bookings: Booking[] = await this.api.read('sale\\booking\\Booking', [this.bookingId], fields);
@@ -156,6 +174,8 @@ export class BookingActivitiesPlanningComponent implements OnInit {
 
                 this.showPrevBtn = this.weekStartDate.getTime() > this.booking.date_from.getTime();
                 this.showNextBtn = this.weekEndDate.getTime() < this.booking.date_to.getTime();
+
+                this.updateActivityWeekDescription(this.booking.activity_weeks_descriptions, this.weekStartDate);
             }
         }
         catch(response) {
@@ -292,6 +312,8 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         this.showPrevBtn = this.weekStartDate.getTime() > this.booking.date_from.getTime();
         this.showNextBtn = this.weekEndDate.getTime() < this.booking.date_to.getTime();
 
+        this.updateActivityWeekDescription(this.booking.activity_weeks_descriptions, this.weekStartDate);
+
         await this.loadWeekActivities();
 
         if(this.planning?.[this.selectedDay]?.[this.selectedTimeSlot]?.[this.selectedGroup.activity_group_num]) {
@@ -319,6 +341,8 @@ export class BookingActivitiesPlanningComponent implements OnInit {
 
         this.showPrevBtn = this.weekStartDate.getTime() > this.booking.date_from.getTime();
         this.showNextBtn = this.weekEndDate.getTime() < this.booking.date_to.getTime();
+
+        this.updateActivityWeekDescription(this.booking.activity_weeks_descriptions, this.weekStartDate);
 
         await this.loadWeekActivities();
 
@@ -616,6 +640,25 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         catch(response) {
             onFail();
 
+            this.api.errorFeedback(response);
+        }
+
+        this.loading = false;
+    }
+
+    public async onWeekDescriptionChanges() {
+        this.loading = true;
+
+        let map_activity_weeks_descriptions = JSON.parse(this.booking.activity_weeks_descriptions) as {[key: string]: string};
+        if(!map_activity_weeks_descriptions) {
+            map_activity_weeks_descriptions = {};
+        }
+        map_activity_weeks_descriptions[this.weekStartDate.toISOString().split("T")[0]] = this.weekDescriptionFormControl.value;
+
+        try {
+            await this.api.update('sale\\booking\\Booking', [this.booking.id], {activity_weeks_descriptions: JSON.stringify(map_activity_weeks_descriptions)});
+        }
+        catch(response) {
             this.api.errorFeedback(response);
         }
 
