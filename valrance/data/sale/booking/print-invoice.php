@@ -97,10 +97,12 @@ $fields = [
     'name',
     'created',
     'date',
+    'notice_html',
     'partner_id' => [
         'partner_identity_id' => [
             'id',
             'display_name',
+            'legal_name',
             'type',
             'address_street', 'address_dispatch', 'address_city', 'address_zip', 'address_country',
             'type',
@@ -147,6 +149,7 @@ $fields = [
         'customer_identity_id' => [
             'id',
             'display_name',
+            'legal_name',
             'address_street', 'address_dispatch', 'address_city', 'address_zip', 'address_country',
             'phone',
             'mobile',
@@ -335,7 +338,7 @@ $values = [
     'header_img_url'            => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
     'signature'                 => $invoice['organisation_id']['signature'] ?? '',
     'invoice_header_html'       => '',
-    'invoice_notice_html'       => '',
+    'invoice_notice_html'       => $invoice['notice_html'],
 
     // by default, there is no ATTN - if required, it is set below
     'attn_name'                 => '',
@@ -347,7 +350,7 @@ $values = [
     'contact_email'             => $invoice['partner_id']['partner_identity_id']['email'],
     'has_orders'                => (int) $invoice['has_orders'],
     'customer_id'               => $invoice['partner_id']['partner_identity_id']['id'],
-    'customer_name'             => substr($invoice['partner_id']['partner_identity_id']['display_name'], 0, 66),
+    'customer_name'             => substr($invoice['partner_id']['partner_identity_id']['legal_name'], 0, 66),
     'customer_address1'         => '',
     'customer_address_dispatch' => '',
     'customer_address2'         => '',
@@ -517,7 +520,7 @@ $values['i18n'] = [
  */
 
 if($invoice['partner_id']['partner_identity_id']['id'] != $booking['customer_identity_id']['id']) {
-    $values['attn_name'] = substr($booking['customer_identity_id']['display_name'], 0, 33);
+    $values['attn_name'] = substr($booking['customer_identity_id']['legal_name'], 0, 33);
     $values['attn_address1'] = $booking['customer_identity_id']['address_street'];
     $values['attn_address2'] = $booking['customer_identity_id']['address_zip'].' '.$booking['customer_identity_id']['address_city'].(($booking['customer_identity_id']['address_country'] != 'BE')?(' - '.$booking['customer_identity_id']['address_country']):'');
 }

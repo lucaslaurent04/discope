@@ -76,7 +76,13 @@ class Invoice extends \finance\accounting\Invoice {
                 'visible'           => ['status', '=', 'invoice'],
                 'function'          => 'calcIsPaid',
                 'store'             => true
-            ]
+            ],
+
+            'notice_html' => [
+                'type'              => 'string',
+                'usage'             => 'text/html',
+                'description'       => "Additional notes to display on the final invoice (html)."
+            ],
 
         ];
     }

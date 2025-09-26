@@ -251,6 +251,29 @@
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "id": "sections.invoice.description",
+                        "label": "Description",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "notice_html",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "height": "400"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             }

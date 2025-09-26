@@ -435,11 +435,17 @@ hr {
     </div>
 </div>
 
+<div style="margin-top: 10px;"><small>Association loi 1901, non assujetie à la TVA : (article 261-4-40-a 3ème alinéa et 261-7-1er du code général des impôts)</small></div>
 <div style="margin-top: 50px; page-break-inside: avoid;"></div>
 
-<div class="notice">
+<div class="notice" style="font-size: 0.6em;">
     {{ invoice_notice_html | raw }}
 </div>
+
+<div class="signature-container">
+    {{ signature|raw }}
+</div>
+
 
 <!-- funding plan -->
 {% if fundings | length > 0  and (price > 0.0) %}
@@ -502,7 +508,7 @@ hr {
         {{ company_address }}<br />
     </div>
     <div style="position: absolute; right: 10px; top: 15px;">
-        <img src="{{ payment_qr_uri }}" width= "150" height="150" />
+        <!-- <img src="{{ payment_qr_uri }}" width= "150" height="150" /> -->
     </div>
 </div>
 {% endif %}
@@ -553,10 +559,6 @@ hr {
 
 <br>
 
-
-<div class="signature-container">
-    {{ signature|raw }}
-</div>
 
 
 
