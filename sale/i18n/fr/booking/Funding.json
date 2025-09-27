@@ -120,6 +120,10 @@
 					"label": "Enregistrer chèque bancaire",
 					"description": "Enregistrer un chèque bancaire à un financement, marquer le financement comme payé et mettre à jour son statut en cours."
 				},
+                "add_manual_payment": {
+					"label": "Ajouter un paiement",
+					"description": "Enregistrer manuellement un paiement bancaire."
+                },
 				"action.pay_financial_help": {
 					"label": "Payement aide financière",
 					"description": "Payé grâce à une aide financière."
