@@ -46,6 +46,17 @@
             "visible": [[true, "=", "env.sale.features.payment.instant"], ["is_paid", "=", false]]
         },
         {
+            "id": "action.unpay_instant",
+            "label": "Undo payment",
+            "description": "This will remove any manual payment and Funding will be marked as unpaid.",
+            "controller": "sale_booking_funding_do-pay-remove",
+            "confirm": true,
+            "access": {
+                "groups": ["finance.default.administrator", "finance.default.user"]
+            },
+            "visible": ["is_paid", "=", true]
+        },
+        {
             "id": "action.add_bank_check",
             "label": "Add bank check",
             "description": "This will complete the funding with a manual payment (bank check) and Funding will be marked as paid.",
@@ -57,6 +68,18 @@
             "visible": [[true, "=", "env.sale.features.payment.bank_check"], ["is_paid", "=", false]]
         },
         {
+            "id": "action.add_manual_payment",
+            "label": "Add manual payment",
+            "description": "This will complete the funding with a manual payment (bank check) and Funding will be marked as paid.",
+            "controller": "sale_booking_funding_add-manual-payment",
+            "confirm": true,
+            "access": {
+                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
+            },
+            "visible": [[true, "=", "env.sale.features.payment.bank_check"], ["is_paid", "=", false]]
+        },
+
+        {
             "id": "action.pay_financial_help",
             "label": "Financial help payment",
             "description": "Use a financial help to create a funding payment.",
@@ -66,17 +89,6 @@
                 "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
             },
             "visible": [[true, "=", "env.sale.features.payment.financial_help"], ["is_paid", "=", false]]
-        },
-        {
-            "id": "action.unpay_instant",
-            "label": "Undo payment",
-            "description": "This will remove any manual payment and Funding will be marked as unpaid.",
-            "controller": "sale_booking_funding_do-pay-remove",
-            "confirm": true,
-            "access": {
-                "groups": ["finance.default.administrator", "finance.default.user"]
-            },
-            "visible": ["is_paid", "=", true]
         },
         {
             "id": "action.mark_paid",
