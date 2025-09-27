@@ -80,6 +80,7 @@ class Payment extends \sale\pay\Payment {
                     'booking',              // payment through addition to the final (balance) invoice of a specific booking
                     'voucher',              // gift, coupon, or tour-operator voucher
                     'bank_check',           // physical bank check
+                    'wire_transfer',        // transfer between bank accounts
                     'financial_help'        // a financial help will take care of the payment
                 ],
                 'description'       => "The method used for payment at the cashdesk.",

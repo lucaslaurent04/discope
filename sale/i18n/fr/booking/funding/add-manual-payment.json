@@ -1,0 +1,28 @@
+{
+    "name": "Association d'un chèque bancaire",
+    "description": "Cette action génère un nouveau chèque bancaire et le lie à un dossier de financement existant. Le chèque sera avec le statut en attente.",
+    "model": {
+        "id": {
+            "label": "Identifiant",
+            "description": "Identifiant unique du financement.",
+            "help": ""
+        },
+        "date": {
+            "label": "Date",
+            "description": "Date à laquelle le paiement a été reçu.",
+            "help": ""
+        },
+        "amount": {
+            "label": "Montant",
+            "description": "Le montant du paiement reçu.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "invalid_amount": "Le montant doit être positif.",
+            "unknown_funding": "Financement introuvable.",
+            "nothing_to_pay": "Le financement est déjà entièrement réglé."
+        }
+    }
+}
