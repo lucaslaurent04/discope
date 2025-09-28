@@ -4,9 +4,18 @@
     "access": {
         "groups": ["booking.default.user"]
     },
+    "header": {
+        "layout": "inline",
+        "actions": {
+            "ACTION.CREATE_INLINE": [
+                {
+                    "view": true
+                }
+            ]
+        }
+    },
     "order": "activity_date,time_slot_order",
     "sort": "asc",
-    "group_by": ["activity_date"],
     "layout": {
         "items": [
             {
