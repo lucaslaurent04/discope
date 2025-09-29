@@ -49,8 +49,19 @@ $result = [];
 
 $domain = new Domain($params['domain']);
 
-$domain->addCondition(new DomainCondition('status', '<>', 'published'));
+$domain->addCondition(new DomainCondition('status', '=', 'draft'));
 
+if(isset($params['date_from'])) {
+    $domain->addCondition(
+        new DomainCondition('date_from', '>=', $params['date_from'])
+    );
+}
+
+if(isset($params['date_to'])) {
+    $domain->addCondition(
+        new DomainCondition('date_from', '<=', $params['date_to'])
+    );
+}
 
 $params['domain'] = $domain->toArray();
 

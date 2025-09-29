@@ -36,8 +36,7 @@
                             "entity": "sale\\camp\\Camp",
                             "view": "list.default",
                             "domain": [
-                                ["date_from", ">=", "date.this.year.first"],
-                                ["date_from", "<=", "date.this.year.last"]
+                                ["status", "=", "published"]
                             ]
                         }
                     },
@@ -51,6 +50,21 @@
                         "context": {
                             "entity": "sale\\camp\\Camp",
                             "view": "list.pending"
+                        }
+                    },
+                    {
+                        "id": "people.camps.cancelled",
+                        "type": "entry",
+                        "label": "Camps annulés",
+                        "description": "",
+                        "icon": "holiday_village",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\camp\\Camp",
+                            "view": "list.default",
+                            "domain": [
+                                ["status", "=", "published"]
+                            ]
                         }
                     }
                 ]
