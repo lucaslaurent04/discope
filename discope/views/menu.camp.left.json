@@ -50,11 +50,7 @@
                         "route": "/camps",
                         "context": {
                             "entity": "sale\\camp\\Camp",
-                            "view": "list.pending",
-                            "domain": [
-                                ["date_from", ">=", "date.this.year.first"],
-                                ["date_from", "<=", "date.this.year.last"]
-                            ]
+                            "view": "list.pending"
                         }
                     }
                 ]
