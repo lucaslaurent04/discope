@@ -101,6 +101,14 @@
                 ["status", "<>", "cancelled"],
                 ["state", "<>", "draft"]
             ]
+        },
+        {
+            "id": "action.pay_instant",
+            "label": "Instant payment",
+            "description": "This will complete the fundings with a manual payment (card) and fundings will be marked as paid.",
+            "controller": "sale_camp_enrollment_do-pay-instant",
+            "confirm": true,
+            "visible": ["status", "=", "confirmed"]
         }
     ],
     "layout": {

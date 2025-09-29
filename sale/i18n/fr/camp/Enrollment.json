@@ -238,6 +238,10 @@
                 },
                 "action.transfer": {
                     "label": "Transférer"
+                },
+                "action.pay_instant": {
+                    "label": "Payement instantané",
+                    "description": "Un paiement manuel par carte de crédit sera ajouté pour compléter le financement, et le financement sera marqué comme payé. Lorsqu'elle aboutit à la clôture de la réservation, cette action ne peut plus être annulée."
                 }
             },
             "layout": {
@@ -282,6 +286,10 @@
                 },
                 "action.transfer": {
                     "label": "Transférer"
+                },
+                "action.pay_instant": {
+                    "label": "Payement instantané",
+                    "description": "Un paiement manuel par carte de crédit sera ajouté pour compléter le financement, et le financement sera marqué comme payé. Lorsqu'elle aboutit à la clôture de la réservation, cette action ne peut plus être annulée."
                 }
             },
             "layout": {
@@ -326,6 +334,10 @@
                 },
                 "action.transfer": {
                     "label": "Transférer"
+                },
+                "action.pay_instant": {
+                    "label": "Payement instantané",
+                    "description": "Un paiement manuel par carte de crédit sera ajouté pour compléter le financement, et le financement sera marqué comme payé. Lorsqu'elle aboutit à la clôture de la réservation, cette action ne peut plus être annulée."
                 }
             },
             "layout": {
@@ -370,6 +382,10 @@
                 },
                 "action.transfer": {
                     "label": "Transférer"
+                },
+                "action.pay_instant": {
+                    "label": "Payement instantané",
+                    "description": "Un paiement manuel par carte de crédit sera ajouté pour compléter le financement, et le financement sera marqué comme payé. Lorsqu'elle aboutit à la clôture de la réservation, cette action ne peut plus être annulée."
                 }
             },
             "layout": {
@@ -412,6 +428,10 @@
                 },
                 "action.transfer": {
                     "label": "Transférer"
+                },
+                "action.pay_instant": {
+                    "label": "Payement instantané",
+                    "description": "Un paiement manuel par carte de crédit sera ajouté pour compléter le financement, et le financement sera marqué comme payé. Lorsqu'elle aboutit à la clôture de la réservation, cette action ne peut plus être annulée."
                 }
             }
         },
