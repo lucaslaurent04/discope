@@ -12,6 +12,11 @@
             "description": "Indique si le chèque bancaire est signé.",
             "help": ""
         },
+        "bank_check_number": {
+            "label": "Numéro",
+            "description": "Référence ou numéro du chèque.",
+            "help": ""
+        },
         "amount": {
             "label": "Montant",
             "description": "La valeur monétaire du chèque bancaire.",

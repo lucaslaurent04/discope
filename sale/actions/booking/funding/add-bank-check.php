@@ -8,7 +8,7 @@
 use sale\booking\BankCheck;
 use sale\booking\Funding;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Creates a bank check and associates it with a funding record.",
     'help'          => "This action generates a new bank check and links it to an existing funding record, updating its status accordingly.  
                     No actual payment transaction is processed. The association can be reversed as long as the booking has not been invoiced.",
@@ -24,6 +24,11 @@ list($params, $providers) = eQual::announce([
             'type'              => 'boolean',
             'description'       => "Has the bank check  the signature?",
             'required'           => true,
+        ],
+
+        'bank_check_number' => [
+            'type'              => 'string',
+            'description'       => 'The official unique number assigned to the bank check by the issuing bank.',
         ],
 
         'amount' => [
@@ -63,7 +68,7 @@ if(!$params['has_signature']) {
 }
 
 if($params['amount'] < 0) {
-    throw new Exception("invalidated_amount", QN_ERROR_INVALID_PARAM);
+    throw new Exception("invalidated_amount", EQ_ERROR_INVALID_PARAM);
 }
 
 $funding = Funding::id($params['id'])
@@ -71,19 +76,20 @@ $funding = Funding::id($params['id'])
             ->first(true);
 
 if(!$funding) {
-    throw new Exception("unknown_funding", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_funding", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-$sign = ($funding['due_amount'] >= 0)? 1 : -1;
+$sign = ($funding['due_amount'] >= 0) ? 1 : -1;
 $remaining_amount = abs($funding['due_amount']) - abs($funding['paid_amount']);
 
 if($remaining_amount <= 0) {
-    throw new Exception("nothing_to_pay", QN_ERROR_INVALID_PARAM);
+    throw new Exception("nothing_to_pay", EQ_ERROR_INVALID_PARAM);
 }
 
 BankCheck::create([
         'funding_id'        => $funding['id'],
         'has_signature'     => $params['has_signature'],
+        'bank_check_number' => $params['bank_check_number'],
         'amount'            => $params['amount']
     ])
     ->read(['id'])
