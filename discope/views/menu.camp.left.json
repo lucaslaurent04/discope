@@ -63,7 +63,7 @@
                             "entity": "sale\\camp\\Camp",
                             "view": "list.default",
                             "domain": [
-                                ["status", "=", "published"]
+                                ["status", "=", "cancelled"]
                             ]
                         }
                     }

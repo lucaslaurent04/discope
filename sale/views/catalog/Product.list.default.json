@@ -129,6 +129,12 @@
                 "value": "is_camp",
                 "width": "10%",
                 "visible": false
+            },
+            {
+                "type": "field",
+                "value": "rate_class_id",
+                "width": "10%",
+                "visible": false
             }
         ]
     }
