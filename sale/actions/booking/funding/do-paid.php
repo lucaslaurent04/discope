@@ -10,6 +10,7 @@ use sale\booking\Booking;
 
 list($params, $providers) = eQual::announce([
     'description'   => "Arbitrary mark a funding as paid for the booking. Applies only on bookings that are not from channel manager.",
+    'deprecated'    => "This breaks consistency between booking and payments. Avoid using it an prefer `add-manual-payment`",
     'params'        => [
         'id' =>  [
             'description'   => 'Identifier of the targeted funding.',
