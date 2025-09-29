@@ -18,6 +18,20 @@
                 ["is_paid", "=", false],
                 ["enrollment_id", "<>", null]
             ]
+        },
+        {
+            "id": "action.unpay_instant",
+            "label": "Undo payment",
+            "description": "This will remove any manual payment and Funding will be marked as unpaid.",
+            "controller": "sale_camp_enrollment_funding_do-pay-remove",
+            "confirm": true,
+            "access": {
+                "groups": ["finance.default.administrator", "finance.default.user"]
+            },
+            "visible": [
+                ["is_paid", "=", true],
+                ["enrollment_id", "<>", null]
+            ]
         }
     ],
     "layout": {

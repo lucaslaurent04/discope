@@ -85,6 +85,10 @@
                 "action.pay_instant": {
                     "label": "Paiement rapide",
                     "description": "Un paiement manuel par carte de crédit sera ajouté pour compléter le financement, et le financement sera marqué comme payé. Lorsqu'elle aboutit à la clôture de la réservation, cette action ne peut plus être annulée."
+                },
+                "action.unpay_instant": {
+                    "label": "Retirer les paiements manuels",
+                    "description": "Le financement sera marqué comme non-payé et les paiements manuels seront supprimés."
                 }
             },
             "layout": {
