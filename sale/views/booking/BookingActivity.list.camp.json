@@ -53,6 +53,7 @@
             },
             {
                 "type": "field",
+                "label": "Activité",
                 "value": "product_id",
                 "width": "35%"
             },
