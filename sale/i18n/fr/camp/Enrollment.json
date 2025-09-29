@@ -224,8 +224,8 @@
             "name": "Inscription",
             "description": "",
             "actions": {
-                "action.transition.pending": {
-                    "label": "En cours"
+                "action.confirm": {
+                    "label": "Confirmer"
                 },
                 "action.transition.confirm": {
                     "label": "Confirmer"
@@ -268,8 +268,8 @@
             "name": "Inscription",
             "description": "",
             "actions": {
-                "action.transition.pending": {
-                    "label": "En cours"
+                "action.confirm": {
+                    "label": "Confirmer"
                 },
                 "action.transition.confirm": {
                     "label": "Confirmer"
@@ -312,8 +312,8 @@
             "name": "Inscription",
             "description": "",
             "actions": {
-                "action.transition.pending": {
-                    "label": "En cours"
+                "action.confirm": {
+                    "label": "Confirmer"
                 },
                 "action.transition.confirm": {
                     "label": "Confirmer"
@@ -356,8 +356,8 @@
             "name": "Inscription",
             "description": "",
             "actions": {
-                "action.transition.pending": {
-                    "label": "En cours"
+                "action.confirm": {
+                    "label": "Confirmer"
                 },
                 "action.transition.confirm": {
                     "label": "Confirmer"
@@ -398,8 +398,14 @@
         },
         "form.camp": {
             "actions": {
-                "action.transition.pending": {
-                    "label": "En cours"
+                "action.confirm": {
+                    "label": "Confirmer"
+                },
+                "action.transition.confirm": {
+                    "label": "Confirmer"
+                },
+                "action.transition.validate": {
+                    "label": "Valider"
                 },
                 "action.transition.cancel": {
                     "label": "Annuler"
@@ -417,11 +423,6 @@
         "list.waitlisted": {
             "name": "Inscriptions en attente",
             "description": "",
-            "header": {
-                "action.transition.pending": {
-                    "label": "En cours"
-                }
-            },
             "layout": {}
         },
         "list.pending": {

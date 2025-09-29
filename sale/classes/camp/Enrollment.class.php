@@ -802,19 +802,35 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function policyPending($self): array {
+    public static function policyConfirm($self): array {
         $result = [];
-        $self->read(['camp_id' => ['max_children', 'enrollments_ids' => ['status']]]);
+        $self->read([
+            'is_ase',
+            'camp_id' => [
+                'max_children',
+                'ase_quota',
+                'enrollments_ids' => ['status', 'is_ase']
+            ]
+        ]);
         foreach($self as $enrollment) {
             $confirmed_enrollments_qty = 0;
+            $confirmed_ase_enrollments = 0;
             foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
-                if(in_array($en['status'], ['pending', 'validated'])) {
+                if(in_array($en['status'], ['confirmed', 'validated'])) {
                     $confirmed_enrollments_qty++;
+
+                    if($en['is_ase']) {
+                        $confirmed_ase_enrollments++;
+                    }
                 }
             }
 
             if($confirmed_enrollments_qty >= $enrollment['camp_id']['max_children']) {
                 return ['camp_id' => ['camp_full' => "The camp is full."]];
+            }
+
+            if($confirmed_ase_enrollments >= $enrollment['camp_id']['ase_quota']) {
+                return ['camp_id' => ['camp_ase_full' => "The camp ASE quota is reached."]];
             }
         }
 
@@ -840,9 +856,9 @@ class Enrollment extends Model {
     public static function getPolicies(): array {
         return [
 
-            'pending' => [
-                'description'   => "Checks if the camp isn't full yet.",
-                'function'      => "policyPending"
+            'confirm' => [
+                'description'   => "Checks if the camp isn't full yet and ASE quota.",
+                'function'      => "policyConfirm"
             ],
 
             'validate' => [
@@ -856,7 +872,7 @@ class Enrollment extends Model {
     /**
      * After status confirm: reset the enrollments qty
      */
-    public static function onafterPending($self) {
+    public static function onafterConfirm($self) {
         $self->do('reset-camp-enrollments-qty');
         $self->do('generate-funding');
     }
@@ -873,6 +889,9 @@ class Enrollment extends Model {
         $self->do('generate-presences');
     }
 
+    /**
+     * After status cancel: unlock enrollment and remove presences
+     */
     public static function onafterCancel($self) {
         $self->update([
             'is_locked'         => false,
@@ -887,41 +906,39 @@ class Enrollment extends Model {
     public static function getWorkflow(): array {
         return [
 
-            'waitlisted' => [
-                'description' => "The enrollment is on the waiting list, waiting for a new camp group to be created or to be transferred.",
+            'pending' => [
+                'description' => "The enrollment is pending/being created, it doesn't block other enrollments.",
                 'transitions' => [
-                    'pending' => [
-                        'status'        => 'pending',
-                        'description'   => "Remove from the waiting list.",
-                        'policies'      => ['pending'],
-                        'onafter'       => 'onafterPending'
+                    'waitlist' => [
+                        'status'        => 'waitlisted',
+                        'description'   => "Add enrollment to waiting list."
+                    ],
+                    'confirm' => [
+                        'status'        => 'confirmed',
+                        'description'   => "Reserves the spot (not all documents have necessarily been received).",
+                        'policies'      => ['confirm'],
+                        'onafter'       => 'onafterConfirm'
                     ],
                     'cancel' => [
                         'status'        => 'cancelled',
-                        'description'   => "Cancel the waiting enrollment.",
+                        'description'   => "Cancel the pending enrollment.",
                         'onafter'       => 'onafterCancel'
                     ]
                 ]
             ],
 
-            'pending' => [
-                'description' => "The enrollment is pending/being created, it doesn't block other enrollments.",
+            'waitlisted' => [
+                'description' => "The enrollment is on the waiting list, waiting for a new camp group to be created or to be transferred.",
                 'transitions' => [
                     'confirm' => [
                         'status'        => 'confirmed',
                         'description'   => "Reserves the spot (not all documents have necessarily been received).",
-                        'help'          => "This step is mandatory for all enrollments (guardians have 10 days to return the documents for web enrollments).",
-                        // vérifier le nombre de places dispo et critère ASE
-                        'policies'      => [/*'validate'*/]
-                    ],
-                    'validate' => [
-                        'status'        => 'validated',
-                        'description'   => "Mark the enrollment as validated (all docs and payments received).",
-                        'policies'      => ['validate']
+                        'policies'      => ['confirm'],
+                        'onafter'       => 'onafterConfirm'
                     ],
                     'cancel' => [
                         'status'        => 'cancelled',
-                        'description'   => "Cancel the pending enrollment.",
+                        'description'   => "Cancel the waiting enrollment.",
                         'onafter'       => 'onafterCancel'
                     ]
                 ]
@@ -932,6 +949,7 @@ class Enrollment extends Model {
                 'transitions' => [
                     'validate' => [
                         'status'        => 'validated',
+                        'help'          => "This step is mandatory for all enrollments (guardians have 10 days to return the documents for web enrollments).",
                         'description'   => "Mark the enrollment as validated (all docs and payments received).",
                         'policies'      => ['validate']
                     ],
@@ -1049,7 +1067,7 @@ class Enrollment extends Model {
 
                             $day_confirmed_enrollments_qty = 0;
                             foreach($camp['enrollments_ids'] as $en) {
-                                if($en['presence_day_'.$day] && in_array($en['status'], ['pending', 'validated']) && $en['id'] !== $enrollment['id']) {
+                                if($en['presence_day_'.$day] && in_array($en['status'], ['confirmed', 'validated']) && $en['id'] !== $enrollment['id']) {
                                     $day_confirmed_enrollments_qty++;
                                 }
                             }
@@ -1077,7 +1095,7 @@ class Enrollment extends Model {
                         $confirmed_enrollments_qty = 0;
 
                         foreach($camp['enrollments_ids'] as $en) {
-                            if(in_array($en['status'], ['pending', 'validated']) && $en['id'] !== $enrollment['id']) {
+                            if(in_array($en['status'], ['confirmed', 'validated']) && $en['id'] !== $enrollment['id']) {
                                 $confirmed_enrollments_qty++;
                             }
                         }
@@ -1717,9 +1735,12 @@ class Enrollment extends Model {
                 continue;
             }
 
+            $ten_days_seconds = 10 * 86400;
+
             $funding = Funding::create([
                 'enrollment_id'     => $id,
                 'due_amount'        => $remaining_amount,
+                'due_date'          => time() + $ten_days_seconds,
                 'center_office_id'  => $enrollment['camp_id']['center_id']['center_office_id']
             ])
                 ->read(['center_office_id'])
@@ -1740,6 +1761,8 @@ class Enrollment extends Model {
                     'center_office_id'  => $funding['center_office_id']
                 ]);
             }
+
+            self::id($id)->update(['payment_status' => null]);
         }
     }
 
