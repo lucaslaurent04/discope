@@ -55,6 +55,7 @@ class Camp extends Model {
                 'dependents'        => ['name']
             ],
 
+            /*
             'sojourn_number' => [
                 'type'              => 'computed',
                 'result_type'       => 'integer',
@@ -63,6 +64,16 @@ class Camp extends Model {
                 'store'             => true,
                 'instant'           => true,
                 'function'          => 'calcSojournNumber',
+                'dependents'        => ['sojourn_code']
+            ],
+            */
+
+            'sojourn_number' => [
+                'type'              => 'string',
+                'description'       => "Sojourn number to distinguish camps.",
+                'help'              => "Is handle by the setting sequence 'sale.organization.camp.sequence{center_id.center_office_id.code}'.",
+                'required'          => true,
+                'unique'            => true,
                 'dependents'        => ['sojourn_code']
             ],
 

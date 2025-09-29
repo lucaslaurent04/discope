@@ -20,19 +20,44 @@
             },
             {
                 "id": "camps",
-                "type": "entry",
+                "type": "parent",
                 "label": "Camps",
                 "description": "",
                 "icon": "holiday_village",
-                "route": "/camps",
-                "context": {
-                    "entity": "sale\\camp\\Camp",
-                    "view": "list.default",
-                    "domain": [
-                        ["date_from", ">=", "date.this.year.first"],
-                        ["date_from", "<=", "date.this.year.last"]
-                    ]
-                }
+                "children": [
+                    {
+                        "id": "people.camps.all",
+                        "type": "entry",
+                        "label": "Camps",
+                        "description": "",
+                        "icon": "holiday_village",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\camp\\Camp",
+                            "view": "list.default",
+                            "domain": [
+                                ["date_from", ">=", "date.this.year.first"],
+                                ["date_from", "<=", "date.this.year.last"]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "people.camps.pending",
+                        "type": "entry",
+                        "label": "Camps brouillon",
+                        "description": "",
+                        "icon": "holiday_village",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\camp\\Camp",
+                            "view": "list.pending",
+                            "domain": [
+                                ["date_from", ">=", "date.this.year.first"],
+                                ["date_from", "<=", "date.this.year.last"]
+                            ]
+                        }
+                    }
+                ]
             },
             {
                 "id": "enrollments",
