@@ -14,6 +14,7 @@
             ]
         }
     },
+    "group_by": ["activity_date"],
     "order": "activity_date,time_slot_order",
     "sort": "asc",
     "layout": {
