@@ -382,7 +382,7 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
         if(this.action_in_progress) {
             return;
         }
-        if(this.group.is_extra) {
+        if(this.group.is_extra && this.group.has_consumptions) {
             return;
         }
         this.action_in_progress = true;
