@@ -33,23 +33,31 @@
     "header": {
         "actions": {
             "ACTION.SAVE": [
-                {
-                    "id": "SAVE_AND_CONTINUE"
-                },
-                {
-                    "id": "SAVE_AND_VIEW"
-                }
+                { "id": "SAVE_AND_CONTINUE" },
+                { "id": "SAVE_AND_VIEW" }
             ]
         }
     },
     "actions": [
         {
-            "id": "action.transition.pending",
-            "label": "Set pending",
+            "id": "action.confirm",
+            "label": "Confirm",
+            "controller": "sale_camp_enrollment_confirm",
+            "params": {
+                "id": "object.id"
+            },
+            "visible": [
+                ["status", "=", "pending"],
+                ["state", "<>", "draft"]
+            ]
+        },
+        {
+            "id": "action.transition.confirm",
+            "label": "Confirm",
             "controller": "model_transition",
             "params": {
                 "entity": "sale\\camp\\Enrollment",
-                "transition": "pending",
+                "transition": "confirm",
                 "ids": []
             },
             "visible": [
@@ -68,20 +76,6 @@
             },
             "visible": [
                 ["status", "=", "confirmed"],
-                ["state", "<>", "draft"]
-            ]
-        },
-        {
-            "id": "action.transition.confirm",
-            "label": "Confirm",
-            "controller": "model_transition",
-            "params": {
-                "entity": "sale\\camp\\Enrollment",
-                "transition": "confirm",
-                "ids": []
-            },
-            "visible": [
-                ["status", "=", "pending"],
                 ["state", "<>", "draft"]
             ]
         },
@@ -107,6 +101,14 @@
                 ["status", "<>", "cancelled"],
                 ["state", "<>", "draft"]
             ]
+        },
+        {
+            "id": "action.pay_instant",
+            "label": "Instant payment",
+            "description": "This will complete the fundings with a manual payment (card) and fundings will be marked as paid.",
+            "controller": "sale_camp_enrollment_do-pay-instant",
+            "confirm": true,
+            "visible": ["status", "=", "confirmed"]
         }
     ],
     "layout": {
@@ -244,6 +246,12 @@
                                             {
                                                 "type": "field",
                                                 "value": "status",
+                                                "width": "25%",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "payment_status",
                                                 "width": "25%",
                                                 "visible": false
                                             },
@@ -513,7 +521,10 @@
                     {
                         "id": "section.mails",
                         "label": "Mails",
-                        "visible": ["state", "<>", "draft"],
+                        "visible": [
+                            ["status", "in", ["confirmed", "validated", "cancelled"]],
+                            ["state", "<>", "draft"]
+                        ],
                         "rows": [
                             {
                                 "columns": [
@@ -534,7 +545,10 @@
                     {
                         "id": "section.fundings",
                         "label": "Fundings",
-                        "visible": ["state", "<>", "draft"],
+                        "visible": [
+                            ["status", "in", ["confirmed", "validated", "cancelled"]],
+                            ["state", "<>", "draft"]
+                        ],
                         "rows": [
                             {
                                 "columns": [

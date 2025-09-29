@@ -272,7 +272,7 @@ class Funding extends Model {
                 $cron->cancel("booking.funding.overdue.{$fid}");
                 // setup a scheduled job upon funding overdue
                 $cron->schedule(
-                // assign a reproducible unique name
+                    // assign a reproducible unique name
                     "booking.funding.overdue.{$fid}",
                     // remind on day following due_date
                     $values['due_date'] + 86400,

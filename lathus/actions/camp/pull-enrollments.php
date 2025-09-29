@@ -317,20 +317,26 @@ if(!empty($data)) {
 
         //  2.3.4) Create enrollment
 
-        $ca = Camp::id($camp['id'])
-            ->read(['max_children', 'enrollments_qty'])
-            ->first();
-
         $enrollment = LathusEnrollment::create([
             'date_created'      => (new DateTime($ext_enrollment['date']))->getTimestamp(),
             'camp_id'           => $camp['id'],
             'child_id'          => $child['id'],
             'main_guardian_id'  => $main_guardian['id'],
             'external_ref'      => $ext_enrollment['wpOrderId'],
-            'status'            => $ca['enrollments_qty'] < $ca['max_children'] ? 'pending' : 'waitlisted'
+            'status'            => 'pending'
         ])
             ->read(['id'])
             ->first();
+
+        try {
+            //  If spot available confirm, else add to waiting list
+            eQual::run('do', 'sale_camp_enrollment_confirm', [
+                'id' => $enrollment['id']
+            ]);
+        }
+        catch(Exception $e) {
+            trigger_error("APP::sale_camp_enrollment_confirm unable to confirm/waitlist the enrollment", EQ_ERROR_UNKNOWN);
+        }
 
         //  2.3.5) Handle adding additional enrollment lines if child stays on the weekend or until Saturday
 

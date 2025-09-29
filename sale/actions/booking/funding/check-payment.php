@@ -8,17 +8,19 @@
 use sale\booking\Funding;
 use core\setting\Setting;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Checks that a given funding has been paid (should be scheduled on due_date).",
     'params'        => [
+
         'id' =>  [
-            'description'   => 'Identifier of the funding to check.',
             'type'          => 'integer',
+            'description'   => "Identifier of the funding to check.",
             'required'      => true
         ]
+
     ],
-    'access' => [
-        'visibility'        => 'private'
+    'access'        => [
+        'visibility'    => 'private'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -33,7 +35,7 @@ list($params, $providers) = eQual::announce([
  * @var \equal\auth\AuthenticationManager   $auth
  * @var \equal\dispatch\Dispatcher          $dispatch
  */
-list($context, $auth, $dispatch) = [ $providers['context'], $providers['auth'], $providers['dispatch'] ];
+['context' => $context, 'auth' => $auth, 'dispatch' => $dispatch] = $providers;
 
 // switch to root account (access is 'private')
 $user_id = $auth->userId();
@@ -41,30 +43,36 @@ $auth->su();
 
 $funding = Funding::id($params['id'])
     ->read([
-        'id', 'is_paid','due_amount', 'due_date',
-        'booking_id' => [
-            'id',
-            'center_office_id' => ['id','code']
-        ]
+        'is_paid',
+        'due_amount',
+        'due_date',
+        'booking_id'    => ['center_office_id' => ['code']],
+        'enrollment_id' => ['center_office_id' => ['code']]
     ])
     ->first();
 
-if(!$funding) {
-    throw new Exception("unknown_funding", QN_ERROR_UNKNOWN_OBJECT);
+if(is_null($funding)) {
+    throw new Exception("unknown_funding", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-if(!$funding['is_paid'] && $funding['due_amount'] > 0 ) {
-    // dispatch a message for notifying users
-    $dispatch->dispatch('lodging.booking.payments', 'sale\booking\Booking', $funding['booking_id']['id'], 'warning', null, [], [], null, $funding['booking_id']['center_office_id']['id']);
+if(!$funding['is_paid'] && $funding['due_amount'] > 0) {
+    if(isset($funding['booking_id'])) {
+        // dispatch a message for notifying users
+        $dispatch->dispatch('lodging.booking.payments', 'sale\booking\Booking', $funding['booking_id']['id'], 'warning', null, [], [], null, $funding['booking_id']['center_office_id']['id']);
 
-    $payment_remind = Setting::get_value('sale', 'features', 'payment.remind.active.' . $funding['booking_id']['center_office_id']['code'], true);
-    if($payment_remind) {
-        try {
-            eQual::run('do', 'sale_booking_funding_remind-payment', ['id' => $params['id']]);
+        $payment_remind = Setting::get_value('sale', 'features', 'payment.remind.active.' . $funding['booking_id']['center_office_id']['code'], true);
+        if($payment_remind) {
+            try {
+                eQual::run('do', 'sale_booking_funding_remind-payment', ['id' => $params['id']]);
+            }
+            catch(Exception $e) {
+                // something went wrong : ignore
+            }
         }
-        catch(Exception $e) {
-           // something went wrong : ignore
-        }
+    }
+    elseif(isset($funding['enrollment_id'])) {
+        // dispatch a message for notifying users
+        $dispatch->dispatch('lodging.camp.payments', 'sale\camp\Enrollment', $funding['enrollment_id']['id'], 'warning', null, [], [], null, $funding['enrollment_id']['center_office_id']['id']);
     }
 }
 
