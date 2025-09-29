@@ -224,8 +224,8 @@
             "name": "Inscription",
             "description": "",
             "actions": {
-                "action.transition.pending": {
-                    "label": "En cours"
+                "action.confirm": {
+                    "label": "Confirmer"
                 },
                 "action.transition.confirm": {
                     "label": "Confirmer"
@@ -238,6 +238,10 @@
                 },
                 "action.transfer": {
                     "label": "Transférer"
+                },
+                "action.pay_instant": {
+                    "label": "Payement instantané",
+                    "description": "Un paiement manuel par carte de crédit sera ajouté pour compléter le financement, et le financement sera marqué comme payé. Lorsqu'elle aboutit à la clôture de la réservation, cette action ne peut plus être annulée."
                 }
             },
             "layout": {
@@ -268,8 +272,8 @@
             "name": "Inscription",
             "description": "",
             "actions": {
-                "action.transition.pending": {
-                    "label": "En cours"
+                "action.confirm": {
+                    "label": "Confirmer"
                 },
                 "action.transition.confirm": {
                     "label": "Confirmer"
@@ -282,6 +286,10 @@
                 },
                 "action.transfer": {
                     "label": "Transférer"
+                },
+                "action.pay_instant": {
+                    "label": "Payement instantané",
+                    "description": "Un paiement manuel par carte de crédit sera ajouté pour compléter le financement, et le financement sera marqué comme payé. Lorsqu'elle aboutit à la clôture de la réservation, cette action ne peut plus être annulée."
                 }
             },
             "layout": {
@@ -312,8 +320,8 @@
             "name": "Inscription",
             "description": "",
             "actions": {
-                "action.transition.pending": {
-                    "label": "En cours"
+                "action.confirm": {
+                    "label": "Confirmer"
                 },
                 "action.transition.confirm": {
                     "label": "Confirmer"
@@ -326,6 +334,10 @@
                 },
                 "action.transfer": {
                     "label": "Transférer"
+                },
+                "action.pay_instant": {
+                    "label": "Payement instantané",
+                    "description": "Un paiement manuel par carte de crédit sera ajouté pour compléter le financement, et le financement sera marqué comme payé. Lorsqu'elle aboutit à la clôture de la réservation, cette action ne peut plus être annulée."
                 }
             },
             "layout": {
@@ -356,8 +368,8 @@
             "name": "Inscription",
             "description": "",
             "actions": {
-                "action.transition.pending": {
-                    "label": "En cours"
+                "action.confirm": {
+                    "label": "Confirmer"
                 },
                 "action.transition.confirm": {
                     "label": "Confirmer"
@@ -370,6 +382,10 @@
                 },
                 "action.transfer": {
                     "label": "Transférer"
+                },
+                "action.pay_instant": {
+                    "label": "Payement instantané",
+                    "description": "Un paiement manuel par carte de crédit sera ajouté pour compléter le financement, et le financement sera marqué comme payé. Lorsqu'elle aboutit à la clôture de la réservation, cette action ne peut plus être annulée."
                 }
             },
             "layout": {
@@ -398,14 +414,24 @@
         },
         "form.camp": {
             "actions": {
-                "action.transition.pending": {
-                    "label": "En cours"
+                "action.confirm": {
+                    "label": "Confirmer"
+                },
+                "action.transition.confirm": {
+                    "label": "Confirmer"
+                },
+                "action.transition.validate": {
+                    "label": "Valider"
                 },
                 "action.transition.cancel": {
                     "label": "Annuler"
                 },
                 "action.transfer": {
                     "label": "Transférer"
+                },
+                "action.pay_instant": {
+                    "label": "Payement instantané",
+                    "description": "Un paiement manuel par carte de crédit sera ajouté pour compléter le financement, et le financement sera marqué comme payé. Lorsqu'elle aboutit à la clôture de la réservation, cette action ne peut plus être annulée."
                 }
             }
         },
@@ -417,11 +443,6 @@
         "list.waitlisted": {
             "name": "Inscriptions en attente",
             "description": "",
-            "header": {
-                "action.transition.pending": {
-                    "label": "En cours"
-                }
-            },
             "layout": {}
         },
         "list.pending": {
