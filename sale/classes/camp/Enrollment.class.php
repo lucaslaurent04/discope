@@ -450,8 +450,8 @@ class Enrollment extends Model {
 
             'enrollment_documents_ids' => [
                 'type'              => 'one2many',
-                'foreign_field'     => 'enrollment_id',
                 'foreign_object'    => 'sale\camp\EnrollmentDocument',
+                'foreign_field'     => 'enrollment_id',
                 'description'       => "The documents that have been received.",
                 'ondetach'          => 'delete'
             ],

@@ -14,6 +14,12 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "value": "enrollment_id",
+                                                "width": "33%",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "document_id",
                                                 "width": "33%"
                                             },
