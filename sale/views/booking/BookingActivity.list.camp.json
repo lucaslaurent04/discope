@@ -33,22 +33,34 @@
             {
                 "type": "field",
                 "value": "name",
+                "width": "20%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "activity_date",
                 "width": "20%"
             },
             {
                 "type": "field",
                 "value": "time_slot_id",
-                "width": "20%"
-            },
-            {
-                "type": "field",
-                "value": "camp_id",
-                "width": "20%"
+                "width": "25%"
             },
             {
                 "type": "field",
                 "value": "camp_group_id",
                 "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "product_id",
+                "width": "35%"
+            },
+            {
+                "type": "field",
+                "value": "camp_id",
+                "width": "20%",
+                "visible": false
             },
             {
                 "type": "field",
