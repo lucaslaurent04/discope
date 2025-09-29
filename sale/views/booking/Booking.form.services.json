@@ -1,6 +1,6 @@
 {
     "name": "Booking",
-    "description": "Basic view used by custom UI /booking/:id/services, holding only available actions & routes (should remain synced with form.default).",
+    "description": "This view is not intented to be displayed and is only used by custom UI /booking/:id/services, it holds only available actions & routes and should remain synced with `form.default`.",
     "access": {
         "groups": ["booking.default.user"]
     },
@@ -11,7 +11,18 @@
             "description": "Rental units will no longer be reserved and will be available for other bookings.",
             "controller": "sale_booking_do-quote",
             "confirm": true,
-            "visible": [ ["status", "in", ["option", "confirmed", "validated"]], ["is_from_channelmanager", "=", false] ]
+            "visible": [["status", "in", ["option", "confirmed", "validated"]], ["is_from_channelmanager", "=", false]]
+        },
+        {
+            "id": "action.quote-from-checkedout",
+            "label": "Revert to Quote",
+            "description": "Rental units will no longer be reserved and will be available for other bookings.",
+            "controller": "sale_booking_do-quote",
+            "confirm": true,
+            "visible": [["status", "in", ["checkedin", "checkedout"]], ["is_from_channelmanager", "=", false], [true, "=", "object.checkedout_revert_to_quote"]],
+            "params": {
+                "free_rental_units": false
+            }
         },
         {
             "id": "action.option",
@@ -19,7 +30,7 @@
             "description": "Rental units will be reserved but no funding will be claimed yet.",
             "controller": "sale_booking_do-option",
             "confirm": true,
-            "visible": ["status", "=", "quote"]
+            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "is", null]]
         },
         {
             "id": "action.option_confirm",
@@ -27,7 +38,7 @@
             "description": "Rental units will be reserved and the invoicing plan will be set up.",
             "controller": "sale_booking_do-option-confirm",
             "confirm": true,
-            "visible": [["status", "=", "quote"], ["is_price_tbc", "=", false]]
+            "visible": [["status", "=", "quote"], ["is_price_tbc", "=", false], ["status_before_revert_to_quote", "is", null]]
         },
         {
             "id": "action.confirm",
@@ -46,12 +57,28 @@
             "visible": ["status", "in", ["confirmed", "validated"]]
         },
         {
+            "id": "action.checkin-from-quote",
+            "label": "Back to Check In",
+            "description": "The Booking status is set back to its previous checkedin status.",
+            "controller": "sale_booking_do-checkin-quote",
+            "confirm": true,
+            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "=", "checkedin"]]
+        },
+        {
             "id": "action.checkout",
             "label": "Check Out",
             "description": "The host is leaving: the rental units will be marked for cleaning.",
             "controller": "sale_booking_do-checkout",
             "confirm": true,
             "visible": ["status", "in", ["checkedin"]]
+        },
+        {
+            "id": "action.checkout-from-quote",
+            "label": "Back to Check Out",
+            "description": "The Booking status is set back to its previous checkedout status.",
+            "controller": "sale_booking_do-checkout-quote",
+            "confirm": true,
+            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "=", "checkedout"]]
         },
         {
             "id": "action.invoice",
@@ -97,7 +124,27 @@
                 "id": "object.id"
             },
             "confirm": true,
-            "visible": [ ["status", "not in", ["proforma", "invoiced", "debit_balance", "credit_balance", "balanced"]], ["is_from_channelmanager", "=", false] ]
+            "visible": [
+                ["status", "not in", ["proforma", "invoiced", "debit_balance", "credit_balance", "balanced", "cancelled"]],
+                ["is_from_channelmanager", "=", false],
+                ["is_cancelled", "=", false]
+            ]
+        },
+        {
+            "id": "action.cancel-ota-without-fee",
+            "label": "Cancel without fee",
+            "description": "Cancel a channel manager booking without a fee.",
+            "controller": "sale_booking_do-cancel-without-fee",
+            "params": {
+                "id": "object.id",
+                "reason": "ota"
+            },
+            "confirm": true,
+            "visible": [
+                ["status", "=", "checkedout"],
+                ["is_from_channelmanager", "=", true],
+                ["is_cancelled", "=", true]
+            ]
         },
         {
             "id": "action.release_rentalunits",
@@ -105,7 +152,7 @@
             "description": "Rental units will be released if they haven't been yet.",
             "controller": "sale_booking_release-rentalunits",
             "confirm": true,
-            "visible": ["status", "=", "quote"]
+            "visible": [["status", "=", "quote"], ["status_before_revert_to_quote", "is", null]]
         },
         {
             "id": "action.pay_instant",
@@ -130,11 +177,15 @@
             "visible": [ ["status", "in", ["invoiced", "debit_balance", "credit_balance"]] ]
         },
         {
-            "id": "action.booking.activities-program",
-            "label": "Activities program",
-            "description": "",
-            "icon": "list_alt",
-            "controller": "sale_booking_print-booking-activity",
+            "id": "action.import_contacts",
+            "label": "Import contacts",
+            "description": "The contacts from the selected customer will be (re) imported to the booking.",
+            "controller": "core_model_do",
+            "params": {
+                "entity": "sale\\booking\\Booking",
+                "action": "import_contacts",
+                "ids": []
+            },
             "confirm": true
         },
         {
@@ -193,6 +244,16 @@
             "target": "_blank",
             "absolute": true,
             "visible": [true, "=", "env.sale.features.booking.activity"]
+        },
+        {
+            "id": "item.booking.room-plans",
+            "label": "Room plans",
+            "description": "",
+            "icon": "map",
+            "route": "/?get=sale_booking_print-room-plans&id=object.id",
+            "target": "_blank",
+            "absolute": true,
+            "visible": [true, "=", "env.sale.features.booking.room_plans"]
         },
         {
             "id": "item.booking.composition",
@@ -283,13 +344,12 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "paid_amount",
+                                                "value": "is_cancelled",
                                                 "visible": false
                                             },
                                             {
                                                 "type": "field",
-                                                "label": "Reference",
-                                                "value": "status",
+                                                "value": "paid_amount",
                                                 "visible": false
                                             },
                                             {
@@ -310,6 +370,21 @@
                                             {
                                                 "type": "field",
                                                 "value": "nb_pers",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_from_channelmanager",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "status_before_revert_to_quote",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_price_tbc",
                                                 "visible": false
                                             }
                                         ]
