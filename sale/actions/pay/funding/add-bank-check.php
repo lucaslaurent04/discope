@@ -5,6 +5,7 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\BankCheck;
 use sale\booking\Funding;
 
@@ -13,6 +14,7 @@ list($params, $providers) = eQual::announce([
     'help'          => "This action generates a new bank check and links it to an existing funding record, updating its status accordingly.  
                     No actual payment transaction is processed. The association can be reversed as long as the booking has not been invoiced.",
     'params'        => [
+
         'id' =>  [
             'description'       => 'Identifier of the targeted funding.',
             'type'              => 'integer',
@@ -63,29 +65,29 @@ if(!$params['has_signature']) {
 }
 
 if($params['amount'] < 0) {
-    throw new Exception("invalidated_amount", QN_ERROR_INVALID_PARAM);
+    throw new Exception("invalidated_amount", EQ_ERROR_INVALID_PARAM);
 }
 
 $funding = Funding::id($params['id'])
-            ->read(['paid_amount', 'due_amount'])
-            ->first(true);
+    ->read(['paid_amount', 'due_amount'])
+    ->first(true);
 
-if(!$funding) {
-    throw new Exception("unknown_funding", QN_ERROR_UNKNOWN_OBJECT);
+if(is_null($funding)) {
+    throw new Exception("unknown_funding", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-$sign = ($funding['due_amount'] >= 0)? 1 : -1;
+$sign = $funding['due_amount'] >= 0 ? 1 : -1;
 $remaining_amount = abs($funding['due_amount']) - abs($funding['paid_amount']);
 
 if($remaining_amount <= 0) {
-    throw new Exception("nothing_to_pay", QN_ERROR_INVALID_PARAM);
+    throw new Exception("nothing_to_pay", EQ_ERROR_INVALID_PARAM);
 }
 
 BankCheck::create([
-        'funding_id'        => $funding['id'],
-        'has_signature'     => $params['has_signature'],
-        'amount'            => $params['amount']
-    ])
+    'funding_id'    => $funding['id'],
+    'has_signature' => $params['has_signature'],
+    'amount'        => $params['amount']
+])
     ->read(['id'])
     ->first(true);
 

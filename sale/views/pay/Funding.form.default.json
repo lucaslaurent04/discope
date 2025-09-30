@@ -32,6 +32,20 @@
                 ["is_paid", "=", true],
                 ["enrollment_id", "<>", null]
             ]
+        },
+        {
+            "id": "action.add_bank_check",
+            "label": "Add bank check",
+            "description": "A bank check will be associated with the funding.",
+            "controller": "sale_pay_funding_add-bank-check",
+            "confirm": true,
+            "access": {
+                "groups": ["camp.default.administrator", "camp.default.user", "finance.default.administrator", "finance.default.user"]
+            },
+            "visible": [
+                [true, "=", "env.sale.features.payment.bank_check"],
+                ["is_paid", "=", false]
+            ]
         }
     ],
     "layout": {
