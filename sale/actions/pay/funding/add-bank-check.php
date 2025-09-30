@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
@@ -16,9 +16,9 @@ list($params, $providers) = eQual::announce([
     'params'        => [
 
         'id' =>  [
-            'description'       => 'Identifier of the targeted funding.',
             'type'              => 'integer',
             'min'               => 1,
+            'description'       => "Identifier of the targeted funding.",
             'required'          => true
         ],
 
@@ -31,34 +31,32 @@ list($params, $providers) = eQual::announce([
         'amount' => [
             'type'              => 'float',
             'usage'             => 'amount/money:2',
-            'description'       => 'The monetary value of the bank check.',
+            'description'       => "The monetary value of the bank check.",
             'default'           => function($id = 0){
-                $funding = Funding::id($id)->read(['due_amount', 'paid_amount'])->first(true);
-                $remaining_amount = abs($funding['due_amount']) - abs($funding['paid_amount']);
-                if(!$funding) {
-                    return 0;
-                }
-                return  $remaining_amount ;}
-        ],
+                $funding = Funding::id($id)
+                    ->read(['due_amount', 'paid_amount'])
+                    ->first();
+
+                return !is_null($funding) ? (abs($funding['due_amount']) - abs($funding['paid_amount'])) : 0;
+            }
+        ]
 
     ],
-    'access' => [
-        'groups'            => ['booking.default.user', 'finance.default.administrator', 'finance.default.user']
+    'access'        => [
+        'groups'        => ['booking.default.user', 'camp.default.administrator', 'camp.default.user', 'finance.default.administrator', 'finance.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $om
+ * @var \equal\php\Context  $context
  */
-list($context, $om) = [ $providers['context'], $providers['orm'] ];
-
+['context' => $context] = $providers;
 
 if(!$params['has_signature']) {
     throw new Exception('missing_has_signature', EQ_ERROR_MISSING_PARAM);
