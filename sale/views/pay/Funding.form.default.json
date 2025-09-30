@@ -6,16 +6,45 @@
      },
     "actions": [
         {
-            "id": "action.mark-as-paid",
-            "label": "Marquer comme payé",
-            "description": "Marquer le financement comme payé même sans avoir reçu tous les paiements.",
-            "controller": "sale_pay_funding_do-mark-as-paid",
+            "id": "action.pay_instant",
+            "label": "Instant payment",
+            "description": "This will complete the funding with a manual payment (card) and Funding will be marked as paid.",
+            "controller": "sale_camp_enrollment_funding_do-pay-append",
+            "confirm": true,
             "access": {
-                "groups": ["finance.default.administrator", "finance.default.user"]
+                "groups": ["camp.default.user", "camp.default.administrator", "finance.default.administrator", "finance.default.user"]
             },
             "visible": [
                 ["is_paid", "=", false],
                 ["enrollment_id", "<>", null]
+            ]
+        },
+        {
+            "id": "action.unpay_instant",
+            "label": "Undo payment",
+            "description": "This will remove any manual payment and Funding will be marked as unpaid.",
+            "controller": "sale_camp_enrollment_funding_do-pay-remove",
+            "confirm": true,
+            "access": {
+                "groups": ["finance.default.administrator", "finance.default.user"]
+            },
+            "visible": [
+                ["is_paid", "=", true],
+                ["enrollment_id", "<>", null]
+            ]
+        },
+        {
+            "id": "action.add_bank_check",
+            "label": "Add bank check",
+            "description": "A bank check will be associated with the funding.",
+            "controller": "sale_pay_funding_add-bank-check",
+            "confirm": true,
+            "access": {
+                "groups": ["camp.default.administrator", "camp.default.user", "finance.default.administrator", "finance.default.user"]
+            },
+            "visible": [
+                [true, "=", "env.sale.features.payment.bank_check"],
+                ["is_paid", "=", false]
             ]
         }
     ],

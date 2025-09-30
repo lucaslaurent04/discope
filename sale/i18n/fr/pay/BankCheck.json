@@ -79,7 +79,41 @@
             "help": ""
         }
     },
-    "view": {},
+    "view": {
+        "form.default": {
+            "name": "Chèque bancaire",
+            "description": "",
+            "actions": {
+                "action.transition.add.payment": {
+                    "label": "Ajouter un paiement",
+                    "help": "Un paiement sera créé et associé au chèque."
+                },
+                "action.transition.remove.payment": {
+                    "label": "Supprimer le paiement",
+                    "help": "L'association avec le paiement sera supprimée."
+                },
+                "action.transition.delete": {
+                    "label": "Supprimer le chèque",
+                    "help": "Le chèque bancaire sera définitivement supprimé."
+                },
+                "action.transition.reject": {
+                    "label": "Rejeter",
+                    "help": "Marquer le chèque bancaire comme rejeté par la banque."
+                }
+            },
+            "layout": {}
+        },
+        "list.default": {
+            "name": "Chèques bancaires",
+            "description": "Liste des chèques Bancaire.",
+            "layout": {},
+            "actions": {
+                "action.import": {
+                    "label": "Importer"
+                }
+            }
+        }
+    },
     "error": {
         "status": {
             "non_editable": "Une fois le chèque bancaire payé, il ne peut plus être modifié.",

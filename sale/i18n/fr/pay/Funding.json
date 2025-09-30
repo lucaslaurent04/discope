@@ -77,6 +77,24 @@
         "form.default": {
             "name": "Financement",
             "description": "",
+            "actions": {
+                "action.mark-as-paid": {
+                    "label": "Marquer comme payé",
+                    "description": "Marquer le financement comme payé même sans avoir reçu tous les paiements."
+                },
+                "action.pay_instant": {
+                    "label": "Paiement rapide",
+                    "description": "Un paiement manuel par carte de crédit sera ajouté pour compléter le financement, et le financement sera marqué comme payé. Lorsqu'elle aboutit à la clôture de la réservation, cette action ne peut plus être annulée."
+                },
+                "action.unpay_instant": {
+                    "label": "Retirer les paiements manuels",
+                    "description": "Le financement sera marqué comme non-payé et les paiements manuels seront supprimés."
+                },
+                "action.add_bank_check": {
+                    "label": "Ajouter chèque bancaire",
+                    "description": "Ajouter un chèque bancaire à un financement."
+                }
+            },
             "layout": {
                 "section.funding": {
                     "label": "Détails"
