@@ -626,23 +626,21 @@ class Booking extends Model {
 
     public static function calcDisplayName($self) {
         $result = [];
-        // retrieve the field to use as code for identifying the customer
-        $customer_code_assignment = Setting::get_value('sale', 'organization', 'customer.number_assignment', 'id');
         $self->read(['state', 'name', 'customer_identity_id' => ['id', 'name', 'accounting_account', 'address_city']]);
         foreach($self as $id => $booking) {
             if($booking['state'] === 'draft') {
                 continue;
             }
-            $name = $booking['name'] . ' - ' . $booking['customer_identity_id']['name'];
-            if(isset($booking['customer_identity_id'][$customer_code_assignment])) {
-                $name .= ' (' . $booking['customer_identity_id'][$customer_code_assignment] . ')' ;
-            }
-            // temporary (quick) feature for adding city in display name for non-Kaleo users
-            if($customer_code_assignment !== 'id' && $booking['customer_identity_id']['address_city'] && strlen($booking['customer_identity_id']['address_city']) > 0) {
-                $name .= ' - ' . $booking['customer_identity_id']['address_city'];
-            }
 
-            $result[$id] = $name;
+            $format = Setting::get_value('sale', 'booking', 'booking.name_format', '%s{name} - %s{customer_name} (%s{customer_identity_id})');
+
+            $result[$id] = Setting::parse_format($format, [
+                'name'                          => $booking['name'],
+                'customer_identity_id'          => $booking['customer_identity_id']['id'],
+                'customer_name'                 => $booking['customer_identity_id']['name'],
+                'customer_accounting_account'   => $booking['customer_identity_id']['accounting_account'] ?? '',
+                'customer_address_city'         => $booking['customer_identity_id']['address_city'] ?? ''
+            ]);
         }
         return $result;
     }
