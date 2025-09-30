@@ -56,7 +56,14 @@
                 "type": "field",
                 "label": "Activité",
                 "value": "product_id",
-                "width": "35%"
+                "width": "35%",
+                "widget": {
+                    "domain": [
+                        ["is_activity", "=", true],
+                        ["can_sell", "=", true],
+                        ["activity_category_id", "=", 4]
+                    ]
+                }
             },
             {
                 "type": "field",
