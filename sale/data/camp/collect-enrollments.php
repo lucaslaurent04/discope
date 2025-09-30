@@ -70,6 +70,12 @@ use equal\orm\DomainCondition;
             ],
             'description'       => "The camp of the enrollment.",
             'default'           => 'all'
+        ],
+
+        'domain' => [
+            'type'          => 'array',
+            'description'   => "Criteria that results have to match (series of conjunctions)",
+            'default'       => []
         ]
 
     ],

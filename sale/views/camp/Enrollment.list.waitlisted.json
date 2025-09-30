@@ -25,6 +25,7 @@
             ]
         }
     },
+    "controller": "sale_camp_collect-enrollments",
     "layout": {
         "items": [
             {
