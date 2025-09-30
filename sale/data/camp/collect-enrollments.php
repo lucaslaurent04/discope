@@ -12,21 +12,25 @@ use equal\orm\DomainCondition;
 [$params, $providers] = eQual::announce([
     'extends'       => 'core_model_collect',
     'params'        => [
+
         'entity' =>  [
             'type'              => 'string',
             'description'       => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
             'default'           => 'sale\camp\Enrollment'
         ],
+
         'date_from' => [
             'type'              => 'date',
             'description'       => "Date interval lower limit.",
             'default'           => fn() => strtotime('first day of January this year')
         ],
+
         'date_to' => [
             'type'              => 'date',
             'description'       => "Date interval upper limit.",
             'default'           => fn() => strtotime('last day of December this year')
         ],
+
         'status' => [
             'type'              => 'string',
             'selection'         => [
@@ -38,7 +42,36 @@ use equal\orm\DomainCondition;
             ],
             'description'       => "Status of the enrollment.",
             'default'           => 'all'
+        ],
+
+        'payment_status' => [
+            'type'              => 'string',
+            'selection'         => [
+                'all',
+                'due',
+                'paid'
+            ],
+            'description'       => "Payment status of the enrollment.",
+            'default'           => 'all'
+        ],
+
+        'camp_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\camp\Camp',
+            'description'       => "The camp of the enrollment."
+        ],
+
+        'is_ase' => [
+            'type'              => 'string',
+            'selection'         => [
+                'all',
+                'yes',
+                'no'
+            ],
+            'description'       => "The camp of the enrollment.",
+            'default'           => 'all'
         ]
+
     ],
     'access'        => [
         'visibility'    => 'protected',
@@ -73,9 +106,27 @@ if(isset($params['date_to'])) {
     );
 }
 
-if(isset($params['status']) && $params['status'] !== 'all') {
+if($params['status'] !== 'all') {
     $domain->addCondition(
         new DomainCondition('status', '=', $params['status'])
+    );
+}
+
+if($params['payment_status'] !== 'all') {
+    $domain->addCondition(
+        new DomainCondition('payment_status', '=', $params['payment_status'])
+    );
+}
+
+if(isset($params['camp_id'])) {
+    $domain->addCondition(
+        new DomainCondition('camp_id', '=', $params['camp_id'])
+    );
+}
+
+if($params['is_ase'] !== 'all') {
+    $domain->addCondition(
+        new DomainCondition('is_ase', '=', $params['is_ase'] === 'yes')
     );
 }
 
