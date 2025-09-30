@@ -1,0 +1,47 @@
+{
+    "name": "Catégorie d'activité",
+    "plural": "Catégories d'activités",
+    "description": "",
+    "model": {
+        "name": {
+            "label": "Nom",
+            "description": "Nom de la catégorie d'activités.",
+            "help": ""
+        },
+        "code": {
+            "label": "Code",
+            "description": "Code de la catégorie de produits.",
+            "help": ""
+        },
+        "description": {
+            "label": "Description",
+            "description": "Descriptif de l'objectif et de l'utilisation de la catégorie.",
+            "help": ""
+        },
+        "products_ids": {
+            "label": "Produits",
+            "description": "Liste des activités affectés à cette catégorie.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Catégorie d'activité",
+            "description": "La catégorie d'activité permet de grouper les produits d'activités.",
+            "layout": {
+                "section.products": {
+                    "label": "Produits"
+                },
+                "section.description": {
+                    "label": "Description"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Catégories d'activités",
+            "description": "Liste des catégories d'activités.",
+            "layout": {}
+        }
+    },
+    "error": {}
+}
