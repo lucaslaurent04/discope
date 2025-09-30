@@ -223,7 +223,13 @@
                                                 "type": "field",
                                                 "value": "total",
                                                 "width": "25%",
-                                                "visible": ["state", "<>", "draft"]
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "25%",
+                                                "visible": false
                                             },
                                             {
                                                 "type": "field",

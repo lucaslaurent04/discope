@@ -101,29 +101,20 @@
                                                 "type": "field",
                                                 "label": "Rental unit",
                                                 "value": "rental_unit_id",
-                                                "width": "33%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "",
-                                                "width": "66%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "",
-                                                "width": "100%"
+                                                "width": "33%",
+                                                "visible": false
                                             },
                                             {
                                                 "type": "field",
                                                 "label": "Has staff required",
                                                 "value": "has_staff_required",
-                                                "width": "33%"
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
                                                 "label": "Employee",
                                                 "value": "employee_id",
-                                                "width": "33%"
+                                                "width": "50%"
                                             }
                                         ]
                                     },

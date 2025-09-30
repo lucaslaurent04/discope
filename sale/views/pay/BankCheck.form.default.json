@@ -6,7 +6,7 @@
     },
     "actions": [
         {
-            "id": "action.transition.add.payment",
+            "id": "action.add_payment",
             "label": "Add Payment",
             "controller": "sale_pay_bankcheck_do-pay",
             "access": {
@@ -17,7 +17,7 @@
             ]
         },
         {
-            "id": "action.transition.remove.payment",
+            "id": "action.remove_payment",
             "label": "Remove Payment",
             "controller": "sale_pay_bankcheck_remove-pay",
             "access": {
@@ -26,7 +26,7 @@
             "visible": ["status", "=", "paid"]
         },
         {
-            "id": "action.transition.delete",
+            "id": "action.delete",
             "label": "Delete Bank Check",
             "controller": "sale_pay_bankcheck_remove-bank-check",
             "access": {
@@ -35,7 +35,7 @@
             "visible": ["state", "<>", "draft"]
         },
         {
-            "id": "action.transition.reject",
+            "id": "action.reject",
             "label": "Reject",
             "controller": "model_transition",
             "params": {

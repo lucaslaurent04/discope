@@ -9,7 +9,7 @@
 use sale\booking\BankCheck;
 use sale\booking\Funding;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Creates a bank check and associates it with a funding record.",
     'help'          => "This action generates a new bank check and links it to an existing funding record, updating its status accordingly.  
                     No actual payment transaction is processed. The association can be reversed as long as the booking has not been invoiced.",
@@ -26,6 +26,11 @@ list($params, $providers) = eQual::announce([
             'type'              => 'boolean',
             'description'       => "Has the bank check  the signature?",
             'required'           => true,
+        ],
+
+        'bank_check_number' => [
+            'type'              => 'string',
+            'description'       => "The official unique number assigned to the bank check by the issuing bank."
         ],
 
         'amount' => [
@@ -82,9 +87,10 @@ if($remaining_amount <= 0) {
 }
 
 BankCheck::create([
-    'funding_id'    => $funding['id'],
-    'has_signature' => $params['has_signature'],
-    'amount'        => $params['amount']
+    'funding_id'        => $funding['id'],
+    'has_signature'     => $params['has_signature'],
+    'bank_check_number' => $params['bank_check_number'],
+    'amount'            => $params['amount']
 ])
     ->read(['id'])
     ->first(true);
