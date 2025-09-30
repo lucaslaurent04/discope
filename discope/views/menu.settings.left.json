@@ -613,6 +613,16 @@
                                             "entity": "sale\\catalog\\Group",
                                             "view": "list.default"
                                         }
+                                    },
+                                    {
+                                        "id": "sales.catalog.products.activity_categories",
+                                        "type": "entry",
+                                        "label": "Activities categories",
+                                        "description": "",
+                                        "context": {
+                                            "entity": "sale\\catalog\\ActivityCategory",
+                                            "view": "list.default"
+                                        }
                                     }
                                 ]
                             },

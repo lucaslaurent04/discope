@@ -42,7 +42,7 @@
 		},
 		"list.default": {
 			"name": "Catégories",
-			"description": "Liste des catégorie.",
+			"description": "Liste des catégories.",
 			"layout": {}
 		}
 	},
