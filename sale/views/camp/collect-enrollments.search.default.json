@@ -26,8 +26,26 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "label": "Camp",
+                                                "value": "camp_id",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "label": "Status",
                                                 "value": "status",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Payment status",
+                                                "value": "payment_status",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "ASE",
+                                                "value": "is_ase",
                                                 "width": "15%"
                                             }
                                         ]
