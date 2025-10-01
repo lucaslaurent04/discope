@@ -42,9 +42,9 @@
             ]
         },
         {
-            "id": "action.clone-group",
-            "label": "Clone group",
-            "controller": "sale_camp_clone-group",
+            "id": "action.add-group",
+            "label": "Ajouter group",
+            "controller": "sale_camp_add-group",
             "params": {
                 "id": "object.id"
             },
@@ -279,7 +279,14 @@
                                             {
                                                 "type": "field",
                                                 "value": "camp_groups_ids",
-                                                "width": "100%"
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
