@@ -901,6 +901,7 @@ class Enrollment extends Model {
 
         $self->do('reset-camp-enrollments-qty');
         $self->do('remove-presences');
+        $self->do('handle-cancellation-refunding');
     }
 
     public static function getWorkflow(): array {
@@ -1719,7 +1720,7 @@ class Enrollment extends Model {
             'price',
             'price_adapters_ids'    => ['value', 'price_adapter_type'],
             'fundings_ids'          => ['amount'],
-            'camp_id'               => ['center_id' => ['center_office_id']]
+            'camp_id'               => ['date_from', 'center_id' => ['center_office_id']]
         ]);
 
         foreach($self as $id => $enrollment) {
@@ -1735,12 +1736,16 @@ class Enrollment extends Model {
                 continue;
             }
 
-            $ten_days_seconds = 10 * 86400;
+            $due_date = $enrollment['camp_id']['date_from'];
+            $one_month_before_camp = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from'])->modify('-30 days')->getTimestamp();
+            if(time() < $one_month_before_camp) {
+                $due_date = $one_month_before_camp;
+            }
 
             $funding = Funding::create([
                 'enrollment_id'     => $id,
                 'due_amount'        => $remaining_amount,
-                'due_date'          => time() + $ten_days_seconds,
+                'due_date'          => $due_date,
                 'center_office_id'  => $enrollment['camp_id']['center_id']['center_office_id']
             ])
                 ->read(['center_office_id'])
@@ -1763,6 +1768,91 @@ class Enrollment extends Model {
             }
 
             self::id($id)->update(['payment_status' => null]);
+        }
+    }
+
+    public static function doHandleCancellationRefunding($self) {
+        $self->read(['fundings_ids' => ['is_paid', 'due_amount', 'paid_amount']]);
+        foreach($self as $enrollment) {
+            foreach($enrollment['fundings_ids'] as $funding_id => $funding) {
+                if($funding['paid_amount'] > 0 || $funding['is_paid']) {
+                    continue;
+                }
+
+                Funding::id($funding_id)->delete(true);
+            }
+        }
+
+        $self->read(['fundings_ids' => ['due_amount', 'paid_amount']]);
+        foreach($self as $enrollment) {
+            foreach($enrollment['fundings_ids'] as $funding_id => $funding) {
+                if($funding['due_amount'] <= 0) {
+                    continue;
+                }
+
+                if($funding['due_amount'] > $funding['paid_amount']) {
+                    Funding::id($funding_id)->update([
+                        'due_amount'    => $funding['paid_amount'],
+                        'is_paid'       => true
+                    ]);
+                }
+            }
+        }
+
+        $self->read([
+            'price',
+            'center_office_id',
+            'camp_id'       => ['date_from'],
+            'fundings_ids'  => ['paid_amount']
+        ]);
+        foreach($self as $id => $enrollment) {
+            $already_paid = 0;
+            foreach($enrollment['fundings_ids'] as $funding) {
+                $already_paid += $funding['paid_amount'];
+            }
+
+            if($already_paid === 0) {
+                continue;
+            }
+
+            $diff_camp_price_to_already_paid = $enrollment['price'] - $already_paid;
+
+            $now = time();
+            $thirty_days_before = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from'])->modify('-30 days');
+            $fifteen_days_before = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from'])->modify('-15 days');
+            $seven_days_before = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from'])->modify('-7 days');
+            if($now < $thirty_days_before) {
+                $refund_amount = $enrollment['price'] * 0.75;
+            }
+            elseif($now < $fifteen_days_before) {
+                $refund_amount = $enrollment['price'] * 0.50;
+            }
+            elseif($now < $seven_days_before) {
+                $refund_amount = $enrollment['price'] * 0.25;
+            }
+            else {
+                continue;
+            }
+
+            $refund_amount -= $diff_camp_price_to_already_paid;
+
+            if($refund_amount > 0) {
+                if($already_paid < $refund_amount) {
+                    $refund_amount = $already_paid;
+                }
+
+                Funding::create([
+                    'description'       => "Remboursement annulation",
+                    'enrollment_id'     => $id,
+                    'center_office_id'  => $enrollment['center_office_id'],
+                    'due_amount'        => round(-$refund_amount, 2),
+                    'is_paid'           => false,
+                    'type'              => 'installment',
+                    'order'             => count($enrollment['fundings_ids']) + 1,
+                    'issue_date'        => time(),
+                    'due_date'          => time()
+                ]);
+            }
         }
     }
 
@@ -1809,6 +1899,12 @@ class Enrollment extends Model {
                 'description'   => "Creates the enrollment funding if is does not already exists.",
                 'policies'      => [],
                 'function'      => 'doGenerateFunding'
+            ],
+
+            'handle-cancellation-refunding' => [
+                'description'   => "Handles the creation of negative fundings if a refund is necessary following a cancellation.",
+                'policies'      => [],
+                'function'      => 'doHandleCancellationRefunding'
             ]
 
         ];
