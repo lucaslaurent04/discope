@@ -89,7 +89,7 @@
                 "ids": []
             },
             "visible": [
-                ["status", "in", ["waitlisted", "pending", "confirmed"]],
+                ["status", "in", ["waitlisted", "pending", "confirmed", "validated"]],
                 ["state", "<>", "draft"]
             ]
         },
