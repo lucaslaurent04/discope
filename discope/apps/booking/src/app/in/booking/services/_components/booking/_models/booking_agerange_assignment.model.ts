@@ -10,6 +10,7 @@ export class BookingAgeRangeAssignment {
         public qty: number = 0,
         public free_qty: number = 0,
         public age_from: number = 0,
-        public age_to: number = 0
+        public age_to: number = 0,
+        public is_sporty: boolean = false
     ) {}
 }

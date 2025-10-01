@@ -51,3 +51,7 @@
         <mat-error *ngIf="freeQtyFormControl.hasError('required')">Ne peut être vide.</mat-error>
     </mat-form-field>
 </div>
+
+<div class="cell" style="margin-right: 20px; padding-top: 10px;" *ngIf="ageRangeSportyFeature">
+    <mat-slide-toggle [formControl]="isSportyFormControl" (change)="onupdateIsSporty()">Sportif</mat-slide-toggle>
+</div>

@@ -53,7 +53,7 @@ class AgeRange extends Model {
                 'default'           => true
             ],
 
-            'has_large_meal' => [
+            'is_sporty' => [
                 'type'              => 'boolean',
                 'description'       => "Indicates whether the age range relates to higher nutritional needs (athletes).",
                 'default'           => false
