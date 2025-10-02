@@ -168,6 +168,11 @@
                                                 "type": "field",
                                                 "value": "is_billable",
                                                 "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "activity_category_id",
+                                                "width": "100%"
                                             }
                                         ]
                                     }

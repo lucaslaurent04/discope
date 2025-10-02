@@ -42,6 +42,8 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
     public rentalUnits: RentalUnitClass[] = [];
     public filteredRentalUnits$ = new BehaviorSubject<RentalUnitClass[]>([]);
     public filteredRentalUnits: RentalUnitClass[] = [];
+    public rentalUnitAssignments$= new BehaviorSubject<{ id: number, name: string }[]>([]);
+    public sortedRentalUnitAssignments: { id: number, name: string }[] = [];
 
     public selectedRentalUnits$ = new BehaviorSubject<number[]>([]);
     public selectedRentalUnits: number[] = [];
@@ -120,6 +122,10 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
                 this.filterBy = filterBy;
                 this.refreshFilteredRentalUnits();
             });
+
+        this.rentalUnitAssignments$.subscribe((assignments) => {
+            this.sortedRentalUnitAssignments = assignments.sort((a: {id: number, name: string}, b: {id: number, name: string}) => a.name.localeCompare(b.name));
+        });
     }
 
     public async ngOnChanges(changes: SimpleChanges) {
@@ -181,6 +187,8 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
     public async update(values:any) {
         console.log('accommodation update', values);
         super.update(values);
+
+        this.rentalUnitAssignments$.next(this.instance.rental_unit_assignments_ids);
     }
 
     /**
@@ -209,6 +217,7 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
         try {
             await this.api.update(this.instance.entity, [this.instance.id], {rental_unit_assignments_ids: [-assignment_id]});
             this.instance.rental_unit_assignments_ids.splice(this.instance.rental_unit_assignments_ids.findIndex((e:any)=>e.id == assignment_id),1);
+            this.rentalUnitAssignments$.next(this.instance.rental_unit_assignments_ids);
             // relay to parent
             this.updated.emit();
         }
@@ -221,6 +230,7 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
         try {
             await this.api.update(this.instance.entity, [this.instance.id], {rental_unit_assignments_ids: this.instance.rental_unit_assignments_ids.map((assign: any) => -assign.id)});
             this.instance.rental_unit_assignments_ids = [];
+            this.rentalUnitAssignments$.next(this.instance.rental_unit_assignments_ids);
             // relay to parent
             this.updated.emit();
         }

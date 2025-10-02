@@ -76,6 +76,14 @@ class BookingLineGroupAgeRangeAssignment extends Model {
                 'description'       => "Age for the upper bound (excluded).",
                 'store'             => true,
                 'relation'          => ['age_range_id' => ['age_to']],
+            ],
+
+            'is_sporty' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => "Indicates whether the age range assignment relates to higher nutritional needs (athletes).",
+                'store'             => true,
+                'relation'          => ['age_range_id' => ['is_sporty']]
             ]
 
         ];

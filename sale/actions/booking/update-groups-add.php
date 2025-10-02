@@ -86,13 +86,15 @@ $group = BookingLineGroup::create($values)
 
 Booking::refreshNbPers($orm, $booking['id']);
 
+$group_type = 'camp';
 // if first group set type to "sojourn"
 if(count($booking['booking_lines_groups_ids']) === 0) {
-    eQual::run('do', 'sale_booking_update-sojourn-type', [
-        'id'            => $group['id'],
-        'group_type'    => 'sojourn'
-    ]);
+    $group_type = 'sojourn';
 }
+eQual::run('do', 'sale_booking_update-sojourn-type', [
+    'id'            => $group['id'],
+    'group_type'    => $group_type
+]);
 
 // restore events in case this controller is chained with others
 $orm->enableEvents();

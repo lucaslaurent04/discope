@@ -21,6 +21,28 @@
                 "cancelled": "Annulée"
             },
             "description": ""
+        },
+        "payment_status": {
+            "label": "Status paiement",
+            "selection": {
+                "all": "Tous",
+                "paid": "Payé",
+                "due": "Dû"
+            },
+            "description": ""
+        },
+        "camp_id": {
+            "label": "Camp",
+            "description": ""
+        },
+        "is_ase": {
+            "label": "ASE",
+            "selection": {
+                "all": "Tous",
+                "yes": "Oui",
+                "no": "Non"
+            },
+            "description": ""
         }
     },
     "view": {

@@ -48,8 +48,8 @@
         {
             "id": "action.add_bank_check",
             "label": "Add bank check",
-            "description": "This will complete the funding with a manual payment (bank check) and Funding will be marked as paid.",
-            "controller": "sale_booking_funding_add-bank-check",
+            "description": "A bank check will be associated with the funding.",
+            "controller": "sale_pay_funding_add-bank-check",
             "confirm": true,
             "access": {
                 "groups": ["finance.default.administrator", "finance.default.user"]

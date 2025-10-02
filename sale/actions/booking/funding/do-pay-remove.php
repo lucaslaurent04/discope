@@ -39,7 +39,7 @@ list($params, $providers) = eQual::announce([
 list($context, $om) = [ $providers['context'], $providers['orm'] ];
 
 $funding = Funding::id($params['id'])
-            ->read(['booking_id' => ['id', 'status', 'customer_id'], 'invoice_id', 'center_office_id', 'is_paid', 'paid_amount', 'due_amount'])
+            ->read(['is_paid', 'booking_id' => ['status']])
             ->first(true);
 
 if(!$funding) {
@@ -48,6 +48,10 @@ if(!$funding) {
 
 if(!$funding['is_paid']) {
     throw new Exception("funding_not_paid", QN_ERROR_INVALID_PARAM);
+}
+
+if(is_null($funding['booking_id'])) {
+    throw new Exception("not_booking_funding", EQ_ERROR_INVALID_PARAM);
 }
 
 if($funding['booking_id']['status'] == 'balanced') {

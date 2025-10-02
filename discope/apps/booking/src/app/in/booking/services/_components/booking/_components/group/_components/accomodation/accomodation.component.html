@@ -167,7 +167,7 @@
                 </div>
                 <!-- right pane -->
                 <div class="list" cdkDropList (cdkDropListDropped)="addSelection()" style="flex: 0 1 calc(50% - 10px); border: solid 1px darkgrey;">
-                    <div *ngFor="let assignment of instance.rental_unit_assignments_ids"
+                    <div *ngFor="let assignment of sortedRentalUnitAssignments"
                             class="rentalunit-line line-assignment">
                         <booking-services-booking-group-accomodation-assignment
                             [model]="assignment"

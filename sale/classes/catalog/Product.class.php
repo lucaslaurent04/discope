@@ -294,7 +294,15 @@ class Product extends Model {
                 'description'       => "Specific GroupingCode this Product related to, if any",
                 'instant'           => true,
                 'store'             => true
+            ],
+
+            'activity_category_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\catalog\ActivityCategory',
+                'description'       => "Category of the activity.",
+                'visible'           => [ ['is_activity', '=', true] ]
             ]
+
         ];
     }
 

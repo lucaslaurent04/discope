@@ -1,0 +1,32 @@
+{
+    "name": "Activities categories",
+    "description": "This view is intended for displaying the list of categories of activities.",
+    "access": {
+        "groups": ["pos.default.user", "sale.default.user"]
+     },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "5%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "name",
+                "width": "25%"
+            },
+            {
+                "type": "field",
+                "value": "code",
+                "width": "15%"
+            },
+            {
+                "type": "field",
+                "value": "description",
+                "width": "33%"
+            }
+        ]
+    }
+}

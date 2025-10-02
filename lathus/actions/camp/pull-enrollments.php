@@ -19,8 +19,8 @@ use sale\camp\Institution;
 use sale\camp\price\PriceAdapter;
 use sale\camp\Sponsor;
 use sale\camp\WorksCouncil;
+use sale\pay\BankCheck;
 use sale\pay\Funding;
-use sale\pay\Payment;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Pull enrollments from CPA Lathus API.",
@@ -597,24 +597,22 @@ if(!empty($data)) {
         //  2.3.8) Handle payments
 
         if(!empty($ext_enrollment['metaJson']['reglement']['montantChequesVacances'])) {
-            Payment::create([
+            BankCheck::create([
                 'enrollment_id'     => $enrollment['id'],
-                'amount'            => floatval($ext_enrollment['metaJson']['reglement']['montantChequesVacances']),
-                'payment_origin'    => 'cashdesk',
-                'payment_method'    => 'bank_check',
                 'funding_id'        => $funding['id'],
-                'center_office_id'  => $funding['center_office_id']
+                'amount'            => floatval($ext_enrollment['metaJson']['reglement']['montantChequesVacances']),
+                'has_signature'     => true,
+                'is_voucher'        => true
             ]);
         }
 
         if(!empty($ext_enrollment['metaJson']['reglement']['montantCheque'])) {
-            Payment::create([
+            BankCheck::create([
                 'enrollment_id'     => $enrollment['id'],
-                'amount'            => floatval($ext_enrollment['metaJson']['reglement']['montantCheque']),
-                'payment_origin'    => 'cashdesk',
-                'payment_method'    => 'bank_check',
                 'funding_id'        => $funding['id'],
-                'center_office_id'  => $funding['center_office_id']
+                'amount'            => floatval($ext_enrollment['metaJson']['reglement']['montantCheque']),
+                'has_signature'     => true,
+                'is_voucher'        => false
             ]);
         }
     }
