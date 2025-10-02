@@ -301,6 +301,20 @@ class Product extends Model {
                 'foreign_object'    => 'sale\catalog\ActivityCategory',
                 'description'       => "Category of the activity.",
                 'visible'           => [ ['is_activity', '=', true] ]
+            ],
+
+            'camp_product_type' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'full',
+                    'day',
+                    'weekend',
+                    'saturday-morning'
+                ],
+                'description'       => "The type of camp product (non CLSH: full, day and weekend | CLSH: day).",
+                'help'              => "Allows to distinguish how the products of camps should be used.",
+                'default'           => 'full',
+                'visible'           => [ ['is_camp', '=', true] ]
             ]
 
         ];

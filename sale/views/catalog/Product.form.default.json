@@ -181,6 +181,27 @@
                         ]
                     },
                     {
+                        "label": "Camp",
+                        "id": "section.camp",
+                        "visible": ["is_camp", "=", true],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "camp_product_type",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "label": "Attributes",
                         "id": "section.attributes",
                         "visible": false,
@@ -293,6 +314,12 @@
                                             {
                                                 "type": "field",
                                                 "value": "is_activity",
+                                                "width": "50%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_camp",
                                                 "width": "50%",
                                                 "readonly": true
                                             },
