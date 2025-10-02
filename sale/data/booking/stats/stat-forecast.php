@@ -7,6 +7,7 @@
 */
 
 use finance\stats\StatSection;
+use identity\Center;
 use identity\User;
 use sale\booking\Booking;
 use sale\booking\BookingLine;
@@ -46,7 +47,10 @@ use sale\booking\BookingLine;
 
         'center' => [
             'type'              => 'string',
-            'description'       => 'Name of the center.'
+            'description'       => 'Name of the center.',
+            'default'           => function() {
+                return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
+            }
         ],
         'aamm' => [
             'type'              => 'string',
@@ -101,7 +105,7 @@ if($params['center_id'] || $params['all_centers']) {
         ['state', 'in', ['instance', 'archive']]
     ];
 
-    $status = ($params['is_not_option'] ?? false) ? ['confirmed'] : ['option', 'confirmed'];
+    $status = ($params['is_not_option'] ?? false) ? ['confirmed'] : ['quote', 'option', 'confirmed'];
 
     $domain[] = ['status', 'in', $status];
 }

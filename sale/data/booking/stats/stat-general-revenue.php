@@ -7,6 +7,7 @@
 */
 
 use finance\stats\StatSection;
+use identity\Center;
 use identity\User;
 use sale\booking\Booking;
 use sale\booking\BookingLine;
@@ -42,7 +43,10 @@ use sale\booking\BookingLineGroup;
 
         'center' => [
             'type'              => 'string',
-            'description'       => 'Name of the center.'
+            'description'       => 'Name of the center.',
+            'default'           => function() {
+                return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
+            }
         ],
         'aamm' => [
             'type'              => 'string',
