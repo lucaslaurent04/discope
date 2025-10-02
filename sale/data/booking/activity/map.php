@@ -135,7 +135,7 @@ foreach($activities as $id => $activity) {
 // load all foreign objects at once
 $bookings = $orm->read(Booking::getType(), array_keys($map_bookings), ['id', 'name', 'description', 'status', 'payment_status', 'customer_id', 'date_from', 'date_to', 'nb_pers']);
 $booking_groups = $orm->read(BookingLineGroup::getType(), array_keys($map_groups), ['id', 'nb_pers', 'age_range_assignments_ids', 'has_person_with_disability', 'person_disability_description']);
-$camps = $orm->read(Camp::getType(), array_keys($map_camps), ['id', 'name', 'short_name', 'date_from', 'date_to', 'min_age', 'max_age', 'enrollments_qty', 'employee_ratio']);
+$camps = $orm->read(Camp::getType(), array_keys($map_camps), ['id', 'status', 'name', 'short_name', 'date_from', 'date_to', 'min_age', 'max_age', 'enrollments_qty', 'employee_ratio']);
 $employees = $orm->read(Employee::getType(), array_keys($map_employees), ['id', 'name', 'relationship']);
 $providers = $orm->read(Provider::getType(), array_keys($map_providers), ['id', 'name', 'relationship']);
 $product_models = $orm->read(ProductModel::getType(), array_keys($map_product_models), ['id', 'name', 'activity_color', 'providers_ids']);
@@ -166,9 +166,24 @@ $adapter = $dap->get('json');
 $result = [];
 // pass-2 - build result: enrich and adapt consumptions
 foreach($activities as $id => $activity) {
+
+    // ignore Activities linked to a cancelled Booking
+    if(isset($activity['booking_id'])) {
+        $booking = $bookings[$activity['booking_id']];
+        if($booking['status'] === 'cancelled') {
+            continue;
+        }
+    }
+    // ignore Activities linked to a cancelled Camp
+    if(isset($activity['camp_id'])) {
+        $camp = $camps[$activity['camp_id']];
+        if($camp['status'] === 'cancelled') {
+            continue;
+        }
+    }
+    // ignore Activities linked to a non-displayed employee
     if(isset($activity['employee_id']) && !empty($params['partners_ids'])) {
         if(!isset($map_employees_ids[$activity['employee_id']])) {
-            // ignore Booking Activities linked to a non-displayed employee
             continue;
         }
     }
