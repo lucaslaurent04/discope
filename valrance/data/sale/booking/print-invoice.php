@@ -718,7 +718,7 @@ foreach($invoice['fundings_ids'] as $funding) {
             $fundings_payments[] = [
                 'receipt_date'      => date('d/m/Y', $payment['receipt_date']),
                 'amount'            => $payment['amount'],
-                'payment_origin'    => $payment['payment_origin']
+                'payment_origin'    => str_replace(['cashdesk', 'bank'], ['caisse', 'banque'], $payment['payment_origin'])
             ];
         }
     }
