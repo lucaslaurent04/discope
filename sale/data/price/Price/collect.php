@@ -8,10 +8,8 @@
 
 use equal\orm\Domain;
 use identity\Center;
-use sale\camp\catalog\Product;
-use sale\camp\catalog\ProductModel;
-use sale\camp\price\Price;
-use sale\catalog\Family;
+use sale\catalog\Product;
+use sale\price\PriceList;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Advanced search for Prices: returns a collection of Price according to extra parameters.",
@@ -122,57 +120,18 @@ if(isset($params['price_list_id']) && $params['price_list_id'] > 0) {
     $domain = Domain::conditionAdd($domain, ['price_list_id', '=', $params['price_list_id']]);
 }
 
-/*
-// #todo - this does not work
-// we need to filter by using price_list_category_id both on PriceList and Center
 
+// center_id : we need to filter by using price_list_category_id both on PriceList and Center
 if(isset($params['center_id']) && $params['center_id'] > 0) {
-    $prices_ids = [];
+    $center = Center::id($params['center_id'])->read(['price_list_category_id'])->first();
 
-    $families = Family::search()
-        ->read(['centers_ids', 'product_models_ids'])
-        ->get(true);
-
-    $family_product_models_ids = [];
-    foreach($families as $family) {
-        if(!in_array($params['center_id'], $family['centers_ids'])) {
-            continue;
-        }
-        foreach($family['product_models_ids'] as $product_models_id) {
-            $family_product_models_ids[$product_models_id] = true;
+    if($center) {
+        $price_lists_ids = PriceList::search(['price_list_category_id', '=', $center['price_list_category_id']])->ids();
+        if(count($price_lists_ids)) {
+            $domain = Domain::conditionAdd($domain, ['price_list_id', 'in', $price_lists_ids]);
         }
     }
-    $family_product_models_ids = array_keys($family_product_models_ids);
-
-    if(!empty($family_product_models_ids)) {
-        $product_models = ProductModel::ids($family_product_models_ids)
-            ->read(['products_ids'])
-            ->get(true);
-
-        $family_products_ids = [];
-        foreach($product_models as $product_model) {
-            foreach($product_model['products_ids'] as $product_id) {
-                $family_products_ids[$product_id] = true;
-            }
-        }
-        $family_products_ids = array_keys($family_products_ids);
-
-        if(!empty($family_products_ids)) {
-            $prices = Price::search()
-                ->read(['product_id'])
-                ->get(true);
-
-            foreach($prices as $price) {
-                if(in_array($price['product_id'], $family_products_ids)) {
-                    $prices_ids[] = $price['id'];
-                }
-            }
-        }
-    }
-
-    $domain = Domain::conditionAdd($domain, ['id', 'in', $prices_ids]);
 }
-*/
 
 if(count($prices_ids)) {
     $domain = Domain::conditionAdd($domain, ['id', 'in', $prices_ids]);
