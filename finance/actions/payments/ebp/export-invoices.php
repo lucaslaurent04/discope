@@ -8,6 +8,7 @@
 
 use core\setting\Setting;
 use documents\Export;
+use equal\text\TextTransformer;
 use finance\accounting\AccountingJournal;
 use identity\CenterOffice;
 use sale\booking\Invoice;
@@ -193,7 +194,7 @@ if(!empty($invoices)) {
             'VE',
             $invoice['partner_id']['partner_identity_id']['accounting_account'],
             'F',
-            $invoice['partner_id']['name'],
+            TextTransformer::toAscii($invoice['partner_id']['name']),
             $invoice['name'],
             number_format($invoice['price'], 2, '.', ''),
             $invoice['type'] === 'invoice' ? 'D' : 'C',
