@@ -42,9 +42,9 @@
             ]
         },
         {
-            "id": "action.clone-group",
-            "label": "Clone group",
-            "controller": "sale_camp_clone-group",
+            "id": "action.add-group",
+            "label": "Ajouter group",
+            "controller": "sale_camp_add-group",
             "params": {
                 "id": "object.id"
             },
@@ -184,25 +184,29 @@
                                                 "type": "field",
                                                 "value": "product_id",
                                                 "width": "50%",
-                                                "visible": false
+                                                "visible": false,
+                                                "domain": ["camp_product_type", "=", "full"]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "day_product_id",
                                                 "width": "50%",
-                                                "visible":  false
+                                                "visible":  false,
+                                                "domain": ["camp_product_type", "=", "day"]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "weekend_product_id",
                                                 "width": "50%",
-                                                "visible":  false
+                                                "visible":  false,
+                                                "domain": ["camp_product_type", "=", "weekend"]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "saturday_morning_product_id",
                                                 "width": "50%",
-                                                "visible":  false
+                                                "visible":  false,
+                                                "domain": ["camp_product_type", "=", "saturday-morning"]
                                             },
                                             {
                                                 "type": "field",
@@ -279,7 +283,14 @@
                                             {
                                                 "type": "field",
                                                 "value": "camp_groups_ids",
-                                                "width": "100%"
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }

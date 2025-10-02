@@ -161,8 +161,8 @@
                 "action.transition.cancel": {
                     "label": "Annuler"
                 },
-                "action.clone-group": {
-                    "label": "Cloner groupe"
+                "action.add-group": {
+                    "label": "Ajouter groupe"
                 }
             },
             "layout": {
