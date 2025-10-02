@@ -169,15 +169,15 @@ foreach($activities as $id => $activity) {
 
     // ignore Activities linked to a cancelled Booking
     if(isset($activity['booking_id'])) {
-        $booking = $bookings[$activity['booking_id']];
-        if($booking['status'] === 'cancelled') {
+        $booking = $bookings[$activity['booking_id']] ?? null;
+        if($booking && $booking['status'] === 'cancelled') {
             continue;
         }
     }
     // ignore Activities linked to a cancelled Camp
     if(isset($activity['camp_id'])) {
-        $camp = $camps[$activity['camp_id']];
-        if($camp['status'] === 'cancelled') {
+        $camp = $camps[$activity['camp_id']] ?? null;
+        if($camp && $camp['status'] === 'cancelled') {
             continue;
         }
     }
@@ -281,6 +281,7 @@ $domain = [
     ['event_date', '>=', $params['date_from']],
     ['event_date', '<=', $params['date_to']]
 ];
+
 if(!empty($params['partners_ids'])) {
     $domain[] = ['partner_id', 'in', $params['partners_ids']];
 }

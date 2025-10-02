@@ -27,7 +27,6 @@ class BookingPoint extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'Reference to the booking this entry is associated with.',
-                'required'          => true,
                 'ondelete'          => 'cascade',
                 'dependents'        =>  ['customer_id', 'nb_paying_pers', 'nb_nights', 'points_value', 'name']
             ],
@@ -35,7 +34,7 @@ class BookingPoint extends Model {
             'booking_apply_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
-                'description'       => 'Booking to which the discount was applied.',
+                'description'       => 'Booking on which the discount was applied.',
                 'ondelete'          => 'cascade',
                 'domain'            => ['customer_id', '=', 'object.customer_id'],
             ],
