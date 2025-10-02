@@ -49,7 +49,10 @@
                         "route": "/camps",
                         "context": {
                             "entity": "sale\\camp\\Camp",
-                            "view": "list.pending"
+                            "view": "list.default",
+                            "domain": [
+                                ["status", "=", "draft"]
+                            ]
                         }
                     },
                     {
