@@ -210,6 +210,10 @@ if(!empty($invoices)) {
         $added++;
 
         foreach($invoice['invoice_lines_ids'] as $line) {
+            // #memo - do not export line with a price of 0,00 EUR
+            if(round($line['price'], 2) === 0.0) {
+                continue;
+            }
             if($line['product_id'] === $downpayment_product['id'] && is_null($line['price_id'])) {
                 // Reference to down payment
                 $data[] = [
