@@ -122,6 +122,10 @@ if(isset($params['price_list_id']) && $params['price_list_id'] > 0) {
     $domain = Domain::conditionAdd($domain, ['price_list_id', '=', $params['price_list_id']]);
 }
 
+/*
+// #todo - this does not work
+// we need to filter by using price_list_category_id both on PriceList and Center
+
 if(isset($params['center_id']) && $params['center_id'] > 0) {
     $prices_ids = [];
 
@@ -168,6 +172,7 @@ if(isset($params['center_id']) && $params['center_id'] > 0) {
 
     $domain = Domain::conditionAdd($domain, ['id', 'in', $prices_ids]);
 }
+*/
 
 if(count($prices_ids)) {
     $domain = Domain::conditionAdd($domain, ['id', 'in', $prices_ids]);
