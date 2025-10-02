@@ -900,6 +900,8 @@ class BookingLineGroup extends Model {
                 elseif($group['is_event']) {
                     $nb_repeat = $group['nb_nights'] + 1;
                 }
+                // default to nb_repeat
+                $qty = $nb_repeat;
                 // apply accounting method
                 if(in_array($group['pack_id.product_model_id.qty_accounting_method'], ['unit', 'accomodation'])) {
                     $qty = $nb_repeat;
