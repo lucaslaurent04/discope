@@ -59,6 +59,9 @@
     "error": {
         "camp_id": {
             "locked_enrollment": "Impossible de modifier une ligne d'une inscription verrouillée."
+        },
+        "product_id": {
+            "invalid_camp_product_type": "The camp product type does not match the type of the currently selected product."
         }
     }
 }

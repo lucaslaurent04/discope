@@ -167,6 +167,17 @@
             "label": "Est facturable",
             "description": "L'activité est-elle facturable ? (génère une ligne de service lors de la facturation).",
             "help": "Permet d'indiquer si une activité est facturable, ce qui entraînera la création d'une ligne de service dans la facturation."
+        },
+        "camp_product_type": {
+            "label": "Type de produit",
+            "description": "Le type de produit du produit de camp.",
+            "help": "",
+            "selection": {
+                "full": "Camp complet",
+                "day": "Camp à la journée",
+                "weekend": "Week-end",
+                "saturday-morning": "Samedi matin"
+            }
         }
     },
     "view": {
@@ -182,6 +193,9 @@
                 },
                 "section.activity": {
                     "label": "Activité"
+                },
+                "section.camp": {
+                    "label": "Camp"
                 },
                 "section.attributes": {
                     "label": "Attributs"

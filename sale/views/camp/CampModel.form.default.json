@@ -37,12 +37,18 @@
                                             {
                                                 "type": "field",
                                                 "value": "product_id",
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "widget": {
+                                                    "domain": ["camp_product_type", "=", "full"]
+                                                }
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "day_product_id",
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "widget": {
+                                                    "domain": ["camp_product_type", "=", "day"]
+                                                }
                                             },
                                             {
                                                 "type": "label",
@@ -52,12 +58,18 @@
                                             {
                                                 "type": "field",
                                                 "value": "weekend_product_id",
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "widget": {
+                                                    "domain": ["camp_product_type", "=", "weekend"]
+                                                }
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "saturday_morning_product_id",
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "widget": {
+                                                    "domain": ["camp_product_type", "=", "saturday-morning"]
+                                                }
                                             },
                                             {
                                                 "type": "field",

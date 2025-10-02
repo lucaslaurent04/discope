@@ -93,22 +93,26 @@
                                             {
                                                 "type": "field",
                                                 "value": "product_id",
-                                                "visible": false
+                                                "visible": false,
+                                                "domain": ["camp_product_type", "=", "full"]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "day_product_id",
-                                                "visible": false
+                                                "visible": false,
+                                                "domain": ["camp_product_type", "=", "day"]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "weekend_product_id",
-                                                "visible": false
+                                                "visible": false,
+                                                "domain": ["camp_product_type", "=", "weekend"]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "saturday_morning_product_id",
-                                                "visible": false
+                                                "visible": false,
+                                                "domain": ["camp_product_type", "=", "saturday-morning"]
                                             },
                                             {
                                                 "type": "field",

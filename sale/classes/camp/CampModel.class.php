@@ -56,7 +56,7 @@ class CampModel extends Model {
             'product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
-                'description'       => "The product that will be added to the enrollment lines if the child enroll for the full camp.",
+                'description'       => "The product that will be added to the enrollment lines for a non CLSH camp.",
                 'domain'            => ['is_camp', '=', true],
                 'visible'           => ['is_clsh', '=', false]
             ],
@@ -82,7 +82,7 @@ class CampModel extends Model {
             'day_product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
-                'description'       => "The product that will be added to the enrollment lines if the child enroll for specific days of the camp.",
+                'description'       => "The product that will be added to the enrollment lines if the child enroll for specific days of the CLSH camp.",
                 'domain'            => ['is_camp', '=', true],
                 'visible'           => ['is_clsh', '=', true]
             ],

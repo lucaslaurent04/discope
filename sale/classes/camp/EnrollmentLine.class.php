@@ -3,6 +3,7 @@
 namespace sale\camp;
 
 use equal\orm\Model;
+use sale\camp\catalog\Product;
 
 class EnrollmentLine extends Model {
 
@@ -12,6 +13,14 @@ class EnrollmentLine extends Model {
 
     public static function getColumns(): array {
         return [
+
+            'name' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Line name relates to its product.",
+                'store'             => true,
+                'relation'          => ['product_id' => 'name']
+            ],
 
             'enrollment_id' => [
                 'type'              => 'many2one',
@@ -25,7 +34,8 @@ class EnrollmentLine extends Model {
                 'foreign_object'    => 'sale\camp\catalog\Product',
                 'description'       => "The product targeted by the line.",
                 'required'          => true,
-                'domain'            => ['is_camp', '=', true]
+                'domain'            => ['is_camp', '=', true],
+                'onupdate'          => 'onupdateProductId'
             ],
 
             'price_id' => [
@@ -182,6 +192,21 @@ class EnrollmentLine extends Model {
         $self->do('reset-enrollments-prices');
     }
 
+    public static function onupdateProductId($self) {
+        $camp_products_enrollments_ids = [];
+
+        $self->read(['enrollment_id', 'product_id' => ['camp_product_type']]);
+        foreach($self as $enrollment_line) {
+            if(in_array($enrollment_line['product_id']['camp_product_type'], ['full', 'day'])) {
+                $camp_products_enrollments_ids[] = $enrollment_line['enrollment_id'];
+            }
+        }
+
+        if(!empty($camp_products_enrollments_ids)) {
+            Enrollment::ids($camp_products_enrollments_ids)->do('refresh-camp-product-line');
+        }
+    }
+
     public static function onupdatePriceId($self) {
         $self->update(['unit_price' => null, 'total' => null, 'price' => null]);
 
@@ -219,6 +244,19 @@ class EnrollmentLine extends Model {
         foreach($self as $enrollment_line) {
             if($enrollment_line['is_locked']) {
                 return ['camp_id' => ['locked_enrollment' => "Cannot modify a line of a locked enrollment."]];
+            }
+        }
+
+        if(isset($values['product_id'])) {
+            $new_product = Product::id($values['product_id'])
+                ->read(['camp_product_type'])
+                ->first();
+
+            $self->read(['product_id' => ['camp_product_type']]);
+            foreach($self as $enrollment_line) {
+                if($enrollment_line['product_id']['camp_product_type'] !== $new_product['camp_product_type']) {
+                    return ['product_id' => ['invalid_camp_product_type' => "Camp product is not matching the current camp product type."]];
+                }
             }
         }
 
