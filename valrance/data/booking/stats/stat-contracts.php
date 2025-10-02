@@ -520,13 +520,29 @@ use sale\customer\Customer;
             'description'       => 'Country.',
             'default'           => 'all'
         ],
-        'price_vate' => [
+        'turnover_membership' => [
             'type'              => 'float',
-            'description'       => 'Price of the sojourn VAT excluded.'
+            'description'       => 'Turnover amount for membership fees.'
         ],
-        'price_vati' => [
+        'turnover_nights_meals' => [
             'type'              => 'float',
-            'description'       => 'Price of the sojourn VAT included.'
+            'description'       => 'Turnover amount for nights and meals fees.'
+        ],
+        'turnover_animations' => [
+            'type'              => 'float',
+            'description'       => 'Turnover amount for internal animations fees.'
+        ],
+        'turnover_providers' => [
+            'type'              => 'float',
+            'description'       => 'Turnover amount for external animations and transports fees.'
+        ],
+        'turnover_laundry' => [
+            'type'              => 'float',
+            'description'       => 'Turnover amount for laundry fees.'
+        ],
+        'turnover_total' => [
+            'type'              => 'float',
+            'description'       => 'Turnover total amount.'
         ]
     ],
     'response'      => [
@@ -666,6 +682,20 @@ if(!empty($domain)){
         ->get(true);
 }
 
+$map_turnovers_accounts = [
+    'turnover_membership'   => ['75620000'],
+    'turnover_nights_meals' => ['70831000'],
+    'turnover_animations'   => ['70833000'],
+    'turnover_providers'    => ['75814000', '75815000', '70882400', '4470000', '70882000', '4684000', '4672000', '70882300', '75813000', '70882000'],
+    'turnover_laundry'      => ['70882200']
+];
+$map_accounts_turnover = [];
+foreach($map_turnovers_accounts as $turnover => $accounts) {
+    foreach($accounts as $account) {
+        $map_accounts_turnover[$account] = $turnover;
+    }
+}
+
 $result = [];
 
 foreach($bookings as $booking) {
@@ -692,18 +722,27 @@ foreach($bookings as $booking) {
     $count_nb_pers_nights = 0;
     $count_nb_room_nights = 0;
 
+    $turnover_amounts = [
+        'turnover_membership'   => 0,
+        'turnover_nights_meals' => 0,
+        'turnover_animations'   => 0,
+        'turnover_providers'    => 0,
+        'turnover_laundry'      => 0,
+        'turnover_total'        => 0
+    ];
+
     foreach($sojourns as $sojourn) {
         // retrieve all lines relating to an accommodation
         $lines = BookingLine::search([
-            ['booking_line_group_id', '=', $sojourn['id']],
-            ['is_accomodation', '=', true]
+            ['booking_line_group_id', '=', $sojourn['id']]
         ])
             ->read([
                 'id',
                 'qty',
                 'price',
                 'qty_accounting_method',
-                'product_id'
+                'product_id',
+                'price_id' => ['accounting_rule_id' => ['accounting_rule_line_ids' => ['id', 'account', 'share']]]
             ])
             ->get(true);
 
@@ -732,6 +771,13 @@ foreach($bookings as $booking) {
                     $sojourn_nb_pers_nights += $line['qty'] * $sojourn['nb_pers'];
                 }
             }
+
+            foreach($line['price_id']['accounting_rule_id']['accounting_rule_line_ids'] as $accounting_rule_line) {
+                $account_amount = $line['price'] * $accounting_rule_line['share'];
+
+                $turnover_amounts[$map_accounts_turnover[$accounting_rule_line['account']]] += $account_amount;
+                $turnover_amounts['turnover_total'] += $account_amount;
+            }
         }
 
         // $sojourn_nb_pers_nights = array_reduce($lines, function($c, $a) { return $c + $a['qty'];}, 0);
@@ -758,31 +804,37 @@ foreach($bookings as $booking) {
 
     // #memo - one entry by booking
     $result[] = [
-        'center'            => $booking['center_id']['name'],
-        'center_type'       => ($booking['center_id']['center_office_id'] == 1)?'GG':'GA',
-        'booking'           => $booking['name'],
-        'type'              => $booking['type_id']['name'],
-        'created'           => $adapter->adaptOut($booking['created'], 'date'),
-        'created_aamm'      => date('Y-m', $booking['created']),
-        'date_from'         => $adapter->adaptOut($booking['date_from'], 'date'),
-        'date_to'           => $adapter->adaptOut($booking['date_to'], 'date'),
-        'aamm'              => date('Y/m', $booking['date_from']),
-        'year'              => date('Y', $booking['date_from']),
-        'nb_pers'           => $booking_nb_pers,
-        'nb_nights'         => $booking_nb_nights,
-        'nb_rental_units'   => $booking_nb_rental_units,
-        'nb_pers_nights'    => $count_nb_pers_nights,
-        'nb_room_nights'    => $count_nb_room_nights,
-        'nb_activities'     => count($booking['booking_activities_ids']),
-        'rate_class'        => $booking['customer_id']['rate_class_id']['name'],
-        'customer_type'     => $booking['customer_id']['customer_type_id']['name'],
-        'customer_name'     => $booking['customer_identity_id']['name'],
-        'customer_lang'     => $booking['customer_identity_id']['lang_id']['name'],
-        'customer_zip'      => $booking['customer_identity_id']['address_zip'],
-        'customer_area'     => $area,
-        'customer_country'  => $booking['customer_identity_id']['address_country'],
-        'price_vate'        => $booking['total'],
-        'price_vati'        => $booking['price']
+        'center'                => $booking['center_id']['name'],
+        'center_type'           => ($booking['center_id']['center_office_id'] == 1)?'GG':'GA',
+        'booking'               => $booking['name'],
+        'type'                  => $booking['type_id']['name'],
+        'created'               => $adapter->adaptOut($booking['created'], 'date'),
+        'created_aamm'          => date('Y-m', $booking['created']),
+        'date_from'             => $adapter->adaptOut($booking['date_from'], 'date'),
+        'date_to'               => $adapter->adaptOut($booking['date_to'], 'date'),
+        'aamm'                  => date('Y/m', $booking['date_from']),
+        'year'                  => date('Y', $booking['date_from']),
+        'nb_pers'               => $booking_nb_pers,
+        'nb_nights'             => $booking_nb_nights,
+        'nb_rental_units'       => $booking_nb_rental_units,
+        'nb_pers_nights'        => $count_nb_pers_nights,
+        'nb_room_nights'        => $count_nb_room_nights,
+        'nb_activities'         => count($booking['booking_activities_ids']),
+        'rate_class'            => $booking['customer_id']['rate_class_id']['name'],
+        'customer_type'         => $booking['customer_id']['customer_type_id']['name'],
+        'customer_name'         => $booking['customer_identity_id']['name'],
+        'customer_lang'         => $booking['customer_identity_id']['lang_id']['name'],
+        'customer_zip'          => $booking['customer_identity_id']['address_zip'],
+        'customer_area'         => $area,
+        'customer_country'      => $booking['customer_identity_id']['address_country'],
+        'price_vate'            => $booking['total'],
+        'price_vati'            => $booking['price'],
+        'turnover_membership'   => $turnover_amounts['turnover_membership'],
+        'turnover_nights_meals' => $turnover_amounts['turnover_nights_meals'],
+        'turnover_animations'   => $turnover_amounts['turnover_animations'],
+        'turnover_providers'    => $turnover_amounts['turnover_providers'],
+        'turnover_laundry'      => $turnover_amounts['turnover_laundry'],
+        'turnover_total'        => $turnover_amounts['turnover_total']
     ];
 }
 
