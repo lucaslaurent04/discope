@@ -172,6 +172,9 @@
                 "section.camp-groups": {
                     "label": "Groupes"
                 },
+                "section.camp-activities": {
+                    "label": "Activités"
+                },
                 "section.enrollments": {
                     "label": "Inscriptions"
                 },
