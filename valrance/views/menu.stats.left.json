@@ -1,0 +1,68 @@
+{
+    "name": "Stats menu",
+    "access": {
+      "groups": ["stats.default.user"]
+    },
+    "layout": {
+        "items": [
+            {
+                "id": "stats.booking",
+                "icon": "query_stats",
+                "type": "parent",
+                "label": "Bookings values",
+                "description": "",
+                "children": [
+                    {
+                        "id": "stats.turnover",
+                        "icon": "business",
+                        "type": "parent",
+                        "label": "Chiffre d’affaires",
+                        "description": "",
+                        "children": [
+                            {
+                                "id": "stats.booking.total_bookings.revenue",
+                                "type": "entry",
+                                "label": "CA facturé",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\stats\\stat-revenue",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.booking.bookings",
+                                "type": "entry",
+                                "label": "CA théorique",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\stats\\stat-estimate",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.booking.total_bookings.provisional",
+                                "type": "entry",
+                                "label": "CA prévisionnel",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\stats\\stat-forecast",
+                                    "view": "list.default"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "stats.booking.total_bookings.contracts",
+                        "type": "entry",
+                        "label": "Contrats & Réservations",
+                        "description": "",
+                        "context": {
+                            "entity": "valrance\\booking\\stats\\stat-contracts",
+                            "view": "list.default"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

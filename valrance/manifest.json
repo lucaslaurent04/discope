@@ -1,13 +1,13 @@
 {
-    "name": "lathus",
+    "name": "valrance",
     "depends_on": ["core", "identity", "finance", "sale", "realestate"],
     "apps": [
         {
-            "id": "lathus-stats",
+            "id": "valrance-stats",
             "name": "Statistiques",
             "extends": "app",
             "show_in_apps": true,
-            "description": "Statistiques Lathus.",
+            "description": "Statistiques Valrances.",
             "icon": "filter_alt",
             "color": "#653BB5",
             "access": {
