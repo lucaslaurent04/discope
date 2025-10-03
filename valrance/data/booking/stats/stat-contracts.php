@@ -548,19 +548,21 @@ use sale\customer\Customer;
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
-        'accept-origin' => '*'
+        'accept-origin' => '*',
+        'cacheable'     => true,
+        'expires'       => (60*60*1)
     ],
     'providers'     => ['context', 'orm', 'adapt']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\data\adapt\AdapterProvider   $adapter_provider
+ * @var \equal\php\Context                      $context
+ * @var \equal\orm\ObjectManager                $orm
+ * @var \equal\data\adapt\DataAdapterProvider   $adapter_provider
  */
 ['context' => $context, 'orm' => $orm, 'adapt' => $adapter_provider] = $providers;
 
-/** @var $adapter \equal\data\adapt\DataAdapterJson */
+/** @var \equal\data\adapt\DataAdapterJson */
 $adapter = $adapter_provider->get('json');
 
 // #memo - we consider all bookings for which at least one sojourn finishes during the given period
@@ -683,11 +685,34 @@ if(!empty($domain)){
 }
 
 $map_turnovers_accounts = [
+    // OK - frais d'adhésion - Hébergement pension complète : petit déjeuner, lunch, goûter, repas, nuitée + fournitures des draps + lits faits + supplément ménage + supplément chambre simple + repas passage
     'turnover_membership'   => ['75620000'],
+    // OK - cetre de séjours PC
     'turnover_nights_meals' => ['70831000'],
+    // OK - animateur Valrance
     'turnover_animations'   => ['70833000'],
-    'turnover_providers'    => ['75814000', '75815000', '70882400', '44700000', '70882000', '46840000', '46720000', '70882300', '75813000', '70882000'],
-    'turnover_laundry'      => ['70882200']
+    // OK - Lessives
+    'turnover_laundry'      => ['70882200'],
+    'turnover_providers'    => [
+        // OK - Intervenants MFV - Prestataire externe avec fournitures associées (hors transport et cirque)
+        '75814000',
+        // OK - Cirque - Intrevenant cirque et fournitures associées
+        '75815000',
+        // OK - Navette - Transports
+        '70882400',
+        // OK - Taxe de séjour
+        '44700000',
+        // OK - Photocopies
+        '70882000',
+        // OK - Assurances annulation
+        '46840000',
+        // OK - Frais médicaux
+        '4671000',
+        // OK - Timbres, affranchissements
+        '70882300',
+        // OK - Etats des lieux + Frais de virement
+        '75813000'
+    ]
 ];
 $map_accounts_turnover = [];
 foreach($map_turnovers_accounts as $turnover => $accounts) {
