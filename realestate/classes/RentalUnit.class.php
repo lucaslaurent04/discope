@@ -278,15 +278,14 @@ class RentalUnit extends Model {
                 'type'              => 'boolean',
                 'description'       => "Should the children's rental units be displayed in the bookings' planning.",
                 'default'           => true,
-                'dependents'        => ['children_ids' => 'display_in_planning']
+                'dependents'        => ['children_ids' => 'display_in_planning'],
+                'onupdate'          => 'onupdateDisplayChildrenInPlanning'
             ],
 
             'display_in_planning' => [
-                'type'              => 'computed',
-                'result_type'       => 'boolean',
+                'type'              => 'boolean',
                 'description'       => "Should rental unit be displayed in the bookings' planning.",
-                'store'             => true,
-                'function'          => 'calcDisplayInPlanning'
+                'default'           => true
             ]
 
         ];
@@ -355,14 +354,13 @@ class RentalUnit extends Model {
         return $result;
     }
 
-    public static function calcDisplayInPlanning($self): array {
-        $result = [];
-        $self->read(['parent_id' => ['display_children_in_planning']]);
-        foreach($self as $id => $rental_unit) {
-            $result[$id] = $rental_unit['parent_id']['display_children_in_planning'] ?? true;
+    protected static function onupdateDisplayChildrenInPlanning($self) {
+        $self->read(['display_children_in_planning']);
+        foreach($self as $id => $rentalUnit) {
+            // #memo - recursion is prevented by the ORM
+            $children_ids = self::computeChildrenRentalUnitsIds($id);
+            self::ids($children_ids)->update(['display_in_planning' => $rentalUnit['display_children_in_planning']]);
         }
-
-        return $result;
     }
 
     public static function getConstraints() {
@@ -449,5 +447,29 @@ class RentalUnit extends Model {
         $number = rand(1, 150);
 
         return "$code$number";
+    }
+
+    private static function computeChildrenRentalUnitsIds($id) {
+        $visited = [$id => true];
+        $stack = [$id];
+
+        while(!empty($stack)) {
+            $current_id = array_pop($stack);
+
+            $rentalUnit = self::id($current_id)->read(['id', 'children_ids'])->first();
+            if(!$rentalUnit) {
+                continue;
+            }
+
+            foreach($rentalUnit['children_ids'] ?? [] as $child_id) {
+                if($child_id && !isset($visited[$child_id])) {
+                    $visited[$child_id] = true;
+                    $stack[] = $child_id;
+                }
+            }
+        }
+        // remove the parent Rental Unit itself
+        unset($visited[$id]);
+        return array_keys($visited);
     }
 }
