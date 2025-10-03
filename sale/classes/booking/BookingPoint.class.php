@@ -27,8 +27,10 @@ class BookingPoint extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'Reference to the booking this entry is associated with.',
+                'help'              => 'This field is not marked as required to allow non-null initial points (from history).',
+                'unique'            => true,
                 'ondelete'          => 'cascade',
-                'dependents'        =>  ['customer_id', 'nb_paying_pers', 'nb_nights', 'points_value', 'name']
+                'dependents'        =>  ['customer_id', 'name']
             ],
 
             'booking_apply_id' => [
@@ -44,6 +46,7 @@ class BookingPoint extends Model {
                 'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\customer\Customer',
                 'store'             => true,
+                'instant'           => true,
                 'relation'          => ['booking_id' => 'customer_id'],
                 'description'       => "Customer associated with the booking, determined based on the selected identity."
             ],
@@ -53,8 +56,7 @@ class BookingPoint extends Model {
                 'result_type'       => 'integer',
                 'description'       => 'Estimated number of paying individuals involved in the booking.',
                 'function'          => 'calcNbPayingPers',
-                'store'             => true,
-                'instant'           => true
+                'store'             => false
             ],
 
             'nb_nights' => [
@@ -62,25 +64,37 @@ class BookingPoint extends Model {
                 'result_type'       => 'float',
                 'description'       => 'Number of nights in the booking.',
                 'function'          => 'calcNbNights',
-                'store'             => true,
-                'instant'           => true
+                'store'             => false
             ],
 
             'points_value' => [
-                'type'              => 'computed',
-                'result_type'       => 'float',
+                'type'              => 'float',
                 'description'       => 'Number of points earned from the target booking.',
-                'function'          => 'calcPointsValue',
-                'store'             => true,
-                'instant'           => true
+            ],
+
+            'is_applicable' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => 'Flag telling if the points can be applied (origin booking is invoiced).',
+                'function'          => 'calcIsApplicable'
             ],
 
             'description' => [
                 'type'              => 'string',
                 'usage'             => 'text/plain',
                 'description'       => "Description of the booking points."
-            ],
+            ]
 
+        ];
+    }
+
+    public static function getAction() {
+        return [
+            'refresh_points' => [
+                'description'   => 'Re-compute assigned points according to origin Booking.',
+                'policies'      => [],
+                'function'      => 'doRefreshPoints'
+            ]
         ];
     }
 
@@ -105,32 +119,39 @@ class BookingPoint extends Model {
     /**
      * computes 1 points per night per paying person
      */
-    public static function calcPointsValue($self) {
-        $result = [];
+    protected static function doRefreshPoints($self) {
         $self->read(['nb_nights' , 'nb_paying_pers']);
-        foreach($self as $id => $point) {
-            $result[$id] = $point['nb_nights'] * $point['nb_paying_pers'];
+        foreach($self as $id => $bookingPoint) {
+            $points = $bookingPoint['nb_nights'] * $bookingPoint['nb_paying_pers'];
+            self::id($id)->update(['points_value' => $points]);
+        }
+    }
 
+    protected static function calcIsApplicable($self) {
+        $result = [];
+        $self->read(['booking_apply_id', 'booking_id' => ['status']]);
+        foreach($self as $id => $bookingPoint) {
+            $is_applicable = false;
+            if(!$bookingPoint['booking_apply_id']) {
+                if(in_array($bookingPoint['booking_id']['status'], ['debit_balance', 'credit_balance', 'balanced'], true)) {
+                    $is_applicable = true;
+                }
+            }
+            $result[$id] = $is_applicable;
         }
         return $result;
     }
 
-    public static function calcNbNights($self) {
+    protected static function calcNbNights($self) {
         $result = [];
         $self->read(['booking_id' => ['date_from', 'date_to']]);
         foreach($self as $id => $point) {
-            $result[$id] =  round( ($point['booking_id']['date_to'] - $point['booking_id']['date_from'])/ (60*60*24) );
+            $result[$id] =  round( ($point['booking_id']['date_to'] - $point['booking_id']['date_from']) / (60*60*24) );
         }
         return $result;
     }
 
-    public function getUnique() {
-        return [
-            ['booking_id']
-        ];
-    }
-
-    public static function calcNbPayingPers($self) {
+    protected static function calcNbPayingPers($self) {
         $result = [];
         $self->read(['booking_id' => ['booking_lines_groups_ids']]);
         foreach($self as $id => $point) {
@@ -158,7 +179,8 @@ class BookingPoint extends Model {
                         ->read([
                             'qty',
                             'free_qty',
-                            'product_model_id' => ['qty_accounting_method']])
+                            'product_model_id' => ['qty_accounting_method']
+                        ])
                         ->first(true);
 
                     if($booking_line){
