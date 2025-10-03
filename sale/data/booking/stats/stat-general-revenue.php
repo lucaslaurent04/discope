@@ -21,7 +21,10 @@ use sale\booking\BookingLineGroup;
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Center',
             'description'       => "Output: Center of the sojourn / Input: The center for which the stats are required.",
-            'visible'           => ['all_centers', '=', false]
+            'visible'           => ['all_centers', '=', false],
+            'default'           => function() {
+                return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
+            }
         ],
         'all_centers' => [
             'type'              => 'boolean',
@@ -43,10 +46,7 @@ use sale\booking\BookingLineGroup;
 
         'center' => [
             'type'              => 'string',
-            'description'       => 'Name of the center.',
-            'default'           => function() {
-                return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
-            }
+            'description'       => 'Name of the center.'
         ],
         'aamm' => [
             'type'              => 'string',

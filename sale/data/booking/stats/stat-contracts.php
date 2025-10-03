@@ -5,6 +5,8 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use identity\Center;
+
 list($params, $providers) = eQual::announce([
     'description'   => 'Lists all+historic contracts and their related details for a given period.',
     'params'        => [
@@ -12,7 +14,10 @@ list($params, $providers) = eQual::announce([
         'center_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Center',
-            'description'       => "Output: Center of the sojourn / Input: The center for which the stats are required."
+            'description'       => "Output: Center of the sojourn / Input: The center for which the stats are required.",
+            'default'           => function() {
+                return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
+            }
         ],
         'date_from' => [
             'type'              => 'date',
