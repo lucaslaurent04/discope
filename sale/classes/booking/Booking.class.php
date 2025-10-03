@@ -1131,17 +1131,25 @@ class Booking extends Model {
                 }
 
                 $loyalty_points_feature = Setting::get_value('sale', 'features', 'booking.loyalty_points', false);
-                if($loyalty_points_feature && $booking['status'] == 'balanced') {
-                    $has_points_applied = false;
+
+                if($loyalty_points_feature) {
+
+                    if($booking['status'] == 'cancelled') {
+                        // remove any created points relating to this booking
+                        BookingPoint::search(['booking_id', '=', $id])->delete(true);
+                        // detach any point applied to this booking
+                        BookingPoint::search(['booking_apply_id', '=', $id])->update(['booking_apply_id' => null]);
+                    }
+
                     $bookingPoint = BookingPoint::search(['booking_id', '=', $id])->read(['id', 'booking_apply_id'])->first();
 
-                    if($bookingPoint && $bookingPoint['booking_apply_id']) {
-                        $has_points_applied = true;
+                    if(!$bookingPoint) {
+                        $bookingPoint = BookingPoint::create(['booking_id' => $id])->read(['id', 'booking_apply_id'])->first();
                     }
-                    if(!$has_points_applied) {
-                        // remove any previous points related to the booking
-                        BookingPoint::search(['booking_id', '=', $id])->delete(true);
-                        BookingPoint::create(['booking_id' => $id]);
+
+                    if($bookingPoint && !isset($bookingPoint['booking_apply_id'])) {
+                        // call a refresh
+                        BookingPoint::id($bookingPoint['id'])->do('refresh_points');
                     }
                 }
 
