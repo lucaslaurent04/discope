@@ -59,7 +59,7 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "label": "Accomodation",
+                                                "label": "Accommodation",
                                                 "value": "is_accomodation",
                                                 "width": "50%"
                                             },
@@ -86,14 +86,14 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "display_children_in_planning",
-                                                "width": "100%",
-                                                "visible": ["has_children", "=", true]
+                                                "value": "display_in_planning",
+                                                "width": "100%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "display_in_planning",
-                                                "width": "100%"
+                                                "value": "display_children_in_planning",
+                                                "width": "100%",
+                                                "visible": ["has_children", "=", true]
                                             }
                                         ]
                                     },
