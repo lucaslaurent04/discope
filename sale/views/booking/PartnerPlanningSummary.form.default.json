@@ -33,6 +33,11 @@
                 "action": "refresh-mail-content",
                 "ids": []
             }
+        },
+        {
+            "id": "action.export-csv",
+            "label": "Export CSV",
+            "controller": "sale_booking_partnerplanning_export-summary-csv"
         }
     ],
     "layout": {

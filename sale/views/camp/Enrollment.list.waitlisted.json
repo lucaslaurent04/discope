@@ -12,13 +12,13 @@
             "default": false,
             "actions": [
                 {
-                    "id": "action.transition.pending",
-                    "label": "Pending",
+                    "id": "action.transition.confirm",
+                    "label": "Confirm",
                     "icon": "",
                     "controller": "model_transition",
                     "params": {
                         "entity": "sale\\camp\\Enrollment",
-                        "transition": "pending",
+                        "transition": "confirm",
                         "ids": []
                     }
                 }

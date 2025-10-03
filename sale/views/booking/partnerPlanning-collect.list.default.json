@@ -13,9 +13,9 @@
             "actions" : [
                 {
                     "id": "action.create-partner-planning-summary",
-                    "label": "Create summary",
+                    "label": "Créer récapitulatif",
                     "description": "Creates an activities summary for the selected partners.",
-                    "controller": "sale_booking_partnerplanning_create-partnerplanningsummary"
+                    "controller": "sale_booking_partnerplanning_create-summary"
                 }
             ]
         }
