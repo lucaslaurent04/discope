@@ -726,9 +726,9 @@ $result = [];
 foreach($bookings as $booking) {
     // find all sojourns
     $sojourns = BookingLineGroup::search([
-        ['booking_id', '=', $booking['id']],
-        ['is_sojourn', '=', true]
-    ])
+            ['booking_id', '=', $booking['id']],
+            ['is_sojourn', '=', true]
+        ])
         ->read([
             'id',
             'nb_pers',
@@ -759,8 +759,8 @@ foreach($bookings as $booking) {
     foreach($sojourns as $sojourn) {
         // retrieve all lines relating to an accommodation
         $lines = BookingLine::search([
-            ['booking_line_group_id', '=', $sojourn['id']]
-        ])
+                ['booking_line_group_id', '=', $sojourn['id']]
+            ])
             ->read([
                 'id',
                 'qty',
@@ -774,9 +774,6 @@ foreach($bookings as $booking) {
         $sojourn_nb_pers_nights = 0;
 
         foreach($lines as $line) {
-            if($line['price'] < 0 || $line['qty'] < 0) {
-                continue;
-            }
 
             // #memo - qty is impacted by nb_pers and nb_nights but might not be equal to nb_nights x nb_pers
             if($line['qty_accounting_method'] == 'person') {
