@@ -1125,6 +1125,7 @@ class BookingLine extends Model {
             'is_rental_unit',
             'is_accomodation',
             'qty_accounting_method',
+            'booking_line_group_id',
             'booking_line_group_id.nb_pers',
             'booking_line_group_id.nb_nights',
             'booking_line_group_id.age_range_assignments_ids',
@@ -1191,6 +1192,26 @@ class BookingLine extends Model {
                 else {
                     $om->callonce(self::getType(), 'updateQty', $oids, [], $lang);
                 }
+            }
+
+            // handle booking meals updates
+            $refresh_meals = false;
+            $map_groups_ids = [];
+            foreach($lines as $line) {
+                if($line['is_meal']) {
+                    $refresh_meals = true;
+                    $map_groups_ids[$line['booking_line_group_id']] = true;
+                }
+            }
+
+            if($refresh_meals) {
+                $event_mask = $om->disableEvents();
+
+                foreach(array_keys($map_groups_ids) as $group_id) {
+                    BookingLineGroup::refreshMeals($om, $group_id);
+                }
+
+                $om->enableEvents($event_mask);
             }
         }
     }

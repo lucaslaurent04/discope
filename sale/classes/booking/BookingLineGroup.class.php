@@ -3251,10 +3251,16 @@ class BookingLineGroup extends Model {
             'is_meal',
             'is_snack',
             'time_slot_id',
+            'qty',
             'qty_vars',
             'product_model_id.schedule_offset',
             'product_model_id.is_repeatable',
-            'booking_line_group_id.nb_pers'
+            'booking_line_group_id.nb_pers',
+            'product_id.has_age_range',
+            'booking_line_group_id.has_pack',
+            'booking_line_group_id.pack_id.has_age_range',
+            'booking_line_group_id.age_range_assignments_ids',
+            'product_id.age_range_id'
         ]);
         if(empty($lines)) {
             // no need of meal if no booking lines
@@ -3281,20 +3287,30 @@ class BookingLineGroup extends Model {
                     $qty_vars = json_decode($line['qty_vars']);
                     if($qty_vars && $day_index >= $line['product_model_id.schedule_offset']) {
                         $nb_pers = $line['booking_line_group_id.nb_pers'];
+                        if($line['product_id.has_age_range'] && !($line['booking_line_group_id.has_pack'] && $line['booking_line_group_id.pack_id.has_age_range'])) {
+                            $age_range_assignments = $om->read(BookingLineGroupAgeRangeAssignment::getType(), $line['booking_line_group_id.age_range_assignments_ids'], ['age_range_id', 'qty']);
+                            foreach($age_range_assignments as $assignment) {
+                                if($assignment['age_range_id'] == $line['product_id.age_range_id']) {
+                                    $nb_pers = $assignment['qty'];
+                                    break;
+                                }
+                            }
+                        }
+
                         $variation = $qty_vars[$day_index - $line['product_model_id.schedule_offset']] ?? -$nb_pers;
                         if(($nb_pers + $variation) > 0) {
                             $is_self_provided = false;
                         }
                     }
                 }
-                else {
+                elseif($line['qty'] > 0) {
                     if($line['product_model_id.schedule_offset'] >= 0) {
                         if($line['product_model_id.schedule_offset'] === $day_index) {
                             $is_self_provided = false;
                         }
                     }
                     else {
-                        if($days_qty + $line['product_model_id.schedule_offset'] === $day_index) {
+                        if(($days_qty + $line['product_model_id.schedule_offset']) === $day_index) {
                             $is_self_provided = false;
                         }
                     }
