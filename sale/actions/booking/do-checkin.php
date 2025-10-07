@@ -74,15 +74,16 @@ if(!$booking) {
 */
 
 if($params['sign_contract']) {
-    $pending_contract = Contract::search([
-        ['booking_id', '=', $booking['id']],
-        ['status', '=','pending']
-    ])
-        ->read(['id'])
+    $pendingContract = Contract::search([
+                ['booking_id', '=', $booking['id']]
+            ],
+            ['sort' => ['date' => 'desc']]
+        )
+        ->read(['id', 'status'])
         ->first();
 
-    if(!is_null($pending_contract)) {
-        eQual::run('do', 'sale_contract_signed', ['id' => $pending_contract['id']]);
+    if($pendingContract && in_array($pendingContract['status'], ['pending', 'sent'], true)) {
+        eQual::run('do', 'sale_contract_signed', ['id' => $pendingContract['id']]);
     }
 }
 
