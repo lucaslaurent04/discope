@@ -49,6 +49,16 @@ class PartnerPlanningSummary extends Model {
                 'default'           => 0
             ],
 
+            'activities_table_data' => [
+                'type'          => 'computed',
+                'result_type'   => 'string',
+                'usage'         => 'text/json',
+                'description'   => "Data used to generate the activities table for the mail content.",
+                'store'         => true,
+                'function'      => 'calcActivitiesTableData',
+                'dependents'    => ['mail_content']
+            ],
+
             'mail_subject' => [
                 'type'          => 'computed',
                 'result_type'   => 'string',
@@ -123,30 +133,20 @@ class PartnerPlanningSummary extends Model {
         return $result;
     }
 
-    public static function calcMailContent($self): array {
-        $template = Template::search([
-            ['code', '=', 'partner_reminder'],
-            ['type', '=', 'planning']
-        ])
-            ->read(['parts_ids' => ['name', 'value']])
-            ->first(true);
-
-        if(is_null($template)) {
-            return [];
-        }
-
+    public static function calcActivitiesTableData($self): array {
         $result = [];
-
-        $self->read(['mail_remarks']);
         foreach($self as $id => $planning) {
             $activities = BookingActivity::ids(self::getActivitiesIds($id))
                 ->read([
                     'name',
                     'activity_date',
+                    'schedule_from',
+                    'schedule_to',
                     'group_num',
                     'employee_id',
                     'providers_ids',
-                    'time_slot_id' => ['name'],
+                    'price',
+                    'time_slot_id' => ['name', 'order'],
                     'booking_id' => [
                         'name',
                         'status',
@@ -156,7 +156,23 @@ class PartnerPlanningSummary extends Model {
                         'age_range_assignments_ids' => ['qty', 'age_from', 'age_to']
                     ]
                 ])
-                ->get();
+                ->get(true);
+
+            usort($activities, function($a, $b) {
+                if($a['activity_date'] !== $b['activity_date']) {
+                    return $a['activity_date'] <=> $b['activity_date'];
+                }
+
+                if($a['time_slot_id']['order'] !== $b['time_slot_id']['order']) {
+                    return $a['time_slot_id']['order'] <> $b['time_slot_id']['order'];
+                }
+
+                if($a['booking_id']['customer_id']['name'] !== $b['booking_id']['customer_id']['name']) {
+                    return strcmp($a['booking_id']['customer_id']['name'], $b['booking_id']['customer_id']['name']);
+                }
+
+                return $a['group_num'] <=> $b['group_num'];
+            });
 
             $map_status = [
                 'quote'             => 'Devis',
@@ -184,23 +200,48 @@ class PartnerPlanningSummary extends Model {
                 preg_match('/(.*)\s+\(([^()]*)\)$/', $activity['name'], $matches);
 
                 $activity_name = $activity['name'];
-                $activity_sku = '';
-                if(count($matches) === 3) {
-                    $activity_name = $matches[1];
-                    $activity_sku = $matches[2];
-                }
+
+                $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
+                $time_format = Setting::get_value('core', 'locale', 'time_format', 'H:i');
+                $currency = Setting::get_value('core', 'locale', 'currency', '€');
 
                 $planned_activities[] = [
-                    'activity_date'         => date('d/m/y', $activity['activity_date']),
+                    'activity_date'         => date($date_format, $activity['activity_date']),
                     'customer_name'         => $activity['booking_id']['customer_id']['name'],
                     'group_num'             => $activity['group_num'],
                     'age_range_assignments' => $age_range_assignments,
                     'booking_status'        => $map_status[$activity['booking_id']['status']],
                     'time_slot_name'        => $activity['time_slot_id']['name'],
+                    'activity_from'         => date($time_format, $activity['schedule_from']),
+                    'activity_to'           => date($time_format, $activity['schedule_to']),
                     'activity_name'         => $activity_name,
-                    'activity_sku'          => $activity_sku
+                    'price'                 => number_format((float) $activity['price'], 2, ",", ".") . ' ' .$currency
                 ];
             }
+
+            $result[$id] = json_encode($planned_activities, JSON_UNESCAPED_UNICODE);
+        }
+
+        return $result;
+    }
+
+    public static function calcMailContent($self): array {
+        $template = Template::search([
+            ['code', '=', 'partner_reminder'],
+            ['type', '=', 'planning']
+        ])
+            ->read(['parts_ids' => ['name', 'value']])
+            ->first(true);
+
+        if(is_null($template)) {
+            return [];
+        }
+
+        $result = [];
+
+        $self->read(['activities_table_data', 'mail_remarks']);
+        foreach($self as $id => $planning) {
+            $data = json_decode($planning['activities_table_data'], true);
 
             $activities_table =
                 '<table style="width: 100%; border-collapse: collapse; margin-top: 20px; border: 1px solid #ddd;">
@@ -208,10 +249,10 @@ class PartnerPlanningSummary extends Model {
                 <th style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #f4f4f4; color: #333;">Date</th>
                 <th style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #f4f4f4; color: #333;">Client</th>
                 <th style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #f4f4f4; color: #333;">Informations groupe</th>
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #f4f4f4; color: #333;">Status réservation</th>
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #f4f4f4; color: #333;">Moment</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: center; background-color: #f4f4f4; color: #333;">Status réservation</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: center; background-color: #f4f4f4; color: #333;">Moment</th>
                 <th style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #f4f4f4; color: #333;">Activité</th>
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #f4f4f4; color: #333;">SKU</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: right; background-color: #f4f4f4; color: #333;">Prix</th>
             </tr>'
                 .implode(
                     array_map(
@@ -221,13 +262,13 @@ class PartnerPlanningSummary extends Model {
                                 '<td style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #fafafa;">'.$planned_activity['activity_date'].'</td>'.
                                 '<td style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #fafafa;">'.$planned_activity['customer_name'].'</td>'.
                                 '<td style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #fafafa;">G'.$planned_activity['group_num'].'<br />'.implode('<br />', $planned_activity['age_range_assignments']).'</td>'.
-                                '<td style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #fafafa;">'.$planned_activity['booking_status'].'</td>'.
-                                '<td style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #fafafa;">'.$planned_activity['time_slot_name'].'</td>'.
+                                '<td style="border: 1px solid #ddd; padding: 12px; text-align: center; background-color: #fafafa;">'.$planned_activity['booking_status'].'</td>'.
+                                '<td style="border: 1px solid #ddd; padding: 12px; text-align: center; background-color: #fafafa;">'.$planned_activity['time_slot_name'].'<br />'.'<span style="color: grey; font-size: 0.7rem;">('.$planned_activity['activity_from'].' - '.$planned_activity['activity_to'].')'.'</span></td>'.
                                 '<td style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #fafafa;">'.$planned_activity['activity_name'].'</td>'.
-                                '<td style="border: 1px solid #ddd; padding: 12px; text-align: left; background-color: #fafafa; font-size: 10px;">'.$planned_activity['activity_sku'].'</td>'.
+                                '<td style="border: 1px solid #ddd; padding: 12px; text-align: right; background-color: #fafafa;">'.$planned_activity['price'].'</td>'.
                                 '</tr>';
                         },
-                        $planned_activities
+                        $data
                     )
                 )
                 .'</table>';
@@ -276,7 +317,7 @@ class PartnerPlanningSummary extends Model {
     }
 
     protected static function doRefreshMailContent($self) {
-        $self->update(['mail_content' => null])
+        $self->update(['activities_table_data' => null])
             ->read(['mail_content']);
     }
 

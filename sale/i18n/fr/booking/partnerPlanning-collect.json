@@ -47,16 +47,31 @@
         "list.default": {
             "name": "Planning relations",
             "description": "",
+            "header": {
+                "action.create-partner-planning-summary": {
+                    "label": "Créer récapitulatif"
+                }
+            },
             "layout": {}
         },
         "list.employee": {
             "name": "Planning employés",
             "description": "",
+            "header": {
+                "action.create-partner-planning-summary": {
+                    "label": "Créer récapitulatif"
+                }
+            },
             "layout": {}
         },
         "list.provider": {
             "name": "Planning prestataires",
             "description": "",
+            "header": {
+                "action.create-partner-planning-summary": {
+                    "label": "Créer récapitulatif"
+                }
+            },
             "layout": {}
         }
     },

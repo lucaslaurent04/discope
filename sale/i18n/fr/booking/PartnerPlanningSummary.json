@@ -54,6 +54,9 @@
                 },
                 "action.refresh-mail-content": {
                     "label": "Rafraichir contenu e-mail"
+                },
+                "action.export-csv": {
+                    "label": "Export CSV"
                 }
             },
             "layout": {
