@@ -22,6 +22,12 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "sojourn_number",
+                                                "width": "25%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "status",
                                                 "visible": false
                                             },
