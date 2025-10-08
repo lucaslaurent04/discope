@@ -563,18 +563,19 @@ class Camp extends Model {
 
     public static function calcName($self): array {
         $result = [];
-        $self->read(['short_name', 'date_from', 'date_to', 'min_age', 'max_age']);
+        $self->read(['sojourn_number', 'short_name', 'date_from', 'date_to', 'min_age', 'max_age']);
 
         $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
 
         foreach($self as $id => $camp) {
-            if(empty($camp['short_name'])) {
+            if(empty($camp['sojourn_number'])) {
                 continue;
             }
 
             $result[$id] = sprintf(
-                '%s | %s -> %s (%d - %d)',
-                $camp['short_name'],
+                '%s - %s | %s -> %s (%d - %d)',
+                $camp['sojourn_number'],
+                $camp['short_name'] ?? '',
                 date($date_format, $camp['date_from']),
                 date($date_format, $camp['date_to']),
                 $camp['min_age'],

@@ -193,7 +193,7 @@ class Child extends Model {
         $self->read(['firstname', 'lastname']);
         foreach($self as $id => $child) {
             if(isset($child['firstname'], $child['lastname'])) {
-                $result[$id] = $child['firstname'].' '.$child['lastname'];
+                $result[$id] = $child['lastname'] . ' ' . $child['firstname'];
             }
         }
 

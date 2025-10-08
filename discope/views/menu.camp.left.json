@@ -80,7 +80,7 @@
                 "icon": "app_registration",
                 "children": [
                     {
-                        "id": "enrollments",
+                        "id": "enrollments.all",
                         "type": "entry",
                         "label": "Enrollments",
                         "description": "",
@@ -92,9 +92,9 @@
                         }
                     },
                     {
-                        "id": "enrollments",
+                        "id": "enrollments.archived",
                         "type": "entry",
-                        "label": "Enrollments",
+                        "label": "Archived Enrollments",
                         "description": "",
                         "icon": "app_registration",
                         "route": "/camps",
