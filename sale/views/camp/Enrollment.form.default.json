@@ -68,12 +68,7 @@
         {
             "id": "action.transition.validate",
             "label": "Validate",
-            "controller": "model_transition",
-            "params": {
-                "entity": "sale\\camp\\Enrollment",
-                "transition": "validate",
-                "ids": []
-            },
+            "controller": "sale_camp_enrollment_validate",
             "visible": [
                 ["status", "=", "confirmed"],
                 ["state", "<>", "draft"]
