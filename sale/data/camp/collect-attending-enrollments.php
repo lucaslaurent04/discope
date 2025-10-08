@@ -100,16 +100,16 @@ foreach($camps as $camp) {
     }
 }
 
-if($params['only_weekend']) {
-    $result = array_filter(
-        $result,
-        fn($item) => $item['weekend_extra'] === 'full'
-    );
-}
-elseif($params['only_saturday']) {
+if($params['only_saturday']) {
     $result = array_filter(
         $result,
         fn($item) => $item['weekend_extra'] === 'saturday-morning'
+    );
+}
+elseif($params['only_weekend']) {
+    $result = array_filter(
+        $result,
+        fn($item) => $item['weekend_extra'] === 'full'
     );
 }
 

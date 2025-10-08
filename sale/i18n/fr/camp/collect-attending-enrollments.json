@@ -13,11 +13,6 @@
             "description": "",
             "help": ""
         },
-        "only_saturday": {
-            "label": "Samedi matin",
-            "description": "",
-            "help": ""
-        },
         "only_weekend": {
             "label": "Weekend",
             "description": "",
