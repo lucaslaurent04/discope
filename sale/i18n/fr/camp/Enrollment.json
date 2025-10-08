@@ -13,6 +13,35 @@
             "description": "L'enfant à inscrire.",
             "help": ""
         },
+        "child_firstname": {
+            "label": "Prénom",
+            "description": "Prénom de l'enfant.",
+            "help": ""
+        },
+        "child_lastname": {
+            "label": "Nom",
+            "description": "Nom de l'enfant.",
+            "help": ""
+        },
+        "child_gender": {
+            "label": "Genre",
+            "description": "Le genre de l'enfant.",
+            "help": "",
+            "selection": {
+                "F": "Féminin",
+                "M": "Masculin"
+            }
+        },
+        "child_birthdate": {
+            "label": "Date de naissance",
+            "description": "La date de naissance de l'enfant.",
+            "help": ""
+        },
+        "has_camp_birthday": {
+            "label": "Anniversaire",
+            "description": "Est-ce que l'enfant fête son anniversaire durant le camp?",
+            "help": ""
+        },
         "child_remarks": {
             "label": "Remarques",
             "description": "Remarques à propos de l'enfant, de sa santé au moment de l'inscription, ...",
@@ -217,6 +246,16 @@
             "label": "Responsable",
             "description": "Le tuteur principal responsable de l'enfant.",
             "help": "Utilisé pour savoir quelle adresse utiliser pour la facturation."
+        },
+        "is_foster": {
+            "label": "Famille d'accueil",
+            "description": "Est-ce que l'enfant vit dans une famille accueil?",
+            "help": ""
+        },
+        "institution_id": {
+            "label": "Institution",
+            "description": "L'institution qui prend en charge l'enfant.",
+            "help": ""
         }
     },
     "view": {
