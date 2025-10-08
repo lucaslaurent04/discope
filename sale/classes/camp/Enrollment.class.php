@@ -924,14 +924,10 @@ class Enrollment extends Model {
 
     public static function policyValidate($self): array {
         $result = [];
-        $self->read(['all_documents_received', 'payment_status']);
+        $self->read(['all_documents_received']);
         foreach($self as $enrollment) {
             if(!$enrollment['all_documents_received']) {
                 return ['camp_id' => ['missing_document' => "At least one document is missing for the enrollment to this camp."]];
-            }
-
-            if($enrollment['payment_status'] !== 'paid') {
-                return ['camp_id' => ['not_paid' => "The enrollment isn't fully paid."]];
             }
         }
 
@@ -1048,7 +1044,7 @@ class Enrollment extends Model {
             ],
 
             'validated' => [
-                'description' => "The enrollment is validated, the required documents have been received and the enrollment has been paid.",
+                'description' => "The enrollment is validated, the required documents have been received.",
                 'transitions' => [
                     'cancel' => [
                         'status'        => 'cancelled',

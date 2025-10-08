@@ -1,0 +1,23 @@
+{
+    "description": "Valider l'inscription si les documents ont été reçus.",
+    "model": {
+        "id": {
+            "label": "Inscription",
+            "description": "Inscription à valider.",
+            "help": ""
+        },
+        "do_not_check_payment": {
+            "label": "Ne pas vérifier les paiements ?",
+            "description": "Ne pas vérifier que tous les paiements ont été réalisés ?",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "unknown_enrollment": "Inscription non connue.",
+            "invalid_status": "L'inscription n'est pas confirmée.",
+            "missing_document": "Il manque au moins un document pour l'inscription à ce camp.",
+            "not_paid": "L'inscription n'est pas complètement payée."
+        }
+    }
+}

@@ -9,19 +9,7 @@
             "ACTION.EDIT": false
         },
         "selection": {
-            "default": false,
-            "actions": [
-                {
-                    "id": "action.transition.validate",
-                    "label": "Validate",
-                    "controller": "model_transition",
-                    "params": {
-                        "entity": "sale\\camp\\Enrollment",
-                        "transition": "validate",
-                        "ids": []
-                    }
-                }
-            ]
+            "default": false
         }
     },
     "controller": "sale_camp_collect-enrollments",
