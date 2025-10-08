@@ -48,7 +48,50 @@ class Enrollment extends Model {
                 'foreign_object'    => 'sale\camp\Child',
                 'description'       => "The child that is enrolled.",
                 'required'          => true,
-                'dependents'        => ['name', 'main_guardian_id']
+                'dependents'        => ['name', 'main_guardian_id', 'child_age', 'is_foster', 'institution_id']
+            ],
+
+            'child_firstname' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Firstname of the child.",
+                'store'             => false,
+                'relation'          => ['child_id' => 'firstname']
+            ],
+
+            'child_lastname' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Lastname of the child.",
+                'store'             => false,
+                'relation'          => ['child_id' => 'lastname']
+            ],
+
+            'child_gender' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'selection'         => [
+                    'F',
+                    'M'
+                ],
+                'store'             => false,
+                'relation'          => ['child_id' => 'gender']
+            ],
+
+            'child_birthdate' => [
+                'type'              => 'computed',
+                'result_type'       => 'date',
+                'description'       => "Birthdate of the child.",
+                'store'             => false,
+                'relation'          => ['child_id' => 'birthdate']
+            ],
+
+            'has_camp_birthday' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => "Does the child has her/his birthday during the camp.",
+                'store'             => false,
+                'function'          => 'calcHasCampBirthday'
             ],
 
             'child_remarks' => [
@@ -74,6 +117,24 @@ class Enrollment extends Model {
                 'relation'          => ['child_id' => ['main_guardian_id']]
             ],
 
+            'is_foster' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => "Is the child living in a forster family/home.",
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['child_id' => ['is_foster']]
+            ],
+
+            'institution_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\camp\Institution',
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['child_id' => ['institution_id']]
+            ],
+
             'family_quotient' => [
                 'type'              => 'integer',
                 'usage'             => 'number/integer{0,5000}',
@@ -90,7 +151,7 @@ class Enrollment extends Model {
                 'description'       => "The camp the child is enrolled to.",
                 'required'          => true,
                 'onupdate'          => 'onupdateCampId',
-                'dependents'        => ['date_from', 'date_to', 'is_clsh', 'clsh_type']
+                'dependents'        => ['date_from', 'date_to', 'is_clsh', 'clsh_type', 'child_age']
             ],
 
             'date_from' => [
@@ -592,18 +653,32 @@ class Enrollment extends Model {
 
     public static function calcChildAge($self): array {
         $result = [];
-        $self->read([
-            'camp_id'   => ['date_from'],
-            'child_id'  => ['birthdate']
-        ]);
+        $self->read(['date_from', 'child_id'  => ['birthdate']]);
         foreach($self as $id => $enrollment) {
-            if(!isset($enrollment['camp_id']['date_from'], $enrollment['child_id']['birthdate'])) {
+            if(!isset($enrollment['date_from'], $enrollment['child_id']['birthdate'])) {
                 continue;
             }
 
-            $date_from = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from']);
+            $date_from = (new \DateTime())->setTimestamp($enrollment['date_from']);
             $birthdate = (new \DateTime())->setTimestamp($enrollment['child_id']['birthdate']);
             $result[$id] = $birthdate->diff($date_from)->y;
+        }
+
+        return $result;
+    }
+
+    public static function calcHasCampBirthday($self): array {
+        $result = [];
+        $self->read(['date_from', 'date_to', 'child_id'  => ['birthdate']]);
+        foreach($self as $id => $enrollment) {
+            if(!isset($enrollment['date_from'], $enrollment['date_to'], $enrollment['child_id']['birthdate'])) {
+                continue;
+            }
+
+            $month_day = date('m-d', $enrollment['child_id']['birthdate']);
+            $year_birthday = \DateTime::createFromFormat('Y-m-d', date('Y').'-'.$month_day);
+
+            $result[$id] = $enrollment['date_from'] >= $year_birthday && $enrollment['date_to'] <= $year_birthday;
         }
 
         return $result;

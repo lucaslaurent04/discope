@@ -6,37 +6,42 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use equal\orm\Field;
 use sale\camp\Camp;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Manage children that are attending the current camps.",
     'params'        => [
+
         'date_from' => [
             'type'              => 'date',
             'description'       => "Date interval lower limit (defaults to first day of the current week).",
             'default'           => fn() => strtotime('last Sunday')
         ],
+
         'date_to' => [
             'type'              => 'date',
             'description'       => "Date interval upper limit (defaults to last day of the current week).",
             'default'           => fn() => strtotime('Saturday this week')
         ],
+
         'only_weekend' => [
             'type'              => 'boolean',
             'description'       => "Show only the children present during the weekend.",
             'default'           => false
         ],
+
         'only_saturday' => [
             'type'              => 'boolean',
             'description'       => "Show only the children present during the saturday morning.",
             'default'           => false
         ],
+
         'only_birthday' => [
             'type'              => 'boolean',
             'description'       => "Show only the children with birthday during camp.",
             'default'           => false
         ]
+
     ],
     'access'        => [
         'visibility'    => 'protected',
@@ -47,47 +52,40 @@ use sale\camp\Camp;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'adapt']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\data\adapt\AdapterProvider   $adapter_provider
+ * @var \equal\php\Context  $context
  */
-['context' => $context, 'adapt' => $adapter_provider] = $providers;
-
-/** @var \equal\data\adapt\DataAdapterJson $json_adapter */
-$json_adapter = $adapter_provider->get('json');
+['context' => $context] = $providers;
 
 $camps = Camp::search(
-        [
-            ['date_from', '>=', $params['date_from']],
-            ['date_from', '<=', $params['date_to']]
-        ]
-    )
+    [
+        ['date_from', '>=', $params['date_from']],
+        ['date_from', '<=', $params['date_to']]
+    ]
+)
     ->read([
         'short_name',
         'date_from',
         'date_to',
         'enrollments_ids' => [
+            'child_firstname',
+            'child_lastname',
+            'child_gender',
+            'child_birthdate',
+            'is_foster',
             'status',
             'weekend_extra',
             'is_ase',
             'child_remarks',
-            'child_id' => [
-                'firstname',
-                'lastname',
-                'gender',
-                'birthdate',
-                'main_guardian_id'  => ['name'],
-                'institution_id'    => ['name'],
-                'is_foster'
-            ],
-            'enrollment_lines_ids' => [
-                'product_id'
-            ]
+            'camp_id'           => ['name'],
+            'main_guardian_id'  => ['name'],
+            'institution_id'    => ['name']
         ]
     ])
+    ->adapt('json')
     ->get();
 
 $result = [];
@@ -98,31 +96,7 @@ foreach($camps as $camp) {
             continue;
         }
 
-        $child = $enrollment['child_id'];
-
-        $month_day = date('m-d', $child['birthdate']);
-        $year_birthday = DateTime::createFromFormat('Y-m-d', date('Y').'-'.$month_day);
-
-        $result[] = array_merge(
-            $child,
-            [
-                /*
-                 * Adapt
-                 */
-                'main_guardian_id'  => ['id' => $child['main_guardian_id']['id'], 'name' => $child['main_guardian_id']['name']],
-                'institution_id'    => ['id' => $child['institution']['id'], 'name' => $child['institution']['name']],
-                'birthdate'         => $json_adapter->adaptOut($child['birthdate'], Field::MAP_TYPE_USAGE['date']),
-
-                /*
-                 * Add AttendingChild fields
-                 */
-                'camp_id'           => ['id' => $camp['id'], 'name' => $camp['short_name']],
-                'weekend_extra'     => $enrollment['weekend_extra'],
-                'has_camp_birthday' => $year_birthday->getTimestamp() >= $camp['date_from'] && $year_birthday->getTimestamp() <= $camp['date_to'],
-                'is_ase'            => $enrollment['is_ase'],
-                'remarks'           => $enrollment['child_remarks']
-            ]
-        );
+        $result[] = $enrollment;
     }
 }
 

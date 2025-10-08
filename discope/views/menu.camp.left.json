@@ -221,8 +221,8 @@
                                 "icon": "",
                                 "route": "/camps",
                                 "context": {
-                                    "entity": "sale\\camp\\AttendingChild",
-                                    "view": "list.default"
+                                    "entity": "sale\\camp\\Enrollment",
+                                    "view": "list.attending"
                                 }
                             }
                         ]

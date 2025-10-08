@@ -29,7 +29,7 @@
         },
         "is_foster": {
             "label": "Famille d'accueil",
-            "description": "Est-ce que l'enfant vit dans une famille accueil.",
+            "description": "Est-ce que l'enfant vit dans une famille accueil?",
             "help": ""
         },
         "is_cpa_member": {
