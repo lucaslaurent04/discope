@@ -242,9 +242,9 @@ if($params['with_fee']) {
             BookingLine::refreshPrice($orm, $cancellation_line['id']);
             Booking::refreshPrice($orm, $booking['id']);
 
-            // Some groups' type field may have been automatically reset to is_extra = false
+            // Some groups may have been automatically added (membership fee), we remove them
             $automatically_added_groups_ids = BookingLineGroup::search([['booking_id', '=', $booking['id']], ['is_extra', '=', false]])->ids();
-            $orm->update(BookingLineGroup::getType(), $automatically_added_groups_ids, ['is_extra' => true]);
+            $orm->delete(BookingLineGroup::getType(), $automatically_added_groups_ids);
         }
     }
 }
