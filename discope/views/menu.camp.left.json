@@ -78,11 +78,33 @@
                 "label": "Enrollments",
                 "description": "",
                 "icon": "app_registration",
-                "route": "/camps",
-                "context": {
-                    "entity": "sale\\camp\\Enrollment",
-                    "view": "list.default"
-                }
+                "children": [
+                    {
+                        "id": "enrollments",
+                        "type": "entry",
+                        "label": "Enrollments",
+                        "description": "",
+                        "icon": "app_registration",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\camp\\Enrollment",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "enrollments",
+                        "type": "entry",
+                        "label": "Enrollments",
+                        "description": "",
+                        "icon": "app_registration",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\camp\\Enrollment",
+                            "view": "list.default",
+                            "domain": ["state", "=", "archive"]
+                        }
+                    }
+                ]
             },
             {
                 "id": "presences",

@@ -125,7 +125,10 @@
                                             {
                                                 "type": "field",
                                                 "value": "child_id",
-                                                "width": "40%"
+                                                "width": "40%",
+                                                "widget": {
+                                                    "limit": 25
+                                                }
                                             },
                                             {
                                                 "type": "field",

@@ -1845,18 +1845,23 @@ class Enrollment extends Model {
 
             $diff_camp_price_to_already_paid = $enrollment['price'] - $already_paid;
 
+            $description = "Remboursement annulation";
+
             $now = time();
             $thirty_days_before = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from'])->modify('-30 days');
             $fifteen_days_before = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from'])->modify('-15 days');
             $seven_days_before = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from'])->modify('-7 days');
             if($now < $thirty_days_before) {
                 $refund_amount = $enrollment['price'] * 0.75;
+                $description .= " (75%)";
             }
             elseif($now < $fifteen_days_before) {
+                $description .= " (50%)";
                 $refund_amount = $enrollment['price'] * 0.50;
             }
             elseif($now < $seven_days_before) {
                 $refund_amount = $enrollment['price'] * 0.25;
+                $description .= " (25%)";
             }
             else {
                 continue;
@@ -1870,7 +1875,7 @@ class Enrollment extends Model {
                 }
 
                 Funding::create([
-                    'description'       => "Remboursement annulation",
+                    'description'       => $description,
                     'enrollment_id'     => $id,
                     'center_office_id'  => $enrollment['center_office_id'],
                     'due_amount'        => round(-$refund_amount, 2),
