@@ -354,7 +354,8 @@ class PartnerPlanningSummary extends Model {
 
         $domain = [
             ['activity_date', '>=', $planning_summary['date_from']],
-            ['activity_date', '<=', $planning_summary['date_to']]
+            ['activity_date', '<=', $planning_summary['date_to']],
+            ['is_cancelled', '=', false]
         ];
 
         if($planning_summary['partner_id']['relationship'] === 'employee') {

@@ -85,7 +85,8 @@ $result = [];
 
 $domain = [
     ['activity_date', '>=', $params['date_from']],
-    ['activity_date', '<=', $params['date_to']]
+    ['activity_date', '<=', $params['date_to']],
+    ['is_cancelled', '=', false]
 ];
 
 if(!isset($params['relationship']) && !empty($params['domain'])) {

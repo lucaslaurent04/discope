@@ -8,6 +8,7 @@
 
 use core\setting\Setting;
 use sale\booking\Booking;
+use sale\booking\BookingActivity;
 use sale\booking\BookingLine;
 use sale\booking\Consumption;
 use sale\booking\BookingLineGroup;
@@ -255,6 +256,10 @@ else {
     // set due_amount to paid_amount value of remaining partially paid funding
     Booking::id($booking['id'])->do('create_negative_funding_for_reimbursement');
 }
+
+// cancel all activities related to the booking for them to not be displayed in planning
+BookingActivity::search(['booking_id', '=', $booking['id']])
+    ->update(['is_cancelled' => true]);
 
 // remove pending alerts relating to booking checks, if any
 $dispatch->cancel('lodging.booking.composition', 'sale\booking\Booking', $booking['id']);

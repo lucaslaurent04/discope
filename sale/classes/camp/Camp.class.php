@@ -391,10 +391,10 @@ class Camp extends Model {
                 'function'      => 'doGenerateActivities'
             ],
 
-            'remove-activities' => [
-                'description'   => "Removes the camp's groups activities.",
+            'cancel-activities' => [
+                'description'   => "Cancels the camp's groups activities.",
                 'policies'      => [],
-                'function'      => 'doRemoveActivities'
+                'function'      => 'doCancelActivities'
             ]
 
         ];
@@ -477,10 +477,10 @@ class Camp extends Model {
         }
     }
 
-    public static function doRemoveActivities($self) {
+    public static function doCancelActivities($self) {
         $self->read(['camp_groups_ids']);
         foreach($self as $id => $camp) {
-            CampGroup::search(['id', 'in', $camp['camp_groups_ids']])->do('remove-activities');
+            CampGroup::search(['id', 'in', $camp['camp_groups_ids']])->do('cancel-activities');
         }
     }
 
@@ -513,7 +513,7 @@ class Camp extends Model {
 
     public static function onafterCancel($self) {
         $self->do('remove-meals');
-        $self->do('remove-activities');
+        $self->do('cancel-activities');
 
         $enrollments_ids = [];
         $self->read(['enrollments_ids']);

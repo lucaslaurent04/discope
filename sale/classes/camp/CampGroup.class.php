@@ -98,10 +98,10 @@ class CampGroup extends Model {
                 'function'      => 'doGenerateActivities'
             ],
 
-            'remove-activities' => [
-                'description'   => "Removes the camp's activities.",
+            'cancel-activities' => [
+                'description'   => "Cancels the camp group's activities.",
                 'policies'      => [],
-                'function'      => 'doRemoveActivities'
+                'function'      => 'doCancelActivities'
             ],
 
             'refresh-activities-dates' => [
@@ -196,10 +196,10 @@ class CampGroup extends Model {
         }
     }
 
-    public static function doRemoveActivities($self) {
+    public static function doCancelActivities($self) {
         $self->read([]);
         foreach($self as $id => $camp_group) {
-            BookingActivity::search(['camp_group_id', '=', $id])->delete(true);
+            BookingActivity::search(['camp_group_id', '=', $id])->update(['is_cancelled' => true]);
         }
     }
 
