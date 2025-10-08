@@ -296,6 +296,12 @@ class BookingActivity extends Model {
                 'function'          => 'calcGroupNum'
             ],
 
+            'is_cancelled' => [
+                'type'              => 'boolean',
+                'description'       => "Is the activity cancelled?",
+                'default'           => false
+            ]
+
         ];
     }
 
@@ -666,7 +672,7 @@ class BookingActivity extends Model {
         $common_fields = [
             'name', 'description', 'providers_ids', 'counter', 'counter_total', 'employee_id', 'activity_date',
             'time_slot_id', 'schedule_from', 'schedule_to', 'rental_unit_id', 'has_staff_required', 'has_provider',
-            'group_num', 'partner_planning_mails_ids', 'product_id', 'product_model_id', 'qty'
+            'group_num', 'partner_planning_mails_ids', 'product_id', 'product_model_id', 'qty', 'is_cancelled'
         ];
         $booking_line_fields = [
             'activity_booking_line_id', 'is_virtual', 'booking_lines_ids', 'booking_id', 'booking_line_group_id',
