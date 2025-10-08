@@ -57,12 +57,12 @@
             "description": "",
             "layout": {}
         },
-        "list.default": {
+        "list.sponsor-search": {
             "name": "Réductions",
             "description": "",
             "header": {
                 "action.invoice-sponsor": {
-                    "label": "Facturer aidant"
+                    "label": "Facturer Aidant"
                 }
             },
             "layout": {}
