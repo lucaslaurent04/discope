@@ -34,13 +34,14 @@ use sale\camp\Enrollment;
         'charset'           => 'utf-8',
         'accept-origin'     => '*'
     ],
-    'providers' => ['context']
+    'providers' => ['context', 'dispatch']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-['context' => $context] = $providers;
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 // force check payment if param not given
 if(!isset($params['do_not_check_payment'])) {
@@ -48,7 +49,7 @@ if(!isset($params['do_not_check_payment'])) {
 }
 
 $enrollment = Enrollment::id($params['id'])
-    ->read(['status', 'all_documents_received', 'payment_status'])
+    ->read(['status', 'all_documents_received', 'payment_status', 'camp_id' => ['center_office_id']])
     ->first();
 
 if(is_null($enrollment)) {
@@ -63,8 +64,12 @@ if(!$enrollment['all_documents_received']) {
     throw new Exception("missing_document", EQ_ERROR_INVALID_PARAM);
 }
 
-if(!$params['do_not_check_payment'] && $enrollment['payment_status'] !== 'paid') {
-    throw new Exception("not_paid", EQ_ERROR_INVALID_PARAM);
+if($enrollment['payment_status'] !== 'paid') {
+    if(!$params['do_not_check_payment']) {
+        throw new Exception("not_paid", EQ_ERROR_INVALID_PARAM);
+    }
+
+    $dispatch->dispatch('lodging.camp.enrollment.validate.not_paid', 'sale\camp\Enrollment', $enrollment['id'], 'warning', null, [], [], null, $enrollment['camp_id']['center_office_id']);
 }
 
 Enrollment::id($enrollment['id'])->transition('validate');
