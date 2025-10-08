@@ -18,6 +18,11 @@
             "description": "",
             "help": ""
         },
+        "only_saturday": {
+            "label": "Samedi",
+            "description": "",
+            "help": ""
+        },
         "only_birthday": {
             "label": "Anniversaire",
             "description": "",

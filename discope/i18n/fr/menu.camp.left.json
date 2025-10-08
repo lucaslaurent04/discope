@@ -10,12 +10,16 @@
             "label": "Camps",
             "help": ""
         },
+        "enrollments": {
+            "label": "Inscriptions",
+            "help": ""
+        },
         "enrollments.all" : {
-            "label": "Toutes les Inscriptions",
+            "label": "Toutes",
             "help": ""
         },
         "enrollments.archived" : {
-            "label": "Inscriptions archivées",
+            "label": "Archives",
             "help": ""
         },
         "presences" : {
