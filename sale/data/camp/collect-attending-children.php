@@ -27,6 +27,11 @@ use sale\camp\Camp;
             'description'       => "Show only the children present during the weekend.",
             'default'           => false
         ],
+        'only_saturday' => [
+            'type'              => 'boolean',
+            'description'       => "Show only the children present during the saturday morning.",
+            'default'           => false
+        ],
         'only_birthday' => [
             'type'              => 'boolean',
             'description'       => "Show only the children with birthday during camp.",
@@ -55,11 +60,11 @@ use sale\camp\Camp;
 $json_adapter = $adapter_provider->get('json');
 
 $camps = Camp::search(
-    [
-        ['date_from', '>=', $params['date_from']],
-        ['date_from', '<=', $params['date_to']]
-    ]
-)
+        [
+            ['date_from', '>=', $params['date_from']],
+            ['date_from', '<=', $params['date_to']]
+        ]
+    )
     ->read([
         'short_name',
         'date_from',
@@ -125,6 +130,12 @@ if($params['only_weekend']) {
     $result = array_filter(
         $result,
         fn($item) => $item['weekend_extra'] === 'full'
+    );
+}
+elseif($params['only_saturday']) {
+    $result = array_filter(
+        $result,
+        fn($item) => $item['weekend_extra'] === 'saturday-morning'
     );
 }
 

@@ -1851,6 +1851,7 @@ class Enrollment extends Model {
             $thirty_days_before = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from'])->modify('-30 days');
             $fifteen_days_before = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from'])->modify('-15 days');
             $seven_days_before = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from'])->modify('-7 days');
+
             if($now < $thirty_days_before) {
                 $refund_amount = $enrollment['price'] * 0.75;
                 $description .= " (75%)";

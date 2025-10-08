@@ -28,7 +28,12 @@
                                             {
                                                 "type": "label",
                                                 "value": "",
-                                                "width": "33%"
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "only_saturday",
+                                                "width": "15%"
                                             },
                                             {
                                                 "type": "field",
