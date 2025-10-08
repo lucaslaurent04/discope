@@ -199,19 +199,24 @@ if($params['with_fee']) {
             ->first();
 
         if(!is_null($cancellation_fee_product)) {
-            $cancellation_group = BookingLineGroup::create([
+            $group_data = [
                 'booking_id'    => $booking['id'],
                 'is_sojourn'    => false,
                 'group_type'    => 'simple',
                 'has_pack'      => false,
                 'name'          => $cancellation_fee_product['name'],
                 'order'         => count($booking['booking_lines_groups_ids']) + 1,
-                'rate_class_id' => $booking['customer_id']['rate_class_id'],
                 'is_extra'      => true,
                 'is_event'      => false,
                 'is_locked'     => false,
                 'nb_pers'       => 1
-            ])
+            ];
+
+            if(!is_null($booking['customer_id']['rate_class_id'])) {
+                $group_data['rate_class_id'] = $booking['customer_id']['rate_class_id'];
+            }
+
+            $cancellation_group = BookingLineGroup::create($group_data)
                 ->read(['id'])
                 ->first();
 
