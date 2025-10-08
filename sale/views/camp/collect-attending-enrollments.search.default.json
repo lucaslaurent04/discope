@@ -4,6 +4,14 @@
     "access": {
         "groups": ["booking.default.user"]
     },
+    "header": {
+        "selection": {
+            "default": false
+        },
+        "actions": {
+            "ACTION.CREATE" : false
+        }
+    },
     "layout": {
         "groups": [
             {

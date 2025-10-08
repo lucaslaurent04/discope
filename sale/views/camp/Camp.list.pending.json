@@ -16,6 +16,9 @@
     "header": {
         "actions": {
             "ACTION.CREATE": false
+        },
+        "advanced_search": {
+            "open": true
         }
     },
     "actions": [

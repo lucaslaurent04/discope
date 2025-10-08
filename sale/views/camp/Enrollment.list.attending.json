@@ -1,8 +1,12 @@
 {
-    "name": "Manage Camps Attending Children",
-    "description": "",
-    "controller": "sale_camp_collect-attending-children",
+    "name": "Enrollments",
+    "order": "date_created",
+    "sort": "desc",
+    "controller": "sale_camp_collect-attending-enrollments",
     "header": {
+        "selection": {
+            "default": false
+        },
         "actions": {
             "ACTION.CREATE" : false
         },
@@ -10,16 +14,12 @@
             "open": true
         }
     },
-    "group_by": [
-        { "field": "camp_id", "open": true }
-    ],
-    "order": "asc",
     "layout": {
         "items": [
             {
                 "type": "field",
                 "value": "id",
-                "width": "5%",
+                "width": "10%",
                 "sortable": false,
                 "readonly": true,
                 "visible": false
@@ -34,21 +34,21 @@
             },
             {
                 "type": "field",
-                "value": "firstname",
+                "value": "child_firstname",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
             },
             {
                 "type": "field",
-                "value": "lastname",
+                "value": "child_lastname",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
             },
             {
                 "type": "field",
-                "value": "gender",
+                "value": "child_gender",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
@@ -62,14 +62,14 @@
             },
             {
                 "type": "field",
-                "value": "birthdate",
+                "value": "child_birthdate",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
             },
             {
                 "type": "field",
-                "value": "remarks",
+                "value": "child_remarks",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
