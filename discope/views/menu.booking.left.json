@@ -492,6 +492,7 @@
                 "description": "",
                 "icon": "money",
                 "type": "parent",
+                "visible": [true, "=", "env.sale.features.booking.financial_helps"],
                 "children": [
                     {
                         "id": "item.financial-helps.financial-helps",
