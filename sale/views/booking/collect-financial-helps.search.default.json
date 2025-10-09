@@ -1,0 +1,45 @@
+{
+    "name": "Financial helps",
+    "description": "Advanced collector for financial helps booking lines.",
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false
+        },
+        "selection": {
+            "default" : false
+        }
+    },
+    "layout": {
+        "groups": [
+            {
+                "sections": [
+                    {
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "label": "From",
+                                                "value": "date_from",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "To",
+                                                "value": "date_to",
+                                                "width": "20%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,39 @@
+{
+    "name": "Financial helps",
+    "description": "List of booking lines that relates financial helps products.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "controller": "sale_booking_collect-financial-helps",
+    "operations": {
+        "total": {
+            "price": {
+                "operation": "SUM",
+                "usage": "amount/money:2"
+            }
+        }
+    },
+    "group_by": [{"field": "product_id", "operation": ["SUM", "object.price"]}],
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "label": "Product",
+                "value": "product_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "label": "Booking",
+                "value": "booking_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "label": "Price",
+                "value": "price",
+                "width": "20%"
+            }
+        ]
+    }
+}

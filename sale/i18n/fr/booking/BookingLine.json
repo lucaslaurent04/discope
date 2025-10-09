@@ -151,6 +151,11 @@
             "name": "Lignes de Réservation",
             "description": "",
             "layout": {}
+        },
+        "list.financial-helps": {
+            "name": "Aides",
+            "description": "",
+            "layout": {}
         }
     },
     "error": {}

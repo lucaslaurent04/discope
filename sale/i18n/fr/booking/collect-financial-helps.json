@@ -1,0 +1,19 @@
+{
+    "name": "Aide",
+    "plural": "Aides",
+    "description": "Aides financières pour les réservation.",
+    "model": {
+        "date_from": {
+            "label": "Du",
+            "description": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": ""
+        }
+    },
+    "view": {
+    },
+    "error": {
+    }
+}

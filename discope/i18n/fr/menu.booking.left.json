@@ -148,6 +148,14 @@
         "item.repairings.repairings": {
             "label": "Réparations",
             "help": ""
+        },
+        "item.financial-helps": {
+            "label": "Aides financières",
+            "help": ""
+        },
+        "item.financial-helps.financial-helps": {
+            "label": "Aides",
+            "help": ""
         }
     }
 }
