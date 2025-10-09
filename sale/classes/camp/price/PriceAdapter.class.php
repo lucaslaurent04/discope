@@ -184,6 +184,14 @@ class PriceAdapter extends Model {
             foreach($self as $id => $price_adapter) {
                 $enrollment_id = $values['enrollment_id'] ?? $price_adapter['enrollment_id'];
 
+                $enrollment = Enrollment::id($enrollment_id)
+                    ->read(['status'])
+                    ->first();
+
+                if($enrollment['status'] !== 'pending') {
+                    return ['enrollment_id' => ['invalid_enrollment_status' => "Enrollment must be pending to add/modify price adapters."]];
+                }
+
                 $other_percent_adapter = PriceAdapter::search([
                     ['enrollment_id', '=', $enrollment_id],
                     ['price_adapter_type', '=', 'percent'],

@@ -79,6 +79,9 @@
         },
         "origin_type": {
             "same_as_sponsor": "Doit avoir le même type que l'aide liée."
+        },
+        "enrollment_id": {
+            "invalid_enrollment_status": "L'inscription doit être en cours pour ajouter/modifier des adaptateurs de prix."
         }
     }
 }
