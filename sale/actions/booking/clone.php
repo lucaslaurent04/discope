@@ -320,9 +320,11 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
 
         $line_data = [
             'booking_id'            => $cloned_booking['id'],
-            'booking_line_group_id' => $cloned_group['id'],
-            'service_date'          => $line['service_date'] + $diff_date_from
+            'booking_line_group_id' => $cloned_group['id']
         ];
+        if(!is_null($line['service_date'])) {
+            $line_data['service_date'] = $line['service_date'] + $diff_date_from;
+        }
         foreach($fields['booking_lines_groups_ids']['booking_lines_ids'] as $line_field) {
             if(!in_array($line_field, ['booking_activity_id', 'service_date', 'unit_price', 'vat_rate'])) {
                 $line_data[$line_field] = $line[$line_field];
