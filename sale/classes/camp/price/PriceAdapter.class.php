@@ -144,6 +144,18 @@ class PriceAdapter extends Model {
     public static function canupdate($self, $values) {
         $self->read(['sponsor_id', 'price_adapter_type', 'is_manual_discount', 'origin_type', 'enrollment_id']);
 
+        foreach($self as $price_adapter) {
+            $enrollment_id = $values['enrollment_id'] ?? $price_adapter['enrollment_id'];
+
+            $enrollment = Enrollment::id($enrollment_id)
+                ->read(['status'])
+                ->first();
+
+            if($enrollment['status'] !== 'pending') {
+                return ['enrollment_id' => ['invalid_enrollment_status' => "Enrollment must be pending to add/modify price adapters."]];
+            }
+        }
+
         if(isset($values['sponsor_id']) || isset($values['price_adapter_type']) || isset($values['is_manual_discount']) || isset($values['origin_type'])) {
             foreach($self as $price_adapter) {
                 $origin_type = $values['origin_type'] ?? $price_adapter['origin_type'];
@@ -183,14 +195,6 @@ class PriceAdapter extends Model {
         if(isset($values['price_adapter_type']) && $values['price_adapter_type'] === 'percent') {
             foreach($self as $id => $price_adapter) {
                 $enrollment_id = $values['enrollment_id'] ?? $price_adapter['enrollment_id'];
-
-                $enrollment = Enrollment::id($enrollment_id)
-                    ->read(['status'])
-                    ->first();
-
-                if($enrollment['status'] !== 'pending') {
-                    return ['enrollment_id' => ['invalid_enrollment_status' => "Enrollment must be pending to add/modify price adapters."]];
-                }
 
                 $other_percent_adapter = PriceAdapter::search([
                     ['enrollment_id', '=', $enrollment_id],
