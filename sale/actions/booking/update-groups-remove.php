@@ -8,6 +8,7 @@
 use sale\booking\Booking;
 use sale\booking\BookingActivity;
 use sale\booking\BookingLineGroup;
+use sale\booking\BookingMeal;
 
 list($params, $providers) = eQual::announce([
     'description'   => "Checks if the composition is complete for a given booking.",
@@ -69,6 +70,8 @@ $orm->disableEvents();
 BookingLineGroup::id($params['booking_line_group_id'])->delete(true);
 
 BookingActivity::search(['booking_line_group_id', '=', $params['booking_line_group_id']])->delete(true);
+
+BookingMeal::search(['booking_line_group_id', '=', $params['booking_line_group_id']])->delete(true);
 
 // recompute total price of the booking
 Booking::refreshPrice($orm, $booking['id']);
