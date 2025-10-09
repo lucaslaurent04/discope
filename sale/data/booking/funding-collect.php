@@ -60,6 +60,8 @@ list($context, $orm) = [ $providers['context'], $providers['orm'] ];
 
 $domain = $params['domain'];
 
+$domain = Domain::conditionAdd($domain, ['booking_id', '<>', null]);
+
 if(isset($params['due_amount_min']) && $params['due_amount_min'] > 0) {
     $domain = Domain::conditionAdd($domain, ['due_amount', '>=', $params['due_amount_min']]);
 }
