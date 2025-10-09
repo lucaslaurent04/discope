@@ -485,6 +485,26 @@
                         "route": "/repairings"
                     }
                 ]
+            },
+            {
+                "id": "item.financial-helps",
+                "label": "Financial helps",
+                "description": "",
+                "icon": "money",
+                "type": "parent",
+                "children": [
+                    {
+                        "id": "item.financial-helps.financial-helps",
+                        "type": "entry",
+                        "label": "Financial helps",
+                        "description": "",
+                        "route": "/bookings",
+                        "context": {
+                            "entity": "sale\\booking\\BookingLine",
+                            "view": "list.financial-helps"
+                        }
+                    }
+                ]
             }
         ]
     }
