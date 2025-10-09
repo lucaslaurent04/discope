@@ -7,7 +7,7 @@
             "name": "Statistiques",
             "extends": "app",
             "show_in_apps": true,
-            "description": "Statistiques Valrances.",
+            "description": "Statistiques Valrance.",
             "icon": "filter_alt",
             "color": "#653BB5",
             "access": {
