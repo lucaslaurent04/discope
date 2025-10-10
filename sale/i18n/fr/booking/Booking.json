@@ -316,6 +316,10 @@
                 "action.clone": {
                     "label": "Cloner",
                     "description": "Cloner la réservation."
+                },
+                "action.apply_loyalty_points": {
+                    "label": "Appliquer points fidélité",
+                    "description": "Appliquer points fidélité à la réservation."
                 }
             },
             "routes": {
@@ -464,6 +468,10 @@
                 "action.clone": {
                     "label": "Cloner",
                     "description": "Cloner la réservation."
+                },
+                "action.apply_loyalty_points": {
+                    "label": "Appliquer points fidélité",
+                    "description": "Appliquer points fidélité à la réservation."
                 }
             },
             "routes": {
@@ -628,6 +636,10 @@
                 "action.clone": {
                     "label": "Cloner",
                     "description": "Cloner la réservation."
+                },
+                "action.apply_loyalty_points": {
+                    "label": "Appliquer points fidélité",
+                    "description": "Appliquer points fidélité à la réservation."
                 }
             },
             "routes": {

@@ -194,6 +194,13 @@
             "description": "Clone the booking.",
             "controller": "sale_booking_clone",
             "visible": ["is_from_channelmanager", "=", false]
+        },
+        {
+            "id": "action.apply_loyalty_points",
+            "label": "Apply loyalty points",
+            "description": "Apply loyalty points on booking.",
+            "controller": "sale_booking_apply-loyalty-points",
+            "visible": [true, "=", "env.sale.features.booking.loyalty_points"]
         }
     ],
     "routes": [
