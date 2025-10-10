@@ -33,29 +33,14 @@
             },
             {
                 "type": "field",
-                "value": "center_type",
-                "width": "10%",
-                "visible": false
-            },
-            {
-                "type": "field",
                 "value": "booking",
                 "width": "10%"
             },
             {
                 "type": "field",
-                "value": "created",
-                "width": "15%",
-                "widget": {
-                    "usage": "date/short"
-                }
+                "value": "booking_status",
+                "width": "10%"
             },
-            {
-                "type": "field",
-                "value": "created_aamm",
-                "width": "8%"
-            },
-
             {
                 "type": "field",
                 "value": "date_from",
@@ -94,6 +79,11 @@
             },
             {
                 "type": "field",
+                "value": "nb_freebies",
+                "width": "10%"
+            },
+            {
+                "type": "field",
                 "value": "nb_nights",
                 "width": "10%"
             },
@@ -109,18 +99,8 @@
             },
             {
                 "type": "field",
-                "value": "nb_room_nights",
-                "width": "15%"
-            },
-            {
-                "type": "field",
                 "value": "customer_name",
                 "width": "20%"
-            },
-            {
-                "type": "field",
-                "value": "customer_lang",
-                "width": "10%"
             },
             {
                 "type": "field",
