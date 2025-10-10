@@ -301,10 +301,10 @@ hr {
         <table width="100%" cellpadding="4" cellspacing="0">
             <thead style="border: solid 1px black; border-left: 0px; border-right: 0px;">
                 <tr>
-                <th width="49%" style="padding-left: 7px; font-weight: bold; text-align: left;">
+                <th width="65%" style="padding-left: 7px; font-weight: bold; text-align: left;">
                     {{i18n['product_label']}}
                 </th>
-                <th width="10%" style="font-weight: bold; text-align: left;  border-left: solid 1px black; padding-right: 7px;">
+                <th width="10%" style="font-weight: bold; text-align: center;  border-left: solid 1px black; padding-right: 7px;">
                     {{i18n['quantity_short']}}
                 </th>
                 <!--
@@ -341,7 +341,7 @@ hr {
             <!-- for each line -->
             {% for line in lines %}
                 <tr valign="top">
-                    <td width="49%">
+                    <td width="65%">
                         {% if line.is_group %}
                             <b>{{ line.name }}</b> <br />
                             {{ line.description }}
