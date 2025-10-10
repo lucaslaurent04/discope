@@ -179,9 +179,12 @@ $fields = [
             ]
         ],
         'booking_lines_groups_ids' => [
+            'nb_pers',
+            'group_type',
             'is_sojourn',
             'age_range_assignments_ids'    => [
                 'qty',
+                'free_qty',
                 'age_range_id'
             ],
             'booking_lines_ids' => [
@@ -326,6 +329,24 @@ if(is_null($invoice)) {
 $booking = $invoice['booking_id'];
 if(is_null($booking)) {
     throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+}
+
+// nb_pers are used to inject in GroupingCode name
+$nb_pers = 0;
+$map_age_range_nb_pers = [];
+foreach($booking['booking_lines_groups_ids'] as $group) {
+    if($group['group_type'] !== 'sojourn') {
+        continue;
+    }
+
+    $nb_pers = $group['nb_pers'];
+    foreach($group['age_range_assignments_ids'] as $assignment) {
+        if(!isset($map_age_range_nb_pers[$assignment['age_range_id']])) {
+            $map_age_range_nb_pers[$assignment['age_range_id']] = 0;
+        }
+
+        $map_age_range_nb_pers[$assignment['age_range_id']] += $assignment['qty'] - $assignment['free_qty'];
+    }
 }
 
 $logo_document_data = $invoice['organisation_id']['logo_document_id']['data'] ?? null;
@@ -558,12 +579,16 @@ $invoice_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
         'product_id' => [
             'grouping_code_id' => [
                 'name',
-                'code'
+                'code',
+                'has_age_range',
+                'age_range_id'
             ],
             'product_model_id' => [
                 'grouping_code_id' => [
                     'name',
-                    'code'
+                    'code',
+                    'has_age_range',
+                    'age_range_id'
                 ]
             ]
         ]
@@ -610,7 +635,18 @@ $map_groupings_lines = [];
 foreach($invoice_lines as $line) {
     $grouping_name = $line['product_id']['label'];
     if(isset($map_products_groupings[$line['product_id']['id']])) {
-        $grouping_name = $map_products_groupings[$line['product_id']['id']]['name'];
+        $grouping = $map_products_groupings[$line['product_id']['id']];
+
+        $grouping_name = $grouping['name'];
+
+        if(strpos($grouping_name, '{nb_pers}') !== false) {
+            if($grouping['has_age_range'] && isset($map_age_range_nb_pers[$grouping['age_range_id']])) {
+                $grouping_name = str_replace('{nb_pers}', $map_age_range_nb_pers[$grouping['age_range_id']], $grouping_name);
+            }
+            else {
+                $grouping_name = str_replace('{nb_pers}', $nb_pers, $grouping_name);
+            }
+        }
     }
     elseif(!empty($line['description'])) {
         $grouping_name = $line['description'];
