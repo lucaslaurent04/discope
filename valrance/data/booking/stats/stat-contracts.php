@@ -81,29 +81,23 @@ use sale\customer\Customer;
             'type'              => 'string',
             'description'       => 'Name of the center.'
         ],
-        'center_type' => [
-            'type'              => 'string',
-            'selection'         => [
-                'GA',
-                'GG'
-            ],
-            'description'       => 'Type of the center.'
-        ],
         'booking' => [
             'type'              => 'string',
             'description'       => 'Name of the center.'
         ],
+        'booking_status' => [
+            'type'              => 'string',
+            'description'       => 'Status of the booking (quote, option, confirmed, invoiced).',
+            'selection'         => [
+                'quote',
+                'option',
+                'confirmed',
+                'invoiced'
+            ]
+        ],
         'type' => [
             'type'              => 'string',
             'description'       => 'Type of the booking.'
-        ],
-        'created' => [
-            'type'              => 'date',
-            'description'       => 'Creation date of the booking.'
-        ],
-        'created_aamm' => [
-            'type'              => 'string',
-            'description'       => 'Index date of the creation date of the booking.'
         ],
         'aamm' => [
             'type'              => 'string',
@@ -117,15 +111,15 @@ use sale\customer\Customer;
             'type'              => 'integer',
             'description'       => 'Number of hosted persons.'
         ],
+        'nb_freebies' => [
+            'type'              => 'integer',
+            'description'       => 'Number of hosted persons for free.'
+        ],
         'nb_nights' => [
             'type'              => 'integer',
             'description'       => 'Duration of the sojourn (number of nights).'
         ],
         'nb_pers_nights' => [
-            'type'              => 'integer',
-            'description'       => 'Number of nights/accommodations.'
-        ],
-        'nb_room_nights' => [
             'type'              => 'integer',
             'description'       => 'Number of nights/accommodations.'
         ],
@@ -146,10 +140,6 @@ use sale\customer\Customer;
             'description'       => 'Internal code of the related booking.'
         ],
         'customer_name' => [
-            'type'              => 'string',
-            'description'       => 'Internal code of the related booking.'
-        ],
-        'customer_lang' => [
             'type'              => 'string',
             'description'       => 'Internal code of the related booking.'
         ],
@@ -573,7 +563,7 @@ if(($params['center_id'] || $params['organisation_id'])){
     $domain = [
         ['date_to', '>=', $params['date_from']],
         ['date_to', '<=', $params['date_to']],
-        ['state', 'in', ['instance','archive']],
+        ['state', 'in', ['instance', 'archive']],
         ['is_cancelled', '=', false]
     ];
 
@@ -669,6 +659,7 @@ if(!empty($domain)){
             'date_to',
             'total',
             'price',
+            'status',
             'type_id'                   => ['name'],
             'center_id'                 => ['id', 'name', 'center_office_id'],
             'customer_id'               => ['rate_class_id' => ['name'], 'customer_type_id' => ['name']],
@@ -687,7 +678,7 @@ if(!empty($domain)){
 $map_turnovers_accounts = [
     // OK - frais d'adhésion - Hébergement pension complète : petit déjeuner, lunch, goûter, repas, nuitée + fournitures des draps + lits faits + supplément ménage + supplément chambre simple + repas passage
     'turnover_membership'   => ['75620000'],
-    // OK - cetre de séjours PC
+    // OK - centre de séjours PC
     'turnover_nights_meals' => ['70831000'],
     // OK - animateur Valrance
     'turnover_animations'   => ['70833000'],
@@ -696,7 +687,7 @@ $map_turnovers_accounts = [
     'turnover_providers'    => [
         // OK - Intervenants MFV - Prestataire externe avec fournitures associées (hors transport et cirque)
         '75814000',
-        // OK - Cirque - Intrevenant cirque et fournitures associées
+        // OK - Cirque - Intervenant cirque et fournitures associées
         '75815000',
         // OK - Navette - Transports
         '70882400',
@@ -710,7 +701,7 @@ $map_turnovers_accounts = [
         '4671000',
         // OK - Timbres, affranchissements
         '70882300',
-        // OK - Etats des lieux + Frais de virement
+        // OK - États des lieux + Frais de virement
         '75813000'
     ]
 ];
@@ -727,22 +718,25 @@ foreach($bookings as $booking) {
     // find all sojourns
     $sojourns = BookingLineGroup::search([
             ['booking_id', '=', $booking['id']],
-            ['is_sojourn', '=', true]
+            ['group_type', '=', 'sojourn']
         ])
         ->read([
             'id',
+            'group_type',
             'nb_pers',
             'nb_nights',
-            'rental_unit_assignments_ids' => ['id', 'is_accomodation', 'qty']
+            'rental_unit_assignments_ids'   => ['id', 'is_accomodation', 'qty'],
+            'age_range_assignments_ids'     => ['free_qty']
         ])
         ->get(true);
 
 
     // nb_nights depends on booking
     $booking_nb_nights = round( ($booking['date_to'] - $booking['date_from']) / (3600*24) );
-    // nb_rental_unit and nb_pers depend on sojourns
+    // nb_rental_unit, nb_pers and nb_freebies depend on sojourns
     $booking_nb_rental_units = 0;
     $booking_nb_pers = 0;
+    $booking_nb_freebies = 0;
 
     $count_nb_pers_nights = 0;
     $count_nb_room_nights = 0;
@@ -774,26 +768,6 @@ foreach($bookings as $booking) {
         $sojourn_nb_pers_nights = 0;
 
         foreach($lines as $line) {
-
-            // #memo - qty is impacted by nb_pers and nb_nights but might not be equal to nb_nights x nb_pers
-            if($line['qty_accounting_method'] == 'person') {
-                $sojourn_nb_pers_nights += $line['qty'];
-            }
-            // by accommodation
-            else {
-                $product = Product::id($line['product_id'])->read(['product_model_id' => ['id', 'capacity']])->first(true);
-                $capacity = $product['product_model_id']['capacity'];
-
-                if($capacity < $sojourn['nb_pers']) {
-                    // $line['qty'] should be nb_nights * ceil(nb_pers/capacity)
-                    $sojourn_nb_pers_nights += $line['qty'] * $capacity;
-                }
-                else {
-                    // $line['qty'] should be the number of nights
-                    $sojourn_nb_pers_nights += $line['qty'] * $sojourn['nb_pers'];
-                }
-            }
-
             foreach($line['price_id']['accounting_rule_id']['accounting_rule_line_ids'] as $accounting_rule_line) {
                 $account_amount = $line['price'] * $accounting_rule_line['share'];
 
@@ -802,16 +776,23 @@ foreach($bookings as $booking) {
             }
         }
 
-        // $sojourn_nb_pers_nights = array_reduce($lines, function($c, $a) { return $c + $a['qty'];}, 0);
         $sojourn_nb_accommodations = count(array_filter($sojourn['rental_unit_assignments_ids'], function($a) {return $a['is_accomodation'];}));
+
+        $sojourn_nb_freebies = 0;
+        if($sojourn['group_type'] === 'sojourn') {
+            foreach($sojourn['age_range_assignments_ids'] as $assignment) {
+                $sojourn_nb_freebies += $assignment['free_qty'];
+            }
+        }
 
         $sojourn_nb_pers = (count($lines))?$sojourn['nb_pers']:0;
         $sojourn_nb_nights = (count($lines))?$sojourn['nb_nights']:0;
 
         $booking_nb_rental_units += $sojourn_nb_accommodations;
         $booking_nb_pers += $sojourn_nb_pers;
+        $booking_nb_freebies += $sojourn_nb_freebies;
 
-        $count_nb_pers_nights += $sojourn_nb_pers_nights;
+        $count_nb_pers_nights += $sojourn_nb_pers * $sojourn_nb_nights;
         $count_nb_room_nights += $sojourn_nb_nights * $sojourn_nb_accommodations;
     }
 
@@ -824,12 +805,22 @@ foreach($bookings as $booking) {
         $area = 'FR-'.$area;
     }
 
+    // status: quote, option, confirmed and invoiced (simplification)
+    $status = $booking['status'];
+    if(in_array($status, ['validated', 'checkedin', 'checkedout', 'proforma'])) {
+        $status = 'confirmed';
+    }
+    elseif(in_array($status, ['invoiced', 'debit_balance', 'credit_balance', 'balanced'])) {
+        $status = 'invoiced';
+    }
+
     // #memo - one entry by booking
     $result[] = [
         'center'                => $booking['center_id']['name'],
         'center_type'           => ($booking['center_id']['center_office_id'] == 1)?'GG':'GA',
         'booking'               => $booking['name'],
         'type'                  => $booking['type_id']['name'],
+        'booking_status'        => $status,
         'created'               => $adapter->adaptOut($booking['created'], 'date'),
         'created_aamm'          => date('Y-m', $booking['created']),
         'date_from'             => $adapter->adaptOut($booking['date_from'], 'date'),
@@ -837,6 +828,7 @@ foreach($bookings as $booking) {
         'aamm'                  => date('Y/m', $booking['date_from']),
         'year'                  => date('Y', $booking['date_from']),
         'nb_pers'               => $booking_nb_pers,
+        'nb_freebies'           => $booking_nb_freebies,
         'nb_nights'             => $booking_nb_nights,
         'nb_rental_units'       => $booking_nb_rental_units,
         'nb_pers_nights'        => $count_nb_pers_nights,

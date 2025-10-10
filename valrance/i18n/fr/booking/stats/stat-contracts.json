@@ -78,9 +78,25 @@
             "description": "Réservation.",
             "help": ""
         },
+        "booking_status": {
+            "label": "Status",
+            "description": "Status de la réservation.",
+            "help": "",
+            "selection": {
+                "quote": "Devis",
+                "option": "Option",
+                "confirmed": "Confirmé",
+                "invoiced": "Facturé"
+            }
+        },
         "nb_pers": {
             "label": "#pers",
             "description": "Nombre de personnes.",
+            "help": ""
+        },
+        "nb_freebies": {
+            "label": "#gratuités",
+            "description": "Nombre de gratuités.",
             "help": ""
         },
         "nb_nights": {
