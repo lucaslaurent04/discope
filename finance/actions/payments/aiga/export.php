@@ -10,7 +10,7 @@ use identity\User;
 
 list($params, $providers) = eQual::announce([
     'name'          => "Generate Exports",
-    'description'   => "Creates EBP export archives with newly available data from invoices and payments.",
+    'description'   => "Creates AIGA export archives with newly available data from invoices and payments.",
     'params'        => [],
     'access'        => [
         'groups'        => ['finance.default.user'],
