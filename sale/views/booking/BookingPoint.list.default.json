@@ -38,6 +38,11 @@
             },
             {
                 "type": "field",
+                "value": "date_expiry",
+                "width": "10%"
+            },
+            {
+                "type": "field",
                 "value": "booking_apply_id",
                 "width": "10%"
             }

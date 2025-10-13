@@ -251,6 +251,9 @@ $fields = [
                     ]
                 ],
             ]
+        ],
+        'booking_applied_points_ids' => [
+            'points_value'
         ]
     ],
     'invoice_lines_ids' => [
@@ -347,6 +350,12 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
 
         $map_age_range_nb_pers[$assignment['age_range_id']] += $assignment['qty'] - $assignment['free_qty'];
     }
+}
+
+// booking_points are used to inject in GroupingCode name
+$booking_points = 0;
+foreach($booking['booking_applied_points_ids'] as $bp) {
+    $booking_points += $bp['points_value'];
 }
 
 $logo_document_data = $invoice['organisation_id']['logo_document_id']['data'] ?? null;
@@ -646,6 +655,9 @@ foreach($invoice_lines as $line) {
             else {
                 $grouping_name = str_replace('{nb_pers}', $nb_pers, $grouping_name);
             }
+        }
+        elseif(strpos($grouping_name, '{booking_points}') !== false) {
+            $grouping_name = str_replace('{booking_points}', $booking_points, $grouping_name);
         }
     }
     elseif(!empty($line['description'])) {
