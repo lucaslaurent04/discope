@@ -23,6 +23,8 @@
             ]
         }
     },
+    "order": "sojourn_number",
+    "sort": "asc",
     "layout": {
         "items": [
             {

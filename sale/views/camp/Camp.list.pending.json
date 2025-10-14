@@ -29,6 +29,8 @@
             "controller": "sale_camp_print-activities-planning"
         }
     ],
+    "order": "sojourn_number",
+    "sort": "asc",
     "layout": {
         "items": [
             {
