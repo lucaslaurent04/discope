@@ -98,10 +98,16 @@ if(isset($params['camp_id']) || isset($params['camp_group_id'])) {
 }
 else {
     if(isset($params['date_from'])) {
-        $domain[] = ['date_from', '>=', $params['date_from']];
-    }
-    if(isset($params['date_to'])) {
-        $domain[] = ['date_from', '<=', $params['date_to']];
+        $day_of_week = date('w', $params['date_from']);
+
+        // find previous Sunday
+        $sunday = $params['date_from'] - ($day_of_week * 86400);
+
+        // next Friday (+5 days)
+        $friday = $sunday + (5 * 86400);
+
+        $domain[] = ['date_from', '>=', $sunday];
+        $domain[] = ['date_from', '<=', $friday];
     }
 }
 
