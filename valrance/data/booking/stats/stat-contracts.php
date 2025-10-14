@@ -660,6 +660,7 @@ if(!empty($domain)){
             'total',
             'price',
             'status',
+            'booking_activities_ids',
             'type_id'                   => ['name'],
             'center_id'                 => ['id', 'name', 'center_office_id'],
             'customer_id'               => ['rate_class_id' => ['name'], 'customer_type_id' => ['name']],
@@ -670,7 +671,13 @@ if(!empty($domain)){
                 'address_zip',
                 'address_country'
             ],
-            'booking_activities_ids',
+            'booking_lines_groups_ids' => [
+                'group_type',
+                'nb_pers',
+                'nb_nights',
+                'rental_unit_assignments_ids'   => ['id', 'is_accomodation', 'qty'],
+                'age_range_assignments_ids'     => ['free_qty']
+            ]
         ])
         ->get(true);
 }
@@ -715,22 +722,6 @@ foreach($map_turnovers_accounts as $turnover => $accounts) {
 $result = [];
 
 foreach($bookings as $booking) {
-    // find all sojourns
-    $sojourns = BookingLineGroup::search([
-            ['booking_id', '=', $booking['id']],
-            ['group_type', '=', 'sojourn']
-        ])
-        ->read([
-            'id',
-            'group_type',
-            'nb_pers',
-            'nb_nights',
-            'rental_unit_assignments_ids'   => ['id', 'is_accomodation', 'qty'],
-            'age_range_assignments_ids'     => ['free_qty']
-        ])
-        ->get(true);
-
-
     // nb_nights depends on booking
     $booking_nb_nights = round( ($booking['date_to'] - $booking['date_from']) / (3600*24) );
     // nb_rental_unit, nb_pers and nb_freebies depend on sojourns
@@ -750,50 +741,65 @@ foreach($bookings as $booking) {
         'turnover_total'        => 0
     ];
 
-    foreach($sojourns as $sojourn) {
+    foreach($booking['booking_lines_groups_ids'] as $group) {
         // retrieve all lines relating to an accommodation
         $lines = BookingLine::search([
-                ['booking_line_group_id', '=', $sojourn['id']]
+                ['booking_line_group_id', '=', $group['id']]
             ])
             ->read([
-                'id',
+                'name',
                 'qty',
                 'price',
                 'qty_accounting_method',
                 'product_id',
-                'price_id' => ['accounting_rule_id' => ['accounting_rule_line_ids' => ['id', 'account', 'share']]]
+                'price_id' => ['accounting_rule_id' => ['accounting_rule_line_ids' => ['id', 'account', 'share']]],
+                'booking_activity_id' => [
+                    'activity_booking_line_id' => [
+                        'price_id' => ['accounting_rule_id' => ['accounting_rule_line_ids' => ['id', 'account', 'share']]],
+                    ]
+                ]
             ])
             ->get(true);
 
-        $sojourn_nb_pers_nights = 0;
+        /*
+            Sojourn related stats
+        */
+        if($group['group_type'] === 'sojourn') {
+            $sojourn_nb_freebies = 0;
+            foreach($group['age_range_assignments_ids'] as $assignment) {
+                $sojourn_nb_freebies += $assignment['free_qty'];
+            }
 
+            $sojourn_nb_pers = (count($lines)) ? $group['nb_pers'] : 0;
+            $sojourn_nb_nights = (count($lines)) ? $group['nb_nights'] : 0;
+
+            $sojourn_nb_accommodations = count(array_filter($group['rental_unit_assignments_ids'], fn($a) => $a['is_accomodation']));
+
+            $booking_nb_rental_units += $sojourn_nb_accommodations;
+            $booking_nb_pers += $sojourn_nb_pers;
+            $booking_nb_freebies += $sojourn_nb_freebies;
+
+            $count_nb_pers_nights += $sojourn_nb_pers * $sojourn_nb_nights;
+            $count_nb_room_nights += $sojourn_nb_nights * $sojourn_nb_accommodations;
+        }
+
+        /*
+            Global stats
+        */
         foreach($lines as $line) {
-            foreach($line['price_id']['accounting_rule_id']['accounting_rule_line_ids'] as $accounting_rule_line) {
+            $accounting_rule_lines = $line['price_id']['accounting_rule_id']['accounting_rule_line_ids'];
+            if(!is_null($line['booking_activity_id']['activity_booking_line_id']) && $line['booking_activity_id']['activity_booking_line_id']['id'] !== $line['id']) {
+                // handle product that are part of activity as activity
+                $accounting_rule_lines = $line['booking_activity_id']['activity_booking_line_id']['price_id']['accounting_rule_id']['accounting_rule_line_ids'];
+            }
+
+            foreach($accounting_rule_lines as $accounting_rule_line) {
                 $account_amount = $line['price'] * $accounting_rule_line['share'];
 
                 $turnover_amounts[$map_accounts_turnover[$accounting_rule_line['account']]] += $account_amount;
                 $turnover_amounts['turnover_total'] += $account_amount;
             }
         }
-
-        $sojourn_nb_accommodations = count(array_filter($sojourn['rental_unit_assignments_ids'], function($a) {return $a['is_accomodation'];}));
-
-        $sojourn_nb_freebies = 0;
-        if($sojourn['group_type'] === 'sojourn') {
-            foreach($sojourn['age_range_assignments_ids'] as $assignment) {
-                $sojourn_nb_freebies += $assignment['free_qty'];
-            }
-        }
-
-        $sojourn_nb_pers = (count($lines))?$sojourn['nb_pers']:0;
-        $sojourn_nb_nights = (count($lines))?$sojourn['nb_nights']:0;
-
-        $booking_nb_rental_units += $sojourn_nb_accommodations;
-        $booking_nb_pers += $sojourn_nb_pers;
-        $booking_nb_freebies += $sojourn_nb_freebies;
-
-        $count_nb_pers_nights += $sojourn_nb_pers * $sojourn_nb_nights;
-        $count_nb_room_nights += $sojourn_nb_nights * $sojourn_nb_accommodations;
     }
 
     $area = null;
