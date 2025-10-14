@@ -966,7 +966,7 @@ class Enrollment extends Model {
     protected static function onafterValidate($self) {
         $self->update([
                 'is_locked' => true,
-                'status'    => 'validated'          // #todo - find why needed and fix error
+                // 'status'    => 'validated'          // #todo - find why needed and fix error
             ])
             ->do('generate_presences');
     }
@@ -1032,6 +1032,7 @@ class Enrollment extends Model {
                 'transitions' => [
                     'validate' => [
                         'status'        => 'validated',
+                        'onafter'       => 'onafterValidate',
                         'help'          => "This step is mandatory for all enrollments (guardians have 10 days to return the documents for web enrollments).",
                         'description'   => "Mark the enrollment as validated (all docs and payments received).",
                         'policies'      => ['validate']
