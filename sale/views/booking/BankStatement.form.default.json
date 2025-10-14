@@ -4,6 +4,19 @@
     "access": {
         "groups": ["sale.default.user"]
     },
+    "actions": [
+        {
+            "id": "action.pending",
+            "label": "Set pending",
+            "description": "Set the bank statement as pending.",
+            "controller": "sale_pay_bankstatement_do-unreconcile",
+            "confirm": true,
+            "visible": [
+                ["status", "=", "reconciled"],
+                ["finance.default.administrator", "in", "user.groups"]
+            ]
+        }
+    ],
     "layout": {
         "groups": [
             {

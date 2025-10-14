@@ -23,6 +23,13 @@
         "form.default": {
             "name": "Relevé bancaire",
             "description": "Vue par défaut des règles comptables avec tous les champs",
+            "actions": {
+                "action.pending": {
+                    "label": "À traiter",
+                    "description": "Re-passer le relevé au status \"À traiter\".",
+                    "help": ""
+                }
+            },
             "layout": {
             }
         },
