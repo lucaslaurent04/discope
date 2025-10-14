@@ -25,6 +25,7 @@
     },
     "order": "sojourn_number",
     "sort": "asc",
+    "limit": 200,
     "layout": {
         "items": [
             {
