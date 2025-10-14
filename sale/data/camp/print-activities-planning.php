@@ -126,6 +126,7 @@ $camps = Camp::search($domain)
         'booking_meals_ids' => [
             'date',
             'meal_place_id' => ['name'],
+            'meal_type_id' => ['name'],
             'time_slot_id'  => ['code']
         ]
     ])
