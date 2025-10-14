@@ -23,7 +23,7 @@ use equal\orm\DomainCondition;
             'type'              => 'date',
             'description'       => "Date interval lower limit.",
             'default'           => function () {
-                $year = (date('n') >= 10) ? date('Y') + 1 : date('Y');
+                $year = (date('n') >= 11) ? date('Y') + 1 : date('Y');
                 return strtotime("first day of January {$year}");
             }
         ],
@@ -31,7 +31,7 @@ use equal\orm\DomainCondition;
             'type'              => 'date',
             'description'       => "Date interval upper limit.",
             'default'           => function () {
-                $year = (date('n') >= 10) ? date('Y') + 1 : date('Y');
+                $year = (date('n') >= 11) ? date('Y') + 1 : date('Y');
                 return strtotime("last day of December {$year}");
             }
         ],
