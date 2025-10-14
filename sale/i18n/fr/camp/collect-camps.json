@@ -30,7 +30,9 @@
                 "circus": "Cirque",
                 "culture": "Culture",
                 "environment": "Environnement",
-                "horse-riding": "Équitation"
+                "horse-riding": "Équitation",
+                "recreation": "Accueil & Loisir",
+                "other": "Autre"
             }
         },
         "sojourn_type": {

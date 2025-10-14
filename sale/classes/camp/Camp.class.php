@@ -162,11 +162,12 @@ class Camp extends Model {
                 'result_type'       => 'string',
                 'selection'         => [
                     'sport',
-                    'circus',
+                    // 'circus',
                     'culture',
                     'environment',
                     'horse-riding',
-                    'recreation'
+                    'recreation',
+                    'other'
                 ],
                 'description'       => "Type of camp.",
                 'store'             => true,

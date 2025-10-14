@@ -57,7 +57,8 @@
                 "circus": "Cirque",
                 "culture": "Culture",
                 "environment": "Environnement",
-                "horse-riding": "Équitation"
+                "horse-riding": "Équitation",
+                "other": "Autre"
             }
         },
         "is_clsh": {

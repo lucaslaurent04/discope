@@ -23,7 +23,8 @@
                 "culture": "Culture",
                 "environment": "Environnement",
                 "horse-riding": "Équitation",
-                "recreation": "Accueil & Loisir"
+                "recreation": "Accueil & Loisir",
+                "other": "Autre"
             }
         },
         "is_clsh": {
