@@ -425,17 +425,19 @@ class Camp extends Model {
                     }
 
                     $meals_ids = BookingMeal::search([
-                        ['camp_id', '=', $id],
-                        ['date', '=', $date],
-                        ['time_slot_id', '=', $map_time_slots[$time_slot_code]['id']]
-                    ])
+                            ['camp_id', '=', $id],
+                            ['date', '=', $date],
+                            ['time_slot_id', '=', $map_time_slots[$time_slot_code]['id']]
+                        ])
                         ->ids();
 
                     if(count($meals_ids) === 0) {
                         BookingMeal::create([
                             'camp_id'       => $id,
                             'date'          => $date,
-                            'time_slot_id'  => $map_time_slots[$time_slot_code]['id']
+                            'time_slot_id'  => $map_time_slots[$time_slot_code]['id'],
+                            // #Lathus - camps are always at 'CPIE'
+                            'meal_place_id' => 2
                         ]);
                     }
                 }
@@ -447,17 +449,19 @@ class Camp extends Model {
                 foreach($dates as $d) {
                     foreach(['B', 'L', 'D'] as $time_slot_code) {
                         $meals_ids = BookingMeal::search([
-                            ['camp_id', '=', $id],
-                            ['date', '=', $d],
-                            ['time_slot_id', '=', $map_time_slots[$time_slot_code]['id']]
-                        ])
+                                ['camp_id', '=', $id],
+                                ['date', '=', $d],
+                                ['time_slot_id', '=', $map_time_slots[$time_slot_code]['id']]
+                            ])
                             ->ids();
 
                         if(count($meals_ids) === 0) {
                             BookingMeal::create([
                                 'camp_id'       => $id,
                                 'date'          => $d,
-                                'time_slot_id'  => $map_time_slots[$time_slot_code]['id']
+                                'time_slot_id'  => $map_time_slots[$time_slot_code]['id'],
+                                // #Lathus - camps are always at 'CPIE'
+                                'meal_place_id' => 2
                             ]);
                         }
                     }

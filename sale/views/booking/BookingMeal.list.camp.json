@@ -40,15 +40,13 @@
                 "type": "field",
                 "value": "meal_type_id",
                 "width": "20%",
-                "sortable": false,
-                "readonly": true
+                "sortable": false
             },
             {
                 "type": "field",
                 "value": "meal_place_id",
                 "width": "20%",
-                "sortable": false,
-                "readonly": true
+                "sortable": false
             }
         ]
     }
