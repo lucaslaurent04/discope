@@ -72,6 +72,10 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
 
     public hover_row_index = -1;
 
+
+    public selectedCategory: any;
+    public categories: any[] = ['CP', 'CH', 'LT'];
+
     public selection =  {
         is_active: false,
         left: 0,

@@ -157,7 +157,7 @@ class BookingActivity extends Model {
                     ['is_activity', '=', true],
                     ['can_sell', '=', true]
                 ],
-                'dependents'        => ['name'],
+                'dependents'        => ['name', 'product_model_id'],
                 'onupdate'          => 'onupdateProductId'
             ],
 
@@ -167,6 +167,7 @@ class BookingActivity extends Model {
                 'foreign_object'    => 'sale\catalog\ProductModel',
                 'description'       => "The product model the activity relates to.",
                 'store'             => true,
+                'instant'           => true,
                 'relation'          => ['product_id' => 'product_model_id']
             ],
 

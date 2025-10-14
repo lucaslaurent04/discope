@@ -964,11 +964,8 @@ class Enrollment extends Model {
      * After status validate: lock enrollment and generate presences
      */
     protected static function onafterValidate($self) {
-        $self->update([
-                'is_locked' => true,
-                // 'status'    => 'validated'          // #todo - find why needed and fix error
-            ])
-            ->do('generate_presences');
+        $self->update(['is_locked' => true])
+             ->do('generate_presences');
     }
 
     /**
