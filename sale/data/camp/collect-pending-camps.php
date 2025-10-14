@@ -49,19 +49,21 @@ $result = [];
 
 $domain = new Domain($params['domain']);
 
-$domain->addCondition(new DomainCondition('status', '=', 'draft'));
+$domain->addCondition(new DomainCondition('status', '=', 'published'));
 
-if(isset($params['date_from'])) {
-    $domain->addCondition(
-        new DomainCondition('date_from', '>=', $params['date_from'])
-    );
+if (isset($params['date_from'])) {
+    $day_of_week = date('w', $params['date_from']);
+
+    // find previous Sunday
+    $sunday = $params['date_from'] - ($day_of_week * 86400);
+
+    // next Friday (+5 days)
+    $friday = $sunday + (5 * 86400);
+
+    $domain->addCondition(new DomainCondition('date_from', '>=', $sunday));
+    $domain->addCondition(new DomainCondition('date_from', '<=', $friday));
 }
 
-if(isset($params['date_to'])) {
-    $domain->addCondition(
-        new DomainCondition('date_from', '<=', $params['date_to'])
-    );
-}
 
 $params['domain'] = $domain->toArray();
 

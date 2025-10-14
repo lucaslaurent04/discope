@@ -4,7 +4,7 @@
     "description": "Camps en cours.",
     "model": {
         "date_from": {
-            "label": "Du",
+            "label": "Semaine du",
             "description": ""
         },
         "date_to": {

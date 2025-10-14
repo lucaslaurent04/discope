@@ -17,12 +17,6 @@
                                                 "label": "From",
                                                 "value": "date_from",
                                                 "width": "15%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "label": "To",
-                                                "value": "date_to",
-                                                "width": "15%"
                                             }
                                         ]
                                     }

@@ -23,14 +23,6 @@
             ]
         }
     },
-    "actions": [
-        {
-            "id": "action.print-activities-planning",
-            "label": "Planning",
-            "description": "Print the planning of activities.",
-            "controller": "sale_camp_print-activities-planning"
-        }
-    ],
     "order": "sojourn_number",
     "sort": "asc",
     "limit": 200,
