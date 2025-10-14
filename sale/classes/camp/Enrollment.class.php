@@ -1542,11 +1542,15 @@ class Enrollment extends Model {
 
     public static function doGeneratePresences($self) {
         $self->read([
+            'status',
             'is_clsh', 'camp_id', 'child_id', 'date_from', 'date_to', 'weekend_extra',
             'presence_day_1', 'presence_day_2', 'presence_day_3', 'presence_day_4', 'presence_day_5',
             'daycare_day_1', 'daycare_day_2', 'daycare_day_3', 'daycare_day_4', 'daycare_day_5'
         ]);
         foreach($self as $enrollment) {
+            if(!in_array($enrollment['status'], ['confirmed', 'validated'])) {
+                continue;
+            }
             $day_index = 1;
             $date = $enrollment['date_from'];
             while($date <= $enrollment['date_to']) {
