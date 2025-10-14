@@ -245,7 +245,7 @@ $fields = [
         'date_from',
         'date_to',
         'nb_pers',
-        'age_range_assignments_ids'=> ['id', 'age_range_id' =>['id', 'name'] ,'booking_line_group_id','qty'],
+        'age_range_assignments_ids'=> ['id', 'age_range_id' => ['id', 'name'] , 'booking_line_group_id', 'qty', 'free_qty'],
         'booking_lines_ids' => [
             'name',
             'is_activity',
@@ -289,6 +289,30 @@ $booking = Booking::id($params['id'])->read($fields, $params['lang'])->first(tru
 
 if(!$booking) {
     throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
+}
+
+// nb_pers are used to inject in GroupingCode name
+$nb_pers = 0;
+$map_age_range_nb_pers = [];
+foreach($booking['booking_lines_groups_ids'] as $group) {
+    if($group['group_type'] !== 'sojourn') {
+        continue;
+    }
+
+    $nb_pers = $group['nb_pers'];
+    foreach($group['age_range_assignments_ids'] as $assignment) {
+        if(!isset($map_age_range_nb_pers[$assignment['age_range_id']['id']])) {
+            $map_age_range_nb_pers[$assignment['age_range_id']['id']] = 0;
+        }
+
+        $map_age_range_nb_pers[$assignment['age_range_id']['id']] += $assignment['qty'] - $assignment['free_qty'];
+    }
+}
+
+// booking_points are used to inject in GroupingCode name
+$booking_points = 0;
+foreach($booking['booking_applied_points_ids'] as $bp) {
+    $booking_points += $bp['points_value'];
 }
 
 $logo_document_data = $booking['center_id']['organisation_id']['logo_document_id']['data'] ?? null;
@@ -763,12 +787,16 @@ $booking_lines = BookingLine::search(['booking_id', '=', $booking['id']])
         'product_id' => [
             'grouping_code_id' => [
                 'name',
-                'code'
+                'code',
+                'has_age_range',
+                'age_range_id'
             ],
             'product_model_id' => [
                 'grouping_code_id' => [
                     'name',
-                    'code'
+                    'code',
+                    'has_age_range',
+                    'age_range_id'
                 ]
             ]
         ]
@@ -823,7 +851,21 @@ foreach($booking_lines as $line) {
     $grouping_name = $line['product_id']['label'];
 
     if(isset($map_products_groupings[$product_id])) {
+        $grouping = $map_products_groupings[$line['product_id']['id']];
+
         $grouping_name = $map_products_groupings[$product_id]['name'];
+
+        if(strpos($grouping_name, '{nb_pers}') !== false) {
+            if($grouping['has_age_range'] && isset($map_age_range_nb_pers[$grouping['age_range_id']])) {
+                $grouping_name = str_replace('{nb_pers}', $map_age_range_nb_pers[$grouping['age_range_id']], $grouping_name);
+            }
+            else {
+                $grouping_name = str_replace('{nb_pers}', $nb_pers, $grouping_name);
+            }
+        }
+        elseif(strpos($grouping_name, '{booking_points}') !== false) {
+            $grouping_name = str_replace('{booking_points}', $booking_points, $grouping_name);
+        }
     }
     elseif(!empty($line['description'])) {
         $grouping_name = $line['description'];
