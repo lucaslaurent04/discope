@@ -22,13 +22,18 @@ use equal\orm\DomainCondition;
         'date_from' => [
             'type'              => 'date',
             'description'       => "Date interval lower limit.",
-            'default'           => fn() => strtotime('first day of January this year')
+            'default'           => function () {
+                $year = (date('n') >= 10) ? date('Y') + 1 : date('Y');
+                return strtotime("first day of January {$year}");
+            }
         ],
-
         'date_to' => [
             'type'              => 'date',
             'description'       => "Date interval upper limit.",
-            'default'           => fn() => strtotime('last day of December this year')
+            'default'           => function () {
+                $year = (date('n') >= 10) ? date('Y') + 1 : date('Y');
+                return strtotime("last day of December {$year}");
+            }
         ],
 
         'status' => [

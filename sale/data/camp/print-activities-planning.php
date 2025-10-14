@@ -92,7 +92,7 @@ if(isset($params['date_from'])) {
     $domain[] = ['date_from', '>=', $params['date_from']];
 }
 if(isset($params['date_to'])) {
-    $domain[] = ['date_from', '<=', $params['date_from']];
+    $domain[] = ['date_to', '<=', $params['date_to']];
 }
 if(isset($params['camp_id'])) {
     $domain[] = ['id', '=', $params['camp_id']];
