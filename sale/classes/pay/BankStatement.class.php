@@ -172,9 +172,14 @@ class BankStatement extends Model {
         return trim(sprintf("BE%02d%s", $control, $account_number));
     }
 
-    public static function canupdate($self) {
+    public static function canupdate($self, $values) {
         $self->read(['status']);
         foreach($self as $id => $statement) {
+            // allow status modification even if reconciled
+            if(count($values) === 1 && array_key_exists('status', $values)) {
+                continue;
+            }
+
             if($statement['status'] === 'reconciled') {
                 return ['status' => ['not_allowed' => 'Reconciled statement cannot be modified.']];
             }
