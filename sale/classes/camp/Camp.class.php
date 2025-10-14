@@ -73,7 +73,9 @@ class Camp extends Model {
                 'description'       => "Sojourn number to distinguish camps.",
                 'help'              => "Is handle by the setting sequence 'sale.organization.camp.sequence{center_id.center_office_id.code}'.",
                 'required'          => true,
-                'unique'            => true,
+                // #memo - should be unique per center and year
+                // #todo - use a policy to ensure uniqueness
+                // 'unique'            => true,
                 'dependents'        => ['sojourn_code']
             ],
 
