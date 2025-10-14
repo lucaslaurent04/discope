@@ -27,7 +27,8 @@
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context                      $context
+ * @var \equal\data\adapt\DataAdapterProvider   $dap
  */
 ['context' => $context, 'adapt' => $dap] = $providers;
 
@@ -38,10 +39,10 @@ $date_to = strtotime('Sunday this week');
 
 if(!empty($params['params'])) {
     if(isset($params['params']['date_from'])) {
-        $date_from = $adapter->adaptIn($params['params']['date_from'], 'date/time');
+        $date_from = $adapter->adaptIn($params['params']['date_from'], 'datetime');
     }
     if(isset($params['params']['date_to'])) {
-        $date_to = $adapter->adaptIn($params['params']['date_to'], 'date/time');
+        $date_to = $adapter->adaptIn($params['params']['date_to'], 'datetime');
     }
 }
 

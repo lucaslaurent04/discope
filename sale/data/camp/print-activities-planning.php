@@ -26,13 +26,11 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
         ],
         'date_from' => [
             'type'              => 'date',
-            'description'       => "Date interval lower limit.",
-            'default'           => fn() => strtotime('last Sunday')
+            'description'       => "Date interval lower limit."
         ],
         'date_to' => [
             'type'              => 'date',
-            'description'       => 'Date interval Upper limit.',
-            'default'           => fn() => strtotime('Saturday this week')
+            'description'       => 'Date interval Upper limit.'
         ],
         'camp_id' => [
             'type'              => 'many2one',
@@ -82,27 +80,29 @@ if(!file_exists($file)) {
     Prepare values for template
 */
 
+$domain = [
+    ['status', '=', 'published']
+];
+
 if(isset($params['camp_id']) || isset($params['camp_group_id'])) {
-    $params['date_from'] = null;
-    $params['date_to'] = null;
-}
+    if(isset($params['camp_id'])) {
+        $domain[] = ['id', '=', $params['camp_id']];
+    }
+    elseif(isset($params['camp_group_id'])) {
+        $campGroup = CampGroup::id($params['camp_group_id'])
+            ->read(['camp_id'])
+            ->first();
 
-$domain = [];
-if(isset($params['date_from'])) {
-    $domain[] = ['date_from', '>=', $params['date_from']];
+        $domain[] = ['id', '=', $campGroup['camp_id']];
+    }
 }
-if(isset($params['date_to'])) {
-    $domain[] = ['date_from', '<=', $params['date_to']];
-}
-if(isset($params['camp_id'])) {
-    $domain[] = ['id', '=', $params['camp_id']];
-}
-if(isset($params['camp_group_id'])) {
-    $campGroup = CampGroup::id($params['camp_group_id'])
-        ->read(['camp_id'])
-        ->first();
-
-    $domain[] = ['id', '=', $campGroup['camp_id']];
+else {
+    if(isset($params['date_from'])) {
+        $domain[] = ['date_from', '>=', $params['date_from']];
+    }
+    if(isset($params['date_to'])) {
+        $domain[] = ['date_from', '<=', $params['date_to']];
+    }
 }
 
 $camps = Camp::search($domain)
