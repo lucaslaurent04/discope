@@ -72,7 +72,7 @@
             },
             {
                 "type": "field",
-                "label": "Analytic",
+                "label": "Analytique",
                 "value": "analytic_section_id",
                 "width": "15%",
                 "sortable": true
@@ -133,6 +133,12 @@
             {
                 "type": "field",
                 "value": "rate_class_id",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "activity_category_id",
                 "width": "10%",
                 "visible": false
             }
