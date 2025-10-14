@@ -42,7 +42,12 @@
 			"label": "Description",
 			"description": "Description des points de réservation.",
 			"help": ""
-		}
+		},
+        "date_expiry": {
+            "label": "Date d'expiration",
+            "description": "Date à laquelle les points expires",
+            "help": ""
+        }
 	},
 	"view": {
 		"form.default": {

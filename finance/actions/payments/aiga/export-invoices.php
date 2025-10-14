@@ -7,6 +7,7 @@
 
 use documents\Export;
 use identity\CenterOffice;
+use sale\booking\BookingActivity;
 use sale\booking\Invoice;
 
 [$params, $providers] = eQual::announce([
@@ -77,6 +78,7 @@ $invoices = Invoice::search(
         'invoice_lines_ids' => [
             'total',
             'product_id'        => [
+                'sku',
                 'analytic_section_id' => [
                     'code'
                 ],
@@ -157,7 +159,18 @@ foreach($invoices as $invoice) {
         'currency_type'         => 'E'
     ];
 
+    $total_map_activities = 0.0;
+    $activities_map_accounting_rule_lines = [];
     foreach($invoice['invoice_lines_ids'] as $line) {
+        $is_activities_map_product = (strlen($line['product_id']['sku']) - strlen('-MAP')) === strrpos($line['product_id']['sku'], '-MAP');
+        if($is_activities_map_product) {
+            $total_map_activities += $line['total'];
+            if(empty($activities_map_accounting_rule_lines)) {
+                $activities_map_accounting_rule_lines = $line['price_id']['accounting_rule_id']['accounting_rule_line_ids'];
+            }
+            continue;
+        }
+
         // invoice product line
         foreach($line['price_id']['accounting_rule_id']['accounting_rule_line_ids'] as $rule_line) {
             // get analytic section from model, product or price
@@ -188,6 +201,87 @@ foreach($invoices as $invoice) {
                 'invoice_number'        => $invoice['number'],
                 'currency_type'         => 'E'
             ];
+        }
+    }
+
+    if($total_map_activities > 0) {
+        if(empty($activities_map_accounting_rule_lines)) {
+            throw new Exception("missing_accounting_rule_lines", EQ_ERROR_INVALID_PARAM);
+        }
+
+        $activities = BookingActivity::search([
+            ['booking_id', '=', $invoice['booking_id']],
+            ['activity_booking_line_id', '=', null]
+        ])
+            ->read([
+                'qty',
+                'product_id' => [
+                    'analytic_section_id' => [
+                        'code'
+                    ],
+                    'product_model_id' => [
+                        'analytic_section_id' => [
+                            'code'
+                        ]
+                    ]
+                ]
+            ])
+            ->get(true);
+
+        $activities_with_analytic = [];
+        $total_qty = 0;
+        foreach($activities as $activity) {
+            if(isset($activity['product_id']['analytic_section_id']['code']) || isset($activity['product_id']['product_model_id']['analytic_section_id']['code'])) {
+                $activities_with_analytic[] = $activity;
+                $total_qty += $activity['qty'];
+            }
+        }
+
+        $activity_unit_price = $total_map_activities / $total_qty;
+
+        $map_analytic_accounts_totals = [];
+        foreach($activities_with_analytic as $index => $activity) {
+            $is_last = ($index + 1) === count($activities_with_analytic);
+
+            $analytic_section_code = $activity['product_id']['analytic_section_id']['code'] ?? $activity['product_id']['product_model_id']['analytic_section_id']['code'];
+
+            if(!isset($map_analytic_accounts_totals[$analytic_section_code])) {
+                $map_analytic_accounts_totals[$analytic_section_code] = 0;
+            }
+
+            if(!$is_last) {
+                $precision = 2;
+                $multiplier = pow(10, $precision);
+                $total_activity = floor($activity_unit_price * $activity['qty'] * $multiplier) / $multiplier;
+
+                $map_analytic_accounts_totals[$analytic_section_code] += $total_activity;
+                $total_map_activities -= $total_activity;
+            }
+            else {
+                $map_analytic_accounts_totals[$analytic_section_code] += $total_map_activities;
+                $total_map_activities = 0;
+            }
+        }
+
+        foreach($map_analytic_accounts_totals as $analytic_section_code => $total) {
+            foreach($activities_map_accounting_rule_lines as $rule_line) {
+                $lines[] = [
+                    'writing_number'        => $writing_number,
+                    'writing_line_number'   => ++$writing_line_number,
+                    'date'                  => $invoice_date,
+                    'general_account'       => $rule_line['account'],
+                    'analytic_account'      => $analytic_section_code,
+                    'journal_account'       => 'VA',
+                    'file_type'             => '',
+                    'file_number'           => $invoice['number'],
+                    'amount'                => sprintf('%.02f', -1 * ($total * $rule_line['share'])),
+                    'writing_label'         => $invoice['partner_id']['name'],
+                    'due_date'              => '',
+                    'check_number'          => '',
+                    'invoice_number'        => $invoice['number'],
+                    'currency_type'         => 'E'
+                ];
+            }
         }
     }
 

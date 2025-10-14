@@ -1,0 +1,19 @@
+{
+    "name": "Appliquer points fidélité",
+    "description": "Appliquer des points de fidélité du client à la réservation.",
+    "model": {
+        "id": {
+            "label": "Identifiant",
+            "description": "Identifiant de la réservation ciblée.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "missing_loyalty_points_sku_setting": "Paramètre sku points fidélité manquant.",
+            "missing_loyalty_points_product": "Produit points fidélité manquant.",
+            "unknown_booking": "Réservation inconnue.",
+            "no_booking_points_to_apply": "Pas de points de fidélité à appliquer."
+        }
+    }
+}

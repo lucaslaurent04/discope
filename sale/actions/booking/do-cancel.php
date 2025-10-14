@@ -10,6 +10,7 @@ use core\setting\Setting;
 use sale\booking\Booking;
 use sale\booking\BookingActivity;
 use sale\booking\BookingLine;
+use sale\booking\BookingPoint;
 use sale\booking\Consumption;
 use sale\booking\BookingLineGroup;
 use sale\booking\Contract;
@@ -265,6 +266,16 @@ else {
 // cancel all activities related to the booking for them to not be displayed in planning
 BookingActivity::search(['booking_id', '=', $booking['id']])
     ->update(['is_cancelled' => true]);
+
+// handle loyalty points
+$loyalty_points_feature = Setting::get_value('sale', 'features', 'booking.loyalty_points', false);
+
+if($loyalty_points_feature) {
+    // remove any created points relating to this booking
+    BookingPoint::search(['booking_id', '=', $booking['id']])->delete(true);
+    // detach any point applied to this booking
+    BookingPoint::search(['booking_apply_id', '=', $booking['id']])->update(['booking_apply_id' => null]);
+}
 
 // remove pending alerts relating to booking checks, if any
 $dispatch->cancel('lodging.booking.composition', 'sale\booking\Booking', $booking['id']);

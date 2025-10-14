@@ -18,48 +18,82 @@
                                             {
                                                 "type": "field",
                                                 "value": "name",
-                                                "width": "100%",
-                                                "visible" :["state" , "<>" , "draft"],
+                                                "width": "75%",
                                                 "widget": {
                                                     "heading": true
                                                 }
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "booking_id",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "customer_id",
-                                                "width": "50%",
-                                                "readonly": true,
-                                                "visible" :["state" , "<>" , "draft"]
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "nb_paying_pers",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "nb_nights",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "points_value",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "booking_apply_id",
-                                                "width": "50%"
+                                                "value": "date_expiry",
+                                                "width": "20%",
+                                                "visible": ["state" , "<>" , "draft"]
                                             }
                                         ]
                                     },
                                     {
-                                        "width": "100%",
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "customer_id",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "booking_id",
+                                                "visible": [[["state" , "=" , "draft"]], [["booking_id", "<>", null]]],
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "nb_paying_pers",
+                                                "width": "25%",
+                                                "visible": [["booking_id", "<>", null], ["state" , "<>" , "draft"]]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "nb_nights",
+                                                "width": "25%",
+                                                "visible": [["booking_id", "<>", null], ["state" , "<>" , "draft"]]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "points_value",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "booking_apply_id",
+                                                "width": "33%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "sections": [
+                    {
+                        "id": "section.description",
+                        "label": "Description",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
                                         "items": [
                                             {
                                                 "type": "field",

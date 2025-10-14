@@ -672,7 +672,7 @@ foreach($bookings as $booking) {
     // find all sojourns
     $sojourns = BookingLineGroup::search([
         ['booking_id', '=', $booking['id']],
-        ['is_sojourn', '=', true]
+        ['group_type', '=', 'sojourn']
     ])
         ->read([
             'id',

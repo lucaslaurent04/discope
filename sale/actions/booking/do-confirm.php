@@ -452,23 +452,26 @@ $fundings_handled_sum = 0.0;
 foreach($booking['fundings_ids'] as $funding) {
     $fid = $funding['id'];
     if($funding['type'] == 'invoice') {
-        continue;
-    }
-    // we're about to generate a new payment plan : remove unpaid fundings
-    if(round($funding['paid_amount'], 2) == 0 && !$funding['is_paid']) {
-        Funding::id($fid)->delete(true);
-        // remove any existing CRON tasks for funding overdue
-        $cron->cancel("booking.funding.overdue.{$fid}");
-        // #memo - there are no alerts specific to fundings (only bookings)
+        // cannot modify a funding related to an invoice
+        $fundings_handled_sum += $funding['due_amount'];
     }
     else {
-        Funding::id($fid)
-            ->update(['due_amount' => $funding['paid_amount']])
-            ->update([
-                'is_paid' => true,
-                'status'  => 'paid'
-            ]);
-        $fundings_handled_sum += $funding['paid_amount'];
+        // we're about to generate a new payment plan : remove unpaid fundings
+        if(round($funding['paid_amount'], 2) == 0 && !$funding['is_paid']) {
+            Funding::id($fid)->delete(true);
+            // remove any existing CRON tasks for funding overdue
+            $cron->cancel("booking.funding.overdue.{$fid}");
+            // #memo - there are no alerts specific to fundings (only bookings)
+        }
+        else {
+            Funding::id($fid)
+                ->update(['due_amount' => $funding['paid_amount']])
+                ->update([
+                    'is_paid' => true,
+                    'status'  => 'paid'
+                ]);
+            $fundings_handled_sum += $funding['paid_amount'];
+        }
     }
 }
 

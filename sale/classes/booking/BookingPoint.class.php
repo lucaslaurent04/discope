@@ -5,13 +5,14 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\booking;
+
 use equal\orm\Model;
 
 class BookingPoint extends Model {
 
-    public static function getColumns() {
-
+    public static function getColumns(): array {
         return [
 
             'name' => [
@@ -70,35 +71,58 @@ class BookingPoint extends Model {
             'points_value' => [
                 'type'              => 'float',
                 'description'       => 'Number of points earned from the target booking.',
+                'default'           => 0
             ],
 
             'is_applicable' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
                 'description'       => 'Flag telling if the points can be applied (origin booking is invoiced).',
-                'function'          => 'calcIsApplicable'
+                'function'          => 'calcIsApplicable',
+                'store'             => false
             ],
 
             'description' => [
                 'type'              => 'string',
                 'usage'             => 'text/plain',
                 'description'       => "Description of the booking points."
+            ],
+
+            'date_expiry' => [
+                'type'              => 'computed',
+                'result_type'       => 'date',
+                'description'       => "Date of expiration of the point.",
+                'store'             => true,
+                'function'          => 'calcDateExpiry'
             ]
 
         ];
     }
 
-    public static function getAction() {
+    public static function getAction(): array {
         return [
+
             'refresh_points' => [
                 'description'   => 'Re-compute assigned points according to origin Booking.',
                 'policies'      => [],
                 'function'      => 'doRefreshPoints'
             ]
+
         ];
     }
 
-    public static function calcName($self) {
+    /**
+     * computes 1 points per night per paying person
+     */
+    protected static function doRefreshPoints($self) {
+        $self->read(['nb_nights', 'nb_paying_pers']);
+        foreach($self as $id => $bookingPoint) {
+            $points = $bookingPoint['nb_nights'] * $bookingPoint['nb_paying_pers'];
+            self::id($id)->update(['points_value' => $points]);
+        }
+    }
+
+    public static function calcName($self): array {
         $result = [];
         $self->read(['booking_id' => ['name'], 'customer_id' => ['name'],  'points_value']);
         foreach($self as $id => $point) {
@@ -116,33 +140,39 @@ class BookingPoint extends Model {
         return $result;
     }
 
-    /**
-     * computes 1 points per night per paying person
-     */
-    protected static function doRefreshPoints($self) {
-        $self->read(['nb_nights' , 'nb_paying_pers']);
-        foreach($self as $id => $bookingPoint) {
-            $points = $bookingPoint['nb_nights'] * $bookingPoint['nb_paying_pers'];
-            self::id($id)->update(['points_value' => $points]);
-        }
-    }
-
-    protected static function calcIsApplicable($self) {
+    protected static function calcIsApplicable($self): array {
         $result = [];
-        $self->read(['booking_apply_id', 'booking_id' => ['status']]);
+        $self->read(['date_expiry', 'booking_apply_id', 'booking_id' => ['status']]);
         foreach($self as $id => $bookingPoint) {
             $is_applicable = false;
-            if(!$bookingPoint['booking_apply_id']) {
-                if(in_array($bookingPoint['booking_id']['status'], ['debit_balance', 'credit_balance', 'balanced'], true)) {
-                    $is_applicable = true;
+            if($bookingPoint['date_expiry'] < time()) {
+                if(!$bookingPoint['booking_apply_id']) {
+                    if(is_null($bookingPoint['booking_id'])) {
+                        $is_applicable = true;
+                    }
+                    else {
+                        $is_applicable = in_array($bookingPoint['booking_id']['status'], ['debit_balance', 'credit_balance', 'balanced']);
+                    }
                 }
             }
+
             $result[$id] = $is_applicable;
         }
         return $result;
     }
 
-    protected static function calcNbNights($self) {
+    protected static function calcDateExpiry($self): array {
+        $result = [];
+        $self->read(['booking_id' => ['date_to']]);
+        foreach($self as $id => $bookingPoint) {
+            if(isset($bookingPoint['booking_id']['date_to'])) {
+                $result[$id] = strtotime('+5 years', $bookingPoint['booking_id']['date_to']);
+            }
+        }
+        return $result;
+    }
+
+    protected static function calcNbNights($self): array {
         $result = [];
         $self->read(['booking_id' => ['date_from', 'date_to']]);
         foreach($self as $id => $point) {
@@ -151,7 +181,7 @@ class BookingPoint extends Model {
         return $result;
     }
 
-    protected static function calcNbPayingPers($self) {
+    protected static function calcNbPayingPers($self): array {
         $result = [];
         $self->read(['booking_id' => ['booking_lines_groups_ids']]);
         foreach($self as $id => $point) {
@@ -201,5 +231,4 @@ class BookingPoint extends Model {
         }
         return $result;
     }
-
 }
