@@ -45,7 +45,7 @@ if(!empty($params['params'])) {
     }
 }
 
-$output = eQual::run('get', 'sale_camp_print-activities-planning', compact('date_from', 'date_to'));
+$output = eQual::run('get', 'sale_camp_print-activities-planning', ['date_from' => $date_from, 'date_to' => $date_to]);
 
 $context->httpResponse()
         ->header('Content-Disposition', 'inline; filename="planning.pdf"')

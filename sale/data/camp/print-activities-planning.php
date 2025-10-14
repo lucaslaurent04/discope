@@ -92,17 +92,17 @@ if(isset($params['date_from'])) {
     $domain[] = ['date_from', '>=', $params['date_from']];
 }
 if(isset($params['date_to'])) {
-    $domain[] = ['date_to', '<=', $params['date_to']];
+    $domain[] = ['date_from', '<=', $params['date_to']];
 }
 if(isset($params['camp_id'])) {
     $domain[] = ['id', '=', $params['camp_id']];
 }
 if(isset($params['camp_group_id'])) {
-    $camp_group = CampGroup::id($params['camp_group_id'])
+    $campGroup = CampGroup::id($params['camp_group_id'])
         ->read(['camp_id'])
         ->first();
 
-    $domain[] = ['id', '=', $camp_group['camp_id']];
+    $domain[] = ['id', '=', $campGroup['camp_id']];
 }
 
 $camps = Camp::search($domain)
