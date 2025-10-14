@@ -17,7 +17,7 @@ use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Print the planning of activities for given date interval.",
+    'description'   => "Print the planning of activities for given week (time interval is always reduced to 5 days based on date_from).",
     'params'        => [
         'view_id' =>  [
             'description'   => 'The identifier of the view <type.name>.',

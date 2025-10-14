@@ -953,27 +953,28 @@ class Enrollment extends Model {
     /**
      * After status confirm: reset the enrollments qty
      */
-    public static function onafterConfirm($self) {
-        $self->do('reset-camp-enrollments-qty');
-        $self->do('generate-funding');
+    protected static function onafterConfirm($self) {
+        $self
+            ->do('reset-camp-enrollments-qty')
+            ->do('generate_funding')
+            ->do('generate_presences');
     }
 
     /**
      * After status validate: lock enrollment and generate presences
      */
-    public static function onafterValidate($self) {
+    protected static function onafterValidate($self) {
         $self->update([
-            'is_locked' => true,
-            'status'    => 'validated'          // #todo - find why needed and fix error
-        ]);
-
-        $self->do('generate-presences');
+                'is_locked' => true,
+                'status'    => 'validated'          // #todo - find why needed and fix error
+            ])
+            ->do('generate_presences');
     }
 
     /**
      * After status cancel: unlock enrollment and remove presences
      */
-    public static function onafterCancel($self) {
+    protected static function onafterCancel($self) {
         $self->update([
             'is_locked'         => false,
             'cancellation_date' => time(),
@@ -981,8 +982,8 @@ class Enrollment extends Model {
         ]);
 
         $self->do('reset-camp-enrollments-qty');
-        $self->do('remove-presences');
-        $self->do('handle-cancellation-refunding');
+        $self->do('remove_presences');
+        $self->do('handle_cancellation_refunding');
     }
 
     public static function getWorkflow(): array {
@@ -1360,9 +1361,9 @@ class Enrollment extends Model {
         /** @var \equal\dispatch\Dispatcher $dispatch */
         $dispatch = $providers['dispatch'];
 
-        $self->do('refresh-camp-product-line');
+        $self->do('refresh_camp_product_line');
         $self->do('reset-camp-enrollments-qty');
-        $self->do('refresh-required-documents');
+        $self->do('refresh_required_documents');
 
         // remove previously generated presences of pending enrollment
         $self->read(['status', 'child_id']);
@@ -1372,7 +1373,7 @@ class Enrollment extends Model {
             }
 
             Child::id($enrollment['child_id'])->do('remove-unnecessary-presences');
-            Enrollment::id($enrollment['id'])->do('generate-presences');
+            Enrollment::id($enrollment['id'])->do('generate_presences');
         }
 
         // check child age
@@ -1385,7 +1386,7 @@ class Enrollment extends Model {
     }
 
     public static function onupdateFamilyQuotient($self) {
-        $self->do('refresh-camp-product-line');
+        $self->do('refresh_camp_product_line');
     }
 
     public static function onupdateWeekendExtra($self) {
@@ -1496,15 +1497,15 @@ class Enrollment extends Model {
     }
 
     public static function onupdatePresentDay($self) {
-        $self->do('refresh-camp-product-line');
+        $self->do('refresh_camp_product_line');
     }
 
     public static function onupdateWorksCouncilId($self) {
-        $self->do('refresh-camp-product-line');
+        $self->do('refresh_camp_product_line');
     }
 
     public static function onupdateCampClass($self) {
-        $self->do('refresh-camp-product-line');
+        $self->do('refresh_camp_product_line');
     }
 
     public static function onupdate($self, $values) {
@@ -1875,6 +1876,7 @@ class Enrollment extends Model {
     }
 
     public static function doHandleCancellationRefunding($self) {
+// #memo - !! motif d'annuylation si "raison impérieuse" -> remboursement total
         $self->read(['fundings_ids' => ['is_paid', 'due_amount', 'paid_amount']]);
         foreach($self as $enrollment) {
             foreach($enrollment['fundings_ids'] as $funding_id => $funding) {
@@ -1980,37 +1982,37 @@ class Enrollment extends Model {
                 'function'      => 'doDeleteLines'
             ],
 
-            'generate-presences' => [
+            'generate_presences' => [
                 'description'   => "Generate the child day presences to the camp.",
                 'policies'      => [],
                 'function'      => 'doGeneratePresences'
             ],
 
-            'remove-presences' => [
+            'remove_presences' => [
                 'description'   => "Remove the child day presences to the camp.",
                 'policies'      => [],
                 'function'      => 'doRemovePresences'
             ],
 
-            'refresh-camp-product-line' => [
+            'refresh_camp_product_line' => [
                 'description'   => "Creates/updates the enrollment line that concerns the product_id or day_product_id.",
                 'policies'      => [],
                 'function'      => 'doRefreshCampProductLine'
             ],
 
-            'refresh-required-documents' => [
+            'refresh_required_documents' => [
                 'description'   => "Creates/updates the enrollment documents that are required depending on the camp.",
                 'policies'      => [],
                 'function'      => 'doRefreshRequiredDocuments'
             ],
 
-            'generate-funding' => [
+            'generate_funding' => [
                 'description'   => "Creates the enrollment funding if is does not already exists.",
                 'policies'      => [],
                 'function'      => 'doGenerateFunding'
             ],
 
-            'handle-cancellation-refunding' => [
+            'handle_cancellation_refunding' => [
                 'description'   => "Handles the creation of negative fundings if a refund is necessary following a cancellation.",
                 'policies'      => [],
                 'function'      => 'doHandleCancellationRefunding'
@@ -2022,7 +2024,7 @@ class Enrollment extends Model {
     public static function ondelete($self): void {
         $self->do('delete-lines');
         $self->do('reset-camp-enrollments-qty');
-        $self->do('remove-presences');
+        $self->do('remove_presences');
 
         parent::ondelete($self);
     }

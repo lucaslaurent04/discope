@@ -527,7 +527,7 @@ class Camp extends Model {
         foreach($self as $camp) {
             $enrollments_ids = array_merge($enrollments_ids, $camp['enrollments_ids']);
         }
-        Enrollment::ids($enrollments_ids)->do('remove-presences');
+        Enrollment::ids($enrollments_ids)->do('remove_presences');
     }
 
     public static function getWorkflow(): array {

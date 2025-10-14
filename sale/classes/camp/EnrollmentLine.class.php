@@ -203,7 +203,7 @@ class EnrollmentLine extends Model {
         }
 
         if(!empty($camp_products_enrollments_ids)) {
-            Enrollment::ids($camp_products_enrollments_ids)->do('refresh-camp-product-line');
+            Enrollment::ids($camp_products_enrollments_ids)->do('refresh_camp_product_line');
         }
     }
 

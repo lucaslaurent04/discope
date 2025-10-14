@@ -181,7 +181,7 @@
             "description": "Status de l'inscription.",
             "help": "",
             "selection": {
-                "pending": "En cours",
+                "pending": "Brouillon",
                 "waitlisted": "En attente",
                 "confirmed": "Confirmée",
                 "validated": "Validée",

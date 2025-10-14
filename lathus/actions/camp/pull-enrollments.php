@@ -588,7 +588,7 @@ if(!empty($data)) {
             'total' => $ext_price,
             'price' => $ext_price
         ])
-            ->do('generate-funding');
+            ->do('generate_funding');
 
         $funding = Funding::search(['enrollment_id', '=', $enrollment['id']])
             ->read(['id'])
