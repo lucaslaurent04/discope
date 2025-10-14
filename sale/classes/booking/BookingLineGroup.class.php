@@ -2610,20 +2610,19 @@ class BookingLineGroup extends Model {
                 }
             }
 
-            // do not auto-assign rental units if manual assignment is set in prefs
-            if($rentalunits_manual_assignment) {
-                continue;
-            }
-
             // read targeted booking lines (received as method param)
-            $lines = $om->read(\sale\booking\BookingLine::getType(), $booking_lines_ids, [
-                'booking_id.center_id',
-                'product_id',
-                'product_id.product_model_id',
-                'qty_accounting_method',
-                'is_rental_unit'
-            ],
-                $lang);
+            $lines = $om->read(\sale\booking\BookingLine::getType(), $booking_lines_ids,
+                [
+                    'booking_id.center_id',
+                    'product_id',
+                    'product_id.product_model_id',
+                    'product_id.product_model_id.rental_unit_assignement',
+                    'product_id.product_model_id.rental_unit_id',
+                    'qty_accounting_method',
+                    'is_rental_unit'
+                ],
+                $lang
+            );
 
             // drop lines that do not relate to rental units
             $lines = array_filter($lines, function($a) { return $a['is_rental_unit']; });
@@ -2633,6 +2632,12 @@ class BookingLineGroup extends Model {
                 $group_assigned_rental_units_ids = [];
                 $has_processed_accomodation_by_person = false;
                 foreach($lines as $lid => $line) {
+                    if($rentalunits_manual_assignment) {
+                        // do not auto-assign rental units if manual assignment is set in prefs, except if specific rental unit is defined on product model
+                        if($line['product_id.product_model_id.rental_unit_assignement'] !== 'unit' || is_null($line['product_id.product_model_id.rental_unit_id'])) {
+                            continue;
+                        }
+                    }
 
                     $center_id = $line['booking_id.center_id'];
 
