@@ -47,7 +47,7 @@ class BookingActivity extends Model {
                 'description'       => "Booking Line of the activity.",
                 'help'              => "A free activity can be linked to a booking line group without being linked directly to a booking line.",
                 'readonly'          => true,
-                'dependents'        => ['time_slot_id', 'activity_date', 'product_model_id'],
+                'dependents'        => ['time_slot_id', 'activity_date', 'booking_id', 'booking_line_group_id', 'product_id', 'product_model_id'],
                 'ondelete'          => 'cascade'
             ],
 
@@ -139,7 +139,8 @@ class BookingActivity extends Model {
                 'foreign_object'    => 'sale\camp\CampGroup',
                 'description'       => "Camp group the activity is organised for.",
                 'readonly'          => true,
-                'ondelete'          => 'cascade'
+                'ondelete'          => 'cascade',
+                'dependents'        => ['camp_id']
             ],
 
             /**
