@@ -15,7 +15,7 @@
                             {
                                 "columns": [
                                     {
-                                        "width": "100%",
+                                        "width": "50%",
                                         "items": [
                                             {
                                                 "type": "field",
@@ -29,7 +29,21 @@
                                                 "type": "field",
                                                 "label": "Description",
                                                 "value": "description",
-                                                "width": "50%"
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "25%",
+                                        "items": []
+                                    },
+                                    {
+                                        "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "code",
+                                                "width": "100%"
                                             }
                                         ]
                                     }

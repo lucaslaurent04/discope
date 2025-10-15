@@ -24,13 +24,15 @@ class RentalUnitCategory extends Model {
 
             'code' => [
                 'type'              => 'string',
-                'description'       => "Short code of the rental unit category."
+                'description'       => "Short code of the rental unit category.",
+                'dependents'        => ['name']
             ],
 
             'description' => [
                 'type'              => 'string',
                 'description'       => "Reason of the categorization of rental units.",
-                'multilang'         => true
+                'multilang'         => true,
+                'dependents'        => ['name']
             ],
 
             'rental_units_ids' => [
