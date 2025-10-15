@@ -73,8 +73,8 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
     public hover_row_index = -1;
 
 
-    public selectedCategory: any;
-    public categories: any[] = ['CP', 'CH', 'LT'];
+    public selectedRentalUnitCategory: any;
+    public rental_units_categories: any[] = [{id: 1, name: 'CP'}, {id: 2, name: 'CH'}, {id: 3, name: 'LT'}];
 
     public selection =  {
         is_active: false,
@@ -217,6 +217,9 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
             this.cd.reattach();
             this.cd.detectChanges();
         });
+    }
+
+    public onchangeSelectedRentalUnitCategories() {
     }
 
     public calcDateIndex(day: Date): string {

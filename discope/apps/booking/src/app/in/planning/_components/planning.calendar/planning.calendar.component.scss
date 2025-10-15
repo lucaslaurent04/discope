@@ -82,6 +82,28 @@
                     font-size: 16px;
                 }
 
+                .mini-select {
+                    width: 90px;
+                    height: 32px;
+
+                    ::ng-deep .mat-mdc-form-field-flex {
+                        padding: 0 4px;
+                    }
+
+                    ::ng-deep .mat-mdc-select-trigger {
+                        font-size: 12px;
+                        line-height: 1.2;
+                    }
+
+                    ::ng-deep .mat-mdc-form-field-infix {
+                        padding: 0 !important;
+                    }
+
+                    ::ng-deep .mat-mdc-select-arrow {
+                        transform: scale(0.8);
+                    }
+                }
+
                 th.head-days {
                     border-top: solid 1px #e0e0e0;
                     top: 35px;

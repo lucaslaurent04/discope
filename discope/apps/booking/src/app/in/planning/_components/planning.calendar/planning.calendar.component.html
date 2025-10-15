@@ -16,16 +16,23 @@
         <!-- header -->
         <thead>
             <tr class="head">
-                <th #calTableRefColumn class="ref-column cell-room" rowspan="2"><span class="material-icons">holiday_village</span></th>
-                <th class="stat-column cell-room" rowspan="2">
-                    <span class="material-icons">task_alt</span>
-                    <mat-form-field appearance="outline" class="mini-select">
-                        <mat-select [(value)]="selectedCategory" disableRipple>
-                            <mat-option *ngFor="let cat of categories" [value]="cat.value">
-                                {{ cat.label }}
+                <th #calTableRefColumn class="ref-column cell-room" rowspan="2">
+                    <span class="material-icons">holiday_village</span>
+                    <mat-form-field class="mini-select">
+                        <mat-select
+                            [(value)]="selectedRentalUnitCategory"
+                            (closed)="onchangeSelectedRentalUnitCategories()"
+                            (selectionChange)="onchangeSelectedRentalUnitCategories()"
+                            multiple
+                            disableRipple>
+                            <mat-option *ngFor="let cat of rental_units_categories" [value]="cat.id">
+                                {{ cat.name }}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
+                </th>
+                <th class="stat-column cell-room" rowspan="2">
+                    <span class="material-icons">task_alt</span>
                 </th>
                 <th class="head-months" *ngFor="let month of headers.months" [attr.colspan]="month.days.length">
                     {{ month.date | date : 'MMMM y' }}

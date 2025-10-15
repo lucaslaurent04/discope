@@ -19,8 +19,7 @@
                     [(ngModel)]="selected_centers_ids"
                     panelClass="centers-selector"
                     [disableOptionCentering]="true"
-                    (closed)="onchangeSelectedCenters()"
-                    (selectionChange)="onchangeSelectedCenters()">
+                    (closed)="onchangeSelectedCenters()">
                 <mat-optgroup [label]="'Sélection'">&nbsp;<a style="cursor: pointer;" (click)="onclickSelectAllCenters()">Tous</a> &nbsp; <a style="cursor: pointer;" (click)="onclickUnselectAllCenters()">Aucun</a> &nbsp; <a style="cursor: pointer;" (click)="onclickSelectGA()">GA</a> &nbsp; <a style="cursor: pointer;" (click)="onclickSelectGG()">GG</a></mat-optgroup>
                 <mat-option *ngFor="let center of centers" [value]="center.id" >{{center.name}}</mat-option>
             </mat-select>
