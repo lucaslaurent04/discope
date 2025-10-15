@@ -381,7 +381,7 @@ catch(Exception $exception) {
     3.8) handle lines
 */
 
-$booking_lines = InvoiceLine::search(['booking_id', '=', $booking['id']])
+$booking_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
     ->read([
         'product_id' => [
             'grouping_code_id' => [
@@ -419,7 +419,7 @@ foreach($booking_lines as $line) {
     $map_products_groupings[$line['product_id']['id']] = $grouping_code;
 }
 
-$booking_lines = InvoiceLine::search(['booking_id', '=', $booking['id']])
+$booking_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
     ->read([
         'name',
         'description',
