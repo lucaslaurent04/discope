@@ -106,11 +106,6 @@ $children = Child::ids($ids)
         'main_guardian_id',
         'enrollments_ids' => [
             'price',
-            'price_adapters' => [
-                'price_adapter_type',
-                'origin_type',
-                'value'
-            ],
             'camp_id' => [
                 'short_name',
                 'sojourn_number',
@@ -128,6 +123,7 @@ $children = Child::ids($ids)
             'price_adapters_ids' => [
                 'name',
                 'price_adapter_type',
+                'origin_type',
                 'value'
             ]
         ]
@@ -176,8 +172,8 @@ foreach($children as $child) {
         $remaining_amount += $enrollment['price'];
 
         foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-            // # memo - the percentage price-adapters are already applied on camp product price
-            if($price_adapter['price_adapter_type'] !== 'amount') {
+            // #memo - the 'other' and 'loyalty-discount' price-adapters are already applied on price
+            if(in_array($price_adapter['origin_type'], ['other', 'loyalty-discount'])) {
                 continue;
             }
 
@@ -262,9 +258,10 @@ catch(Exception $e) {
 
 if($params['output'] == 'html') {
     $context->httpResponse()
-        ->header('Content-Type', 'text/html')
-        ->body($html)
-        ->send();
+            ->header('Content-Type', 'text/html')
+            ->body($html)
+            ->send();
+
     exit(0);
 }
 

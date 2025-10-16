@@ -156,11 +156,21 @@ class PriceAdapter extends Model {
             }
         }
 
+        if(isset($values['price_adapter_type']) || isset($values['origin_type'])) {
+            foreach($self as $price_adapter) {
+                $origin_type = $values['origin_type'] ?? $price_adapter['origin_type'];
+                $price_adapter_type = $values['price_adapter_type'] ?? $price_adapter['price_adapter_type'];
+                if(in_array($origin_type, ['commune', 'community-of-communes', 'department-caf', 'department-msa']) && $price_adapter_type !== 'amount') {
+                    return ['price_adapter_type' => ['must_be_amount_financial_help' => "Must be amount when origin is financial help."]];
+                }
+            }
+        }
+
         if(isset($values['sponsor_id']) || isset($values['price_adapter_type']) || isset($values['is_manual_discount']) || isset($values['origin_type'])) {
             foreach($self as $price_adapter) {
                 $origin_type = $values['origin_type'] ?? $price_adapter['origin_type'];
                 $price_adapter_type = $values['price_adapter_type'] ?? $price_adapter['price_adapter_type'];
-                if($origin_type !== 'loyalty-discount' && $price_adapter_type  === 'percent') {
+                if(!in_array($origin_type, ['other', 'loyalty-discount']) && $price_adapter_type  === 'percent') {
                     return ['price_adapter_type' => ['must_be_loyalty_discount' => "Must be loyalty discount when percent type."]];
                 }
             }

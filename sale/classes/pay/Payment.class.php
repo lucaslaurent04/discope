@@ -376,17 +376,17 @@ class Payment extends Model {
      * @return array                       Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be deleted.
      */
     public static function candelete($om, $ids) {
-        $payments = $om->read(self::getType(), $ids, [ 'payment_origin', 'status', 'is_exported', 'is_manual', 'statement_line_id.status' ]);
+        $payments = $om->read(self::getType(), $ids, [ 'payment_origin', 'payment_method', 'status', 'is_exported', 'is_manual', 'statement_line_id.status' ]);
 
         if($payments > 0) {
             foreach($payments as $id => $payment) {
                 if($payment['is_exported']) {
                     return ['is_exported' => ['non_removable' => 'Paid payment cannot be removed.']];
                 }
-                if($payment['payment_origin'] == 'bank' && $payment['statement_line_id.status'] != 'pending') {
+                if($payment['payment_origin'] === 'bank' && $payment['statement_line_id.status'] !== 'pending') {
                     return ['status' => ['non_removable' => 'Payment from reconciled line cannot be removed.']];
                 }
-                if(!$payment['is_manual'] && $payment['status'] == 'paid') {
+                if(!$payment['is_manual'] && $payment['status'] === 'paid' && $payment['payment_method'] !== 'camp_financial_help') {
                     return ['status' => ['non_removable' => 'Non manual paid payment cannot be removed.']];
                 }
             }

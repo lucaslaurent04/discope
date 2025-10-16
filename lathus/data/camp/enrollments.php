@@ -10,7 +10,7 @@ use core\setting\Setting;
 use equal\http\HttpRequest;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Retrieve a batch of the latest enrollments, as provided from CPA Lathus API in response to ``.", // TODO: complete
+    'description'   => "Retrieve a batch of the latest enrollments, as provided from CPA Lathus API in response to configured api_uri.",
     'params'        => [
     ],
     'access'        => [

@@ -142,7 +142,7 @@
                     </tr>
                     <tr>
                         <td>{{ date|format_date() }}</td>
-                        <td></td>
+                        <td>{{ children[0].id }}</td>
                         <td>{{ children[0].enrollments_ids[0].camp_id.accounting_code }}</td>
                     </tr>
                 </table>
@@ -246,7 +246,11 @@
                             {% for price_adapter in enrollment.price_adapters_ids %}
                                 {% if price_adapter.price_adapter_type == 'amount' %}
                                     <tr>
-                                        <td style="width: 70%;">{{ price_adapter.name }}</td>
+                                        {% if child.enrollments_ids|length == 1 %}
+                                            <td style="width: 70%;">{{ price_adapter.name }}</td>
+                                        {% else %}
+                                            <td style="width: 70%;">Séj. n°{{enrollment.camp_id.sojourn_number}} - {{ price_adapter.name }}</td>
+                                        {% endif %}
                                         <td style="text-align: right;">{{ price_adapter.value|format_money() }}</td>
                                     </tr>
                                 {% endif %}
@@ -254,7 +258,11 @@
 
                             {% if map_enrollment_percent_price_adapter[enrollment.id] is defined %}
                                 <tr>
-                                    <td style="width: 70%;">{{ map_enrollment_percent_price_adapter[enrollment.id].name }}</td>
+                                    {% if child.enrollments_ids|length == 1 %}
+                                        <td style="width: 70%;">{{ map_enrollment_percent_price_adapter[enrollment.id].name }}</td>
+                                    {% else %}
+                                        <td style="width: 70%;">Séj. n°{{enrollment.camp_id.sojourn_number}} - {{ map_enrollment_percent_price_adapter[enrollment.id].name }}</td>
+                                    {% endif %}
                                     <td style="text-align: right;">{{ map_enrollment_percent_price_adapter[enrollment.id].value|format_money() }}</td>
                                 </tr>
                             {% endif %}
