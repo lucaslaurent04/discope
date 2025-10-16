@@ -381,7 +381,7 @@ catch(Exception $exception) {
     3.8) handle lines
 */
 
-$booking_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
+$invoice_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
     ->read([
         'product_id' => [
             'grouping_code_id' => [
@@ -399,7 +399,7 @@ $booking_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
     ->get();
 
 $map_products_groupings = [];
-foreach($booking_lines as $line) {
+foreach($invoice_lines as $line) {
     if(isset($map_products_groupings[$line['product_id']['id']])) {
         continue;
     }
@@ -419,7 +419,7 @@ foreach($booking_lines as $line) {
     $map_products_groupings[$line['product_id']['id']] = $grouping_code;
 }
 
-$booking_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
+$invoice_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
     ->read([
         'name',
         'description',
@@ -434,7 +434,7 @@ $booking_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
     ->get();
 
 $map_groupings_lines = [];
-foreach($booking_lines as $line) {
+foreach($invoice_lines as $line) {
     $grouping_name = $line['product_id']['label'];
     if(isset($map_products_groupings[$line['product_id']['id']])) {
         $grouping_name = $map_products_groupings[$line['product_id']['id']]['name'];

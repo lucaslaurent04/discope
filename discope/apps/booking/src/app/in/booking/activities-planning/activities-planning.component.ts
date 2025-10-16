@@ -459,7 +459,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         this.loading = true;
 
         try {
-            await this.api.fetch('?do=sale_booking_update-sojourn-nbpers', {
+            await this.api.call('?do=sale_booking_update-activity-group-info', {
                 id: this.selectedGroup.id,
                 nb_pers: nbPers
             });
@@ -476,10 +476,9 @@ export class BookingActivitiesPlanningComponent implements OnInit {
     public async onAgeFromChanged(ageFrom: number) {
         this.loading = true;
 
-        const ageRangeAssign = this.mapGroupAgeRangeAssignment[this.selectedGroup.id];
-
         try {
-            await this.api.update('sale\\booking\\BookingLineGroupAgeRangeAssignment', [ageRangeAssign.id], {
+            await this.api.call('?do=sale_booking_update-activity-group-info', {
+                id: this.selectedGroup.id,
                 age_from: ageFrom
             });
 
@@ -495,10 +494,9 @@ export class BookingActivitiesPlanningComponent implements OnInit {
     public async onAgeToChanged(ageTo: number) {
         this.loading = true;
 
-        const ageRangeAssign = this.mapGroupAgeRangeAssignment[this.selectedGroup.id];
-
         try {
-            await this.api.update('sale\\booking\\BookingLineGroupAgeRangeAssignment', [ageRangeAssign.id], {
+            await this.api.call('?do=sale_booking_update-activity-group-info', {
+                id: this.selectedGroup.id,
                 age_to: ageTo
             });
 
@@ -515,7 +513,8 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         this.loading = true;
 
         try {
-            await this.api.update('sale\\booking\\BookingLineGroup', [this.selectedGroup.id], {
+            await this.api.call('?do=sale_booking_update-activity-group-info', {
+                id: this.selectedGroup.id,
                 has_person_with_disability: hasPersonWithDisability
             });
 
@@ -528,13 +527,16 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         this.loading = false;
     }
 
-    public async onParticipantsOptionsChanged(participantsOptions: { person_disability_description: string }) {
+    public async onParticipantsOptionsChanged({ person_disability_description }: { person_disability_description: string }) {
         this.loading = true;
 
         try {
-            await this.api.update('sale\\booking\\BookingLineGroup', [this.selectedGroup.id], participantsOptions);
+            await this.api.call('?do=sale_booking_update-activity-group-info', {
+                id: this.selectedGroup.id,
+                person_disability_description
+            });
 
-            this.selectedGroup.person_disability_description = participantsOptions.person_disability_description;
+            this.selectedGroup.person_disability_description = person_disability_description;
         }
         catch(response) {
             this.api.errorFeedback(response);
