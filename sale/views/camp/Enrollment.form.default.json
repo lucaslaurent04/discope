@@ -77,12 +77,8 @@
         {
             "id": "action.transition.cancel",
             "label": "Cancel",
-            "controller": "model_transition",
-            "params": {
-                "entity": "sale\\camp\\Enrollment",
-                "transition": "cancel",
-                "ids": []
-            },
+            "controller": "sale_camp_enrollment_cancel",
+            "confirm": true,
             "visible": [
                 ["status", "in", ["waitlisted", "pending", "confirmed", "validated"]],
                 ["state", "<>", "draft"]
@@ -279,6 +275,24 @@
                                                 "value": "all_documents_received",
                                                 "width": "50%",
                                                 "visible": false
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "33%",
+                                                "visible": ["status", "=", "cancelled"]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "cancellation_date",
+                                                "width": "33%",
+                                                "visible": ["status", "=", "cancelled"]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "cancellation_reason",
+                                                "width": "33%",
+                                                "visible": ["status", "=", "cancelled"]
                                             }
                                         ]
                                     }

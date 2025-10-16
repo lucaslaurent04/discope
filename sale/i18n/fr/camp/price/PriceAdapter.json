@@ -70,6 +70,7 @@
     },
     "error": {
         "price_adapter_type": {
+            "must_be_amount_financial_help": "Doit être de type montant pour une aide financière.",
             "must_be_loyalty_discount": "Doit être une réduction fidélité pour le type pourcentage.",
             "must_be_amount": "Doit être un montant quand liée à une aide.",
             "already_percent": "Une seule réduction de prix 'Pourcentage' est autorisé pour une inscription."

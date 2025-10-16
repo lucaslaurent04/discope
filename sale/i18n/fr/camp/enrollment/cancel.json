@@ -1,0 +1,35 @@
+{
+    "description": "Annuler l'inscription.",
+    "model": {
+        "id": {
+            "label": "Inscription",
+            "description": "Inscription à annuler.",
+            "help": ""
+        },
+        "reason": {
+            "label": "Motif d'annulation",
+            "description": "Raison pour laquelle l'inscription est annulée.",
+            "help": "",
+            "selection": {
+                "other": "autre",
+                "overbooking": "Overbooking: plus de place libre dans le camp",
+                "duplicate": "Doublon: inscription effectuée plusieurs fois",
+                "internal_impediment": "Force majeure interne: incident empêchant la réservation",
+                "external_impediment": "Force majeure externe (accident, transport, pandémie, ...)",
+                "health_impediment": "Motif médical ou familial"
+            }
+        },
+        "fee": {
+            "label": "Frais d'annulation",
+            "description": "Montant des frais d'annulation.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "unknown_enrollment": "Inscription non connue.",
+            "invalid_status": "L'inscription est déjà annulée.",
+            "invalid_fee": "Les frais d'annulations sont trop élevés."
+        }
+    }
+}

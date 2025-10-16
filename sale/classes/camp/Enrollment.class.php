@@ -397,6 +397,21 @@ class Enrollment extends Model {
                 'description'       => "Date of cancellation."
             ],
 
+            'cancellation_reason' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'other',                    // customer cancelled for a non-listed reason or without mentioning the reason (cancellation fees might apply)
+                    'overbooking',              // the booking was cancelled due to failure in delivery of the service
+                    'duplicate',                // several contacts of the same group made distinct bookings for the same sojourn
+                    'internal_impediment',      // cancellation due to an incident impacting the rental units
+                    'external_impediment',      // cancellation due to external delivery failure (organisation, means of transport, ...)
+                    'health_impediment'         // cancellation for medical or mourning reason
+                ],
+                'description'       => "The reason at the origin of the enrollment's cancellation.",
+                'default'           => 'other',
+                'visible'           => ['status', '=', 'cancelled']
+            ],
+
             'is_ase' => [
                 'type'              => 'boolean',
                 'description'       => "Is \"aide sociale à l'enfance\".",
@@ -689,7 +704,7 @@ class Enrollment extends Model {
         $self->read([
             'camp_id'               => ['product_id', 'day_product_id'],
             'enrollment_lines_ids'  => ['product_id', 'total'],
-            'price_adapters_ids'    => ['price_adapter_type', 'value']
+            'price_adapters_ids'    => ['price_adapter_type', 'origin_type', 'value']
         ]);
         foreach($self as $id => $enrollment) {
             $total = 0.0;
@@ -702,7 +717,7 @@ class Enrollment extends Model {
                 }
             }
 
-            // # memo - the percentage price-adapter only applies on camp price
+            // #memo - the percentage price-adapter only applies on camp price
             if(!is_null($camp_product_line)) {
                 $percent_price_adapter = null;
                 foreach($enrollment['price_adapters_ids'] as $price_adapter) {
@@ -720,6 +735,17 @@ class Enrollment extends Model {
                 }
             }
 
+            // #memo - apply other and loyalty discount price adapters when type is amount
+            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+                if(!in_array($price_adapter['origin_type'], ['other', 'loyalty-discount']) || $price_adapter['price_adapter_type'] !== 'amount') {
+                    continue;
+                }
+
+                $total -= $price_adapter['value'];
+                if($total < 0) {
+                    $total = 0;
+                }
+            }
 
             $result[$id] = $total;
         }
@@ -732,7 +758,7 @@ class Enrollment extends Model {
         $self->read([
             'camp_id'               => ['product_id', 'day_product_id'],
             'enrollment_lines_ids'  => ['product_id', 'price'],
-            'price_adapters_ids'    => ['price_adapter_type', 'value']
+            'price_adapters_ids'    => ['price_adapter_type', 'origin_type', 'value']
         ]);
         foreach($self as $id => $enrollment) {
             $price = 0.0;
@@ -745,7 +771,7 @@ class Enrollment extends Model {
                 }
             }
 
-            // # memo - the percentage price-adapter only applies on camp price
+            // #memo - the percentage price-adapter only applies on camp price
             if(!is_null($camp_product_line)) {
                 $percent_price_adapter = null;
                 foreach($enrollment['price_adapters_ids'] as $price_adapter) {
@@ -758,6 +784,18 @@ class Enrollment extends Model {
                 if(!is_null($percent_price_adapter)) {
                     $price -= ($camp_product_line['price'] / 100 * $percent_price_adapter['value']);
                 }
+                if($price < 0) {
+                    $price = 0;
+                }
+            }
+
+            // #memo - apply other and loyalty discount price adapters when type is amount
+            foreach($enrollment['price_adapters_ids'] as $price_adapter) {
+                if(!in_array($price_adapter['origin_type'], ['other', 'loyalty-discount']) || $price_adapter['price_adapter_type'] !== 'amount') {
+                    continue;
+                }
+
+                $price -= $price_adapter['value'];
                 if($price < 0) {
                     $price = 0;
                 }
@@ -978,9 +1016,14 @@ class Enrollment extends Model {
             'status'            => 'cancelled'   // #todo - find why needed and fix error
         ]);
 
-        $self->do('reset-camp-enrollments-qty');
-        $self->do('remove_presences');
-        $self->do('handle_cancellation_refunding');
+        // handle fundings and payments
+        $self->do('remove_financial_help_payments')
+            ->do('delete_unpaid_fundings')
+            ->do('update_fundings_due_to_paid')
+            ->update(['paid_amount' => null]);
+
+        $self->do('reset-camp-enrollments-qty')
+            ->do('remove_presences');
     }
 
     public static function getWorkflow(): array {
@@ -1820,7 +1863,7 @@ class Enrollment extends Model {
     public static function doGenerateFunding($self) {
         $self->read([
             'price',
-            'price_adapters_ids'    => ['value', 'price_adapter_type'],
+            'price_adapters_ids'    => ['value', 'origin_type'],
             'fundings_ids'          => ['amount'],
             'camp_id'               => ['date_from', 'center_id' => ['center_office_id']]
         ]);
@@ -1854,8 +1897,8 @@ class Enrollment extends Model {
                 ->first();
 
             foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-                // # memo - the percentage price-adapters are already removed from price
-                if($price_adapter['price_adapter_type'] !== 'amount') {
+                // #memo - the other price-adapters are already removed from price
+                if(!in_array($price_adapter['origin_type'], ['commune', 'community-of-communes', 'department-caf', 'department-msa'])) {
                     continue;
                 }
 
@@ -1873,9 +1916,33 @@ class Enrollment extends Model {
         }
     }
 
-    public static function doHandleCancellationRefunding($self) {
-// #memo - !! motif d'annuylation si "raison impérieuse" -> remboursement total
-        $self->read(['fundings_ids' => ['is_paid', 'due_amount', 'paid_amount']]);
+    protected static function doRemoveFinancialHelpPayments($self) {
+        $self->read(['fundings_ids' => ['payments_ids' => ['payment_method']]]);
+        foreach($self as $enrollment) {
+            $map_funding_to_reset_ids = [];
+            $external_payments_ids = [];
+            foreach($enrollment['fundings_ids'] as $fid => $funding) {
+                foreach($funding['payments_ids'] as $pid => $payment) {
+                    if($payment['payment_method'] === 'camp_financial_help') {
+                        $external_payments_ids[] = $pid;
+                        $map_funding_to_reset_ids[$fid] = true;
+                    }
+                }
+            }
+
+            Payment::ids($external_payments_ids)->delete();
+
+            Funding::ids(array_keys($map_funding_to_reset_ids))->update([
+                'paid_amount'   => null,
+                'is_paid'       => null,
+                'status'        => 'pending'
+            ])
+                ->read(['paid_amount', 'is_paid']);
+        }
+    }
+
+    protected static function doDeleteUnpaidFundings($self) {
+        $self->read(['fundings_ids' => ['is_paid', 'paid_amount']]);
         foreach($self as $enrollment) {
             foreach($enrollment['fundings_ids'] as $funding_id => $funding) {
                 if($funding['paid_amount'] > 0 || $funding['is_paid']) {
@@ -1885,7 +1952,9 @@ class Enrollment extends Model {
                 Funding::id($funding_id)->delete(true);
             }
         }
+    }
 
+    protected static function doUpdateFundingsDueToPaid($self) {
         $self->read(['fundings_ids' => ['due_amount', 'paid_amount']]);
         foreach($self as $enrollment) {
             foreach($enrollment['fundings_ids'] as $funding_id => $funding) {
@@ -1893,74 +1962,7 @@ class Enrollment extends Model {
                     continue;
                 }
 
-                if($funding['due_amount'] > $funding['paid_amount']) {
-                    Funding::id($funding_id)->update([
-                        'due_amount'    => $funding['paid_amount'],
-                        'is_paid'       => true
-                    ]);
-                }
-            }
-        }
-
-        $self->read([
-            'price',
-            'center_office_id',
-            'camp_id'       => ['date_from'],
-            'fundings_ids'  => ['paid_amount']
-        ]);
-        foreach($self as $id => $enrollment) {
-            $already_paid = 0;
-            foreach($enrollment['fundings_ids'] as $funding) {
-                $already_paid += $funding['paid_amount'];
-            }
-
-            if($already_paid === 0) {
-                continue;
-            }
-
-            $diff_camp_price_to_already_paid = $enrollment['price'] - $already_paid;
-
-            $description = "Remboursement annulation";
-
-            $now = time();
-            $thirty_days_before = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from'])->modify('-30 days');
-            $fifteen_days_before = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from'])->modify('-15 days');
-            $seven_days_before = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from'])->modify('-7 days');
-
-            if($now < $thirty_days_before) {
-                $refund_amount = $enrollment['price'] * 0.75;
-                $description .= " (75%)";
-            }
-            elseif($now < $fifteen_days_before) {
-                $description .= " (50%)";
-                $refund_amount = $enrollment['price'] * 0.50;
-            }
-            elseif($now < $seven_days_before) {
-                $refund_amount = $enrollment['price'] * 0.25;
-                $description .= " (25%)";
-            }
-            else {
-                continue;
-            }
-
-            $refund_amount -= $diff_camp_price_to_already_paid;
-
-            if($refund_amount > 0) {
-                if($already_paid < $refund_amount) {
-                    $refund_amount = $already_paid;
-                }
-
-                Funding::create([
-                    'description'       => $description,
-                    'enrollment_id'     => $id,
-                    'center_office_id'  => $enrollment['center_office_id'],
-                    'due_amount'        => round(-$refund_amount, 2),
-                    'is_paid'           => false,
-                    'type'              => 'installment',
-                    'order'             => count($enrollment['fundings_ids']) + 1,
-                    'issue_date'        => time(),
-                    'due_date'          => time()
-                ]);
+                Funding::id($funding_id)->update(['due_amount' => $funding['paid_amount']]);
             }
         }
     }
@@ -2010,10 +2012,25 @@ class Enrollment extends Model {
                 'function'      => 'doGenerateFunding'
             ],
 
-            'handle_cancellation_refunding' => [
-                'description'   => "Handles the creation of negative fundings if a refund is necessary following a cancellation.",
+            'remove_financial_help_payments' => [
+                'description'   => "Removes funding's payments that are related for financial helps.",
+                'help'          => "Used when a enrollment is cancelled.",
                 'policies'      => [],
-                'function'      => 'doHandleCancellationRefunding'
+                'function'      => 'doRemoveFinancialHelpPayments'
+            ],
+
+            'delete_unpaid_fundings' => [
+                'description'   => "Removes enrollment's fundings that haven't received any payment.",
+                'help'          => "Used when a enrollment is cancelled.",
+                'policies'      => [],
+                'function'      => 'doDeleteUnpaidFundings'
+            ],
+
+            'update_fundings_due_to_paid' => [
+                'description'   => "Sets partially paid fundings due_amount to the value of paid_amount.",
+                'help'          => "Used when a enrollment is cancelled.",
+                'policies'      => [],
+                'function'      => 'doUpdateFundingsDueToPaid'
             ]
 
         ];
