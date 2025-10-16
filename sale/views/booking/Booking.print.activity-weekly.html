@@ -153,7 +153,7 @@ div.footer {
                                             <td style="padding: 0; border: none; vertical-align: top; line-height: 0.8rem;">{{ key }}.</td>
                                             <td style="padding: 0; border: none; line-height: 0.8rem;">
                                                 {% if activity %}
-                                                    {{ activity.product_id.label }}
+                                                    {{ activity.name|format_activity_name }}
                                                     <span style="color: grey;">({{ activity.schedule_from|format_time }} - {{ activity.schedule_to|format_time }})</span>
                                                 {% endif %}
                                             </td>
@@ -170,7 +170,7 @@ div.footer {
             </tbody>
         </table>
 
-        {% set week_start_key = week_dates|keys|first %}
+        {% set week_start_key = week_dates|keys|first|start_of_week() %}
         {% if attribute(booking.activity_weeks_descriptions, week_start_key) is defined and attribute(booking.activity_weeks_descriptions, week_start_key) %}
             <div style="width: 100%; text-align: center;">
                 <div style="max-width: 500px; margin: auto;">

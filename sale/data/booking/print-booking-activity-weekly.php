@@ -99,6 +99,17 @@ $formatPhone = function($value) {
     return DataFormatter::format($value, 'phone');
 };
 
+$startOfWeek = function($value) {
+    $timestamp = strtotime($value);
+    $monday = strtotime('monday this week', $timestamp);
+
+    return date('Y-m-d', $monday);
+};
+
+$formatActivityName = function($value) {
+    return preg_replace('/\s\([^)]+\)$/', '', $value);
+};
+
 /**
  * Data controller
  */
@@ -138,8 +149,7 @@ $booking = Booking::id($params['id'])
             'activity_date',
             'schedule_from',
             'schedule_to',
-            'time_slot_id'  => ['code'],
-            'product_id'    => ['label']
+            'time_slot_id'  => ['code']
         ],
         'booking_lines_groups_ids' => [
             'activity_group_num'
@@ -242,11 +252,17 @@ try {
     $date_index_filter = new TwigFilter('format_date_index', $formatDateIndex);
     $twig->addFilter($date_index_filter);
 
-    $date_filter = new TwigFilter('format_date_long', $formatDateLong);
-    $twig->addFilter($date_filter);
+    $date_long_filter = new TwigFilter('format_date_long', $formatDateLong);
+    $twig->addFilter($date_long_filter);
 
-    $date_filter = new TwigFilter('format_time', $formatTime);
-    $twig->addFilter($date_filter);
+    $time_filter = new TwigFilter('format_time', $formatTime);
+    $twig->addFilter($time_filter);
+
+    $start_of_week_filter = new TwigFilter('start_of_week', $startOfWeek);
+    $twig->addFilter($start_of_week_filter);
+
+    $format_activity_name = new TwigFilter('format_activity_name', $formatActivityName);
+    $twig->addFilter($format_activity_name);
 
     $template = $twig->load("{$class_path}.{$params['view_id']}.html");
     $html = $template->render($values);
