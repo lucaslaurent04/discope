@@ -302,16 +302,19 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
                 const parts = await this.api.collect("communication\\TemplatePart", ['id', 'in', template['parts_ids']], ['name', 'value'], 'id', 'asc', 0, 10, this.lang);
 
                 for(let part of parts) {
+                    const date_from = new Date(this.booking.date_from);
+                    const date_to = new Date(this.booking.date_to);
+
+                    // apply replacements
+                    let str_date_from = date_from.getDate().toString().padStart(2, '0') + '/' + (date_from.getMonth()+1).toString().padStart(2, '0') + '/' + date_from.getFullYear();
+                    let str_date_to = date_to.getDate().toString().padStart(2, '0') + '/' + (date_to.getMonth()+1).toString().padStart(2, '0') + '/' + date_to.getFullYear();
+
                     if(part.name == 'subject') {
                         let title = '';
                         if(part.hasOwnProperty('value') && part.value.length) {
                             // strip html nodes
                             title = part.value.replace(/<[^>]*>?/gm, '');
-                            console.log(part.value);
                         }
-
-                        const date_from = new Date(this.booking.date_from);
-                        const date_to = new Date(this.booking.date_to);
 
                         if(title.indexOf('{booking}') == -1) {
                             // prepend the booking code to make sure it is always present
@@ -326,10 +329,6 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
                             title = title + '-' + '{date_to}';
                         }
 
-                        // apply replacements
-                        let str_date_from = date_from.getDate().toString().padStart(2, '0') + '/' + (date_from.getMonth()+1).toString().padStart(2, '0') + '/' + date_from.getFullYear();
-                        let str_date_to = date_to.getDate().toString().padStart(2, '0') + '/' + (date_to.getMonth()+1).toString().padStart(2, '0') + '/' + date_to.getFullYear();
-
                         title = title.replace("{booking}", this.booking.name);
                         title = title.replace("{center}", this.center.name);
                         title = title.replace("{date_from}", str_date_from);
@@ -338,7 +337,14 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
                         this.vm.title.formControl.setValue(title);
                     }
                     else if(part.name == 'body') {
-                        this.vm.message.formControl.setValue(part.value);
+                        let body = part.value;
+
+                        body = body.replace("{booking}", this.booking.name);
+                        body = body.replace("{center}", this.center.name);
+                        body = body.replace("{date_from}", str_date_from);
+                        body = body.replace("{date_to}", str_date_to);
+
+                        this.vm.message.formControl.setValue(body);
                     }
                 }
 
