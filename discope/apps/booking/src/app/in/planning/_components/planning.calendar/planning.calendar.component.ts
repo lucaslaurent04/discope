@@ -10,6 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { ConsumptionCreationDialog } from './_components/consumption.dialog/consumption.component';
+import { FormControl } from '@angular/forms';
 
 class RentalUnit {
     constructor(
@@ -28,6 +29,12 @@ class RentalUnit {
     ) {}
 }
 
+interface vmModel {
+    rentalUnitCategories: {
+        formControl: FormControl
+    }
+}
+
 @Component({
     selector: 'planning-calendar',
     templateUrl: './planning.calendar.component.html',
@@ -39,6 +46,7 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
     @Output() filters = new EventEmitter<ChangeReservationArg>();
     @Output() showBooking = new EventEmitter();
     @Output() showRentalUnit = new EventEmitter();
+    @Output() applySettings = new EventEmitter();
 
     @Output() openLegendDialog = new EventEmitter();
     @Output() openPrefDialog = new EventEmitter();
@@ -72,9 +80,9 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
 
     public hover_row_index = -1;
 
+    public vm: vmModel;
 
-    public selectedRentalUnitCategory: any;
-    public rental_units_categories: any[] = [{id: 1, name: 'CP'}, {id: 2, name: 'CH'}, {id: 3, name: 'LT'}];
+    public rental_units_categories: any[] = [];
 
     public selection =  {
         is_active: false,
@@ -122,27 +130,32 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
         private elementRef: ElementRef,
         private cd: ChangeDetectorRef
     ) {
-            this.headers = {};
-            this.rental_units = [];
-            this.previous_duration = 0;
-            this.show_parents = (localStorage.getItem('planning_show_parents') === 'true');
-            this.show_children = (localStorage.getItem('planning_show_children') === 'true');
-            if(!this.show_parents && !this.show_children) {
-                this.show_parents = true;
-                this.show_children = true;
+        this.headers = {};
+        this.rental_units = [];
+        this.previous_duration = 0;
+        this.show_parents = (localStorage.getItem('planning_show_parents') === 'true');
+        this.show_children = (localStorage.getItem('planning_show_children') === 'true');
+        if(!this.show_parents && !this.show_children) {
+            this.show_parents = true;
+            this.show_children = true;
+        }
+        this.today = new Date();
+        this.today_index = this.calcDateIndex(this.today);
+
+        this.vm = {
+            rentalUnitCategories: {
+                formControl: new FormControl()
             }
-            this.today = new Date();
-            this.today_index = this.calcDateIndex(this.today);
+        };
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if(changes.rowsHeight)     {
+        if(changes.rowsHeight) {
             this.elementRef.nativeElement.style.setProperty('--rows_height', this.rowsHeight + 'px');
         }
-     }
+    }
 
     async ngOnInit() {
-
         this.params.getObservable().subscribe( () => {
             console.log('PlanningCalendarComponent cal params change', this.params);
             this.consumptions = [];
@@ -150,6 +163,13 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
         });
 
         this.elementRef.nativeElement.style.setProperty('--rows_height', this.rowsHeight + 'px');
+
+        this.rental_units_categories = await this.api.collect('realestate\\RentalUnitCategory', [], ['name', 'code'], 'name', 'asc', 0, 100);
+
+        const rentalUnitCategories = localStorage.getItem('planning_rental_units_categories');
+        if(rentalUnitCategories) {
+            this.vm.rentalUnitCategories.formControl.setValue(JSON.parse(rentalUnitCategories));
+        }
     }
 
     async ngAfterViewInit() {
@@ -219,7 +239,9 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
         });
     }
 
-    public onchangeSelectedRentalUnitCategories() {
+    public oncloseRentalUnitCategoriesSelect() {
+        localStorage.setItem('planning_rental_units_categories', JSON.stringify(this.vm.rentalUnitCategories.formControl.value));
+        this.applySettings.emit();
     }
 
     public calcDateIndex(day: Date): string {
@@ -613,7 +635,6 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
         clearTimeout(this.mousedownTimeout);
 
         if(this.selection.is_active) {
-            console.log('is active');
             // make from and to right
             let rental_unit:any = this.selection.cell_from.rental_unit;
             let from:any = this.selection.cell_from;

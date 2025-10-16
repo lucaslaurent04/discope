@@ -116,6 +116,10 @@ export class PlanningComponent implements OnInit, AfterViewInit, OnDestroy {
         if(localStorage.getItem('planning_rental_units_types')) {
             rental_units_types = JSON.parse(localStorage.getItem('planning_rental_units_types'));
         }
+        let rental_units_categories = [];
+        if(localStorage.getItem('planning_rental_units_categories')) {
+            rental_units_categories = JSON.parse(localStorage.getItem('planning_rental_units_categories'));
+        }
 
         if(!show_parents && !show_children) {
             show_parents = true;
@@ -165,13 +169,23 @@ export class PlanningComponent implements OnInit, AfterViewInit, OnDestroy {
             }
         }
 
+        if(rental_units_categories.length > 0) {
+            if(!domain.length) {
+                domain.push([['can_rent', '=', true], ['rental_unit_category_id', 'in', rental_units_categories]])
+            }
+            else {
+                for(let i = 0, n = domain.length; i < n; ++i) {
+                    domain[i].push(['rental_unit_category_id', 'in', rental_units_categories]);
+                }
+            }
+        }
+
         this.params.rental_units_filter = domain;
     }
 
     // apply updated settings from localStorage
-    private applySettings() {
+    public applySettings() {
         this.retrieveSettings();
-        this.planningCalendar.onRefresh();
     }
 
     /**

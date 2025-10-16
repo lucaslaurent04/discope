@@ -20,11 +20,11 @@
                     <span class="material-icons">holiday_village</span>
                     <mat-form-field class="mini-select">
                         <mat-select
-                            [(value)]="selectedRentalUnitCategory"
-                            (closed)="onchangeSelectedRentalUnitCategories()"
-                            (selectionChange)="onchangeSelectedRentalUnitCategories()"
+                            [formControl]="vm.rentalUnitCategories.formControl"
+                            (closed)="oncloseRentalUnitCategoriesSelect()"
                             multiple
-                            disableRipple>
+                            disableRipple
+                        >
                             <mat-option *ngFor="let cat of rental_units_categories" [value]="cat.id">
                                 {{ cat.name }}
                             </mat-option>
