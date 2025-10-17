@@ -14,6 +14,7 @@ class Booking {
         public name: string = '',
         public date_from: Date = new Date(),
         public date_to: Date  = new Date(),
+        public date_expiry: Date  = new Date(),
         public customer_id: number = 0,
         public center_id: number = 0,
         public type_id: number = 0,
@@ -292,6 +293,8 @@ export class BookingOptionComponent implements OnInit, AfterContentInit {
     private async fetchTemplates() {
         console.log('re-fetch templates', this.center);
         try {
+            const environment:any = await this.env.getEnv();
+
             const templates = await this.api.collect("communication\\Template", [
                 ['category_id', '=', this.center.template_category_id],
                 ['type', '=', 'option'],
@@ -347,9 +350,19 @@ export class BookingOptionComponent implements OnInit, AfterContentInit {
                         value = value.replace(/{center}/gm, this.center.name);
                         value = value.replace(/{date_from}/gm, this.datepipe.transform(this.booking.date_from, 'shortDate'));
                         value = value.replace(/{date_to}/gm, this.datepipe.transform(this.booking.date_to, 'shortDate'));
-                        if(this.env.hasOwnProperty('sale.booking.option.validity')) {
-                            value = value.replace(/{validity}/gm, this.env['sale.booking.option.validity'])
+                        value = value.replace(/{date_expiry}/gm, this.datepipe.transform(this.booking.date_expiry, 'shortDate'));
+
+                        const oneDay = 1000 * 60 * 60 * 24;
+                        const diffInTime = (new Date(this.booking.date_expiry)).getTime() - (new Date()).getTime();
+                        const validity = Math.round(diffInTime / oneDay);
+
+                        if(validity > 0) {
+                            value = value.replace(/{validity}/gm, validity);
                         }
+                        else if(environment.hasOwnProperty('sale.booking.option.validity') && environment['sale.booking.option.validity']) {
+                            value = value.replace(/{validity}/gm, environment['sale.booking.option.validity']);
+                        }
+
                         this.vm.message.formControl.setValue(value);
                     }else if(part.name == 'mention') {
                         this.vm.mention.formControl.setValue(part.value);
