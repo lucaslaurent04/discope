@@ -803,28 +803,42 @@ class Identity extends Model {
      */
     public static function calcDisplayName($om, $oids, $lang) {
         $result = [];
-        $res = $om->read(self::getType(), $oids, ['type_id', 'firstname', 'lastname', 'legal_name', 'short_name']);
+
+        $person_format = Setting::get_value('identity', 'organization', 'identity.person.name_format', '%s{firstname} %s{lastname}');
+        $entity_format = Setting::get_value('identity', 'organization', 'identity.entity.name_format', '%s{short_name} %s{legal_name}');
+
+        $res = $om->read(self::getType(), $oids, ['type_id', 'firstname', 'lastname', 'legal_name', 'short_name', 'address_city']);
         foreach($res as $oid => $odata) {
-            $parts = [];
+            $name = '';
             if( isset($odata['type_id'])  ) {
+                $address_city = !empty($odata['address_city']) ? $odata['address_city'] : '';
+
                 if( $odata['type_id'] == 1  ) {
-                    if( isset($odata['firstname']) && strlen($odata['firstname']) ) {
-                        $parts[] = ucfirst($odata['firstname']);
-                    }
-                    if( isset($odata['lastname']) && strlen($odata['lastname'])) {
-                        $parts[] = mb_strtoupper($odata['lastname']);
-                    }
+                    $firstname = !empty($odata['firstname']) ? ucfirst($odata['firstname']) : '';
+                    $lastname = !empty($odata['lastname']) ? mb_strtoupper($odata['lastname']) : '';
+
+                    $name = Setting::parse_format($person_format, [
+                        'firstname'     => $firstname,
+                        'lastname'      => $lastname,
+                        'address_city'  => $address_city
+                    ]);
+
+                    $name = trim($name);
                 }
-                if( $odata['type_id'] != 1 || empty($parts) ) {
-                    if( isset($odata['short_name']) && strlen($odata['short_name'])) {
-                        $parts[] = $odata['short_name'];
-                    }
-                    else if( isset($odata['legal_name']) && strlen($odata['legal_name'])) {
-                        $parts[] = $odata['legal_name'];
-                    }
+                if( $odata['type_id'] != 1 || empty($name) ) {
+                    $short_name = !empty($odata['short_name']) ? $odata['short_name'] : '';
+                    $legal_name = !empty($odata['legal_name']) ? $odata['legal_name'] : '';
+
+                    $name = Setting::parse_format($entity_format, [
+                        'short_name'    => $short_name,
+                        'legal_name'    => $legal_name,
+                        'address_city'  => $address_city
+                    ]);
+
+                    $name = trim($name);
                 }
             }
-            $result[$oid] = implode(' ', $parts);
+            $result[$oid] = $name;
         }
         return $result;
     }
