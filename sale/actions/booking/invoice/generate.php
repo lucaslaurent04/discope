@@ -90,7 +90,9 @@ $booking = Booking::id($params['id'])
                 'free_qty',
                 'discount',
                 'price',
-                'total'
+                'total',
+                'is_supply',
+                'booking_activity_id'
             ]
         ]
     ])
@@ -228,7 +230,9 @@ foreach($booking['booking_lines_groups_ids'] as $group_id => $group) {
                     'invoice_line_group_id'     => $invoice_line_group['id'],
                     'product_id'                => $line['product_id'],
                     'description'               => $line['description'],
-                    'price_id'                  => $line['price_id']
+                    'price_id'                  => $line['price_id'],
+                    'is_supply'                 => $line['is_supply'],
+                    'booking_activity_id'       => $line['booking_activity_id']
                 ])
                 ->update([
                     'vat_rate'                  => $line['vat_rate'],

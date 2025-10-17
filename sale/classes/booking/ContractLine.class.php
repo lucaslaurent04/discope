@@ -34,6 +34,19 @@ class ContractLine extends \sale\contract\ContractLine {
                 'foreign_object'    => 'sale\catalog\Product',
                 'description'       => 'The product (SKU) the line relates to.',
                 'required'          => true
+            ],
+
+            'is_supply' => [
+                'type'              => 'boolean',
+                'description'       => "Is the contract line related to a booking line who is a supply.",
+                'default'           => false
+            ],
+
+            'booking_activity_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\booking\BookingActivity',
+                'description'       => "Main Booking Activity this line relates to, if any.",
+                'help'              => "If the line refers to a transport/supply, it means that the transport/supply is needed for a specific activity."
             ]
 
         ];

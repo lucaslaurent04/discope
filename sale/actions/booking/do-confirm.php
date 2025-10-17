@@ -110,7 +110,9 @@ $booking = Booking::id($params['id'])
                 'free_qty',
                 'discount',
                 'price',
-                'total'
+                'total',
+                'is_supply',
+                'booking_activity_id'
             ]
         ]
     ])
@@ -274,7 +276,9 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
                 'unit_price'                => $line['unit_price'],
                 'qty'                       => $line['qty'],
                 'free_qty'                  => $line['free_qty'],
-                'discount'                  => $line['discount']
+                'discount'                  => $line['discount'],
+                'is_supply'                 => $line['is_supply'],
+                'booking_activity_id'       => $line['booking_activity_id']
             ];
 
         // for pack with own price, we rely on the line created for the group, other lines don't have price
