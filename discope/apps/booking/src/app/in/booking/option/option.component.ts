@@ -347,6 +347,9 @@ export class BookingOptionComponent implements OnInit, AfterContentInit {
                         value = value.replace(/{center}/gm, this.center.name);
                         value = value.replace(/{date_from}/gm, this.datepipe.transform(this.booking.date_from, 'shortDate'));
                         value = value.replace(/{date_to}/gm, this.datepipe.transform(this.booking.date_to, 'shortDate'));
+                        if(this.env.hasOwnProperty('sale.booking.option.validity')) {
+                            value = value.replace(/{validity}/gm, this.env['sale.booking.option.validity'])
+                        }
                         this.vm.message.formControl.setValue(value);
                     }else if(part.name == 'mention') {
                         this.vm.mention.formControl.setValue(part.value);
