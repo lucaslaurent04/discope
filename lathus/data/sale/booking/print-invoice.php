@@ -159,7 +159,7 @@ $data_to_inject = [
         'date_expiry', 'date_from', 'date_to', 'time_from', 'time_to', 'price',
     ],
     'customer' => [
-        'display_name', 'address_street', 'address_zip', 'address_dispatch', 'address_city'
+        'display_name', 'short_name', 'address_street', 'address_zip', 'address_dispatch', 'address_city'
     ],
     'center' => [
         'name', 'address_street', 'address_dispatch', 'address_zip', 'address_city', 'address_country', 'email', 'phone'
@@ -194,7 +194,20 @@ $invoice['payment_reference'] = DataFormatter::format($invoice['payment_referenc
 */
 
 $booking = Booking::id($invoice['booking_id']['id'])
-    ->read($data_to_inject['booking'])
+    ->read(array_merge(
+        $data_to_inject['booking'],
+        [
+            'booking_lines_groups_ids'  => [
+                'nb_pers',
+                'group_type',
+                'age_range_assignments_ids' => [
+                    'age_range_id',
+                    'qty',
+                    'free_qty'
+                ]
+            ]
+        ]
+    ))
     ->first(true);
 
 $booking['date_from_long'] = $formatDateLong($booking['date_from']);
@@ -205,6 +218,24 @@ $booking['date_to'] = $formatDate($booking['date_to']);
 $booking['date_expiry'] = $formatDate($booking['date_expiry']);
 $booking['time_from'] = $formatTime($booking['time_from']);
 $booking['time_to'] = $formatTime($booking['time_to']);
+
+// nb_pers are used to inject in GroupingCode name
+$nb_pers = 0;
+$map_age_range_nb_pers = [];
+foreach($booking['booking_lines_groups_ids'] as $group) {
+    if($group['group_type'] !== 'sojourn') {
+        continue;
+    }
+
+    $nb_pers = $group['nb_pers'];
+    foreach($group['age_range_assignments_ids'] as $assignment) {
+        if(!isset($map_age_range_nb_pers[$assignment['age_range_id']['id']])) {
+            $map_age_range_nb_pers[$assignment['age_range_id']['id']] = 0;
+        }
+
+        $map_age_range_nb_pers[$assignment['age_range_id']['id']] += $assignment['qty'] - $assignment['free_qty'];
+    }
+}
 
 /*
       3.3) get customer data
@@ -381,17 +412,21 @@ catch(Exception $exception) {
     3.8) handle lines
 */
 
-$booking_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
+$invoice_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
     ->read([
         'product_id' => [
             'grouping_code_id' => [
                 'name',
-                'code'
+                'code',
+                'has_age_range',
+                'age_range_id'
             ],
             'product_model_id' => [
                 'grouping_code_id' => [
                     'name',
-                    'code'
+                    'code',
+                    'has_age_range',
+                    'age_range_id'
                 ]
             ]
         ]
@@ -399,7 +434,7 @@ $booking_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
     ->get();
 
 $map_products_groupings = [];
-foreach($booking_lines as $line) {
+foreach($invoice_lines as $line) {
     if(isset($map_products_groupings[$line['product_id']['id']])) {
         continue;
     }
@@ -419,7 +454,7 @@ foreach($booking_lines as $line) {
     $map_products_groupings[$line['product_id']['id']] = $grouping_code;
 }
 
-$booking_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
+$invoice_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
     ->read([
         'name',
         'description',
@@ -434,10 +469,21 @@ $booking_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
     ->get();
 
 $map_groupings_lines = [];
-foreach($booking_lines as $line) {
+foreach($invoice_lines as $line) {
     $grouping_name = $line['product_id']['label'];
     if(isset($map_products_groupings[$line['product_id']['id']])) {
+        $grouping = $map_products_groupings[$line['product_id']['id']];
+
         $grouping_name = $map_products_groupings[$line['product_id']['id']]['name'];
+
+        if(strpos($grouping_name, '{nb_pers}') !== false) {
+            if($grouping['has_age_range'] && isset($map_age_range_nb_pers[$grouping['age_range_id']])) {
+                $grouping_name = str_replace('{nb_pers}', $map_age_range_nb_pers[$grouping['age_range_id']], $grouping_name);
+            }
+            else {
+                $grouping_name = str_replace('{nb_pers}', $nb_pers, $grouping_name);
+            }
+        }
     }
     elseif(!empty($line['description'])) {
         $grouping_name = $line['description'];

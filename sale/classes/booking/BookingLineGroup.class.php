@@ -3584,7 +3584,7 @@ class BookingLineGroup extends Model {
                 // no product found: issue a warning and skip
                 if(!$product_id) {
                     trigger_error("ORM::no match for age range {$age_range_id} and no 'all ages' product found for model {$pack_line['child_product_model_id']}", QN_REPORT_WARNING);
-                    continue 2;
+                    continue;
                 }
 
                 // create a booking line with found product

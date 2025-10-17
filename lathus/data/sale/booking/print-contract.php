@@ -164,7 +164,20 @@ $contract = Contract::id($contract['id'])
 */
 
 $booking = Booking::id($contract['booking_id']['id'])
-    ->read($data_to_inject['booking'])
+    ->read(array_merge(
+        $data_to_inject['booking'],
+        [
+            'booking_lines_groups_ids'  => [
+                'nb_pers',
+                'group_type',
+                'age_range_assignments_ids' => [
+                    'age_range_id',
+                    'qty',
+                    'free_qty'
+                ]
+            ]
+        ]
+    ))
     ->first(true);
 
 $booking['date_from_long'] = $formatDateLong($booking['date_from']);
@@ -174,6 +187,24 @@ $booking['date_from'] = $formatDate($booking['date_from']);
 $booking['date_to'] = $formatDate($booking['date_to']);
 $booking['time_from'] = $formatTime($booking['time_from']);
 $booking['time_to'] = $formatTime($booking['time_to']);
+
+// nb_pers are used to inject in GroupingCode name
+$nb_pers = 0;
+$map_age_range_nb_pers = [];
+foreach($booking['booking_lines_groups_ids'] as $group) {
+    if($group['group_type'] !== 'sojourn') {
+        continue;
+    }
+
+    $nb_pers = $group['nb_pers'];
+    foreach($group['age_range_assignments_ids'] as $assignment) {
+        if(!isset($map_age_range_nb_pers[$assignment['age_range_id']['id']])) {
+            $map_age_range_nb_pers[$assignment['age_range_id']['id']] = 0;
+        }
+
+        $map_age_range_nb_pers[$assignment['age_range_id']['id']] += $assignment['qty'] - $assignment['free_qty'];
+    }
+}
 
 /*
       3.3) get customer data
@@ -431,12 +462,16 @@ $contract_lines = ContractLine::search(['contract_id', '=', $contract['id']])
         'product_id' => [
             'grouping_code_id' => [
                 'name',
-                'code'
+                'code',
+                'has_age_range',
+                'age_range_id'
             ],
             'product_model_id' => [
                 'grouping_code_id' => [
                     'name',
-                    'code'
+                    'code',
+                    'has_age_range',
+                    'age_range_id'
                 ]
             ]
         ]
@@ -482,7 +517,18 @@ $map_groupings_lines = [];
 foreach($contract_lines as $line) {
     $grouping_name = $line['product_id']['label'];
     if(isset($map_products_groupings[$line['product_id']['id']])) {
+        $grouping = $map_products_groupings[$line['product_id']['id']];
+
         $grouping_name = $map_products_groupings[$line['product_id']['id']]['name'];
+
+        if(strpos($grouping_name, '{nb_pers}') !== false) {
+            if($grouping['has_age_range'] && isset($map_age_range_nb_pers[$grouping['age_range_id']])) {
+                $grouping_name = str_replace('{nb_pers}', $map_age_range_nb_pers[$grouping['age_range_id']], $grouping_name);
+            }
+            else {
+                $grouping_name = str_replace('{nb_pers}', $nb_pers, $grouping_name);
+            }
+        }
     }
     elseif(!empty($line['description'])) {
         $grouping_name = $line['description'];
