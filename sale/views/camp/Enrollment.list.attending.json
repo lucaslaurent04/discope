@@ -62,6 +62,14 @@
             },
             {
                 "type": "field",
+                "value": "following_camp",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
                 "value": "has_camp_birthday",
                 "width": "20%",
                 "sortable": false,

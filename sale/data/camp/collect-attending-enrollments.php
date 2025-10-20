@@ -93,6 +93,7 @@ $camps = Camp::search(
             'is_foster',
             'status',
             'weekend_extra',
+            'following_camp',
             'is_ase',
             'child_remarks',
             'main_guardian_mobile',

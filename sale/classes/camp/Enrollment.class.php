@@ -242,6 +242,14 @@ class Enrollment extends Model {
                 'visible'           => ['is_clsh', '=', false]
             ],
 
+            'following_camp' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "The name of the camp the child is enrolled to the following week if he/she stays the full weekend.",
+                'store'             => false,
+                'function'          => 'calcFollowingCamp'
+            ],
+
             'is_clsh' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
@@ -707,6 +715,28 @@ class Enrollment extends Model {
             $date_from = (new \DateTime())->setTimestamp($enrollment['date_from']);
             $birthdate = (new \DateTime())->setTimestamp($enrollment['child_id']['birthdate']);
             $result[$id] = $birthdate->diff($date_from)->y;
+        }
+
+        return $result;
+    }
+
+    public static function calcFollowingCamp($self): array {
+        $result = [];
+        $self->read(['weekend_extra', 'child_id', 'camp_id' => ['date_from']]);
+        foreach($self as $id => $enrollment) {
+            if($enrollment['weekend_extra'] === 'full') {
+                $following_enrollment = Enrollment::search([
+                    ['child_id', '=', $enrollment['child_id']],
+                    ['is_clsh', '=', false],
+                    ['date_from', '=', $enrollment['camp_id']['date_from'] + (84600 * 8)],
+                ])
+                    ->read(['camp_id' => ['name']])
+                    ->first(true);
+
+                if(!is_null($following_enrollment)) {
+                    $result[$id] = $following_enrollment['camp_id']['name'];
+                }
+            }
         }
 
         return $result;

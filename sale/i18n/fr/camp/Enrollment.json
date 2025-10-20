@@ -92,6 +92,11 @@
             "description": "L'enfant reste tout le week-end ou une partie du week-end.",
             "help": ""
         },
+        "following_camp": {
+            "label": "Camp suivant",
+            "description": "Camp de la semaine suivante.",
+            "help": "Uniquement si l'enfant reste le weekend complet."
+        },
         "is_clsh": {
             "label": "CLSH",
             "description": "Centre loisir sans hébergement.",
