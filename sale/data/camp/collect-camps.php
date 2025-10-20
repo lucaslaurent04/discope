@@ -82,9 +82,20 @@ use equal\orm\DomainCondition;
         ],
         'max_age' => [
             'type'              => 'integer',
-            'description'       => "Max age of the children",
+            'description'       => "Max age of the children.",
             'default'           => 18
         ],
+        'age_range' => [
+            'type'              => 'string',
+            'selection'         => [
+                'all',
+                '6-to-9',
+                '10-to-12',
+                '13-to-16'
+            ],
+            'description'       => "Age range of the camp.",
+            'default'           => 'all'
+        ]
     ],
     'access'        => [
         'visibility'    => 'protected',
@@ -170,6 +181,12 @@ if(isset($params['min_age']) && $params['min_age'] >= 0) {
 if(isset($params['max_age']) && $params['max_age'] >= 0) {
     $domain->addCondition(
         new DomainCondition('max_age', '<=', $params['max_age'])
+    );
+}
+
+if($params['age_range'] !== 'all') {
+    $domain->addCondition(
+        new DomainCondition('age_range', '=', $params['age_range'])
     );
 }
 
