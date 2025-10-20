@@ -4,7 +4,7 @@ import { ChangeReservationArg } from 'src/app/model/changereservationarg';
 import { HeaderDays } from 'src/app/model/headerdays';
 
 
-import { ApiService } from 'sb-shared-lib';
+import { ApiService, AuthService, EnvService } from 'sb-shared-lib';
 import { CalendarParamService } from '../../_services/calendar.param.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -101,6 +101,8 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
         }
     };
 
+    public user: any = null;
+
     public mapStats: any = {
         'occupied': {},
         'capacity': {},
@@ -122,13 +124,17 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
     private today: Date;
     private today_index: string;
 
+    private environment: any;
+
     constructor(
         private params: CalendarParamService,
         private api: ApiService,
         private dialog: MatDialog,
         private snack: MatSnackBar,
         private elementRef: ElementRef,
-        private cd: ChangeDetectorRef
+        private cd: ChangeDetectorRef,
+        private auth: AuthService,
+        private env: EnvService
     ) {
         this.headers = {};
         this.rental_units = [];
@@ -162,6 +168,10 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
             this.onRefresh();
         });
 
+        this.auth.getObservable().subscribe(async (user: any) => {
+            this.user = user;
+        });
+
         this.elementRef.nativeElement.style.setProperty('--rows_height', this.rowsHeight + 'px');
 
         this.rental_units_categories = await this.api.collect('realestate\\RentalUnitCategory', [], ['name', 'code'], 'name', 'asc', 0, 100);
@@ -170,6 +180,8 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
         if(rentalUnitCategories) {
             this.vm.rentalUnitCategories.formControl.setValue(JSON.parse(rentalUnitCategories));
         }
+
+        this.environment = await this.env.getEnv();
     }
 
     async ngAfterViewInit() {
@@ -604,7 +616,17 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
 
     public onSelectedRentalUnit(rental_unit: any) {
         clearTimeout(this.mousedownTimeout);
-        this.showRentalUnit.emit(rental_unit);
+
+        const settingName = `sale.organization.planning.ul_details_dialog.${this.user.center_office.id}`;
+
+        const showRentalUnitDetails = !this.environment.hasOwnProperty(settingName) || this.environment[settingName];
+
+        if(showRentalUnitDetails) {
+            this.showRentalUnit.emit(rental_unit);
+        }
+        else {
+            console.log('Setting sale.organization.planning.ul_details_dialog false');
+        }
     }
 
     public onhoverDay(rental_unit: any, day:Date) {
