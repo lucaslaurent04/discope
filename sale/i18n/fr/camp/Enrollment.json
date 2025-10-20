@@ -42,6 +42,16 @@
             "description": "Est-ce que l'enfant fête son anniversaire durant le camp?",
             "help": ""
         },
+        "camp_age_range": {
+            "label": "Tranche d'âge camp",
+            "description": "Tranche d'âge du camp auquel l'enfant participe.",
+            "help": "",
+            "selection": {
+                "6-to-9": "6 à 9 ans",
+                "10-to-12": "10 à 12 ans",
+                "13-to-16": "13 à 16 ans"
+            }
+        },
         "child_remarks": {
             "label": "Remarques",
             "description": "Remarques à propos de l'enfant, de sa santé au moment de l'inscription, ...",
@@ -264,6 +274,16 @@
             "label": "Responsable",
             "description": "Le tuteur principal responsable de l'enfant.",
             "help": "Utilisé pour savoir quelle adresse utiliser pour la facturation."
+        },
+        "main_guardian_mobile": {
+            "label": "Mobile tuteur",
+            "description": "Numéro de téléphone mobile du tuteur.",
+            "help": ""
+        },
+        "main_guardian_phone": {
+            "label": "Téléphone tuteur",
+            "description": "Numéro de téléphone du tuteur.",
+            "help": ""
         },
         "is_foster": {
             "label": "Famille d'accueil",

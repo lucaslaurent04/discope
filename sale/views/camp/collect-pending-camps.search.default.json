@@ -17,6 +17,17 @@
                                                 "label": "From",
                                                 "value": "date_from",
                                                 "width": "15%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Age range",
+                                                "value": "age_range",
+                                                "width": "15%"
                                             }
                                         ]
                                     }

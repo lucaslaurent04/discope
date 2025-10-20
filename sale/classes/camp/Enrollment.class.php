@@ -117,6 +117,24 @@ class Enrollment extends Model {
                 'relation'          => ['child_id' => ['main_guardian_id']]
             ],
 
+            'main_guardian_mobile' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'usage'             => 'phone',
+                'description'       => "Mobile phone number of the main guardian of the child.",
+                'store'             => false,
+                'relation'          => ['main_guardian_id' => ['mobile']]
+            ],
+
+            'main_guardian_phone' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'usage'             => 'phone',
+                'description'       => "Phone number of the main guardian of the child.",
+                'store'             => false,
+                'relation'          => ['main_guardian_id' => ['phone']]
+            ],
+
             'is_foster' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
@@ -152,6 +170,18 @@ class Enrollment extends Model {
                 'required'          => true,
                 'onupdate'          => 'onupdateCampId',
                 'dependents'        => ['date_from', 'date_to', 'is_clsh', 'clsh_type', 'child_age']
+            ],
+
+            'camp_age_range' => [
+                'type'              => 'computed',
+                'selection'         => [
+                    '6-to-9',
+                    '10-to-12',
+                    '13-to-16'
+                ],
+                'description'       => "Age range of the camp.",
+                'store'             => false,
+                'relation'          => ['camp_id' => 'age_range']
             ],
 
             'date_from' => [

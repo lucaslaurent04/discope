@@ -18,10 +18,16 @@ use sale\camp\Camp;
             'default'           => fn() => strtotime('last Sunday')
         ],
 
-        'date_to' => [
-            'type'              => 'date',
-            'description'       => "Date interval upper limit (defaults to last day of the current week).",
-            'default'           => fn() => strtotime('Saturday this week')
+        'camp_age_range' => [
+            'type'              => 'string',
+            'description'       => "Age range of the camp the enrollment relates to.",
+            'selection'         => [
+                'all',
+                '6-to-9',
+                '10-to-12',
+                '13-to-16'
+            ],
+            'default'           => 'all'
         ],
 
         'only_weekend' => [
@@ -60,10 +66,18 @@ use sale\camp\Camp;
  */
 ['context' => $context] = $providers;
 
+$day_of_week = date('w', $params['date_from']);
+
+// find previous Sunday
+$sunday = $params['date_from'] - ($day_of_week * 86400);
+
+// next Friday (+5 days)
+$friday = $sunday + (5 * 86400);
+
 $camps = Camp::search(
     [
-        ['date_from', '>=', $params['date_from']],
-        ['date_from', '<=', $params['date_to']]
+        ['date_from', '>=', $sunday],
+        ['date_from', '<=', $friday]
     ]
 )
     ->read([
@@ -75,11 +89,14 @@ $camps = Camp::search(
             'child_lastname',
             'child_gender',
             'child_birthdate',
+            'camp_age_range',
             'is_foster',
             'status',
             'weekend_extra',
             'is_ase',
             'child_remarks',
+            'main_guardian_mobile',
+            'main_guardian_phone',
             'camp_id'           => ['name'],
             'main_guardian_id'  => ['name'],
             'institution_id'    => ['name']
@@ -98,6 +115,13 @@ foreach($camps as $camp) {
 
         $result[] = $enrollment;
     }
+}
+
+if($params['camp_age_range'] !== 'all') {
+    $result = array_filter(
+        $result,
+        fn($item) => $item['camp_age_range'] === $params['camp_age_range']
+    );
 }
 
 if($params['only_saturday']) {

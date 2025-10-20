@@ -29,13 +29,13 @@
                                                 "width": "15%"
                                             },
                                             {
-                                                "type": "field",
-                                                "value": "date_to",
+                                                "type": "label",
+                                                "value": "",
                                                 "width": "15%"
                                             },
                                             {
-                                                "type": "label",
-                                                "value": "",
+                                                "type": "field",
+                                                "value": "camp_age_range",
                                                 "width": "15%"
                                             },
                                             {

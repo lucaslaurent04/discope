@@ -55,6 +55,13 @@
             },
             {
                 "type": "field",
+                "value": "camp_age_range",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
                 "value": "has_camp_birthday",
                 "width": "20%",
                 "sortable": false,
@@ -101,6 +108,22 @@
             {
                 "type": "field",
                 "value": "is_ase",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "main_guardian_mobile",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "main_guardian_phone",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true,
