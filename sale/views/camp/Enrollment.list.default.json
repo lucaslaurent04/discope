@@ -17,7 +17,7 @@
                 "type": "field",
                 "value": "child_id",
                 "width": "20%",
-                "sortable": false,
+                "sortable": true,
                 "readonly": true
             },
             {
@@ -62,6 +62,13 @@
                 "sortable": false,
                 "readonly": true,
                 "visible": false
+            },
+            {
+                "type": "field",
+                "value": "all_documents_received",
+                "width": "33%",
+                "sortable": false,
+                "readonly": true
             },
             {
                 "type": "field",

@@ -17,6 +17,7 @@
                 "all": "Tous",
                 "pending": "En cours",
                 "waitlisted": "En attente",
+                "confirmed": "Confirmée",
                 "validated": "Validée",
                 "cancelled": "Annulée"
             },
