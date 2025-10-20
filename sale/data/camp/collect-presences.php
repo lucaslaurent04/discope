@@ -9,6 +9,7 @@
 use equal\orm\Domain;
 use equal\orm\DomainClause;
 use equal\orm\DomainCondition;
+use sale\camp\Camp;
 
 [$params, $providers] = eQual::announce([
     'extends'       => 'core_model_collect',
@@ -45,7 +46,19 @@ use equal\orm\DomainCondition;
         'pm_daycare' => [
             'type'              => 'boolean',
             'description'       => "Show only PM day cares presences."
-        ]
+        ],
+        'sojourn_type' => [
+            'type'              => 'string',
+            'selection'         => [
+                'all',
+                'camp',
+                'clsh',
+                'clsh-4-days',
+                'clsh-5-days',
+            ],
+            'description'       => "The camp sojourn type that was used with the enrollment.",
+            'default'           => 'all'
+        ],
     ],
     'access'        => [
         'visibility'    => 'protected',
@@ -106,6 +119,26 @@ if(isset($params['date_from'])) {
 if(isset($params['date_to'])) {
     $domain->addCondition(
         new DomainCondition('presence_date', '<=', $params['date_to'])
+    );
+}
+
+if($params['sojourn_type'] !== 'all') {
+    $camp_domain = [];
+    if(strpos($params['sojourn_type'], 'clsh') !== false) {
+        $camp_domain[] = ['is_clsh', '=', true];
+        if(in_array($params['sojourn_type'], ['clsh-4-days', 'clsh-5-days'])) {
+            $clsh_type = $params['sojourn_type'] === 'clsh-4-days' ? '4-days' : '5-days';
+            $camp_domain[] = ['clsh_type', '=', $clsh_type];
+        }
+    }
+    else {
+        $camp_domain = ['is_clsh', '=', false];
+    }
+
+    $camps_ids = Camp::search($camp_domain)->ids();
+
+    $domain->addCondition(
+        new DomainCondition('camp_id', 'in', $camps_ids)
     );
 }
 

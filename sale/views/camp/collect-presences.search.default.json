@@ -62,6 +62,12 @@
                                                 "label": "Camp",
                                                 "value": "camp_id",
                                                 "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Sojourn type",
+                                                "value": "sojourn_type",
+                                                "width": "25%"
                                             }
                                         ]
                                     }

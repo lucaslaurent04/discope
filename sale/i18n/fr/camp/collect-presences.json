@@ -26,6 +26,17 @@
         "camp_id": {
             "label": "Camp",
             "description": ""
+        },
+        "sojourn_type": {
+            "label": "Type séjour",
+            "description": "",
+            "selection": {
+                "all": "Tous",
+                "camp": "Camp",
+                "clsh": "Camp CLSH",
+                "clsh-4-days": "Camp CLSH 4 jours",
+                "clsh-5-days": "Camp CLSH 5 jours"
+            }
         }
     },
     "view": {
