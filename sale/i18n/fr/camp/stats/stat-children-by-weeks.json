@@ -30,8 +30,28 @@
             "description": "",
             "help": ""
         },
+        "qty_week_male": {
+            "label": "Qté garçons semaine",
+            "description": "",
+            "help": ""
+        },
+        "qty_week_female": {
+            "label": "Qté filles semaine",
+            "description": "",
+            "help": ""
+        },
         "qty_weekend": {
             "label": "Qté week-end",
+            "description": "",
+            "help": ""
+        },
+        "qty_weekend_male": {
+            "label": "Qté garçons week-end",
+            "description": "",
+            "help": ""
+        },
+        "qty_weekend_female": {
+            "label": "Qté filles week-end",
             "description": "",
             "help": ""
         }

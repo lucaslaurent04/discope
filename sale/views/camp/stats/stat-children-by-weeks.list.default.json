@@ -40,8 +40,32 @@
             },
             {
                 "type": "field",
+                "value": "qty_week_male",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "qty_week_female",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
                 "value": "qty_week",
                 "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty_weekend_male",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "qty_weekend_female",
+                "width": "10%",
+                "visible": false
             },
             {
                 "type": "field",

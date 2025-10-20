@@ -45,9 +45,25 @@ use sale\camp\Sponsor;
             'type'              => 'date',
             'description'       => "Week of the year, first day of the week."
         ],
+        'qty_week_male' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of male children during week."
+        ],
+        'qty_week_female' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of female children during week."
+        ],
         'qty_week' => [
             'type'              => 'integer',
             'description'       => "Quantity of children during week."
+        ],
+        'qty_weekend_male' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of male children during weekend."
+        ],
+        'qty_weekend_female' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of female children during weekend."
         ],
         'qty_weekend' => [
             'type'              => 'integer',
@@ -105,7 +121,8 @@ $camps = Camp::search($domain)
         'date_from',
         'enrollments_ids' => [
             'status',
-            'weekend_extra'
+            'weekend_extra',
+            'child_id'      => ['gender']
         ]
     ])
     ->get(true);
@@ -136,13 +153,19 @@ foreach($camps as $camp) {
         if(!isset($map_center_weeks_children_qty[$camp['center_id']][$week])) {
             $map_center_weeks_children_qty[$camp['center_id']][$week] = [
                 'week'      => 0,
-                'weekend'   => 0
+                'week_M'    => 0,
+                'week_F'    => 0,
+                'weekend'   => 0,
+                'weekend_M' => 0,
+                'weekend_F' => 0
             ];
         }
 
         $map_center_weeks_children_qty[$camp['center_id']][$week]['week']++;
+        $map_center_weeks_children_qty[$camp['center_id']][$week]['week_'.$enrollment['child_id']['gender']]++;
         if($enrollment['weekend_extra'] === 'full') {
             $map_center_weeks_children_qty[$camp['center_id']][$week]['weekend']++;
+            $map_center_weeks_children_qty[$camp['center_id']][$week]['weekend_'.$enrollment['child_id']['gender']]++;
         }
     }
 }
@@ -164,10 +187,14 @@ foreach($map_center_weeks_children_qty as $center_id => $map_weeks_children_qty)
 
     foreach($map_weeks_children_qty as $week => $map_children_qty) {
         $result[] = [
-            'center'        => $center,
-            'week'          => $json_adapter->adaptOut(DateTime::createFromFormat('Y-m-d', $week)->getTimestamp(), 'date'),
-            'qty_week'      => $map_children_qty['week'],
-            'qty_weekend'   => $map_children_qty['weekend']
+            'center'                => $center,
+            'week'                  => $json_adapter->adaptOut(DateTime::createFromFormat('Y-m-d', $week)->getTimestamp(), 'date'),
+            'qty_week'              => $map_children_qty['week'],
+            'qty_week_male'         => $map_children_qty['week_M'],
+            'qty_week_female'       => $map_children_qty['week_F'],
+            'qty_weekend'           => $map_children_qty['weekend'],
+            'qty_weekend_male'      => $map_children_qty['weekend_M'],
+            'qty_weekend_female'    => $map_children_qty['weekend_F']
         ];
     }
 }
