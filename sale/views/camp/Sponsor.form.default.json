@@ -10,10 +10,21 @@
     },
     "actions": [
         {
-            "id": "action.invoice",
+            "id": "action.print-invoice",
             "label": "Invoice",
-            "controller": "sale_camp_sponsor_invoice",
+            "controller": "sale_camp_print-sponsor-invoice",
             "visible": ["camp.default.administrator", "in", "user.groups"]
+        }
+    ],
+    "routes": [
+        {
+            "id": "route.print-year-invoice",
+            "label": "Year invoice",
+            "description": "",
+            "icon": "receipt",
+            "route": "/?get=sale_camp_print-sponsor-invoice&id=object.id",
+            "target": "_blank",
+            "absolute": true
         }
     ],
     "layout": {

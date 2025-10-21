@@ -59,8 +59,13 @@
             "name": "Aide",
             "description": "",
             "actions": {
-                "action.invoice": {
+                "action.print-invoice": {
                     "label": "Facturer"
+                }
+            },
+            "routes": {
+                "route.print-year-invoice": {
+                    "label": "Facture de l'année"
                 }
             },
             "layout": {

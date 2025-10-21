@@ -6,10 +6,6 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use sale\camp\Camp;
-use sale\camp\price\PriceAdapter;
-use sale\camp\Sponsor;
-
 [$params, $providers] = eQual::announce([
     'description'   => "Invoice the given price adapters between two dates to a sponsor.",
     'params'        => [
@@ -24,18 +20,14 @@ use sale\camp\Sponsor;
             'type'              => 'date',
             'description'       => "Use price adapters of enrollments to camps after this date.",
             'required'          => true,
-            'default'           => function() {
-                return strtotime('first day of january this year');
-            }
+            'default'           => fn() => strtotime('first day of january this year')
         ],
 
         'date_to' => [
             'type'              => 'date',
             'description'       => "Use price adapters of enrollments to camps before this date.",
             'required'          => true,
-            'default'           => function() {
-                return strtotime('last day of december this year');
-            }
+            'default'           => fn() => strtotime('last day of december this year')
         ]
 
     ],
@@ -55,40 +47,11 @@ use sale\camp\Sponsor;
  */
 ['context' => $context] = $providers;
 
-$sponsor = Sponsor::id($params['id'])
-    ->read(['id'])
-    ->first();
-
-if(is_null($sponsor)) {
-    throw new Exception("unknown_object", EQ_ERROR_UNKNOWN_OBJECT);
-}
-
-$camps = Camp::search([
-    ['date_from', '>=', $params['date_from']],
-    ['date_to', '<=', $params['date_to']]
-])
-    ->read(['enrollments_ids'])
-    ->get();
-
-$enrollments_ids = [];
-foreach($camps as $camp) {
-    $enrollments_ids = array_merge(
-        $enrollments_ids,
-        $camp['enrollments_ids']
-    );
-}
-
-if(empty($enrollments_ids)) {
-    throw new Exception("no_enrollments_for_dates", EQ_ERROR_INVALID_PARAM);
-}
-
-$price_adapters_ids = PriceAdapter::search([
-    ['enrollment_id', 'in', $enrollments_ids],
-    ['sponsor_id', '=', $sponsor['id']]
-])
-    ->ids();
-
-$output = eQual::run('do', 'sale_camp_sponsor_generate-invoice-pdf', ['ids' => $price_adapters_ids]);
+$output = eQual::run('get', 'sale_camp_print-sponsor-invoice', [
+    'id'        => $params['id'],
+    'date_from' => $params['date_from'],
+    'date_to'   => $params['date_to']
+]);
 
 $context->httpResponse()
         ->header('Content-Disposition', 'inline; filename="document.pdf"')
