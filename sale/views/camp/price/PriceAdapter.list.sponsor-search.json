@@ -28,6 +28,14 @@
         }
     },
     "group_by": [{"field": "sponsor_id", "operation": ["SUM", "object.value"]}],
+    "actions": [
+        {
+            "id": "action.print-list",
+            "label": "Imprimer aides communes",
+            "controller": "sale_camp_price_print-price-adapters",
+            "visible": ["camp.default.administrator", "in", "user.groups"]
+        }
+    ],
     "layout": {
         "items": [
             {

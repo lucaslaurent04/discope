@@ -9,9 +9,7 @@
 use core\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
-use equal\data\DataFormatter;
-use identity\Center;
-use sale\camp\Sponsor;
+use sale\camp\price\PriceAdapter;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
@@ -19,19 +17,13 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\TwigFilter;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Print the invoice of a specific sponsor.",
+    'description'   => "Print list of price adapters.",
     'params'        => [
-
-        'id' => [
-            'type'              => 'integer',
-            'description'       => "Id of the sponsor to invoice.",
-            'required'          => true
-        ],
 
         'view_id' =>  [
             'description'       => 'The identifier of the view <type.name>.',
             'type'              => 'string',
-            'default'           => 'print.invoice'
+            'default'           => 'print.list'
         ],
 
         'date_from' => [
@@ -44,13 +36,6 @@ use Twig\TwigFilter;
             'type'              => 'date',
             'description'       => "Date interval upper limit.",
             'default'           => fn() => strtotime('last day of december this year')
-        ],
-
-        'center_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'identity\Center',
-            'description'       => "The center for which we want to invoice the sponsors helps.",
-            'default'           => 1
         ]
 
     ],
@@ -80,13 +65,6 @@ $formatMoney = function($value) use($currency) {
     return number_format((float) $value, 2, ',', '.').' '.$currency;
 };
 
-$map_days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-$map_months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-
-$formatDateLong = function($value) use($map_days, $map_months) {
-    return $map_days[date('w', $value)].' '.date('j', $value).' '.$map_months[date('n', $value) - 1].' '.date('Y', $value);
-};
-
 /**
  * Action
  */
@@ -95,7 +73,7 @@ $formatDateLong = function($value) use($map_days, $map_months) {
     Retrieve the requested template
 */
 
-$entity = 'sale\camp\Sponsor';
+$entity = 'sale\camp\price\PriceAdapter';
 $parts = explode('\\', $entity);
 $package = array_shift($parts);
 $class_path = implode('/', $parts);
@@ -111,80 +89,32 @@ if(!file_exists($file)) {
     Prepare values for template
 */
 
-$sponsor = Sponsor::id($params['id'])
+$price_adapters = PriceAdapter::search([
+    ['sponsor_id', '<>', null],
+    ['origin_type', 'in', ['commune', 'community-of-communes']]
+])
     ->read([
-        'complete_name',
-        'address_street',
-        'address_dispatch',
-        'address_zip',
-        'address_city',
-        'price_adapters_ids' => [
-            'value',
-            'enrollment_id' => [
-                'center_id',
-                'date_from'
+        'value',
+        'sponsor_id' => [
+            'complete_name'
+        ],
+        'enrollment_id' => [
+            'price',
+            'child_id' => [
+                'firstname',
+                'lastname'
+            ],
+            'camp_id' => [
+                'sojourn_code',
+                'accounting_code'
             ]
         ]
     ])
-    ->first(true);
+    ->get(true);
 
-if(is_null($sponsor)) {
-    throw new Exception("unknown_sponsor", EQ_ERROR_UNKNOWN_OBJECT);
-}
+usort($price_adapters, fn($a, $b) => $a['sponsor_id']['complete_name'] <=> $b['sponsor_id']['complete_name']);
 
-$center = Center::id($params['center_id'])
-    ->read([
-        'organisation_id' => [
-            'bank_account_iban',
-            'bank_account_bic',
-            'logo_document_id' => [
-                'type',
-                'data'
-            ]
-        ]])
-    ->first();
-
-if(is_null($center)) {
-    throw new Exception("unknown_center", EQ_ERROR_UNKNOWN_OBJECT);
-}
-
-$center['organisation_id']['bank_account_iban'] = DataFormatter::format($center['organisation_id']['bank_account_iban'], 'iban');
-$center['organisation_id']['bank_account_bic'] = DataFormatter::format($center['organisation_id']['bank_account_bic'], 'bic');
-
-$img_url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=';
-
-$logo_document_data = $center['organisation_id']['logo_document_id']['data'] ?? null;
-if($logo_document_data) {
-    $content_type = $center['organisation_id']['logo_document_id']['type'] ?? 'image/png';
-    $img_url = "data:{$content_type};base64, ".base64_encode($logo_document_data);
-}
-
-$total = 0;
-
-$map_amount_price_adapters = [];
-foreach($sponsor['price_adapters_ids'] as $price_adapter) {
-    if(
-        $price_adapter['enrollment_id']['center_id'] !== $center['id']
-        || $price_adapter['enrollment_id']['date_from'] < $params['date_from']
-        || $price_adapter['enrollment_id']['date_from'] > $params['date_to']
-    ) {
-        continue;
-    }
-
-    if(!isset($map_amount_price_adapters[$price_adapter['value']])) {
-        $map_amount_price_adapters[$price_adapter['value']] = [
-            'qty'   => 0,
-            'total' => 0
-        ];
-    }
-    $map_amount_price_adapters[$price_adapter['value']]['qty']++;
-    $map_amount_price_adapters[$price_adapter['value']]['total'] += $price_adapter['value'];
-    $total += $price_adapter['value'];
-}
-
-$today = time();
-
-$values = compact('sponsor', 'center', 'img_url', 'map_amount_price_adapters', 'total', 'today');
+$values = compact('price_adapters');
 
 /*
     Inject all values into the template
@@ -197,9 +127,6 @@ try {
     /**  @var ExtensionInterface **/
     $extension  = new IntlExtension();
     $twig->addExtension($extension);
-
-    $date_long_filter = new TwigFilter('format_date_long', $formatDateLong);
-    $twig->addFilter($date_long_filter);
 
     $format_money_filter = new TwigFilter('format_money', $formatMoney);
     $twig->addFilter($format_money_filter);
