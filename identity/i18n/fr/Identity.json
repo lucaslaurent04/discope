@@ -271,7 +271,7 @@
             "help": ""
         },
         "accounting_account": {
-            "label": "Compte Comptable",
+            "label": "Code Comptable",
             "description": "Code unique identifiant le compte comptable associé.",
             "help": ""
         }

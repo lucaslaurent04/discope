@@ -159,7 +159,7 @@ $data_to_inject = [
         'date_expiry', 'date_from', 'date_to', 'time_from', 'time_to', 'price',
     ],
     'customer' => [
-        'display_name', 'short_name', 'address_street', 'address_zip', 'address_dispatch', 'address_city'
+        'display_name', 'short_name', 'address_street', 'address_zip', 'address_dispatch', 'address_city', 'accounting_account'
     ],
     'center' => [
         'name', 'address_street', 'address_dispatch', 'address_zip', 'address_city', 'address_country', 'email', 'phone'
