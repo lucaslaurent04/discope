@@ -320,6 +320,10 @@
                 "action.apply_loyalty_points": {
                     "label": "Appliquer points fidélité",
                     "description": "Appliquer points fidélité à la réservation."
+                },
+                "action.unarchive": {
+                    "label": "Désarchiver",
+                    "description": "Désarchiver la réservation."
                 }
             },
             "routes": {

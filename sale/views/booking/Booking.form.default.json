@@ -209,6 +209,13 @@
             "description": "Apply loyalty points on booking.",
             "controller": "sale_booking_apply-loyalty-points",
             "visible": [true, "=", "env.sale.features.booking.loyalty_points"]
+        },
+        {
+            "id": "action.unarchive",
+            "label": "Unarchive",
+            "description": "Unarchive the booking.",
+            "controller": "sale_booking_do-unarchive",
+            "visible": ["state", "=", "archive"]
         }
     ],
     "routes": [

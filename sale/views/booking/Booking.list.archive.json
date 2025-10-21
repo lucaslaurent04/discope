@@ -18,6 +18,17 @@
                 {
                     "id": "ACTION.CLONE",
                     "visible": false
+                },
+                {
+                    "id": "ACTION.ARCHIVE",
+                    "visible": false
+                },
+                {
+                    "id": "unarchive_bulk",
+                    "label": "Désarchiver",
+                    "icon": "archive",
+                    "controller": "sale_booking_bulk-unarchive",
+                    "confirm": true
                 }
             ]
         },
