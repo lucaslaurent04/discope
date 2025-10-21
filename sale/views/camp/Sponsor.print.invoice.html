@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+    <title>Facture</title>
+
+    <style type="text/css">
+        @page {
+            margin: 1cm;
+        }
+
+        body {
+            width: 100%;
+            margin: 0;
+            margin-top: 155px;
+            margin-bottom: 35px;
+            padding: 0;
+            text-align: justify;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 0.9em;
+        }
+
+        div, table, table tr td {
+            font-family: Helvetica, Arial, sans-serif;
+        }
+
+        div.header,
+        div.footer {
+            box-sizing: border-box;
+            border: 0;
+            margin: 0;
+            padding: 0;
+            position: fixed;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        div.header {
+            top: 0;
+            left: 0;
+            height: 150px;
+        }
+
+        div.footer {
+            bottom: 0;
+            left: 0;
+            height: 30px;
+            overflow: visible;
+            z-index: 200;
+            font-size: 0.7em !important;
+        }
+
+        .table-invoice {
+            width: 100%;
+            margin-top: 40px;
+            border-collapse: collapse;
+            border-top: solid 1px black;
+            border-right: solid 1px black;
+        }
+
+        .table-invoice th,
+        .table-invoice td {
+            padding: 5px 15px;
+            border: solid 1px black;
+        }
+
+        .table-invoice .no-border-top-bottom {
+            border-top: none;
+            border-bottom: none;
+        }
+
+        .table-invoice .no-border-top-bottom td {
+            border-top: none;
+            border-bottom: none;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <img src="{{ img_url }}" style="position: absolute; max-width: 100px; width: 100%; left: 50px; height: auto;" border="0" alt="Header Image" />
+</div>
+
+<div class="footer">
+    <table width="100%">
+        <tr>
+            <td>
+                <div style="font-weight: bold;">CPA Lathus - Accueil Collectif de Mineurs</div>
+                <div>La Voulzie - CS 40005 - 86390 LATHUS-SAINT-RÉMY</div>
+                <div>Tél: 05.49.91.72.60 - Email : camps@cpa-lathus.asso.fr</div>
+                <div style="font-weight: bold;">www.cpa-lathus.asso.fr</div>
+            </td>
+            <td style="text-align: right; vertical-align: top;">
+                <div>Association Loi 1901 APE 9312 Z</div>
+                <div>SIRET : 331 320 507 000 14</div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<table style="width: 100%;">
+    <tr>
+        <td style="width: 55%;"></td>
+        <td>
+            <table>
+                <tr><td style="font-weight: bold;">{{ sponsor.complete_name }}</td></tr>
+                <tr><td>{{ sponsor.address_street }}</td></tr>
+                {% if sponsor.address_dispatch|length > 0 %}
+                    <tr><td>{{ sponsor.address_dispatch }}</td></tr>
+                {% endif %}
+                <tr><td>{{ sponsor.address_zip }} {{ sponsor.address_city }}</td></tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<div style="width: 100%; margin-top: 25px;">
+    <div>RNAW862000036 – Pref 86-058-045</div>
+    <div>IBAN : {{ center.organisation_id.bank_account_iban }}</div>
+    <div>BIC : {{ center.organisation_id.bank_account_bic }}</div>
+</div>
+
+<table style="width: 100%;">
+    <tr>
+        <td style="width: 55%;"></td>
+        <td>
+            Lathus, le {{ today|format_date_long }}
+        </td>
+    </tr>
+</table>
+
+<table class="table-invoice">
+    <tr>
+        <th style="width: 75%; height: 40px; background-color: #d6eaff;" colspan="2">
+            Désignation
+        </th>
+        <th style="width: 25%; height: 40px; background-color: #d6eaff;">
+            Montant
+        </th>
+    </tr>
+    <tr class="no-border-top-bottom" style="height: 50px;">
+        <td colspan="2">&nbsp;</td>
+        <td>&nbsp;</td>
+    </tr>
+    {% for key, value in map_amount_price_adapters %}
+        <tr class="no-border-top-bottom">
+            <td colspan="2">{{ key }} euros x {{ value.qty }} enfant{% if value.qty > 1 %}s{% endif %}</td>
+            <td class="text-right">{{ value.total|format_money }}</td>
+        </tr>
+    {% endfor %}
+    <tr class="no-border-top-bottom" style="height: 50px;">
+        <td colspan="2">&nbsp;</td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td style="width: 50%; border: none; border-top: solid 1px black;"></td>
+        <td style="width: 25%; font-weight: bold; background-color: #d6eaff;">Total</td>
+        <td style="width: 25%; font-weight: bold; background-color: #d6eaff;text-align: right;">{{ total|format_money }}</td>
+    </tr>
+    <tr>
+        <td style="width: 50%; border: none;"></td>
+        <td style="width: 25%;">&nbsp;</td>
+        <td style="width: 25%;">&nbsp;</td>
+    </tr>
+    <tr>
+        <td style="width: 50%; border: none;"></td>
+        <td style="width: 25%; font-weight: bold; background-color: #d6eaff;">Reste à payer</td>
+        <td style="width: 25%; font-weight: bold; background-color: #d6eaff;text-align: right;">{{ total|format_money }}</td>
+    </tr>
+</table>
+
+<div style="margin-top: 75px; font-style: italic;">
+    <div>Aucun escompte ne sera accordé pour paiement anticipé</div>
+    <div>Exonération de TVA selon Art. 261-7-1° du C.G.I. et 293B du C.G.I</div>
+</div>
+
+</body>
+</html>

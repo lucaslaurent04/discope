@@ -1,0 +1,23 @@
+<table style="border: solid 1px black; border-collapse: collapse; width: 100%; margin-top: 50px; font-size: 0.8rem;" border="1">
+    <tr>
+        <th>Nom</th>
+        <th>Prénom</th>
+        <th style="text-align: center;">Séjour</th>
+        <th style="text-align: center;">Tarif séjour</th>
+        <th style="text-align: center;">Bon vacances</th>
+        <th style="text-align: center; width: 150px;">Communes</th>
+        <th style="text-align: center; width: 100px;">Numéro comptabilité</th>
+    </tr>
+
+    {% for price_adapter in price_adapters %}
+        <tr>
+            <td>{{ price_adapter.enrollment_id.child_id.lastname }}</td>
+            <td>{{ price_adapter.enrollment_id.child_id.firstname }}</td>
+            <td style="text-align: center;">{{ price_adapter.enrollment_id.camp_id.sojourn_code }}</td>
+            <td style="text-align: center;">{{ price_adapter.enrollment_id.price|format_money }}</td>
+            <td style="text-align: center;">{{ price_adapter.value|format_money }}</td>
+            <td style="text-align: center;">{{ price_adapter.sponsor_id.complete_name }}</td>
+            <td style="text-align: center;">{{ price_adapter.enrollment_id.camp_id.accounting_code }}</td>
+        </tr>
+    {% endfor %}
+</table>
