@@ -12,6 +12,29 @@
             "description": "Date à laquelle le paiement a été reçu.",
             "help": ""
         },
+        "payment_origin": {
+            "label": "Origine du paiement",
+            "selection": {
+                "cashdesk": "Caisse",
+                "bank": "Banque",
+                "online": "En ligne"
+            },
+            "description": "L'origine du paiement.",
+            "help": ""
+        },
+        "payment_method": {
+            "label": "Méthode de paiement",
+            "selection": {
+                "voucher": "Chèque cadeau (voucher)",
+                "cash": "Espèces",
+                "bank_card": "Carte bancaire",
+                "wire_transfer": "Virement bancaire",
+                "bank_check": "Chèque bancaire",
+                "financial_help": "Aide financière"
+            },
+            "description": "Méthode de paiement.",
+            "help": ""
+        },
         "amount": {
             "label": "Montant",
             "description": "Le montant du paiement reçu.",
