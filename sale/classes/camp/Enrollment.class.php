@@ -988,22 +988,11 @@ class Enrollment extends Model {
         ];
     }
 
-    /**
-     * After status confirm: reset the enrollments qty
-     */
     protected static function onafterConfirm($self) {
-        $self
+        $self->update(['is_locked' => true])
             ->do('reset-camp-enrollments-qty')
             ->do('generate_funding')
             ->do('generate_presences');
-    }
-
-    /**
-     * After status validate: lock enrollment and generate presences
-     */
-    protected static function onafterValidate($self) {
-        $self->update(['is_locked' => true])
-             ->do('generate_presences');
     }
 
     /**
@@ -1072,7 +1061,6 @@ class Enrollment extends Model {
                 'transitions' => [
                     'validate' => [
                         'status'        => 'validated',
-                        'onafter'       => 'onafterValidate',
                         'help'          => "This step is mandatory for all enrollments (guardians have 10 days to return the documents for web enrollments).",
                         'description'   => "Mark the enrollment as validated (all docs and payments received).",
                         'policies'      => ['validate']
@@ -1114,7 +1102,7 @@ class Enrollment extends Model {
             if($enrollment['is_external']) {
                 foreach(array_keys($values) as $column) {
                     // weekend_extra can be modified to alter presences, but it'll not affect lines
-                    if(!in_array($column, ['is_locked', 'status', 'cancellation_date', 'enrollment_mails_ids', 'weekend_extra'])) {
+                    if(!in_array($column, ['is_locked', 'status', 'payment_status', 'paid_amount', 'cancellation_date', 'enrollment_mails_ids', 'weekend_extra'])) {
                         return ['is_external' => ['external_enrollment' => "Cannot modify an external enrollment."]];
                     }
                 }
@@ -1125,7 +1113,7 @@ class Enrollment extends Model {
         foreach($self as $enrollment) {
             if($enrollment['is_locked']) {
                 foreach(array_keys($values) as $column) {
-                    if(!in_array($column, ['is_locked', 'status', 'cancellation_date', 'enrollment_mails_ids'])) {
+                    if(!in_array($column, ['is_locked', 'status', 'payment_status', 'paid_amount', 'cancellation_date', 'enrollment_mails_ids'])) {
                         return ['is_locked' => ['locked_enrollment' => "Cannot modify a locked enrollment."]];
                     }
                 }
