@@ -207,3 +207,37 @@ Base de configuration d'un camp :
   - **Quota ASE** : nombre max d'enfants de l'Aide Sociale à l'Enfance
 
 ---
+
+### Camps
+
+Un camp est créé à partir d'un modèle de camp qui peut être :
+  - `classique` ou `CLSH`
+  - d'un certain type `Sport`, `Cirque`, ...
+  - configuré avec certains produits
+  - configuré avec certains documents requis
+  - configuré avec certaines compétences requises
+
+#### Workflow
+
+Les status :
+  - **Brouillon** : Le camp est encore en phase de configuration et tous ses champs peuvent être modifiés.
+  - **Publié** : Le camp est publié, ses champs sont bloqués, mais de nouveau groupe peuvent y être ajoutés pour augmenter le nombre de places disponibles.
+  - **Annulé** : Le camp est annulé, ses inscriptions peuvent être annulées ou transférées vers un autre camp.
+
+#### Groupes
+
+Un groupe d'un camp peut accueillir une quantité max d'enfant et un animateur y est assigné comme responsable.
+Un groupe peut être ajouté tant que le camp n'a pas commencé, cela permet d'augmenter le nombre de places disponibles.
+
+#### Activités
+
+Les activités des groupes du camp sont générées à la création d'un groupe et sont décalées à la modification de la date de début du camp.
+
+Pour chaque activité générée, il faut assigner un produit activité et, si requis, un animateur.
+Cela doit être fait avant le début du camp.
+
+#### Repas
+
+Les repas du camp sont générés quand le camp est publié et sont supprimés si le camp est annulé.
+
+Une liste globale des repas se trouve dans `Apps dashboard → Camps → Repas`
