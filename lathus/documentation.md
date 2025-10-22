@@ -320,3 +320,5 @@ Les présences de l'enfant sont générées quand l'inscription est `confirmée`
   - Une indication est garderie matin et/ou soir est ajoutée
 
 > 📍 Liste globale des présences `Apps dashboard → Camps → Présences`
+
+> 💡 **Astuce :** Si non-facturation d'un hébergement supplémentaire, modifier "Week-end extra" puis supprimer manuellement la ligne ajoutée automatiquement.
