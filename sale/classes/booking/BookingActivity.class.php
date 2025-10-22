@@ -460,36 +460,10 @@ class BookingActivity extends Model {
 
     public static function onupdateActivityDate($self) {
         $self->do('update-counters');
-
-        $self->read(['camp_group_id']);
-        $map_camp_group_ids = [];
-        foreach($self as $booking_activity) {
-            if(isset($booking_activity['camp_group_id'])) {
-                $map_camp_group_ids[$booking_activity['camp_group_id']] = true;
-            }
-        }
-        if(!empty($map_camp_group_ids)) {
-            $camp_groups_ids = array_keys($map_camp_group_ids);
-
-            CampGroup::ids($camp_groups_ids)->do('refresh-partner-events');
-        }
     }
 
     public static function onupdateTimeSlotId($self) {
         $self->do('update-counters');
-
-        $self->read(['camp_group_id']);
-        $map_camp_group_ids = [];
-        foreach($self as $booking_activity) {
-            if(isset($booking_activity['camp_group_id'])) {
-                $map_camp_group_ids[$booking_activity['camp_group_id']] = true;
-            }
-        }
-        if(!empty($map_camp_group_ids)) {
-            $camp_groups_ids = array_keys($map_camp_group_ids);
-
-            CampGroup::ids($camp_groups_ids)->do('refresh-partner-events');
-        }
     }
 
     public static function onupdateRentalUnitId($self) {

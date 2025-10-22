@@ -750,8 +750,7 @@ class Camp extends Model {
         $self->read(['camp_groups_ids']);
         foreach($self as $camp) {
             CampGroup::search(['id', 'in', $camp['camp_groups_ids']])
-                ->do('refresh-activities-dates')
-                ->do('refresh-partner-events');
+                ->do('refresh-activities-dates');
         }
     }
 
@@ -759,8 +758,7 @@ class Camp extends Model {
         $self->read(['camp_groups_ids']);
         foreach($self as $camp) {
             CampGroup::search(['id', 'in', $camp['camp_groups_ids']])
-                ->do('refresh-activities-dates')
-                ->do('refresh-partner-events');
+                ->do('refresh-activities-dates');
         }
     }
 

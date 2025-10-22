@@ -43,8 +43,7 @@ class CampGroup extends Model {
             'employee_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'hr\employee\Employee',
-                'description'       => "Employee responsible of the group during the camp.",
-                'onupdate'          => 'onupdateEmployeeId'
+                'description'       => "Employee responsible of the group during the camp."
             ],
 
             'max_children' => [
@@ -86,12 +85,6 @@ class CampGroup extends Model {
     public static function getActions(): array {
         return [
 
-            'refresh-partner-events' => [
-                'description'   => "Refresh the partners events linked to the camp group's activities.",
-                'policies'      => [],
-                'function'      => 'doRefreshPartnerEvents'
-            ],
-
             'generate-activities' => [
                 'description'   => "Generates the camp's activities.",
                 'policies'      => [],
@@ -111,50 +104,6 @@ class CampGroup extends Model {
             ]
 
         ];
-    }
-
-    public static function doRefreshPartnerEvents($self) {
-        $self->read([
-            'name',
-            'employee_id',
-            'booking_activities_ids'    => ['name', 'activity_date', 'time_slot_id'],
-            'partner_events_ids'        => ['name', 'description', 'booking_activity_id']
-        ]);
-        foreach($self as $camp_group) {
-            PartnerEvent::search(['camp_group_id', '=', $camp_group['id']])->delete(true);
-
-            if(is_null($camp_group['employee_id'])) {
-                continue;
-            }
-
-            foreach($camp_group['booking_activities_ids'] as $booking_activity) {
-                $partner_event = null;
-                foreach($camp_group['partner_events_ids'] as $part_ev) {
-                    if($part_ev['booking_activity_id'] === $booking_activity['id']) {
-                        $partner_event = $part_ev;
-                    }
-                }
-
-                $name = $camp_group['name'];
-                if(!empty($partner_event['name'])) {
-                    $name = $partner_event['name'];
-                }
-                elseif(!empty($booking_activity['name'])) {
-                    $name = $booking_activity['name'];
-                }
-
-                PartnerEvent::create([
-                    'name'                  => $name,
-                    'description'           => $partner_event['description'] ?? null,
-                    'partner_id'            => $camp_group['employee_id'],
-                    'event_date'            => $booking_activity['activity_date'],
-                    'time_slot_id'          => $booking_activity['time_slot_id'],
-                    'event_type'            => 'camp_activity',
-                    'camp_group_id'         => $camp_group['id'],
-                    'booking_activity_id'   => $booking_activity['id']
-                ]);
-            }
-        }
     }
 
     public static function doGenerateActivities($self) {
@@ -382,10 +331,6 @@ class CampGroup extends Model {
         }
 
         $self->do('generate-activities');
-    }
-
-    public static function onupdateEmployeeId($self) {
-        $self->do('refresh-partner-events');
     }
 
     public static function candelete($self): array {

@@ -57,7 +57,6 @@ export class PlanningEmployeesCalendarActivityComponent implements OnInit, OnCha
     public getColor(): string {
         if(this.activity.is_partner_event) {
             const mapPartnerEventColors: any = {
-                camp_activity: '#7A8F78',
                 leave: '#BFA58A',
                 time_off: '#8C6E5E',
                 other: '#6C7A91',
