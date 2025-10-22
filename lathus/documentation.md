@@ -24,9 +24,7 @@ Le calendrier permet d'assigner des activités aux animateurs et prestataires, l
 Une activité peut être liée à une **réservation** ou un **camp**.
 
 **Règles :**
-
   - Si le champ **_Nécessite du personnel_** (`has_staff_required`) est activé → l’activité **doit être assignée** à un animateur.
-
   - Si le champ **_Exclusive_** (`is_exclusive`) est activé → l’activité **ne peut pas partager la même tranche horaire** avec une autre pour un même animateur.
 
 ---
@@ -178,5 +176,30 @@ Une fiche tuteur permet de consulter les informations de contact d'un tuteur d'u
 #### Institutions
 
 Une fiche d'institution permet de consulter les informations de contact d'une institution en charge d'un enfant.
+
+---
+
+### Modèles de camps
+
+Base de configuration d'un camp :
+  - **Produits** :
+    - Camp classique :
+      - Camp complet
+      - Samedi matin
+      - Liaison entre deux camps
+    - Camp CLSH :
+      - Journée camp
+  - **Compétences requises** : compétences que l'enfant doit avoir pour s'inscrire au camp
+  - **Documents requis** : documents nécessaires à l'inscription de l'enfant au camp
+  - **Type de camp** :
+    - Sport
+    - Cirque
+    - Culture
+    - Environnement
+    - Équitation
+    - Accueil & Loisir
+    - Autre
+  - **Ratio employé** : nombre max d'enfants par groupe
+  - **Quota ASE** : nombre max d'enfants de l'Aide Sociale à l'Enfance
 
 ---
