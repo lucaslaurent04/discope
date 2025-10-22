@@ -33,6 +33,7 @@
             "description": "Le type d'événement.",
             "help": "",
             "selection": {
+                "camp_activity": "Activité d'un camp",
                 "leave": "Congé",
                 "other": "Autre",
                 "rest": "Repos",

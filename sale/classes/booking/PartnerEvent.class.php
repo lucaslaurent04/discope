@@ -63,6 +63,7 @@ class PartnerEvent extends Model {
                 'type'              => 'string',
                 'description'       => "Type of the partner event.",
                 'selection'         => [
+                    'camp_activity',    // The employee is responsible for a camp group's activity
                     'leave',            // The employee is absent because of leave absence
                     'other',            // The event concerns none of the other types
                     'rest',             // The employee is absent because of rest
