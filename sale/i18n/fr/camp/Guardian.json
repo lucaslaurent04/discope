@@ -43,7 +43,9 @@
                 "legal-tutor": "Tuteur légal",
                 "family-member": "Membre famille",
                 "home-manager": "Responsable foyer",
-                "departmental-council": "Conseil département"
+                "departmental-council": "Conseil département",
+                "childminder": "Garde d'enfants",
+                "other": "Autre"
             }
         },
         "address_street": {
