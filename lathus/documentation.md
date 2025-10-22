@@ -241,3 +241,82 @@ Cela doit être fait avant le début du camp.
 Les repas du camp sont générés quand le camp est publié et sont supprimés si le camp est annulé.
 
 Une liste globale des repas se trouve dans `Apps dashboard → Camps → Repas`
+
+---
+
+### Inscriptions
+
+Description des inscriptions et lignes
+
+#### Workflow
+
+Les status :
+  - **En attente** : En attente d'une place dans un camp.
+  - **Brouillon** : En cours de création, tous ses champs peuvent être modifiés.
+  - **Confirmée** : Ses lignes et réductions/aides ne peuvent plus être modifiées, car son financement a été généré.
+  - **Validée** : Les documents requis ont été reçus, mais pas nécessairement tous les paiements.
+  - **Annulée** : L'inscription est annulée avec ou sans frais. Un financement positif ou négatif peut devoir être géré.
+
+Flux normal : `Brouillon` (création) → `Confirmée` (récupération document requis) → `Validée` (paiement avant début camp)
+
+#### Lignes
+
+Les lignes d'inscription listent les produits qui sont vendus, la ligne du produit du prix du camp "Tarif séjour X" ou "Tarif CLSH journée" est ajoutée directement à la création.
+
+Pour une inscription à un `Camp classique` la modification du champ "Week-end extra" affecte les lignes.
+Cela ajoute/retire/replace les produits "Fin séjour samedi matin" et "Lier 2 séjours".
+
+Pour une inscription à `Camp CLSH` la modification des jours de présences affectent la quantité de la ligne du produit "Tarif CLSH journée".
+
+#### Réductions & aides
+
+Tant que l'inscription n'est pas confirmée, des réductions et aides peuvent être appliquées.
+
+Type d'adaptateur de prix :
+  - Autre `Réduction`
+  - Réduction fidélité `Réduction`
+  - Aide commune `Aide`
+  - Aide communauté de communes `Aide`
+  - Aide CAF `Aide`
+  - Aide MSA `Aide`
+
+**Réductions**
+
+Les réductions "Autre" et "Réduction fidélité" affectent directement le prix de l'inscription en soustrayant un montant ou un pourcentage.
+Le **pourcentage** est seulement par rapport à la ligne de prix du camp et `ignore les lignes "Samedi matin" ou "Liaison 2 séjours"`.
+
+**Aides**
+
+Les aides "Aide commune", "Aide communauté de communes", "Aide CAF" et "Aide MSA" n'affectent pas directement le prix de l'inscription.
+Elles génèrent des paiements sur le financement créé lors du passage de l'état `Brouillon` → `Confirmé`. Ce qui réduit le montant
+demandé aux parents de l'enfant.
+
+> 📍 Les remboursements des aidants peuvent être demandés `Fiche aidant → Facturer/Facturer à l'année`
+
+> 📍 Liste globale des aides fournies `Apps dashboard → Camps → Aides financières -> Réductions aides`
+
+#### Documents requis
+
+La fiche d'inscription liste les documents **requis** afin de pouvoir **valider** l'inscription.
+Cette liste est créée en fonction de la configuration du **modèle de camp**.
+Il faut marquer les documents comme reçus quand ils le sont.
+
+#### Inscription via site web
+
+Récupération des inscriptions sur l'API
+
+#### Présences
+
+Les présences de l'enfant sont générées quand l'inscription est `confirmée` et supprimée quand elle est annulée.
+
+**Camp classique** :
+  - Les présences sont générées du dimanche au vendredi
+  - Une présence samedi est ajoutée si "Week-end extra" est `Hébergement jusqu'à samedi matin`
+  - Des présences samedi et dimanche sont ajoutée si "Week-end extra" est `Hébergement tour le weekend`
+
+
+**Camp CLSH** :
+  - Une présence est ajoutée pour chaque jour de présence de l'enfant
+  - Une indication est garderie matin et/ou soir est ajoutée
+
+> 📍 Liste globale des présences `Apps dashboard → Camps → Présences`
