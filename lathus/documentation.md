@@ -31,23 +31,27 @@ Une activité peut être liée à une **réservation** ou un **camp**.
 
 ### 🗓️ Événements
 
-Les **événements** ajoutent des informations spécifiques à un moment donné pour un animateur (ex. congé, repos…).
+Les événements ajoutent des **informations spécifiques** à un moment donné pour un animateur (ex. congé, repos…).
+Ils peuvent également représenter **un groupe de camp** dont un animateur est responsable.
 
-#### Types d’événements :
-- 🏖️ Congé → `leave`
-- 🕓 Autre → `other`
-- 😌 Repos → `rest`
-- 🔁 Récupération → `time_off`
-- 👨‍🏫 Formateur → `trainer`
-- 🎓 Formation → `training`
+**Types d’événements** :
+  - Info animateur :
+    - 🏖️ Congé
+    - 🕓 Autre
+    - 😌 Repos
+    - 🔁 Récupération
+    - 👨‍🏫 Formateur
+    - 🎓 Formation
+  - Camp :
+    - ⛺ Activité d'un camp
 
-#### Gestion :
-- Les événements **ne peuvent pas être déplacés** par *drag and drop*.
-- Ils sont modifiables depuis la **fiche événement** (accessible par clic sur l’événement).
+Les événements **ne peuvent pas être déplacés** par *drag and drop*.
 
-#### Création :
-- **Double-clic** sur une case du calendrier.
-- **Depuis une fiche animateur/prestataire** `(Onglet) Événements` ou `(Onglet) Séries d’événements`.
+Ils sont modifiables depuis la **fiche événement** (accessible par clic sur l’événement).
+
+**Création** :
+  - **Double-clic** sur une case du calendrier.
+  - **Depuis une fiche animateur/prestataire** `(Onglet) Événements` ou `(Onglet) Séries d’événements`.
 
 > ⚡ Les **séries d’événements** permettent la création **rapide** d’événements récurrents entre deux dates.
 
