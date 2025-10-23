@@ -153,6 +153,7 @@ class Camp extends Model {
                 'foreign_object'    => 'sale\camp\catalog\Product',
                 'description'       => "The product that will be added to the enrollment lines for a non CLSH camp.",
                 'domain'            => ['is_camp', '=', true],
+                'visible'           => ['is_clsh', '=', false],
                 'store'             => true,
                 'relation'          => ['camp_model_id' => 'product_id']
             ],

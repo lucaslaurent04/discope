@@ -1123,7 +1123,7 @@ class Enrollment extends Model {
             if($enrollment['is_external']) {
                 foreach(array_keys($values) as $column) {
                     // weekend_extra can be modified to alter presences, but it'll not affect lines
-                    if(!in_array($column, ['is_locked', 'status', 'payment_status', 'paid_amount', 'cancellation_date', 'enrollment_mails_ids', 'weekend_extra'])) {
+                    if(!in_array($column, ['is_locked', 'status', 'all_documents_received', 'payment_status', 'paid_amount', 'cancellation_date', 'enrollment_mails_ids', 'weekend_extra'])) {
                         return ['is_external' => ['external_enrollment' => "Cannot modify an external enrollment."]];
                     }
                 }
@@ -1134,7 +1134,7 @@ class Enrollment extends Model {
         foreach($self as $enrollment) {
             if($enrollment['is_locked']) {
                 foreach(array_keys($values) as $column) {
-                    if(!in_array($column, ['is_locked', 'status', 'payment_status', 'paid_amount', 'cancellation_date', 'enrollment_mails_ids'])) {
+                    if(!in_array($column, ['is_locked', 'status', 'all_documents_received', 'payment_status', 'paid_amount', 'cancellation_date', 'enrollment_mails_ids'])) {
                         return ['is_locked' => ['locked_enrollment' => "Cannot modify a locked enrollment."]];
                     }
                 }
