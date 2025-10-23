@@ -248,12 +248,14 @@ Description des inscriptions et lignes.
 
 Les statuts :
   - **En attente** : En attente d'une place dans un camp.
-  - **Brouillon** : En cours de création, tous ses champs peuvent être modifiés.
+  - **Brouillon** : En cours de création/modification, tous ses champs peuvent être modifiés.
   - **Confirmée** : Ses lignes et réductions/aides ne peuvent plus être modifiées, car son financement a été généré.
   - **Validée** : Les documents requis ont été reçus, mais pas nécessairement tous les paiements.
   - **Annulée** : L'inscription est annulée avec ou sans frais. Un financement positif ou négatif peut devoir être géré.
 
 Flux normal : `Brouillon` (création) → `Confirmée` (récupération documents requis) → `Validée` (paiement avant début camp)
+
+> 💡 **Astuce :** Une inscription confirmée peut être `Repasser en brouillon` afin de la modifier.
 
 #### Lignes
 
@@ -304,7 +306,16 @@ Il faut marquer les documents comme reçus quand ils le sont.
 
 #### Inscription via site web
 
-Récupération des inscriptions sur l'API.
+Une action Discope permet de récupérer les inscriptions depuis l'API du site web du CPA Lathus et les ajouter dans Discope.
+
+Si le camp ciblé par une inscription a au moins une place libre, alors l'état de l'inscription est `Confirmée`.
+Il est possible de la `Repasser en brouillon` afin de la modifier si nécessaire.
+
+Si le camp ciblé n'a pas de place libre, alors l'état de l'inscription est `En attente`.
+Ensuite, les différentes possibilités :
+  - L'inscription peut être `transférée`
+  - Ou, l'inscription peut être `annulée`
+  - Ou, un groupe supplémentaire peut être ajouté au camp afin de créer plus de places
 
 #### Présences
 
