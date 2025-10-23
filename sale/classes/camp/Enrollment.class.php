@@ -989,18 +989,16 @@ class Enrollment extends Model {
     }
 
     protected static function onafterConfirm($self) {
-        $self->update(['is_locked' => true])
-            ->do('reset_camp_enrollments_qty')
-            ->do('generate_funding')
+        // lock
+        $self->update(['is_locked' => true]);
+
+        $self->do('generate_funding')
             ->do('generate_presences');
     }
 
     protected static function onafterUnconfirm($self) {
         // unlock
-        $self->update([
-            'is_locked' => false,
-            'status'    => 'pending'   // #todo - find why needed and fix error
-        ]);
+        $self->update(['is_locked' => false]);
 
         // handle fundings and payments
         $self->do('remove_financial_help_payments')
@@ -1008,16 +1006,14 @@ class Enrollment extends Model {
             ->do('update_fundings_due_to_paid')
             ->update(['paid_amount' => null]);
 
-        $self->do('reset_camp_enrollments_qty')
-            ->do('remove_presences');
+        $self->do('remove_presences');
     }
 
     protected static function onafterCancel($self) {
         // unlock
         $self->update([
             'is_locked'         => false,
-            'cancellation_date' => time(),
-            'status'            => 'cancelled'   // #todo - find why needed and fix error
+            'cancellation_date' => time()
         ]);
 
         // handle fundings and payments
@@ -1026,8 +1022,7 @@ class Enrollment extends Model {
             ->do('update_fundings_due_to_paid')
             ->update(['paid_amount' => null]);
 
-        $self->do('reset_camp_enrollments_qty')
-            ->do('remove_presences');
+        $self->do('remove_presences');
     }
 
     public static function getWorkflow(): array {

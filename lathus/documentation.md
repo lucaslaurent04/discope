@@ -101,6 +101,9 @@ Il existe **deux types** de camps :
     - L'enfant est inscrit par jour
     - Peut durer 4 à 5 jours, jamais durant le week-end
 
+> **Notes** : Le nombre de places maximum dans un camp en égale à `Qté groupe * Max enfants`.
+> Les inscriptions de status `Brouillon`, `Confirmée` et `Validée` sont prises en compte.
+
 ---
 
 ### Produits

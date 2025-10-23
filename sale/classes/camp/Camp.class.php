@@ -686,7 +686,7 @@ class Camp extends Model {
         foreach($self as $id => $camp) {
             $enrollment_qty = 0;
             foreach($camp['enrollments_ids'] as $enrollment) {
-                if(!in_array($enrollment['status'], ['cancelled', 'waitlisted'])) {
+                if(in_array($enrollment['status'], ['pending', 'confirmed', 'validated'])) {
                     $enrollment_qty++;
                 }
             }
