@@ -1118,25 +1118,20 @@ class Enrollment extends Model {
             'presence_day_1', 'presence_day_2', 'presence_day_3', 'presence_day_4', 'presence_day_5'
         ]);
 
-        // If is_external some fields cannot be modified
+        // Handle is_locked
         foreach($self as $enrollment) {
+            $allowed_keys = ['is_locked', 'status', 'all_documents_received', 'payment_status', 'paid_amount', 'cancellation_date', 'enrollment_mails_ids'];
             if($enrollment['is_external']) {
-                foreach(array_keys($values) as $column) {
-                    // weekend_extra can be modified to alter presences, but it'll not affect lines
-                    if(!in_array($column, ['is_locked', 'status', 'all_documents_received', 'payment_status', 'paid_amount', 'cancellation_date', 'enrollment_mails_ids', 'weekend_extra'])) {
-                        return ['is_external' => ['external_enrollment' => "Cannot modify an external enrollment."]];
-                    }
-                }
+                // weekend_extra can be modified to alter presences, but it'll not affect lines for external enrollments, only presences
+                $allowed_keys = array_merge(
+                    $allowed_keys,
+                    ['weekend_extra']
+                );
             }
-        }
 
-        // If is_locked cannot be modified
-        foreach($self as $enrollment) {
-            if($enrollment['is_locked']) {
-                foreach(array_keys($values) as $column) {
-                    if(!in_array($column, ['is_locked', 'status', 'all_documents_received', 'payment_status', 'paid_amount', 'cancellation_date', 'enrollment_mails_ids'])) {
-                        return ['is_locked' => ['locked_enrollment' => "Cannot modify a locked enrollment."]];
-                    }
+            foreach(array_keys($values) as $column) {
+                if(!in_array($column, $allowed_keys)) {
+                    return ['is_locked' => ['locked_enrollment' => "Cannot modify a locked enrollment."]];
                 }
             }
         }
@@ -1415,15 +1410,16 @@ class Enrollment extends Model {
         $self->do('reset_camp_enrollments_qty');
         $self->do('refresh_required_documents');
 
-        // remove previously generated presences of pending enrollment
+        // regenerate presences
         $self->read(['status', 'child_id']);
         foreach($self as $enrollment) {
-            if($enrollment['status'] !== 'pending' && $enrollment['status'] !== 'validated') {
+            if(!in_array($enrollment['status'], ['confirmed', 'validated'])) {
+                // skip if they were not yet generated
                 continue;
             }
 
             Child::id($enrollment['child_id'])->do('remove-unnecessary-presences');
-            Enrollment::id($enrollment['id'])->do('generate_presences');
+            self::id($enrollment['id'])->do('generate_presences');
         }
 
         // check child age
@@ -1441,13 +1437,19 @@ class Enrollment extends Model {
 
     public static function onupdateWeekendExtra($self) {
         $self->read([
-            'weekend_extra', 'is_external',
+            'weekend_extra',
+            'is_external',
+            'status',
             'camp_id'               => ['weekend_product_id', 'saturday_morning_product_id', 'date_from', 'date_to', 'center_office_id'],
             'enrollment_lines_ids'  => ['product_id']
         ]);
         foreach($self as $id => $enrollment) {
             if($enrollment['is_external']) {
-                // If external we can modify weekend_extra to affect presences generation, but it shouldn't modify the enrollment lines
+                // If external we can modify weekend_extra to affect presences, but it shouldn't modify the enrollment lines
+                if(in_array($enrollment['status'], ['confirmed', 'validated'])) {
+                    // refresh presences (add/remove presences during weekend)
+                    self::id($id)->do('generate_presences');
+                }
                 continue;
             }
 
@@ -1618,36 +1620,109 @@ class Enrollment extends Model {
                         }
                     }
 
-                    Presence::create([
-                        'presence_date' => $date,
-                        'camp_id'       => $enrollment['camp_id'],
-                        'child_id'      => $enrollment['child_id'],
-                        'am_daycare'    => $am_daycare,
-                        'pm_daycare'    => $pm_daycare
-                    ]);
+                    $presence = Presence::search([
+                        ['presence_date', '=', $date],
+                        ['camp_id', '=', $enrollment['camp_id']],
+                        ['child_id', '=', $enrollment['child_id']]
+                    ])
+                        ->read(['id'])
+                        ->first();
+
+                    if(is_null($presence)) {
+                        Presence::create([
+                            'presence_date' => $date,
+                            'camp_id'       => $enrollment['camp_id'],
+                            'child_id'      => $enrollment['child_id'],
+                            'am_daycare'    => $am_daycare,
+                            'pm_daycare'    => $pm_daycare
+                        ]);
+                    }
+                    else {
+                        Presence::id($presence['id'])->update([
+                            'am_daycare'    => $am_daycare,
+                            'pm_daycare'    => $pm_daycare
+                        ]);
+                    }
+                }
+                else {
+                    // remove because not present that day for CLSH camp
+                    Presence::search([
+                        ['presence_date', '=', $date],
+                        ['camp_id', '=', $enrollment['camp_id']],
+                        ['child_id', '=', $enrollment['child_id']]
+                    ])
+                        ->delete(true);
                 }
 
                 $day_index++;
                 $date += 60 * 60 * 24;
             }
 
-            if(!$enrollment['is_clsh'] && $enrollment['weekend_extra'] !== 'none') {
-                // add Saturday presence
-                Presence::create([
-                    'presence_date' => $date,
-                    'camp_id'       => $enrollment['camp_id'],
-                    'child_id'      => $enrollment['child_id']
-                ]);
+            // handle weekend
+            if(!$enrollment['is_clsh']) {
+                $sunday_date = $date + 60 * 60 * 24;
 
-                if($enrollment['weekend_extra'] === 'full') {
-                    $date += 60 * 60 * 24;
+                if($enrollment['weekend_extra'] !== 'none') {
+                    $saturday_presence = Presence::search([
+                        ['presence_date', '=', $date],
+                        ['camp_id', '=', $enrollment['camp_id']],
+                        ['child_id', '=', $enrollment['child_id']]
+                    ])
+                        ->read(['id'])
+                        ->first();
 
-                    // add Sunday presence
-                    Presence::create([
-                        'presence_date' => $date,
-                        'camp_id'       => $enrollment['camp_id'],
-                        'child_id'      => $enrollment['child_id']
-                    ]);
+                    if(is_null($saturday_presence)) {
+                        // add Saturday presence
+                        Presence::create([
+                            'presence_date' => $date,
+                            'camp_id'       => $enrollment['camp_id'],
+                            'child_id'      => $enrollment['child_id']
+                        ]);
+                    }
+
+                    if($enrollment['weekend_extra'] === 'full') {
+                        $sunday_presence = Presence::search([
+                            ['presence_date', '=', $sunday_date],
+                            ['camp_id', '=', $enrollment['camp_id']],
+                            ['child_id', '=', $enrollment['child_id']]
+                        ])
+                            ->read(['id'])
+                            ->first();
+
+                        if(is_null($sunday_presence)) {
+                            // add Sunday presence
+                            Presence::create([
+                                'presence_date' => $sunday_date,
+                                'camp_id'       => $enrollment['camp_id'],
+                                'child_id'      => $enrollment['child_id']
+                            ]);
+                        }
+                    }
+                    else {
+                        // remove Sunday presence
+                        Presence::search([
+                            ['presence_date', '=', $sunday_date],
+                            ['camp_id', '=', $enrollment['camp_id']],
+                            ['child_id', '=', $enrollment['child_id']]
+                        ])
+                            ->delete(true);
+                    }
+                }
+                else {
+                    // remove Saturday and Sunday presences
+                    Presence::search([
+                        [
+                            ['presence_date', '=', $date],
+                            ['camp_id', '=', $enrollment['camp_id']],
+                            ['child_id', '=', $enrollment['child_id']]
+                        ],
+                        [
+                            ['presence_date', '=', $sunday_date],
+                            ['camp_id', '=', $enrollment['camp_id']],
+                            ['child_id', '=', $enrollment['child_id']]
+                        ]
+                    ])
+                        ->delete(true);
                 }
             }
         }

@@ -43,7 +43,7 @@ Ils peuvent également représenter **un groupe de camp** dont un animateur est 
     - 👨‍🏫 Formateur
     - 🎓 Formation
   - Camp :
-    - ⛺ Activité d'un camp
+    - ⛺ Activité d'un camp (_l'animateur est responsable d'un groupe de camps durant la tranche horaire_)
 
 Les événements **ne peuvent pas être déplacés** par *drag and drop*.
 
@@ -87,7 +87,7 @@ L'application `Camps` permet la gestion des camps d'été du CPA Lathus.
 Chaque camp a un thème et un tarif, des parents ou tuteurs peuvent y inscrire leurs enfants âgés de 6 à 16 ans.
 
 Les inscriptions peuvent être réalisées :
-  - par les parents sur le site `www.cpa-lathus.asso.fr`
+  - par les parents sur le site `www.cpa-lathus.asso.fr` (pour les camps classiques, pas les CLSH)
   - par les employés du CPA Lathus dans Discope (contact téléphone/mail avec un parent)
 
 Il existe **deux types** de camps :
@@ -148,7 +148,7 @@ Classes de camp :
   - Autre
   - Habitants Vienne/Partenaires hors Vienne
 
-> **Note :** La classe `Adhérents/Partenaires Vienne/Habitants` des cantons n'est pas utilisée.
+> **Note :** La classe `Adhérents/Partenaires Vienne/Habitants des cantons` n'est pas utilisée.
 > Une inscription de cette classe utilise le prix de la classe la plus proche, donc `Habitants Vienne/Partenaires hors Vienne`.
 
 Ajout des champs `Quotient familial min` et `Quotient familial max` qui permettent d'appliquer un prix spécifique en fonction du quotient familial de l'inscription.
@@ -365,6 +365,8 @@ Il faut marquer les documents comme reçus quand ils le sont.
 Une action Discope permet de récupérer les inscriptions depuis l'API du site web du CPA Lathus et les ajouter dans Discope.
 
 Si le camp ciblé par une inscription a au moins une place libre, alors l'état de l'inscription est `Confirmée`.
+Le champ "Week-end extra" peut être modifié pour une réservation confirmée si elle est externe.
+Cela n'affectera pas les lignes de produit, mais bien les présences.
 Il est possible de la `Repasser en brouillon` afin de la modifier si nécessaire.
 
 Si le camp ciblé n'a pas de place libre, alors l'état de l'inscription est `En attente`.
