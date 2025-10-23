@@ -25,7 +25,7 @@ Une activité peut être liée à une **réservation** ou un **camp**.
 
 **Règles :**
   - Si le champ **_Nécessite du personnel_** (`has_staff_required`) est activé → l'activité **doit être assignée** à un animateur.
-  - Si le champ **_Exclusive_** (`is_exclusive`) est activé → l'activité **ne peut pas partager la même tranche horaire** avec une autre pour un même animateur.
+  - Si le champ **_Exclusive_** (`is_exclusive`) est activé → l'activité **ne peut pas partager la même tranche horaire** avec une autre activité pour un même animateur.
 
 ---
 
@@ -124,6 +124,42 @@ Une inscription liste les produits qui seront facturés. Il existe 4 types de pr
       - Tarif CLSH journée
 
 ---
+
+### Prix
+
+Les prix des produits de camps peuvent être plus détaillés que les prix ordinaires, s'il s'agit d'un produit `Camp complet` ou `Camp à la journée`.
+
+#### Camp complet
+
+Ajout d'un champ `Classe de camp` qui permet d'appliquer un prix spécifique en fonction de la `Classe de camp` de l'inscription.
+
+Classes de camp :
+  - Autre
+  - Habitants Vienne/Partenaires hors Vienne
+  - Adhérents/Partenaires Vienne/Habitants des cantons
+
+> **Note :** 3 prix sont donc nécessaires pour chaque produit `Camp complet`
+
+#### Camp à la journée
+
+Ajout d'un champ `Classe de camp` qui permet d'appliquer un prix spécifique en fonction de la `Classe de camp` de l'inscription.
+
+Classes de camp :
+  - Autre
+  - Habitants Vienne/Partenaires hors Vienne
+
+> **Note :** La classe `Adhérents/Partenaires Vienne/Habitants` des cantons n'est pas utilisée.
+> Une inscription de cette classe utilise le prix de la classe la plus proche, donc `Habitants Vienne/Partenaires hors Vienne`.
+
+Ajout des champs `Quotient familial min` et `Quotient familial max` qui permettent d'appliquer un prix spécifique en fonction du quotient familial de l'inscription.
+
+Tranches quotient familial :
+  - 0 - 700
+  - 701 - 850
+  - 851 - 1200
+  - 1201 - 10000
+
+> **Note :** 8 prix sont donc nécessaires pour chaque produit `Camp complet`
 
 ### Participants
 
@@ -242,7 +278,7 @@ Une liste globale des repas se trouve dans `Apps dashboard → Camps → Repas`
 
 ### Inscriptions
 
-Description des inscriptions et lignes.
+Une inscription permet d'inscrire un enfant à un camp d'été.
 
 #### Workflow
 
@@ -271,6 +307,26 @@ Cela ajoute/retire/remplace les produits "Fin séjour samedi matin" et "Lier 2 s
 | Hébergement entre 2 séjours      |                                          |                X                |
 
 Pour une inscription à `Camp CLSH`, la modification des jours de présence affecte la quantité de la ligne du produit "Tarif CLSH journée".
+
+#### Classe de camp
+
+Une classe de camp est assignée à une inscription et permet de proposer un prix plus avantageux.
+
+Classes de camp :
+  - `Autre` (prix de base)
+  - `Habitants Vienne/Partenaires hors Vienne` (prix avantageux)
+  - `Adhérents/Partenaires Vienne/Habitants des cantons` (prix le plus avantageux)
+
+Elle est récupérée de la `Classe de camp` de l'enfant concerné, mais peut être modifiée pour chaque inscription.
+
+#### Quotient familial
+
+Un quotient familial est assigné à une inscription et permet de proposer un prix plus avantageux.
+Il est un indicateur de mesure des ressources mensuelles de la famille de l'enfant.
+
+Le quotient familial est un **entier** d'une valeur de `0` à `5000`.
+
+Il est définis manuellement et fourni par le tuteur principal de l'enfant.
 
 #### Réductions & aides
 
