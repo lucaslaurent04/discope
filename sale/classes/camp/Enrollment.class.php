@@ -990,15 +990,30 @@ class Enrollment extends Model {
 
     protected static function onafterConfirm($self) {
         $self->update(['is_locked' => true])
-            ->do('reset-camp-enrollments-qty')
+            ->do('reset_camp_enrollments_qty')
             ->do('generate_funding')
             ->do('generate_presences');
     }
 
-    /**
-     * After status cancel: unlock enrollment and remove presences
-     */
+    protected static function onafterUnconfirm($self) {
+        // unlock
+        $self->update([
+            'is_locked' => false,
+            'status'    => 'pending'   // #todo - find why needed and fix error
+        ]);
+
+        // handle fundings and payments
+        $self->do('remove_financial_help_payments')
+            ->do('delete_unpaid_fundings')
+            ->do('update_fundings_due_to_paid')
+            ->update(['paid_amount' => null]);
+
+        $self->do('reset_camp_enrollments_qty')
+            ->do('remove_presences');
+    }
+
     protected static function onafterCancel($self) {
+        // unlock
         $self->update([
             'is_locked'         => false,
             'cancellation_date' => time(),
@@ -1011,7 +1026,7 @@ class Enrollment extends Model {
             ->do('update_fundings_due_to_paid')
             ->update(['paid_amount' => null]);
 
-        $self->do('reset-camp-enrollments-qty')
+        $self->do('reset_camp_enrollments_qty')
             ->do('remove_presences');
     }
 
@@ -1061,9 +1076,15 @@ class Enrollment extends Model {
                 'transitions' => [
                     'validate' => [
                         'status'        => 'validated',
-                        'help'          => "This step is mandatory for all enrollments (guardians have 10 days to return the documents for web enrollments).",
                         'description'   => "Mark the enrollment as validated (all docs and payments received).",
+                        'help'          => "This step is mandatory for all enrollments (guardians have 10 days to return the documents for web enrollments).",
                         'policies'      => ['validate']
+                    ],
+                    'unconfirm' => [
+                        'status'        => 'pending',
+                        'description'   => "Set the enrollment status back to pending to allow its alteration.",
+                        'policies'      => [],
+                        'onafter'       => 'onafterUnconfirm'
                     ],
                     'cancel' => [
                         'status'        => 'cancelled',
@@ -1391,7 +1412,7 @@ class Enrollment extends Model {
         $dispatch = $providers['dispatch'];
 
         $self->do('refresh_camp_product_line');
-        $self->do('reset-camp-enrollments-qty');
+        $self->do('reset_camp_enrollments_qty');
         $self->do('refresh_required_documents');
 
         // remove previously generated presences of pending enrollment
@@ -1539,7 +1560,7 @@ class Enrollment extends Model {
 
     public static function onupdate($self, $values) {
         if(isset($values['status']) || (isset($values['state']) && $values['state'] === 'instance')) {
-            $self->do('reset-camp-enrollments-qty');
+            $self->do('reset_camp_enrollments_qty');
 
             foreach($self as $id => $enrollment) {
                 \eQual::run('do', 'sale_camp_followup_generate-task-status-change', ['enrollment_id' => $id]);
@@ -1958,13 +1979,13 @@ class Enrollment extends Model {
     public static function getActions(): array {
         return [
 
-            'reset-camp-enrollments-qty' => [
+            'reset_camp_enrollments_qty' => [
                 'description'   => "Reset the enrollments prices fields values so they can be re-calculated.",
                 'policies'      => [],
                 'function'      => 'doResetCampEnrollmentsQty'
             ],
 
-            'delete-lines' => [
+            'delete_lines' => [
                 'description'   => "Remove all enrollment lines.",
                 'policies'      => [],
                 'function'      => 'doDeleteLines'
@@ -2025,8 +2046,8 @@ class Enrollment extends Model {
     }
 
     public static function ondelete($self): void {
-        $self->do('delete-lines');
-        $self->do('reset-camp-enrollments-qty');
+        $self->do('delete_lines');
+        $self->do('reset_camp_enrollments_qty');
         $self->do('remove_presences');
 
         parent::ondelete($self);

@@ -43,9 +43,6 @@
             "id": "action.confirm",
             "label": "Confirm",
             "controller": "sale_camp_enrollment_confirm",
-            "params": {
-                "id": "object.id"
-            },
             "visible": [
                 ["status", "=", "pending"],
                 ["state", "<>", "draft"]
@@ -62,6 +59,16 @@
             },
             "visible": [
                 ["status", "=", "waitlisted"],
+                ["state", "<>", "draft"]
+            ]
+        },
+        {
+            "id": "action.unconfirm",
+            "label": "Unconfirm",
+            "controller": "sale_camp_enrollment_unconfirm",
+            "confirm": true,
+            "visible": [
+                ["status", "=", "confirmed"],
                 ["state", "<>", "draft"]
             ]
         },

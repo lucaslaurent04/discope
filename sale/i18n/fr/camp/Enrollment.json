@@ -287,6 +287,9 @@
                 "action.transition.confirm": {
                     "label": "Confirmer"
                 },
+                "action.unconfirm": {
+                    "label": "Repasser en brouillon"
+                },
                 "action.transition.validate": {
                     "label": "Valider"
                 },
@@ -334,6 +337,9 @@
                 },
                 "action.transition.confirm": {
                     "label": "Confirmer"
+                },
+                "action.unconfirm": {
+                    "label": "Repasser en brouillon"
                 },
                 "action.transition.validate": {
                     "label": "Valider"
@@ -383,6 +389,9 @@
                 "action.transition.confirm": {
                     "label": "Confirmer"
                 },
+                "action.unconfirm": {
+                    "label": "Repasser en brouillon"
+                },
                 "action.transition.validate": {
                     "label": "Valider"
                 },
@@ -431,6 +440,9 @@
                 "action.transition.confirm": {
                     "label": "Confirmer"
                 },
+                "action.unconfirm": {
+                    "label": "Repasser en brouillon"
+                },
                 "action.transition.validate": {
                     "label": "Valider"
                 },
@@ -476,6 +488,9 @@
                 },
                 "action.transition.confirm": {
                     "label": "Confirmer"
+                },
+                "action.unconfirm": {
+                    "label": "Repasser en brouillon"
                 },
                 "action.transition.validate": {
                     "label": "Valider"

@@ -9,12 +9,12 @@
 use sale\camp\Enrollment;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Confirms the pending enrollment if the camp has an available spot, else adds it to the waiting list.",
+    'description'   => "Unconfirms the confirmed enrollment to alter it.",
     'params'        => [
 
         'id' => [
             'type'          => 'integer',
-            'description'   => "Identifier of the enrollment we want to confirm.",
+            'description'   => "Identifier of the enrollment we want to unconfirm.",
             'required'      => true
         ]
 
@@ -37,46 +37,22 @@ use sale\camp\Enrollment;
 ['context' => $context] = $providers;
 
 $enrollment = Enrollment::id($params['id'])
-    ->read([
-        'status',
-        'is_ase',
-        'camp_id' => [
-            'max_children',
-            'ase_quota',
-            'enrollments_ids' => ['status', 'is_ase']
-        ]
-    ])
+    ->read(['status', 'camp_id' => ['date_from']])
     ->first();
 
 if(is_null($enrollment)) {
     throw new Exception("unknown_enrollment", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-if($enrollment['status'] !== 'pending') {
+if($enrollment['status'] !== 'confirmed') {
     throw new Exception("invalid_status", EQ_ERROR_INVALID_PARAM);
 }
 
-$confirmed_enrollments_qty = 0;
-$confirmed_ase_enrollments = 0;
-foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
-    if(in_array($en['status'], ['confirmed', 'validated'])) {
-        $confirmed_enrollments_qty++;
-
-        if($en['is_ase']) {
-            $confirmed_ase_enrollments++;
-        }
-    }
+if($enrollment['camp_id']['date_from'] <= time()) {
+    throw new Exception("camp_already_started", EQ_ERROR_INVALID_PARAM);
 }
 
-$transition = 'confirm';
-if($confirmed_enrollments_qty >= $enrollment['camp_id']['max_children']) {
-    $status = 'waitlist';
-}
-if($enrollment['is_ase'] && $confirmed_ase_enrollments >= $enrollment['camp_id']['ase_quota']) {
-    $status = 'waitlist';
-}
-
-Enrollment::id($enrollment['id'])->transition($transition);
+Enrollment::id($enrollment['id'])->transition('unconfirm');
 
 $context->httpResponse()
         ->status(200)
