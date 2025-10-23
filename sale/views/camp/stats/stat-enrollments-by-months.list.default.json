@@ -18,7 +18,7 @@
             "qty_pending": {
                 "operation": "SUM",
                 "usage": "numeric/integer",
-                "suffix": " pré-inscriptions"
+                "suffix": " brouillons"
             },
             "qty_waitlisted": {
                 "operation": "SUM",

@@ -335,3 +335,126 @@ Les présences de l'enfant sont générées quand l'inscription est `confirmée`
 > 📍 Liste globale des présences `Apps dashboard → Camps → Présences`
 
 > 💡 **Astuce :** Si non-facturation d'un hébergement supplémentaire, modifier "Week-end extra" puis supprimer manuellement la ligne ajoutée automatiquement.
+
+---
+
+
+### Stats camps
+
+#### Distribution enfants
+
+Liste les camps entre les deux dates données et donne des informations sur les quantités d'enfants participants aux camps.
+
+Informations :
+  - Age (_list les âges, contient une valeur si `Par âge` activer_)
+  - Qté garçons
+  - Qté filles
+  - Qté anciens
+  - Qté nouveaux (_première inscription_)
+  - Qté
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Camps → Distribution enfants`
+
+> 💡 **Astuce :** Il est possible de séparer `Par âge` pour avoir les informations séparées pour chaque âge des enfants.
+
+> **Note :** Uniquement les inscriptions validées sont prises en compte.
+
+#### Enfants par semaines
+
+Liste les semaines entre les deux dates données et done des informations sur les quantités d'enfants participants aux camps.
+
+Informations :
+  - Qté semaine
+  - Qté week-end (_si non CLSH et liaison entre 2 séjours_)
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Enfants → Par semaines`
+
+> **Note :** Uniquement les inscriptions validées sont prises en compte.
+
+#### Inscriptions par régions
+
+Liste les départements entre les deux dates données et donne des informations sur les quantités d'inscriptions aux camps.
+
+Informations :
+  - Qté
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Inscriptions → Par régions`
+
+> 💡 **Astuce :** Il est possible de séparer `Par commune (86, 87)` pour avoir les informations séparées pour chaque commune pour les départements 86xxx et 87xxx.
+
+> **Note :** Uniquement les inscriptions validées sont prises en compte.
+
+#### Inscriptions par tarifs
+
+Liste les tarifs entre les deux dates données et donne des informations sur les quantités d'inscriptions aux camps.
+
+Pour les camps `CLSH` la quantité de journées d'inscriptions est utilisées (_si 2 jours alors comptabilisé comme 2 inscriptions_).
+
+Informations :
+  - Qté
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Inscriptions → Par tarifs`
+
+#### Inscriptions par aides
+
+Liste les aidants entre les deux dates données et donne des informations sur les quantités d'inscriptions aux camps et les montants accordés.
+
+Informations :
+  - Qté
+  - Montant (_montant accordé par l'aidant_)
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Inscriptions → Par aides`
+
+#### Inscriptions par CEs
+
+Liste les CEs entre les deux dates données et donne des informations sur les quantités d'inscriptions aux camps.
+
+Informations :
+  - Qté
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Inscriptions → Par CEs`
+
+#### Inscriptions par types de séjour
+
+Liste les types de séjour entre les deux dates données et donne des informations sur les quantités d'inscriptions aux camps.
+
+Types de séjour :
+  - Camp
+  - Camp CLSH (4 jours ou 5 jours)
+
+Informations :
+  - Qté
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Inscriptions → Par types de séjour`
+
+> 💡 **Astuce :** Il est possible de séparer `Par durée` pour avoir les informations séparées pour les camps CLSH 4 ou 5 jours.
+
+#### Inscriptions par tranches d'âge
+
+Liste les tranches d'âge entre les deux dates données et donne des informations sur les quantités d'inscriptions aux camps.
+
+Tranches d'âges :
+  - 6 - 9
+  - 10 - 12
+  - 13 - 16
+
+Informations :
+  - Qté
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Inscriptions → Par tranches d'âge`
+
+#### Inscriptions par mois
+
+Liste les mois quand se déroule les camps entre deux dates données et donnes des informations sur les quantités d'inscriptions aux camps par status.
+
+Informations :
+  - Qté brouillon
+  - Qté en attente
+  - Qté confirmée
+  - Qté validée
+  - Qté annulée
+  - Qté
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Inscriptions → Par mois`
+
+---
