@@ -107,14 +107,15 @@ $result = [];
 
 $camps = Camp::search($domain)
     ->read([
+        'is_clsh',
         'product_id',
         'day_product_id',
-        'weekend_product_id',
         'center_id',
         'enrollments_ids' => [
             'status',
             'enrollment_lines_ids' => [
-                'product_id'
+                'product_id',
+                'qty'
             ]
         ]
     ])
@@ -129,15 +130,27 @@ foreach($camps as $camp) {
             continue;
         }
 
+        $camp_product_id = $camp['is_clsh'] ? $camp['day_product_id'] : $camp['product_id'];
+
         if(!isset($map_center_tariffs_enrollments_qty[$camp['center_id']])) {
             $map_center_tariffs_enrollments_qty[$camp['center_id']] = [];
         }
-        if(!isset($map_center_tariffs_enrollments_qty[$camp['center_id']][$camp['product_id']])) {
-            $map_center_tariffs_enrollments_qty[$camp['center_id']][$camp['product_id']] = 0;
+        if(!isset($map_center_tariffs_enrollments_qty[$camp['center_id']][$camp_product_id])) {
+            $map_center_tariffs_enrollments_qty[$camp['center_id']][$camp_product_id] = 0;
         }
 
-        $map_center_tariffs_enrollments_qty[$camp['center_id']][$camp['product_id']]++;
-        $map_products[$camp['product_id']] = true;
+        $qty = 1;
+        if($camp['is_clsh']) {
+            foreach($enrollment['enrollment_lines_ids'] as $line) {
+                if($line['product_id'] === $camp_product_id) {
+                    $qty = $line['qty'];
+                    break;
+                }
+            }
+        }
+
+        $map_center_tariffs_enrollments_qty[$camp['center_id']][$camp_product_id] += $qty;
+        $map_products[$camp_product_id] = true;
     }
 }
 

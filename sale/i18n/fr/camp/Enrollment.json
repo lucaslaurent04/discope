@@ -284,13 +284,13 @@
                 "action.confirm": {
                     "label": "Confirmer"
                 },
-                "action.transition.confirm": {
-                    "label": "Confirmer"
+                "action.unconfirm": {
+                    "label": "Repasser en brouillon"
                 },
-                "action.transition.validate": {
+                "action.validate": {
                     "label": "Valider"
                 },
-                "action.transition.cancel": {
+                "action.cancel": {
                     "label": "Annuler"
                 },
                 "action.transfer": {
@@ -332,13 +332,13 @@
                 "action.confirm": {
                     "label": "Confirmer"
                 },
-                "action.transition.confirm": {
-                    "label": "Confirmer"
+                "action.unconfirm": {
+                    "label": "Repasser en brouillon"
                 },
-                "action.transition.validate": {
+                "action.validate": {
                     "label": "Valider"
                 },
-                "action.transition.cancel": {
+                "action.cancel": {
                     "label": "Annuler"
                 },
                 "action.transfer": {
@@ -380,13 +380,13 @@
                 "action.confirm": {
                     "label": "Confirmer"
                 },
-                "action.transition.confirm": {
-                    "label": "Confirmer"
+                "action.unconfirm": {
+                    "label": "Repasser en brouillon"
                 },
-                "action.transition.validate": {
+                "action.validate": {
                     "label": "Valider"
                 },
-                "action.transition.cancel": {
+                "action.cancel": {
                     "label": "Annuler"
                 },
                 "action.transfer": {
@@ -428,13 +428,13 @@
                 "action.confirm": {
                     "label": "Confirmer"
                 },
-                "action.transition.confirm": {
-                    "label": "Confirmer"
+                "action.unconfirm": {
+                    "label": "Repasser en brouillon"
                 },
-                "action.transition.validate": {
+                "action.validate": {
                     "label": "Valider"
                 },
-                "action.transition.cancel": {
+                "action.cancel": {
                     "label": "Annuler"
                 },
                 "action.transfer": {
@@ -474,13 +474,13 @@
                 "action.confirm": {
                     "label": "Confirmer"
                 },
-                "action.transition.confirm": {
-                    "label": "Confirmer"
+                "action.unconfirm": {
+                    "label": "Repasser en brouillon"
                 },
-                "action.transition.validate": {
+                "action.validate": {
                     "label": "Valider"
                 },
-                "action.transition.cancel": {
+                "action.cancel": {
                     "label": "Annuler"
                 },
                 "action.transfer": {
@@ -506,7 +506,7 @@
             "name": "Inscriptions à confirmer",
             "description": "",
             "header": {
-                "action.transition.validate": {
+                "action.validate": {
                     "label": "Valider"
                 }
             },
@@ -517,7 +517,7 @@
             "name": "Inscriptions à valider",
             "description": "",
             "header": {
-                "action.transition.validate": {
+                "action.validate": {
                     "label": "Valider"
                 }
             },

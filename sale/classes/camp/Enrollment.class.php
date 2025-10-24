@@ -43,6 +43,12 @@ class Enrollment extends Model {
                 'relation'          => ['child_id' => 'name']
             ],
 
+            'description' => [
+                'type'              => 'string',
+                'usage'             => 'text/plain',
+                'description'       => "Description of the enrollment."
+            ],
+
             'child_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Child',
@@ -498,6 +504,12 @@ class Enrollment extends Model {
             'external_ref' => [
                 'type'              => 'string',
                 'description'       => "External reference for enrollment, if any."
+            ],
+
+            'external_data' => [
+                'type'              => 'string',
+                'usage'             => 'text/json',
+                'description'       => "External data given to create enrollment."
             ],
 
             'fundings_ids' => [
@@ -988,32 +1000,32 @@ class Enrollment extends Model {
         ];
     }
 
-    /**
-     * After status confirm: reset the enrollments qty
-     */
     protected static function onafterConfirm($self) {
-        $self
-            ->do('reset-camp-enrollments-qty')
-            ->do('generate_funding')
+        // lock
+        $self->update(['is_locked' => true]);
+
+        $self->do('generate_funding')
             ->do('generate_presences');
     }
 
-    /**
-     * After status validate: lock enrollment and generate presences
-     */
-    protected static function onafterValidate($self) {
-        $self->update(['is_locked' => true])
-             ->do('generate_presences');
+    protected static function onafterUnconfirm($self) {
+        // unlock
+        $self->update(['is_locked' => false]);
+
+        // handle fundings and payments
+        $self->do('remove_financial_help_payments')
+            ->do('delete_unpaid_fundings')
+            ->do('update_fundings_due_to_paid')
+            ->update(['paid_amount' => null]);
+
+        $self->do('remove_presences');
     }
 
-    /**
-     * After status cancel: unlock enrollment and remove presences
-     */
     protected static function onafterCancel($self) {
+        // unlock
         $self->update([
             'is_locked'         => false,
-            'cancellation_date' => time(),
-            'status'            => 'cancelled'   // #todo - find why needed and fix error
+            'cancellation_date' => time()
         ]);
 
         // handle fundings and payments
@@ -1022,8 +1034,7 @@ class Enrollment extends Model {
             ->do('update_fundings_due_to_paid')
             ->update(['paid_amount' => null]);
 
-        $self->do('reset-camp-enrollments-qty')
-            ->do('remove_presences');
+        $self->do('remove_presences');
     }
 
     public static function getWorkflow(): array {
@@ -1072,10 +1083,15 @@ class Enrollment extends Model {
                 'transitions' => [
                     'validate' => [
                         'status'        => 'validated',
-                        'onafter'       => 'onafterValidate',
-                        'help'          => "This step is mandatory for all enrollments (guardians have 10 days to return the documents for web enrollments).",
                         'description'   => "Mark the enrollment as validated (all docs and payments received).",
+                        'help'          => "This step is mandatory for all enrollments (guardians have 10 days to return the documents for web enrollments).",
                         'policies'      => ['validate']
+                    ],
+                    'unconfirm' => [
+                        'status'        => 'pending',
+                        'description'   => "Set the enrollment status back to pending to allow its alteration.",
+                        'policies'      => [],
+                        'onafter'       => 'onafterUnconfirm'
                     ],
                     'cancel' => [
                         'status'        => 'cancelled',
@@ -1109,25 +1125,25 @@ class Enrollment extends Model {
             'presence_day_1', 'presence_day_2', 'presence_day_3', 'presence_day_4', 'presence_day_5'
         ]);
 
-        // If is_external some fields cannot be modified
-        foreach($self as $enrollment) {
-            if($enrollment['is_external']) {
-                foreach(array_keys($values) as $column) {
-                    // weekend_extra can be modified to alter presences, but it'll not affect lines
-                    if(!in_array($column, ['is_locked', 'status', 'cancellation_date', 'enrollment_mails_ids', 'weekend_extra'])) {
-                        return ['is_external' => ['external_enrollment' => "Cannot modify an external enrollment."]];
-                    }
-                }
-            }
-        }
+        $allowed_keys = ['is_locked', 'status', 'description', 'all_documents_received', 'payment_status', 'paid_amount', 'cancellation_date', 'enrollment_mails_ids'];
 
-        // If is_locked cannot be modified
+        // weekend_extra can be modified to alter presences, but it'll not affect lines for external enrollments, only presences
+        $external_allowed_keys = ['weekend_extra'];
+
+        // Handle is_locked
         foreach($self as $enrollment) {
-            if($enrollment['is_locked']) {
-                foreach(array_keys($values) as $column) {
-                    if(!in_array($column, ['is_locked', 'status', 'cancellation_date', 'enrollment_mails_ids'])) {
-                        return ['is_locked' => ['locked_enrollment' => "Cannot modify a locked enrollment."]];
-                    }
+            if(!$enrollment['is_locked']) {
+                continue;
+            }
+
+            $enrollment_allowed_keys = $allowed_keys;
+            if($enrollment['is_external']) {
+                $enrollment_allowed_keys = array_merge($enrollment_allowed_keys, $external_allowed_keys);
+            }
+
+            foreach(array_keys($values) as $column) {
+                if(!in_array($column, $enrollment_allowed_keys)) {
+                    return ['is_locked' => ['locked_enrollment' => "Cannot modify a locked enrollment."]];
                 }
             }
         }
@@ -1403,18 +1419,19 @@ class Enrollment extends Model {
         $dispatch = $providers['dispatch'];
 
         $self->do('refresh_camp_product_line');
-        $self->do('reset-camp-enrollments-qty');
+        $self->do('reset_camp_enrollments_qty');
         $self->do('refresh_required_documents');
 
-        // remove previously generated presences of pending enrollment
+        // regenerate presences
         $self->read(['status', 'child_id']);
         foreach($self as $enrollment) {
-            if($enrollment['status'] !== 'pending' && $enrollment['status'] !== 'validated') {
+            if(!in_array($enrollment['status'], ['confirmed', 'validated'])) {
+                // skip if they were not yet generated
                 continue;
             }
 
             Child::id($enrollment['child_id'])->do('remove-unnecessary-presences');
-            Enrollment::id($enrollment['id'])->do('generate_presences');
+            self::id($enrollment['id'])->do('generate_presences');
         }
 
         // check child age
@@ -1432,13 +1449,16 @@ class Enrollment extends Model {
 
     public static function onupdateWeekendExtra($self) {
         $self->read([
-            'weekend_extra', 'is_external',
+            'weekend_extra',
+            'status',
             'camp_id'               => ['weekend_product_id', 'saturday_morning_product_id', 'date_from', 'date_to', 'center_office_id'],
             'enrollment_lines_ids'  => ['product_id']
         ]);
         foreach($self as $id => $enrollment) {
-            if($enrollment['is_external']) {
-                // If external we can modify weekend_extra to affect presences generation, but it shouldn't modify the enrollment lines
+            if(in_array($enrollment['status'], ['confirmed', 'validated'])) {
+                // If external we can modify weekend_extra to affect presences when confirmed/validated, but it shouldn't modify the enrollment lines
+                self::id($id)->do('generate_presences');
+
                 continue;
             }
 
@@ -1551,7 +1571,7 @@ class Enrollment extends Model {
 
     public static function onupdate($self, $values) {
         if(isset($values['status']) || (isset($values['state']) && $values['state'] === 'instance')) {
-            $self->do('reset-camp-enrollments-qty');
+            $self->do('reset_camp_enrollments_qty');
 
             foreach($self as $id => $enrollment) {
                 \eQual::run('do', 'sale_camp_followup_generate-task-status-change', ['enrollment_id' => $id]);
@@ -1609,36 +1629,109 @@ class Enrollment extends Model {
                         }
                     }
 
-                    Presence::create([
-                        'presence_date' => $date,
-                        'camp_id'       => $enrollment['camp_id'],
-                        'child_id'      => $enrollment['child_id'],
-                        'am_daycare'    => $am_daycare,
-                        'pm_daycare'    => $pm_daycare
-                    ]);
+                    $presence = Presence::search([
+                        ['presence_date', '=', $date],
+                        ['camp_id', '=', $enrollment['camp_id']],
+                        ['child_id', '=', $enrollment['child_id']]
+                    ])
+                        ->read(['id'])
+                        ->first();
+
+                    if(is_null($presence)) {
+                        Presence::create([
+                            'presence_date' => $date,
+                            'camp_id'       => $enrollment['camp_id'],
+                            'child_id'      => $enrollment['child_id'],
+                            'am_daycare'    => $am_daycare,
+                            'pm_daycare'    => $pm_daycare
+                        ]);
+                    }
+                    else {
+                        Presence::id($presence['id'])->update([
+                            'am_daycare'    => $am_daycare,
+                            'pm_daycare'    => $pm_daycare
+                        ]);
+                    }
+                }
+                else {
+                    // remove because not present that day for CLSH camp
+                    Presence::search([
+                        ['presence_date', '=', $date],
+                        ['camp_id', '=', $enrollment['camp_id']],
+                        ['child_id', '=', $enrollment['child_id']]
+                    ])
+                        ->delete(true);
                 }
 
                 $day_index++;
                 $date += 60 * 60 * 24;
             }
 
-            if(!$enrollment['is_clsh'] && $enrollment['weekend_extra'] !== 'none') {
-                // add Saturday presence
-                Presence::create([
-                    'presence_date' => $date,
-                    'camp_id'       => $enrollment['camp_id'],
-                    'child_id'      => $enrollment['child_id']
-                ]);
+            // handle weekend
+            if(!$enrollment['is_clsh']) {
+                $sunday_date = $date + 60 * 60 * 24;
 
-                if($enrollment['weekend_extra'] === 'full') {
-                    $date += 60 * 60 * 24;
+                if($enrollment['weekend_extra'] !== 'none') {
+                    $saturday_presence = Presence::search([
+                        ['presence_date', '=', $date],
+                        ['camp_id', '=', $enrollment['camp_id']],
+                        ['child_id', '=', $enrollment['child_id']]
+                    ])
+                        ->read(['id'])
+                        ->first();
 
-                    // add Sunday presence
-                    Presence::create([
-                        'presence_date' => $date,
-                        'camp_id'       => $enrollment['camp_id'],
-                        'child_id'      => $enrollment['child_id']
-                    ]);
+                    if(is_null($saturday_presence)) {
+                        // add Saturday presence
+                        Presence::create([
+                            'presence_date' => $date,
+                            'camp_id'       => $enrollment['camp_id'],
+                            'child_id'      => $enrollment['child_id']
+                        ]);
+                    }
+
+                    if($enrollment['weekend_extra'] === 'full') {
+                        $sunday_presence = Presence::search([
+                            ['presence_date', '=', $sunday_date],
+                            ['camp_id', '=', $enrollment['camp_id']],
+                            ['child_id', '=', $enrollment['child_id']]
+                        ])
+                            ->read(['id'])
+                            ->first();
+
+                        if(is_null($sunday_presence)) {
+                            // add Sunday presence
+                            Presence::create([
+                                'presence_date' => $sunday_date,
+                                'camp_id'       => $enrollment['camp_id'],
+                                'child_id'      => $enrollment['child_id']
+                            ]);
+                        }
+                    }
+                    else {
+                        // remove Sunday presence
+                        Presence::search([
+                            ['presence_date', '=', $sunday_date],
+                            ['camp_id', '=', $enrollment['camp_id']],
+                            ['child_id', '=', $enrollment['child_id']]
+                        ])
+                            ->delete(true);
+                    }
+                }
+                else {
+                    // remove Saturday and Sunday presences
+                    Presence::search([
+                        [
+                            ['presence_date', '=', $date],
+                            ['camp_id', '=', $enrollment['camp_id']],
+                            ['child_id', '=', $enrollment['child_id']]
+                        ],
+                        [
+                            ['presence_date', '=', $sunday_date],
+                            ['camp_id', '=', $enrollment['camp_id']],
+                            ['child_id', '=', $enrollment['child_id']]
+                        ]
+                    ])
+                        ->delete(true);
                 }
             }
         }
@@ -1864,19 +1957,16 @@ class Enrollment extends Model {
         $self->read([
             'price',
             'price_adapters_ids'    => ['value', 'origin_type'],
-            'fundings_ids'          => ['amount'],
+            'fundings_ids'          => ['paid_amount'],
             'camp_id'               => ['date_from', 'center_id' => ['center_office_id']]
         ]);
 
         foreach($self as $id => $enrollment) {
             $remaining_amount = $enrollment['price'];
-
-            $fundings_amount = 0.0;
             foreach($enrollment['fundings_ids'] as $funding) {
-                $fundings_amount += $funding['amount'];
+                $remaining_amount -= $funding['paid_amount'];
             }
 
-            $remaining_amount -= $fundings_amount;
             if($remaining_amount <= 0) {
                 continue;
             }
@@ -1970,13 +2060,13 @@ class Enrollment extends Model {
     public static function getActions(): array {
         return [
 
-            'reset-camp-enrollments-qty' => [
+            'reset_camp_enrollments_qty' => [
                 'description'   => "Reset the enrollments prices fields values so they can be re-calculated.",
                 'policies'      => [],
                 'function'      => 'doResetCampEnrollmentsQty'
             ],
 
-            'delete-lines' => [
+            'delete_lines' => [
                 'description'   => "Remove all enrollment lines.",
                 'policies'      => [],
                 'function'      => 'doDeleteLines'
@@ -2037,8 +2127,8 @@ class Enrollment extends Model {
     }
 
     public static function ondelete($self): void {
-        $self->do('delete-lines');
-        $self->do('reset-camp-enrollments-qty');
+        $self->do('delete_lines');
+        $self->do('reset_camp_enrollments_qty');
         $self->do('remove_presences');
 
         parent::ondelete($self);

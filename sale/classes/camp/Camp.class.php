@@ -153,6 +153,7 @@ class Camp extends Model {
                 'foreign_object'    => 'sale\camp\catalog\Product',
                 'description'       => "The product that will be added to the enrollment lines for a non CLSH camp.",
                 'domain'            => ['is_camp', '=', true],
+                'visible'           => ['is_clsh', '=', false],
                 'store'             => true,
                 'relation'          => ['camp_model_id' => 'product_id']
             ],
@@ -685,7 +686,7 @@ class Camp extends Model {
         foreach($self as $id => $camp) {
             $enrollment_qty = 0;
             foreach($camp['enrollments_ids'] as $enrollment) {
-                if(!in_array($enrollment['status'], ['cancelled', 'waitlisted'])) {
+                if(in_array($enrollment['status'], ['pending', 'confirmed', 'validated'])) {
                     $enrollment_qty++;
                 }
             }

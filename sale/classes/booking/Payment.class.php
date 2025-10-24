@@ -61,12 +61,9 @@ class Payment extends \sale\pay\Payment {
             'payment_origin' => [
                 'type'              => 'string',
                 'selection'         => [
-                    // money was received at the cashdesk
-                    'cashdesk',
-                    // money was received on a bank account
-                    'bank',
-                    // money was received online, through a PSP
-                    'online'
+                    'cashdesk',             // money was received at the cashdesk
+                    'bank',                 // money was received on a bank account
+                    'online'                // money was received online, through a PSP
                 ],
                 'description'       => "Origin of the received money.",
                 'default'           => 'bank'

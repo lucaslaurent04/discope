@@ -103,6 +103,11 @@
             "description": "L'activité nécessite-t-elle qu'un employé lui soit affecté ?",
             "help": ""
         },
+        "is_exclusive": {
+            "label": "Exclusive",
+            "description": "L'activité peut-elle partager une tranche horaire avec une autre pour un même animateur ?",
+            "help": ""
+        },
         "has_provider": {
             "label": "Prestataire nécessaire",
             "description": "L'activité nécessite-t-elle qu'un ou plusieurs prestataires lui soient affectés ?",

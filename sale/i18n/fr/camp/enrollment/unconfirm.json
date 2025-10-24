@@ -1,0 +1,17 @@
+{
+    "description": "Repasser l'inscription en cours pour la modifier.",
+    "model": {
+        "id": {
+            "label": "Inscription",
+            "description": "Inscription à repasser en brouillon.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "unknown_enrollment": "Inscription non connue.",
+            "invalid_status": "L'inscription n'est pas confirmée.",
+            "camp_already_started": "Le camp a déjà commencé"
+        }
+    }
+}
