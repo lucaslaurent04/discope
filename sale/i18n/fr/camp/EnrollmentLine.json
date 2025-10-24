@@ -57,7 +57,7 @@
         }
     },
     "error": {
-        "camp_id": {
+        "enrollment_id": {
             "locked_enrollment": "Impossible de modifier une ligne d'une inscription verrouillée."
         },
         "product_id": {

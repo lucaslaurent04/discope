@@ -148,11 +148,11 @@ class PriceAdapter extends Model {
             $enrollment_id = $values['enrollment_id'] ?? $price_adapter['enrollment_id'];
 
             $enrollment = Enrollment::id($enrollment_id)
-                ->read(['status'])
+                ->read(['is_locked'])
                 ->first();
 
-            if($enrollment['status'] !== 'pending') {
-                return ['enrollment_id' => ['invalid_enrollment_status' => "Enrollment must be pending to add/modify price adapters."]];
+            if($enrollment['is_locked']) {
+                return ['enrollment_id' => ['locked_enrollment' => "Cannot modify a line of a locked enrollment."]];
             }
         }
 

@@ -44,21 +44,7 @@
             "label": "Confirm",
             "controller": "sale_camp_enrollment_confirm",
             "visible": [
-                ["status", "=", "pending"],
-                ["state", "<>", "draft"]
-            ]
-        },
-        {
-            "id": "action.transition.confirm",
-            "label": "Confirm",
-            "controller": "model_transition",
-            "params": {
-                "entity": "sale\\camp\\Enrollment",
-                "transition": "confirm",
-                "ids": []
-            },
-            "visible": [
-                ["status", "=", "waitlisted"],
+                ["status", "in", ["pending", "waitlisted"]],
                 ["state", "<>", "draft"]
             ]
         },
@@ -73,7 +59,7 @@
             ]
         },
         {
-            "id": "action.transition.validate",
+            "id": "action.validate",
             "label": "Validate",
             "controller": "sale_camp_enrollment_validate",
             "visible": [
@@ -82,7 +68,7 @@
             ]
         },
         {
-            "id": "action.transition.cancel",
+            "id": "action.cancel",
             "label": "Cancel",
             "controller": "sale_camp_enrollment_cancel",
             "confirm": true,
@@ -399,11 +385,16 @@
                                             {
                                                 "type": "field",
                                                 "value": "tasks_ids",
-                                                "width": "100%",
+                                                "width": "66%",
                                                 "widget": {
                                                     "view": "list.enrollment",
                                                     "domain": ["visible_date", "<=", "date.this.day.first"]
                                                 }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "description",
+                                                "width": "33%"
                                             }
                                         ]
                                     }
@@ -573,8 +564,15 @@
                         "id": "section.fundings",
                         "label": "Fundings",
                         "visible": [
-                            ["status", "in", ["confirmed", "validated", "cancelled"]],
-                            ["state", "<>", "draft"]
+                            [
+                                ["status", "in", ["confirmed", "validated", "cancelled"]],
+                                ["state", "<>", "draft"]
+                            ],
+                            [
+                                ["status", "in", ["pending", "waitlisted"]],
+                                ["paid_amount", ">", 0],
+                                ["state", "<>", "draft"]
+                            ]
                         ],
                         "rows": [
                             {

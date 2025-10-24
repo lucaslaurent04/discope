@@ -242,8 +242,8 @@ class EnrollmentLine extends Model {
     public static function canupdate($self, $values): array {
         $self->read(['enrollment_id' => ['is_locked']]);
         foreach($self as $enrollment_line) {
-            if($enrollment_line['is_locked']) {
-                return ['camp_id' => ['locked_enrollment' => "Cannot modify a line of a locked enrollment."]];
+            if($enrollment_line['enrollment_id']['is_locked']) {
+                return ['enrollment_id' => ['locked_enrollment' => "Cannot modify a line of a locked enrollment."]];
             }
         }
 

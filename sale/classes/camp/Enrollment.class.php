@@ -43,6 +43,12 @@ class Enrollment extends Model {
                 'relation'          => ['child_id' => 'name']
             ],
 
+            'description' => [
+                'type'              => 'string',
+                'usage'             => 'text/plain',
+                'description'       => "Description of the enrollment."
+            ],
+
             'child_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Child',
@@ -498,6 +504,12 @@ class Enrollment extends Model {
             'external_ref' => [
                 'type'              => 'string',
                 'description'       => "External reference for enrollment, if any."
+            ],
+
+            'external_data' => [
+                'type'              => 'string',
+                'usage'             => 'text/json',
+                'description'       => "External data given to create enrollment."
             ],
 
             'fundings_ids' => [
@@ -1113,19 +1125,24 @@ class Enrollment extends Model {
             'presence_day_1', 'presence_day_2', 'presence_day_3', 'presence_day_4', 'presence_day_5'
         ]);
 
+        $allowed_keys = ['is_locked', 'status', 'description', 'all_documents_received', 'payment_status', 'paid_amount', 'cancellation_date', 'enrollment_mails_ids'];
+
+        // weekend_extra can be modified to alter presences, but it'll not affect lines for external enrollments, only presences
+        $external_allowed_keys = ['weekend_extra'];
+
         // Handle is_locked
         foreach($self as $enrollment) {
-            $allowed_keys = ['is_locked', 'status', 'all_documents_received', 'payment_status', 'paid_amount', 'cancellation_date', 'enrollment_mails_ids'];
+            if(!$enrollment['is_locked']) {
+                continue;
+            }
+
+            $enrollment_allowed_keys = $allowed_keys;
             if($enrollment['is_external']) {
-                // weekend_extra can be modified to alter presences, but it'll not affect lines for external enrollments, only presences
-                $allowed_keys = array_merge(
-                    $allowed_keys,
-                    ['weekend_extra']
-                );
+                $enrollment_allowed_keys = array_merge($enrollment_allowed_keys, $external_allowed_keys);
             }
 
             foreach(array_keys($values) as $column) {
-                if(!in_array($column, $allowed_keys)) {
+                if(!in_array($column, $enrollment_allowed_keys)) {
                     return ['is_locked' => ['locked_enrollment' => "Cannot modify a locked enrollment."]];
                 }
             }
@@ -1433,18 +1450,15 @@ class Enrollment extends Model {
     public static function onupdateWeekendExtra($self) {
         $self->read([
             'weekend_extra',
-            'is_external',
             'status',
             'camp_id'               => ['weekend_product_id', 'saturday_morning_product_id', 'date_from', 'date_to', 'center_office_id'],
             'enrollment_lines_ids'  => ['product_id']
         ]);
         foreach($self as $id => $enrollment) {
-            if($enrollment['is_external']) {
-                // If external we can modify weekend_extra to affect presences, but it shouldn't modify the enrollment lines
-                if(in_array($enrollment['status'], ['confirmed', 'validated'])) {
-                    // refresh presences (add/remove presences during weekend)
-                    self::id($id)->do('generate_presences');
-                }
+            if(in_array($enrollment['status'], ['confirmed', 'validated'])) {
+                // If external we can modify weekend_extra to affect presences when confirmed/validated, but it shouldn't modify the enrollment lines
+                self::id($id)->do('generate_presences');
+
                 continue;
             }
 
@@ -1943,19 +1957,16 @@ class Enrollment extends Model {
         $self->read([
             'price',
             'price_adapters_ids'    => ['value', 'origin_type'],
-            'fundings_ids'          => ['amount'],
+            'fundings_ids'          => ['paid_amount'],
             'camp_id'               => ['date_from', 'center_id' => ['center_office_id']]
         ]);
 
         foreach($self as $id => $enrollment) {
             $remaining_amount = $enrollment['price'];
-
-            $fundings_amount = 0.0;
             foreach($enrollment['fundings_ids'] as $funding) {
-                $fundings_amount += $funding['amount'];
+                $remaining_amount -= $funding['paid_amount'];
             }
 
-            $remaining_amount -= $fundings_amount;
             if($remaining_amount <= 0) {
                 continue;
             }

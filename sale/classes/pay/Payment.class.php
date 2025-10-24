@@ -52,7 +52,8 @@ class Payment extends Model {
                 'type'              => 'string',
                 'selection'         => [
                     'cashdesk',             // money was received at the cashdesk
-                    'bank'                  // money was received on a bank account
+                    'bank',                 // money was received on a bank account
+                    'online'                // money was received online, through a PSP
                 ],
                 'description'       => "Origin of the received money.",
                 'default'           => 'bank'

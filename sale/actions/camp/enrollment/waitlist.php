@@ -9,12 +9,12 @@
 use sale\camp\Enrollment;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Confirms the pending enrollment.",
+    'description'   => "Adds the pending enrollment to the waiting list.",
     'params'        => [
 
         'id' => [
             'type'          => 'integer',
-            'description'   => "Identifier of the enrollment we want to confirm.",
+            'description'   => "Identifier of the enrollment we want to add to the waiting list.",
             'required'      => true
         ]
 
@@ -44,7 +44,7 @@ if(is_null($enrollment)) {
     throw new Exception("unknown_enrollment", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-if(!in_array($enrollment['status'], ['pending', 'waitlisted'])) {
+if($enrollment['status'] !== 'pending') {
     throw new Exception("invalid_status", EQ_ERROR_INVALID_PARAM);
 }
 
@@ -52,7 +52,7 @@ if($enrollment['camp_id']['date_from'] <= time()) {
     throw new Exception("camp_already_started", EQ_ERROR_INVALID_PARAM);
 }
 
-Enrollment::id($enrollment['id'])->transition('confirm');
+Enrollment::id($enrollment['id'])->transition('waitlist');
 
 $context->httpResponse()
         ->status(200)
