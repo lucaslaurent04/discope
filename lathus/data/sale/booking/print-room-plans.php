@@ -61,6 +61,36 @@ use Twig\TwigFilter;
  * Methods
  */
 
+// Returns main building parent id
+$getParentBuildingRentalUnitId = function($parent_id, $map_parents) use(&$getParentBuildingRentalUnitId) {
+    if(!isset($map_parents[$parent_id])) {
+        return $parent_id;
+    }
+    return $getParentBuildingRentalUnitId($map_parents[$parent_id], $map_parents);
+};
+
+// Returns ids of sub rental units without any children
+$getSubRentalUnitsIds = function($parent_rental_unit_id) use(&$getSubRentalUnitsIds) {
+    $sub_rental_units = RentalUnit::search(['parent_id', '=', $parent_rental_unit_id])
+        ->read(['has_children'])
+        ->get();
+
+    $sub_rental_units_ids = [];
+    foreach($sub_rental_units as $sub_rental_unit) {
+        if(!$sub_rental_unit['has_children']) {
+            $sub_rental_units_ids[] = $sub_rental_unit['id'];
+        }
+        else {
+            $sub_rental_units_ids = array_merge(
+                $sub_rental_units_ids,
+                $getSubRentalUnitsIds($sub_rental_unit['id'])
+            );
+        }
+    }
+
+    return $sub_rental_units_ids;
+};
+
 $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
 $formatDate = fn($value) => date($date_format, $value);
 
@@ -106,11 +136,11 @@ $booking = Booking::id($params['id'])
         ],
         'rental_unit_assignments_ids' => [
             'rental_unit_id' => [
-                'name',
-                'capacity',
-                'extra',
-                'description',
-                'parent_id'
+                'name',         // template
+                'capacity',     // template
+                'description',  // template
+                'parent_id',    // needed to map by main buildings
+                'has_children'  // needed to list only sub rental units (without any children)
             ]
         ]
     ])
@@ -148,17 +178,29 @@ foreach($sub_rental_units as $id => $sub_rental_unit) {
     $map_parents[$id] = $sub_rental_unit['parent_id'];
 }
 
-$getParentBuildingRentalUnitId = function($parent_id) use(&$getParentBuildingRentalUnitId, $map_parents) {
-    if(!isset($map_parents[$parent_id])) {
-        return $parent_id;
-    }
-    return $getParentBuildingRentalUnitId($map_parents[$parent_id]);
-};
-
 foreach($booking['rental_unit_assignments_ids'] as $rental_unit_assignment) {
-    $parent_building_rental_unit_id = $getParentBuildingRentalUnitId($rental_unit_assignment['rental_unit_id']['parent_id']);
+    $parent_building_rental_unit_id = null;
+    if(is_null($rental_unit_assignment['rental_unit_id']['parent_id'])) {
+        $parent_building_rental_unit_id = $rental_unit_assignment['rental_unit_id']['id'];
+    }
+    else {
+        $parent_building_rental_unit_id = $getParentBuildingRentalUnitId($rental_unit_assignment['rental_unit_id']['parent_id'], $map_parents);
+    }
+
     if(isset($map_buildings_rental_units[$parent_building_rental_unit_id])) {
-        $map_buildings_rental_units[$parent_building_rental_unit_id]['rental_units'][] = $rental_unit_assignment['rental_unit_id'];
+        if($rental_unit_assignment['rental_unit_id']['has_children']) {
+            $rental_units = RentalUnit::ids($getSubRentalUnitsIds($rental_unit_assignment['rental_unit_id']['id']))
+                ->read(['name', 'capacity', 'description'])
+                ->get(true);
+
+            $map_buildings_rental_units[$parent_building_rental_unit_id]['rental_units'] = array_merge(
+                $map_buildings_rental_units[$parent_building_rental_unit_id]['rental_units'],
+                $rental_units
+            );
+        }
+        else {
+            $map_buildings_rental_units[$parent_building_rental_unit_id]['rental_units'][] = $rental_unit_assignment['rental_unit_id'];
+        }
     }
 }
 
