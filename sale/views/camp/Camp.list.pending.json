@@ -46,8 +46,7 @@
                 "value": "sojourn_number",
                 "width": "5%",
                 "sortable": false,
-                "readonly": true,
-                "visible": false
+                "readonly": true
             },
             {
                 "type": "field",

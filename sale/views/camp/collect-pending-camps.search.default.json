@@ -17,6 +17,12 @@
                                                 "label": "From",
                                                 "value": "date_from",
                                                 "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Sojourn number",
+                                                "value": "sojourn_number",
+                                                "width": "15%"
                                             }
                                         ]
                                     }

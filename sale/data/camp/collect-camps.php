@@ -60,6 +60,7 @@ use equal\orm\DomainCondition;
         ],
         'sojourn_type' => [
             'type'              => 'string',
+            'description'       => "Sojourn type of the camp.",
             'selection'         => [
                 'all',
                 'camp',
@@ -67,13 +68,43 @@ use equal\orm\DomainCondition;
                 'clsh-4-days',
                 'clsh-5-days'
             ],
-            'description'       => "Sojourn type of the camp.",
             'default'           => 'all'
         ],
         'camp_model_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\camp\CampModel',
             'description'       => "Model that was used as a base to create this camp."
+        ],
+        'sojourn_number' => [
+            'type'              => 'string',
+            'description'       => "Number of the sojourn."
+        ],
+        'sojourn_week' => [
+            'type'              => 'string',
+            'description'       => "The week 0 to 7 based on sojourn number",
+            'selection'         => [
+                'all',
+                '0',
+                '1',
+                '2',
+                '3',
+                '4',
+                '5',
+                '6',
+                '7'
+            ],
+            'default'           => 'all'
+        ],
+        'age_range' => [
+            'type'              => 'string',
+            'description'       => "Age range of the participants.",
+            'selection'         => [
+                'all',
+                '6-to-9',
+                '10-to-12',
+                '13-to-16'
+            ],
+            'default'           => 'all'
         ],
         'min_age' => [
             'type'              => 'integer',
@@ -155,9 +186,27 @@ if(isset($params['sojourn_type']) && $params['sojourn_type'] !== 'all') {
     }
 }
 
+if(!empty($params['sojourn_number'])) {
+    $domain->addCondition(
+        new DomainCondition('sojourn_number', 'like', "%{$params['sojourn_number']}%")
+    );
+}
+
+if($params['sojourn_week'] !== 'all') {
+    $domain->addCondition(
+        new DomainCondition('sojourn_number', 'like', "%{$params['sojourn_week']}__%")
+    );
+}
+
 if(isset($params['camp_model_id']) && $params['camp_model_id'] > 0) {
     $domain->addCondition(
         new DomainCondition('camp_model_id', '=', $params['camp_model_id'])
+    );
+}
+
+if($params['age_range'] !== 'all') {
+    $domain->addCondition(
+        new DomainCondition('age_range', '=', $params['age_range'])
     );
 }
 
