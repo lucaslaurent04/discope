@@ -22,10 +22,9 @@ use equal\orm\DomainCondition;
             'description'       => "Date interval lower limit.",
             'default'           => fn() => strtotime('last Sunday')
         ],
-        'date_to' => [
-            'type'              => 'date',
-            'description'       => "Date interval upper limit.",
-            'default'           => fn() => strtotime('Saturday this week')
+        'sojourn_number' => [
+            'type'              => 'string',
+            'description'       => "Sojourn number."
         ]
     ],
     'access'        => [
@@ -51,7 +50,7 @@ $domain = new Domain($params['domain']);
 
 $domain->addCondition(new DomainCondition('status', '=', 'published'));
 
-if (isset($params['date_from'])) {
+if(isset($params['date_from'])) {
     $day_of_week = date('w', $params['date_from']);
 
     // find previous Sunday
@@ -64,6 +63,9 @@ if (isset($params['date_from'])) {
     $domain->addCondition(new DomainCondition('date_from', '<=', $friday));
 }
 
+if(!empty($params['sojourn_number'])) {
+    $domain->addCondition(new DomainCondition('sojourn_number', 'like', "%{$params['sojourn_number']}%"));
+}
 
 $params['domain'] = $domain->toArray();
 

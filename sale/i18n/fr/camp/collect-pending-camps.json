@@ -7,9 +7,9 @@
             "label": "Semaine du",
             "description": ""
         },
-        "date_to": {
-            "label": "Au",
-            "description": ""
+        "sojourn_number": {
+            "label": "N° séjour",
+            "description": "Numéro de séjour."
         }
     },
     "view": {

@@ -50,6 +50,35 @@
             "label": "Modèle",
             "description": ""
         },
+        "sojourn_number": {
+            "label": "N° séjour",
+            "description": "Numéro de séjour."
+        },
+        "sojourn_week": {
+            "label": "Semaine séjour",
+            "description": "Semaine du séjour.",
+            "selection": {
+                "all": "Toutes",
+                "0": "0xx",
+                "1": "1xx",
+                "2": "2xx",
+                "3": "3xx",
+                "4": "4xx",
+                "5": "5xx",
+                "6": "6xx",
+                "7": "7xx"
+            }
+        },
+        "age_range": {
+            "label": "Tranche d'âge",
+            "description": "Tranche d'âge des participants.",
+            "selection": {
+                "all": "Toutes",
+                "6-to-9": "6 à 9 ans",
+                "10-to-12": "10 à 12 ans",
+                "13-to-16": "13 à 16 ans"
+            }
+        },
         "min_age": {
             "label": "Age min",
             "description": ""
