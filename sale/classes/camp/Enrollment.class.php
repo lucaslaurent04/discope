@@ -1956,7 +1956,7 @@ class Enrollment extends Model {
     public static function doGenerateFunding($self) {
         $self->read([
             'price',
-            'price_adapters_ids'    => ['value', 'origin_type'],
+            'price_adapters_ids'    => ['name', 'value', 'origin_type'],
             'fundings_ids'          => ['paid_amount'],
             'camp_id'               => ['date_from', 'center_id' => ['center_office_id']]
         ]);
@@ -1998,7 +1998,8 @@ class Enrollment extends Model {
                     'payment_origin'    => 'cashdesk',
                     'payment_method'    => 'camp_financial_help',
                     'funding_id'        => $funding['id'],
-                    'center_office_id'  => $funding['center_office_id']
+                    'center_office_id'  => $funding['center_office_id'],
+                    'description'       => $price_adapter['name']
                 ]);
             }
 
