@@ -1,0 +1,10 @@
+:host {
+    .mat-dialog-content {
+        padding: 25px;
+    }
+
+    ::ng-deep quill-editor .ql-container {
+        height: 100px !important;
+        font-size: 15px;
+    }
+}

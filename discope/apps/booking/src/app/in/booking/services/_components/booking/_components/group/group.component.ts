@@ -27,6 +27,7 @@ import { BookingMeal } from '../../_models/booking_meal.model';
 import { BookedServicesDisplaySettings, RentalUnitsSettings } from '../../../../services.component';
 
 import { BookingServicesBookingGroupDialogParticipantsOptionsComponent } from './_components/dialog-participants-options/dialog-participants-options.component';
+import { BookingServicesBookingGroupDialogMealsOptionsComponent } from './_components/dialog-meals-options/dialog-meals-options.component';
 
 
 // declaration of the interface for the map associating relational Model fields with their components
@@ -384,6 +385,40 @@ export class BookingServicesBookingGroupComponent
 
             date.setDate(date.getDate() + 1);
         }
+    }
+
+    public async oneditMealsOptions() {
+        const dialogRef = this.dialog.open(BookingServicesBookingGroupDialogMealsOptionsComponent, {
+            width: '33vw',
+            data: {
+                meal_prefs_description: this.instance.meal_prefs_description
+            }
+        });
+
+        console.log('INSTANCE', this.instance);
+
+        dialogRef.afterClosed().subscribe(async (result) => {
+            if(result) {
+                if(this.instance.meal_prefs_description != result.meal_prefs_description) {
+
+                    try {
+                        this.loading = true;
+                        await this.api.update('sale\\booking\\BookingLineGroup', [this.instance.id], {
+                            meal_prefs_description: result.meal_prefs_description
+                        });
+
+                        // relay change to parent component
+                        this.updated.emit();
+                    }
+                    catch(response) {
+                        this.api.errorFeedback(response);
+                    }
+                    finally {
+                        this.loading = false;
+                    }
+                }
+            }
+        });
     }
 
     public update(values: any) {

@@ -1,0 +1,15 @@
+<h3 style="display: flex; border-bottom: solid 1px lightgrey; margin-bottom: 0;" mat-dialog-title>
+    Info repas
+</h3>
+
+<div mat-dialog-content class="mat-dialog-content">
+    <quill-editor [formControl]="vm.meal_prefs_description.formControl"
+                  theme="snow"
+                  [placeholder]="'Description'"
+    ></quill-editor>
+</div>
+
+<div mat-dialog-actions style="justify-content: flex-end; border-top: solid 1px lightgrey;">
+    <button  mat-raised-button color="primary" style="float: right;" (click)="onClose()">ANNULER</button>
+    <button  mat-raised-button color="primary" style="float: right;" (click)="onSave()">SAUVER</button>
+</div>

@@ -228,6 +228,11 @@ class BookingLineGroup extends Model {
                 'ondelete'          => 'cascade'         // delete group when parent booking is deleted
             ],
 
+            'meal_prefs_description' => [
+                'type'              => 'string',
+                'description'       => "Global description about the meals of the group."
+            ],
+
             'meal_preferences_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\MealPreference',
