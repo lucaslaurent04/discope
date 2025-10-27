@@ -670,15 +670,21 @@
 
             <div class="part-container" [class.highlight]="!vGroup.meals.folded">
                 <div class="row">
-                    <div class="row-booking-meals-title" style="flex: 0 1 150px;">
+                    <div class="row-booking-meals-title">
                         Repas ({{providedMealsQty}})
                     </div>
+                    <button mat-mini-fab
+                            color="primary"
+                            style="transform: scale(0.66);"
+                            (click)="oneditMealsOptions();"
+                            title="Editer les options des repas">
+                        <mat-icon>info_outline</mat-icon>
+                    </button>
                     <mat-slide-toggle
                             [(ngModel)]="mealsShowSnack"
                             style="margin-left: 20px; transform: scale(0.8);">
                         {{ mealsShowSnack ? 'Masquer les collations' : 'Montrer les collations' }}
                     </mat-slide-toggle>
-
                 </div>
                 <div class="row" [class.hidden]="vGroup.meals.folded">
                     <div style="width: 100%;">

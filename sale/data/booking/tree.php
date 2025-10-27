@@ -72,6 +72,7 @@ $tree = [
         'activity_group_num',
         'has_person_with_disability',
         'person_disability_description',
+        'meal_prefs_description',
         'pack_id' => [
             'id',
             'name'

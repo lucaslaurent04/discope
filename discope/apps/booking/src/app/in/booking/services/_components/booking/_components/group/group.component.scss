@@ -85,9 +85,13 @@
                 .row-products-title,
                 .row-activities-title,
                 .row-booking-meals-title {
-                    flex: 1;
                     height: 40px;
                     line-height: 40px;
+                }
+
+                .row-products-title,
+                .row-activities-title {
+                    flex: 1;
                 }
 
                 .row-products-price {

@@ -40,6 +40,7 @@ export class BookingLineGroup {
         public activity_group_num: number = 0,
         public booking_meals_ids: any[] = [],
         public has_person_with_disability: boolean = false,
-        public person_disability_description: string = ''
+        public person_disability_description: string = '',
+        public meal_prefs_description: string = ''
     ) {}
 }

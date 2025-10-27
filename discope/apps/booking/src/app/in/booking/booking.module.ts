@@ -43,6 +43,7 @@ import { BookingActivitiesPlanningActivityScheduleComponent } from './activities
 
 import { BookingServicesBookingGroupDayMealsComponent } from './services/_components/booking/_components/group/_components/day-meals/day-meals.component';
 import { BookingServicesBookingGroupDayMealsMealComponent } from './services/_components/booking/_components/group/_components/day-meals/_components/meal/meal.component';
+import { BookingServicesBookingGroupDialogMealsOptionsComponent } from './services/_components/booking/_components/group/_components/dialog-meals-options/dialog-meals-options.component';
 import { BookingServicesBookingGroupDayActivitiesActivityDetailsDialogComponent } from './services/_components/booking/_components/group/_components/day-activities/_components/activity/_components/details/details.component';
 import { BookingServicesBookingGroupDialogParticipantsOptionsComponent } from './services/_components/booking/_components/group/_components/dialog-participants-options/dialog-participants-options.component';
 
@@ -80,7 +81,8 @@ import { BookingServicesBookingGroupDialogParticipantsOptionsComponent } from '.
     BookingActivitiesPlanningBookingGroupDetailDialogParticipantsOptionsComponent,
     BookingActivitiesPlanningWeekActivitiesComponent,
     BookingServicesBookingGroupDayMealsComponent,
-    BookingServicesBookingGroupDayMealsMealComponent
+    BookingServicesBookingGroupDayMealsMealComponent,
+    BookingServicesBookingGroupDialogMealsOptionsComponent
   ],
   providers: [
     DatePipe,
