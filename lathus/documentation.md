@@ -296,6 +296,14 @@ Flux normal : `Brouillon` (création) → `Confirmée` (récupération documents
 
 > 💡 **Astuce :** Une inscription confirmée peut être `Repasser en brouillon` afin de la modifier.
 
+#### Restrictions
+
+Un nombre d'inscriptions max par camp limite le nombre d'enfants acceptés. Un nouveau groupe de camp peut être créé pour ajouter des places.
+
+Un nombre d'inscriptions ASE (Aide Sociale à l'Enfance) max par camp limite le nombre d'enfants ASE acceptés.
+
+Pour être inscrit à un camp, un enfant doit respecter sa tranche d'âge à une année près. Donc un enfant de cinq ans peut être inscrit à un camp de 6 à 9 ans.
+
 #### Lignes
 
 Les lignes d'inscription listent les produits qui sont vendus. La ligne du produit du prix du camp "Tarif séjour X" ou "Tarif CLSH journée" est ajoutée directement à la création.
