@@ -51,11 +51,6 @@
             },
             {
                 "type": "field",
-                "value": "invoice_id",
-                "width": "10%"
-            },
-            {
-                "type": "field",
                 "value": "description",
                 "width": "25%"
             },
