@@ -234,10 +234,20 @@ if($params['with_fee']) {
                 'product_id'    => $cancellation_fee_product['id']
             ]);
 
+            $cancellation_line = BookingLine::id($cancellation_line['id'])
+                ->read(['price_id' => ['vat_rate']])
+                ->first();
+
+            $unit_price = $params['fee_amount'];
+            if(isset($cancellation_line['price_id']['vat_rate']) && $cancellation_line['price_id']['vat_rate'] > 0) {
+                $vat_rate = $cancellation_line['price_id']['vat_rate'];
+                $unit_price = $params['fee_amount'] / (1 + $vat_rate);
+            }
+
             BookingLine::id($cancellation_line['id'])
                 ->update([
                     'has_manual_unit_price' => true,
-                    'unit_price'            => $params['fee_amount']
+                    'unit_price'            => round($unit_price, 4)
                 ]);
 
             BookingLine::refreshPrice($orm, $cancellation_line['id']);
