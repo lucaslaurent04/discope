@@ -65,6 +65,7 @@ use sale\provider\Provider;
 $fields = [
     'center_id',
     'center_office_id',
+    'organisation_id',
     'description',
     'type_id',
     'date_from',

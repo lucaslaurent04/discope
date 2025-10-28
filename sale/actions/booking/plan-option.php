@@ -83,7 +83,7 @@ list($context, $orm, $cron, $dispatch) = [$providers['context'], $providers['orm
 
 // retrieve rental unit and related center
 $rental_unit = RentalUnit::id($params['rental_unit_id'])
-    ->read(['id', 'name', 'capacity', 'center_id' => ['id', 'name', 'sojourn_type_id', 'product_groups_ids']])
+    ->read(['id', 'name', 'capacity', 'center_id' => ['id', 'name', 'sojourn_type_id', 'organisation_id', 'product_groups_ids']])
     ->first(true);
 
 if(!$rental_unit) {
@@ -139,6 +139,7 @@ $booking = Booking::create([
         'date_from'             => $params['date_from'],
         'date_to'               => $params['date_to'],
         'center_id'             => $rental_unit['center_id']['id'],
+        'organisation_id'       => $rental_unit['center_id']['organisation_id'],
         'customer_identity_id'  => $params['customer_identity_id'],
         'customer_nature_id'    => $customer_nature_id
     ])
