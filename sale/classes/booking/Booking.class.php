@@ -2157,6 +2157,7 @@ class Booking extends Model {
             'date_from',
             'date_to',
             'center_id.autosale_list_category_id',
+            'center_id.sojourn_type_id',
             'customer_rate_class_id'
         ]);
 
@@ -2307,6 +2308,9 @@ class Booking extends Model {
                     'date_to'       => $booking['date_to'],
                     'is_autosale'   => true
                 ];
+                if(isset($booking['center_id.sojourn_type_id'])) {
+                    $group['sojourn_type_id'] = $booking['center_id.sojourn_type_id'];
+                }
                 if($count == 1) {
                     // in case of a single line, overwrite group name
                     foreach($products_to_apply as $autosale_id => $product) {
