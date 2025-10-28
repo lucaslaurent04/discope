@@ -185,7 +185,7 @@ if(!empty($domain)){
             'date_to',
             'total',
             'price',
-            'center_id'                 => ['id', 'name', 'center_office_id'],
+            'center_id'                 => ['id', 'name', 'sojourn_type_id' => ['name']],
             'customer_id'               => ['rate_class_id' => ['name']],
             'customer_identity_id'      => [
                 'id',
@@ -282,7 +282,7 @@ foreach($bookings as $booking) {
     // #memo - one entry by booking
     $result[] = [
         'center'            => $booking['center_id']['name'],
-        'center_type'       => ($booking['center_id']['center_office_id'] == 1)?'GG':'GA',
+        'center_type'       => $booking['center_id']['sojourn_type_id']['name'],
         'booking'           => $booking['name'],
         'created'           => $adaptOut($booking['created'], 'date'),
         'created_aamm'      => date('Y-m', $booking['created']),

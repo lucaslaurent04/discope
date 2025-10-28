@@ -662,7 +662,7 @@ if(!empty($domain)){
             'status',
             'booking_activities_ids',
             'type_id'                   => ['name'],
-            'center_id'                 => ['id', 'name', 'center_office_id'],
+            'center_id'                 => ['id', 'name', 'sojourn_type_id' => ['name']],
             'customer_id'               => ['rate_class_id' => ['name'], 'customer_type_id' => ['name']],
             'customer_identity_id'      => [
                 'id',
@@ -823,7 +823,7 @@ foreach($bookings as $booking) {
     // #memo - one entry by booking
     $result[] = [
         'center'                => $booking['center_id']['name'],
-        'center_type'           => ($booking['center_id']['center_office_id'] == 1)?'GG':'GA',
+        'center_type'           => $booking['center_id']['sojourn_type_id']['name'],
         'booking'               => $booking['name'],
         'type'                  => $booking['type_id']['name'],
         'booking_status'        => $status,
