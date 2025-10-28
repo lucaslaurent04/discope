@@ -1969,13 +1969,13 @@ class Booking extends Model {
                 'nb_adults',
             ];
 
-            $valid = true;
+            // Check conditions on booking
             foreach($conditions as $condition) {
-                $operator = $condition['operator'];
-                if(!in_array($condition['operator'], ['>', '>=', '<', '<=', '='])) {
-                    $valid = false;
-                    break;
+                if(!in_array($condition['operand'], $on_booking)) {
+                    continue;
                 }
+
+                $operator = $condition['operator'];
                 if($operator === '=') {
                     $operator = '==';
                 }
@@ -1985,71 +1985,63 @@ class Booking extends Model {
                     $value = "'$value'";
                 }
 
-                if(in_array($condition['operand'], $on_booking)) {
-                    $operand = $booking[$condition['operand']];
+                $operand = $booking[$condition['operand']];
+                if(!is_numeric($operand)) {
+                    $operand = "'$operand'";
+                }
+
+                if(!eval("return $operand $operator $value;")) {
+                    continue 2;
+                }
+            }
+
+            // Check conditions, rate class and sojourn type on groups
+            foreach($groups as $group) {
+                foreach($conditions as $condition) {
+                    if(!in_array($condition['operand'], $on_sojourn_group)) {
+                        continue;
+                    }
+
+                    $operator = $condition['operator'];
+                    if($operator === '=') {
+                        $operator = '==';
+                    }
+
+                    $value = $condition['value'];
+                    if(!is_numeric($condition['value'])) {
+                        $value = "'$value'";
+                    }
+
+                    if(!empty($attribution['rate_classes_ids']) && !in_array($group['rate_class_id'], $attribution['rate_classes_ids'])) {
+                        continue 2;
+                    }
+                    if($attribution['sojourn_type_id'] && $group['sojourn_type_id'] !== $attribution['sojourn_type_id']) {
+                        continue 2;
+                    }
+
+                    $operand = $group[$condition['operand']];
                     if(!is_numeric($operand)) {
                         $operand = "'$operand'";
                     }
 
                     if(!eval("return $operand $operator $value;")) {
-                        $valid = false;
-                        break;
-                    }
-                }
-                elseif(in_array($condition['operand'], $on_sojourn_group)) {
-                    $group_match = false;
-                    foreach($groups as $group) {
-                        if(!empty($attribution['rate_classes_ids']) && !in_array($group['rate_class_id'], $attribution['rate_classes_ids'])) {
-                            continue;
-                        }
-                        if($attribution['sojourn_type_id'] && $group['sojourn_type_id'] !== $attribution['sojourn_type_id']) {
-                            continue;
-                        }
-
-                        $operand = $group[$condition['operand']];
-                        if(!is_numeric($operand)) {
-                            $operand = "'$value'";
-                        }
-
-                        if(eval("return $operand $operator $value;")) {
-                            $group_match = true;
-                            break;
-                        }
-                    }
-
-                    if(!$group_match) {
-                        $valid = false;
-                        break;
-                    }
-                }
-            }
-
-            // If no conditions only check rate class and sojourn type
-            if(empty($conditions) && (!empty($attribution['rate_classes_ids']) || $attribution['sojourn_type_id'])) {
-                $group_match = false;
-                foreach($groups as $group) {
-                    if(!empty($attribution['rate_classes_ids'])) {
-                        if(in_array($group['rate_class_id'], $attribution['rate_classes_ids'])) {
-                            $group_match = true;
-                            break;
-                        }
-                    }
-                    elseif($attribution['sojourn_type_id']) {
-                        if($group['sojourn_type_id'] === $attribution['sojourn_type_id']) {
-                            $group_match = true;
-                            break;
-                        }
+                        continue 2;
                     }
                 }
 
-                if(!$group_match) {
-                    $valid = false;
+                if(!empty($attribution['rate_classes_ids'])) {
+                    if(!in_array($group['rate_class_id'], $attribution['rate_classes_ids'])) {
+                        continue;
+                    }
                 }
-            }
+                elseif($attribution['sojourn_type_id']) {
+                    if($group['sojourn_type_id'] !== $attribution['sojourn_type_id']) {
+                        continue;
+                    }
+                }
 
-            if($valid) {
                 $matched_attribution = $attribution;
-                break;
+                break 2;
             }
         }
 
