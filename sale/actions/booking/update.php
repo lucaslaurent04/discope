@@ -90,6 +90,7 @@ $orm->disableEvents();
 $orm->update(Booking::getType(), $booking_id, [
         'customer_nature_id'    => $params['fields']['customer_nature_id'],
         'center_id'             => $params['fields']['center_id'],
+        'organisation_id'       => $params['fields']['organisation_id'],
         'date_from'             => strtotime($params['fields']['date_from']),
         'date_to'               => strtotime($params['fields']['date_to']),
         'has_tour_operator'     => ($params['fields']['has_tour_operator'] ?? '') === 'true',

@@ -13,7 +13,9 @@
                     "controller": "sale_booking_update"
                 },
                 {
-                    "id": "SAVE_AND_VIEW"
+                    "id": "SAVE_AND_VIEW",
+                    "view": "form.default",
+                    "controller": "sale_booking_update"
                 }
             ]
         }

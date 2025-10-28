@@ -108,7 +108,7 @@ class Booking extends Model {
                 'foreign_object'    => 'identity\Center',
                 'description'       => "The center to which the booking relates to.",
                 'required'          => true,
-                'dependents'        => ['name', 'display_name', 'organisation_id', 'center_office_id']
+                'dependents'        => ['name', 'display_name', 'center_office_id']
             ],
 
             'center_office_id' => [
