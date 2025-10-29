@@ -135,6 +135,8 @@ $booking = Booking::id($params['id'])
             'address_city'
         ],
         'rental_unit_assignments_ids' => [
+            'qty',
+            'extra_qty',
             'rental_unit_id' => [
                 'name',         // template
                 'capacity',     // template
@@ -190,7 +192,7 @@ foreach($booking['rental_unit_assignments_ids'] as $rental_unit_assignment) {
     if(isset($map_buildings_rental_units[$parent_building_rental_unit_id])) {
         if($rental_unit_assignment['rental_unit_id']['has_children']) {
             $rental_units = RentalUnit::ids($getSubRentalUnitsIds($rental_unit_assignment['rental_unit_id']['id']))
-                ->read(['name', 'capacity', 'description'])
+                ->read(['name', 'capacity', 'extra', 'description'])
                 ->get(true);
 
             $map_buildings_rental_units[$parent_building_rental_unit_id]['rental_units'] = array_merge(
@@ -199,7 +201,13 @@ foreach($booking['rental_unit_assignments_ids'] as $rental_unit_assignment) {
             );
         }
         else {
-            $map_buildings_rental_units[$parent_building_rental_unit_id]['rental_units'][] = $rental_unit_assignment['rental_unit_id'];
+            $map_buildings_rental_units[$parent_building_rental_unit_id]['rental_units'][] = array_merge(
+                $rental_unit_assignment['rental_unit_id'],
+                [
+                    'capacity'  => $rental_unit_assignment['qty'],
+                    'extra'     => $rental_unit_assignment['extra_qty']
+                ]
+            );
         }
     }
 }

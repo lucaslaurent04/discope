@@ -9,6 +9,7 @@ export class BookingAccomodationAssignment {
         public rental_unit_id: any = {},
         public qty: number = 0,
         public use_extra: boolean = false,
+        public extra_qty: number = 0,
         public booking_line_group_id: number = 0,
     ) {}
 }

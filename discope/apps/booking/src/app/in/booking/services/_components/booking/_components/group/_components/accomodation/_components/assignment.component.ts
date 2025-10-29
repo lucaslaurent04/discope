@@ -1,22 +1,19 @@
-import { Component, Inject, OnInit, OnChanges, NgZone, Output, Input, EventEmitter, SimpleChanges, AfterViewInit, ViewChild, AfterContentInit } from '@angular/core';
-import { AuthService, ApiService, ContextService, TreeComponent } from 'sb-shared-lib';
+import { Component, OnInit, OnChanges, Output, Input, EventEmitter, SimpleChanges, AfterViewInit, AfterContentInit } from '@angular/core';
+import { ApiService, TreeComponent } from 'sb-shared-lib';
 
 import { FormControl, Validators, ValidationErrors } from '@angular/forms';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
-import { BookingPriceAdapter } from '../../../../../_models/booking_price_adapter.model';
 import { BookingLineGroup } from '../../../../../_models/booking_line_group.model';
 import { BookingAccomodationAssignment } from '../../../../../_models/booking_accomodation_assignment.model';
 import { BookingAccomodation } from '../../../../../_models/booking_accomodation.model';
 import { Booking } from '../../../../../_models/booking.model';
 
 
-import {MatSnackBar} from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 interface BookingGroupAccomodationAssignmentComponentsMap {
-};
+}
 
 @Component({
   selector: 'booking-services-booking-group-accomodation-assignment',
@@ -42,18 +39,17 @@ export class BookingServicesBookingGroupAccomodationAssignmentComponent extends 
 
     public useExtraFromControl: FormControl;
 
+    public extraQtyFromControl: FormControl;
+
 
     constructor(
         private api: ApiService,
-        private context: ContextService,
-        private auth: AuthService,
-        private dialog: MatDialog,
-        private zone: NgZone,
         private snack: MatSnackBar
     ) {
         super( new BookingAccomodationAssignment() );
-        this.qtyFormControl = new FormControl('', [Validators.required, this.validateQty.bind(this)]);
+        this.qtyFormControl = new FormControl(0, [Validators.required, this.validateQty.bind(this)]);
         this.useExtraFromControl = new FormControl(false);
+        this.extraQtyFromControl = new FormControl(0, [Validators.min(0)]);
     }
 
     private validateQty(c: FormControl) : ValidationErrors {
@@ -107,6 +103,7 @@ export class BookingServicesBookingGroupAccomodationAssignmentComponent extends 
         // assign VM values
         this.qtyFormControl.setValue(this.instance.qty);
         this.useExtraFromControl.setValue(this.instance.use_extra);
+        this.extraQtyFromControl.setValue(this.instance.extra_qty);
     }
 
     public ondelete() {
@@ -152,5 +149,27 @@ export class BookingServicesBookingGroupAccomodationAssignmentComponent extends 
             this.useExtraFromControl.setValue(!useExtra);
             this.api.errorFeedback(response);
         }
+    }
+
+    public async onchangeExtraQty(event: Event) {
+        const prevExtraQty = this.instance.extra_qty;
+        const extraQty = (event.target as HTMLSelectElement).value;
+        try {
+            await this.api.update(this.instance.entity, [this.instance.id], {extra_qty: extraQty});
+            // relay change to parent component
+            this.updated.emit();
+        } catch (response) {
+            this.instance.extra_qty = prevExtraQty;
+            this.extraQtyFromControl.setValue(prevExtraQty);
+            this.api.errorFeedback(response);
+        }
+    }
+
+    get extraOptions(): number[] {
+        const extra = this.instance?.rental_unit_id?.extra;
+
+        const extraQtyList = extra && extra > 0 ? Array.from({ length: extra }, (_, i) => i) : [];
+
+        return extraQtyList.map(x => x + 1);
     }
 }

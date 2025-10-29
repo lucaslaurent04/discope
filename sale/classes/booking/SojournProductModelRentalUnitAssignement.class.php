@@ -92,6 +92,13 @@ class SojournProductModelRentalUnitAssignement extends Model {
                 'default'           => false,
                 'onupdate'          => 'onupdateUseExtra',
                 'visible'           => ['is_accomodation', '=', true]
+            ],
+
+            'extra_qty' => [
+                'type'              => 'integer',
+                'description'       => 'Number of extra persons assigned to the rental unit for related booking line.',
+                'default'           => 0,
+                'onupdate'          => 'onupdateExtraQty'
             ]
 
         ];
@@ -156,11 +163,21 @@ class SojournProductModelRentalUnitAssignement extends Model {
     }
 
     public static function onupdateUseExtra($self) {
-        $self->read(['use_extra', 'qty', 'rental_unit_id' => ['capacity']]);
+        $self->read(['use_extra']);
         foreach($self as $id => $assignment) {
-            if(!$assignment['use_extra'] && $assignment['qty'] > $assignment['rental_unit_id']['capacity']) {
-                self::id($id)->update(['qty' => $assignment['rental_unit_id']['capacity']]);
+            if(!$assignment['use_extra']) {
+                self::id($id)->update(['extra_qty' => 0]);
             }
+            else {
+                self::id($id)->update(['extra_qty' => 1]);
+            }
+        }
+    }
+
+    public static function onupdateExtraQty($self) {
+        $self->read(['extra_qty', 'rental_unit_id' => ['capacity']]);
+        foreach($self as $id => $assignment) {
+            self::id($id)->update(['qty' => $assignment['rental_unit_id']['capacity'] + $assignment['extra_qty']]);
         }
     }
 

@@ -101,6 +101,7 @@ $tree = [
                 'name',
                 'qty',
                 'use_extra',
+                'extra_qty',
                 'booking_line_group_id',
                 'rental_unit_id' => [
                     'id',

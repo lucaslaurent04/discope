@@ -127,7 +127,7 @@ div.footer {
                                 <tr>
                                     <td>{{ rental_unit.name }}</td>
                                     <td style="text-align: center;">{{ rental_unit.capacity }}</td>
-                                    <td style="text-align: left; width: 120px;">{{ rental_unit.description }}</td>
+                                    <td style="text-align: left; width: 120px;">{{ rental_unit.description }}{% if rental_unit.extra > 0 %}{% if rental_unit.description|length > 0 %}, {% endif %}{{ rental_unit.extra }} lit{% if rental_unit.extra > 1 %}s{% endif %} extra{% endif %}</td>
                                 </tr>
                             {% endif %}
                         {% endfor %}
@@ -150,7 +150,7 @@ div.footer {
                                     <tr>
                                         <td>{{ rental_unit.name }}</td>
                                         <td style="text-align: center;">{{ rental_unit.capacity }}</td>
-                                        <td style="text-align: left; width: 120px;">{{ rental_unit.description }}</td>
+                                        <td style="text-align: left; width: 120px;">{{ rental_unit.description }} {% if rental_unit.extra > 0 %}{{ rental_unit.extra }} lit(s) extra{% endif %}</td>
                                     </tr>
                                 {% endif %}
                             {% endfor %}
@@ -174,7 +174,7 @@ div.footer {
                                     <tr>
                                         <td>{{ rental_unit.name }}</td>
                                         <td style="text-align: center;">{{ rental_unit.capacity }}</td>
-                                        <td style="text-align: left; width: 120px;">{{ rental_unit.description }}</td>
+                                        <td style="text-align: left; width: 120px;">{{ rental_unit.description }} {% if rental_unit.extra > 0 %}{{ rental_unit.extra }} lit(s) extra{% endif %}</td>
                                     </tr>
                                 {% endif %}
                             {% endfor %}

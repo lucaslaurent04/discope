@@ -15,8 +15,16 @@
                               [formControl]="useExtraFromControl"
                               (change)="onchangeUseExtra($event.checked)"
             >
-                extra <span class="extra-capacity">({{ instance.rental_unit_id ? instance.rental_unit_id.extra : 0 }})</span>
+                extra
             </mat-slide-toggle>
+            <select *ngIf="instance.rental_unit_id && instance.use_extra && instance.rental_unit_id.extra > 0"
+                    [formControl]="extraQtyFromControl"
+                    (change)="onchangeExtraQty($event)"
+            >
+                <option *ngFor="let val of extraOptions" [value]="val">
+                    {{ val }}
+                </option>
+            </select>
         </div>
         <div *ngIf="!assignmentQtyOpen" class="qty" (click)="onclickAssignmentQty()">{{instance.qty}}</div>
         <div *ngIf="assignmentQtyOpen" style="margin-left: auto;">
