@@ -851,6 +851,9 @@
                                                 "widget": {
                                                     "view": "list.booking",
                                                     "header": {
+                                                        "selection": {
+                                                            "default" : false
+                                                        },
                                                         "actions": {
                                                             "ACTION.CREATE": [ {
                                                                 "view": "form.create",
