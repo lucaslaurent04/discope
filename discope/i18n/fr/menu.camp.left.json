@@ -110,6 +110,10 @@
             "label": "Modèles",
             "help": ""
         },
+        "settings.catalog.price-lists" : {
+            "label": "Listes de prix",
+            "help": ""
+        },
         "settings.requirements": {
             "label": "Exigences",
             "help": ""

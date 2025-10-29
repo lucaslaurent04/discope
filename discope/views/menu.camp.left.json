@@ -346,6 +346,17 @@
                                     "view": "list.default",
                                     "domain": ["is_camp", "=", true]
                                 }
+                            },
+                            {
+                                "id": "settings.catalog.price-lists",
+                                "type": "entry",
+                                "label": "Prices Lists",
+                                "description": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\price\\PriceList",
+                                    "view": "list.default"
+                                }
                             }
                         ]
                     },
