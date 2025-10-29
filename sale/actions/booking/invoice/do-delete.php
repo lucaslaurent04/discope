@@ -52,6 +52,15 @@ Funding::ids($invoice['fundings_ids'])->update(['invoice_id' => null]);
 // if invoice had been created to convert an installment to a downpayment, revert the related funding
 if($invoice['is_deposit']) {
     Funding::id($invoice['funding_id'])->update(['invoice_id' => null, 'type' => 'installment']);
+
+    $funding = Funding::id($invoice['funding_id'])
+        ->read(['paid_amount'])
+        ->first();
+
+    // remove funding if it hasn't received any payment yet
+    if($funding['paid_amount'] == 0) {
+        Funding::id($funding['id'])->delete(true);
+    }
 }
 // if balanced proforma invoice deleted, set the status back to "checkedout"
 elseif($invoice['type'] === 'invoice') {

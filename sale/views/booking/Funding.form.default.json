@@ -109,7 +109,7 @@
             "access": {
                 "groups": ["finance.default.administrator", "finance.default.user"]
             },
-            "visible": [["type", "<>", "invoice"], ["due_amount", "<", 0]]
+            "visible": ["paid_amount", "=", 0]
         }
     ],
     "layout": {
