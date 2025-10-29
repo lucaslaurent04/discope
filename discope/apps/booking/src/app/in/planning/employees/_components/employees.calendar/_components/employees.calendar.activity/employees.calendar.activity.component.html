@@ -20,6 +20,7 @@
                 <div class="activity-customer" *ngIf="activity.customer_id?.name || activity.camp_id?.short_name">
                     <!-- Booking -->
                     <div class="activity-customer-details" *ngIf="activity.customer_id?.name">
+                        <mat-icon *ngIf="activity.booking_line_group_id.has_person_with_disability" aria-hidden="true" style="color: #514d4d; height: 12px; width: 12px;">accessible</mat-icon>
                         {{activity.customer_id.name}}
                     </div>
 
