@@ -47,7 +47,7 @@ if($invoice['status'] != 'proforma') {
 }
 
 // detach fundings from deleted invoice
-Funding::ids($invoice['fundings_ids'])->update(['invoice_id' => null]);  // The fundings that are referenced by the last invoice
+Funding::ids($invoice['fundings_ids'])->update(['invoice_id' => null]);
 
 // if invoice had been created to convert an installment to a downpayment, revert the related funding
 if($invoice['is_deposit']) {
