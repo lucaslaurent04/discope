@@ -5,7 +5,9 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\booking;
+
 use core\setting\Setting;
 use equal\data\DataFormatter;
 use equal\orm\Model;
@@ -2133,6 +2135,33 @@ class Booking extends Model {
 
         // mark booking according to found TBC flag
         $om->update(self::getType(), $id, ['is_price_tbc' => $is_tbc]);
+    }
+
+    public static function refreshOrder($om, $id) {
+        $bookings = $om->read(self::getType(), $id, ['id', 'booking_lines_groups_ids']);
+        if($bookings <= 0) {
+            return;
+        }
+
+        $booking = reset($bookings);
+
+        $groups = $om->read(BookingLineGroup::getType(), $booking['booking_lines_groups_ids'], ['id', 'order']);
+
+        $map_group_order = [];
+        foreach($groups as $id => $group) {
+            if(!isset($map_group_order[$group['order']])) {
+                $map_group_order[$group['order']] = [];
+            }
+
+            $map_group_order[$group['order']][] = $id;
+        }
+
+        $order = 0;
+        foreach($map_group_order as $group_ids) {
+            foreach($group_ids as $group_id) {
+                $om->update(BookingLineGroup::getType(), $group_id, ['order' => ++$order]);
+            }
+        }
     }
 
     private static function computeCountBookingYearFiscal($booking_id, $customer_id) {
