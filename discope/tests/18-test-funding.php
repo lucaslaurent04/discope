@@ -864,7 +864,7 @@ $tests = [
             return $message;
         },
         'assert'            =>  function ($message) {
-            return ( $message == 'non_refund_funding' );
+            return ( $message == 'funding_already_paid' );
         },
         'rollback'          =>  function () {
             $booking = Booking::search(['description', 'like', '%'. 'Validate that funding cannot be removed if a payment is received'.'%'])
