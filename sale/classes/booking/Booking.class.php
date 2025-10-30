@@ -1460,11 +1460,21 @@ class Booking extends Model {
                 'activity_group_num' => null
             ]);
 
+            $group_camp_name_format = Setting::get_value('sale', 'booking', 'group.camp.name_format');
+
             $group_ids = array_values($map_order_groups_ids);
             foreach($group_ids as $index => $group_id) {
-                BookingLineGroup::id($group_id)->update([
-                    'activity_group_num' => $index + 1
-                ]);
+                $activity_group_num = $index + 1;
+
+                $data = compact('activity_group_num');
+                if(!is_null($group_camp_name_format)) {
+                    $data['name'] = Setting::parse_format($group_camp_name_format, [
+                        'center_name'           => $booking['center_id']['name'],
+                        'activity_group_num'    => $activity_group_num
+                    ]);
+                }
+
+                BookingLineGroup::id($group_id)->update($data);
             }
         }
     }
