@@ -37,7 +37,7 @@ use sale\camp\Enrollment;
 ['context' => $context] = $providers;
 
 $enrollment = Enrollment::id($params['id'])
-    ->read(['status'])
+    ->read(['status', 'camp_id' => ['date_from']])
     ->first();
 
 if(is_null($enrollment)) {

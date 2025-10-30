@@ -1,9 +1,9 @@
 {
-    "description": "Confirmer l'inscription.",
+    "description": "Ajouter à la liste d'attente.",
     "model": {
         "id": {
             "label": "Inscription",
-            "description": "Inscription à confirmer.",
+            "description": "Inscription à ajouter à la liste d'attente.",
             "help": ""
         }
     },
