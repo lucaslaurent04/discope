@@ -170,3 +170,13 @@ Setting::assert_value('lodging', 'locale', 'i18n.customer_num', 'Num. Client');
 Setting::assert_value('lodging', 'locale', 'i18n.time_slot', 'Tranche horaire');
 Setting::assert_value('lodging', 'locale', 'i18n.snack', 'Collation');
 Setting::assert_value('lodging', 'locale', 'i18n.meals', 'Repas');
+
+Setting::assert_value('sale', 'booking', 'booking.name_format', '%s{name} - %s{customer_name} (%s{customer_identity_id})');
+Setting::assert_value('sale', 'booking', 'group.first_type', 'sojourn');
+Setting::assert_value('sale', 'booking', 'group.first_type', 'simple');
+Setting::assert_value('sale', 'booking', 'group.name_format', 'Services %s{center_name}');
+// Uncomment following if you need a group name format for specific group type
+//     Setting::assert_value('sale', 'booking', 'group.sojourn.name_format', 'Services séjour %s{center_name}');
+//     Setting::assert_value('sale', 'booking', 'group.simple.name_format', 'Services simple %s{center_name}');
+//     Setting::assert_value('sale', 'booking', 'group.event.name_format', 'Services événement %s{center_name}');
+//     Setting::assert_value('sale', 'booking', 'group.camp.name_format', 'Groupe (%s{activity_group_num})');

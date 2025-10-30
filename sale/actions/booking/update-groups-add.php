@@ -5,6 +5,8 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use core\setting\Setting;
 use sale\booking\Booking;
 use sale\booking\BookingLineGroup;
 
@@ -56,9 +58,15 @@ if(!$booking) {
 // they need to be disabled here to prevent recursive cycles that could lead to deep cycling issues.
 $orm->disableEvents();
 
+$group_name_format = Setting::get_value('sale', 'booking', 'group.name_format', 'Services %s{center_name}');
+
+$group_name = Setting::parse_format($group_name_format, [
+    'center_name' => $booking['center_id']['name']
+]);
+
 $values = [
     'booking_id' => $booking['id'],
-    'name'       => "Services " . $booking['center_id']['name'],
+    'name'       => $group_name,
     'date_from'  => ((int) $booking['date_from'] > 0) ? $booking['date_from'] : time(),
     'date_to'    => ((int) $booking['date_to'] > 0) ? $booking['date_to'] : time() + 86400
 ];
@@ -86,15 +94,38 @@ $group = BookingLineGroup::create($values)
 
 Booking::refreshNbPers($orm, $booking['id']);
 
-$group_type = 'camp';
-// if first group set type to "sojourn"
+$first_group_type = Setting::get_value('sale', 'booking', 'group.first_type', 'sojourn');
+$other_group_type = Setting::get_value('sale', 'booking', 'group.other_type', 'simple');
+
+$group_type = $other_group_type;
+// if first group set type to "sojourn" or setting value
 if(count($booking['booking_lines_groups_ids']) === 0) {
-    $group_type = 'sojourn';
+    $group_type = $first_group_type;
 }
 eQual::run('do', 'sale_booking_update-sojourn-type', [
     'id'            => $group['id'],
     'group_type'    => $group_type
 ]);
+
+$group_type_name_format = Setting::get_value('sale', 'booking', "group.$group_type.name_format");
+if(!is_null($group_type_name_format)) {
+    $groups_qty = count($booking['booking_lines_groups_ids']) + 1;
+    $type_groups_qty = count(BookingLineGroup::search(['group_type', '=', $group_type])->ids());
+
+    $group = BookingLineGroup::id($group['id'])->read(['name', 'activity_group_num'])->first(true);
+    $activity_group_num = $group['activity_group_num'];
+
+    $group_name = Setting::parse_format($group_type_name_format, [
+        'center_name'           => $booking['center_id']['name'],
+        'groups_qty'            => $groups_qty,
+        'type_groups_qty'       => $type_groups_qty,
+        'activity_group_num'    => $activity_group_num
+    ]);
+
+    if($group['name'] !== $group_name) {
+        BookingLineGroup::id($group['id'])->update(['name' => $group_name]);
+    }
+}
 
 // restore events in case this controller is chained with others
 $orm->enableEvents();
