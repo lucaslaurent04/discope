@@ -439,6 +439,51 @@ Les présences de l'enfant sont générées quand l'inscription est `confirmée`
 
 ---
 
+#### Envoi pré-inscription
+
+Quand une inscription est à l'état `Confirmée`, il est possible d'envoyer la **pré-inscription** par e-mail au tuteur principal.
+
+> 📍 Envoi pré-inscription `Apps dashboard → Camps → Inscriptions → Fiche inscription → Pré-inscription`
+
+> 💡 **Astuce :** La *Pré-inscription* se trouve dans le **menu de droite**.
+
+Le mail de pré-inscription comprend :
+  - Le document PDF de pré-inscription
+    - Liste les inscriptions (produits, prix) des enfants dont le tuteur principal est responsable, il est possible de ne sélectionner qu'un enfant specifique.
+  - Le sujet du mail
+  - Le contenu du mail
+    - Demande de documents pour valider l'inscription :
+      - la fiche sanitaire complétée et signée
+      - la fiche renseignement complémentaire complétée et signée
+      - la photocopie des vaccins de l'enfant
+      - le test préalable aux pratiques des activités aquatique et nautique, seulement pour les séjours avec le logo de la vague
+      - le règlement à l'ordre du CPA Lathus ou preuves
+  - Les documents attachés :
+    - Fiche sanitaire
+    - Petit trousseau
+    - Renseignement complémentaire
+    - Test préalable pratique activité aquatique
+
+Ce mail demande au tuteur principal de fournir les documents nécéssaire à l'inscription de l'enfant ainsi que le paiement.
+
+> **Notes** : Une inscription peu être "Validée" même si tous les paiements n'ont pas encore été reçus.
+
+#### Envoi confirmation
+
+Quand une inscription est à l'état `Validée`, il est possible d'envoyer la **confirmation** par e-mail au tuteur principal.
+
+> 📍 Envoi confirmation `Apps dashboard → Camps → Inscriptions → Fiche inscription → Confirmation`
+
+> 💡 **Astuce :** La *Confirmation* se trouve dans le **menu de droite**.
+
+Le mail de confirmation comprend :
+  - Le document PDF de confirmation
+    - Donne les informations précises sur l'inscription (prix, arrivée, départ _liaison avec autre séjour ou samedi matin_)
+  - Le sujet du mail
+  - Le contenu du mail
+    - Donne les informations résumées sur l'inscription (nom enfant, numéro séjour, nom camp, dates)
+
+Ce mail confirme au tuteur principal l'inscription de l'enfant au camp.
 
 ### Stats camps
 
