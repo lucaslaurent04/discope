@@ -468,7 +468,7 @@ Ce mail demande au tuteur principal de fournir les documents nécéssaire à l'i
 
 > **Notes** : Une inscription peu être "Validée" même si tous les paiements n'ont pas encore été reçus.
 
-#### Envoie confirmation
+#### Envoi confirmation
 
 Quand une inscription est à l'état `Validée`, il est possible d'envoyer la **confirmation** par e-mail au tuteur principal.
 
