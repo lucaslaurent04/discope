@@ -339,6 +339,17 @@ Le quotient familial est un **entier** d'une valeur de `0` à `5000`.
 
 Il est définis manuellement et fourni par le tuteur principal de l'enfant.
 
+#### Conseil d'entreprise
+
+Un CE peut être assigné à une réservation, la classe de camp est alors améliorée de 1.
+
+Si la classe de l'enfant est :
+  - `Autre`, alors l'assignation d'un CE modifie la classe de camp à `Habitants Vienne/Partenaires hors Vienne`.
+  - `Habitants Vienne/Partenaires hors Vienne`, alors l'assignation d'un CE modifie la classe de camp à `Adhérents/Partenaires Vienne/Habitants des cantons`.
+  - `Adhérents/Partenaires Vienne/Habitants des cantons`, alors pas de changement, car il n'existe pas de meilleur classe de camp.
+
+L'amélioration de la classe de camp de l'inscription va engendrer la selection d'un **tarif plus avantageux**.
+
 #### Réductions & aides
 
 Tant que l'inscription n'est pas confirmée, des réductions et aides peuvent être appliquées.
@@ -385,6 +396,27 @@ Ensuite, les différentes possibilités :
   - L'inscription peut être `transférée`
   - Ou, l'inscription peut être `annulée`
   - Ou, un groupe supplémentaire peut être ajouté au camp afin de créer plus de places
+
+Des messages d'alertes sont ajoutés à une inscription si des problèmes surviennent durant l'ajout de l'inscription ou si une incohérence est détectée.
+
+Liste des alertes :
+  - Week-end extra incohérent
+    - Message: _Le week-end extra donné par l'API du site web www.cpa-lathus.asso.fr contient "Hébergement tout le weekend" et "Hébergement jusqu'à samedi matin"._
+    - Code : `lodging.camp.pull_enrollments.weekend_extra_inconsistency`
+  - Aidant non trouvé
+    - Message : _L'aidant (commune) donné par l'API du site web www.cpa-lathus.asso.fr n'a pas été trouvé dans Discope._
+    - (`lodging.camp.pull_enrollments.sponsor_not_found`)
+  - CE non trouvé
+    - Message: _Le CE (conseil d'entreprise) donné par l'API du site web www.cpa-lathus.asso.fr n'a pas été trouvé dans Discope._
+    - Code : `lodging.camp.pull_enrollments.work_council_not_found`
+  - CE mauvais code
+    - Message: _Le code CE qui a été renseigné par le client ne correspond pas avec le code de conseil d'entreprise._
+    - Code : `lodging.camp.pull_enrollments.work_council_wrong_code`
+  - Prix incohérent
+    - Message: _Le prix calculé par le site web est différent du prix calculé par Discope._
+    - Code : `lodging.camp.pull_enrollments.price_mismatch`
+
+> 💡 **Astuce :** Des informations supplémentaires sur les alertes peuvent avoir été ajoutées à la description de l'inscription.
 
 #### Présences
 
