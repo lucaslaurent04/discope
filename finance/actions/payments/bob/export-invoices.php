@@ -617,7 +617,7 @@ if(count($invoices_data)) {
         'center_office_id'      => $params['center_office_id'],
         'export_type'           => $journal['type'] === 'sales' ? 'invoices' : 'invoices_peppol',
         'data'                  => $data,
-        'object_class'          => Invoice::getType(),
+        'object_class'          => InvoiceNotScope::getType(), // #memo - must use InvoiceNotScope to allow reversing export
         'object_ids'            => json_encode(array_column($invoices, 'id'))
     ])
         ->read(['id'])
