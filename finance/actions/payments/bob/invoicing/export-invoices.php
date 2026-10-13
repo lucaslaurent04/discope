@@ -12,19 +12,18 @@ use identity\CenterOffice;
 use finance\accounting\AccountingJournal;
 use sale\booking\Invoice;
 use sale\booking\Funding;
+use sale\booking\export\InvoiceNotScope;
 use sale\catalog\Product;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Creates an export archive containing all emitted invoices that haven't been exported yet (for external invoicing software).",
     'params'        => [
-
         'center_office_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\CenterOffice',
             'description'       => 'Management Group to which the center belongs.',
             'required'          => true
         ],
-
         'journal_type' => [
             'type'              => 'string',
             'description'       => "The type of journal to export for the center office.",
@@ -34,7 +33,6 @@ use sale\catalog\Product;
             ],
             'default'           => 'sales_peppol'
         ]
-
     ],
     'access'        => [
         'groups'        => ['finance.default.user'],
@@ -126,7 +124,8 @@ $funding_fields = [
     'paid_amount'
 ];
 
-$invoices = Invoice::search($domain, ['limit' => 100, 'sort' => ['number' => 'asc']])
+// #memo - InvoiceNotScope was created as a quick fix to have one query instead of two (1. for booking invoices, 2. for pos invoices)
+$invoices = InvoiceNotScope::search($domain, ['limit' => 100, 'sort' => ['number' => 'asc']])
     ->read([
         'name',
         'date',
@@ -567,7 +566,7 @@ if(count($invoices_data)) {
         'center_office_id'      => $params['center_office_id'],
         'export_type'           => $journal['type'] === 'sales' ? 'invoices' : 'invoices_peppol',
         'data'                  => $data,
-        'object_class'          => Invoice::getType(),
+        'object_class'          => InvoiceNotScope::getType(), // #memo - must use InvoiceNotScope to allow reversing export
         'object_ids'            => json_encode(array_keys($invoices_data))
     ])
         ->read(['id'])
@@ -579,7 +578,7 @@ if(count($invoices_data)) {
 
     try {
         // mark processed invoices as exported
-        Invoice::ids(array_keys($invoices_data))->update(['is_exported' => true]);
+        InvoiceNotScope::ids(array_keys($invoices_data))->update(['is_exported' => true]);
     }
     catch(Exception $e) {
         // remove export if error triggered while flagging invoices as exported
