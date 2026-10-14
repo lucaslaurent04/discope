@@ -1,0 +1,23 @@
+parameters:
+    paths:
+        - ../packages/calendar
+        - ../packages/communication
+        - ../packages/discope
+        - ../packages/discope
+        - ../packages/documents
+        - ../packages/finance
+        - ../packages/hr
+        - ../packages/kaleo
+        - ../packages/lathus
+        - ../packages/realestate
+        - ../packages/sale
+        - ../packages/stats
+        - ../packages/stock
+        - ../packages/support
+        - ../packages/valrance
+    scanDirectories:
+        - ../lib
+        - ../packages/core
+    scanFiles:
+        - ../eq.lib.php
+        - ../run.php

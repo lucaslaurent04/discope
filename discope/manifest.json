@@ -18,7 +18,8 @@
         "twig/intl-extra": "^3.3",
         "smhg/sepa-qr-data": "^1.1",
         "endroid/qr-code": "^4.3",
-        "codelicious/php-coda-parser": "^2.0"
+        "codelicious/php-coda-parser": "^2.0",
+        "phpstan/phpstan": ">=2.1"
     },
     "apps": [
         "booking",
