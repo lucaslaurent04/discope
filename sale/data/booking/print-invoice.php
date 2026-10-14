@@ -315,6 +315,8 @@ if(is_null($output)) {
         retrieve downpayment product (based on the organisation)
     */
 
+    $downpayment_product_id = 0;
+
     $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']['id']);
     if($downpayment_sku) {
         $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();

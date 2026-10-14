@@ -143,9 +143,9 @@ elseif($params['center_id'] && $params['center_id'] > 0) {
 if($centers_ids) {
     $centers = Center::ids($centers_ids)->read(['name', 'rental_units_ids' => ['is_accomodation', 'capacity', 'parent_id']])->get();
 
+    // initialize map_results as an empty associative array of intervals map
+    $index_map = [];
     if($centers) {
-        // initialize map_results as an empty associative array of intervals map
-        $index_map = [];
         $next_date = $params['range_from'];
         while($next_date < $params['range_to']) {
             $index = $occupanciesGetDateIndex($next_date, $params['range_interval']);

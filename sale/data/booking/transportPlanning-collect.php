@@ -204,7 +204,7 @@ usort($result, function ($a, $b) {
     }
 
     // last sort on booking activity name, if any
-    return strcmp($a['booking_activity_id']['name'] ?? '', $b['booking_activity_id']['name'] ?? '');
+    return strcmp($a['booking_activity'], $b['booking_activity']);
 });
 
 $context->httpResponse()

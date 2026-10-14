@@ -166,10 +166,20 @@ foreach($consumption_meter_readings as $id => $consumption_meter_reading) {
 $map_meter_reading_type = [];
 foreach ($consumption_meter_reading_map as $center_id => $meter_map) {
     foreach ($meter_map as $meter_id => $readings) {
+        $center_name = '';
+        $meter = [
+            'name'          => '',
+            'type_meter'    => '',
+            'meter_unit'    => ''
+        ];
+
         $first_checking = null;
         $last_checkout = null;
 
         foreach ($readings as $reading) {
+            $center_name = $reading['center_id']['name'];
+            $meter = $reading['consumption_meter_id'];
+
             $date_reading = $reading['date_reading'];
 
             if ($reading['booking_inspection_id']['type_inspection'] == 'checkedin') {
@@ -188,10 +198,10 @@ foreach ($consumption_meter_reading_map as $center_id => $meter_map) {
         $last_checkout_value = $last_checkout ? $last_checkout['index_value'] : null;
 
         $map_meter_reading_type[$center_id][$meter_id] = [
-            'center'                   => $reading['center_id']['name'],
-            'meter'                    => $reading['consumption_meter_id']['name'],
-            'meter_type'               => $reading['consumption_meter_id']['type_meter'],
-            'meter_unit'               => $reading['consumption_meter_id']['meter_unit'],
+            'center'                   => $center_name,
+            'meter'                    => $meter['name'],
+            'meter_type'               => $meter['type_meter'],
+            'meter_unit'               => $meter['meter_unit'],
             'index_initial'            => $first_checking_value,
             'index_final'              => $last_checkout_value,
             'index_consumption'        => $last_checkout_value - $first_checking_value

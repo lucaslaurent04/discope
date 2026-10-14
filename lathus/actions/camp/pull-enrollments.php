@@ -316,12 +316,9 @@ try {
             $fetched_external_refs[] = $ext_enrollment['wpOrderId'];
         }
 
-        $handled_enrollments = [];
-        if(!empty($fetched_external_refs)) {
-            $handled_enrollments = Enrollment::search(['external_ref', 'in', $fetched_external_refs])
-                ->read(['external_ref'])
-                ->get(true);
-        }
+        $handled_enrollments = Enrollment::search(['external_ref', 'in', $fetched_external_refs])
+            ->read(['external_ref'])
+            ->get(true);
 
         $handled_enrollments_ext_refs = array_column($handled_enrollments, 'external_ref');
 

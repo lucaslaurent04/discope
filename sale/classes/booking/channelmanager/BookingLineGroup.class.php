@@ -503,8 +503,8 @@ class BookingLineGroup extends \sale\booking\BookingLineGroup {
                                 while(count($children_stack)) {
                                     $unit_id = array_pop($children_stack);
                                     $children_ids[] = $unit_id;
-                                    if(isset($rental_units[$unit_id]) && $rental_units[$unit_id]['children_ids']) {
-                                        foreach($units[$unit_id]['children_ids'] as $child_id) {
+                                    if(!empty($rental_units[$unit_id]['children_ids'])) {
+                                        foreach($rental_units[$unit_id]['children_ids'] as $child_id) {
                                             $children_stack[] = $child_id;
                                         }
                                     }

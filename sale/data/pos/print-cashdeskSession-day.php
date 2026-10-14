@@ -139,6 +139,7 @@ $values = [
 
 $total_paid = 0.0;
 $total_cash = 0.0;
+$total_booking = 0.0;
 $total_bank_card = 0.0;
 $total_voucher = 0.0;
 $total_operations_in = 0.0;
@@ -268,9 +269,9 @@ foreach($cashdeskSession['operations_ids'] as $operation) {
 
     if($operation['type'] == 'move') {
         $item = [
-                'order'             => $order['name'],
+                'order'             => $operation['name'],
                 'type'              => 'M',
-                'created'           => $order['created'],
+                'created'           => $operation['created'],
                 'mode'              => 'espèces',
                 'amount'            => $operation['amount']
             ];

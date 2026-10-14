@@ -993,7 +993,7 @@ class Identity extends Model {
                 }
 
                 $duplicate_identity = null;
-                if(!empty($domain)) {
+                if(count($domain) > 0) {
                     $domain[] = ['id', '<>', $values['id']];
                     $identity_ids = $om->search('identity\Identity', $domain);
 

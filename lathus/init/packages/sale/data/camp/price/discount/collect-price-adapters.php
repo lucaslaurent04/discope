@@ -202,7 +202,7 @@ if(in_array($params['advanced_filter'], ['all', 'third-sojourn'])) {
     $result = array_values($result);
 }
 elseif($params['advanced_filter'] === 'second-sojourn') {
-    $result = array_filter($result, function($price_adapter) use($params) {
+    $result = array_filter($result, function($price_adapter) {
         return $price_adapter['amount'] >= 0.01;
     });
 

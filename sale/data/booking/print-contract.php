@@ -413,6 +413,7 @@ if(is_null($output)) {
     /*
         retrieve contact for booking
     */
+    $contact_name = '';
     foreach($booking['contacts_ids'] as $contact) {
         if(strlen($values['contact_name']) == 0 || $contact['type'] == 'booking') {
             // overwrite data of customer with contact info

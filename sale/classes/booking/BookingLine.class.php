@@ -974,10 +974,10 @@ class BookingLine extends Model {
             $sojourns[$gid][] = $lid;
         }
         foreach($sojourns as $gid => $lines_ids) {
+            $rentalunits_manual_assignment = false;
             $groups = $om->read(BookingLineGroup::getType(), $gid, ['has_locked_rental_units', 'booking_id.center_office_id']);
             if($groups > 0 && count($groups)) {
                 $group = reset($groups);
-                $rentalunits_manual_assignment = false;
                 $offices_preferences = $om->read(\identity\CenterOffice::getType(), $group['booking_id.center_office_id'], ['rentalunits_manual_assignment']);
                 if($offices_preferences > 0 && count($offices_preferences)) {
                     $prefs = reset($offices_preferences);

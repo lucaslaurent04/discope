@@ -41,6 +41,7 @@ $tests = [
                 ->read(['id'])
                 ->first(true);
 
+            $code = '';
             try {
                 eQual::run('do', 'sale_booking_do-delete', ['id' => $booking['id']]);
 

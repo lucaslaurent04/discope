@@ -105,6 +105,7 @@ $tests = [
             return $booking['id'];
         },
         'assert'            =>  function ($booking_id) {
+            $code = 0;
             try {
                 Booking::id($booking_id)->delete(true);
             } catch (Exception $e) {
@@ -396,6 +397,8 @@ $tests = [
                 ->read(['id','status'])
                 ->first(true);
 
+            $message = '';
+
             $new_product = Product::search(['sku','=', 'GA-NuitCh1-A' ])->read(['id'])->first(true);
             try {
                 BookingLine::create([
@@ -419,6 +422,7 @@ $tests = [
 
         'assert' =>  function ($data) {
 
+            $messageError = '';
             if ($data){
                 list($messageError) = $data;
             }

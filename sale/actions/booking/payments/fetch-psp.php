@@ -39,16 +39,15 @@ list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $provid
 
 $result = [];
 
+$payment = Payment::id($params['id'])
+    ->read(['id', 'center_office_id', 'has_psp', 'psp_type', 'psp_ref', 'booking_id' => ['id', 'name', 'extref_reservation_id']])
+    ->first(true);
+
+if(!$payment) {
+    throw new Exception('unknown_payment', QN_ERROR_UNKNOWN_OBJECT);
+}
+
 try {
-
-    $payment = Payment::id($params['id'])
-        ->read(['id', 'center_office_id', 'has_psp', 'psp_type', 'psp_ref', 'booking_id' => ['id', 'name', 'extref_reservation_id']])
-        ->first(true);
-
-    if(!$payment) {
-        throw new Exception('unknown_payment', QN_ERROR_UNKNOWN_OBJECT);
-    }
-
     $property = Property::search(['center_office_id', '=', $payment['center_office_id']])->read(['id'])->first(true);
 
     if(!$property) {

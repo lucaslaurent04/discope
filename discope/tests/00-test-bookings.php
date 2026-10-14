@@ -149,10 +149,7 @@ $tests = [
 
         },
         'act'               =>  function ($data) {
-
-            if ($data){
-                list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id) = $data;
-            }
+            list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id) = $data;
 
             $booking = Booking::create([
                     'date_from'             => strtotime('2023-01-01'),

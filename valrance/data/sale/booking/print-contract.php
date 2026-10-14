@@ -611,6 +611,7 @@ foreach($booking['contacts_ids'] as $contact) {
 }
 
 $contact = $contract_contact ?? ($booking_contact ?? ($other_contacts[0] ?? null));
+$contact_name = '';
 if(!is_null($contact)) {
     $contact_name = $contact['partner_identity_id']['display_name'];
     if($contact['partner_identity_id']['type_id'] !== 1) {
@@ -690,6 +691,7 @@ $booking_options['insurance_amount'] = round(3.5 * $contract['price'] / 100, 2);
 /*
     retrieve templates
 */
+$has_contract_approved = false;
 if($booking['center_id']['template_category_id']) {
 
     $template = Template::search([
