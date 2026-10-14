@@ -94,7 +94,7 @@ jobs:
       # initialize database with demo data
       - run: php run.php --do=init_package --package=discope --ignore_platform=true
       # run static analysis
-      - run: ~/repo/vendor/bin/phpstan analyse --no-progress --level=0 --memory-limit=-1 --configuration=packages/phpstan.neon
+      - run: ~/repo/vendor/bin/phpstan analyse --no-progress --level=1 --memory-limit=-1 --configuration=packages/phpstan.neon
       # run test units
       - run: php run.php --do=test_package --package=core
       - run: php run.php --do=test_package --package=discope
@@ -197,7 +197,7 @@ jobs:
       # initialize database with demo data
       - run: php run.php --do=init_package --package=discope --ignore_platform=true
       # run static analysis
-      - run: ~/repo/vendor/bin/phpstan analyse --no-progress --level=0 --memory-limit=-1 --configuration=packages/phpstan.neon
+      - run: ~/repo/vendor/bin/phpstan analyse --no-progress --level=1 --memory-limit=-1 --configuration=packages/phpstan.neon
       # run test units
       - run: php run.php --do=test_package --package=core
       - run: php run.php --do=test_package --package=discope
