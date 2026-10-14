@@ -36,8 +36,7 @@ class Holiday extends \equal\orm\Model {
                 'usage'             => 'date/year:4',
                 'description'       => 'Year of the holiday.',
                 'function'          => 'calcYear',
-                'store'             => true,
-                'description'       => "Year on which the holiday applies (based first date)."
+                'store'             => true
             ]
         ];
     }

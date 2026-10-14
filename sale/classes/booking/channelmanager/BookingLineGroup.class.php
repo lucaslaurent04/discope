@@ -210,8 +210,7 @@ class BookingLineGroup extends \sale\booking\BookingLineGroup {
      * @return void
      */
     public static function ondelete($om, $ids) {
-
-        return parent::ondelete($om, $ids);
+        parent::ondelete($om, $ids);
     }
 
     /**

@@ -49,7 +49,7 @@ class Setting extends \core\setting\Setting {
         return SettingSequence::class;
     }
 
-    public static function get_value(string $package, string $section, string $code, $default = null, array $selectors = [], string $lang = null) {
+    public static function get_value(string $package, string $section, string $code, $default = null, array $selectors = [], ?string $lang = null) {
         if(empty($selectors) || !array_is_list($selectors)) {
             // handle unique selector given
             $selectors = [$selectors];

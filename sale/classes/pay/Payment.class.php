@@ -395,7 +395,7 @@ class Payment extends Model {
                 $om->update('sale\pay\Funding', $payment['funding_id'], ['is_paid' => false, 'paid_amount' => null]);
             }
         }
-        return parent::ondelete($om, $oids);
+        parent::ondelete($om, $oids);
     }
 
     /**

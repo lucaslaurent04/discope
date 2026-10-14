@@ -1272,7 +1272,7 @@ class BookingLineGroup extends Model {
         $groups = $om->read(self::getType(), $oids, ['booking_id']);
         $bookings_ids = array_map(function($a) {return $a['booking_id'];}, $groups);
         $om->update(Booking::getType(), $bookings_ids, ['nb_pers' => null]);
-        return parent::ondelete($om, $oids);
+        parent::ondelete($om, $oids);
     }
 
     /**
