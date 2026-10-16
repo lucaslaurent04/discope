@@ -1636,10 +1636,12 @@ class BookingLine extends Model {
             ]
         ]);
         foreach($self as $id => $line) {
-            $price = 0;
-            if($line['price_id']['price']) {
-                $price = (float) $line['price_id']['price'];
+            if(!isset($line['price_id']['price'])) {
+                $result[$id] = 0.0;
+                continue;
             }
+
+            $price = (float) $line['price_id']['price'];
 
             $disc_percent = 0.0;
             $disc_value = 0.0;
@@ -1806,6 +1808,11 @@ class BookingLine extends Model {
             'price_id' => ['price']
         ]);
         foreach($self as $id => $line) {
+            if(!isset($line['price_id']['price'])) {
+                $result[$id] = 0.0;
+                continue;
+            }
+
             // delta between final price and catalog price
             $catalog_price = $line['price_id']['price'] * $line['qty'] * (1.0 + $line['vat_rate']);
 
@@ -1856,6 +1863,11 @@ class BookingLine extends Model {
         $result = [];
         $self->read(['price_id' => ['accounting_rule_id' => ['vat_rule_id' => ['rate']]]]);
         foreach($self as $id => $line) {
+            if(!isset($line['price_id']['accounting_rule_id']['vat_rule_id']['rate'])) {
+                $result[$id] = 0.0;
+                continue;
+            }
+
             $result[$id] = floatval($line['price_id']['accounting_rule_id']['vat_rule_id']['rate']);
         }
 
