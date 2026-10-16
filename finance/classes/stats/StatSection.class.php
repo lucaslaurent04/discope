@@ -1,10 +1,12 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2026
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace finance\stats;
+
 use equal\orm\Model;
 
 class StatSection extends Model {
@@ -14,12 +16,12 @@ class StatSection extends Model {
     }
 
     public static function getDescription() {
-        return "Stat sections allow to generate view by grouping sales in an arbitray manner (independent from chart of accounts and analytical chart of accounts).";
+        return "Stat sections allow to generate view by grouping sales in an arbitrary manner (independent from chart of accounts and analytical chart of accounts).";
     }
 
     public static function getColumns() {
-
         return [
+
             'name' => [
                 'type'              => 'alias',
                 'alias'             => 'code'
@@ -52,12 +54,9 @@ class StatSection extends Model {
         ];
     }
 
-
     public function getUnique() {
         return [
             ['code']
         ];
     }
-
-
 }

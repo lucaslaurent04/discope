@@ -84,6 +84,7 @@ if(!$booking) {
     throw new Exception('unknown_booking', EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-$context->httpResponse()
+$context
+    ->httpResponse()
     ->body($booking)
     ->send();

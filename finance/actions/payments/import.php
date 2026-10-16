@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2022
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -9,13 +9,13 @@ use identity\CenterOffice;
 use sale\booking\BankStatement;
 use sale\booking\BankStatementLine;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Import a Bank statements file and return the list of created statements. Already existing statements are ignored.",
     'help'          => "This controller must be called using POST requests (experience shows that HTTP header quickly reaches the nginx max-header limit).",
     'params'        => [
         'data' =>  [
-            'description'   => 'TXT file holding the data to import as statements.',
             'type'          => 'file',
+            'description'   => 'TXT file holding the data to import as statements.',
             'required'      => true
         ]
     ],
@@ -28,24 +28,27 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context', 'auth']
 ]);
 
-
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
+ */
+['context' => $context, 'auth' => $auth] = $providers;
 
 $user_id = $auth->userId();
 
 if($user_id <= 0) {
     // restricted to identified users
-    throw new Exception('unknown_user', QN_ERROR_NOT_ALLOWED);
+    throw new Exception('unknown_user', EQ_ERROR_NOT_ALLOWED);
 }
 
 // parse the CODA data
 $data = eQual::run('get', 'sale_booking_payments_coda-parse', ['data' => $params['data']]);
 
 if(empty($data)) {
-    throw new Exception('invalid_file', QN_ERROR_INVALID_PARAM);
+    throw new Exception('invalid_file', EQ_ERROR_INVALID_PARAM);
 }
 
 $result = [];
@@ -59,7 +62,7 @@ foreach($statements as $statement) {
     $center_office = CenterOffice::search(['bank_account_iban', '=', trim($iban)])->read(['id'])->first(true);
 
     if(!$center_office) {
-        throw new Exception('unknown_account_number', QN_ERROR_INVALID_PARAM);
+        throw new Exception('unknown_account_number', EQ_ERROR_INVALID_PARAM);
     }
 
     $fields = [
@@ -81,7 +84,7 @@ foreach($statements as $statement) {
         ->first(true);
 
     if($bank_statement) {
-        throw new Exception('already_imported', QN_ERROR_CONFLICT_OBJECT);
+        throw new Exception('already_imported', EQ_ERROR_CONFLICT_OBJECT);
     }
 
     // unique constraint on ['date', 'old_balance', 'new_balance'] will apply
@@ -115,16 +118,17 @@ foreach($statements as $statement) {
         }
     }
     catch(Exception $e) {
-        trigger_error('APP::faulty statement: '.$e->getMessage(), QN_REPORT_ERROR);
+        trigger_error('APP::faulty statement: '.$e->getMessage(), EQ_REPORT_ERROR);
         // rollback
         BankStatement::id($bank_statement['id'])->delete(true);
-        throw new Exception('import_error', QN_ERROR_UNKNOWN);
+        throw new Exception('import_error', EQ_ERROR_UNKNOWN);
     }
 
     $result[] = $bank_statement;
 }
 
-$context->httpResponse()
-        ->status(200)
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->body($result)
+    ->send();

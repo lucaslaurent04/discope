@@ -1,6 +1,6 @@
 {
     "name": "Vat Rules List",
-    "description": "This view is intented for displaying the VAT rules.",
+    "description": "This view is intended for displaying the VAT rules.",
     "access": {
         "groups": ["finance.default.user"]
      },

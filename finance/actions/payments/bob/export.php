@@ -77,6 +77,7 @@ foreach($center_office_ids as $center_office_id) {
     }
 }
 
-$context->httpResponse()
-        ->status(201)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(201)
+    ->send();

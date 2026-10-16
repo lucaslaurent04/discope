@@ -1,11 +1,14 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2026
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace finance\accounting;
+
 use equal\orm\Model;
+use sale\price\Price;
 
 class AccountingRule extends Model {
 
@@ -43,7 +46,7 @@ class AccountingRule extends Model {
 
             'accounting_rule_line_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => \finance\accounting\AccountingRuleLine::getType(),
+                'foreign_object'    => 'finance\accounting\AccountingRuleLine',
                 'foreign_field'     => 'accounting_rule_id',
                 'description'       => "Lines that are related to this rule."
             ],
@@ -56,9 +59,9 @@ class AccountingRule extends Model {
 
             'vat_rule_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \finance\tax\VatRule::getType(),
+                'foreign_object'    => 'finance\tax\VatRule',
                 'description'       => "VAT rule the line is related to.",
-                'onupdate'          => 'onupdateVatRuleId'
+                'dependents'        => ['prices_ids' => ['vat_rate']]
             ],
 
             'prices_ids' => [
@@ -85,15 +88,4 @@ class AccountingRule extends Model {
 
         ];
     }
-
-
-    public static function onupdateVatRuleId($om, $oids, $values, $lang) {
-        $res = $om->read(__CLASS__, $oids, ['prices_ids']);
-        if($res > 0 && count($res)) {
-            foreach($res as $oid => $odata) {
-                $om->update('sale\price\Price', $odata['prices_ids'], ['vat_rate' => null], $lang);
-            }
-        }
-    }
-
 }

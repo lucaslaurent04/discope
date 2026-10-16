@@ -1,24 +1,21 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2022
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-namespace discope\core\alert;
 
+namespace discope\core\alert;
 
 class Message extends \core\alert\Message {
 
     public static function getColumns() {
         return [
 
-            'center_office_id' => [
-                'type'              => 'computed',
-                'result_type'       => 'many2one',
+            'group_id' => [
+                'type'              => 'many2one',
                 'foreign_object'    => 'identity\CenterOffice',
-                'description'       => 'Office the message relates to (for targeting the users).',
-                'store'             => true,
-                'function'          => 'calcCenterOfficeId'
+                'description'       => 'Office the message relates to (for targeting the users).'
             ],
 
             'alert' => [
@@ -31,37 +28,28 @@ class Message extends \core\alert\Message {
         ];
     }
 
-    // We hijack the group_id to target the Center Offices.
-    public static function calcCenterOfficeId($om, $oids, $lang) {
+    public static function calcAlert($self) {
         $result = [];
-        $messages = $om->read(self::getType(), $oids, ['group_id']);
-        foreach($messages as $mid => $message) {
-            $result[$mid] = $message['group_id'];
-        }
-        return $result;
-    }
-
-    public static function calcAlert($om, $oids, $lang) {
-        $result = [];
-        $messages = $om->read(self::getType(), $oids, ['severity']);
-
-        foreach($messages as $oid => $message) {
+        $self->read(['severity']);
+        foreach($self as $id => $message) {
             switch($message['severity']) {
                 case 'notice':
-                    $result[$oid] = 'info';
+                    $alert = 'info';
                     break;
                 case 'warning':
-                    $result[$oid] = 'warn';
+                    $alert = 'warn';
                     break;
                 case 'important':
-                    $result[$oid] = 'major';
+                    $alert = 'major';
                     break;
                 case 'error':
                 default:
-                    $result[$oid] = 'error';
-                    break;
+                    $alert = 'error';
             }
+
+            $result[$id] = $alert;
         }
+
         return $result;
     }
 }

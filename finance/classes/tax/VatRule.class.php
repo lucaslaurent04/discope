@@ -1,10 +1,12 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2026
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace finance\tax;
+
 use equal\orm\Model;
 
 class VatRule extends Model {
@@ -18,8 +20,8 @@ class VatRule extends Model {
     }
 
     public static function getColumns() {
-
         return [
+
             'name' => [
                 'type'              => 'string',
                 'description'       => "Name of the VAT rule.",
@@ -47,9 +49,8 @@ class VatRule extends Model {
                 'description'       => "Account which the tax amount relates to.",
             ],
 
-            // #todo - if several accounting accounts are involded (distinct shares), we need to use a VatRuleLine class holding `account_id` and `share` fields
+            // #todo - if several accounting accounts are involved (distinct shares), we need to use a VatRuleLine class holding `account_id` and `share` fields
 
         ];
     }
-
 }

@@ -11,28 +11,25 @@ use documents\Export;
 [$params, $providers] = eQual::announce([
     'description'   => "Deletes the export and set linked objects as non exported.",
     'params'        => [
-
         'id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'documents\Export',
             'description'       => "Identifier of the targeted export.",
             'required'          => true
         ],
-
         'confirm' =>  [
             'type'          => 'boolean',
             'description'   => "Confirm the deletion of the export.",
             'required'      => true
         ]
-
     ],
     'access'        => [
-        'visibility'        => 'public'
+        'visibility'    => 'public'
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);

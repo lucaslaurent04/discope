@@ -82,6 +82,7 @@ foreach($center_offices as $center_office) {
     Setting::set_sequence('sale', 'accounting', 'invoice.sequence.'.$center_office['code'], 1);
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

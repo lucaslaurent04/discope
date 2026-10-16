@@ -1,10 +1,12 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2026
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace finance\accounting;
+
 use equal\orm\Model;
 
 class AccountingEntry extends Model {
@@ -33,7 +35,7 @@ class AccountingEntry extends Model {
 
             'invoice_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => Invoice::getType(),
+                'foreign_object'    => 'finance\accounting\Invoice',
                 'description'       => 'Invoice that the line relates to.',
                 'ondelete'          => 'cascade',
                 'visible'           => ['has_invoice', '=', true]
@@ -41,7 +43,7 @@ class AccountingEntry extends Model {
 
             'invoice_line_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => InvoiceLine::getType(),
+                'foreign_object'    => 'finance\accounting\InvoiceLine',
                 'description'       => 'Invoice line the entry relates to.',
                 'ondelete'          => 'cascade',
                 'visible'           => ['has_invoice', '=', true]
@@ -55,7 +57,7 @@ class AccountingEntry extends Model {
 
             'order_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \sale\pos\Order::getType(),
+                'foreign_object'    => 'sale\pos\Order',
                 'description'       => 'Invoice that the line relates to.',
                 'ondelete'          => 'cascade',
                 'visible'           => ['has_order', '=', true]
@@ -63,7 +65,7 @@ class AccountingEntry extends Model {
 
             'order_line_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \sale\pos\OrderLine::getType(),
+                'foreign_object'    => 'sale\pos\OrderLine',
                 'description'       => 'Invoice line the entry relates to.',
                 'ondelete'          => 'cascade',
                 'visible'           => ['has_invoice', '=', true]
@@ -71,7 +73,7 @@ class AccountingEntry extends Model {
 
             'account_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => AccountChartLine::getType(),
+                'foreign_object'    => 'finance\accounting\AccountChartLine',
                 'description'       => "Accounting account the entry relates to.",
                 'required'          => true,
                 'ondelete'          => 'null'
@@ -79,7 +81,7 @@ class AccountingEntry extends Model {
 
             'journal_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => AccountingJournal::getType(),
+                'foreign_object'    => 'finance\accounting\AccountingJournal',
                 'description'       => "Accounting journal the entry relates to.",
                 'required'          => true
             ],
@@ -97,7 +99,7 @@ class AccountingEntry extends Model {
                 'description'       => 'Amount to be disbursed.',
                 'default'           => 0.0
             ]
+
         ];
     }
-
 }

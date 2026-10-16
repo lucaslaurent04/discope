@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2025
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -131,11 +131,11 @@ foreach($invoices as $index => $invoice) {
         ob_start();
         print_r($invoice);
         $out = ob_get_clean();
-        trigger_error("APP::Ignoring invalid invoice : missing partner info for invoice {$invoice['name']} [{$invoice['id']}] - $out", QN_REPORT_WARNING);
+        trigger_error("APP::Ignoring invalid invoice : missing partner info for invoice {$invoice['name']} [{$invoice['id']}] - $out", EQ_REPORT_WARNING);
         unset($invoices[$index]);
     }
     elseif(!$invoice['has_orders'] && !isset($invoice['booking_id'])) {
-        trigger_error("APP::Ignoring invalid invoice : missing booking info for invoice {$invoice['name']} [{$invoice['id']}]", QN_REPORT_WARNING);
+        trigger_error("APP::Ignoring invalid invoice : missing booking info for invoice {$invoice['name']} [{$invoice['id']}]", EQ_REPORT_WARNING);
         unset($invoices[$index]);
     }
     // #memo - for cancelled invoices and orders invoices, it is ok not to have funding
@@ -449,6 +449,7 @@ if(!empty($result)) {
     }
 }
 
-$context->httpResponse()
-        ->status(201)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(201)
+    ->send();

@@ -45,13 +45,18 @@
             "help": ""
         },
         "controller": {
-            "label": "Controleur",
-            "description": "Controleur a invoquer.",
+            "label": "Contrôleur",
+            "description": "Contrôleur a invoquer.",
             "help": ""
         },
         "params": {
             "label": "Paramètres",
-            "description": "Paramètres à transmettre au controleur.",
+            "description": "Paramètres à transmettre au contrôleur.",
+            "help": ""
+        },
+        "group_id": {
+            "label": "Centre de gestion",
+            "description": "Le centre de gestion concerné par le message d'alerte.",
             "help": ""
         }
     },

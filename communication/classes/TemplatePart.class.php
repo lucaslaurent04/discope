@@ -1,17 +1,19 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2026
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace communication;
+
 use equal\orm\Model;
 
 class TemplatePart extends Model {
 
     public static function getColumns() {
-
         return [
+
             'order' => [
                 'type'              => 'integer',
                 'description'       => "Arbitrary order sequence of the part.",
@@ -32,7 +34,7 @@ class TemplatePart extends Model {
             'value' => [
                 'type'              => 'string',
                 'usage'             => 'text/html',
-                'description'       => "Template body (html).",
+                'description'       => "Template part body (html).",
                 'multilang'         => true,
                 'dependents'        => ['excerpt']
             ],
@@ -67,7 +69,6 @@ class TemplatePart extends Model {
     public static function calcExcerpt($self) {
         $result = [];
         $self->read(['value']);
-
         foreach ($self as $id => $part) {
             $html = $part['value'];
             $text = strip_tags($html);
@@ -79,5 +80,4 @@ class TemplatePart extends Model {
 
         return $result;
     }
-
 }

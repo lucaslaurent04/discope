@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2025
+    Some Rights Reserved, Yesbabylon SRL, 2020-2026
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -10,14 +10,12 @@ use finance\accounting\Invoice;
 [$params, $providers] = eQual::announce([
     'description'   => "Generate the UBL file of a given invoice.",
     'params'        => [
-
         'id' =>  [
             'type'          => 'integer',
             'description'   => "Identifier of the invoice for which the UBL file has to be generated.",
             'min'           => 1,
             'required'      => true
         ]
-
     ],
     'access' => [
         'visibility'    => 'protected',
@@ -455,7 +453,8 @@ $ubl['Invoice']['cac:LegalMonetaryTotal'] = [
 
 $ubl_xml = $formatToUblXml($ubl);
 
-$context->httpResponse()
-        ->status(200)
-        ->body($ubl_xml)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->body($ubl_xml)
+    ->send();

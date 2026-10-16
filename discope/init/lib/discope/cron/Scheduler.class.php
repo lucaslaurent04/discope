@@ -55,14 +55,14 @@ class Scheduler extends \equal\cron\Scheduler {
             // do not run the task if current available memory is below MEM_FREE_LIMIT
             $mem_available = self::computeAvailableMemory();
             if($mem_available < constant('MEM_FREE_LIMIT')) {
-                trigger_error("PHP::Ignoring scheduler batch because free memory is below MEM_FREE_LIMIT (".$mem_available."/".constant('MEM_FREE_LIMIT').")", QN_REPORT_INFO);
+                trigger_error("PHP::Ignoring scheduler batch because free memory is below MEM_FREE_LIMIT (".$mem_available."/".constant('MEM_FREE_LIMIT').")", EQ_REPORT_INFO);
                 return;
             }
 
             // if an exclusive task is already running, ignore current batch
             $running_tasks_ids = $orm->search('core\Task', [['status', '=', 'running'], ['is_exclusive', '=', true]]);
             if($running_tasks_ids > 0 && count($running_tasks_ids)) {
-                trigger_error("PHP::Ignoring scheduler batch because at least one exclusive task is already running (running tasks ".implode(',', $running_tasks_ids).")", QN_REPORT_INFO);
+                trigger_error("PHP::Ignoring scheduler batch because at least one exclusive task is already running (running tasks ".implode(',', $running_tasks_ids).")", EQ_REPORT_INFO);
                 return;
             }
             foreach($selected_tasks_ids as $tid) {
@@ -74,14 +74,14 @@ class Scheduler extends \equal\cron\Scheduler {
                 $task = reset($tasks);
                 // prevent simultaneous execution of a same task
                 if($task['status'] != 'idle') {
-                    trigger_error("PHP::Ignoring execution of a task that is already running [{$task['id']}] - [{$task['controller']}]", QN_REPORT_INFO);
+                    trigger_error("PHP::Ignoring execution of a task that is already running [{$task['id']}] - [{$task['controller']}]", EQ_REPORT_INFO);
                     continue;
                 }
                 // prevent concurrent execution for exclusive tasks
                 if($task['is_exclusive']) {
                     $running_tasks_ids = $orm->search('core\Task', ['status', '=', 'running']);
                     if($running_tasks_ids > 0 && count($running_tasks_ids)) {
-                        trigger_error("PHP::Ignoring execution of task that is exclusive [{$task['id']}] - [{$task['controller']}] (running tasks ".implode(',', $running_tasks_ids).")", QN_REPORT_INFO);
+                        trigger_error("PHP::Ignoring execution of task that is exclusive [{$task['id']}] - [{$task['controller']}] (running tasks ".implode(',', $running_tasks_ids).")", EQ_REPORT_INFO);
                         continue;
                     }
                 }
@@ -123,7 +123,7 @@ class Scheduler extends \equal\cron\Scheduler {
                     }
                     catch(\Exception $e) {
                         // error occurred during execution
-                        trigger_error("PHP::Error while running scheduled job [{$task['id']}]: ".$e->getMessage(), QN_REPORT_ERROR);
+                        trigger_error("PHP::Error while running scheduled job [{$task['id']}]: ".$e->getMessage(), EQ_REPORT_ERROR);
                         $status = 'error';
                         $msg = $e->getMessage();
                         $data = @unserialize($msg);

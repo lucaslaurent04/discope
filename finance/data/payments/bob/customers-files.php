@@ -13,31 +13,26 @@ use identity\Partner;
 [$params, $providers] = eQual::announce([
     'description'   => "Returns files 'CLIENTS_FACT.sch' and 'CLIENTS_FACT.txt' to import customers data in BOB software.",
     'params'        => [
-
         'domain' => [
             'type'          => 'array',
             'description'   => "Domain to filter the partners.",
             'default'       => []
         ],
-
         'file_name' => [
             'type'          => 'string',
             'description'   => "Name of the file.",
             'default'       => 'CLIENTS_FACT'
         ],
-
         'file_type' => [
             'type'          => 'string',
             'description'   => "Import file type.",
             'default'       => 'Fixed'
         ],
-
         'char_set' => [
             'type'          => 'string',
             'description'   => "Import file character set.",
             'default'       => 'ascii'
         ]
-
     ],
     'access'        => [
         'groups'        => ['finance.default.user'],

@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2025
+    Some Rights Reserved, Yesbabylon SRL, 2020-2026
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -207,35 +207,52 @@ class InvoiceLine extends Model {
         return $result;
     }
 
-    public static function onupdatePriceId($om, $oids, $values, $lang) {
-        $om->update(get_called_class(), $oids, ['vat_rate' => null, 'unit_price' => null, 'total' => null, 'price' => null]);
-        // reset parent invoice computed values
-        $om->callonce(self::getType(), '_resetInvoice', $oids, [], $lang);
+    public static function onupdatePriceId($self, $values) {
+        $self
+            ->update(['vat_rate' => null, 'unit_price' => null, 'total' => null, 'price' => null])
+            ->do('reset-invoice-prices');
     }
 
-    public static function onupdateVatRate($om, $oids, $values, $lang) {
-        $om->update(get_called_class(), $oids, ['price' => null]);
-        // reset parent invoice computed values
-        $om->callonce(self::getType(), '_resetInvoice', $oids, [], $lang);
+    public static function onupdateVatRate($self) {
+        $self
+            ->update(['price' => null])
+            ->do('reset-invoice-prices');
     }
 
-    public static function onupdateQty($om, $oids, $values, $lang) {
-        $om->update(get_called_class(), $oids, ['price' => null, 'total' => null]);
-        // reset parent invoice computed values
-        $om->callonce(self::getType(), '_resetInvoice', $oids, [], $lang);
+    public static function onupdateQty($self) {
+        $self
+            ->update(['price' => null, 'total' => null])
+            ->do('reset-invoice-prices');
     }
 
-    public static function onupdateDiscount($om, $oids, $values, $lang) {
-        $om->update(get_called_class(), $oids, ['price' => null, 'total' => null]);
-        // reset parent invoice computed values
-        $om->callonce(self::getType(), '_resetInvoice', $oids, [], $lang);
+    public static function onupdateDiscount($self) {
+        $self
+            ->update(['price' => null, 'total' => null])
+            ->do('reset-invoice-prices');
     }
 
-    public static function _resetInvoice($om, $oids, $values, $lang) {
-        $lines = $om->read(get_called_class(), $oids, ['invoice_id']);
-        if($lines > 0)  {
-            $invoices_ids = array_map(function($a) {return $a['invoice_id'];}, $lines);
-            $om->update('finance\accounting\Invoice', $invoices_ids, ['price' => null, 'total' => null]);
+    protected static function doResetInvoicePrices($self) {
+        $self->read(['invoice_id']);
+
+        $map_invoices_ids = [];
+        foreach($self as $line) {
+            $map_invoices_ids[$line['invoice_id']] = true;
         }
+
+        Invoice::ids(array_keys($map_invoices_ids))
+            ->update([
+                'price' => null,
+                'total' => null
+            ]);
+    }
+
+    public static function getActions() {
+        return [
+            'reset-invoice-prices' => [
+                'description'   => "Reset the prices of the invoices.",
+                'policies'      => [],
+                'function'      => 'doResetInvoicePrices'
+            ]
+        ];
     }
 }

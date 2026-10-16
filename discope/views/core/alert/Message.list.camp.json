@@ -69,7 +69,7 @@
             },
             {
                 "type": "field",
-                "value": "center_office_id",
+                "value": "group_id",
                 "visible": false
             },
             {

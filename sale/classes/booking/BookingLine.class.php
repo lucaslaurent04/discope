@@ -1267,6 +1267,8 @@ class BookingLine extends Model {
 
     /**
      * Reset computed fields related to price.
+     *
+     * #todo - refactoring to avoid calling Group _resetPrice here, because Group _restPrice calls Line _resetPrice
      */
     public static function _resetPrices($om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLine:_resetPrices", QN_REPORT_DEBUG);

@@ -1,13 +1,13 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2022
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
 use equal\orm\Domain;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Advanced search for Reports: returns a collection of Reports according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
@@ -41,13 +41,13 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm' ]
+    'providers'     => ['context']
 ]);
+
 /**
  * @var \equal\php\Context $context
- * @var \equal\orm\ObjectManager $orm
  */
-list($context, $orm) = [ $providers['context'], $providers['orm'] ];
+['context' => $context] = $providers;
 
 
 $domain = $params['domain'];
@@ -73,6 +73,7 @@ $params['domain'] = $domain;
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

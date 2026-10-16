@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2024
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -15,14 +15,14 @@ use documents\Export;
             'foreign_object'    => 'documents\Export',
             'description'       => "Management Group to which the center belongs.",
             'required'          => true
-        ],
+        ]
     ],
     'access'        => [
-        'visibility'        => 'public'
+        'visibility'    => 'public'
     ],
     'response'      => [
-        'accept-origin'     => '*',
-        'content-type'      => 'application/zip'
+        'accept-origin' => '*',
+        'content-type'  => 'application/zip'
     ],
     'providers'     => ['context']
 ]);
@@ -37,13 +37,14 @@ $export = Export::id($params['id'])
     ->first(true);
 
 if(!$export) {
-    throw new Exception("document_unknown", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("document_unknown", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 Export::id($params['id'])->update(['is_exported' => true]);
 
-$context->httpResponse()
-        ->header('Content-Type', $export['type'])
-        ->header('Content-Disposition', 'attachment; filename="'.$export['name'].'.zip"')
-        ->body($export['data'], true)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Type', $export['type'])
+    ->header('Content-Disposition', 'attachment; filename="'.$export['name'].'.zip"')
+    ->body($export['data'], true)
+    ->send();

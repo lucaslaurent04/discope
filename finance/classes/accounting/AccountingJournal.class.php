@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2025
+    Some Rights Reserved, Yesbabylon SRL, 2020-2026
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -58,14 +58,14 @@ class AccountingJournal extends Model {
 
             'organisation_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \identity\Identity::getType(),
+                'foreign_object'    => 'identity\Identity',
                 'description'       => "The organisation the journal belongs to.",
                 'default'           => 1
             ],
 
             'accounting_entries_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => AccountingEntry::getType(),
+                'foreign_object'    =>  'finance\accounting\AccountingEntry',
                 'foreign_field'     => 'journal_id',
                 'description'       => 'Accounting entries relating to the journal.',
                 'ondetach'          => 'null'
@@ -79,7 +79,7 @@ class AccountingJournal extends Model {
 
             'center_office_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \identity\CenterOffice::getType(),
+                'foreign_object'    => 'identity\CenterOffice',
                 'description'       => 'Management Group the accounting journal belongs to.',
                 'onupdate'          => 'updateCenterOfficeId'
             ]
@@ -87,33 +87,22 @@ class AccountingJournal extends Model {
         ];
     }
 
-    public static function calcName($om, $oids, $lang) {
+    public static function calcName($self) {
         $result = [];
-        $journals = $om->read(__CLASS__, $oids, ['code', 'organisation_id.name'], $lang);
-
-        foreach($journals as $oid => $journal) {
-            $result[$oid] = $journal['code'].' - '.$journal['organisation_id.name'];
+        $self->read(['code', 'organisation_id' => ['name']]);
+        foreach($self as $id => $journal) {
+            $result[$id] = $journal['code'].' - '.$journal['organisation_id']['name'];
         }
+
         return $result;
     }
 
-    /**
-     * Handler for updating values relating the customer.
-     * Sets the organisation_id accordingly to the Center Office.
-     *
-     * @param  \equal\orm\ObjectManager     $om        Object Manager instance.
-     * @param  array                        $oids      List of objects identifiers.
-     * @param  array                        $values    Associative array mapping fields names with new values tha thave been assigned.
-     * @param  string                       $lang      Language (char 2) in which multilang field are to be processed.
-     */
-    public static function updateCenterOfficeId($om, $oids, $values, $lang) {
-
-        $journals = $om->read(__CLASS__, $oids, ['center_office_id.organisation_id'], $lang);
-        if($journals > 0) {
-            foreach($journals as $oid => $odata) {
-                $om->update(self::getType(), $oid, ['organisation_id' => $odata['center_office_id.organisation_id']], $lang);
-            }
+    public static function updateCenterOfficeId($self) {
+        $self->read(['center_office_id' => ['organisation_id']]);
+        foreach($self as $id => $journal) {
+            AccountingJournal::id($id)->update([
+                'organisation_id' => $journal['center_office_id']['organisation_id'] ?? null
+            ]);
         }
     }
-
 }

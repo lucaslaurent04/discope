@@ -91,6 +91,8 @@ $getSanitizedUtf8String = function(string $value): string {
     return ($sanitized === null) ? $value : $sanitized;
 };
 
+$api_reachable = false;
+
 try {
     $properties = Property::search(['is_active', '=', true])
         ->read([
@@ -125,11 +127,15 @@ try {
                 ++$count_attempts;
             }
             if(!$flag_success && $count_attempts >= 3) {
-                ++$result['errors'];
-                $result['logs'][] = "ERR - Property {$property['extref_property_id']} : Unable to connect to Cubilis server (retry scheduled).";
+                ++$result['warnings'];
+                $result['logs'][] = "WARN- Property {$property['extref_property_id']} : Unable to connect to Cubilis server (retry scheduled).";
+
+                // logged afterward as an error if cubilis api unreachable threshold exceeded
                 throw new Exception('cubilis_unreachable', EQ_ERROR_UNKNOWN);
             }
         }
+
+        $api_reachable = true;
 
         // init result map for property center office, if necessary
         if(!isset($result['center_offices'][$property['center_office_id']['id']])) {
@@ -187,8 +193,16 @@ try {
                             }
                             catch(Exception $e) {
                                 // error while cancelling (unable to cancel)
-                                ++$result['errors'];
-                                $result['logs'][] = "ERR - Unable to cancel Booking {$booking['id']} for reservation {$reservation['reservation_id']} : ".$e->getMessage();
+                                if(in_array($booking['status'], ['quote', 'option', 'confirmed', 'validated'])) {
+                                    // future booking triggers error
+                                    ++$result['errors'];
+                                    $result['logs'][] = "ERR - Unable to cancel Booking {$booking['id']} for reservation {$reservation['reservation_id']} : ".$e->getMessage();
+                                }
+                                else {
+                                    // pending or passed booking triggers warning (not supposed to be cancelled)
+                                    ++$result['warnings'];
+                                    $result['logs'][] = "WARN- Unable to cancel Booking {$booking['id']} for reservation {$reservation['reservation_id']} : ".$e->getMessage();
+                                }
                             }
                         }
                     }
@@ -1109,8 +1123,33 @@ try {
     }
 }
 catch(Exception $e) {
-    ++$result['errors'];
-    $report['logs'][] = "ERR - ".$e->getMessage();
+    if($e->getMessage() === 'cubilis_unreachable') {
+        $api_reachable = false;
+
+        $unreachable_api_count = Setting::get_value('sale', 'booking', 'cubilis.api.unreachable.count', 0);
+        $unreachable_api_threshold = Setting::get_value('sale', 'booking', 'cubilis.api.unreachable.threshold', 3);
+
+        $unreachable_api_count++;
+        if($unreachable_api_count >= $unreachable_api_threshold) {
+            ++$result['errors'];
+            $result['logs'][] = "ERR - ".$e->getMessage();
+        }
+        else {
+            ++$result['warnings'];
+            $result['logs'][] = "WARN- ".$e->getMessage();
+        }
+
+        Setting::set_value('sale', 'booking', 'cubilis.api.unreachable.count', $unreachable_api_count);
+    }
+    else {
+        ++$result['errors'];
+        $result['logs'][] = "ERR - ".$e->getMessage();
+    }
+}
+
+if($api_reachable) {
+    // reset api unreachable count if it was successfully reached
+    Setting::set_value('sale', 'booking', 'cubilis.api.unreachable.count', 0);
 }
 
 // send acknowledgements to Cubilis for successfully imported reservations

@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2025
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
@@ -17,8 +17,8 @@ use equal\text\TextTransformer;
 
         'id' =>  [
             'type'              => 'many2one',
-            'description'       => "The assembly the invitation refers to.",
             'foreign_object'    => 'documents\export\ExportingTask',
+            'description'       => "The assembly the invitation refers to.",
             'required'          => true
         ]
 
@@ -96,7 +96,8 @@ $export_name = substr(str_replace(' ', '_', TextTransformer::normalize($exportin
 
 ExportingTask::id($params['id'])->update(['is_exported' => true]);
 
-$context->httpResponse()
-        ->header('Content-Disposition', 'attachment; filename="' . $export_name . '.zip"')
-        ->body($data, true)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Disposition', 'attachment; filename="' . $export_name . '.zip"')
+    ->body($data, true)
+    ->send();

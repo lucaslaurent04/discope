@@ -1,6 +1,6 @@
 {
     "name": "Accounting Rule Line List",
-    "description": "This view is intented for displaying the list accounting rule lines.",
+    "description": "This view is intended for displaying the list accounting rule lines.",
     "access": {
         "groups": ["finance.default.user"]
      },

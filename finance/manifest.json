@@ -3,6 +3,7 @@
     "depends_on": [
         "core",
         "identity",
+        "documents",
         "sale"
     ],
     "apps": ["accounting"]

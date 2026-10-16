@@ -1,63 +1,40 @@
-# Ticket de demande de support
+# Suivi d’une demande de support
 
+Cette fiche rassemble les informations et les échanges d’un ticket de support. Un ticket peut concerner une question, un incident ou une demande de fonctionnalité, et être pris en charge par l’équipe ou la personne à laquelle il est assigné.
 
-Le système de ticket permet aux utilisateurs de soumettre une demande d'assistance.
+### Sujet et description
 
-
-### Sujet
-Les tickets sont identifiés par un court sujet décrivant sommairement le motif de la demande.
-
-Les tickets peuvent être pris en charge en interne (Kaleo) ou en externe, selon leur nature. Un sujet spécifique, univoque et couvrant une seule demande est donc préférable afin de pouvoir orienter le ticket vers les bonnes personnes.
-Au besoin, plusieurs demandes peuvent être introduites l'une à la suite de l'autre.
-
-
-### Description
-
-Pour pouvoir être bien compris et pris en charge rapidement, il est préférable de fournir une description précise du problème :
-* dans quelles situation(s) le problème se présente-t-il ?;
-* quel est le résultat observé ?
-* quel est le résultat attendu ?
-
-Lorsque cela est pertinent, la description peut également reprendre un identifiant permettant de retouver l'élément pour lequel se présente le problème
-(par exemple un numéro de réservation ou un numéro de facture) ou directement un lien vers la page concernée.
-
-
+Le sujet identifie brièvement une seule demande et permet de l’orienter vers la bonne personne ou équipe, en interne ou en externe selon sa nature. La description doit préciser le contexte, les étapes qui provoquent le problème, le résultat observé et le résultat attendu. Une référence, comme un numéro de réservation ou de facture, et un lien vers la page concernée facilitent le diagnostic.
 
 ### Type
 
-Afin de pouvoir classer les demandes en fonction de la nature des actions qu'elles impliquent, on distingue 3 types de demandes:
-1. **Incident**: lorsqu'un utilisateur est confronté à une erreur qui l'empêche de réaliser une tâche;
-2. **Question**: lorsqu'un utilisateur a besoin d'aide pour accomplir une tâche spécifique;
-3. **Demande de fonctionnalité**: lorsqu'un utilisateur souhiate suggérer une amélioration ou une nouvelle fonctionnalité.
+Les demandes sont réparties en trois types :
 
-Si nécessaire, les administrateurs ont la possibilité d'ajutser le type d'un ticket pour le réorienter vers la bonne personne ou équipe.
+1. **Incident** : une erreur empêche ou perturbe l’exécution d’une tâche ;
+2. **Question** : une aide est nécessaire pour comprendre ou accomplir une tâche ;
+3. **Demande de fonctionnalité** : une amélioration ou une nouvelle fonctionnalité est proposée.
 
-En ce qui concerne les améliorations: lorsqu'elles sont identifiées, elles sont ajoutées à la liste des améliorations et correctifs. Une personne au sein de Kaleo est chargée de valider et d'assigner un degré de priorité à chaque élément de cette liste. Les améliorations et correctifs sont ensuite plannifiés en fonction de la priorité qui leur ont été assignée. Lors de la mise en ligne d'une nouvelle version, le listing des améliorations et correctifs qu'elle contient est communiqué aux équipes.
-
+Le type peut être ajusté pour orienter le ticket vers la bonne équipe. Les demandes de fonctionnalité et les correctifs sont ajoutés à la liste des améliorations, puis validés, priorisés et planifiés. Lors de la mise en ligne d’une version, la liste des améliorations et correctifs qu’elle contient est communiquée aux équipes.
 
 ### Priorité
-Les demandes sont classés selon leur niveau d'urgence: P1 à P4.
 
-L'utilisateur a la possibilité de renseigner le niveau d'urgence en fonction de sa situation, ou en complément d'information. Les administrateurs ont la possibilité d'ajuster les priorités en fonction de chaque situation particulière ou conformément à la politique interne.
+La priorité reflète l’impact du problème et l’existence d’une solution temporaire. Elle peut être ajustée au cours de la prise en charge. Les incidents impliquent généralement une priorité plus élevée, et la réponse est organisée selon le niveau retenu.
 
-Les incidents impliquent généralement un niveau d'urgence plus élevé.
+| Niveau | Description |
+| --- | --- |
+| **P1 – Critique** | L’accès au service ou des fonctions essentielles est fortement dégradé, le travail est bloqué et aucune solution alternative n’est disponible. |
+| **P2 – Haute** | Des fonctions importantes sont fortement dégradées. Une solution alternative existe, mais une intervention rapide est nécessaire. |
+| **P3 – Moyenne** | Le fonctionnement est affecté de manière limitée et doit être contrôlé, sans urgence immédiate. |
+| **P4 – Basse** | Défaut mineur, remarque ou proposition d’amélioration. Les demandes de nouvelles fonctionnalités relèvent généralement de ce niveau. |
 
-Lors de la réception d’une demande, une réponse sera donnée dans le délai de réponse correspondant :
+### Assignation et référence
 
-|Niveau|Description|
-|--|--|
-|P1 - Critique|Les fonctionnalités ou l'accès au service ont significativement diminué; l'utilisateur est confronté à une ou plusieurs erreurs qui l'empêchent de réaliser son travail; aucune solution alternative n’est disponible.|
-|P2 - Haute|Les fonctionnalités ont significativement diminué; une solution alternative est disponible, mais une intervention rapide est requise.|
-|P3 - Moyenne|Les fonctionnalités ont diminué dans un moindre mesure qui doit faire l'objet d'un contrôle, sans pour autant que la situation ne soit urgente.|
-|P4 - Basse|Petits défauts, remarques ou propositions pour améliorer le logiciel ou le service. Les demandes de nouvelles fonctionnalités s'intègrent généralement dans cette catégorie.|
+Le créateur identifie l’auteur de la demande et l’assignation indique la personne chargée de son suivi. La référence permet de retrouver rapidement le ticket dans les échanges et les listes.
 
+### Messages et pièces jointes
 
-### Statut
+La description conserve la demande initiale. Utilisez ensuite les messages pour ajouter du contexte, répondre aux questions, communiquer un résultat de test ou signaler un changement. Les pièces jointes servent à transmettre les captures et documents utiles au diagnostic.
 
-Lorsqu'un ticket est à l'état "brouillon", l'utilisateur qui en est l'auteur a la possibilité de le mofifier.
+### Statut et actions
 
-L'action "SOUMETTRE" permet de valider un ticket et de faire passer son état de "brouillon" à "ouvert".
-
-Lorsqu'un ticket est ouvert, il est relayé aux personnes concernées afin d'être pris en charge.
-
-
+Un ticket en **Brouillon** peut être complété avant d’être envoyé. L’action **Soumettre** le fait passer à l’état **Ouvert** pour sa prise en charge. L’état d’attente signale qu’un élément ou une réponse est nécessaire avant de poursuivre. Utilisez l’action de clôture lorsque la réponse a été apportée ou que le problème est résolu.

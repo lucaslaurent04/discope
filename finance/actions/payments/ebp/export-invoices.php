@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2025
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
@@ -14,17 +14,15 @@ use identity\CenterOffice;
 use sale\booking\Invoice;
 use sale\catalog\Product;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Creates an export archive containing all emitted invoices that haven't been exported yet (for external accounting software).",
     'params'        => [
-
         'center_office_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\CenterOffice',
             'description'       => "Management Group to which the center belongs.",
             'required'          => true
         ]
-
     ],
     'access'        => [
         'groups'        => ['finance.default.user']
@@ -69,7 +67,7 @@ $generateZip = function($files) {
     $tmp_file = tempnam(sys_get_temp_dir(), 'zip');
     $zip = new ZipArchive();
     if($zip->open($tmp_file, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-        throw new Exception('Unable to create a ZIP file.', QN_ERROR_UNKNOWN);
+        throw new Exception('Unable to create a ZIP file.', EQ_ERROR_UNKNOWN);
     }
 
     foreach($files as $file_name => $file_data) {
@@ -82,7 +80,7 @@ $generateZip = function($files) {
     unlink($tmp_file);
 
     if($data === false) {
-        throw new Exception("Unable to retrieve ZIP file content.", QN_ERROR_UNKNOWN);
+        throw new Exception("Unable to retrieve ZIP file content.", EQ_ERROR_UNKNOWN);
     }
 
     return $data;
@@ -302,6 +300,7 @@ if(!empty($invoices)) {
     }
 }
 
-$context->httpResponse()
-        ->status(201)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(201)
+    ->send();

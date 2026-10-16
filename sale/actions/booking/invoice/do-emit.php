@@ -7,6 +7,7 @@
 */
 
 use discope\setting\Setting;
+use finance\accounting\Invoice as AccountingInvoice;
 use sale\booking\Invoice;
 use sale\booking\Booking;
 use sale\booking\Funding;
@@ -45,7 +46,13 @@ $invoice = Invoice::id($params['id'])
     ->first(true);
 
 if(!$invoice) {
-    throw new Exception("unknown_invoice", QN_ERROR_UNKNOWN_OBJECT);
+    $invoice = AccountingInvoice::id($params['id'])
+        ->read(['id', 'state', 'deleted', 'date', 'status', 'type', 'is_deposit', 'price', 'has_orders', 'invoice_lines_ids'])
+        ->first();
+
+    if(!$invoice) {
+        throw new Exception("unknown_invoice", QN_ERROR_UNKNOWN_OBJECT);
+    }
 }
 
 if($invoice['deleted'] || $invoice['state'] != 'instance' || $invoice['status'] != 'proforma') {
@@ -75,7 +82,7 @@ if($invoice['date'] < $date_from || $invoice['date'] > $date_to) {
 
 if($invoice['has_orders']) {
     // emit the invoice
-    Invoice::id($params['id'])
+    AccountingInvoice::id($params['id'])
         // #memo - changing status will trigger an invoice number assignation
         ->update(['status' => 'invoice'])
         // force recomputing the is_paid status

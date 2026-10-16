@@ -6,7 +6,9 @@
         "finance",
         "sale",
         "realestate",
-        "communication"
+        "communication",
+        "documents",
+        "hr"
     ],
     "requires": {
         "swiftmailer/swiftmailer": "^6.2",

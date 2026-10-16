@@ -12,19 +12,18 @@ use identity\CenterOffice;
 use finance\accounting\AccountingJournal;
 use sale\booking\Invoice;
 use sale\booking\Funding;
+use sale\booking\export\InvoiceNotScope;
 use sale\catalog\Product;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Creates an export archive containing all emitted invoices that haven't been exported yet (for external invoicing software).",
     'params'        => [
-
         'center_office_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\CenterOffice',
             'description'       => 'Management Group to which the center belongs.',
             'required'          => true
         ],
-
         'journal_type' => [
             'type'              => 'string',
             'description'       => "The type of journal to export for the center office.",
@@ -34,7 +33,6 @@ use sale\catalog\Product;
             ],
             'default'           => 'sales_peppol'
         ]
-
     ],
     'access'        => [
         'groups'        => ['finance.default.user'],
@@ -89,7 +87,7 @@ $office = CenterOffice::id($params['center_office_id'])
     ->first();
 
 if(!$office) {
-    throw new Exception("unknown_center_office", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_center_office", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $journal = AccountingJournal::search([
@@ -100,7 +98,7 @@ $journal = AccountingJournal::search([
     ->first();
 
 if(!$journal) {
-    throw new Exception("unknown_accounting_journal", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_accounting_journal", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $domain = [
@@ -126,7 +124,8 @@ $funding_fields = [
     'paid_amount'
 ];
 
-$invoices = Invoice::search($domain, ['limit' => 100, 'sort' => ['number' => 'asc']])
+// #memo - InvoiceNotScope was created as a quick fix to have one query instead of two (1. for booking invoices, 2. for pos invoices)
+$invoices = InvoiceNotScope::search($domain, ['limit' => 100, 'sort' => ['number' => 'asc']])
     ->read([
         'name',
         'date',
@@ -448,7 +447,7 @@ foreach($invoices as $invoice) {
         }
         elseif($line['price'] != 0.0) {
             // #memo - this should not occur! - products shouldn't be embedded to invoices if there is no accounting rule
-            trigger_error("APP::No related price found for non-null amount for line {$line['name']} [{$line['product_id']}] with price [{$line['price_id']}] of invoice {$invoice['name']} [{$invoice['id']}]", QN_REPORT_WARNING);
+            trigger_error("APP::No related price found for non-null amount for line {$line['name']} [{$line['product_id']}] with price [{$line['price_id']}] of invoice {$invoice['name']} [{$invoice['id']}]", EQ_REPORT_WARNING);
             // remove invoice from processed invoices, and skip all lines
             unset($invoices_data[$invoice['id']]);
             // #todo - dispatch an alert that relates to a dedicated controller
@@ -536,7 +535,7 @@ if(count($invoices_data)) {
     $zip = new ZipArchive();
     if($zip->open($tmp_file, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
         // could not create the ZIP archive
-        throw new Exception('Unable to create a ZIP file.', QN_ERROR_UNKNOWN);
+        throw new Exception('Unable to create a ZIP file.', EQ_ERROR_UNKNOWN);
     }
 
     // embed schema files
@@ -556,7 +555,7 @@ if(count($invoices_data)) {
     unlink($tmp_file);
 
     if($data === false) {
-        throw new Exception('Unable to retrieve ZIP file content.', QN_ERROR_UNKNOWN);
+        throw new Exception('Unable to retrieve ZIP file content.', EQ_ERROR_UNKNOWN);
     }
 
     // switch to root user
@@ -567,7 +566,7 @@ if(count($invoices_data)) {
         'center_office_id'      => $params['center_office_id'],
         'export_type'           => $journal['type'] === 'sales' ? 'invoices' : 'invoices_peppol',
         'data'                  => $data,
-        'object_class'          => Invoice::getType(),
+        'object_class'          => InvoiceNotScope::getType(), // #memo - must use InvoiceNotScope to allow reversing export
         'object_ids'            => json_encode(array_keys($invoices_data))
     ])
         ->read(['id'])
@@ -579,7 +578,7 @@ if(count($invoices_data)) {
 
     try {
         // mark processed invoices as exported
-        Invoice::ids(array_keys($invoices_data))->update(['is_exported' => true]);
+        InvoiceNotScope::ids(array_keys($invoices_data))->update(['is_exported' => true]);
     }
     catch(Exception $e) {
         // remove export if error triggered while flagging invoices as exported

@@ -727,6 +727,8 @@ class BookingLineGroup extends Model {
 
     /**
      * In case prices of a group are impacted, we need to reset parent booking and children lines as well.
+     *
+     * #todo - refactoring to avoid calling Line _resetPrice here, because Line _restPrice calls Group _resetPrice
      */
     public static function _resetPrices($om, $oids, $values, $lang) {
         // reset computed fields related to price

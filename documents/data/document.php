@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2025
+    Some Rights Reserved, Yesbabylon SRL, 2020-2026
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -11,13 +11,11 @@ use documents\DocumentTemp;
 [$params, $providers] = eQual::announce([
     'description'   => "Return raw data (with original MIME) of a document identified by given hash.",
     'params'        => [
-
         'hash' =>  [
             'type'          => 'string',
             'description'   => "Unique identifier of the resource.",
             'required'      => true
         ],
-
         'disposition' => [
             'type'          => 'string',
             'description'   => "Inline document or attachment document.",
@@ -27,13 +25,11 @@ use documents\DocumentTemp;
             ],
             'default'       => 'inline'
         ],
-
         'is_temp' => [
             'description'   => "Is the document temporary?",
             'type'          => 'boolean',
             'default'       => false
         ]
-
     ],
     'access'        => [
         'visibility'    => 'public'
@@ -44,11 +40,15 @@ use documents\DocumentTemp;
     'providers'     => ['context', 'auth']
 ]);
 
+/**
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
+ */
 ['context' => $context, 'auth' => $auth] = $providers;
 
 $user_id = $auth->userId();
 
-// documents can be public : swith to root user to bypass any permission check
+// documents can be public : switch to root user to bypass any permission check
 $auth->su();
 
 /** @var Document $document_class */
@@ -72,8 +72,9 @@ if(!$document['public']) {
 
 $document = $collection->read(['name', 'data', 'type'])->first();
 
-$context->httpResponse()
-        ->header('Content-Disposition', $params['disposition'].'; filename="'.$document['name'].'"')
-        ->header('Content-Type', $document['type'])
-        ->body($document['data'], true)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Disposition', $params['disposition'].'; filename="'.$document['name'].'"')
+    ->header('Content-Type', $document['type'])
+    ->body($document['data'], true)
+    ->send();

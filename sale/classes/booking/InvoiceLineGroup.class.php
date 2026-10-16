@@ -32,17 +32,32 @@ class InvoiceLineGroup extends \finance\accounting\InvoiceLineGroup {
         ];
     }
 
-
-    public static function onupdateInvoiceLinesIds($om, $oids, $values, $lang) {
-        $groups = $om->read(self::getType(), $oids, ['invoice_id']);
-        if($groups) {
-            $invoices_ids = [];
-            foreach($groups as $gid => $group) {
-                $invoices_ids[] = $group['invoice_id'];
-            }
-            $om->update(Invoice::getType(), $invoices_ids, ['price' => null, 'total' => null]);
-        }        
+    public static function onupdateInvoiceLinesIds($self) {
+        $self->do('reset-invoice-prices');
     }
 
+    protected static function doResetInvoicePrices($self) {
+        $self->read(['invoice_id']);
 
+        $map_invoices_ids = [];
+        foreach($self as $group) {
+            $map_invoices_ids[$group['invoice_id']] = true;
+        }
+
+        Invoice::ids(array_keys($map_invoices_ids))
+            ->update([
+                'price' => null,
+                'total' => null
+            ]);
+    }
+
+    public static function getActions() {
+        return [
+            'reset-invoice-prices' => [
+                'description'   => "Reset the prices of the invoices.",
+                'policies'      => [],
+                'function'      => 'doResetInvoicePrices'
+            ]
+        ];
+    }
 }

@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2024
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -11,7 +11,7 @@ use identity\CenterOffice;
 use finance\accounting\AccountingJournal;
 use sale\booking\Payment;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Creates an export archive containing all emitted invoices that haven't been exported yet (for external accounting software).",
     'params'        => [
         'center_office_id' => [
@@ -28,10 +28,14 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context', 'auth']
 ]);
 
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
+ */
+['context' => $context, 'auth' => $auth] = $providers;
 
 // make sure we have right on all involved objects: switch to root user
 $auth->su();
@@ -54,14 +58,14 @@ $auth->su();
 $office = CenterOffice::id($params['center_office_id'])->read(['id'])->first(true);
 
 if(!$office) {
-    throw new Exception("unknown_center_office", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_center_office", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // retrieve the journal of miscellaneous operations
 $journal = AccountingJournal::search([['center_office_id', '=', $params['center_office_id']], ['type', '=', 'miscellaneous']])->read(['id', 'code', 'index'])->first(true);
 
 if(!$journal) {
-    throw new Exception("unknown_center_office", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_center_office", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
@@ -455,11 +459,11 @@ foreach($payments as $payment) {
     else {
         if($payment['psp_type'] != 'stripe') {
             // #todo - send an email to admin
-            throw new Exception('non_supported_psp', QN_ERROR_UNKNOWN);
+            throw new Exception('non_supported_psp', EQ_ERROR_UNKNOWN);
         }
         if(is_null($payment['psp_fee_amount']) || $payment['psp_fee_amount'] <= 0) {
             // #todo - send an email to admin
-            // throw new Exception('invalid_psp_fee', QN_ERROR_UNKNOWN);
+            // throw new Exception('invalid_psp_fee', EQ_ERROR_UNKNOWN);
         }
 
         // entry 1 : amount minus fees to temp account
@@ -550,7 +554,7 @@ $tmpfile = tempnam(sys_get_temp_dir(), "zip");
 $zip = new ZipArchive();
 if($zip->open($tmpfile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
     // could not create the ZIP archive
-    throw new Exception('Unable to create a ZIP file.', QN_ERROR_UNKNOWN);
+    throw new Exception('Unable to create a ZIP file.', EQ_ERROR_UNKNOWN);
 }
 
 // embed schema files
@@ -570,7 +574,7 @@ $data = file_get_contents($tmpfile);
 unlink($tmpfile);
 
 if($data === false) {
-    throw new Exception('Unable to retrieve ZIP file content.', QN_ERROR_UNKNOWN);
+    throw new Exception('Unable to retrieve ZIP file content.', EQ_ERROR_UNKNOWN);
 }
 
 // create the export archive
@@ -607,6 +611,7 @@ catch(Exception $e) {
     throw $e;
 }
 
-$context->httpResponse()
-        ->status(201)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(201)
+    ->send();

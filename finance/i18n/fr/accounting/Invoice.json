@@ -79,7 +79,7 @@
         },
         "accounting_entries_ids": {
             "label": "Écritures comptables",
-            "description": "Lignes d'écruture comptables de la facture.",
+            "description": "Lignes d'écriture comptables de la facture.",
             "help": ""
         },
         "reversed_invoice_id": {
@@ -88,7 +88,7 @@
             "help": ""
         },
         "center_office_id": {
-            "label": "Equipe de gestion",
+            "label": "Équipe de gestion",
             "description": "Le centre de gestion à l'origine de la facture.",
             "help": ""
         },
