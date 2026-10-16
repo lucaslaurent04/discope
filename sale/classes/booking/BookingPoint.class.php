@@ -205,7 +205,7 @@ class BookingPoint extends Model {
         foreach($self as $id => $point) {
             $total_qty = 0;
             $total_free_qty = 0;
-            $booking_lines_groups_ids = $point['booking_id']['booking_lines_groups_ids'];
+            $booking_lines_groups_ids = $point['booking_id']['booking_lines_groups_ids'] ?? [];
             foreach($booking_lines_groups_ids as $booking_line_group_id){
                 $booking_line_group = BookingLineGroup::search(
                     [
@@ -217,6 +217,10 @@ class BookingPoint extends Model {
                         'booking_lines_ids'
                     ])
                     ->first(true);
+
+                if(!$booking_line_group) {
+                    continue;
+                }
 
                 foreach($booking_line_group['booking_lines_ids'] as $booking_line_id){
                     $booking_line = BookingLine::search(
