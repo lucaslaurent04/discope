@@ -188,15 +188,19 @@ Mail::queue($message, 'sale\booking\Booking', $params['booking_id']);
     Setup a scheduled job to remind the customer about the quote (if still in 'quote' within the delay)
 */
 
-$limit = Setting::get_value('sale', 'features', 'quote.remind_delay', 7);
+$remind_auto = Setting::get_value('sale', 'features', 'quote.remind_auto', false);
 
-// add a task to the CRON
-$cron->schedule(
-    "booking.quote.reminder.{$params['booking_id']}",
-    time() + $limit * 86400,
-    'sale_booking_remind-quote',
-    [ 'id' => $params['booking_id'], 'lang' => $params['lang'] ]
-);
+if($remind_auto) {
+    $limit = Setting::get_value('sale', 'features', 'quote.remind_delay', 7);
+
+    // add a task to the CRON
+    $cron->schedule(
+        "booking.quote.reminder.{$params['booking_id']}",
+        time() + $limit * 86400,
+        'sale_booking_remind-quote',
+        [ 'id' => $params['booking_id'], 'lang' => $params['lang'] ]
+    );
+}
 
 $context->httpResponse()
         ->status(204)
