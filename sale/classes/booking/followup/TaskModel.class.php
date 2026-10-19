@@ -16,7 +16,7 @@ class TaskModel extends \core\followup\TaskModel {
     public static function getColumns(): array {
         return [
 
-            'entity' => [
+            'object_class' => [
                 'type'              => 'string',
                 'description'       => "Namespace of the concerned entity.",
                 'default'           => 'sale\booking\Booking'
