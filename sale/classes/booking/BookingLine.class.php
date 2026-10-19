@@ -652,16 +652,9 @@ class BookingLine extends Model {
      * @return array            Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be updated.
      */
     public static function canupdate($self, $values, $lang = 'en') {
-
         // handle exceptions for fields that can always be updated
-        $allowed = ['is_contractual', 'is_invoiced'];
-        $count_non_allowed = 0;
-
-        foreach($values as $field => $value) {
-            if(!in_array($field, $allowed)) {
-                ++$count_non_allowed;
-            }
-        }
+        $allowed_fields = ['description', 'is_contractual', 'is_invoiced'];
+        $count_non_allowed = count(array_diff(array_keys($values), $allowed_fields));
 
         if($count_non_allowed > 0) {
             $self->read([
