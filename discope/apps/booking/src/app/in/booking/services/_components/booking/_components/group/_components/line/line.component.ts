@@ -251,11 +251,13 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
 
     /**
      * Retrieves the number of persons to whom the service of the line will be delivered.
-     * If the parent group has a matching age_range, the related qty is given. Otherwise, the method returns nb_pers from the group.
+     * If the parent group has a matching age_range, the related qty is given. For age-ranged packs,
+     * or when no matching age range exists, the method returns nb_pers from the group.
      */
     private getNbPers(): number {
         let nb_pers = this.group.nb_pers;
-        if(this.instance.product_id.has_age_range) {
+        const has_age_ranged_pack = this.group.has_pack && this.group.pack_id.has_age_range;
+        if(this.instance.product_id.has_age_range && !has_age_ranged_pack) {
             for(let assignment of this.group.age_range_assignments_ids) {
                 if(assignment.age_range_id == this.instance.product_id.age_range_id) {
                     nb_pers = assignment.qty;

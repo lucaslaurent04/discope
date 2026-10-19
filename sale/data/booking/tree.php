@@ -101,7 +101,8 @@ $booking_lines_groups_tree = [
     'meal_prefs_description',
     'pack_id' => [
         'id',
-        'name'
+        'name',
+        'has_age_range'
     ],
     'rate_class_id' => [
         'id',
