@@ -16,7 +16,7 @@ class TaskEvent extends \core\followup\TaskEvent {
     public static function getColumns(): array {
         return [
 
-            'entity' => [
+            'object_class' => [
                 'type'              => 'string',
                 'description'       => "Namespace of the concerned entity.",
                 'default'           => 'sale\camp\Enrollment'
