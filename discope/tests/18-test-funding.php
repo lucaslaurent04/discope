@@ -851,6 +851,7 @@ $tests = [
                 $e->getMessage();
             }
 
+            $message = '';
             try {
                 $funding = Funding::search(['booking_id', '=',  $booking['id']])
                     ->read(['id'])

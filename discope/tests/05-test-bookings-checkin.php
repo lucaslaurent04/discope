@@ -217,7 +217,7 @@ $tests = [
 
             $booking_line = BookingLine::search([
                         ['booking_id','=', $booking['id']],
-                        ['product_id', '=' , $new_product['id']]])->read(['id','price']);
+                        ['product_id', '=' , $new_product['id']]])->read(['id','price'])->first();
 
             return isset($booking_line);
         },
@@ -337,6 +337,7 @@ $tests = [
                 $e->getMessage();
             }
 
+            $message = '';
             try {
                 eQual::run('do', 'sale_booking_do-checkin', ['id' => $booking['id']]);
             }

@@ -413,6 +413,7 @@ if(is_null($output)) {
     /*
         retrieve contact for booking
     */
+    $contact_name = '';
     foreach($booking['contacts_ids'] as $contact) {
         if(strlen($values['contact_name']) == 0 || $contact['type'] == 'booking') {
             // overwrite data of customer with contact info
@@ -1009,7 +1010,6 @@ if(is_null($output)) {
         $loader = new TwigFilesystemLoader(dirname($template_file_path));
 
         $twig = new TwigEnvironment($loader);
-        /**  @var ExtensionInterface **/
         $extension  = new IntlExtension();
         $twig->addExtension($extension);
         $currency = Setting::get_value('core', 'locale', 'currency', '€');

@@ -157,8 +157,8 @@ try {
 
                 // #memo - in case of change (customer address, new payment, ...), the reservation is put back in the queue with a status 'Reserved' or 'Modify' (both situations were observed)
                 // #memo - in case of cancellation, the reservation is put in the queue with a status 'Cancelled' (services are no longer present)
+                $is_new_booking = false;
                 try {
-                    $is_new_booking = false;
                     $has_overbooking = false;
                     // this will hold the total amount paid by the customer, in case some payments are given
                     $total_paid = 0;
@@ -1100,7 +1100,7 @@ try {
                 }
                 catch(Exception $e) {
                     // rollback : remove all elements relating to booking (only in case of new booking)
-                    if(isset($is_new_booking) && isset($booking['id']) && $is_new_booking && $booking) {
+                    if(isset($booking['id']) && $is_new_booking && $booking) {
                         SojournProductModelRentalUnitAssignement::search(['booking_id', '=', $booking['id']])->delete(true);
                         Consumption::search(['booking_id', '=', $booking['id']])->delete(true);
                         SojournProductModel::search(['booking_id', '=', $booking['id']])->delete(true);

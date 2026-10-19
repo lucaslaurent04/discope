@@ -402,7 +402,7 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
             ->read(['id'])
             ->first();
 
-        $cloned_lines_ids = $map_activities_lines[$activity['id']];
+        $cloned_lines_ids = $map_activities_lines[$activity['id']] ?? [];
         if(!empty($cloned_lines_ids)) {
             BookingLine::search(['id', 'in', $cloned_lines_ids])
                 ->update(['booking_activity_id' => $cloned_activity['id']]);

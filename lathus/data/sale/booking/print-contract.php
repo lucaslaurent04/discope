@@ -369,7 +369,7 @@ if(!is_null($meals[count($meals) - 1])) {
 }
 
 $meals_conf = [
-    'has_meals'     => !empty($meals),
+    'has_meals'     => count($meals) > 0,
     'first_date'    => $first['date'],
     'first_moment'  => $first['moment'],
     'last_date'     => $last['date'],
@@ -649,7 +649,6 @@ try {
     $loader = new TwigFilesystemLoader(QN_BASEDIR."/packages/{$package}/views/");
 
     $twig = new TwigEnvironment($loader);
-    /**  @var ExtensionInterface **/
     $extension  = new IntlExtension();
     $twig->addExtension($extension);
 

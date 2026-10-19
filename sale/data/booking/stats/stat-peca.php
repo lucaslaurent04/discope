@@ -142,7 +142,7 @@ $products_models_ids = ProductModel::search([['id', 'in', $products_models_ids],
 $products_ids = Product::search(['product_model_id', 'in', $products_models_ids])->ids();
 
 $bookings_ids = [];
-
+$bookings = [];
 if($domain) {
     $bookings = Booking::search($domain)->read(['id'])->get(true);
 }

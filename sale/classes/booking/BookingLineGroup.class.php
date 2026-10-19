@@ -1272,7 +1272,7 @@ class BookingLineGroup extends Model {
         $groups = $om->read(self::getType(), $oids, ['booking_id']);
         $bookings_ids = array_map(function($a) {return $a['booking_id'];}, $groups);
         $om->update(Booking::getType(), $bookings_ids, ['nb_pers' => null]);
-        return parent::ondelete($om, $oids);
+        parent::ondelete($om, $oids);
     }
 
     /**
@@ -2210,8 +2210,8 @@ class BookingLineGroup extends Model {
                                 while(count($children_stack)) {
                                     $unit_id = array_pop($children_stack);
                                     $children_ids[] = $unit_id;
-                                    if(isset($rental_units[$unit_id]) && $rental_units[$unit_id]['children_ids']) {
-                                        foreach($units[$unit_id]['children_ids'] as $child_id) {
+                                    if(!empty($rental_units[$unit_id]['children_ids'])) {
+                                        foreach($rental_units[$unit_id]['children_ids'] as $child_id) {
                                             $children_stack[] = $child_id;
                                         }
                                     }
@@ -2683,6 +2683,10 @@ class BookingLineGroup extends Model {
                     }
 
                     $center_id = $line['booking_id.center_id'];
+
+                    if(!isset($product_models[$line['product_id.product_model_id']])) {
+                        continue;
+                    }
 
                     $is_accomodation = $product_models[$line['product_id.product_model_id']]['is_accomodation'];
                     // 'accomodation', 'person', 'unit'
@@ -4581,6 +4585,10 @@ class BookingLineGroup extends Model {
                 foreach($lines as $lid => $line) {
 
                     $center_id = $line['booking_id.center_id'];
+
+                    if(!isset($product_models[$line['product_id.product_model_id']])) {
+                        continue;
+                    }
 
                     $is_accomodation = $product_models[$line['product_id.product_model_id']]['is_accomodation'];
                     // 'accomodation', 'person', 'unit'

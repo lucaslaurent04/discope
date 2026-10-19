@@ -105,6 +105,7 @@ $tests = [
                 ->read(['id'])
                 ->first(true);
 
+            $message = '';
             try {
                 eQual::run('do', 'sale_booking_do-cancel', ['id' => $booking['id']]);
 
@@ -159,6 +160,7 @@ $tests = [
                 ->read(['id'])
                 ->first(true);
 
+            $message = '';
             try {
                 eQual::run('do', 'sale_booking_do-cancel', ['id' => $booking['id'],  'reason' => 'other']);
 
@@ -279,6 +281,7 @@ $tests = [
                 ->read(['id'])
                 ->first(true);
 
+            $message = '';
             try {
                 eQual::run('do', 'sale_booking_do-cancel', ['id' => $booking['id'], 'reason' => 'other']);
             }

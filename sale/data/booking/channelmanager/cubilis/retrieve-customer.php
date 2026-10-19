@@ -61,8 +61,13 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'auth']
+    'providers'     => ['context']
 ]);
+
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $valid = true;
 

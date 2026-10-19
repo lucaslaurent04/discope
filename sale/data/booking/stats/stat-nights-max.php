@@ -68,8 +68,8 @@ $result = [];
 if(isset($params['center_id']) || $params['all_centers']) {
 
     $map_centers = [];
-
-    if ($params['all_centers']){
+    $centers_ids = [];
+    if($params['all_centers']) {
 
         $user_id = $auth->userId();
         if($user_id <= 0) {
@@ -87,11 +87,13 @@ if(isset($params['center_id']) || $params['all_centers']) {
         $centers_ids = (array) $params['center_id'];
     }
 
-    if($centers_ids){
+    $centers = [];
+    if($centers_ids) {
         $centers = Center::ids($centers_ids)->read(['name', 'rental_units_ids' => ['is_accomodation', 'capacity', 'parent_id']])->get();
     }
 
-    if ($centers){
+    $rental_units = [];
+    if($centers) {
         $rental_units = RentalUnit::search([['center_id', 'in', $centers_ids],['is_accomodation', '=', true], ['has_parent', '=', false]])->read(['id', 'capacity', 'center_id'])->get();
     }
 

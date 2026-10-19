@@ -30,12 +30,13 @@ list($params, $providers) = eQual::announce([
 ['context' => $context, 'orm' => $orm, 'auth' => $auth] = $providers;
 
 $user_id = $auth->userId();
-if($user_id != QN_ROOT_USER_ID) {
-    $guest_user = eQual::run('get','sale_booking_guests_userinfo');
+if($user_id === EQ_ROOT_USER_ID) {
+    throw new Exception("not_a_guest_user", EQ_ERROR_NOT_ALLOWED);
+}
 
-    if(!$guest_user) {
-        throw new Exception("unknown_guest_user", EQ_ERROR_NOT_ALLOWED);
-    }
+$guest_user = eQual::run('get','sale_booking_guests_userinfo');
+if(!$guest_user) {
+    throw new Exception("unknown_guest_user", EQ_ERROR_NOT_ALLOWED);
 }
 
 $auth->su();

@@ -837,7 +837,6 @@ try {
     $loader = new TwigFilesystemLoader(QN_BASEDIR."/packages/{$package}/views/");
 
     $twig = new TwigEnvironment($loader);
-    /**  @var ExtensionInterface **/
     $extension  = new IntlExtension();
     $twig->addExtension($extension);
     // do not rely on system locale (LC_*)

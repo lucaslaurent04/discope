@@ -99,6 +99,7 @@ if( (isset($params['center_office_id']) || isset($params['organisation_id'])) &&
     );
 }
 
+$invoices = [];
 if($domain){
     $invoices = Invoice::search($domain,  ['sort'  => ['date' => 'asc'] ])
         ->read([
@@ -113,6 +114,7 @@ if($domain){
         ->get(true);
 }
 
+$map_organisation_accounting = [];
 foreach($invoices as $invoice) {
     $organisation_id = $invoice['organisation_id']['id'];
     $center_office_id = $invoice['center_office_id']['id'];
@@ -158,8 +160,8 @@ foreach($map_organisation_accounting as $organisation_id => $center_offices) {
     foreach($center_offices as $center_office_id => $invoices) {
         foreach($invoices as $invoice_id => $invoice) {
             $result[] = [
-                'organisation_id'  => $product_stat['organisation_id'],
-                'center_office_id' => $product_stat['center_office_id'],
+                'organisation_id'  => $organisation_id,
+                'center_office_id' => $center_office_id,
                 'center_office'    => $invoice['center_office_name'],
                 'invoice'          => $invoice['invoice'],
                 'qty'              => $invoice['qty'],
