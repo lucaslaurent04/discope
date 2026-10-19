@@ -52,7 +52,7 @@ use sale\booking\followup\Task;
 $domain = [
     ['is_done', '=', false],
     ['deadline_date', '<=', time()],
-    ['entity', '=', Booking::getType()]
+    ['object_class', '=', Booking::getType()]
 ];
 
 $tasks = Task::search($domain)
