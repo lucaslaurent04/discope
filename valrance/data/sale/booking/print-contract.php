@@ -1546,7 +1546,6 @@ try {
     $loader = new TwigFilesystemLoader(QN_BASEDIR."/packages/{$package}/views/");
 
     $twig = new TwigEnvironment($loader);
-    /**  @var ExtensionInterface **/
     $extension  = new IntlExtension();
     $twig->addExtension($extension);
     $currency = Setting::get_value('core', 'locale', 'currency', '€');
