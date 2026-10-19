@@ -102,7 +102,7 @@ class Task extends \core\followup\Task {
     public static function getConstraints(): array {
         return [
 
-            'entity' =>  [
+            'object_class' =>  [
                 'not_allowed' => [
                     'message'   => 'Entity must be "sale\camp\Enrollment".',
                     'function'  => function ($entity, $values) {

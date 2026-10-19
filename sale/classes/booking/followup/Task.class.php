@@ -62,7 +62,8 @@ class Task extends \core\followup\Task {
                 'type'              => 'string',
                 'description'       => 'Namespace of the concerned entity.',
                 'required'          => false,
-                'help'              => 'Overloaded to make field optional.'
+                'help'              => 'Overloaded to make field optional.',
+                'default'           => 'sale\booking\Booking'
             ],
 
             'object_id' => [
@@ -80,7 +81,7 @@ class Task extends \core\followup\Task {
                 'description'       => 'Namespace of the concerned entity.',
                 'required'          => false,
                 'help'              => 'Overloaded to make field optional.',
-                'default'           => 'sale\camp\Enrollment'
+                'default'           => 'sale\booking\Booking'
             ],
 
             // #todo - remove when update 20261019125905_followup-task-use-object-instead-of-entity applied on all instances
@@ -152,7 +153,7 @@ class Task extends \core\followup\Task {
     public static function getConstraints(): array {
         return [
 
-            'entity' =>  [
+            'object_class' =>  [
                 'not_allowed' => [
                     'message'   => 'Entity must be "sale\booking\Booking".',
                     'function'  => function ($entity, $values) {
