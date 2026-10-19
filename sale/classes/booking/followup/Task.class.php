@@ -51,22 +51,6 @@ class Task extends \core\followup\Task {
                 'required'          => false
             ],
 
-            'entity' => [
-                'type'              => 'string',
-                'description'       => "Namespace of the concerned entity.",
-                'default'           => 'sale\booking\Booking'
-            ],
-
-            'entity_id' => [
-                'type'              => 'computed',
-                'result_type'       => 'integer',
-                'description'       => 'Id of the associated entity. In this case it is the booking id.',
-                'store'             => true,
-                'instant'           => true,
-                'function'          => 'calcEntityId',
-                'readonly'          => true
-            ],
-
             'booking_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
@@ -82,10 +66,12 @@ class Task extends \core\followup\Task {
             ],
 
             'object_id' => [
-                'type'              => 'integer',
+                'type'              => 'computed',
+                'result_type'       => 'integer',
                 'description'       => 'Id of the associated entity.',
-                'required'          => false,
-                'help'              => 'Overloaded to make field optional.'
+                'help'              => 'Overloaded to make field optional.',
+                'store'             => true,
+                'function'          => 'calcObjectId'
             ]
 
         ];
@@ -132,7 +118,7 @@ class Task extends \core\followup\Task {
         return $result;
     }
 
-    public static function calcEntityId($self): array {
+    public static function calcObjectId($self): array {
         $result = [];
         $self->read(['booking_id']);
         foreach($self as $id => $task) {

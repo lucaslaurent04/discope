@@ -41,22 +41,6 @@ class Task extends \core\followup\Task {
                 'required'          => false
             ],
 
-            'entity' => [
-                'type'              => 'string',
-                'description'       => "Namespace of the concerned entity.",
-                'default'           => 'sale\camp\Enrollment'
-            ],
-
-            'entity_id' => [
-                'type'              => 'computed',
-                'result_type'       => 'integer',
-                'description'       => 'Id of the associated entity. In this case it is the enrollment id.',
-                'store'             => true,
-                'instant'           => true,
-                'function'          => 'calcEntityId',
-                'readonly'          => true
-            ],
-
             'enrollment_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Enrollment',
@@ -68,20 +52,23 @@ class Task extends \core\followup\Task {
                 'type'              => 'string',
                 'description'       => 'Namespace of the concerned entity.',
                 'required'          => false,
-                'help'              => 'Overloaded to make field optional.'
+                'help'              => 'Overloaded to make field optional.',
+                'default'           => 'sale\camp\Enrollment'
             ],
 
             'object_id' => [
-                'type'              => 'integer',
+                'type'              => 'computed',
+                'result_type'       => 'integer',
                 'description'       => 'Id of the associated entity.',
-                'required'          => false,
-                'help'              => 'Overloaded to make field optional.'
+                'help'              => 'Overloaded to make field optional.',
+                'store'             => true,
+                'function'          => 'calcObjectId'
             ]
 
         ];
     }
 
-    public static function calcEntityId($self): array {
+    public static function calcObjectId($self): array {
         $result = [];
         $self->read(['enrollment_id']);
         foreach($self as $id => $task) {
