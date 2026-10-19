@@ -39,14 +39,6 @@ use sale\camp\Enrollment;
  */
 ['context' => $context, 'auth' => $auth] = $providers;
 
-/*
-Enrollment::search()->update([
-    'is_exported'   => false,
-    'export_number' => null
-]);
-die;
-*/
-
 $start_year = strtotime("first day of January {$params['year']}");
 $end_year = strtotime("last day of December {$params['year']}");
 
