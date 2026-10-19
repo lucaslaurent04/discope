@@ -40,7 +40,8 @@ class Export extends Document {
                 'selection'         => [
                     'invoices',
                     'invoices_peppol',
-                    'payments'
+                    'payments',
+                    'camps_enrollments'
                 ],
                 'required'          => true,
                 'readonly'          => true

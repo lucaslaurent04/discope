@@ -9,7 +9,8 @@
             "selection": {
                 "invoices": "factures",
                 "invoices_peppol": "factures Peppol",
-                "payments": "règlements"
+                "payments": "règlements",
+                "camps_enrollments": "inscriptions camps"
             },
             "help": ""
         },
