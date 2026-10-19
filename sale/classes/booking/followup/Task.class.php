@@ -73,25 +73,6 @@ class Task extends \core\followup\Task {
                 'help'              => 'Overloaded to make field optional.',
                 'store'             => true,
                 'function'          => 'calcObjectId'
-            ],
-
-            // #todo - remove when update 20261019125905_followup-task-use-object-instead-of-entity applied on all instances
-            'entity' => [
-                'type'              => 'string',
-                'description'       => 'Namespace of the concerned entity.',
-                'required'          => false,
-                'help'              => 'Overloaded to make field optional.',
-                'default'           => 'sale\booking\Booking'
-            ],
-
-            // #todo - remove when update 20261019125905_followup-task-use-object-instead-of-entity applied on all instances
-            'entity_id' => [
-                'type'              => 'computed',
-                'result_type'       => 'integer',
-                'description'       => 'Id of the associated entity.',
-                'help'              => 'Overloaded to make field optional.',
-                'store'             => true,
-                'function'          => 'calcObjectId'
             ]
 
         ];
