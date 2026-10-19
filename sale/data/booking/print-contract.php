@@ -417,8 +417,7 @@ if(is_null($output)) {
         if(strlen($values['contact_name']) == 0 || $contact['type'] == 'booking') {
             // overwrite data of customer with contact info
 
-            $contact_name = str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title']) . ' ' . $contact['partner_identity_id']['display_name'];
-            $values['contact_name'] =  $contact_name;
+            $values['contact_name'] = str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title']) . ' ' . $contact['partner_identity_id']['display_name'];
             $values['contact_phone'] = (strlen($contact['partner_identity_id']['phone']))?$contact['partner_identity_id']['phone']:$contact['partner_identity_id']['mobile'];
             $values['contact_email'] = $contact['partner_identity_id']['email'];
         }
@@ -459,7 +458,7 @@ if(is_null($output)) {
                 $value = str_replace('{address}', $postal_address, $value);
                 $value = str_replace('{customer}', $customer_name, $value);
                 $value = str_replace('{customer_address}', $customer_address, $value);
-                $value = str_replace('{contact}', $contact_name, $value);
+                $value = str_replace('{contact}', $values['contact_name'], $value);
                 $value = str_replace('{nb_pers}', $booking['nb_pers'] ,$value);
                 $value = str_replace('{date_from}', date('d/m/Y', $booking['date_from']), $value);
                 $value = str_replace('{date_to}', date('d/m/Y', $booking['date_to']), $value);
@@ -480,7 +479,7 @@ if(is_null($output)) {
                 $value = $part['value'];
                 $value = str_replace('{center}', $booking['center_id']['name'], $value);
                 $value = str_replace('{customer}', $customer_name, $value);
-                $value = str_replace('{contact}', $contact_name, $value);
+                $value = str_replace('{contact}', $values['contact_name'], $value);
                 $values['contract_authorization_html'] = $value;
             }
         }
@@ -719,8 +718,9 @@ if(is_null($output)) {
             $installment_ref = $funding['payment_reference'];
             $installment_amount = $funding['due_amount'];
         }
+        $payment_deadline_name = $funding['payment_deadline_id']['name'] ?? '';
         $line = [
-            'name'          => (strlen($funding['payment_deadline_id']['name']))?$funding['payment_deadline_id']['name']:$funding['description'],
+            'name'          => (strlen($payment_deadline_name))?$payment_deadline_name:$funding['description'],
             'due_date'      => date('d/m/Y', $funding['due_date']),
             'due_amount'    => $funding['due_amount'],
             'is_paid'       => $funding['is_paid'],
