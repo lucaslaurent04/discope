@@ -174,6 +174,7 @@ try {
                     if(!empty($line['product_id']['price_id']['analytic_section_id']['code'])) {
                         $analytic_account = $line['product_id']['price_id']['analytic_section_id']['code'];
                     }
+                    break;
                 }
             }
 
