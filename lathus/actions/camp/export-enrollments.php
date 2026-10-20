@@ -116,6 +116,9 @@ if(!$has_enrollments_to_export) {
     throw new Exception("nothing_to_export", EQ_ERROR_NOT_ALLOWED);
 }
 
+$default_accounting_rule_lines = [['account' => '70680000', 'share' => 1]];
+$default_analytic_account = 'A980084';
+
 $writing_number = 0;
 $maps_exported_enrollments_numbers = [];
 $lines = [];
@@ -160,8 +163,8 @@ try {
                 'currency_type'         => 'E'
             ];
 
-            $accounting_rule_lines = [['account' => '70680000', 'share' => 1]];
-            $product_analytic_account = 'A980084';
+            $accounting_rule_lines = $default_accounting_rule_lines;
+            $analytic_account = $default_analytic_account;
 
             foreach($enrollment['enrollments_lines_ids'] as $line) {
                 if(in_array($line['product_id']['camp_product_type'], ['full', 'clsh-day', 'clsh-full-4-days', 'clsh-full-5-days'])) {
@@ -169,7 +172,7 @@ try {
                         $accounting_rule_lines = $line['product_id']['price_id']['accounting_rule_id']['accounting_rule_lines_ids'];
                     }
                     if(!empty($line['product_id']['price_id']['analytic_section_id']['code'])) {
-                        $product_analytic_account = $line['product_id']['price_id']['analytic_section_id']['code'];
+                        $analytic_account = $line['product_id']['price_id']['analytic_section_id']['code'];
                     }
                 }
             }
@@ -182,7 +185,7 @@ try {
                     'writing_line_number'   => ++$writing_line,
                     'date'                  => $camp_date,
                     'general_account'       => $rule_line['account'],
-                    'analytic_account'      => $product_analytic_account,
+                    'analytic_account'      => $analytic_account,
                     'journal_account'       => 'VAC',
                     'file_type'             => '',
                     'file_number'           => $enrollment_number,
