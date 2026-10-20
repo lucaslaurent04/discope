@@ -78,7 +78,7 @@ $template = Template::search([
         ['code', '=', 'reminder'],
         ['type', '=', 'contract']
     ])
-    ->read(['parts_ids' => ['name', 'value']], $recipient['lang'])
+    ->read(['parts_ids' => ['name', 'value']], $params['lang'])
     ->first(true);
 
 if(!$template){

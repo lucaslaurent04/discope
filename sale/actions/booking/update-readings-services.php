@@ -197,7 +197,9 @@ foreach($booking['bookings_inspections_ids'] as $index => $booking_inspection) {
         }
 
         if ($all_booking_lines_created) {
-            BookingInspection::id($reading_checkedin['booking_inspection_id']['id'])->update(["status" => "billed"]);
+            if(isset($reading_checkedin['booking_inspection_id']['id'])) {
+                BookingInspection::id($reading_checkedin['booking_inspection_id']['id'])->update(["status" => "billed"]);
+            }
             BookingInspection::id($booking_inspection['id'])->update(["status" => "billed"]);
         }
 

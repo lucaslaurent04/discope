@@ -584,6 +584,17 @@ class Enrollment extends Model {
                 'store'             => true
             ],
 
+            'is_exported' => [
+                'type'              => 'boolean',
+                'description'       => "Has the enrollment already been exported in a financial export.",
+                'default'           => false
+            ],
+
+            'export_number' => [
+                'type'              => 'integer',
+                'description'       => 'Export number of the enrollment set when exporting.'
+            ],
+
             'is_external' => [
                 'type'              => 'boolean',
                 'description'       => "Does the enrollment comes from an external source, not Discope.",
@@ -1317,7 +1328,7 @@ class Enrollment extends Model {
             'presence_day_1', 'presence_day_2', 'presence_day_3', 'presence_day_4', 'presence_day_5'
         ]);
 
-        $allowed_keys = ['is_locked', 'status', 'is_handled', 'description', 'child_age', 'all_documents_received', 'doc_aquatic_skills_received', 'payment_status', 'paid_amount', 'cancellation_date', 'cancellation_reason', 'preregistration_sent', 'confirmation_sent', 'enrollment_mails_ids'];
+        $allowed_keys = ['is_locked', 'status', 'is_handled', 'description', 'child_age', 'all_documents_received', 'doc_aquatic_skills_received', 'payment_status', 'paid_amount', 'cancellation_date', 'cancellation_reason', 'preregistration_sent', 'confirmation_sent', 'enrollment_mails_ids', 'is_exported', 'export_number'];
 
         // weekend_extra can be modified to alter presences, but it'll not affect lines for external enrollments, only presences
         $external_allowed_keys = ['weekend_extra'];

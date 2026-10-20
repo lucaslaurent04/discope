@@ -168,7 +168,7 @@ elseif(!is_null($invoice['booking_id'])) {
     // check total of emitted non-cancelled invoices
     $sum_invoices = ($invoice['status'] == 'invoice' && $invoice['type'] == 'invoice')?$invoice['price']:0.0;
     foreach($booking['invoices_ids'] as $oid => $odata) {
-        if($odata['status'] == 'invoice' && $type == 'invoice') {
+        if($odata['status'] == 'invoice' && $invoice['type'] == 'invoice') {
             $sum_invoices += ($odata['type'] == 'invoice')? $odata['price'] : -($odata['price']);
         }
     }

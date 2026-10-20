@@ -16,7 +16,7 @@ class TaskEvent extends \core\followup\TaskEvent {
     public static function getColumns(): array {
         return [
 
-            'entity' => [
+            'object_class' => [
                 'type'              => 'string',
                 'description'       => "Namespace of the concerned entity.",
                 'default'           => 'sale\camp\Enrollment'
@@ -80,7 +80,7 @@ class TaskEvent extends \core\followup\TaskEvent {
     public static function getConstraints(): array {
         return [
 
-            'entity' => [
+            'object_class' => [
                 'not_allowed' => [
                     'message'   => 'Entity must be "sale\camp\Enrollment".',
                     'function'  => function ($entity, $values) {

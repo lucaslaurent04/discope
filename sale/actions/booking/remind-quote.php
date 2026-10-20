@@ -75,13 +75,17 @@ foreach($template['parts_ids'] as $part_id => $part) {
     }
 }
 
+$recipient_email = null;
 foreach($booking['contacts_ids'] as $contact) {
-    foreach($contact['partner_identity_id'] as $identity) {
-        if(isset($identity['email']) && strlen($identity['email'])) {
-            $recipient_email = $identity['email'];
-            break;
-        }
+    $identity = $contact['partner_identity_id'];
+    if(isset($identity['email']) && strlen($identity['email'])) {
+        $recipient_email = $identity['email'];
+        break;
     }
+}
+
+if(empty($recipient_email)) {
+    throw new Exception('missing_contact_email', EQ_ERROR_INVALID_PARAM);
 }
 
 // generate signature

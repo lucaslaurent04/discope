@@ -38,7 +38,7 @@ $tests = [
             return [$center['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id']];
 
         },
-        'act'               =>  function ($data) use ($orm) {
+        'act'               =>  function ($data) {
 
             list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id) = $data;
 
@@ -131,7 +131,7 @@ $tests = [
             return [$center['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id']];
 
         },
-        'act'               =>  function ($data) use ($orm) {
+        'act'               =>  function ($data) {
 
             list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id) = $data;
 

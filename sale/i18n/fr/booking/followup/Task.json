@@ -38,12 +38,12 @@
             "description": "Les notes sur la tâche.",
             "help": ""
         },
-        "entity": {
-            "label": "Namspace entité",
+        "object_class": {
+            "label": "Namespace entité",
             "description": "Le namespace de l'entité concernée.",
             "help": ""
         },
-        "entity_id": {
+        "object_id": {
             "label": "Entité",
             "description": "L'entité concernée.",
             "help": ""

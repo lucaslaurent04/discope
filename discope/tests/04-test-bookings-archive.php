@@ -129,6 +129,7 @@ $tests = [
                 ->read(['id','status','price', 'paid_amount'])
                 ->first(true);
 
+            $message = '';
             try {
                 eQual::run('do', 'sale_booking_do-archive', [ 'id' => $booking['id'] ]);
             } catch (Exception $e) {
@@ -175,6 +176,7 @@ $tests = [
                 ->read(['id'])
                 ->first(true);
 
+            $message = '';
             try {
                 eQual::run('do', 'sale_booking_do-archive', [ 'id' => $booking['id'] ]);
             } catch (Exception $e) {

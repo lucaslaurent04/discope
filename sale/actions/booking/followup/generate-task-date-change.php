@@ -29,7 +29,7 @@ use sale\booking\followup\TaskModel;
  */
 ['context' => $context] = $providers;
 
-$task_models = TaskModel::search(['entity', '=', 'sale\booking\Booking'])
+$task_models = TaskModel::search(['object_class', '=', 'sale\booking\Booking'])
     ->read([
         'name',
         'center_offices_ids',

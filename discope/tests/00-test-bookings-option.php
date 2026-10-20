@@ -83,6 +83,7 @@ $tests = [
             return $booking;
         },
         'assert'            =>  function ($booking) {
+            $code = 0;
             try {
                 Booking::id($booking['id'])->delete(true);
             } catch (Exception $e) {
@@ -163,6 +164,7 @@ $tests = [
 
             $new_product = Product::search(['sku','=', 'GA-NuitCh1-A' ])->read(['id'])->first(true);
 
+            $message = '';
             try {
                 BookingLine::create([
                     'booking_id'            => $booking['id'],
@@ -185,10 +187,7 @@ $tests = [
             return [$messageError];
         },
         'assert'            =>  function ($data) {
-
-            if ($data){
-                list($messageError) = $data;
-            }
+            list($messageError) = $data;
 
             return ($messageError == "Non-extra service lines cannot be changed for non-quote bookings.");
         },
@@ -277,6 +276,7 @@ $tests = [
 
             $new_product = Product::search(['sku','=', 'GA-NuitCh1-A' ])->read(['id'])->first(true);
 
+            $message = '';
             try {
                 bookingLine::id($bookingLine['id'])
                 ->update([
@@ -298,10 +298,7 @@ $tests = [
             return [$messageError];
         },
         'assert'            =>  function ($data) {
-
-            if ($data){
-                list($messageError) = $data;
-            }
+            list($messageError) = $data;
 
             return ($messageError == "Services cannot be updated for non-quote bookings.");
         },

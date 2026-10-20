@@ -29,7 +29,7 @@ use sale\camp\followup\TaskModel;
  */
 ['context' => $context] = $providers;
 
-$task_models = TaskModel::search(['entity', '=', 'sale\camp\Enrollment'])
+$task_models = TaskModel::search(['object_class', '=', 'sale\camp\Enrollment'])
     ->read([
         'name',
         'center_offices_ids',

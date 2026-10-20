@@ -52,7 +52,7 @@ use sale\camp\followup\Task;
 $domain = [
     ['is_done', '=', false],
     ['deadline_date', '<=', time()],
-    ['entity', '=', Enrollment::getType()]
+    ['object_class', '=', Enrollment::getType()]
 ];
 
 $tasks = Task::search($domain)

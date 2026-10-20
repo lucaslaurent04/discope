@@ -652,16 +652,9 @@ class BookingLine extends Model {
      * @return array            Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be updated.
      */
     public static function canupdate($self, $values, $lang = 'en') {
-
         // handle exceptions for fields that can always be updated
-        $allowed = ['is_contractual', 'is_invoiced'];
-        $count_non_allowed = 0;
-
-        foreach($values as $field => $value) {
-            if(!in_array($field, $allowed)) {
-                ++$count_non_allowed;
-            }
-        }
+        $allowed_fields = ['description', 'is_contractual', 'is_invoiced'];
+        $count_non_allowed = count(array_diff(array_keys($values), $allowed_fields));
 
         if($count_non_allowed > 0) {
             $self->read([
@@ -974,10 +967,10 @@ class BookingLine extends Model {
             $sojourns[$gid][] = $lid;
         }
         foreach($sojourns as $gid => $lines_ids) {
+            $rentalunits_manual_assignment = false;
             $groups = $om->read(BookingLineGroup::getType(), $gid, ['has_locked_rental_units', 'booking_id.center_office_id']);
             if($groups > 0 && count($groups)) {
                 $group = reset($groups);
-                $rentalunits_manual_assignment = false;
                 $offices_preferences = $om->read(\identity\CenterOffice::getType(), $group['booking_id.center_office_id'], ['rentalunits_manual_assignment']);
                 if($offices_preferences > 0 && count($offices_preferences)) {
                     $prefs = reset($offices_preferences);
@@ -1638,10 +1631,12 @@ class BookingLine extends Model {
             ]
         ]);
         foreach($self as $id => $line) {
-            $price = 0;
-            if($line['price_id']['price']) {
-                $price = (float) $line['price_id']['price'];
+            if(!isset($line['price_id']['price'])) {
+                $result[$id] = 0.0;
+                continue;
             }
+
+            $price = (float) $line['price_id']['price'];
 
             $disc_percent = 0.0;
             $disc_value = 0.0;
@@ -1808,6 +1803,11 @@ class BookingLine extends Model {
             'price_id' => ['price']
         ]);
         foreach($self as $id => $line) {
+            if(!isset($line['price_id']['price'])) {
+                $result[$id] = 0.0;
+                continue;
+            }
+
             // delta between final price and catalog price
             $catalog_price = $line['price_id']['price'] * $line['qty'] * (1.0 + $line['vat_rate']);
 
@@ -1858,6 +1858,11 @@ class BookingLine extends Model {
         $result = [];
         $self->read(['price_id' => ['accounting_rule_id' => ['vat_rule_id' => ['rate']]]]);
         foreach($self as $id => $line) {
+            if(!isset($line['price_id']['accounting_rule_id']['vat_rule_id']['rate'])) {
+                $result[$id] = 0.0;
+                continue;
+            }
+
             $result[$id] = floatval($line['price_id']['accounting_rule_id']['vat_rule_id']['rate']);
         }
 

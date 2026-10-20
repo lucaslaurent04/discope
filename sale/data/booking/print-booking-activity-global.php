@@ -445,7 +445,6 @@ if(is_null($output)) {
         $loader = new TwigFilesystemLoader(dirname($template_file_path));
 
         $twig = new TwigEnvironment($loader);
-        /**  @var ExtensionInterface **/
         $extension  = new IntlExtension();
         $twig->addExtension($extension);
         $filter = new \Twig\TwigFilter('format_money', function ($value) {

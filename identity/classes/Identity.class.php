@@ -998,7 +998,7 @@ class Identity extends Model {
                 }
 
                 $duplicate_identity = null;
-                if(!empty($domain)) {
+                if(count($domain) > 0) {
                     $domain[] = ['id', '<>', $values['id']];
 
                     $duplicate_identity = Identity::search($domain)

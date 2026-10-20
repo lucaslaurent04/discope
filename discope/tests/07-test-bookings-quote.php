@@ -143,6 +143,7 @@ $tests = [
                     $booking['status'] == 'quote' &&
                     $booking['id'] == $spm_rental_unit_assignment['booking_id'] &&
                     $booking['nb_pers'] <= $spm_rental_unit_assignment['qty'] &&
+                    isset($b_spm_rental_unit_assignment['id']) &&
                     $b_spm_rental_unit_assignment['id'] == $spm_rental_unit_assignment['id']
             );
         },

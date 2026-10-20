@@ -102,9 +102,6 @@ if(isset($params['rental_unit_category_id'])) {
     $consumptions_domain = [
         ['rental_unit_id', 'in', $category_rental_units_ids]
     ];
-    if(!empty($bookings_ids)) {
-        $consumptions_domain[] = ['booking_id', 'in', $bookings_ids];
-    }
 
     $consumptions = Consumption::search($consumptions_domain)
         ->read(['booking_id'])

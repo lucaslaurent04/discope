@@ -315,6 +315,8 @@ if(is_null($output)) {
         retrieve downpayment product (based on the organisation)
     */
 
+    $downpayment_product_id = 0;
+
     $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']['id']);
     if($downpayment_sku) {
         $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();
@@ -812,7 +814,6 @@ if(is_null($output)) {
         $loader = new TwigFilesystemLoader(dirname($template_file_path));
 
         $twig = new TwigEnvironment($loader);
-        /**  @var ExtensionInterface **/
         $extension  = new IntlExtension();
         $twig->addExtension($extension);
         // do not rely on system locale (LC_*)

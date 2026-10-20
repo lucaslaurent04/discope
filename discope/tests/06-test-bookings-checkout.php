@@ -170,36 +170,27 @@ $tests = [
 
             $new_product = Product::search(['sku','=', 'GA-Boisson-A' ])->read(['id'])->first(true);
 
-            try {
-                $new_booking_line_group = BookingLineGroup::create([
-                        'booking_id'     => $booking['id'],
-                        'is_sojourn'     => false,
-                        'group_type'     => 'simple',
-                        'has_pack'       => false,
-                        'name'           => 'Suppléments',
-                        'order'          => 1,
-                        'rate_class_id'  => 4,
-                        'is_extra'       => true
-                    ])
-                    ->read(['id'])
-                    ->first(true);
-            }
-            catch (Exception $e) {
-                $e->getMessage();
-            }
+            $new_booking_line_group = BookingLineGroup::create([
+                'booking_id'     => $booking['id'],
+                'is_sojourn'     => false,
+                'group_type'     => 'simple',
+                'has_pack'       => false,
+                'name'           => 'Suppléments',
+                'order'          => 1,
+                'rate_class_id'  => 4,
+                'is_extra'       => true
+            ])
+                ->read(['id'])
+                ->first(true);
 
-            try {
-                BookingLine::create([
-                    'booking_id'            => $booking['id'],
-                    'booking_line_group_id' => $new_booking_line_group['id']
-                ])
+            BookingLine::create([
+                'booking_id'            => $booking['id'],
+                'booking_line_group_id' => $new_booking_line_group['id']
+            ])
                 ->update([
                     'product_id'            => $new_product['id']
                 ]);
-            }
-            catch (Exception $e) {
-                $e->getMessage();
-            }
+
             return $booking['id'];
         },
 
@@ -212,7 +203,7 @@ $tests = [
 
             $booking_line = BookingLine::search([
                         ['booking_id','=', $booking['id']],
-                        ['product_id', '=' , $new_product['id']]])->read(['id','price']);
+                        ['product_id', '=' , $new_product['id']]])->read(['id','price'])->first();
 
             return isset($booking_line);
         },
@@ -387,6 +378,7 @@ $tests = [
                 ->update(['date' => strtotime('2023-01-01')])
                 ->update(['status' => 'invoice']);
 
+            $message = '';
             try {
                 eQual::run('do', 'sale_booking_do-checkout', ['id' => $booking['id']]);
             }

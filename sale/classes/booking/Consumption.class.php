@@ -332,7 +332,7 @@ class Consumption extends Model {
                     // in is_extra group, add a new line with same product as targeted booking_line
                     $groups_ids = $om->search('sale\booking\BookingLineGroup', [['booking_id', '=', $consumption['booking_id']], ['is_extra', '=', true]]);
                     if($groups_ids > 0 && count($groups_ids)) {
-                        $group_id = reset(($groups_ids));
+                        $group_id = reset($groups_ids);
                     }
                     else {
                         // create extra group

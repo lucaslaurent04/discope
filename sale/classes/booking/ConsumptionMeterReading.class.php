@@ -174,7 +174,7 @@ class ConsumptionMeterReading extends \equal\orm\Model {
             return $meterReadingValidationResult;
         }
 
-        return parent::canUpdate($om, $oids, $values, $lang);
+        return parent::canupdate($om, $oids, $values, $lang);
     }
 
     public static function cancreate($om, $values, $lang) {
@@ -200,7 +200,7 @@ class ConsumptionMeterReading extends \equal\orm\Model {
             return $meterReadingValidationResult;
         }
 
-        return parent::canCreate($om, $values, $lang);
+        return parent::cancreate($om, $values, $lang);
     }
 
     private static function validateIndex($values) {

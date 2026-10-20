@@ -138,6 +138,7 @@ $tests = [
 
             return (
                     $booking['id'] == $spm_rental_unit_assignement['booking_id'] &&
+                    isset($b_spm_rental_unit_assignement['id']) &&
                     $b_spm_rental_unit_assignement['id'] == $spm_rental_unit_assignement['id']
                 );
         },

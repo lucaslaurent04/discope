@@ -491,7 +491,7 @@ $tests = [
             return $booking;
         },
         'assert'            =>  function ($booking) {
-
+            $message = '';
             try {
                 eQual::run('do', 'sale_booking_do-quote', ['id' => $booking['id']]);
             }
