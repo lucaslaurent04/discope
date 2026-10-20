@@ -112,7 +112,7 @@ class Export extends Document {
             if(!empty($ids)) {
                 $data = ['is_exported' => false];
                 if($export['export_type'] === 'camps_enrollments') {
-                    $data['export_number'] = ['export_number' => null];
+                    $data['export_number'] = null;
                 }
 
                 $export['object_class']::ids($ids)->update($data);
