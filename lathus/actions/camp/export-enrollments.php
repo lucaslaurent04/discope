@@ -39,6 +39,14 @@ use sale\camp\Enrollment;
  */
 ['context' => $context, 'auth' => $auth] = $providers;
 
+/*
+Enrollment::search()->update([
+    'is_exported'   => false,
+    'export_number' => null
+]);
+die;
+*/
+
 $start_year = strtotime("first day of January {$params['year']}");
 $end_year = strtotime("last day of December {$params['year']}");
 
@@ -61,7 +69,7 @@ $enrollment = Enrollment::search(
     ->first();
 
 $export_number = 0;
-if(isset($enrollment['export_number'])) {
+if(!empty($enrollment['export_number'])) {
     $export_number = $enrollment['export_number'];
 }
 
@@ -70,9 +78,7 @@ $camps = Camp::search(
         ['id', 'in', $year_camps_ids],
         ['date_to', '<', $now]
     ],
-    [
-        'sort' => ['date_from' => 'asc']
-    ]
+    ['sort' => ['sojourn_number' => 'asc']]
 )
     ->read([
         'date_from',
@@ -86,10 +92,37 @@ $camps = Camp::search(
             'child_id' => [
                 'firstname',
                 'lastname'
+            ],
+            'enrollments_lines_ids' => [
+                'product_id' => [
+                    'camp_product_type',
+                    'price_id' => [
+                        'accounting_rule_id' => [
+                            'accounting_rule_line_ids' => [
+                                'account',
+                                'share'
+                            ]
+                        ],
+                        'analytic_section_id' => [
+                            'code'
+                        ]
+                    ]
+                ]
             ]
         ]
     ])
-    ->get(true);
+    ->get();
+
+$has_enrollments_to_export = false;
+foreach($camps as $camp) {
+    if(count($camp['enrollments_ids']) > 0) {
+        $has_enrollments_to_export = true;
+        break;
+    }
+}
+if(!$has_enrollments_to_export) {
+    throw new Exception("nothing_to_export", EQ_ERROR_NOT_ALLOWED);
+}
 
 $writing_number = 0;
 $exported_enrollments_ids = [];
@@ -97,12 +130,20 @@ $lines = [];
 
 try {
     foreach($camps as $camp) {
-        $camp_date = date('dmY', $camp['date_from']);          // +1 day if Sunday
+        if(date('D', $camp['date_from']) === 'Sun') {
+            // #memo - if a full camp starts on Sunday, we want it to start the next Monday instead for the export
+            $camp_date = date('dmY', $camp['date_from'] + 86400);
+        }
+        else {
+            $camp_date = date('dmY', $camp['date_from']);
+        }
 
         foreach($camp['enrollments_ids'] as $enrollment) {
             $export_number++;
             $writing_number++;
             $writing_line = 0;
+
+            $customer_accounting_account = '411C4526';
 
             $enrollment_number = Setting::parse_format('C%2d{year}/%04d{sequence}', [
                 'year'      => $params['year'],
@@ -114,7 +155,7 @@ try {
                 'writing_number'        => $writing_number,
                 'writing_line_number'   => ++$writing_line,
                 'date'                  => $camp_date,
-                'general_account'       => '411C4526',
+                'general_account'       => $customer_accounting_account,
                 'analytic_account'      => '',
                 'journal_account'       => 'VAC',
                 'file_type'             => '',
@@ -127,22 +168,40 @@ try {
                 'currency_type'         => 'E'
             ];
 
-            $lines[] = [
-                'writing_number'        => $writing_number,
-                'writing_line_number'   => ++$writing_line,
-                'date'                  => $camp_date,
-                'general_account'       => '70680000',
-                'analytic_account'      => 'A980084',
-                'journal_account'       => 'VAC',
-                'file_type'             => '',
-                'file_number'           => $enrollment_number,
-                'amount'                => sprintf('%.02f', $enrollment['price']),
-                'writing_label'         => $child_name,
-                'due_date'              => '',
-                'check_number'          => '',
-                'invoice_number'        => $enrollment_number,
-                'currency_type'         => 'E'
-            ];
+            $accounting_rule_lines = [['account' => '70680000', 'share' => 1]];
+            $product_analytic_account = 'A980084';
+
+            foreach($enrollment['enrollments_lines_ids'] as $line) {
+                if(in_array($line['product_id']['camp_product_type'], ['full', 'clsh-day', 'clsh-full-4-days', 'clsh-full-5-days'])) {
+                    if(!empty($line['product_id']['price_id']['accounting_rule_id']['accounting_rule_lines_ids'])) {
+                        $accounting_rule_lines = $line['product_id']['price_id']['accounting_rule_id']['accounting_rule_lines_ids'];
+                    }
+                    if(!empty($line['product_id']['price_id']['analytic_section_id']['code'])) {
+                        $product_analytic_account = $line['product_id']['price_id']['analytic_section_id']['code'];
+                    }
+                }
+            }
+
+            foreach($accounting_rule_lines as $rule_line) {
+                $amount = -1 * ($enrollment['price'] * $rule_line['share']);
+
+                $lines[] = [
+                    'writing_number'        => $writing_number,
+                    'writing_line_number'   => ++$writing_line,
+                    'date'                  => $camp_date,
+                    'general_account'       => $rule_line['account'],
+                    'analytic_account'      => $product_analytic_account,
+                    'journal_account'       => 'VAC',
+                    'file_type'             => '',
+                    'file_number'           => $enrollment_number,
+                    'amount'                => sprintf('%.02f', $amount),
+                    'writing_label'         => $child_name,
+                    'due_date'              => '',
+                    'check_number'          => '',
+                    'invoice_number'        => $enrollment_number,
+                    'currency_type'         => 'E'
+                ];
+            }
 
             Enrollment::id($enrollment['id'])->update([
                 'is_exported'   => true,
@@ -153,41 +212,37 @@ try {
         }
     }
 
+    $format_config = [
+        'writing_number'        => ['length' => 6, 'pad_type' => STR_PAD_LEFT],
+        'writing_line_number'   => ['length' => 6, 'pad_type' => STR_PAD_LEFT],
+        'date'                  => ['length' => 8],
+        'general_account'       => ['length' => 11],
+        'analytic_account'      => ['length' => 10],
+        'journal_account'       => ['length' => 3],
+        'file_type'             => ['length' => 3],
+        'file_number'           => ['length' => 15],
+        'amount'                => ['length' => 15],
+        'writing_label'         => ['length' => 50],
+        'due_date'              => ['length' => 8],
+        'check_number'          => ['length' => 12],
+        'invoice_number'        => ['length' => 20],
+        'currency_type'         => ['length' => 1]
+    ];
+
     // format each line to AIGA format (handle padding and substring)
     $formatted_lines = [];
     foreach($lines as $line) {
-        $writing_label = substr(TextTransformer::toAscii($line['writing_label']), 0, 50);
+        $line['writing_label'] = substr(TextTransformer::toAscii($line['writing_label']), 0, $format_config['writing_label']['length']);
 
-        $formatted_lines[] = [
-            'writing_number'        => str_pad($line['writing_number'], 6, ' ', STR_PAD_LEFT),
-            'writing_line_number'   => str_pad($line['writing_line_number'], 6, ' ', STR_PAD_LEFT),
-            'date'                  => str_pad($line['date'], 8),
-            'general_account'       => str_pad($line['general_account'], 11),
-            'analytic_account'      => str_pad($line['analytic_account'], 10),
-            'journal_account'       => str_pad($line['journal_account'], 3),
-            'file_type'             => str_pad($line['file_type'], 3),
-            'file_number'           => str_pad($line['file_number'], 15),
-            'amount'                => str_pad($line['amount'], 15),
-            'writing_label'         => str_pad($writing_label, 50),
-            'due_date'              => str_pad($line['due_date'], 8),
-            'check_number'          => str_pad($line['check_number'], 12),
-            'invoice_number'        => str_pad($line['invoice_number'], 20),
-            'currency_type'         => str_pad($line['currency_type'], 1)
-        ];
+        $formatted_line = [];
+        foreach(array_keys($format_config) as $key) {
+            $formatted_line[$key] = str_pad($line[$key], $format_config[$key]['length'], ' ', $format_config[$key]['pad_type'] ?? STR_PAD_RIGHT);
+        }
+
+        $formatted_lines[] = implode('', $formatted_line);
     }
 
-    $result = implode(
-        PHP_EOL,
-        array_map(
-            function($line) {
-                return $line['writing_number'].$line['writing_line_number'].$line['date'].$line['general_account']
-                    .$line['analytic_account'] .$line['journal_account'].$line['file_type'].$line['file_number']
-                    .$line['amount'].$line['writing_label'].$line['due_date'] .$line['check_number']
-                    .$line['invoice_number'].$line['currency_type'];
-            },
-            $formatted_lines
-        )
-    );
+    $result = implode(PHP_EOL, $formatted_lines);
 }
 catch(Exception $e) {
     if(!empty($exported_enrollments_ids)) {
