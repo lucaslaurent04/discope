@@ -39,14 +39,6 @@ use sale\camp\Enrollment;
  */
 ['context' => $context, 'auth' => $auth] = $providers;
 
-/*
-Enrollment::search()->update([
-    'is_exported'   => false,
-    'export_number' => null
-]);
-die;
-*/
-
 $start_year = strtotime("first day of January {$params['year']}");
 $end_year = strtotime("last day of December {$params['year']}");
 
@@ -125,7 +117,7 @@ if(!$has_enrollments_to_export) {
 }
 
 $writing_number = 0;
-$exported_enrollments_ids = [];
+$maps_exported_enrollments_numbers = [];
 $lines = [];
 
 try {
@@ -203,12 +195,7 @@ try {
                 ];
             }
 
-            Enrollment::id($enrollment['id'])->update([
-                'is_exported'   => true,
-                'export_number' => $export_number
-            ]);
-
-            $exported_enrollments_ids[] = $enrollment['id'];
+            $maps_exported_enrollments_numbers[$enrollment['id']] = $export_number;
         }
     }
 
@@ -245,8 +232,8 @@ try {
     $result = implode(PHP_EOL, $formatted_lines);
 }
 catch(Exception $e) {
-    if(!empty($exported_enrollments_ids)) {
-        Enrollment::ids($exported_enrollments_ids)->update([
+    if(!empty($maps_exported_enrollments_numbers)) {
+        Enrollment::ids(array_keys($maps_exported_enrollments_numbers))->update([
             'is_exported'   => false,
             'export_number' => null
         ]);
@@ -279,6 +266,8 @@ if(!empty($result)) {
     // switch to root user
     $auth->su();
 
+    $export = null;
+
     try {
         // create the export archive
         $export = Export::create([
@@ -286,14 +275,26 @@ if(!empty($result)) {
             'export_type'       => 'camps_enrollments',
             'data'              => $data,
             'object_class'      => Enrollment::getType(),
-            'object_ids'        => json_encode($exported_enrollments_ids)
+            'object_ids'        => json_encode(array_keys($maps_exported_enrollments_numbers))
         ])
-            ->read(['id'])
             ->first();
+
+        // set enrollments as exported
+        foreach($maps_exported_enrollments_numbers as $enrollment_id => $export_number) {
+            Enrollment::id($enrollment_id)->update([
+                'is_exported'   => true,
+                'export_number' => $export_number
+            ]);
+        }
     }
     catch(Exception $e) {
-        // set enrollments as not imported
-        Enrollment::ids($exported_enrollments_ids)->update([
+        if($export) {
+            // remove export archive, if it was created
+            Export::id($export['id'])->delete(true);
+        }
+
+        // set enrollments as not exported
+        Enrollment::ids(array_keys($maps_exported_enrollments_numbers))->update([
             'is_exported'   => false,
             'export_number' => null
         ]);

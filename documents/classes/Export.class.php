@@ -106,11 +106,16 @@ class Export extends Document {
     }
 
     protected static function doReverse($self) {
-        $self->read(['object_class', 'object_ids']);
+        $self->read(['export_type', 'object_class', 'object_ids']);
         foreach($self as $export) {
             $ids = json_decode($export['object_ids'], true);
             if(!empty($ids)) {
-                $export['object_class']::ids($ids)->update(['is_exported' => false]);
+                $data = ['is_exported' => false];
+                if($export['export_type'] === 'camps_enrollments') {
+                    $data['export_number'] = ['export_number' => null];
+                }
+
+                $export['object_class']::ids($ids)->update($data);
             }
         }
     }
