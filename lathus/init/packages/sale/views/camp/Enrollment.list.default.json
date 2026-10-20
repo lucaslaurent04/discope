@@ -3,6 +3,12 @@
     "order": "date_created",
     "sort": "desc",
     "controller": "sale_camp_collect-enrollments",
+    "actions": [
+        {
+            "id": "action.create-export",
+            "controller": "lathus_camp_export-enrollments"
+        }
+    ],
     "layout": {
         "items": [
             {

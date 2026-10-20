@@ -18,7 +18,8 @@ use sale\camp\Enrollment;
         'year' => [
             'type'          => 'integer',
             'description'   => 'The year the export needs to be created for.',
-            'default'       => fn() => (int) date('Y')
+            'default'       => fn() => (int) date('Y'),
+            'required'      => true
         ]
     ],
     'access'        => [
@@ -85,7 +86,7 @@ $camps = Camp::search(
                 'firstname',
                 'lastname'
             ],
-            'enrollments_lines_ids' => [
+            'enrollment_lines_ids' => [
                 'product_id' => [
                     'camp_product_type',
                     'price_id' => [
@@ -166,7 +167,7 @@ try {
             $accounting_rule_lines = $default_accounting_rule_lines;
             $analytic_account = $default_analytic_account;
 
-            foreach($enrollment['enrollments_lines_ids'] as $line) {
+            foreach($enrollment['enrollment_lines_ids'] as $line) {
                 if(in_array($line['product_id']['camp_product_type'], ['full', 'clsh-day', 'clsh-full-4-days', 'clsh-full-5-days'])) {
                     if(!empty($line['product_id']['price_id']['accounting_rule_id']['accounting_rule_lines_ids'])) {
                         $accounting_rule_lines = $line['product_id']['price_id']['accounting_rule_id']['accounting_rule_lines_ids'];
@@ -277,10 +278,12 @@ if(!empty($result)) {
         $export = Export::create([
             'center_office_id'  => 1,
             'export_type'       => 'camps_enrollments',
-            'data'              => $data,
             'object_class'      => Enrollment::getType(),
             'object_ids'        => json_encode(array_keys($maps_exported_enrollments_numbers))
         ])
+            // #memo - read computed name before onupdateDate to not trigger the error "Document name required"
+            ->read(['name'])
+            ->update(['data' => $data])
             ->first();
 
         // set enrollments as exported

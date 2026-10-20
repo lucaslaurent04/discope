@@ -14,5 +14,17 @@
             }
         }
     },
+    "view": {
+        "list.default": {
+            "name": "Inscriptions",
+            "description": "",
+            "actions": {
+                "action.create-export": {
+                    "label": "Générer l'export financier",
+                    "description": "Générer l'export financier des inscriptions aux camps terminés."
+                }
+            }
+        }
+    },
     "error": {}
 }
