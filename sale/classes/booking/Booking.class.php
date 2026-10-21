@@ -935,7 +935,7 @@ class Booking extends Model {
         foreach($self as $id => $booking) {
             $payment_status = 'paid';
             foreach($booking['fundings_ids'] as $funding) {
-                if(!$funding['is_paid'] && $funding['due_date'] < time()) {
+                if(!$funding['is_paid'] && $funding['due_date'] <= time()) {
                     $payment_status = 'due';
                     break;
                 }
