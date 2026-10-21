@@ -55,7 +55,7 @@ $is_paid = true;
 if($fundings) {
     $today = time();
     foreach($fundings as $fid => $funding) {
-        if($funding['booking_id'] != $booking['id'] && $funding['due_date'] <= $today && !$funding['is_paid']) {
+        if(!$funding['is_paid'] && $funding['due_date'] <= $today) {
             $is_paid = false;
             $result[] = $fid;
             break;
