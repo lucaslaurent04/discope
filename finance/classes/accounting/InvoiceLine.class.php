@@ -69,7 +69,7 @@ class InvoiceLine extends Model {
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:4',
                 'description'       => "Unit price of the product related to the line.",
-                'function'          => 'finance\accounting\InvoiceLine::calcUnitPrice',
+                'function'          => 'calcUnitPrice',
                 'store'             => true
             ],
 

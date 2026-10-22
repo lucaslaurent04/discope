@@ -55,7 +55,7 @@ class SettingSequence extends \core\setting\SettingSequence {
         ];
     }
 
-    public function getUnique() {
+    public function getUniques(): array {
         return [
             ['setting_id', 'user_id', 'organisation_id', 'center_office_id', 'center_id']
         ];
