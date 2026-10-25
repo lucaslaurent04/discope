@@ -43,7 +43,12 @@ list($params, $providers) = announce([
 // init local vars with inputs
 list($context, $cron) = [ $providers['context'], $providers['cron'] ];
 
-$booking = Booking::id($params['id'])->read(['center_id' => ['template_category_id'], 'contacts_ids' => ['partner_identity_id' => ['email']]])->first(true);
+$booking = Booking::id($params['id'])->read([
+    'date_from',
+    'date_to',
+    'center_id' => ['name', 'template_category_id'],
+    'contacts_ids' => ['partner_identity_id' => ['email']]
+])->first(true);
 
 if(!$booking) {
     throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
@@ -74,6 +79,15 @@ foreach($template['parts_ids'] as $part_id => $part) {
         $body = $part['value'];
     }
 }
+
+$replacements = [
+    '{center}'    => $booking['center_id']['name'],
+    '{date_from}' => date('d/m/Y', $booking['date_from']),
+    '{date_to}'   => date('d/m/Y', $booking['date_to'])
+];
+
+$title = str_replace(array_keys($replacements), array_values($replacements), $title);
+$body = str_replace(array_keys($replacements), array_values($replacements), $body);
 
 $recipient_email = null;
 foreach($booking['contacts_ids'] as $contact) {
