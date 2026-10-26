@@ -34,6 +34,7 @@ Setting::assert_value('sale', 'features', 'quote.remind_delay', 7);
 Setting::assert_value('sale', 'features', 'option.validity_delay', 10);
 Setting::assert_value('sale', 'features', 'option.remind_auto', false);
 Setting::assert_value('sale', 'features', 'option.remind_delay', 5);
+Setting::assert_value('sale', 'features', 'option.expired_notify_auto', false);
 Setting::assert_value('sale', 'features', 'contract.remind_auto', false);
 Setting::assert_value('sale', 'features', 'contract.remind_delay', 15);
 Setting::assert_value('sale', 'features', 'invoice.downpayment', false);

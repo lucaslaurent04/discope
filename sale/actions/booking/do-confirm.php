@@ -180,6 +180,7 @@ $dispatch->cancel('lodging.booking.ready', 'sale\booking\Booking', $booking['id'
 
 // remove any existing CRON tasks for reverting the booking to quote
 $cron->cancel("booking.option.deprecation.{$booking['id']}");
+$cron->cancel("booking.option.reminder.{$booking['id']}");
 
 
 /*

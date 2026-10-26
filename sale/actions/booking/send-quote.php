@@ -94,6 +94,10 @@ list($context, $cron) = [ $providers['context'], $providers['cron'] ];
 
 $booking = Booking::id($params['booking_id'])
     ->read([
+        'id',
+        'status',
+        'date_expiry',
+        'is_noexpiry',
         'center_id' => ['id', 'center_office_id' => ['email_bcc']]
     ])
     ->first(true);
@@ -184,22 +188,31 @@ foreach($attachments as $attachment) {
 // queue message
 Mail::queue($message, 'sale\booking\Booking', $params['booking_id']);
 
-/*
-    Setup a scheduled job to remind the customer about the quote (if still in 'quote' within the delay)
-*/
+// make sure there is at most one pending option reminder
+$cron->cancel("booking.option.reminder.{$params['booking_id']}");
 
-$remind_auto = Setting::get_value('sale', 'features', 'quote.remind_auto', false);
+if($booking['status'] === 'option' && !$booking['is_noexpiry']) {
+    $remind_auto = Setting::get_value('sale', 'features', 'option.remind_auto', false);
+    if($remind_auto) {
+        $remind_delay = Setting::get_value('sale', 'features', 'option.remind_delay', 5);
+        $date_expiry = strtotime(date('Y-m-d', $booking['date_expiry']));
+        $reminder_moment = strtotime("-{$remind_delay} days", $date_expiry);
 
-if($remind_auto) {
-    $limit = Setting::get_value('sale', 'features', 'quote.remind_delay', 7);
-
-    // add a task to the CRON
-    $cron->schedule(
-        "booking.quote.reminder.{$params['booking_id']}",
-        time() + $limit * 86400,
-        'sale_booking_remind-quote',
-        [ 'id' => $params['booking_id'], 'lang' => $params['lang'] ]
-    );
+        // do not schedule reminders whose expected sending date has already passed
+        if($reminder_moment > time()) {
+            $cron->schedule(
+                "booking.option.reminder.{$params['booking_id']}",
+                $reminder_moment,
+                'sale_booking_remind-option',
+                [
+                    'id'                    => $params['booking_id'],
+                    'lang'                  => $params['lang'],
+                    'recipient_email'       => $params['recipient_email'],
+                    'expected_date_expiry'  => $date_expiry
+                ]
+            );
+        }
+    }
 }
 
 $context->httpResponse()

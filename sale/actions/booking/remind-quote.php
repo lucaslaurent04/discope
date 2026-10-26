@@ -1,132 +1,38 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
-    Original author(s): Yesbabylon SRL
+    Some Rights Reserved, Discope PMS, 2020-2026
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use communication\Template;
-use core\Mail;
-use equal\email\Email;
-use sale\booking\Booking;
-
-// announce script and fetch parameters values
-list($params, $providers) = announce([
-    'description'	=>	"Send an instant email with given details with a booking quote as attachment.",
-    'params' 		=>	[
+[$params, $providers] = eQual::announce([
+    'deprecated'    => "No followup notification is planned for quotes (customer details might still be incomplete).",
+    'description'   => "Deprecated quote reminder controller kept to neutralize legacy scheduled tasks.",
+    'params'        => [
         'id' => [
-            'description'   => 'Identifier of the booking related to the sending of the email.',
             'type'          => 'integer',
+            'description'   => 'Identifier of the targeted booking.',
             'required'      => true
         ],
-        'lang' =>  [
-            'description'   => 'Language to use for multilang contents.',
+        'lang' => [
             'type'          => 'string',
-            'usage'         => 'language/iso-639',
+            'description'   => 'Legacy language parameter.',
             'default'       => constant('DEFAULT_LANG')
         ]
     ],
-    'constants'             => ['DEFAULT_LANG'],
-    'access' => [
-        'groups'            => ['booking.default.user'],
+    'constants'     => ['DEFAULT_LANG'],
+    'access'        => [
+        'visibility' => 'private'
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'cron']
+    'providers'     => ['context']
 ]);
 
+/** @var \equal\php\Context $context */
+['context' => $context] = $providers;
 
-// init local vars with inputs
-list($context, $cron) = [ $providers['context'], $providers['cron'] ];
-
-$booking = Booking::id($params['id'])->read([
-    'date_from',
-    'date_to',
-    'center_id' => ['name', 'template_category_id'],
-    'contacts_ids' => ['partner_identity_id' => ['email']]
-])->first(true);
-
-if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
-}
-
-// retrieve body and title
-
-$title = '';
-$body = '';
-
-$template = Template::search([
-                        ['category_id', '=', $booking['center_id']['template_category_id']],
-                        ['code', '=', 'expired'],
-                        ['type', '=', 'quote']
-                    ])
-                    ->read(['parts_ids' => ['name', 'value']], $params['lang'])
-                    ->first(true);
-
-if(!$template) {
-    throw new Exception("missing_template", QN_ERROR_UNKNOWN_OBJECT);
-}
-
-foreach($template['parts_ids'] as $part_id => $part) {
-    if($part['name'] == 'header') {
-        $title = $part['value'];
-    }
-    else if($part['name'] == 'body') {
-        $body = $part['value'];
-    }
-}
-
-$replacements = [
-    '{center}'    => $booking['center_id']['name'],
-    '{date_from}' => date('d/m/Y', $booking['date_from']),
-    '{date_to}'   => date('d/m/Y', $booking['date_to'])
-];
-
-$title = str_replace(array_keys($replacements), array_values($replacements), $title);
-$body = str_replace(array_keys($replacements), array_values($replacements), $body);
-
-$recipient_email = null;
-foreach($booking['contacts_ids'] as $contact) {
-    $identity = $contact['partner_identity_id'];
-    if(isset($identity['email']) && strlen($identity['email'])) {
-        $recipient_email = $identity['email'];
-        break;
-    }
-}
-
-if(empty($recipient_email)) {
-    throw new Exception('missing_contact_email', EQ_ERROR_INVALID_PARAM);
-}
-
-// generate signature
-$signature = '';
-try {
-    $data = eQual::run('get', 'identity_center-signature', [
-        'center_id'     => $booking['center_id']['id'],
-        'lang'          => $params['lang']
-    ]);
-    $signature = (isset($data['signature']))?$data['signature']:'';
-}
-catch(Exception $e) {
-    // ignore errors
-}
-
-$body .= $signature;
-
-// create message
-$message = new Email();
-$message->setTo($recipient_email)
-        ->setSubject($title)
-        ->setContentType("text/html")
-        ->setBody($body);
-
-// queue message
-Mail::queue($message, 'sale\booking\Booking', $params['id']);
-
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context->httpResponse()->status(204)->send();
