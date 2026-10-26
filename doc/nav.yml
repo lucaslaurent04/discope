@@ -25,6 +25,7 @@
         - 'Produits automatiques': 'logic/automatic-products.md'
     - 'Réservations':
         - 'Réservations': 'logic/bookings.md'
+        - 'Options : rappels et expiration': 'logic/options.md'
         - 'Contrats': 'logic/contracts.md'
         - 'Financements': 'logic/fundings.md'
         - 'Plans de paiement': 'logic/payment-plans.md'
