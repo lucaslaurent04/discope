@@ -93,6 +93,8 @@ jobs:
       - run: php run.php --do=init_db
       # initialize database with demo data
       - run: php run.php --do=init_package --package=discope --ignore_platform=true
+      # support is used by Kaleo, init needed for consistency check but package not mandatory to Discope
+      - run: php run.php --do=init_package --package=support --ignore_platform=true --import=false
       # run static analysis
       - run: ~/repo/vendor/bin/phpstan analyse --no-progress --level=1 --memory-limit=-1 --configuration=packages/phpstan.neon
       # run package consistency check
@@ -315,6 +317,8 @@ jobs:
       - run: php run.php --do=init_db
       # initialize database with demo data
       - run: php run.php --do=init_package --package=discope --ignore_platform=true
+      # support is used by Kaleo, init needed for consistency check but package not mandatory to Discope
+      - run: php run.php --do=init_package --package=support --ignore_platform=true --import=false
       # run static analysis
       - run: ~/repo/vendor/bin/phpstan analyse --no-progress --level=1 --memory-limit=-1 --configuration=packages/phpstan.neon
       # Run package consistency check
