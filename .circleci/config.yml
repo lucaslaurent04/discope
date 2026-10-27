@@ -213,7 +213,7 @@ jobs:
       # initialize database without demo data
       - run: php run.php --do=init_package --package=discope --ignore_platform=true --import=false
       - run: php run.php --do=init_package --package=lathus --ignore_platform=true --import=false
-      - run: php run.php --do=init_package --package=sale --ignore_platform=true --import=false
+      - run: php run.php --do=init_package --package=sale --ignore_platform=true --import=false --force=true
       # run package consistency check
       - run: php run.php --do=test_package-consistency --level=error --package=sale
       # export logs on failure
