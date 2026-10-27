@@ -96,20 +96,20 @@ jobs:
       # run static analysis
       - run: ~/repo/vendor/bin/phpstan analyse --no-progress --level=1 --memory-limit=-1 --configuration=packages/phpstan.neon
       # run package consistency check
-      - run: php run.php --do=test_package-consistency --package=calendar
-      - run: php run.php --do=test_package-consistency --package=communication
-      - run: php run.php --do=test_package-consistency --package=discope
-      - run: php run.php --do=test_package-consistency --package=documents
-      - run: php run.php --do=test_package-consistency --package=finance
-      - run: php run.php --do=test_package-consistency --package=hr
-      - run: php run.php --do=test_package-consistency --package=identity
-      - run: php run.php --do=test_package-consistency --package=kaleo
-      - run: php run.php --do=test_package-consistency --package=lathus
-      - run: php run.php --do=test_package-consistency --package=sale
-      - run: php run.php --do=test_package-consistency --package=stats
-      - run: php run.php --do=test_package-consistency --package=stock
-      - run: php run.php --do=test_package-consistency --package=support
-      - run: php run.php --do=test_package-consistency --package=valrance
+      - run: php run.php --do=test_package-consistency --level=error --package=calendar
+      - run: php run.php --do=test_package-consistency --level=error --package=communication
+      - run: php run.php --do=test_package-consistency --level=error --package=discope
+      - run: php run.php --do=test_package-consistency --level=error --package=documents
+      - run: php run.php --do=test_package-consistency --level=error --package=finance
+      - run: php run.php --do=test_package-consistency --level=error --package=hr
+      - run: php run.php --do=test_package-consistency --level=error --package=identity
+      - run: php run.php --do=test_package-consistency --level=error --package=kaleo
+      - run: php run.php --do=test_package-consistency --level=error --package=lathus
+      - run: php run.php --do=test_package-consistency --level=error --package=sale
+      - run: php run.php --do=test_package-consistency --level=error --package=stats
+      - run: php run.php --do=test_package-consistency --level=error --package=stock
+      - run: php run.php --do=test_package-consistency --level=error --package=support
+      - run: php run.php --do=test_package-consistency --level=error --package=valrance
       # run test units
       - run: php run.php --do=test_package --package=core
       - run: php run.php --do=test_package --package=discope
@@ -214,7 +214,7 @@ jobs:
       - run: php run.php --do=init_package --package=discope --ignore_platform=true --import=false
       - run: php run.php --do=init_package --package=lathus --ignore_platform=true --import=false
       # run package consistency check
-      - run: php run.php --do=test_package-consistency --package=sale
+      - run: php run.php --do=test_package-consistency --level=error --package=sale
       # export logs on failure
       - run:
           command: |
