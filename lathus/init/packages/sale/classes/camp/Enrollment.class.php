@@ -554,34 +554,12 @@ class Enrollment extends Model {
                 'onupdate'          => 'onupdateWorksCouncilId'
             ],
 
-            'payment_status' => [
-                'type'              => 'computed',
-                'result_type'       => 'string',
-                'selection'         => [
-                    'due',
-                    'paid'
-                ],
-                'function'          => 'calcPaymentStatus',
-                'store'             => true,
-                'description'       => "Current status of the payments. Depends on the status of the enrollment.",
-                'help'              => "'Due' means we are expecting some money for the enrollment (at the moment, at least one due funding has not been fully received). 'Paid' means that everything expected (all payments) has been received."
-            ],
-
             'payment_reference' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
                 'description'       => "Structured reference for identifying payments relating to the enrollment.",
                 'store'             => true,
                 'function'          => 'calcPaymentReference'
-            ],
-
-            'paid_amount' => [
-                'type'              => 'computed',
-                'result_type'       => 'float',
-                'usage'             => 'amount/money:2',
-                'description'       => "Total amount that has been received so far.",
-                'function'          => 'calcPaidAmount',
-                'store'             => true
             ],
 
             'is_exported' => [
@@ -1032,25 +1010,6 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function calcPaymentStatus($self): array {
-        $result = [];
-        $self->read(['status', 'fundings_ids' => ['due_date', 'is_paid']]);
-        foreach($self as $id => $enrollment) {
-            $payment_status = 'paid';
-            // if there is at least one overdue funding: a payment is 'due', otherwise enrollment is 'paid'
-            foreach($enrollment['fundings_ids'] as $funding) {
-                if(!$funding['is_paid'] && $funding['due_date'] > time()) {
-                    $payment_status = 'due';
-                    break;
-                }
-            }
-
-            $result[$id] = $payment_status;
-        }
-
-        return $result;
-    }
-
     public static function calcPaymentReference($self): array {
         $result = [];
         $self->read(['main_guardian_id']);
@@ -1106,19 +1065,6 @@ class Enrollment extends Model {
             $result[$id] = $reference_value;
         }
 
-        return $result;
-    }
-
-    public static function calcPaidAmount($self): array {
-        $result = [];
-        $self->read(['fundings_ids' => ['paid_amount']]);
-        foreach($self as $id => $enrollment) {
-            $paid_amount = 0.0;
-            foreach($enrollment['fundings_ids'] as $funding) {
-                $paid_amount += $funding['paid_amount'];
-            }
-            $result[$id] = $paid_amount;
-        }
         return $result;
     }
 

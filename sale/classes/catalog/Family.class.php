@@ -46,10 +46,10 @@ class Family extends Model {
 
             'path' => [
                 'type'              => 'computed',
-                'function'          => 'sale\catalog\Family::getPath',
                 'result_type'       => 'string',
+                'description'       => 'Full path of the family with ancestors.',
                 'store'             => true,
-                'description'       => 'Full path of the family with ancestors.'
+                'function'          => 'calcPath'
             ],
 
             'centers_ids' => [
@@ -71,18 +71,30 @@ class Family extends Model {
         ];
     }
 
-    public static function getPath($om, $oids, $lang) {
+    protected static function calcPath($self, $lang): array {
         $result = [];
-        $res = $om->read(__CLASS__, $oids, ['name', 'parent_id']);
-        foreach($res as $oid => $odata) {
-            if($odata['parent_id']) {
-                $paths = self::getPath($om, (array) $odata['parent_id'], $lang);
-                $result[$oid] = $paths[$odata['parent_id']].'/'.$odata['name'];
-            }
-            else {
-                $result[$oid] = $odata['name'];
-            }
+        $self->read(['name', 'parent_id']);
+        foreach($self as $id => $category) {
+            $result[$id] = self::addParentPath($category['name'], $category['parent_id'], $lang);
         }
+
         return $result;
-    }    
+    }
+
+    public static function addParentPath($path, $parent_id, $lang) {
+        if(is_null($parent_id)) {
+            return $path;
+        }
+
+        $parent_category = self::id($parent_id)
+            ->lang($lang)
+            ->read(['name', 'parent_id'])
+            ->first();
+
+        return self::addParentPath(
+            $parent_category['name'].'/'.$path,
+            $parent_category['parent_id'],
+            $lang
+        );
+    }
 }

@@ -459,7 +459,7 @@ class ProductModel extends Model {
                 'description'       => 'Indicates whether the animation lasts the full day. If true, assignments must include both AM and PM; otherwise, only one of them.',
                 'default'           => false,
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ],
-                'dependents'        => [ 'products_ids'  => ['is_supply']]
+                'dependents'        => [ 'products_ids' => 'is_fullday' ]
             ],
 
             'is_billable' => [
@@ -467,7 +467,7 @@ class ProductModel extends Model {
                 'description'       => 'Indicates whether the activity is billable (generates a service line in invoicing).',
                 'default'           => true,
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ],
-                'dependents'        => ['product_id' => 'is_billable']
+                'dependents'        => [ 'products_ids' => 'is_billable' ]
             ],
 
             'has_staff_required' => [

@@ -167,6 +167,15 @@ class Camp extends Model {
                 'foreign_field'     => 'camp_id',
                 'description'       => "The children's meals for this camp.",
                 'ondetach'          => 'delete'
+            ],
+
+            'employees_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'hr\employee\Employee',
+                'foreign_field'     => 'camps_ids',
+                'rel_table'         => 'sale_hr_rel_camp_employee',
+                'rel_foreign_key'   => 'employee_id',
+                'rel_local_key'     => 'camp_id'
             ]
 
         ];

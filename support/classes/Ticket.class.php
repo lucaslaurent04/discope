@@ -37,8 +37,7 @@ class Ticket extends Model {
                     'waiting',
                     'closed'
                 ],
-                'default'           => 'draft',
-                'onupdate'          => 'onupdateStatus'
+                'default'           => 'draft'
             ],
 
             'type' => [
