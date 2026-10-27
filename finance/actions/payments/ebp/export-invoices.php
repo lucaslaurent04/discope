@@ -180,6 +180,12 @@ $invoices = Invoice::search([
     ])
     ->get(true);
 
+foreach($invoices as $invoice) {
+    if(empty($invoice['partner_id']['rate_class_id']['code'])) {
+        throw new Exception("partner_missing_rate_class", EQ_ERROR_INVALID_CONFIG);
+    }
+}
+
 if(!empty($invoices)) {
     $entry_num = 1;
     $data = [];
