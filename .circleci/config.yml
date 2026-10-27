@@ -329,7 +329,7 @@ jobs:
       - run: php run.php --do=test_package-consistency --package=lathus
       - run: php run.php --do=test_package-consistency --package=sale
       - run: php run.php --do=test_package-consistency --package=stats
-      - # stock package not used yet
+      # stock package not used yet
       - # - run: php run.php --do=test_package-consistency --level=error --package=stock
       - run: php run.php --do=test_package-consistency --package=support
       - run: php run.php --do=test_package-consistency --package=valrance
