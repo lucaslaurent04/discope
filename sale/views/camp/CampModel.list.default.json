@@ -1,0 +1,23 @@
+{
+    "name": "Camp models",
+    "description": "Model that acts as a creation base for new camps.",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "33%"
+            },
+            {
+                "type": "field",
+                "value": "description",
+                "width": "33%"
+            },
+            {
+                "type": "field",
+                "value": "employee_ratio",
+                "width": "33%"
+            }
+        ]
+    }
+}
