@@ -95,7 +95,7 @@ jobs:
       - run: php run.php --do=init_package --package=discope --ignore_platform=true
       # run static analysis
       - run: ~/repo/vendor/bin/phpstan analyse --no-progress --level=1 --memory-limit=-1 --configuration=packages/phpstan.neon
-      - # Run package consistency check
+      # run package consistency check
       - run: php run.php --do=test_package-consistency --package=calendar
       - run: php run.php --do=test_package-consistency --package=communication
       - run: php run.php --do=test_package-consistency --package=discope
@@ -213,7 +213,7 @@ jobs:
       # initialize database without demo data
       - run: php run.php --do=init_package --package=discope --ignore_platform=true --import=false
       - run: php run.php --do=init_package --package=lathus --ignore_platform=true --import=false
-      - # Run package consistency check
+      # run package consistency check
       - run: php run.php --do=test_package-consistency --package=sale
       # export logs on failure
       - run:
@@ -315,7 +315,7 @@ jobs:
       - run: php run.php --do=init_package --package=discope --ignore_platform=true
       # run static analysis
       - run: ~/repo/vendor/bin/phpstan analyse --no-progress --level=1 --memory-limit=-1 --configuration=packages/phpstan.neon
-      - # Run package consistency check
+      # Run package consistency check
       - run: php run.php --do=test_package-consistency --package=calendar
       - run: php run.php --do=test_package-consistency --package=communication
       - run: php run.php --do=test_package-consistency --package=discope
