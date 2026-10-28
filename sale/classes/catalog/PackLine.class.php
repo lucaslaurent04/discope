@@ -18,7 +18,7 @@ class PackLine extends Model {
         return [
             'name' => [
                 'type'              => 'computed',
-                'function'          => 'sale\catalog\PackLine::calcName',
+                'function'          => 'calcName',
                 'result_type'       => 'string',
                 'store'             => true,
                 'description'       => 'The display name of the pack line.'
@@ -36,7 +36,7 @@ class PackLine extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\catalog\Product',
                 'description'       => "The Product this line refers to.",
-                'onupdate'          => 'sale\catalog\PackLine::onupdateChildProductId'
+                'onupdate'          => 'onupdateChildProductId'
             ],
 
             'child_product_model_id' => [
@@ -44,7 +44,7 @@ class PackLine extends Model {
                 'foreign_object'    => 'sale\catalog\ProductModel',
                 'description'       => "The Product Model the line refers to.",
                 'required'          => true,
-                'onupdate'          => 'sale\catalog\PackLine::onupdateChildProductModelId'
+                'onupdate'          => 'onupdateChildProductModelId'
             ],
 
             'has_own_qty' => [

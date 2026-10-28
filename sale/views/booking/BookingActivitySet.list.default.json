@@ -1,0 +1,48 @@
+{
+    "name": "Booking activity sets",
+    "description": "This view displays sets used to generate booking activities.",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "product_id",
+                "width": "12%"
+            },
+            {
+                "type": "field",
+                "value": "date_from",
+                "width": "12%"
+            },
+            {
+                "type": "field",
+                "value": "date_to",
+                "width": "12%"
+            },
+            {
+                "type": "field",
+                "value": "day_of_week",
+                "width": "12%"
+            },
+            {
+                "type": "field",
+                "value": "time_slot_id",
+                "width": "12%"
+            },
+            {
+                "type": "field",
+                "value": "schedule_from",
+                "width": "12%"
+            },
+            {
+                "type": "field",
+                "value": "schedule_to",
+                "width": "12%"
+            },
+            {
+                "type": "field",
+                "value": "name",
+                "width": "12%"
+            }
+        ]
+    }
+}

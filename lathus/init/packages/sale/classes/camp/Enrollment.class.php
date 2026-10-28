@@ -1097,9 +1097,9 @@ class Enrollment extends Model {
                 case 'VCS':
                     // structure: +++xxx/xxxx/xxxcc+++ where cc is the control result (we omit the '+' and '/' chars in the result)
                 default:
-                $control = ((76 * intval($code_ref)) + $enrollment_code) % 97;
-                $control = ($control == 0) ? 97 : $control;
-                $reference_value = sprintf('%3d%04d%03d%02d', $code_ref, $enrollment_code / 1000, $enrollment_code % 1000, $control);
+                    $control = ((76 * intval($code_ref)) + $enrollment_code) % 97;
+                    $control = ($control == 0) ? 97 : $control;
+                    $reference_value = sprintf('%3d%04d%03d%02d', $code_ref, $enrollment_code / 1000, $enrollment_code % 1000, $control);
                     break;
             }
 

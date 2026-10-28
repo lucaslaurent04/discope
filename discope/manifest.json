@@ -2,6 +2,7 @@
     "name": "discope",
     "depends_on": [
         "core",
+        "calendar",
         "identity",
         "finance",
         "sale",

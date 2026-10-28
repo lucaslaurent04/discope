@@ -12,6 +12,7 @@
         "field": "name",
         "datasets": [
             {
+                "label": "Document category",
                 "operation": ["COUNT", "object.id"]
             }
         ]

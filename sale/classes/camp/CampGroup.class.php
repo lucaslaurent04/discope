@@ -31,7 +31,6 @@ class CampGroup extends Model {
                 'description'       => "The camp this group is part of.",
                 'required'          => true,
                 'readonly'          => true,
-                'onupdate'          => 'onupdateCampId',
                 'ondelete'          => 'cascade'
             ],
 
@@ -39,6 +38,13 @@ class CampGroup extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'hr\employee\Employee',
                 'description'       => "Employee responsible of the group during the camp.",
+                'domain'            => ['relationship', '=', 'employee']
+            ],
+
+            'second_employee_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'hr\employee\Employee',
+                'description'       => "Second employee responsible of the group during the camp.",
                 'domain'            => ['relationship', '=', 'employee']
             ],
 

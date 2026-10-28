@@ -22,7 +22,7 @@ class Composition extends Model {
         return [
             'name' => [
                 'type'              => 'computed',
-                'function'          => 'sale\booking\Composition::getDisplayName',
+                'function'          => 'calcDisplayName',
                 'result_type'       => 'string',
                 'store'             => true,
                 'description'       => 'Composition name is based on the related booking (customer and date).'
@@ -51,7 +51,7 @@ class Composition extends Model {
     }
 
 
-    public static function getDisplayName($om, $oids, $lang) {
+    protected static function calcDisplayName($om, $oids, $lang) {
         $result = [];
         $compositions = $om->read(__CLASS__, $oids, ['booking_id.customer_id.name', 'booking_id.date_from']);
         foreach($compositions as $oid => $odata) {
