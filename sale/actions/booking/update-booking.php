@@ -23,6 +23,12 @@ list($params, $providers) = eQual::announce([
             'description'   => 'Flag for marking reserved rental units to be release immediately, if any.',
             'type'          => 'boolean',
             'default'       => false
+        ],
+        'expected_date_expiry' => [
+            'description'   => 'Option expiry date known when the deprecation was scheduled.',
+            'type'          => 'integer',
+            // keep compatibility with tasks scheduled before this parameter existed
+            'default'       => 0
         ]
     ],
     'access'        => [
@@ -33,58 +39,73 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'dispatch']
+    'providers'     => ['context', 'cron', 'dispatch']
 ]);
 
 /**
  * @var \equal\php\Context          $context
+ * @var \equal\cron\Scheduler       $cron
  * @var \equal\dispatch\Dispatcher  $dispatch
  */
-['context' => $context, 'dispatch' => $dispatch] = $providers;
+['context' => $context, 'cron' => $cron, 'dispatch' => $dispatch] = $providers;
 
 
 // read booking object
 $booking = Booking::id($params['id'])
-                  ->read(['id', 'name', 'status', 'is_noexpiry', 'center_office_id'])
+                  ->read(['id', 'name', 'status', 'is_noexpiry', 'date_expiry', 'center_office_id'])
                   ->first(true);
 
 if(!$booking) {
     throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
 }
 
-if($booking['status'] != 'option') {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+$date_expiry = strtotime(date('Y-m-d', $booking['date_expiry']));
+if(
+    $booking['status'] !== 'option'
+    || $booking['is_noexpiry']
+    || $date_expiry > time()
+    || ($params['expected_date_expiry'] && $date_expiry !== $params['expected_date_expiry'])
+) {
+    $context->httpResponse()->status(204)->send();
+    return;
 }
 
+$cron->cancel("booking.option.reminder.{$params['id']}");
 
-if($booking['is_noexpiry']) {
-    // do nothing (remain as option and no alert dispatched) - we shouldn't have reached this code!
+// customer notification is best effort and must never block option deprecation
+try {
+    eQual::run('do', 'sale_booking_notify-option-expired', [
+        'id'                    => $params['id'],
+        'expected_date_expiry'  => $date_expiry
+    ]);
 }
-else {
-    $back_to_quote = Setting::get_value('sale', 'features', 'booking.expired_option.revert_to_quote', true);
-    if($back_to_quote) {
-        // revert to quote
-        eQual::run('do', 'sale_booking_do-quote', [
-            'id'                    => $params['id'],
-            'free_rental_units'     => $params['free_rental_units']
-        ]);
+catch(Throwable $e) {
+    trigger_error("APP::option expiration notification failed: {$e->getMessage()}", QN_REPORT_WARNING);
+}
 
-        if($params['free_rental_units']) {
-            // send an alert saying that the option has expired and the booking was reverted to quote with a release of the blocked rental units
-            $dispatch->dispatch('lodging.booking.option.expired', 'sale\booking\Booking', $params['id'], 'important', null, [], [], null, $booking['center_office_id']);
-        }
-        else {
-            // send an alert saying that the option has expired and the booking was reverted to quote
-            $dispatch->dispatch('lodging.booking.option.expired.reverted_to_quote', 'sale\booking\Booking', $params['id'], 'important', null, [], [], null, $booking['center_office_id']);
+$back_to_quote = Setting::get_value('sale', 'features', 'booking.expired_option.revert_to_quote', true);
+if($back_to_quote) {
+    // revert to quote
+    eQual::run('do', 'sale_booking_do-quote', [
+        'id'                    => $params['id'],
+        'free_rental_units'     => $params['free_rental_units']
+    ]);
 
-            // check quote for blocked rental units (might raise alert lodging.booking.quote.blocking)
-            eQual::run('do', 'sale_booking_check-quote', ['id' => $params['id']]);
-        }
+    if($params['free_rental_units']) {
+        // send an alert saying that the option has expired and the booking was reverted to quote with a release of the blocked rental units
+        $dispatch->dispatch('lodging.booking.option.expired', 'sale\booking\Booking', $params['id'], 'important', null, [], [], null, $booking['center_office_id']);
     }
     else {
-        // send an alert saying that the option has expired
-        $dispatch->dispatch('lodging.booking.option.expired.expired_only', 'sale\booking\Booking', $params['id'], 'important', null, [], [], null, $booking['center_office_id']);
+        // send an alert saying that the option has expired and the booking was reverted to quote
+        $dispatch->dispatch('lodging.booking.option.expired.reverted_to_quote', 'sale\booking\Booking', $params['id'], 'important', null, [], [], null, $booking['center_office_id']);
+
+        // check quote for blocked rental units (might raise alert lodging.booking.quote.blocking)
+        eQual::run('do', 'sale_booking_check-quote', ['id' => $params['id']]);
     }
+}
+else {
+    // send an alert saying that the option has expired
+    $dispatch->dispatch('lodging.booking.option.expired.expired_only', 'sale\booking\Booking', $params['id'], 'important', null, [], [], null, $booking['center_office_id']);
 }
 
 $context->httpResponse()

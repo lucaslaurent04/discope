@@ -169,27 +169,36 @@ $orm->call(Booking::getType(), 'createConsumptions', $params['id']);
 $dispatch->cancel('lodging.booking.quote.blocking', 'sale\booking\Booking', $params['id']);
 // make sure there is no pending scheduled task
 $cron->cancel("booking.option.deprecation.{$params['id']}");
+$cron->cancel("booking.option.reminder.{$params['id']}");
+// remove reminders created by the former quote reminder mechanism
+$cron->cancel("booking.quote.reminder.{$params['id']}");
 
 if($params['no_expiry'] || $booking['is_price_tbc']) {
     // set booking as never expiring
     Booking::id($params['id'])->update(['is_noexpiry' => true]);
 }
 else {
+    $date_expiry = strtotime(date('Y-m-d', strtotime(' +' . $days_expiry . ' days')));
+
     // memo - no_expiry could have been set previously (returned from option to quote, with an original flag set to true): in that situation we must consider the 'false' value
     Booking::id($params['id'])
         ->update([
             'is_noexpiry' => false,
-            'date_expiry' => strtotime(' +' . $days_expiry . ' days')
+            'date_expiry' => $date_expiry
         ]);
 
     // set up a scheduled job to set back the booking to a quote according to delay set by Setting `option.validity`
     $cron->schedule(
         // assign a reproducible unique name
         "booking.option.deprecation.{$params['id']}",
-        // remind after {sale.booking.option.validity} days (default 10 days), or manually given value
-        time() + $days_expiry  * 86400,
+        // expire after {sale.booking.option.validity} days (default 10 days), or manually given value
+        time() + $days_expiry * 86400,
         'sale_booking_update-booking',
-        [ 'id' => $params['id'], 'free_rental_units' => $params['free_rental_units'] ]
+        [
+            'id'                    => $params['id'],
+            'free_rental_units'     => $params['free_rental_units'],
+            'expected_date_expiry'  => $date_expiry
+        ]
     );
 
 }

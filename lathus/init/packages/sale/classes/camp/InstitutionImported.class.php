@@ -48,8 +48,7 @@ class InstitutionImported extends Institution {
 
             'address_city' => [
                 'type'              => 'string',
-                'description'       => "City of the child's institution.",
-                'dependents'        => ['is_ccvg']
+                'description'       => "City of the child's institution."
             ]
 
         ];

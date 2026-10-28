@@ -85,6 +85,7 @@ $dispatch->cancel('lodging.booking.ready', 'sale\booking\Booking', $params['id']
 
 // remove existing CRON tasks for reverting the booking to quote
 $cron->cancel("booking.option.deprecation.{$params['id']}");
+$cron->cancel("booking.option.reminder.{$params['id']}");
 
 // remove non-invoiced fundings, if any
 $fundings_ids_to_remove = [];

@@ -322,6 +322,8 @@ $dispatch->cancel('lodging.booking.rental_units_assignment', 'sale\booking\Booki
 $dispatch->cancel('lodging.booking.sojourns_accomodations', 'sale\booking\Booking', $booking['id']);
 $dispatch->cancel('sale.booking.followup.task.reminder', 'sale\booking\Booking', $booking['id']);
 
+$cron->cancel("booking.option.reminder.{$booking['id']}");
+
 $context->httpResponse()
         ->status(200)
         ->send();

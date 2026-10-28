@@ -280,7 +280,6 @@ class RentalUnit extends Model {
                 'type'              => 'boolean',
                 'description'       => "Should the children's rental units be displayed in the bookings' planning.",
                 'default'           => true,
-                'dependents'        => ['children_ids' => 'display_in_planning'],
                 'onupdate'          => 'onupdateDisplayChildrenInPlanning'
             ],
 

@@ -1,0 +1,118 @@
+{
+    "name": "Booking history entries",
+    "description": "This view displays historic booking data imported from the legacy system.",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "historic_identifier",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "name",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "date_create",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "date_from",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "date_to",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "total",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "price",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "organisation_id",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "center_id",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "center_type",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "nb_pers",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "nb_nights",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "nb_rental_units",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "nb_pers_nights",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "nb_room_nights",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "customer_name",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "customer_street",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "customer_zip",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "customer_city",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "customer_country_code",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "customer_language_code",
+                "width": "4%"
+            },
+            {
+                "type": "field",
+                "value": "customer_rate_class_id",
+                "width": "4%"
+            }
+        ]
+    }
+}

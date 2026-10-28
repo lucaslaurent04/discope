@@ -1173,6 +1173,9 @@ modifier l'assignation des UL, et passer à nouveau en option (pendant
 cette opération, les unités locatives restent assignées à la
 réservation, sauf indication contraire par l'utilisateur).
 
+Les règles d'échéance, les rappels et les notifications client sont détaillés dans
+[Options : rappels et expiration](options.md), avec leurs paramètres de configuration.
+
 La plupart des transitions se font via la fiche de réservation, mais il
 y a des cas particuliers :
 

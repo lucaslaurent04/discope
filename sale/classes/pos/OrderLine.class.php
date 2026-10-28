@@ -95,7 +95,7 @@ class OrderLine extends Model {
                 'type'              => 'integer',
                 'usage'             => 'numeric/integer',
                 'description'       => 'Amount of units in this line.',
-                'default'           => 0.0,
+                'default'           => 0,
                 'onupdate'          => '_resetPrice'
             ],
 
@@ -103,7 +103,7 @@ class OrderLine extends Model {
                 'type'              => 'integer',
                 'usage'             => 'numeric/integer',
                 'description'       => 'Amount of freebies in this line.',
-                'default'           => 0.0,
+                'default'           => 0,
                 'onupdate'          => '_resetPrice'
             ],
 

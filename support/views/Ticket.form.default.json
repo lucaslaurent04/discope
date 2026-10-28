@@ -154,6 +154,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "width": "100%",
                                                 "value": "attachments_ids"
                                             }
                                         ]
@@ -178,6 +179,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "width": "100%",
                                                 "value": "ticket_entries_ids",
                                                 "widget": {
                                                     "domain": [ [ ["status", "<>", "draft"] ], [ ["creator", "=", "user.id"] ] ]

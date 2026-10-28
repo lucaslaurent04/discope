@@ -15,3 +15,9 @@ propre signature individuelle).
 Les templates (destinés aux emails ou aux documents) sont regroupés par
 catégories. A chaque centre, il est possible d'assigner une catégorie
 de templates.
+
+## Rappels et expiration des options
+
+Les modèles de type `option`, codes `reminder` et `expired`, distinguent le rappel avant échéance de la notification d'expiration effective. Ils comprennent les parties `subject` et `body` et utilisent les variables `{booking}`, `{center}`, `{date_from}`, `{date_to}` et `{date_expiry}`.
+
+Le contenu du rappel doit annoncer une expiration prochaine. Les conditions d'envoi, les settings et le choix des destinataires sont décrits dans [Options : rappels et expiration](options.md).

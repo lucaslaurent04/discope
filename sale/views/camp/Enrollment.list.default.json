@@ -1,0 +1,93 @@
+{
+    "name": "Enrollments",
+    "description": "The enrollment of a child to a camp group.",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "description",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "is_foster",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "camp_id",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "camp_remaining_qty",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "date_from",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "date_to",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "center_id",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "center_office_id",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "status",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "cancellation_reason",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "payment_status",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "paid_amount",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "all_documents_received",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "is_external",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "external_ref",
+                "width": "5%"
+            },
+            {
+                "type": "field",
+                "value": "external_data",
+                "width": "5%"
+            }
+        ]
+    }
+}
